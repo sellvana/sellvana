@@ -17,12 +17,12 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory extends FCom
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'create_at', 'index' => 'o.create_at'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'cell' => 'datetime'],
             ['name' => 'product_sku', 'index' => 'oi.product_sku'],
             ['name' => 'unique_id', 'index' => 'unique_id'],
             ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered'],
-            ['name' => 'price', 'index' => 'oi.price'],
-            ['name' => 'row_price', 'index' => 'row_price'],
+            ['name' => 'price', 'index' => 'oi.price', 'cell' => 'currency'],
+            ['name' => 'row_price', 'index' => 'row_price', 'cell' => 'currency'],
         ];
         $config['filters'] = [
             ['field' => 'product_sku', 'type' => 'text'],

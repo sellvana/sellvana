@@ -19,7 +19,7 @@
                 <tr>
                     <td>{{ product.get('product_sku') }}</td>
                     <td>{{ product.get('product_name') }}</td>
-                    <td>{{ product.get('create_at') }}</td>
+                    <td>{{ product.get('create_at')|locdate('datetime_short') }}</td>
                     <td>{{ product.get('categories')|nl2br }}</td>
                 </tr>
             {% endfor %}

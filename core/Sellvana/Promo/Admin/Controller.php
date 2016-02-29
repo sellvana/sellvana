@@ -46,15 +46,15 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             ['name' => 'internal_notes', 'label' => 'Admin Notes', 'width' => 250, 'hidden' => 1],
             ['name' => 'customer_label', 'label' => 'Customer Label', 'width' => 250, 'hidden' => 1],
             ['name' => 'customer_details', 'label' => 'Customer Details', 'width' => 250, 'hidden' => 1],
-            ['name' => 'from_date', 'label' => 'Start Date', 'formatter' => 'date'],
-            ['name' => 'to_date', 'label' => 'End Date', 'formatter' => 'date'],
+            ['name' => 'from_date', 'label' => 'Start Date', 'formatter' => 'date', 'cell' => 'date'],
+            ['name' => 'to_date', 'label' => 'End Date', 'formatter' => 'date', 'cell' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
                 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $hlp->fieldOptions('status')
             ],
             ['name' => 'details', 'label' => 'Details', 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date'],
-            ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date'],
+            ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date', 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => true,

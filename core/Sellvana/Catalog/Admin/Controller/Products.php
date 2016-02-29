@@ -56,8 +56,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true],
             ['name' => 'ship_weight', 'label' => 'Ship Weight',  'width' => 100, 'hidden' => true],
             ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
-            ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
+            ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'refresh' => true,
@@ -283,8 +283,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200],
+                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200, 'cell' => 'datetime'],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200, 'cell' => 'datetime'],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
                 ],
                 'actions' => [
@@ -382,8 +382,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                             . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images["+rc.row["id"]+"][in_gallery]\' '
                             . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200]
+                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200, 'cell' => 'datetime'],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200, 'cell' => 'datetime']
                 ],
                 'actions' => [
                     'refresh' => true,
@@ -484,8 +484,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                         'print' => $isDefaultEle],
                     ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
                         'print' => $inGalleryEle],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 130],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 130]
+                    ['name' => 'create_at', 'label' => 'Created', 'width' => 130, 'cell' => 'datetime'],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 130, 'cell' => 'datetime']
                 ],
                 'actions' => [
                     'refresh' => true,
@@ -1352,12 +1352,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     /**
      * Collect media source link
      * 
-     * @param  array $data
+     * @param array $mediaItems
      * @return array
      */
     protected function _processMediaLink($mediaItems) {
         if (empty($mediaItems)) {
-            return  [];
+            return [];
         }
 
         foreach ($mediaItems as $key => $item) {

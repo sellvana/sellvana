@@ -25,8 +25,8 @@ class Sellvana_Customer_Admin_Controller_Report_Country extends FCom_Admin_Contr
             ['name' => 'customer_with_order_count', 'index' => 'customer_with_order_count'],
             ['name' => 'order_count', 'index' => 'order_count'],
             ['name' => 'item_count', 'index' => 'item_count'],
-            ['name' => 'total_amount', 'index' => 'total_amount'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'total_amount', 'index' => 'total_amount', 'cell' => 'currency'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],

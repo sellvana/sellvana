@@ -75,14 +75,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Internal ID', 'width' => 70, 'hidden' => true],
             ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'ID', 'width' => 70],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date', 'cell' => 'date'],
 
             #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
-            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
-            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due'],
-            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid'],
-            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total', 'cell' => 'currency'],
+            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due', 'cell' => 'currency'],
+            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid', 'cell' => 'currency'],
+            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code', 'cell' => 'currency'],
 
             ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],
             ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'o.state_payment', 'options' => $paymentStates],
@@ -194,7 +194,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ]
             ];
 
-            $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
+            $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'), 'base')
                 . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
                 . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
                 . ' | ' . $this->_('Delivery') . ': ' . $m->state()->delivery()->getValueLabel();
@@ -312,15 +312,15 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     ['name' => 'product_name', 'label' => 'Name'],
                     ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 100],
                     ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 100, 'hidden' => true],
-                    ['name' => 'price', 'label' => 'Price', 'width' => 50],
+                    ['name' => 'price', 'label' => 'Price', 'width' => 50, 'cell' => 'currency'],
                     ['name' => 'qty_ordered', 'label' => 'Qty', 'width' => 50],
                     ['name' => 'qty_backordered', 'label' => 'Backordered', 'width' => 50, 'hidden' => true],
                     ['name' => 'qty_canceled', 'label' => 'Canceled', 'width' => 50, 'hidden' => true],
                     ['name' => 'qty_shipped', 'label' => 'Shipped', 'width' => 50, 'hidden' => true],
                     ['name' => 'qty_returned', 'label' => 'Returned', 'width' => 50, 'hidden' => true],
-                    ['name' => 'row_total', 'label' => 'Total', 'width' => 50],
-                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50, 'hidden' => true],
-                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50, 'hidden' => true],
+                    ['name' => 'row_total', 'label' => 'Total', 'width' => 50, 'cell' => 'currency'],
+                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50, 'hidden' => true, 'cell' => 'currency'],
+                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50, 'hidden' => true, 'cell' => 'currency'],
                     ['name' => 'row_discount_percent', 'label' => 'Discount Percent', 'width' => 50, 'hidden' => true],
                     ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'width' => 50, 'hidden' => true],
                     ['name' => 'shipping_size', 'label' => 'Ship Size', 'width' => 50, 'hidden' => true],
@@ -356,14 +356,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date', 'cell' => 'date'],
             ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'o.billing_name'],
             ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'o.billing_address'],
             ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'o.shipping_name'],
             ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'o.shipping_address'],
-            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
-            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
-            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total', 'cell' => 'currency'],
+            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due', 'cell' => 'currency'],
+            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code', 'cell' => 'currency'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
                 'options' => $this->Sellvana_Sales_Model_StateCustom->optionsByType('order')],
             ['type' => 'btn_group', 'buttons' => [
@@ -487,14 +487,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ]],
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'payment_method', 'label' => 'Method', 'options' => $methodOptions],
-                ['name' => 'amount_authorized', 'label' => 'Authorized'],
-                ['name' => 'amount_due', 'label' => 'Due'],
-                ['name' => 'amount_captured', 'label' => 'Captured'],
-                ['name' => 'amount_refunded', 'label' => 'Refunded'],
+                ['name' => 'amount_authorized', 'label' => 'Authorized', 'cell' => 'currency'],
+                ['name' => 'amount_due', 'label' => 'Due', 'cell' => 'currency'],
+                ['name' => 'amount_captured', 'label' => 'Captured', 'cell' => 'currency'],
+                ['name' => 'amount_refunded', 'label' => 'Refunded', 'cell' => 'currency'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
                 ['name' => 'transactions', 'label' => 'Transactions'],
             ],
             'actions' => [
@@ -562,8 +562,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_carrier', 'label' => 'Carrier Status', 'options' => $stateCarrierOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
                 ['name' => 'packages', 'label' => 'Packages'],
             ],
             'actions' => [
@@ -615,7 +615,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
                 ['name' => 'rma_at', 'label' => 'RMA at'],
-                ['name' => 'received_at', 'label' => 'Received at'],
+                ['name' => 'received_at', 'label' => 'Received at', 'cell' => 'datetime'],
             ],
             'actions' => [
                 #'add' => ['caption' => 'Add return'],
@@ -655,7 +655,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'canceled_at', 'label' => 'Timestamp'],
+                ['name' => 'canceled_at', 'label' => 'Timestamp', 'cell' => 'datetime'],
             ],
             'actions' => [
                 #'add' => ['caption' => 'Add cancellation'],
@@ -695,7 +695,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'amount', 'label' => 'Amount'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'refunded_at', 'label' => 'Timestamp'],
+                ['name' => 'refunded_at', 'label' => 'Timestamp', 'cell' => 'datetime'],
             ],
             'actions' => [
                 #'add' => ['caption' => 'Add refund'],
@@ -730,8 +730,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     ['name' => 'edit'],
                 ]],
                 ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated', 'hidden' => true],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'hidden' => true, 'cell' => 'datetime'],
                 ['name' => 'from_admin', 'label' => 'Direction', 'options' => [0 => 'Received', 1 => 'Sent']],
                 ['name' => 'is_internal', 'label' => 'Visibility', 'options' => [0 => 'Public', 1 => 'Private']],
                 ['name' => 'comment_text', 'label' => 'Text'],
@@ -767,7 +767,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'state' => ['s' => 'create_at', 'sd' => 'desc'],
             'columns' => [
                 ['type' => 'row_select'],
-                ['name' => 'create_at', 'label' => 'Created'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'entity_id', 'label' => 'Entity ID'],
                 ['name' => 'order_item_id', 'label' => 'Item ID'],

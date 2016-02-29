@@ -99,7 +99,7 @@ class Sellvana_Sales_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
         $this->_processFilters($orm);
 
         $result = (float)$orm->find_one()->get('avg_total');
-        return number_format($result, 2);
+        return $result;
     }
 
     /**

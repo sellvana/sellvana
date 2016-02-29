@@ -27,7 +27,7 @@ class Sellvana_Catalog_Admin_Controller_Report_LowInventory extends FCom_Admin_C
             ['name' => 'is_hidden', 'index' => 'p.is_hidden', 'options' => [1 => 'Inactive', 0 => 'Active']],
             ['name' => 'qty_in_stock', 'index' => 'i.qty_in_stock'],
 //            ['name' => 'out_of_stock_date', 'index' => 'out_of_stock_date'],
-            ['name' => 'last_sold_date', 'index' => 'last_sold_date'],
+            ['name' => 'last_sold_date', 'index' => 'last_sold_date', 'cell' => 'datetime'],
         ];
 
         foreach ($this->_statDays as $dayCount) {

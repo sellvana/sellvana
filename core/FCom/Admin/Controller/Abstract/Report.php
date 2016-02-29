@@ -55,9 +55,21 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
 
     /**
+     * Get field labels
+     *
      * @return array
      */
     protected function _getFieldLabels()
+    {
+        return [];
+    }
+
+    /**
+     * Get cell formats (currency, date, datetime, etc.)
+     *
+     * @return array
+     */
+    protected function _getCellFormats()
     {
         return [];
     }
@@ -139,6 +151,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
     protected function _addAllColumns()
     {
         $columns = [];
+        $cellFormats = $this->_getCellFormats();
         /** @var FCom_Core_Model_Abstract $model */
         foreach ($this->_selectModels as $alias => $model) {
             $table = $model->table();
@@ -150,7 +163,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
                     $columns[] = [
                         'name' => $fieldName,
                         'index' => $alias . '.' . $fieldId,
-                        'hidden' => (!in_array($fieldName, $this->_visibleFields))
+                        'hidden' => (!in_array($fieldName, $this->_visibleFields)),
+                        'cell' => !empty($cellFormats[$fieldName]) ? $cellFormats[$fieldName] : ''
                     ];
                 }
             }

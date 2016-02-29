@@ -5,9 +5,10 @@
 */
 class BLocale extends BClass
 {
-    const FORMAT_SHORT_DATE = 'date_short';
-    const FORMAT_FULL_DATE  = 'date_full';
-    const FORMAT_CURRENCY   = 'currency';
+    const FORMAT_SHORT_DATE      = 'date_short';
+    const FORMAT_SHORT_DATETIME  = 'datetime_short';
+    const FORMAT_FULL_DATETIME   = 'datetime_full';
+    const FORMAT_CURRENCY        = 'currency';
 
     static protected $_domainPrefix = 'fulleron/';
     static protected $_domainStack = [];
@@ -65,9 +66,10 @@ class BLocale extends BClass
      * @var array
      */
     protected $_defaultFormats = [
-        self::FORMAT_SHORT_DATE => 'MMM d, y',
-        self::FORMAT_FULL_DATE  => "EEEE, MMMM d, y 'at' h:mm:ss a",
-        self::FORMAT_CURRENCY   => '¤#,##0.00',
+        self::FORMAT_SHORT_DATE     => 'MMM d, y',
+        self::FORMAT_SHORT_DATETIME => "MMM d, y h:mm:ss a",
+        self::FORMAT_FULL_DATETIME  => "EEEE, MMMM d, y 'at' h:mm:ss a",
+        self::FORMAT_CURRENCY       => '¤#,##0.00',
     ];
 
     /**
@@ -83,9 +85,10 @@ class BLocale extends BClass
      * @var IntlDateFormatter[]|NumberFormatter[]
      */
     static protected $_formatters = [
-        self::FORMAT_SHORT_DATE => false,
-        self::FORMAT_FULL_DATE  => false,
-        self::FORMAT_CURRENCY   => false
+        self::FORMAT_SHORT_DATE     => false,
+        self::FORMAT_SHORT_DATETIME => false,
+        self::FORMAT_FULL_DATETIME  => false,
+        self::FORMAT_CURRENCY       => false
     ];
 
 
@@ -1325,14 +1328,18 @@ class BLocale extends BClass
     * Convert DB datetime (GMT) to local
     *
     * @param string $value
-    * @param bool $full Full format or short
+    * @param string $format
     * @return string
     */
-    public function datetimeDbToLocal($value, $full = false)
+    public function datetimeDbToLocal($value, $format = self::FORMAT_SHORT_DATE)
     {
         $value = strtotime($value) + $this->tzOffset();
-        $type = $full ? self::FORMAT_FULL_DATE : self::FORMAT_SHORT_DATE;
-        $formatter = self::$_formatters[$type];
+
+        if (empty(self::$_formatters[$format])) {
+            return $value;
+        }
+
+        $formatter = self::$_formatters[$format];
 
         return $formatter->format($value);
     }
@@ -1377,7 +1384,10 @@ class BLocale extends BClass
 
     public function currency($value, $currency = null, $decimals = 2)
     {
-        $formatter = self::$_formatters[self::FORMAT_CURRENCY];
+        $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
+        if ($currency == 'base') {
+            $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        }
 
         if ($currency) {
             $symbol = $this->getSymbol($currency) ?: $currency;
@@ -1463,7 +1473,12 @@ class BLocale extends BClass
             IntlDateFormatter::MEDIUM,
             IntlDateFormatter::NONE
         );
-        $formatters[self::FORMAT_FULL_DATE] = new IntlDateFormatter(
+        $formatters[self::FORMAT_SHORT_DATETIME] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::MEDIUM
+        );
+        $formatters[self::FORMAT_FULL_DATETIME] = new IntlDateFormatter(
             $locale,
             IntlDateFormatter::FULL,
             IntlDateFormatter::MEDIUM

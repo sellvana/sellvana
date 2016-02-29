@@ -50,9 +50,9 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode', 'hidden' => true],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select', 'hidden' => true,
                     'options' => $this->BLocale->getAvailableCountries()],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at'],
+            ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at', 'cell' => 'datetime'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
-            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true],
+            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'export' => true,
@@ -122,8 +122,8 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         }
         if ($m->id()) {
             $saleStatistics = $m->saleStatistics();
-            $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'])
-                . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg']);
+            $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'], 'base')
+                . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg'], 'base');
         } else {
             $info = '';
         }

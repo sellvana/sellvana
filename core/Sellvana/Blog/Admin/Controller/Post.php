@@ -46,8 +46,8 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
             ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
             ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
             ['name' => 'create_ym', 'label' => 'Create ym' , 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'date'],
-            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'date'],
+            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
