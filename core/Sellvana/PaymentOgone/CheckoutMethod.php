@@ -30,7 +30,7 @@ class Sellvana_PaymentOgone_CheckoutMethod extends Sellvana_Sales_Method_Checkou
             return false;
         }
 
-        if (empty($config['pspid']) || empty($config['owner_address'] || empty($config['owner_country']))) {
+        if (empty($config['pspid']) || empty($config['owner_address']) || empty($config['owner_country'])) {
             return false;
         }
 
