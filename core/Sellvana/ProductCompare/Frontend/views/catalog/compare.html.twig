@@ -16,7 +16,7 @@
     {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
     {% set pUrl = p.url() %}
 
-        <a href="{{ APP.href('catalog/compare/remove?id=' ~ p.id()) }}" class="trigger-remove fa fa-times" onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)" title="{{ "Remove" |_ }}"></a>
+        <a href="{{ APP.href('catalog/compare/remove?id=' ~ p.id()) }}" class="trigger-remove fa fa-times" {#onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)"#} title="{{ "Remove" |_ }}"></a>
         <p><a href="{{ pUrl }}"><img src="{{ p.thumbUrl(125) }}"class="product-img"/></a></p>
         <h3 class="product-name"><a href="{{ pUrl }}">{{ p.getName() }}</a></h3>
         <span class="manuf-name">{{ p.get('mfr_name') }}</span>

@@ -568,7 +568,7 @@ class FCom_Core_Main extends BClass
             $s->set('lastNav', [$r->rawPath(), $r->get()]);
         } else {
             $d = $s->get('lastNav');
-            return $this->BApp->href() . ($d ? $d[0] . '?' . http_build_query((array)$d[1]) : '');
+            return $this->BApp->href() . ($d ? ltrim($d[0], '/') . '?' . http_build_query((array)$d[1]) : '');
         }
     }
 
