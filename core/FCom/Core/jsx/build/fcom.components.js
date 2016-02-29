@@ -274,11 +274,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         render: function () {
             var node = null;
+            var uuid = guid();
             var validationRules = this.validationRules(this.props.validation);
             switch (this.props.type) {
                 case 'textarea':
-                    node = React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
-                                    name: this.props.name || guid(), 
+                    node = React.createElement("textarea", React.__spread({id: this.props.id || uuid, 
+                                    name: this.props.name || uuid, 
                                     className: "form-control " + this.props.className, 
                                     onChange: this._handleChange, 
                                     value: this.state.value},  this.props.attrs,  validationRules));
@@ -288,16 +289,16 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                     _(this.props.options).each(function (text, value) {
                         options.push(React.createElement("option", {value: value, key: value}, text));
                     });
-                    node = React.createElement("select", React.__spread({id: this.props.id || guid(), 
-                            name: this.props.name || guid(), 
+                    node = React.createElement("select", React.__spread({id: this.props.id || uuid, 
+                            name: this.props.name || uuid, 
                             className: "form-control " + this.props.className, 
                             onChange: this._handleChange, 
                             value: this.state.value},  this.props.attrs,  validationRules), options);
                     break;
                 default:
                     node = React.createElement("input", React.__spread({type: this.props.type, 
-                                  id: this.props.id || guid(), 
-                                  name: this.props.name || guid(), 
+                                  id: this.props.id || uuid, 
+                                  name: this.props.name || uuid, 
                                   className: "form-control " + this.props.className, 
                                   onChange: this._handleChange, 
                                   value: this.state.value},  this.props.attrs,  validationRules));
@@ -323,6 +324,11 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 value: this.props.value,
                 selection: null
             };
+        },
+        ComponentWillMount: function () {
+            var uuid = guid();
+            if (!this.props.id) this.props.id = uuid;
+            if (!this.props.name) this.props.name = uuid;
         },
         getElement: function (type) {
             if (this.refs[type + '-' + this.props.id])
@@ -393,7 +399,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                           ref: 'switch-' + this.props.id},  this.props.attrs));
         },
         createWysiwyg: function () {
-            if (!this.props.id) this.props.id = guid();
             return React.createElement("div", null, React.createElement("textarea", React.__spread({id: this.props.id, 
                              name: this.props.name, 
                              className: 'form-control ' + this.props.className, 
