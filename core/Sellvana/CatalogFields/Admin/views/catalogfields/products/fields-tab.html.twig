@@ -11,7 +11,14 @@
         <div class="row">
             <input type="hidden" name="custom_fields" id="custom_fields" />
             {% if sites %}
-                <div id="multisite" class="col-sm-3"></div>
+                <div id="multisite" class="col-sm-3">
+                    {% if sites %}
+                        {{ THIS.view('core/multisite-griddle').set('config', {
+                            siteContainer: 'multisite',
+                            sites: sites
+                        }) | raw }}
+                    {% endif %}
+                </div>
             {% endif %}
             <div id="fieldsets" class="col-sm-5"></div>
             <div id="fields" class="col-sm-4"></div>
@@ -21,7 +28,7 @@
 <div id='fields_list'></div>
 
 <script type="text/javascript">
-    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage) {
         var APP = {},
             dragging,
             collection = {},
@@ -34,6 +41,11 @@
             fieldsOptions = {{ UTIL.toJson(APP.instance('Sellvana_CatalogFields_Model_Field').as_values('field_name')) | raw }},
             fieldSets = {},
             fieldSetOptions = {{ UTIL.toJson(fieldSetModel.as_values('set_name')) | raw }};
+
+        // Multisite change handling
+        window.onMultiSiteChange = function (e, selection) {
+            FieldsListComponent.setProps({ site: selection });
+        };
 
         var SortableFieldItem = React.createClass({
             getDefaultProps: function () {
@@ -94,14 +106,26 @@
             getClassName: function () {
                 return this.state.field.id == dragging ? "dragging" : "";
             },
-            getOptions: function (id) {
+            getOptions: function () {
                 var options = this.state.field.options || [];
-                return _(options).map(function (option, id) {
-                    return {
-                        id: id,
-                        text: option
-                    };
-                });
+                if (!_.isEmpty(options)) {
+                    return _(options).map(function (option, id) {
+                        return {
+                            id: id,
+                            text: option
+                        };
+                    });
+                } else {
+                    var field = this.state.field;
+                    switch (field.admin_input_type) {
+                        case 'boolean':
+                            return {
+                                0: "{{ 'no'|_ }}",
+                                1: "{{ 'YES'|_ }}"
+                            };
+                            break;
+                    }
+                }
             },
             parseLangs: function (data) {
                 var langs = data ? JSON.parse(data) : data;
@@ -122,11 +146,6 @@
                 this.props.refreshChanges(selection.id, selection.text, 'select');
                 this.reloadSiteValue(selection.text);
             },
-            _handleSwitchBoxChange: function (e, state) {
-                state = Number(state).toString();
-                this.props.refreshChanges(this.state.field.field_code, state);
-                this.reloadSiteValue(state);
-            },
             _handleInputChange: function (e) {
                 var $input = $(e.target);
                 this.props.refreshChanges($input.data('code'), $input.val());
@@ -136,9 +155,9 @@
                 this.props.refreshChanges(this.state.field.field_code, data);
                 this.reloadSiteValue(data);
             },
-            createTextarea: function (field) {
-                return React.createElement(Components.ControlInput, {
-                    type: 'textarea',
+            getInputConfig: function (field, type) {
+                return {
+                    type: type || field.admin_input_type,
                     value: field.default_value,
                     onChange: this._handleInputChange,
                     validation: {
@@ -149,7 +168,7 @@
                         'data-code': field.field_code,
                         'data-field-id': field.id
                     }
-                });
+                };
             },
             createWysiwyg: function (field) {
                 return React.createElement(Components.SpecialInput, {
@@ -171,38 +190,24 @@
                     className: '',
                     placeholder: "{{ 'Select field options' |_ }}",
                     multiple: false,
-                    options: this.getOptions(field.id),
+                    options: this.getOptions(),
                     enabled: !field.disable,
                     'data-field-id': field.id,
                     onChange: this._handleSelect2Change,
                     defaultValue: [field.default_value]
                 });
             },
-            createSwitchBox: function (field) {
-                return React.createElement(Components.SpecialInput, {
-                    type: 'switch',
-                    id: field.id,
-                    value: Boolean(Number(field.default_value)),
-                    disable: field.disable,
-                    onChange: this._handleSwitchBoxChange,
-                    attrs: {
-                        'data-field-id': field.id
-                    }
-                });
-            },
             createInput: function (field) {
-                return React.createElement(Components.ControlInput, {
-                    value: field.default_value,
-                    onChange: this._handleInputChange,
-                    validation: {
-                        required: (field.required || 'false')
-                    },
-                    attrs: {
-                        disabled: field.disable || false,
-                        'data-code': field.field_code,
-                        'data-field-id': field.id
-                    }
-                });
+                var type = null;
+                var config = this.getInputConfig(field);
+
+                if (field.admin_input_type === 'boolean') {
+                    type = 'select';
+                    config = this.getInputConfig(field, type);
+                    config['options'] = this.getOptions();
+                }
+
+                return React.createElement(Components.ControlInput, config);
             },
             createLanguageComponent: function (field) {
                 var serialized = JSON.parse(field.serialized);
@@ -268,18 +273,12 @@
             },
             createField: function (field) {
                 switch (field.admin_input_type) {
-                    case 'textarea':
-                        return this.createTextarea(field);
-                        break;
                     case 'wysiwyg':
                         return this.createWysiwyg(field);
                         break;
                     case 'select':
                     case 'multiselect':
                         return this.createSelect2(field);
-                        break;
-                    case 'boolean':
-                        return this.createSwitchBox(field);
                         break;
                     default:
                         return this.createInput(field);
@@ -1099,26 +1098,6 @@
                     site_values: initData['site_values']
                 }), fieldsListContainer
         );
-
-        if (sites && _.keys(sites).length) {
-            var multisiteContainer = document.getElementById('multisite');
-            React.unmountComponentAtNode(multisiteContainer);
-            var MultisiteComponent = React.render(
-                React.createElement(Components.MultiSite, {
-                    id: 'multisite_list',
-                    placeholder: "{{ 'Select site'|_ }}",
-                    options: sites,
-                    onChange: function (event, callback, selection) {
-                        FieldsListComponent.setProps({ site: selection });
-                    },
-                    style: {
-                        height: '28px',
-                        width: '150px',
-                        fontSize: '0.8em'
-                    }
-                }), multisiteContainer
-            );
-        }
 
         var $customHiddenInput = $('#custom_fields');
         var $siteHiddenInput = $('#site_values');

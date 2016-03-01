@@ -60,7 +60,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 name: this.props.name,
                 className: this.props.className || '',
                 style: this.props.style,
-                placeholder: this.props.placeholder || Locale._('Select some options'),
+                placeholder: this.props.placeholder || '',
                 multiple: this.props.multiple || false,
                 options: this.props.options || this.state.options || [],
                 enabled: this.props.enabled || true,
@@ -70,22 +70,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 url: this.props.url || '',
                 initData: this.props.initData || [],
                 attrs: this.props.attrs || {}
-            };
-        },
-        switchConfig: function () {
-            return {
-                state: this.state.value,
-                size: this.props.size || 'normal',
-                disabled: this.props.disabled || false,
-                readonly: this.props.readonly || false,
-                indeterminate: this.props.indeterminate || false,
-                inverse: this.props.inverse || false,
-                onColor: this.props.onColor || 'primary',
-                offColor: this.props.offColor || 'default',
-                onText: this.props.onText || '<i class="fa fa-check" />',
-                offText: this.props.offText || '<i class="fa fa-close" />',
-                onInit: this.props.onInit && typeof this.props.onInit === 'function' ? this.props.onInit : function() {},
-                onSwitchChange: this._handleSwitchChange || function () {}
             };
         }
     };
@@ -186,49 +170,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         }
     };
 
-    FCom.Components.MultiSite = React.createClass({
-        displayName: "MultiSite",
-        mixins: [FCom.InputMixin],
-        getDefaultProps: function () {
-            return {
-                options: []
-            };
-        },
-        getInitialState: function () {
-            return {
-                options: this.parseOptions(),
-                selections: []
-            };
-        },
-        parseOptions: function () {
-            var sites = this.props.options;
-            sites[''] = Locale._('Default');
-            return _(sites).map(function (site, id) {
-                return {
-                    id: id, text: site
-                }
-            });
-        },
-        _handleSelections: function (e, sites) {
-            if (this.props.onChange) {
-                this.props.onChange(e, this.props.callback, sites);
-            }
-
-            this.setState({sites: sites});
-        },
-        shouldComponentUpdate: function (nextProps, nextState) {
-            return nextState.selections !== this.state.selections || nextProps.sites !== this.props.sites;
-        },
-        render: function () {
-            return (
-                <div className={this.props.cClass || 'col-md-5'}>
-                    <input type="hidden" id="site_values" name="site_values" />
-                    <FCom.Components.Select2 {...this.select2Config()}/>
-                </div>
-            );
-        }
-    });
-
     FCom.Components.ControlLabel = React.createClass({
         render: function () {
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
@@ -325,7 +266,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 selection: null
             };
         },
-        ComponentWillMount: function () {
+        componentWillMount: function () {
             var uuid = guid();
             if (!this.props.id) this.props.id = uuid;
             if (!this.props.name) this.props.name = uuid;
@@ -361,14 +302,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         componentWillUnmount: function () {
             if (this.node) React.unmountComponentAtNode(this.node);
         },
-        _handleSwitchChange: function (e, state) {
-            state = Number(state);
-            if (typeof this.props.onChange === 'function') {
-                this.props.onChange(e, state);
-            }
-
-            this.setState({ value: state });
-        },
         _handleWysiwygChange: function (editor, data) {
             if (typeof this.props.onChange === 'function') {
                 this.props.onChange(editor, data);
@@ -389,15 +322,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         createSelect2: function () {
             return <FCom.Components.Select2 {...this.select2Config()} />;
         },
-        createSwitchBox: function () {
-            return <input type="checkbox" id={this.props.id}
-                          name={this.props.name}
-                          className={"switch-cbx " + this.props.className}
-                          checked={!!(this.state.value === undefined || this.state.value === '1')}
-                          value={this.state.value}
-                          onChange={this._handleSwitchChange}
-                          ref={'switch-' + this.props.id} {...this.props.attrs} />;
-        },
         createWysiwyg: function () {
             return <div><textarea id={this.props.id}
                              name={this.props.name}
@@ -409,9 +333,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         renderNode: function () {
             switch (this.props.type) {
-                case 'switch':
-                    return this.createSwitchBox();
-                    break;
                 case 'wysiwyg':
                     return this.createWysiwyg();
                     break;
