@@ -137,7 +137,7 @@ class BLocale extends BClass
     public function getAvailableLocaleCodes()
     {
         static $codes = [
-            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', ' ar_EG', 'ar_IN',
+            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', 'ar_EG', 'ar_IN',
             'ar_IQ', 'ar_JO', 'ar_KW', 'ar_LB', 'ar_LY', 'ar_MA', 'ar_OM', ' ar_QA', 'ar_SA', 'ar_SD', 'ar_SY',
             'ar_TN', 'ar_YE', 'az_AZ', 'as_IN', 'ast_ES', ' be_BY', 'bem_ZM', 'ber_DZ', 'ber_MA', 'bg_BG',
             'bho_IN', 'bn_BD', 'bn_IN', 'bo_CN', ' bo_IN', 'br_FR', 'brx_IN', 'bs_BA', 'byn_ER', 'ca_AD',
@@ -847,25 +847,25 @@ class BLocale extends BClass
             if (!$found) {
                 $this->BDebug->warning('Invalid locale: ' . $locale);
                 $locale = $this->_defaultLocale;
-            } else {
-                $localeSetup = $this->BConfig->get('modules/Sellvana_MultiLanguage/setup_string_' . $locale, []);
-                $localeSetup = explode("\n", $localeSetup);
-                $this->_initFormatters($locale);
-                self::$_localeSettings = $this->getLocaleDefaultFormats($locale);
-                foreach ($localeSetup as $setupString) {
-                    if (!trim($setupString)) {
-                        continue;
-                    }
-                    list($setting, $value) = explode(':', $setupString, 2) + [null];
-                    if (!array_key_exists($setting, self::$_localeSettings)) {
-                        continue;
-                    }
-                    $value = str_replace('"', '', trim($value));
-                    self::$_localeSettings[$setting] = $value;
-                    self::$_formatters[$setting]->setPattern($value);
-                }
             }
         }
+        $localeSetup = $this->BConfig->get('modules/Sellvana_MultiLanguage/setup_string_' . $locale, "");
+        $localeSetup = explode("\n", $localeSetup);
+        $this->_initFormatters($locale);
+        self::$_localeSettings = $this->getLocaleDefaultFormats($locale);
+        foreach ($localeSetup as $setupString) {
+            if (!trim($setupString)) {
+                continue;
+            }
+            list($setting, $value) = explode(':', $setupString, 2) + [null];
+            if (!array_key_exists($setting, self::$_localeSettings)) {
+                continue;
+            }
+            $value = str_replace('"', '', trim($value));
+            self::$_localeSettings[$setting] = $value;
+            self::$_formatters[$setting]->setPattern($value);
+        }
+
         $this->_currentLocale = $locale;
         list($lang) = explode('_', $locale, 2);
         $this->BSession->set('current_language', $lang)->set('current_locale', $locale);

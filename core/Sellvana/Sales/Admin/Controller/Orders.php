@@ -75,7 +75,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Internal ID', 'width' => 70, 'hidden' => true],
             ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'ID', 'width' => 70],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date', 'cell' => 'date'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date', 'cell' => 'datetime'],
 
             #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
