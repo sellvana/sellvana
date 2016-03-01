@@ -12,7 +12,10 @@ class Sellvana_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      * @var BLayout
      */
     static protected $_layoutHlp;
+
     static protected $_origClass = __CLASS__;
+
+    protected $_formFieldsPlaceholder = '__FORM_FIELDS__';
 
     /**
      * Create a new block view instance within layout
@@ -53,7 +56,7 @@ class Sellvana_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
     /**
      * Get block model instance for the current view
-     * @param $view
+     * @param BView $view
      * @return bool
      */
     public function getBlockModel($view)
@@ -74,8 +77,6 @@ class Sellvana_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         }
         return $model;
     }
-
-    protected $_formFieldsPlaceholder = '__FORM_FIELDS__';
 
     /**
      * Renderer for use with other views
@@ -102,8 +103,8 @@ class Sellvana_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         $view->setParam([
             //'renderer'    => $subRenderer,
             'source' => $blockContent,
-            'source_name' => 'cms_block:' . get_class($model) . ':' . $model->handle,
-            'source_mtime' => $model->modified_time,
+            'source_name' => 'cms_block:' . get_class($model) . ':' . $model->get('handle'),
+            'source_mtime' => $model->get('modified_time'),
             'source_untrusted' => true,
         ]);
 

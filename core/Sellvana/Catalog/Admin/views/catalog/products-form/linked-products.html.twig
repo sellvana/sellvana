@@ -8,12 +8,12 @@
 {% set similarLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'similar') %}
 {% set crossLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'cross_sell') %}
 
-<input type='hidden' name='grid[linked_products_similar][add]' id='similar_ids_add' />
-<input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
-<input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
-<input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
-<input type='hidden' name='grid[linked_products_cross_sell][add]' id='cross_sell_ids_add'/>
-<input type='hidden' name='grid[linked_products_cross_sell][del]' id='cross_sell_ids_remove'/>
+<input type='hidden' name='linked_products_similar[add]' id='similar_ids_add' />
+<input type='hidden' name='linked_products_similar[del]' id='similar_ids_remove'/>
+<input type='hidden' name='linked_products_related[add]' id='related_ids_add'/>
+<input type='hidden' name='linked_products_related[del]' id='related_ids_remove'/>
+<input type='hidden' name='linked_products_cross_sell[add]' id='cross_sell_ids_add'/>
+<input type='hidden' name='linked_products_cross_sell[del]' id='cross_sell_ids_remove'/>
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {

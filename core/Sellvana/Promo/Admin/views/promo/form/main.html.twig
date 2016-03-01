@@ -253,7 +253,7 @@
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
                     buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}',
-                    numCodes: {{ numCodes | raw }},
+                    numCodes: {{ numCodes | default(0) }},
                     base_fields: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('price_relation_options'))|raw }}
                 };
                 RulesWidget.init(options);

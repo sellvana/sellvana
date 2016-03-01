@@ -59,8 +59,6 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
     /**
      * Create wishlist
-     * 
-     * @return Json
      */
     public function action_create__POST()
     {
@@ -164,6 +162,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         }
                         break;
                     case 'move':
+                        $wlId = null;
                         $wlIds = $post['wishlist_ids'];
                         foreach ($post['selected'] as $id) {
                             $wishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->load($id);
@@ -177,8 +176,11 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
                         }
 
-                        $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($wlId);
-                        $this->message(sprintf('Product was moved to %s', $wishlist->title));
+                        if ($wlId) {
+                            $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($wlId);
+                            $this->message(sprintf('Product was moved to %s', $wishlist->get('title')));
+                        }
+
                         $this->BResponse->redirect('wishlist');
                         break;
                 }
@@ -219,7 +221,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                 } else {
                     $data = [
                         'title'      => $wishlist['title'],
-                        'is_default' => $wishlists['is_default'] == $id
+                        'is_default' => intval($wishlists['is_default'] == $id)
                     ];
 
                     if (!$model->set($data)->save()) {
@@ -251,8 +253,6 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
     /**
      * Move product to other wishlist
-     * 
-     * @return Json
      */
     public function action_move()
     {
@@ -323,11 +323,13 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
      */
     public function onAddToWishlist($args)
     {
+        /** @var Sellvana_Catalog_Model_Product $product */
         $product = $args['product'];
         if (!$product || !$product->id()) {
             return false;
         }
 
+        #TODO: Method `wishlist` does not available on `Sellvana_Wishlist_Model_Wishlist`
         $this->Sellvana_Wishlist_Model_Wishlist->wishlist(true)->addItem($product->id());
     }
 }

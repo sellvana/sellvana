@@ -196,27 +196,34 @@
             loadSwitchButtons();
 
             $('#search-settings').select2({
-                ajax: {
-                    url: '{{ APP.href('/settings/search') | raw }}',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (param) {
-                        return {
-                            q: param
-                        };
-                    },
-                    results: function (data) {
-                        return {
-                            results: $.map(data, function (item, id) {
-                                return {
-                                    text: '<strong>' + item.field_label + '</strong><br><small>' + item.tab_label + ' > ' + item.panel_label + '</small>',
-                                    id: item.tab_id + '|' + item.panel_id + '|' + item.field_id
-                                }
-                            })
-                        };
-                    },
-                    cache: true
+                cacheDataSource: {},
+                query: function (query) {
+                    var self = this;
+                    var term = query.term;
+                    var cachedData = self.cacheDataSource[term] || null;
+                    if(cachedData) {
+                        query.callback({results: cachedData});
+                    } else {
+                        $.ajax({
+                            url: '{{ APP.href('/settings/search') | raw }}',
+                            dataType: 'json',
+                            delay: 250,
+                            data: {q: term},
+                            success: function (data) {
+                                var results = $.map(data, function (item, id) {
+                                    return {
+                                        text: '<strong>' + item.field_label + '</strong><br><small>' + item.tab_label + ' > ' + item.panel_label + '</small>',
+                                        id: item.tab_id + '|' + item.panel_id + '|' + item.field_id
+                                    }
+                                });
+                                self.cacheDataSource[term] = results;
+                                query.callback({results: results});
+                            },
+                            cache: true
+                        });
+                    }
                 },
+                cache: true,
                 minimumInputLength: 1,
                 escapeMarkup: function (markup) { return markup; }
             }).on('change', function(ev) {

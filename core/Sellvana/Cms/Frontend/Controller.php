@@ -35,13 +35,14 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $viewName = $view->param('view_name');
         $this->BLayout->hookView('main', $viewName);
 
+        /** @var FCom_Core_View_Root $root */
         if (($root = $this->BLayout->getView('root'))) {
             $root->addBodyClass('cms-' . $block->handle)
                  ->addBodyClass('page-' . $block->handle);
         }
 
+        /** @var BViewHead $head */
         if (($head = $this->BLayout->getView('head'))) {
-            /** @var BViewHead $head */
             $head->addTitle($block->page_title);
             foreach (['title', 'description', 'keywords'] as $f) {
                 if (($v = $block->get('meta_' . $f))) {
@@ -99,12 +100,14 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $this->BLayout->getView('cms/nav-content')->set('nav', $nav);
 
+        /** @var FCom_Core_View_Root $root */
         if (($root = $this->BLayout->getView('root'))) {
             $htmlClass = $this->BUtil->simplifyString($nav->url_path);
             $root->addBodyClass('cms-' . $htmlClass)
                  ->addBodyClass('page-' . $htmlClass);
         }
 
+        /** @var BViewHead $head */
         if (($head = $this->BLayout->getView('head'))) {
             $head->addTitle($nav->title);
             foreach (['title', 'description', 'keywords'] as $f) {
@@ -178,6 +181,7 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $email = $this->BConfig->get('modules/FCom_Core/' . $block->get('form_email'));
         }
 
+        /** @var Sellvana_Cms_Model_FormData $model */
         $model = $this->Sellvana_Cms_Model_FormData->create();
         $model->set('block_id', $block->id())
               ->set('customer_id', $data['customer_id'])

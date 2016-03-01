@@ -3,11 +3,11 @@
  *
  * FCom Multi Languages Component
  */
-define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'store', 'ckeditor', 'jquery.validate'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale, Store) {
+define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'store', 'ckeditor', 'jquery.validate'], function ($, React, _, Components, FComSelect2, Locale, Store) {
 
     var LangFields = React.createClass({
         componentWillUnmount: function () {
-            _(this.props.langs).map(function (lang, key) {
+            _(this.props.langs).each(function (lang, key) {
                 if (this.refs['lang_field_' + lang.lang_code])
                     React.unmountComponentAtNode(this.refs['lang_field_' + lang.lang_code].getDOMNode());
             }.bind(this));
@@ -28,7 +28,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.setLangVal(e,currentTarget.dataset.code, e.currentTarget.value);
         },
         createField: function () {
-            _(this.props.langs).map(function (lang, key) {
+            _(this.props.langs).each(function (lang, key) {
                 var node = null,
                     dataAttrs = {
                         'data-code': lang.lang_code,
@@ -249,24 +249,35 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 modal.close();
             }
         },
+        clearCKEditorInstances: function (data) {
+            if ($.isArray(data)) {
+                _(this.state.data).each(function (f, i) {
+                    var fi = _.findIndex(data, {lang_code: f.lang_code});
+                    if (fi == -1) {
+                        adminForm.wysiwygDestroy(this.props.id + '_' + f.lang_code);
+                    }
+                }.bind(this));
+            } else {
+                adminForm.wysiwygDestroy(this.props.id + '_' + data);
+            }
+        },
         _handleModalCancel: function (modal) {
             var data = this.getStoreData('data');
             if (!_.isEqual(this.state.data, data)) {
                 setTimeout(function () {
+                    this.clearCKEditorInstances(data);
+
                     this.setState({
                         data: data,
                         locales: this.getStoreData('locales')
                     });
-                }.bind(this), 300);
+                }.bind(this), 500);
             }
             modal.close();
         },
         handleRemoveField: function (code) {
             var locales = this.getLocales();
-
-            if (this.props.inputType === 'wysiwyg') {
-                adminForm.wysiwygDestroy(this.props.id + '_' + code);
-            }
+            this.clearCKEditorInstances(code);
 
             var defaultIds = _.pluck(locales, 'id');
             if (!_.contains(defaultIds, code)) {

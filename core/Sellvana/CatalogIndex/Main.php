@@ -171,7 +171,7 @@ class Sellvana_CatalogIndex_Main extends BClass
         /** @var FCom_Core_Model_TreeAbstract $model */
         $model = $args['model'];
         $resetUrl = $args['resetUrl'];
-        $oldValues = $model->old_values();
+        $oldValues = (array)$model->old_values();
         if ($resetUrl && array_key_exists('url_key', $oldValues) && $model->get('url_key') != $oldValues['url_key']) {
             $subCategoriesIds = [$model->id()];
             foreach ($model->descendants() as $descendant) {
@@ -184,7 +184,9 @@ class Sellvana_CatalogIndex_Main extends BClass
                 ->group_by('p.id')
                 ->find_many_assoc('product_id', 'product_id');
 
-            $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1], ['id' => $reindexIds]);
+            if (!empty($reindexIds)) {
+                $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1], ['id' => $reindexIds]);
+            }
         }
     }
 

@@ -51,6 +51,46 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
     };
 
     /**
+     * common mixin for custom input configuration
+     */
+    FCom.InputMixin = {
+        select2Config: function () {
+            return {
+                id: this.props.id,
+                name: this.props.name,
+                className: this.props.className || '',
+                style: this.props.style,
+                placeholder: this.props.placeholder || Locale._('Select some options'),
+                multiple: this.props.multiple || false,
+                options: this.props.options || this.state.options || [],
+                enabled: this.props.enabled || true,
+                onSelection: this._handleSelections || function () {},
+                val: this.props.multiple ? this.state.value : [this.state.value || ''],
+                dataMode: this.props.dataMode || 'local',
+                url: this.props.url || '',
+                initData: this.props.initData || [],
+                attrs: this.props.attrs || {}
+            };
+        },
+        switchConfig: function () {
+            return {
+                state: this.state.value,
+                size: this.props.size || 'normal',
+                disabled: this.props.disabled || false,
+                readonly: this.props.readonly || false,
+                indeterminate: this.props.indeterminate || false,
+                inverse: this.props.inverse || false,
+                onColor: this.props.onColor || 'primary',
+                offColor: this.props.offColor || 'default',
+                onText: this.props.onText || '<i class="fa fa-check" />',
+                offText: this.props.offText || '<i class="fa fa-close" />',
+                onInit: this.props.onInit && typeof this.props.onInit === 'function' ? this.props.onInit : function() {},
+                onSwitchChange: this._handleSwitchChange || function () {}
+            };
+        }
+    };
+
+    /**
      * form mixin
      * @type {{getInputId: Function, getInputName: Function, validationRules: Function}}
      */
@@ -148,44 +188,33 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
 
     FCom.Components.MultiSite = React.createClass({
         displayName: "MultiSite",
+        mixins: [FCom.InputMixin],
         getDefaultProps: function () {
             return {
-                defaultValue: [''],
-                sites: []
+                options: []
             };
         },
         getInitialState: function () {
             return {
+                options: this.parseOptions(),
                 selections: []
             };
         },
-        componentWillMount: function () {
-            this.setState({ sites: this.getSites() });
-        },
-        getSites: function () {
-            var sites = this.props.sites;
-            sites[''] = Locale._('Default configuration');
-            sites = _(sites).map(function (site, id) {
+        parseOptions: function () {
+            var sites = this.props.options;
+            sites[''] = Locale._('Default');
+            return _(sites).map(function (site, id) {
                 return {
                     id: id, text: site
                 }
             });
-
-            return _.sortBy(sites, 'id');
         },
-        initSelect2: function () {
-            return {
-                id: 'multisite_list',
-                className: '',
-                multiple: false
-            };
-        },
-        handleSelections: function (e, sites) {
-            this.setState({sites: sites});
-
+        _handleSelections: function (e, sites) {
             if (this.props.onChange) {
-                this.props.onChange(e, this.props.callback, this.state.sites);
+                this.props.onChange(e, this.props.callback, sites);
             }
+
+            this.setState({sites: sites});
         },
         shouldComponentUpdate: function (nextProps, nextState) {
             return nextState.selections !== this.state.selections || nextProps.sites !== this.props.sites;
@@ -194,10 +223,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             return (
                 React.createElement("div", {className: this.props.cClass || 'col-md-5'}, 
                     React.createElement("input", {type: "hidden", id: "site_values", name: "site_values"}), 
-                    React.createElement(FCom.Components.Select2, React.__spread({},  this.initSelect2(), 
-                                        {options: this.getSites(), 
-                                        onSelection: this.handleSelections, 
-                                        multiple: this.props.multiple || false, val: this.props.defaultValue}))
+                    React.createElement(FCom.Components.Select2, React.__spread({},  this.select2Config()))
                 )
             );
         }
@@ -221,7 +247,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         }
     });
 
-    FCom.Components.ControlInput = React.createClass({displayName: "ControlInput",
+    FCom.Components.ControlInput = React.createClass({
+        displayName: 'ControlInput',
         mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
@@ -239,22 +266,22 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         componentWillReceiveProps: function (nextProps) {
             this.setState({ value: nextProps.value });
         },
-        handleChange: function (e) {
-            this.setState({ value: e.target.value });
-            if (typeof this.props.callback === 'function') {
-                this.props.callback(e, this.state.value);
+        _handleChange: function (e) {
+            if (typeof this.props.onChange === 'function') {
+                this.props.onChange(e, this.state.value);
             }
+            this.setState({ value: e.target.value });
         },
         render: function () {
             var node = null;
+            var uuid = guid();
             var validationRules = this.validationRules(this.props.validation);
             switch (this.props.type) {
                 case 'textarea':
-                    node = React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
-                                    name: this.props.name || guid(), 
+                    node = React.createElement("textarea", React.__spread({id: this.props.id || uuid, 
+                                    name: this.props.name || uuid, 
                                     className: "form-control " + this.props.className, 
-                                    onChange: this.handleChange, 
-                                    onBlur: this.props.callback, 
+                                    onChange: this._handleChange, 
                                     value: this.state.value},  this.props.attrs,  validationRules));
                     break;
                 case 'select':
@@ -262,19 +289,18 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                     _(this.props.options).each(function (text, value) {
                         options.push(React.createElement("option", {value: value, key: value}, text));
                     });
-                    node = React.createElement("select", React.__spread({id: this.props.id || guid(), 
-                            name: this.props.name || guid(), 
+                    node = React.createElement("select", React.__spread({id: this.props.id || uuid, 
+                            name: this.props.name || uuid, 
                             className: "form-control " + this.props.className, 
-                            onChange: this.handleChange, 
+                            onChange: this._handleChange, 
                             value: this.state.value},  this.props.attrs,  validationRules), options);
                     break;
                 default:
                     node = React.createElement("input", React.__spread({type: this.props.type, 
-                                  id: this.props.id || guid(), 
-                                  name: this.props.name || guid(), 
+                                  id: this.props.id || uuid, 
+                                  name: this.props.name || uuid, 
                                   className: "form-control " + this.props.className, 
-                                  onChange: this.handleChange, 
-                                  onBlur: this.props.callback, 
+                                  onChange: this._handleChange, 
                                   value: this.state.value},  this.props.attrs,  validationRules));
                     break;
             }
@@ -282,7 +308,9 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         }
     });
 
-    FCom.Components.SpecialInput = React.createClass({displayName: "SpecialInput",
+    FCom.Components.SpecialInput = React.createClass({
+        displayName: 'SpecialInput',
+        mixins: [FCom.InputMixin],
         getDefaultProps: function () {
             return {
                 type: '',
@@ -294,21 +322,36 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         getInitialState: function () {
             return {
                 value: this.props.value,
-                selections: []
+                selection: null
             };
         },
+        ComponentWillMount: function () {
+            var uuid = guid();
+            if (!this.props.id) this.props.id = uuid;
+            if (!this.props.name) this.props.name = uuid;
+        },
+        getElement: function (type) {
+            if (this.refs[type + '-' + this.props.id])
+                return this.refs[type + '-' + this.props.id].getDOMNode();
+            return null;
+        },
         componentDidMount: function () {
+            var node = this.getElement(this.props.type);
+            if (!node) return;
+            this.node = node;
             switch (this.props.type) {
                 case 'switch':
-                    this.props.options['state'] = parseInt(this.state.value) == 1;
-                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch(this.props.options);
+                    $(this.node).bootstrapSwitch(this.switchConfig());
                     break;
                 case 'wysiwyg':
-                    adminForm.wysiwygInit(
-                        this.refs['wysiwyg-' + this.props.id].getDOMNode(),
-                        this.state.value,
-                        this.handleWysiwygChange
-                    );
+                    adminForm.wysiwygInit(this.node, this.state.value, this._handleWysiwygChange);
+                    break;
+            }
+        },
+        componentDidUpdate: function () {
+            switch (this.props.type) {
+                case 'switch':
+                    $(this.node).bootstrapSwitch('state', this.state.value);
                     break;
             }
         },
@@ -316,37 +359,46 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             this.setState({ value: nextProps.value });
         },
         componentWillUnmount: function () {
-            if (this.refs['switch-cbx-' + this.props.id])
-                React.unmountComponentAtNode(this.refs['switch-cbx-' + this.props.id].getDOMNode());
-            if (this.refs['wysiwyg-' + this.props.id])
-                React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id].getDOMNode());
+            if (this.node) React.unmountComponentAtNode(this.node);
         },
-        handleSwitch: function (e, state) {
+        _handleSwitchChange: function (e, state) {
+            state = Number(state);
+            if (typeof this.props.onChange === 'function') {
+                this.props.onChange(e, state);
+            }
+
             this.setState({ value: state });
         },
-        handleWysiwygChange: function (editor, data) {
-            if (this.props.onChange) {
+        _handleWysiwygChange: function (editor, data) {
+            if (typeof this.props.onChange === 'function') {
                 this.props.onChange(editor, data);
             }
+
             this.setState({ value: data });
         },
-        handleChange: function (e) {
+        _handleSelections: function (e, selection) {
+            if (this.props.onChange) {
+                this.props.onChange(e, this.props.callback, selection);
+            }
+
+            this.setState({selection: selection});
+        },
+        _handleChange: function (e) {
             this.setState({ value: e.target.value });
+        },
+        createSelect2: function () {
+            return React.createElement(FCom.Components.Select2, React.__spread({},  this.select2Config()));
         },
         createSwitchBox: function () {
             return React.createElement("input", React.__spread({type: "checkbox", id: this.props.id, 
                           name: this.props.name, 
                           className: "switch-cbx " + this.props.className, 
-                          defaultChecked: !!(this.state.value === undefined || this.state.value === '1'), 
+                          checked: !!(this.state.value === undefined || this.state.value === '1'), 
                           value: this.state.value, 
-                          onChange: this.handleSwitch, 
-                          placeholder: this.props.placeholder, 
-                          ref: 'switch-cbx-' + this.props.id},  this.props.attrs));
+                          onChange: this._handleSwitchChange, 
+                          ref: 'switch-' + this.props.id},  this.props.attrs));
         },
         createWysiwyg: function () {
-            if (!this.props.id) {
-                this.props.id = guid();
-            }
             return React.createElement("div", null, React.createElement("textarea", React.__spread({id: this.props.id, 
                              name: this.props.name, 
                              className: 'form-control ' + this.props.className, 
@@ -354,29 +406,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                              ref: 'wysiwyg-' + this.props.id},  this.props.attrs)), 
                         React.createElement("label", {htmlFor: this.props.id, className: "error", style: { display: 'none'}})
                     );
-        },
-        handleSelections: function () {
-            this.setState({selections: selections});
-
-            if (this.props.onChange) {
-                this.props.onChange(e, this.props.callback, this.state.selections);
-            }
-        },
-        getSelect2Config: function () {
-            return {
-                name: this.props.name,
-                className: this.props.className || '',
-                placeholder: this.props.placeholder || Locale._('Select some options'),
-                multiple: this.props.multiple || false,
-                options: this.props.options,
-                enabled: this.props.enabled || true,
-                onSelection: this.handleSelections,
-                val: this.props.defaultValue,
-                attrs: this.props.attrs || {}
-            };
-        },
-        createSelect2: function () {
-            return React.createElement(FCom.Components.Select2, this.getSelect2Config());
         },
         renderNode: function () {
             switch (this.props.type) {
@@ -559,7 +588,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
 
             if (this.props.confirm) {
                 confirmButton = (
-                    React.createElement(FCom.Components.Button, React.__spread({type: "button", onClick: this.handleConfirm, 
+                    React.createElement(FCom.Components.Button, React.__spread({type: "button", onClick: this._handleConfirm, 
                                             className: "btn-primary " + (this.props.confirmClass || '')},  this.props.confirmAttrs), 
                         this.props.confirm
                     )
@@ -567,7 +596,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             }
             if (this.props.cancel) {
                 cancelButton = (
-                    React.createElement(FCom.Components.Button, {onClick: this.handleCancel, className: "btn-default " + (this.props.cancelClass || ''), type: "button"}, 
+                    React.createElement(FCom.Components.Button, {onClick: this._handleCancel, className: "btn-default " + (this.props.cancelClass || ''), type: "button"}, 
                         this.props.cancel
                     )
                 );
@@ -578,7 +607,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                     React.createElement("div", {className: "modal-dialog"}, 
                         React.createElement("div", {className: "modal-content"}, 
                             React.createElement("div", {className: "modal-header"}, 
-                                cancelButton ? React.createElement("button", {type: "button", className: "close", onClick: this.handleCancel}, 
+                                cancelButton ? React.createElement("button", {type: "button", className: "close", onClick: this._handleCancel}, 
                                     "×"
                                 ) : null, 
                                 React.createElement("h4", {className: "modal-title"}, this.props.title)
@@ -595,14 +624,14 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 )
             );
         },
-        handleCancel: function () {
+        _handleCancel: function () {
             if (this.props.onCancel) {
                 this.props.onCancel(this);
             } else {
                 this.close();
             }
         },
-        handleConfirm: function () {
+        _handleConfirm: function () {
             if (this.props.onConfirm) {
                 this.props.onConfirm(this);
             } else {
@@ -623,136 +652,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             }
         }
     });
-
-    var _nextSibling;
-
-    var _activeComponent;
-
-    var _defaultOptions = {
-        ref: 'list',
-        model: 'items',
-
-        animation: 100,
-        onStart: 'handleStart',
-        onEnd: 'handleEnd',
-        onAdd: 'handleAdd',
-        onUpdate: 'handleUpdate',
-        onRemove: 'handleRemove',
-        onSort: 'handleSort',
-        onFilter: 'handleFilter',
-        onMove: 'handleMove'
-    };
-
-
-    function _getModelName(component) {
-        return component.sortableOptions && component.sortableOptions.model || _defaultOptions.model;
-    }
-
-
-    function _getModelItems(component) {
-        var name = _getModelName(component),
-            items = component.state && component.state[name] || component.props[name];
-
-        return items.slice();
-    }
-
-
-    function _extend(dst, src) {
-        for (var key in src) {
-            if (src.hasOwnProperty(key)) {
-                dst[key] = src[key];
-            }
-        }
-
-        return dst;
-    }
-
-    FCom.Components.SortableMixin = {
-        sortableMixinVersion: '0.1.1',
-
-        /**
-         * @type {Sortable}
-         * @private
-         */
-        _sortableInstance: null,
-
-        componentDidMount: function () {
-            var DOMNode, options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),
-                copyOptions = _extend({}, options),
-
-                emitEvent = function (/** string */type, /** Event */evt) {
-                    var method = this[options[type]];
-                    method && method.call(this, evt, this._sortableInstance);
-                }.bind(this);
-
-            // Bind callbacks so that "this" refers to the component
-            'onStart onEnd onAdd onSort onUpdate onRemove onFilter onMove'.split(' ').forEach(function (/** string */name) {
-                copyOptions[name] = function (evt) {
-                    if (name === 'onStart') {
-                        _nextSibling = evt.item.nextElementSibling;
-                        _activeComponent = this;
-                    }
-                    else if (name === 'onAdd' || name === 'onUpdate') {
-                        evt.from.insertBefore(evt.item, _nextSibling);
-
-                        var newState = {},
-                            remoteState = {},
-                            oldIndex = evt.oldIndex,
-                            newIndex = evt.newIndex,
-                            items = _getModelItems(this),
-                            remoteItems,
-                            item;
-
-                        if (name === 'onAdd') {
-                            remoteItems = _getModelItems(_activeComponent);
-                            item = remoteItems.splice(oldIndex, 1)[0];
-                            items.splice(newIndex, 0, item);
-
-                            remoteState[_getModelName(_activeComponent)] = remoteItems;
-                        }
-                        else {
-                            items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
-                        }
-
-                        newState[_getModelName(this)] = items;
-
-                        if (copyOptions.stateHandler) {
-                            this[copyOptions.stateHandler](newState);
-                        } else {
-                            this.setState(newState);
-                        }
-
-                        (this !== _activeComponent) && _activeComponent.setState(remoteState);
-                    }
-
-                    setTimeout(function () {
-                        emitEvent(name, evt);
-                    }, 0);
-                }.bind(this);
-            }, this);
-
-            DOMNode = this.getDOMNode() ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
-
-            /** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
-            this._sortableInstance = Sortable.create(DOMNode, copyOptions);
-        },
-
-        componentWillReceiveProps: function (nextProps) {
-            var newState = {},
-                modelName = _getModelName(this),
-                items = nextProps[modelName];
-
-            if (items) {
-                newState[modelName] = items;
-                this.setState(newState);
-            }
-        },
-
-        componentWillUnmount: function () {
-            this._sortableInstance.destroy();
-            this._sortableInstance = null;
-        }
-    };
 
     /**
      * render modal elements, only support for fcom grid
@@ -845,7 +744,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 multiple: false,
                 val: [],
                 style: {
-                    witdh: "100%"
+                    width: "100%"
                 },
                 enabled: true,
                 options: [],
@@ -862,20 +761,22 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 }
 
                 // Handle val prop
-                var updateVal = false;
-                if (prevProps.val.length === this.props.val.length) {
-                    $.each(prevProps.val, function (index, value) {
-                        if (this.props.val[index] != value) {
-                            updateVal = true;
-                        }
-                    }.bind(this));
+                if (!this.props.multiple) {
+                    var updateVal = false;
+                    if (prevProps.val.length === this.props.val.length) {
+                        $.each(prevProps.val, function (index, value) {
+                            if (this.props.val[index] != value) {
+                                updateVal = true;
+                            }
+                        }.bind(this));
 
-                } else {
-                    updateVal = true;
+                    } else {
+                        updateVal = true;
+                    }
+
+                    // ...update our val if we need to
+                    if (updateVal) this.getElement().select2("val", this.props.val);
                 }
-
-                // ...update our val if we need to
-                if (updateVal) this.getElement().select2("val", this.props.val);
 
                 // Enable/disable
                 if (prevProps.enabled != this.props.enabled) this.getElement().select2("enable", this.props.enabled);
@@ -883,7 +784,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         componentDidMount: function () {
             // Set up Select2
-            var $select2 = this.createSelect2();
+            this.createSelect2();
         },
         setPlaceholderTo: function ($elem, placeholder) {
             var currData = $elem.select2("data");
@@ -909,49 +810,58 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
 
             var $select2 = this.getElement();
             var options = {
+                placeholder: this.props.placeholder,
                 minimumInputLength: this.props.minInputLength || 0,
                 multiple: this.props.multiple,
+                cacheDataSource: {},
                 val: val
             };
 
-            if (this.props.dataMode == 'local') {
+            if (this.props.dataMode === 'local') {
                 options['data'] = _this._parseDataToSelect2Options(this.props.options);
-            } else if (this.props.dataMode == 'server' && !_.isEmpty(this.props.options)) {
-                options['query'] = function (options) {
-                    if (options.term) {
-                        $.ajax({
-                            url: _this.props.url,
-                            dataType: 'json',
-                            data: {q: options.term},
-                            success: function (data) {
-                                options.callback({ results: _this._parseDataToSelect2Options(data) });
-                            },
-                            cache: true
-                        });
-                    } else {
-                        options.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
-                    }
-                };
-            } else {
-                options['ajax'] = {
-                    url: this.props.url,
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (param) {
-                        return {
-                            q: param
-                        };
-                    },
-                    results: function (data) {
-                        return {results: _this._parseDataToSelect2Options(data)};
-                    },
-                    cache: true
-                };
-            }
+            } else if (this.props.dataMode === 'server') {
+                if (!_.isEmpty(this.props.options)) {
+                    options['query'] = function (query) {
+                        var self = this;
+                        var key = query.term;
+                        var cachedData = self.cacheDataSource[key] || '';
+                        if(cachedData) {
+                            query.callback({results: cachedData});
+                        } else if (query.term) {
+                            $.ajax({
+                                url: _this.props.url,
+                                dataType: 'json',
+                                data: {q: query.term},
+                                success: function (data) {
+                                    data = _this._parseDataToSelect2Options(data);
+                                    self.cacheDataSource[key] = data;
+                                    query.callback({ results: data });
+                                },
+                                cache: true
+                            });
+                        } else {
+                            query.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
+                        }
+                    };
+                } else {
+                    options['ajax'] = {
+                        url: this.props.url,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (param) {
+                            return {
+                                q: param
+                            };
+                        },
+                        results: function (data) {
+                            return {results: _this._parseDataToSelect2Options(data)};
+                        },
+                        cache: true
+                    };
+                }
 
-            if (this.props.dataMode !== 'local') {
                 options['initSelection'] = function (element, callback) {
-                    var data = _this.props.localData || [];
+                    var data = _this.props.initData || [];
                     if (typeof data === 'string') data = JSON.parse(data);
                     callback(_this._parseDataToSelect2Options(data));
                 };
@@ -963,22 +873,18 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 'data-col': this.props['data-col']
             };
 
-            if (this.props.attrs)
-                attrs = _.extend({}, attrs, this.props.attrs);
-
-            if (!this.props.multiple)
-                options['placeholder'] = this.props.placeholder;
+            if (this.props.attrs) attrs = _.extend({}, attrs, this.props.attrs);
 
             $select2.attr(attrs)
             .val(val)
             .select2(options)
-            .on("change", this.handleChange)
-            .on("select2-open", this.handleErrorState)
+            .on("change", this._handleChange)
+            .on("select2-open", this._handleErrorState)
             .select2("enable", this.props.enabled);
 
             this.setPlaceholderTo($select2, this.props.placeholder);
         },
-        handleErrorState: function () {
+        _handleErrorState: function () {
             var $dropNode = $('#select2-drop');
             var classNames = $dropNode[0].className.split(/\s+/);
 
@@ -993,7 +899,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 $dropNode.removeClass(this.props.errorClass);
             }
         },
-        handleChange: function (e) {
+        _handleChange: function (e) {
             if (this.props.onSelection) {
                 this.props.onSelection(e, this.getElement().select2("data"));
             }
@@ -1014,11 +920,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             });
         },
         render: function () {
-            return (
-                React.createElement("div", null, 
-                    React.createElement("input", React.__spread({id: this.props.id, name: this.props.name},  this.props.attrs, {type: "hidden", style: this.props.style}))
-                )
-            );
+            return React.createElement("input", React.__spread({type: "hidden", id: this.props.id, name: this.props.name, style: this.props.style},  this.props.attrs));
         }
     });
 
@@ -1028,13 +930,19 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             return {
                 type: 'empty',
                 temporaryRating: false,
-                stepTitle: {1: 'Bad', 2: 'Poor', 3: 'Ok', 4: 'Good', 5: 'Very good'}
+                stepTitle: {
+                    1: Locale._('Bad'),
+                    2: Locale._('Poor'),
+                    3: Locale._('Ok'),
+                    4: Locale._('Good'),
+                    5: Locale._('Very good')
+                }
             };
         },
-        handleClick: function(e) {
+        _handleClick: function(e) {
             this.props.onClick(this.props.step, e);
         },
-        handleMouseMove: function(e) {
+        _handleMouseMove: function(e) {
             this.props.onMouseMove(this.props.step, e);
         },
         render: function () {
@@ -1048,8 +956,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             return (
                 React.createElement("span", {
                     className: cx(classes), 
-                    onClick: this.handleClick, 
-                    onMouseMove: this.handleMouseMove, 
+                    onClick: this._handleClick, 
+                    onMouseMove: this._handleMouseMove, 
                     title: this.props.stepTitle[this.props.step]}
                 )
             );
@@ -1077,7 +985,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 tempRating: null
             };
         },
-        handleClick: function(newRating, e) {
+        _handleClick: function(newRating, e) {
             if (this.props.disabled) {
                 return;
             }
@@ -1090,7 +998,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             this.setState({rating: newRating, tempRating: null});
             this.props.onChange(newRating);
         },
-        handleOnMouseMove: function(newTempRating, e) {
+        _handleOnMouseMove: function(newTempRating, e) {
             if (this.props.disabled || !this.props.hover
             ) {
                 return;
@@ -1110,7 +1018,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             newTempRating = this.calcHalfRating(newTempRating, e);
             this.setState({tempRating: newTempRating})
         },
-        handleOnMouseLeave: function() {
+        _handleOnMouseLeave: function() {
             this.setState({tempRating: null});
         },
         calcHalfRating: function(newRating, e) {
@@ -1156,8 +1064,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                         step: i, 
                         type: type, 
                         temporaryRating: this.state.tempRating !== null, 
-                        onClick: this.handleClick, 
-                        onMouseMove: this.handleOnMouseMove, 
+                        onClick: this._handleClick, 
+                        onMouseMove: this._handleOnMouseMove, 
                         key: "rating-step-" + i}
                     )
                 );
@@ -1175,7 +1083,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             classes = cx(classes) + ' ' + this.props.className;
 
             return (
-                React.createElement("div", {className: classes, onMouseLeave: this.handleOnMouseLeave}, 
+                React.createElement("div", {className: classes, onMouseLeave: this._handleOnMouseLeave}, 
                     ratingSteps
                 )
             );
@@ -1412,7 +1320,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             });
         },
         render: function () {
-            var buttons = [], hiddenInput = null,
+            var buttons = [], customHiddenInput = null,
                 files = this.state.files,
                 config = this.props.config,
                 className = (this.props.className) ? 'filepicker dropzone ' + this.props.className : 'filepicker dropzone';
@@ -1423,14 +1331,15 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             }
 
             if (config.showHiddenInput) {
+                // Show hidden input if needed for post data
                 var inputAttrs = this.props.attrs || {};
-                hiddenInput = React.createElement("input", React.__spread({type: "hidden", name: this.props.name},  inputAttrs));
+                customHiddenInput = React.createElement("input", React.__spread({type: "hidden", name: this.props.name},  inputAttrs));
             }
 
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     React.createElement("form", {action: this.props.action, className: className}, 
-                        hiddenInput, 
+                        customHiddenInput, 
                         buttons, 
                         buttons.length ? React.createElement("br", null) : null, 
                         this.props.children
@@ -1439,7 +1348,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             } else {
                 return (
                     React.createElement("div", {className: className}, 
-                        hiddenInput, 
+                        customHiddenInput, 
                         buttons, 
                         buttons.length ? React.createElement("br", null) : null, 
                         this.props.children
