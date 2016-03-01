@@ -812,10 +812,14 @@ class BUtil extends BClass
      * @param  array $array
      * @param  string|array $value
      * @param  string|array|null $key
-     * @return array
+     * @return array|null
      */
     public function arrayPluck($array, $value, $key = null)
     {
+        if (!is_array($array)) {
+            return null;
+        }
+
         $results = [];
 
         list($value, $key) = static::_parsePluckParams($value, $key);
