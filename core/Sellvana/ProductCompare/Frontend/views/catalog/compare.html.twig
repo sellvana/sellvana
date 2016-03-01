@@ -16,8 +16,8 @@
     {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
     {% set pUrl = p.url() %}
 
-        <a href="{{ APP.href('catalog/compare/remove?id=' ~ p.id()) }}" class="trigger-remove fa fa-times" onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)" title="{{ "Remove" |_ }}"></a>
-        <p><a href="{{ pUrl }}"><img src="{{ p.thumbUrl(125) }}"class="product-img"/></a></p>
+        <a href="{{ APP.href('catalog/compare/remove?id=' ~ p.id()) }}" class="trigger-remove fa fa-times" {#onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)"#} title="{{ "Remove" |_ }}"></a>
+        <p><a href="{{ pUrl }}"><img src="{{ p.thumbUrl(125) }}" class="product-img"/></a></p>
         <h3 class="product-name"><a href="{{ pUrl }}">{{ p.getName() }}</a></h3>
         <span class="manuf-name">{{ p.get('mfr_name') }}</span>
         <span class="sku">{{ "Part #: %s" | _(p.get('product_sku'))  }}</span>
@@ -61,10 +61,10 @@
                 <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
 
                 <div class="form-group overflow-hidden">
-                    <label class="col-md-6 control-label">{{ 'Quantity:' |_ }}</label>
+                    <label for="qty" class="col-md-6 control-label">{{ 'Quantity:' |_ }}</label>
 
                     <div class="col-md-6">
-                        <input type="number" name="qty" class="form-control" value="1"/>
+                        <input type="number" id="qty" name="qty" class="form-control" value="1"/>
                     </div>
                 </div>
 

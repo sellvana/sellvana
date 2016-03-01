@@ -326,7 +326,7 @@ class BDb
                 exit;
             }
             $row = $r->$method();
-            if (null !== $fields) $row = BUtil::arrayMask($row, $fields, $maskInverse);
+            if (null !== $fields) $row = BUtil::i()->arrayMask($row, $fields, $maskInverse);
             $res[$i] = $row;
         }
         return $res;

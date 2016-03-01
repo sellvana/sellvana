@@ -7,7 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['jquery', 'underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function($, _, React, GridNoData, Components) {
+define(['jquery', 'underscore', 'react', 'griddle.gridNoData', 'fcom.components'], function($, _, React, GridNoData, Components) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -212,8 +212,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         } else {
             totalResults = (results||this.state.results).length;
         }
-        var maxPage = Math.ceil(totalResults / this.props.resultsPerPage);
-        return maxPage;
+        return Math.ceil(totalResults / this.props.resultsPerPage);
     },
     setMaxPage: function(results){
         var maxPage = this.getMaxPage();
@@ -383,6 +382,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         if (this.hasExternalResults()) {
             // Update the state with external results when mounting
             state = this.updateStateWithExternalResults(state, function(updatedState) {
+                that.totalResults = updatedState.totalResults;
                 that.setState(updatedState);
                 that.setMaxPage();
             });
@@ -851,6 +851,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                 totalResults: filteredResults.length
             });
         } else { //empty value + empty filtered data
+            this.state.totalResults = this.totalResults;
             this.setState({
                 filteredResults: null,
                 maxPage: this.getMaxPage(null)

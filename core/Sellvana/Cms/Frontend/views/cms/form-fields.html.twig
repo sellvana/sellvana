@@ -62,6 +62,5 @@
                 input_class: cls, readonly: ro, attr: atr, options: opts}) }}
         {% endif %}
     {% endfor %}
-    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
     <input type="submit" value="Submit" class="btn btn-default"/>
 </form>

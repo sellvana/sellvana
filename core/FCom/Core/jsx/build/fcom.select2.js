@@ -32,6 +32,7 @@ define(['underscore', 'react', 'fcom.components', 'fcom.locale'], function (_, R
         render: function () {
             return (React.createElement(Components.Select2, {id: this.props.id, 
                                         className: this.props.className, 
+                                        style: this.props.style, 
                                         attrs: this.props.attrs || {}, 
                                         "data-col": this.props['data-col'] || '', 
                                         name: this.props.name, 

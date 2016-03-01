@@ -19,7 +19,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
 
         function thumb(s, i) {
             //console.log(s, i);
-            var aHtml = '<a href="#" title="' + s.alt + '">' +
+            var aHtml = '<a href="javascript:void(0)" title="' + s.alt + '">' +
                 '<img src="' + s.src + '" width="' + thumbWidth + '" ' +
                 'height="' + thumbHeight + '" alt="' + s.alt + '"/>' +
                 '</a>';
@@ -82,7 +82,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
             return add;
         }
 
-        function remove(id, trigger) {
+        function remove(id, trigger, type) {
             var i, ii;
             for (i = 0, ii = selected.length; i < ii; i++) {
                 if (selected[i].id == id) {
@@ -96,8 +96,12 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
             check(id, false);
             $.get(urlRm, {id: id}, function(result){
                 if(result.hasOwnProperty('success')) {
-                    ul.children().get(i).remove();
-                    ul.append('<li class="item"/>');
+                    if (type === 'reset') {
+                        $(ul.children().get(i)).html('');
+                    } else {
+                        ul.children().get(i).remove();
+                        ul.append('<li class="item"/>');
+                    }
                     selected.splice(i, 1);
                     $.cookie(cookieName, JSON.stringify(selected), FCom.cookie_options);
 
@@ -134,7 +138,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                 }
 
                 if (selected.hasOwnProperty(i)) {
-                    remove(selected[i].id);
+                    remove(selected[i].id, null, 'reset');
                 }
             }
         }

@@ -782,41 +782,99 @@ class BUtil extends BClass
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
+     * @param  mixed $value
      * @return mixed
      */
-    protected static function _value($value)
+    protected function _ret($value)
     {
         return $value instanceof Closure ? $value() : $value;
     }
 
     /**
-     * Get an item from an array using "dot" or "slash" notation.
+     * Explode the "value" and "key" arguments passed to "pluck".
      *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param  string|array $value
+     * @param  string|array|null $key
+     * @return array
+     */
+    protected function _parsePluckParams($value, $key)
+    {
+        $value = is_string($value) ? preg_split('#[./]#', $value) : $value;
+
+        $key = is_null($key) || is_array($key) ? $key : preg_split('#[./]#', $key);
+
+        return [$value, $key];
+    }
+
+    /**
+     * Pluck an array of values from an array.
+     *
+     * @param  array $array
+     * @param  string|array $value
+     * @param  string|array|null $key
+     * @return array|null
+     */
+    public function arrayPluck($array, $value, $key = null)
+    {
+        if (!is_array($array)) {
+            return null;
+        }
+
+        $results = [];
+
+        list($value, $key) = static::_parsePluckParams($value, $key);
+
+        foreach ($array as $item) {
+            $itemValue = static::arrayGet($item, $value);
+            if (is_null($key)) {
+                $results[] = $itemValue;
+            } else {
+                $itemKey = static::arrayGet($item, $key);
+                $results[$itemKey] = $itemValue;
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Get an item from an array|object using "dot" or "slash" notation.
+     *
+     * @param  mixed $target
+     * @param  string|array $key
+     * @param  mixed $default
      * @return mixed
      */
-    public function arrayGet($array, $key, $default = null)
+    public function arrayGet($target, $key, $default = null)
     {
         if (is_null($key)) {
-            return $array;
+            return $target;
         }
 
-        if (isset($array[$key])) {
-            return $array[$key];
-        }
+        $key = is_array($key) ? $key : preg_split('#[./]#', $key);
 
-        foreach (preg_split('#[./]#', $key) as $segment) {
-            if (! is_array($array) || ! array_key_exists($segment, $array)) {
-                return static::_value($default);
+        while (($segment = array_shift($key)) !== null) {
+            if (is_array($target)) {
+                if (!array_key_exists($segment, $target)) {
+                    return static::_ret($default);
+                }
+
+                $target = $target[$segment];
+            }  elseif (is_object($target)) {
+                if ($target instanceof Model) {
+                    $target = $target->get($segment);
+                } else {
+                    if (!isset($target->{$segment})) {
+                        return static::_ret($default);
+                    }
+
+                    $target = $target->{$segment};
+                }
+            } else {
+                return static::_ret($default);
             }
-
-            $array = $array[$segment];
         }
 
-        return $array;
+        return $target;
     }
 
     /**
