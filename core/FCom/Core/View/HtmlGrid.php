@@ -472,7 +472,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                 switch ($col['format']) {
                     case 'boolean': $value = $value ? 1 : 0; break;
                     case 'date': $value = $value ? $this->BLocale->datetimeDbToLocal($value) : ''; break;
-                    case 'datetime': $value = $value ? $this->BLocale->datetimeDbToLocal($value, true) : ''; break;
+                    case 'datetime': $value = $value ? $this->BLocale->datetimeDbToLocal($value, BLocale::FORMAT_SHORT_DATETIME) : ''; break;
                     case 'currency': $value = $value ? '$' . number_format($value, 2) : ''; break;
                     default: $this->BDebug->warning('Grid value format not implemented: ' . $col['format']);
                 }
