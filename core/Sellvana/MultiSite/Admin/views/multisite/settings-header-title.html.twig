@@ -1,7 +1,7 @@
 {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
 {% if sites %}
     <div id="multisite" style="display: inline-block">
-        {{ THIS.view('core/multisite-griddle').set('config', {
+        {{ THIS.view('multisite/multisite-griddle').set('config', {
             siteContainer: 'multisite',
             sites: sites,
             defaultSite: REQUEST.get('site')|default('')

@@ -13,7 +13,7 @@
             {% if sites %}
                 <div id="multisite" class="col-sm-3">
                     {% if sites %}
-                        {{ THIS.view('core/multisite-griddle').set('config', {
+                        {{ THIS.view('multisite/multisite-griddle').set('config', {
                             siteContainer: 'multisite',
                             sites: sites
                         }) | raw }}
