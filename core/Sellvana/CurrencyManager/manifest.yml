@@ -1,0 +1,27 @@
+modules:
+    Sellvana_CurrencyManager:
+        version: 0.6.0.0
+        channel: beta
+        require: { module: { Sellvana_MultiCurrency: 0.6.0 } }
+        translations: { en: en.php }
+        description: Currency format tweaks
+        auto_use: [ bootstrap, layout, views ]
+
+        observe:
+            - [ "BLocale::currency", "Sellvana_CurrencyManager_Main.onCurrencyFormat" ]
+            - [ "BLocale::getSymbol", "Sellvana_CurrencyManager_Main.onGetSymbol" ]
+
+        default_config:
+            modules:
+                Sellvana_CurrencyManager:
+                    enabled_on_frontend: 1
+                    exclude_in_checkout: 1
+                    enabled_on_admin: 0
+                    enabled_for_inputs: 0
+                    precision: 2
+                    cut_zero_decimals: 0
+                    replace_zero_decimals_with: ',-'
+                    symbol_position: 8
+                    symbol_type: 0
+                    symbol_space: 0
+

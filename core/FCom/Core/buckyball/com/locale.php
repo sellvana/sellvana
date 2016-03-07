@@ -1377,12 +1377,20 @@ class BLocale extends BClass
         return static::$_currencyCode;
     }
 
-    public function getSymbol($currency)
+    public function getAvailableCurrencies()
     {
-        return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+        $currencies = str_replace(' ', '', $this->BConfig->get('modules/Sellvana_MultiCurrency/available_currencies'));
+        return explode(',', $currencies);
     }
 
-    public function currency($value, $currency = null, $decimals = 2)
+    public function getSymbol($currency)
+    {
+        $value = !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+        $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency]);
+        return $value;
+    }
+
+    public function currency($value, $currency = null)
     {
         $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
         if ($currency == 'base') {
@@ -1397,7 +1405,7 @@ class BLocale extends BClass
         }
 
         if ($symbol) {
-            $formatter->setPattern(str_replace('¤', $symbol, $formatter->getPattern()));
+            //$formatter->setPattern(str_replace('¤', "'" . $symbol . "'", $formatter->getPattern()));
         }
 
         $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency, 'formatter' => &$formatter]);
@@ -1431,6 +1439,11 @@ class BLocale extends BClass
             $settings[$format] = $formatter->getPattern();
         }
         return $settings;
+    }
+
+    public function getCurrentLocaleSettings()
+    {
+        return self::$_localeSettings;
     }
 
     /**
@@ -1483,6 +1496,7 @@ class BLocale extends BClass
             IntlDateFormatter::FULL,
             IntlDateFormatter::MEDIUM
         );
+        // NumberFormatter::CURRENCY ignores fractional digit limit
         $formatters[self::FORMAT_CURRENCY] = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 
         return $formatters;
