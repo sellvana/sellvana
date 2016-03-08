@@ -62,11 +62,6 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
      */
     public function setFormatterPattern(NumberFormatter &$formatter, $value, $currency)
     {
-        if (self::$_pattern) {
-            $formatter->setPattern(self::$_pattern);
-            return true;
-        }
-
         $oldPattern = $formatter->getPattern();
         $precision = $this->getConfig('precision', $currency);
         $symbolType = $this->getConfig('symbol_type', $currency);
@@ -109,7 +104,6 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
 
         $newPattern = $this->_buildPattern($value, $currency, $precision, $symbol, $symbolPosition);
         $formatter->setPattern($newPattern);
-        self::$_pattern = $newPattern;
 
         return true;
     }
@@ -168,10 +162,6 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
     {
         $result = [];
         $layout = $this->FCom_Frontend_Main->getLayout();
-        $loadedModules = $this->BModuleRegistry->getAllModules();
-        foreach ($loadedModules as $m) {
-            $layout->addModuleViewsDirsAndLayouts($m, 'FCom_Frontend');
-        }
         $views = $layout->collectAllViewsFiles('FCom_Frontend', true)->getAllViews();
         foreach ($views as $view) {
             $result[$view->getParam('view_name')] = $view->getParam('view_name');

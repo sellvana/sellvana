@@ -8,6 +8,8 @@
  */
 class Sellvana_CurrencyManager_Main extends BClass
 {
+    protected static $_viewStack = [];
+
     /**
      * @param array $args
      */
@@ -73,13 +75,26 @@ class Sellvana_CurrencyManager_Main extends BClass
      */
     protected function _getCurrentView()
     {
-        $trace = debug_backtrace();
-        foreach ($trace as $str) {
-            if ($str['function'] == 'display' && $str['object'] instanceof Twig_Template) {
-                return $str['object']->getTemplateName();
-            }
-        }
+        return end(self::$_viewStack);
+    }
 
-        return '';
+    /**
+     * @param $args
+     */
+    public function onBeforeViewRender($args)
+    {
+        if ($args['view'] instanceof BView) {
+            array_push(self::$_viewStack, $args['view']->getParam('view_name'));
+        }
+    }
+
+    /**
+     * @param $args
+     */
+    public function onAfterViewRender($args)
+    {
+        if ($args['view'] instanceof BView) {
+            array_pop(self::$_viewStack);
+        }
     }
 }

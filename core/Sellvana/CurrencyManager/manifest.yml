@@ -8,6 +8,8 @@ modules:
         auto_use: [ bootstrap, layout, views ]
 
         observe:
+            - [ "BView::render:before", "Sellvana_CurrencyManager_Main.onBeforeViewRender" ]
+            - [ "BView::render:after", "Sellvana_CurrencyManager_Main.onAfterViewRender" ]
             - [ "BLocale::currency", "Sellvana_CurrencyManager_Main.onCurrencyFormat" ]
             - [ "BLocale::getSymbol", "Sellvana_CurrencyManager_Main.onGetSymbol" ]
 
