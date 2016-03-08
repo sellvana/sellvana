@@ -10,6 +10,9 @@ class BLocale extends BClass
     const FORMAT_FULL_DATETIME   = 'datetime_full';
     const FORMAT_CURRENCY        = 'currency';
 
+    const DECIMAL_SEPARATOR      = 'decimal_sep';
+    const GROUP_SEPARATOR        = 'group_sep';
+
     static protected $_domainPrefix = 'fulleron/';
     static protected $_domainStack = [];
 
@@ -863,7 +866,16 @@ class BLocale extends BClass
             }
             $value = str_replace('"', '', trim($value));
             self::$_localeSettings[$setting] = $value;
-            self::$_formatters[$setting]->setPattern($value);
+            if (!empty(self::$_formatters[$setting])) {
+                self::$_formatters[$setting]->setPattern($value);
+            } elseif (in_array($setting, [self::DECIMAL_SEPARATOR, self::DECIMAL_SEPARATOR])) {
+                if ($setting == self::DECIMAL_SEPARATOR) {
+                    $symbol = NumberFormatter::MONETARY_SEPARATOR_SYMBOL;
+                } else {
+                    $symbol = NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL;
+                }
+                self::$_formatters[self::FORMAT_CURRENCY]->setSymbol($symbol, $value);
+            }
         }
 
         $this->_currentLocale = $locale;
@@ -1438,6 +1450,9 @@ class BLocale extends BClass
         foreach ($formatters as $format => $formatter) {
             $settings[$format] = $formatter->getPattern();
         }
+        $currencyFormatter = $formatters[self::FORMAT_CURRENCY];
+        $settings[self::DECIMAL_SEPARATOR] = $currencyFormatter->getSymbol(NumberFormatter::MONETARY_SEPARATOR_SYMBOL);
+        $settings[self::GROUP_SEPARATOR] = $currencyFormatter->getSymbol(NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL);
         return $settings;
     }
 

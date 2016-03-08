@@ -65,6 +65,8 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
         $oldPattern = $formatter->getPattern();
         $precision = $this->getConfig('precision', $currency);
         $symbolType = $this->getConfig('symbol_type', $currency);
+        $decimalSeparator = $formatter->getSymbol(NumberFormatter::MONETARY_SEPARATOR_SYMBOL);
+        $groupSeparator = $formatter->getSymbol(NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL);
         $formatter = NumberFormatter::create($this->BLocale->getCurrentLocale(), NumberFormatter::DECIMAL);
         switch ($symbolType) {
             case self::SYMBOL_TYPE_NONE:
@@ -104,6 +106,8 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
 
         $newPattern = $this->_buildPattern($value, $currency, $precision, $symbol, $symbolPosition);
         $formatter->setPattern($newPattern);
+        $formatter->setSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, $decimalSeparator);
+        $formatter->setSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL, $groupSeparator);
 
         return true;
     }
