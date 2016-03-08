@@ -41,7 +41,7 @@
                             <td>{{ item.get('id') }}</td>
                             <td>{{ THIS.view('orders/item').set('item', item) | raw }} </td>
                             <td>{{ item.get('qty_ordered') }} </td>
-                            <td>{{ item.get('row_total') | currency(orderCurrency) }} </td>
+                            <td>{{ item.getData('store_currency/row_total') | currency(orderCurrency) }} </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -93,10 +93,10 @@
                 </tr>
                 </thead>
                 <tr>
-                    <td>{{ order.get('subtotal') | currency(orderCurrency) }} </td>
-                    <td>{{ order.get('grand_total') | currency(orderCurrency) }} </td>
-                    <td>{{ order.get('amount_paid') | currency(orderCurrency) }} </td>
-                    <td>{{ order.get('amount_due') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/subtotal') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/grand_total') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/amount_paid') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/amount_due') | currency(orderCurrency) }} </td>
                 </tr>
             </table>
         </div>

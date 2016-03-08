@@ -196,6 +196,7 @@
             loadSwitchButtons();
 
             $('#search-settings').select2({
+                placeholder: "{{ 'Settings Search'|_ }}",
                 cacheDataSource: {},
                 query: function (query) {
                     var self = this;

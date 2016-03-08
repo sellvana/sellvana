@@ -55,7 +55,7 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
             'shipping_service' => 'Shipping Method',
             'order_count' => '# of Orders',
             'qty_sold' => '# of Items',
-            'total_shipping_amount' => 'Shipping Collected',
+            'total_shipping_amount' => 'Shipping Amount Collected',
             'period_type' => 'Period',
             'create_at' => 'Created',
         ];

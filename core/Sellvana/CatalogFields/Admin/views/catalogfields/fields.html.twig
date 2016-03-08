@@ -13,7 +13,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         langsNode,
         originOptionIds = [],
         removedOptionIds,
-        isSelect = false;
+        isSelect = false, isNew = true;
 
     var OptionsComponent, LangsComponent;
 
@@ -59,38 +59,40 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             hash[key] = fieldsGrid.html2text(val);
         });
 
+        if (!isNew) {
+            if (isSelect) {
+                var currentOptionIds = _.pluck(grid.getRows(), 'id');
+                removedOptionIds = _.difference(originOptionIds, currentOptionIds);
+                hash['rowsDelete'] = removedOptionIds;
+                hash['rows'] = _(grid.getRows()).map(function (row, i) {
+                    if (row.langs && row.lang_vals) {
+                        var langs = row.langs.split(',');
+                        var lang_vals = row.lang_vals.split(',');
 
-        if (isSelect) {
-            var currentOptionIds = _.pluck(grid.getRows(), 'id');
-            removedOptionIds = _.difference(originOptionIds, currentOptionIds);
-            hash['rowsDelete'] = removedOptionIds;
-            hash['rows'] = _(grid.getRows()).map(function (row, i) {
-                if (row.langs && row.lang_vals) {
-                    var langs = row.langs.split(',');
-                    var lang_vals = row.lang_vals.split(',');
+                        delete row.langs;
+                        delete row.lang_vals;
 
-                    delete row.langs;
-                    delete row.lang_vals;
+                        row.languages = _(langs).map(function (lang, i) {
+                            return {
+                                value: lang_vals[i],
+                                lang_code: lang
+                            };
+                        });
+                    }
 
-                    row.languages = _(langs).map(function (lang, i) {
-                        return {
-                            value: lang_vals[i],
-                            lang_code: lang
-                        };
-                    });
-                }
-
-                return row;
-            });
-        } else {
-            var langs = [];
-            _(grid.getRows()).each(function (row) {
-                 langs.push({ lang_code: row.lang_code, value: row.value, input_type: hash['admin_input_type'] });
-            });
-            hash['data_serialized'] = JSON.stringify({ frontend_label_translation: langs });
+                    return row;
+                });
+            } else {
+                var langs = [];
+                _(grid.getRows()).each(function (row) {
+                    langs.push({ lang_code: row.lang_code, value: row.value, input_type: hash['admin_input_type'] });
+                });
+                hash['data_serialized'] = JSON.stringify({ frontend_label_translation: langs });
+            }
         }
 
-        if (fieldsForm.valid() && optionsForm.valid()) {
+        if (fieldsForm.valid()) {
+            if (!isNew && !optionsForm.valid()) return false;
             $.post(url, hash, function(data) {
                 $.bootstrapGrowl("{{ 'Saved succeeded.'|_ }}", { type: 'success', align: 'center', width: 'auto', delay: 3000 });
                 fieldsGrid.refresh();
@@ -106,11 +108,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * callback function for render modal to add / edit fieldset
      * @param row|null
      */
-    function modalRender(row) {console.log('row', row);
-        isSelect = false;
-        if (row && $.inArray(row.admin_input_type, ['select', 'multiselect']) != -1) {
-            isSelect = true;
-        }
+    function modalRender(row) {
+        isNew = row === undefined;
+        isSelect = !isNew && $.inArray(row.admin_input_type, ['select', 'multiselect']) != -1;
 
         var modalContainerEle = document.getElementById('{{ fieldsConfig.config.id }}-modal');
         React.unmountComponentAtNode(modalContainerEle);
@@ -153,7 +153,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             ), modalContainerEle);
 
         var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_form');
-        if (row) {
+        if (!isNew) {
             if (isSelect) {
                 var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
                 if (row.multilanguage == '0') {
@@ -191,40 +191,27 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                 OptionsComponent = React.render(
                         React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}), attachGridContainerEle
                 );
-
-                if (row && _.contains(['select', 'multiselect'], row.admin_input_type)) {
-                    optionsNode.find('button#add_new_field').prop('disabled', false);
-                } else {
-                    optionsNode.find('button#add_new_field').prop('disabled', true);
-                }
             } else {
                 var langsConfigCompiled = {{ UTIL.toJson(langsConfigCompiled) | raw }};
                 LangsComponent = React.render(
                         React.createElement(FComGriddleComponent, { config: langsConfigCompiled }), attachGridContainerEle
                 );
 
-                var data = row.data_serialized && typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
-                var rows = data['frontend_label_translation'];
-                if (rows) {
-                    _(rows).each(function (row, i) {
-                        rows[i].id = i;
-                        originOptionIds.push(i);
-                    });
+                var serialized = row.data_serialized && typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
+                if (serialized) {
+                    var langRows = serialized['frontend_label_translation'];
+                    if (langRows) {
+                        _(langRows).each(function (row, i) {
+                            langRows[i].id = i;
+                            originOptionIds.push(i);
+                        });
 
-                    langsGrid.addRows(rows);
+                        langsGrid.addRows(langRows);
+                    }
                 }
             }
         }
     }
-
-    $(document).on('change', '#admin_input_type', function (e) {
-        e.preventDefault();
-        if (_.contains(['select', 'multiselect'], $(this).val())) {
-            optionsNode.find('button#add_new_field').prop('disabled', false);
-        } else {
-            optionsNode.find('button#add_new_field').prop('disabled', true);
-        }
-    });
 
     window.insertNewOption = function(grid) {
         optionsGrid.addRows([{id: guid()}]);

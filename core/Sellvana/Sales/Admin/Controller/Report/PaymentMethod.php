@@ -54,9 +54,9 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
             'payment_method' => 'Payment Type',
             'order_count' => '# of Orders',
             'pc_orders' => '% of Orders',
-            'total_amount' => 'Total',
+            'total_amount' => 'Total Amount',
             'pc_total_amount' => '% of Total',
-            'received' => 'Received',
+            'received' => 'Received Amount',
             'pc_received' => '% of Received',
             'create_at' => 'Created',
         ];
