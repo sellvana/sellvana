@@ -1,0 +1,63 @@
+{% set config = THIS.get('config') %}
+<script type="text/javascript">
+    require(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale'], function($, _, React, Components, Locale) {
+        var sites = {{ UTIL.toJson(config.sites) | raw }};
+        var MultiSite = React.createClass({
+            displayName: "MultiSite",
+            mixins: [FCom.InputMixin],
+            getDefaultProps: function () {
+                return {
+                    value: '',
+                    options: []
+                };
+            },
+            getInitialState: function () {
+                return {
+                    options: this.parseOptions(),
+                    value: this.props.value,
+                    selection: []
+                };
+            },
+            parseOptions: function () {
+                var sites = this.props.options;
+                sites[''] = Locale._('Default configuration');
+                return _(sites).map(function (site, id) {
+                    return {
+                        id: id, text: site
+                    }
+                });
+            },
+            _handleSelections: function (e, selection) {
+                if (typeof window.onMultiSiteChange === 'function') {
+                    window.onMultiSiteChange(e, selection)
+                }
+            },
+            shouldComponentUpdate: function (nextProps, nextState) {
+                return nextState.selection !== this.state.selection || nextProps.sites !== this.props.sites;
+            },
+            render: function () {
+                return React.DOM.div({ className: this.props.cClass || 'col-md-5' },
+                    React.DOM.input({ type: 'hidden', id: 'site_values', name: 'site_values' }),
+                    React.createElement(Components.Select2, React.__spread({}, this.select2Config()))
+                );
+            }
+        });
+
+        var container = document.getElementById("{{ config.siteContainer|default('multisite-container') }}");
+        if (container) {
+            React.unmountComponentAtNode(container);
+            React.render(
+                React.createElement(MultiSite, {
+                    id: "{{ config.id|default('multisite_list') }}",
+                    placeholder: "{{ config.placeholder|default('') }}",
+                    value: '{{ config.defaultSite|default('') }}',
+                    options: sites,
+                    style: {
+                        width: "{{ config.inputConfig.width|default('200px') }}",
+                        fontSize: "{{ config.inputConfig.fontSize|default('0.8em') }}"
+                    }
+                }), container
+            )
+        }
+    });
+</script>

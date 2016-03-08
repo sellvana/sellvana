@@ -1,6 +1,21 @@
 {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
 {% if sites %}
-    <select id="multisite-selector">
+    <div id="multisite" style="display: inline-block">
+        {{ THIS.view('multisite/multisite-griddle').set('config', {
+            siteContainer: 'multisite',
+            sites: sites,
+            defaultSite: REQUEST.get('site')|default('')
+        }) | raw }}
+    </div>
+
+    <script type="text/javascript">
+        window.onMultiSiteChange = function (e, selection) {
+            var site = selection.id;
+            location.href = '{{ APP.href('settings') }}' + (site ? '?site=' + site : '');
+        }
+    </script>
+
+    {#<select id="multisite-selector">
         <option value="">{{ 'Default configuration'|_ }}</option>
         {{ UTIL.optionsHtml(sites, REQUEST.get('site')) | raw }}
     </select>
@@ -11,5 +26,5 @@
                 location.href = '{{ APP.href('settings') }}' + (site ? '?site=' + site : '');
             })
         })
-    </script>
+    </script>#}
 {% endif %}

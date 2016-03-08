@@ -25,7 +25,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
             this.props.removeField(e.currentTarget.dataset.code);
         },
         _handleChange: function (e) {
-            this.props.setLangVal(e,currentTarget.dataset.code, e.currentTarget.value);
+            this.props.setLangVal(e.currentTarget.dataset.code, e.currentTarget.value);
         },
         createField: function () {
             _(this.props.langs).each(function (lang, key) {
@@ -54,7 +54,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                                                         name: this.props.id + '_' + lang.lang_code, 
                                                         value: lang.value, 
                                                         className: "form-control lang-field", 
-                                                        callback: this._handleChange, 
+                                                        onChange: this._handleChange, 
                                                         validation: validation, 
                                                         attrs: dataAttrs});
                         break;
@@ -63,7 +63,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                                                         name: this.props.id + '_' + lang.lang_code, 
                                                         value: lang.value, 
                                                         className: "form-control lang-field", 
-                                                        callback: this._handleChange, 
+                                                        onChange: this._handleChange, 
                                                         validation: validation, 
                                                         attrs: dataAttrs});
                         break;
@@ -168,7 +168,11 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 name: 'multilang-' + this.props.id,
                 className: '',
                 placeholder: Locale._("Select languages"),
-                multiple: false
+                multiple: false,
+                style: {
+                    width: '180px',
+                    fontSize: '0.8em'
+                }
             }, this.props.select2Config);
         },
         getLocales: function () {

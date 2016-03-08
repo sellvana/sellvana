@@ -78,12 +78,14 @@ class Sellvana_CatalogFields_Main extends BClass
                 }
                 foreach ($set['fields'] as $field) {
                     $p->set($field['field_code'], $this->BUtil->arrayGet($field, 'value'));
-                    if ($langFields = $this->BUtil->arrayGet($field, 'lang_fields')) {
-                        $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
-                        if ($fieldModel && !in_array($field['admin_input_type'], ['select', 'multiselect'])) {
-                            $fieldModel->setData('frontend_label_translation', $langFields)->save();
-                        }
+                    $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
+                    if (!$fieldModel || in_array($field['admin_input_type'], ['select', 'multiselect'])) {
+                        continue;
                     }
+
+                    $fieldModel->setData(
+                        'frontend_label_translation', $this->BUtil->arrayGet($field, 'lang_fields')
+                    )->save();
                 }
             }
         } else {
