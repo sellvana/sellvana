@@ -107,7 +107,7 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
      */
     public function getValueFormatted()
     {
-        return $this->BLocale->currency($this->getStoreCurrencyValue(), 'base');
+        return $this->BLocale->currency($this->getStoreCurrencyValue(), $this->_currency);
     }
 
     /**
