@@ -63,7 +63,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                 $itemPrice = $product->variantPrice($itemPrice, $item->get('variant'));
             }
 
-            if ($item->getData('shopper_fields')) {
+            if ($item->getData('shopper_fields') && $this->BModuleRegistry->isLoaded('Sellvana_ShopperFields')) {
                 $frontendFields = $this->Sellvana_ShopperFields_Frontend->getProductFrontendFields($product);
 #var_dump(__METHOD__, $item->getData('shopper_fields'), $frontendFields); exit;
                 foreach ($item->getData('shopper_fields') as $f => $fData) {
@@ -89,12 +89,13 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             $subtotal += $rowTotal;
 
             if ($storeCurrency != $baseCurrency) {
-                $storeCurrencySubtotal = $item->calcRowTotal(true);
+                $storeCurrencyRowtotal = $item->calcRowTotal(true);
             } else {
-                $storeCurrencySubtotal = $rowTotal;
+                $storeCurrencyRowtotal = $rowTotal;
             }
+            $storeCurrencySubtotal += $storeCurrencyRowtotal;
 
-            $item->set('row_total', $rowTotal)->setData('store_currency/row_total', $storeCurrencySubtotal);
+            $item->set('row_total', $rowTotal)->setData('store_currency/row_total', $storeCurrencyRowtotal);
         }
 
         $this->_value = $subtotal;
