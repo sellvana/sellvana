@@ -34,7 +34,7 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
             ['name' => 'title', 'label' => 'Title', 'editable' => true, 'addable' => true],
             ['name' => 'customer_name', 'label' => 'Customer'],
             ['name' => 'remote_ip', 'label' => 'IP'],
-            ['name' => 'create_at', 'label' => 'Created'],
+            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
             ['name' => 'is_default', 'label' => 'Is Default', 'display' => 'eval',
                 'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[is_default]\' "+(rc.row["is_default"] == 1 ? checked=\'checked\' : \'\')+" />"', 'tdStyle' => ['textAlign' => 'center']
             ],
@@ -86,8 +86,8 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
             ['name' => 'wishlist_title', 'label' => 'Wishlist'],
             ['name' => 'product_name', 'label' => 'Product Name'],
             ['name' => 'product_sku', 'label' => 'SKU'],
-            ['name' => 'base_price', 'label' => 'Base Price'],
-            ['name' => 'sale_price', 'label' => 'Sale Price'],
+            ['name' => 'base_price', 'label' => 'Base Price', 'cell' => 'currency'],
+            ['name' => 'sale_price', 'label' => 'Sale Price', 'cell' => 'currency'],
             ['type' => 'btn_group', 'buttons' => [
                     ['name' => 'edit-custom', 'callback' => 'showModalToEditWishlistItems', 'cssClass' => " btn-xs btn-edit ", 'textValue' => 'Edit Wishlist Items', "icon" => " icon-edit-sign", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Update Wishlist', 'data-placement' => 'top']]
                 ]

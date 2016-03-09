@@ -380,6 +380,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         ]);
 
         $this->setData('totals', $cart->getData('totals'));
+        $this->setData('store_currency', $cart->getData('store_currency'));
         return $this;
     }
 

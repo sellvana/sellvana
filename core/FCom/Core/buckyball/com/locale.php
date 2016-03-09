@@ -5,6 +5,14 @@
 */
 class BLocale extends BClass
 {
+    const FORMAT_SHORT_DATE      = 'date_short';
+    const FORMAT_SHORT_DATETIME  = 'datetime_short';
+    const FORMAT_FULL_DATETIME   = 'datetime_full';
+    const FORMAT_CURRENCY        = 'currency';
+
+    const DECIMAL_SEPARATOR      = 'decimal_sep';
+    const GROUP_SEPARATOR        = 'group_sep';
+
     static protected $_domainPrefix = 'fulleron/';
     static protected $_domainStack = [];
 
@@ -56,6 +64,38 @@ class BLocale extends BClass
     protected static $_customTranslators = [];
 
     /**
+     * Default locale settings
+     *
+     * @var array
+     */
+    protected $_defaultFormats = [
+        self::FORMAT_SHORT_DATE     => 'MMM d, y',
+        self::FORMAT_SHORT_DATETIME => "MMM d, y h:mm:ss a",
+        self::FORMAT_FULL_DATETIME  => "EEEE, MMMM d, y 'at' h:mm:ss a",
+        self::FORMAT_CURRENCY       => '¤#,##0.00',
+    ];
+
+    /**
+     * Current locale settings
+     *
+     * @var array
+     */
+    static protected $_localeSettings = [];
+
+    /**
+     * Locale aware date formatters
+     *
+     * @var IntlDateFormatter[]|NumberFormatter[]
+     */
+    static protected $_formatters = [
+        self::FORMAT_SHORT_DATE     => false,
+        self::FORMAT_SHORT_DATETIME => false,
+        self::FORMAT_FULL_DATETIME  => false,
+        self::FORMAT_CURRENCY       => false
+    ];
+
+
+    /**
      * Shortcut to help with IDE autocompletion
      *
      * @param bool  $new
@@ -76,6 +116,8 @@ class BLocale extends BClass
         date_default_timezone_set($this->_defaultTz);
         setlocale(LC_ALL, $this->_defaultLocale);
         $this->_tzCache['UTC'] = new DateTimeZone('UTC');
+        $this->_initFormatters($this->_defaultLocale);
+        self::$_localeSettings = $this->getLocaleDefaultFormats($this->_defaultLocale);
     }
 
     public function transliterate($str, $filler = '-')
@@ -98,7 +140,7 @@ class BLocale extends BClass
     public function getAvailableLocaleCodes()
     {
         static $codes = [
-            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', ' ar_EG', 'ar_IN',
+            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', 'ar_EG', 'ar_IN',
             'ar_IQ', 'ar_JO', 'ar_KW', 'ar_LB', 'ar_LY', 'ar_MA', 'ar_OM', ' ar_QA', 'ar_SA', 'ar_SD', 'ar_SY',
             'ar_TN', 'ar_YE', 'az_AZ', 'as_IN', 'ast_ES', ' be_BY', 'bem_ZM', 'ber_DZ', 'ber_MA', 'bg_BG',
             'bho_IN', 'bn_BD', 'bn_IN', 'bo_CN', ' bo_IN', 'br_FR', 'brx_IN', 'bs_BA', 'byn_ER', 'ca_AD',
@@ -810,6 +852,32 @@ class BLocale extends BClass
                 $locale = $this->_defaultLocale;
             }
         }
+        $localeSetup = $this->BConfig->get('modules/Sellvana_MultiLanguage/setup_string_' . $locale, "");
+        $localeSetup = explode("\n", $localeSetup);
+        $this->_initFormatters($locale);
+        self::$_localeSettings = $this->getLocaleDefaultFormats($locale);
+        foreach ($localeSetup as $setupString) {
+            if (!trim($setupString)) {
+                continue;
+            }
+            list($setting, $value) = explode(':', $setupString, 2) + [null];
+            if (!array_key_exists($setting, self::$_localeSettings)) {
+                continue;
+            }
+            $value = str_replace('"', '', trim($value));
+            self::$_localeSettings[$setting] = $value;
+            if (!empty(self::$_formatters[$setting])) {
+                self::$_formatters[$setting]->setPattern($value);
+            } elseif (in_array($setting, [self::DECIMAL_SEPARATOR, self::DECIMAL_SEPARATOR])) {
+                if ($setting == self::DECIMAL_SEPARATOR) {
+                    $symbol = NumberFormatter::MONETARY_SEPARATOR_SYMBOL;
+                } else {
+                    $symbol = NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL;
+                }
+                self::$_formatters[self::FORMAT_CURRENCY]->setSymbol($symbol, $value);
+            }
+        }
+
         $this->_currentLocale = $locale;
         list($lang) = explode('_', $locale, 2);
         $this->BSession->set('current_language', $lang)->set('current_locale', $locale);
@@ -1191,7 +1259,7 @@ class BLocale extends BClass
     /**
     * Get timezone offset in seconds
     *
-    * @param stirng|null $tz If null, return server timezone offset
+    * @param string|null $tz If null, return server timezone offset
     * @return int
     */
     public function tzOffset($tz = null)
@@ -1272,12 +1340,20 @@ class BLocale extends BClass
     * Convert DB datetime (GMT) to local
     *
     * @param string $value
-    * @param bool $full Full format or short
+    * @param string $format
     * @return string
     */
-    public function datetimeDbToLocal($value, $full = false)
+    public function datetimeDbToLocal($value, $format = self::FORMAT_SHORT_DATE)
     {
-        return strftime($full ? '%c' : '%x', strtotime($value) + $this->tzOffset());
+        $value = strtotime($value) + $this->tzOffset();
+
+        if (empty(self::$_formatters[$format])) {
+            return $value;
+        }
+
+        $formatter = self::$_formatters[$format];
+
+        return $formatter->format($value);
     }
 
     public function getTranslations()
@@ -1313,19 +1389,41 @@ class BLocale extends BClass
         return static::$_currencyCode;
     }
 
-    public function getSymbol($currency)
+    public function getAvailableCurrencies()
     {
-        return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+        $currencies = str_replace(' ', '', $this->BConfig->get('modules/Sellvana_MultiCurrency/available_currencies'));
+        return explode(',', $currencies);
     }
 
-    public function currency($value, $currency = null, $decimals = 2)
+    public function getSymbol($currency)
     {
+        $value = !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+        $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency]);
+        return $value;
+    }
+
+    public function currency($value, $currency = null)
+    {
+        $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
+        if ($currency == 'base') {
+            $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        }
+
         if ($currency) {
-            $symbol = $this->getSymbol($currency);
+            $symbol = $this->getSymbol($currency) ?: $currency;
         } else {
             $symbol = static::$_currencySymbol;
+            $currency = self::$_currencyCode;
         }
-        return sprintf('%s%s', $symbol, number_format($value, $decimals));
+
+        if ($symbol) {
+            //$formatter->setPattern(str_replace('¤', "'" . $symbol . "'", $formatter->getPattern()));
+        }
+
+        $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency, 'formatter' => &$formatter]);
+        $value = $formatter->formatCurrency($value, $currency);
+
+        return $value;
     }
 
     public function roundCurrency($value, $decimals = 2)
@@ -1333,6 +1431,90 @@ class BLocale extends BClass
         //TODO: currency specific number of digits
         $precision = pow(10, $decimals);
         return round($value * $precision) / $precision;
+    }
+
+    /**
+     * Selects locale default settings from intl package
+     *
+     * @param $locale
+     * @return array
+     */
+    public function getLocaleDefaultFormats($locale)
+    {
+        if (!$this->_isLocaleAvailableInIntl($locale)) {
+            return $this->_defaultFormats;
+        }
+
+        $formatters = ($locale == $this->_currentLocale) ? self::$_formatters : $this->_createFormatters($locale);
+        $settings = [];
+        foreach ($formatters as $format => $formatter) {
+            $settings[$format] = $formatter->getPattern();
+        }
+        $currencyFormatter = $formatters[self::FORMAT_CURRENCY];
+        $settings[self::DECIMAL_SEPARATOR] = $currencyFormatter->getSymbol(NumberFormatter::MONETARY_SEPARATOR_SYMBOL);
+        $settings[self::GROUP_SEPARATOR] = $currencyFormatter->getSymbol(NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL);
+        return $settings;
+    }
+
+    public function getCurrentLocaleSettings()
+    {
+        return self::$_localeSettings;
+    }
+
+    /**
+     * Checks if locale is available in intl package
+     *
+     * @param $locale
+     * @return bool
+     */
+    protected function _isLocaleAvailableInIntl($locale) {
+        $availableLocales = ResourceBundle::getLocales('');
+
+        return in_array($locale, $availableLocales);
+    }
+
+    /**
+     * Creates date and currency formatters for selected locale
+     *
+     * @param $locale
+     */
+    protected function _initFormatters($locale)
+    {
+        if (!$this->_isLocaleAvailableInIntl($locale)) {
+            $locale = $this->_defaultLocale;
+        }
+
+        self::$_formatters = $this->_createFormatters($locale);
+    }
+
+    /**
+     * Create formatters for locale
+     *
+     * @param $locale
+     * @return array
+     */
+    protected function _createFormatters($locale)
+    {
+        $formatters = [];
+        $formatters[self::FORMAT_SHORT_DATE] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::NONE
+        );
+        $formatters[self::FORMAT_SHORT_DATETIME] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::MEDIUM
+        );
+        $formatters[self::FORMAT_FULL_DATETIME] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::MEDIUM
+        );
+        // NumberFormatter::CURRENCY ignores fractional digit limit
+        $formatters[self::FORMAT_CURRENCY] = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+
+        return $formatters;
     }
 }
 

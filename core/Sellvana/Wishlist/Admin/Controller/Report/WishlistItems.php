@@ -17,7 +17,7 @@ class Sellvana_Wishlist_Admin_Controller_Report_WishlistItems extends FCom_Admin
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'create_at', 'index' => 'wi.create_at'],
+            ['name' => 'create_at', 'index' => 'wi.create_at', 'cell' => 'datetime'],
             ['name' => 'days_in_wishlist', 'index' => 'days_in_wishlist'],
             ['name' => 'customer_name', 'index' => 'customer_name'],
             ['name' => 'customer_group', 'index' => 'cg.title'],

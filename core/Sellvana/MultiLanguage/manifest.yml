@@ -22,6 +22,8 @@ modules:
                 routing:
                     - [ /translations, Sellvana_MultiLanguage_Admin_Controller_Translations.index ]
                     - [ /translations/.action, Sellvana_MultiLanguage_Admin_Controller_Translations ]
+                observe:
+                    - [ "BActionController::onBeforeDispatch", Sellvana_MultiLanguage_Admin.userLocale ]
 
         default_config:
             modules:

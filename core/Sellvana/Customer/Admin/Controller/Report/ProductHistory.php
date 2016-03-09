@@ -25,16 +25,16 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
         }
 
         $config['columns'] = [
-            ['name' => 'order_date', 'index' => 'o.create_at'],
+            ['name' => 'order_date', 'index' => 'o.create_at', 'cell' => 'datetime'],
             ['name' => 'customer_id', 'index' => 'customer_id', 'options' => $customersOptions],
             ['name' => 'unique_id', 'index' => 'o.unique_id'],
             ['name' => 'product_sku', 'index' => 'oi.product_sku'],
             ['name' => 'product_name', 'index' => 'oi.product_name'],
             ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered'],
-            ['name' => 'price', 'index' => 'oi.price'],
-            ['name' => 'row_total', 'index' => 'oi.row_total'],
+            ['name' => 'price', 'index' => 'oi.price', 'cell' => 'currency'],
+            ['name' => 'row_total', 'index' => 'oi.row_total', 'cell' => 'currency'],
             ['name' => 'qty_refunded', 'index' => 'oi.qty_refunded'],
-            ['name' => 'amount_refunded', 'index' => 'o.amount_refunded'],
+            ['name' => 'amount_refunded', 'index' => 'o.amount_refunded', 'cell' => 'currency'],
         ];
         $config['filters'] = [
             ['field' => 'order_date', 'type' => 'date-range'],

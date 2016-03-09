@@ -20,8 +20,8 @@
             {% for  order in orders %}
                 <tr>
                     <td>{{ order.get('unique_id') }}</td>
-                    <td>{{ order.get('create_at') }}</td>
-                    <td>{{ order.get('update_at') }}</td>
+                    <td>{{ order.get('create_at')|locdate('datetime_short') }}</td>
+                    <td>{{ order.get('update_at')|locdate('datetime_short') }}</td>
                 </tr>
             {% endfor %}
         {% endif %}

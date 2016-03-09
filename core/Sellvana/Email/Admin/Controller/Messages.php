@@ -25,8 +25,8 @@ class Sellvana_Email_Admin_Controller_Messages extends FCom_Admin_Controller_Abs
             ['name' => 'recipient', 'label' => 'Recipient'],
             ['name' => 'subject', 'label' => 'Subject'],
             ['name' => 'status', 'label' => 'Status'],
-            ['name' => 'num_attemps', 'label' => 'Number Attemps'],
-            ['name' => 'create_at', 'label' => 'Created'],
+            ['name' => 'num_attemps', 'label' => 'Number of Attempts'],
+            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
         ];
         $config['filters'] = [

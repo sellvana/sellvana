@@ -20,8 +20,8 @@ class Sellvana_Catalog_Admin_Controller_Report_SearchTerms extends FCom_Admin_Co
             ['name' => 'query', 'index' => 'query'],
             ['name' => 'num_searches', 'index' => 'num_searches'],
             ['name' => 'num_products_found_last', 'index' => 'num_products_found_last'],
-            ['name' => 'first_at', 'index' => 'first_at', 'hidden' => true],
-            ['name' => 'last_at', 'index' => 'last_at', 'hidden' => true],
+            ['name' => 'first_at', 'index' => 'first_at', 'hidden' => true, 'cell' => 'datetime'],
+            ['name' => 'last_at', 'index' => 'last_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'first_at', 'type' => 'date-range'],

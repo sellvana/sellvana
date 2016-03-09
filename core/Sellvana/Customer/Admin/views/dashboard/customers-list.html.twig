@@ -17,14 +17,14 @@
                 <td colspan="6">{{ "No data"|_ }}</td>
             </tr>
         {% else %}
-            {% for  customer in customers %}
+            {% for customer in customers %}
                 <tr>
                     <td>{{ customer.id|_ }}</td>
                     <td>{{ customer.firstname|_ }} </td>
                     <td>{{ customer.lastname|_ }}</td>
                     <td>{{ customer.email|_ }}</td>
                     <td>{{ customer.status|_ }}</td>
-                    <td>{{ customer.create_at|_ }}</td>
+                    <td>{{ customer.create_at|locdate('datetime_short') }}</td>
                 </tr>
             {% endfor %}
         {% endif %}

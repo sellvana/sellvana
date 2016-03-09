@@ -54,9 +54,9 @@
                         {% if order.state().custom().getValue() %}
                             <p><label>{{ 'Custom Status' }}:</label> <strong>{{ order.state().custom().getValueLabel() }}</strong></p>
                         {% endif %}
-                        <p><label>{{ 'Placed' }}:</label> <strong>{{ order.get('create_at')|date }}</strong></p>
+                        <p><label>{{ 'Placed' }}:</label> <strong>{{ order.get('create_at')|locdate('datetime_short') }}</strong></p>
                         {% if order.get('create_at')|date != order.get('update_at')|date %}
-                            <p><label>{{ 'Updated' }}:</label> <strong>{{ order.get('update_at')|date }}</strong></p>
+                            <p><label>{{ 'Updated' }}:</label> <strong>{{ order.get('update_at')|locdate('datetime_short') }}</strong></p>
                         {% endif %}
                     </div>
                     <div id="order-section-edit" hidden>
@@ -102,7 +102,7 @@
             <h4><i class="fa fa-info-circle"></i> {{ 'Totals'|_ }}</h4>
             <table class="table table-bordered table-striped">
                 {% for total in totals %}
-                    <tr><th>{{ total.label }}</th><td style="text-align:right">{{ total.value|currency(total.currency) }}</td></tr>
+                    <tr><th>{{ total.label }}</th><td style="text-align:right">{{ total.value|currency('base') }}</td></tr>
                 {% endfor %}
             </table>
         </div>
