@@ -3334,7 +3334,7 @@ class BModel extends Model
     {
         $collection = $this->get($var);
         if (!$collection) {
-            $collection = $this-> {$var};
+            $collection = $this->{$var};
             if (!$collection) return null;
         }
         foreach ($collection as $k => $v) {
