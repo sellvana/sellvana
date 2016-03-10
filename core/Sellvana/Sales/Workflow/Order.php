@@ -16,6 +16,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
     {
         /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['result']['order'];
+        $order->generateToken();
         $order->state()->overall()->setPlaced();
         $order->addHistoryEvent('placed', 'Order was placed by a customer');
 
@@ -24,7 +25,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
             $order->addHistoryEvent('auto_review', 'Order was sent for review as per default policy');
         }
 
-        $order->generateToken()->save();
+        $order->save();
 
         $this->Sellvana_Sales_Model_Order_Shipment->createShipmentFromOrder($order);
     }
