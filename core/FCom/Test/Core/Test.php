@@ -306,7 +306,7 @@ class FCom_Test_Core_Test extends BClass
      *
      * Also check the log line may indicate if the Test has passed.
      *
-     * @param Array $lines
+     * @param array $lines
      */
     public function setLog($lines = [])
     {

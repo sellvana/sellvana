@@ -27,8 +27,6 @@ class Db extends \Codeception\Module implements DbInterface
         'populate' => true,
         'cleanup' => true,
         'reconnect' => false,
-        // Test db name
-        'load_dump' => true,
         'dump' => null
     ];
 
@@ -85,28 +83,35 @@ class Db extends \Codeception\Module implements DbInterface
 
     public function _initialize()
     {
-        if ($this->config['load_dump'] && ($this->config['cleanup'] || ($this->config['populate']))) {
-            $dump = $this->config['dump'] ?: $this->getDumpPath(sprintf('%s_test.sql',
-                \BConfig::i()->get('db/dbname')));
+        $dumpPath = $this->config['dump'];
+        if (!$dumpPath or ($dumpPath && filesize($dumpPath) <= 57)) {
+            $dName = $dumpPath ?: sprintf('%s_test.sql', \BConfig::i()->get('db/dbname'));
+            // If do not have dump config on each module codeception.yml
+            // Then load dump with default connection
+            $dumpPath = $this->getDumpPath($dName);
 
-            if (!file_exists($dump)) {
+            if (!file_exists($dumpPath)) {
                 // If dump is not available then load it
                 $ld = new \FCom_Test_Core_LoadDump;
 
-                if ($ld->make('*', $this->getDumpPath())) {
-                    $dump = $this->getDumpPath($ld->getDumpName());
-                }
+                $ld->make('*', $this->getDumpPath(), [
+                        'raw' => true,
+                        'autocreate' => $this->config['auto_create_db'] ?: false
+                    ]
+                );
             }
+        }
 
-            if (!file_exists($dump)) {
+        if ($dumpPath && ($this->config['cleanup'] || ($this->config['populate']))) {
+            if (!file_exists($dumpPath)) {
                 throw new ModuleConfigException(
                     __CLASS__,
                     \BApp::i()->t("\nFile with dump doesn't exist.\nPlease, check path for sql file: ")
-                    . $dump
+                    . $this->config['dump']
                 );
             }
 
-            $sql = file_get_contents($dump);
+            $sql = file_get_contents($dumpPath);
             $sql = preg_replace('%/\*(?!!\d+)(?:(?!\*/).)*\*/%s', "", $sql);
             if (!empty($sql)) {
                 $this->sql = explode("\n", $sql);
@@ -232,17 +237,23 @@ class Db extends \Codeception\Module implements DbInterface
      * 
      * @return string
      */
-    private function getDumpPath($dump = '')
+    private function getDumpPath($name = '')
     {
-        $dataDir = sprintf('%s/%s/data', \BConfig::i()->get('fs/storage_dir'), \BConfig::i()->get('core/storage_random_dir'));
+        $dataDir = sprintf('%s/%s/data', \BConfig::i()->get('fs/storage_dir'),
+            \BConfig::i()->get('core/storage_random_dir'));
+
         if (!file_exists($dataDir)) {
-            mkdir($dataDir, 755, true);
+            mkdir($dataDir, 0777, true);
         }
 
-        if (empty($dump)) {
+        if (empty($name)) {
             return $dataDir . '/';
         }
-        return $dataDir . '/' . $dump;
+
+        $dump = $dataDir . '/' . $name;
+        $this->config['dump'] = $dump;
+
+        return $dump;
     }
 
     /**

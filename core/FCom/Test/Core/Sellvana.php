@@ -326,7 +326,13 @@ class FCom_Test_Core_Sellvana extends BClass
     {
         if (!isset($this->primaryKeys[$tableName])) {
             $primaryKey = [];
-            $stmt = $this->getDbh()->query('SHOW KEYS FROM ' . $this->getQuotedName($tableName) . ' WHERE Key_name = "PRIMARY"');
+
+            try {
+                $stmt = $this->getDbh()->query('SHOW KEYS FROM ' . $this->getQuotedName($tableName) . ' WHERE Key_name = "PRIMARY"');
+            } catch (Exception $e) {
+                throw new PDOException($e->getMessage());
+            }
+
             $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($columns as $column) {
