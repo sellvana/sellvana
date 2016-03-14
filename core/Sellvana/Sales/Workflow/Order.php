@@ -25,8 +25,6 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         }
 
         $order->generateToken()->save();
-
-        $this->Sellvana_Sales_Model_Order_Shipment->createShipmentFromOrder($order);
     }
 
     /**

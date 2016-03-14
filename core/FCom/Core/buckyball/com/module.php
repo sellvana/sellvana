@@ -1272,11 +1272,13 @@ if (!isset($o[0]) || !isset($o[1])) {
             $config = $this->default_config;
             foreach ($config as $path => $value) {
                 if (strpos($path, '/') !== false) {
-                    $cfgHlp->set($path, $value);
+                    if ($cfgHlp->get($path) === null) {
+                        $cfgHlp->set($path, $value);
+                    }
                     unset($config[$path]);
                 }
             }
-            $cfgHlp->add($config);
+            $cfgHlp->addDefault($config);
         }
         $this->_processThemes();
         return $this;

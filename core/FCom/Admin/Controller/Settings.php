@@ -52,7 +52,13 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             $this->BEvents->fire(__METHOD__, ['post' => &$post, 'skip_default_handler' => &$skipDefaultHandler]);
 
             if (!$skipDefaultHandler) {
-                $this->BConfig->add($post['config'], true);
+                $cfgHlp = $this->BConfig;
+                if (!empty($post['remove_old']['config'])) {
+                    foreach ($post['remove_old']['config'] as $key => $_) {
+                        $cfgHlp->set($key, [], false, true);
+                    }
+                }
+                $cfgHlp->add($post['config'], true);
 
                 if (!empty($post['config']['db'])) {
                     try {
@@ -62,7 +68,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
                         $this->message('Invalid DB configuration, not saved: ' . $e->getMessage(), 'error');
                     }
                 }
-                $this->BConfig->writeConfigFiles();
+                $cfgHlp->writeConfigFiles();
             }
 
             if (!$xhr) {

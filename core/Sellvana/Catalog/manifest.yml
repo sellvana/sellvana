@@ -13,9 +13,9 @@ modules:
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:
+            modules/Sellvana_Catalog/allowed_locales: [ en_US ]
             modules:
                 Sellvana_Catalog:
-                    allowed_locales: [ en_US ]
                     weight_unit: lb
                     length_unit: in
                     enable_rollover: true

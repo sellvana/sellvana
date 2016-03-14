@@ -14,6 +14,11 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     protected $_config;
     protected $_lastError;
 
+    public function getCode()
+    {
+        return $this->_code;
+    }
+
     public function getName()
     {
         return $this->_name;

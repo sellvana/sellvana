@@ -427,8 +427,6 @@ class FCom_Core_Main extends BClass
         }
 #$this->BDebug->profile($d);
 
-        $modReg->processDefaultConfig();
-
         if ($useProductionCache && !$manifestsLoaded) {
             $modReg->saveManifestCache(); //TODO: call explicitly
         }
@@ -441,6 +439,8 @@ class FCom_Core_Main extends BClass
         if (file_exists($localConfigFile)) {
             $config->addFile($localConfigFile, true);
         }
+
+        $modReg->processDefaultConfig();
 
         $this->BClassAutoload->addPath($dirConf['local_dir']);
         $this->BClassAutoload->addPath($dirConf['dlc_dir']);
