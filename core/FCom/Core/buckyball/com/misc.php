@@ -780,17 +780,6 @@ class BUtil extends BClass
     }
 
     /**
-     * Return the default value of the given value.
-     *
-     * @param  mixed $value
-     * @return mixed
-     */
-    protected function _ret($value)
-    {
-        return $value instanceof Closure ? $value() : $value;
-    }
-
-    /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param  string|array $value
@@ -855,7 +844,7 @@ class BUtil extends BClass
         while (($segment = array_shift($key)) !== null) {
             if (is_array($target)) {
                 if (!array_key_exists($segment, $target)) {
-                    return static::_ret($default);
+                    return static::maybeCallback($default);
                 }
 
                 $target = $target[$segment];
@@ -864,13 +853,13 @@ class BUtil extends BClass
                     $target = $target->get($segment);
                 } else {
                     if (!isset($target->{$segment})) {
-                        return static::_ret($default);
+                        return static::maybeCallback($default);
                     }
 
                     $target = $target->{$segment};
                 }
             } else {
-                return static::_ret($default);
+                return static::maybeCallback($default);
             }
         }
 
