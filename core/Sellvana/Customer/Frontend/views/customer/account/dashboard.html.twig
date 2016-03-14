@@ -26,22 +26,22 @@
           <li>
             <a href="{{ APP.href('orders') }}">{{ 'Order history'|_ }}</a>
           </li>
-          <li>
+          {#<li>
             <a href="{{ APP.href('') }}">{{ 'Downloads'|_ }}</a>
-          </li>
-          <li>
+          </li>#}
+          {#<li>
             <a href="{{ APP.href('') }}">{{ 'Reward Points'|_ }}</a>
-          </li>
-          <li>
+          </li>#}
+          {#<li>
             <a href="{{ APP.href('') }}">{{ 'Return Request'|_ }}</a>
-          </li>
+          </li>#}
         </ul>
-        <h4>{{ 'Newsletter'|_ }}</h4>
+        {#<h4>{{ 'Newsletter'|_ }}</h4>
         <ul>
           <li>
             <a href="{{ APP.href('') }}">{{ 'Newsletter Subscriptions'|_ }}</a>
           </li>
-        </ul>
+        </ul>#}
       </div>
       {{ THIS.view('customer/account/sidebar').set('current', 'dashboard') | raw }}
     </div>
