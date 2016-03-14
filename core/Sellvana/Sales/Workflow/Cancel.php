@@ -17,6 +17,24 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
+    public function action_customerRequestsToCancelItems($args)
+    {
+        $order = $args['order'];
+        $qtys = $args['qtys'];
+
+        /** @var Sellvana_Sales_Model_Order_Cancel $cancelModel */
+        $cancelModel = $this->Sellvana_Sales_Model_Order_Cancel->create()->importFromOrder($order, $qtys);
+
+        $cancelModel->state()->overall()->setRequested();
+        $cancelModel->state()->custom()->setDefaultState();
+        $cancelModel->save();
+
+        $items = $order->items();
+        foreach ($cancelModel->items() as $cItem) {
+            $items[$cItem->get('order_item_id')]->state()->cancel()->setRequested();
+        }
+    }
+
     public function action_adminCancelsOrder($args)
     {
         $args['order']->state()->overall()->setCanceled();

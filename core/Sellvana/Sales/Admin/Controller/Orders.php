@@ -36,6 +36,14 @@
  * @property Sellvana_Sales_Model_Order_Cancel_State_Custom $Sellvana_Sales_Model_Order_Cancel_State_Custom
  * @property Sellvana_Sales_Model_Order_Refund_State_Overall $Sellvana_Sales_Model_Order_Refund_State_Overall
  * @property Sellvana_Sales_Model_Order_Refund_State_Custom $Sellvana_Sales_Model_Order_Refund_State_Custom
+ *
+ * @property Sellvana_Sales_Model_Order_Item_State_Overall $Sellvana_Sales_Model_Order_Item_State_Overall
+ * @property Sellvana_Sales_Model_Order_Item_State_Payment $Sellvana_Sales_Model_Order_Item_State_Payment
+ * @property Sellvana_Sales_Model_Order_Item_State_Delivery $Sellvana_Sales_Model_Order_Item_State_Delivery
+ * @property Sellvana_Sales_Model_Order_Item_State_Refund $Sellvana_Sales_Model_Order_Item_State_Refund
+ * @property Sellvana_Sales_Model_Order_Item_State_Return $Sellvana_Sales_Model_Order_Item_State_Return
+ * @property Sellvana_Sales_Model_Order_Item_State_Cancel $Sellvana_Sales_Model_Order_Item_State_Cancel
+ * @property Sellvana_Sales_Model_Order_Item_State_Custom $Sellvana_Sales_Model_Order_Item_State_Custom
  */
 
 class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_GridForm
@@ -241,27 +249,27 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
         $pay = $this->BRequest->post('pay');
         if (!empty($pay['items'])) {
-            $this->Sellvana_Sales_Model_Order_Payment->payOrderItems($order, $pay['items']);
+            $this->_payOrderItems($order, $pay['items']);
         }
 
         $ship = $this->BRequest->post('ship');
         if (!empty($ship['items'])) {
-            $this->Sellvana_Sales_Model_Order_Shipment->shipOrderItems($order, $ship['items']);
+            $this->_shipOrderItemsBySku($order, $ship['items']);
         }
 
         $cancel = $this->BRequest->post('cancel');
         if (!empty($cancel['items'])) {
-            $this->Sellvana_Sales_Model_Order_Cancel->cancelOrderItems($order, $cancel['items']);
+            $this->_cancelOrderItemsBySku($order, $cancel['items']);
         }
 
         $return = $this->BRequest->post('return');
         if (!empty($return['items'])) {
-            $this->Sellvana_Sales_Model_Order_Return->returnOrderItems($order, $return['items']);
+            $this->_returnOrderItemsBySku($order, $return['items']);
         }
 
         $refund = $this->BRequest->post('refund');
         if (!empty($refund['items'])) {
-            $this->Sellvana_Sales_Model_Order_Refund->refundOrderItems($order, $refund['items']);
+            $this->_refundOrderItemsBySku($order, $refund['items']);
         }
 
         $order->save();
@@ -285,6 +293,151 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 }
             }
         }
+    }
+
+
+    protected function _payOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    {
+        return $this;
+    }
+
+    protected function _shipOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData = null)
+    {
+        $qtys = null;
+        if ($itemsData !== null) {
+            $itemLines = preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_PATTERN_ORDER);
+            $qtys = [];
+            foreach ($matches as $m) {
+                $qtys[$m[1]] = $m[3];
+            }
+        }
+        $items = $order->items();
+        foreach ($items as $item) {
+            if (null === $qtys || empty($qtys[$item->get('product_sku')])) {
+                continue;
+            }
+
+        }
+    }
+
+    protected function _cancelOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData)
+    {
+        if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
+            throw new BException('Invalid items data string');
+        }
+        $qtys = [];
+        foreach ($matches as $m) {
+            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
+        }
+        $skus = array_keys($qtys);
+        $items = $order->items();
+        foreach ($items as $i => $item) {
+            if (!in_array($item->get('product_sku'), $skus)) {
+                unset($items[$i]);
+            }
+        }
+        if (!$items) {
+            throw new BException('No valid SKUs found');
+        }
+
+        foreach ($items as $item) {
+            $sku = $item->get('product_sku');
+            $qty = $qtys[$sku] === true ? $item->getQtyCanCancel() : $qtys[$sku];
+            $item->set('qty_to_cancel', $qty);
+        }
+
+        $result = [];
+        $this->Sellvana_Sales_Main->workflowAction('adminCancelsOrderItems', [
+            'order' => $order,
+            'items' => $items,
+            'result' => &$result,
+        ]);
+
+        return $this;
+    }
+
+    protected function _returnOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData)
+    {
+        if (is_string($itemsData)) {
+            if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
+                throw new BException('Invalid items data string');
+            }
+            $qtys = [];
+            foreach ($matches as $m) {
+                $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
+            }
+        } elseif (is_array($itemsData)) {
+            $qtys = $itemsData;
+        } else {
+            throw new BException('Invalid items data');
+        }
+        $skus = array_keys($qtys);
+        $items = $order->items();
+        foreach ($items as $i => $item) {
+            if (!in_array($item->get('product_sku'), $skus)) {
+                unset($items[$i]);
+            }
+        }
+        if (!$items) {
+            throw new BException('No valid SKUs found');
+        }
+
+        foreach ($items as $item) {
+            $sku = $item->get('product_sku');
+            $qty = $qtys[$sku] === true ? $item->getQtyCanReturn() : $qtys[$sku];
+            $item->set('qty_to_return', $qty);
+        }
+
+        $result = [];
+        $this->Sellvana_Sales_Main->workflowAction('adminReturnsOrderItems', [
+            'order' => $order,
+            'items' => $items,
+            'result' => &$result,
+        ]);
+
+        return $this;
+    }
+
+    protected function _refundOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData)
+    {
+        if (is_string($itemsData)) {
+            if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
+                throw new BException('Invalid items data string');
+            }
+            $qtys = [];
+            foreach ($matches as $m) {
+                $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
+            }
+        } elseif (is_array($itemsData)) {
+            $qtys = $itemsData;
+        } else {
+            throw new BException('Invalid items data');
+        }
+        $skus = array_keys($qtys);
+        $items = $order->items();
+        foreach ($items as $i => $item) {
+            if (!in_array($item->get('product_sku'), $skus)) {
+                unset($items[$i]);
+            }
+        }
+        if (!$items) {
+            throw new BException('No valid SKUs found');
+        }
+
+        foreach ($items as $item) {
+            $sku = $item->get('product_sku');
+            $qty = $qtys[$sku] === true ? $item->getQtyCanRefund() : $qtys[$sku];
+            $item->set('qty_to_refund', $qty);
+        }
+
+        $result = [];
+        $this->Sellvana_Sales_Main->workflowAction('adminRefundsOrderItems', [
+            'order' => $order,
+            'items' => $items,
+            'result' => &$result,
+        ]);
+
+        return $this;
     }
 
     public function itemsOrderGridConfig(Sellvana_Sales_Model_Order $order)

@@ -73,6 +73,14 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         return $name;
     }
 
+    public function getInputNameRemoveOld($p)
+    {
+        if (preg_match_all('#((^[^\[]+)|\[([^\]]+)\])#', $this->getInputName($p), $keyArr)) {
+            return 'remove_old[' . $keyArr[2][0] . '][' . trim(join('/', $keyArr[3]), '/') . ']';
+        }
+        return false;
+    }
+
     /**
      * @param $p
      * @return string

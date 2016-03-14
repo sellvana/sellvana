@@ -26,6 +26,4 @@ modules:
                     - [ "BActionController::onBeforeDispatch", Sellvana_MultiLanguage_Admin.userLocale ]
 
         default_config:
-            modules:
-                Sellvana_MultiLanguage:
-                    allowed_locales: [ en_US, fr_FR, de_DE, it_IT ]
+            modules/Sellvana_MultiLanguage/allowed_locales: [ en_US, fr_FR, de_DE, it_IT ]
