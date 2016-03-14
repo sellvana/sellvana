@@ -67,7 +67,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
             ['name' => 'transactions', 'label' => 'Transactions'],
         ];
         $config['actions'] = [
-            'add' => ['caption' => 'Add payment'],
+            //'add' => ['caption' => 'Add payment'],
             'delete' => ['caption' => 'Remove'],
             'mark_paid' => [
                 'caption'      => 'Mark as paid',

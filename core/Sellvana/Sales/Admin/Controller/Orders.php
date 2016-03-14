@@ -651,7 +651,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'transactions', 'label' => 'Transactions'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add payment'],
+                //'add' => ['caption' => 'Add payment'],
                 'delete' => ['caption' => 'Remove'],
                 'mark_paid' => [
                     'caption'      => 'Mark as paid',
