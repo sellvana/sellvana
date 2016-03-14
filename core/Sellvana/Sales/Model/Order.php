@@ -38,6 +38,9 @@
  * @property Sellvana_Sales_Model_Order_State $Sellvana_Sales_Model_Order_State
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
+ * @property Sellvana_Sales_Model_Order_Return $Sellvana_Sales_Model_Order_Return
+ * @property Sellvana_Sales_Model_Order_Refund $Sellvana_Sales_Model_Order_Refund
+ * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
  */
 class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
@@ -499,6 +502,14 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $methods[$this->get('shipping_method')];
     }
 
+    public function getShippingServiceTitle()
+    {
+        $method = $this->getShippingMethod();
+        $services = $method->getServices();
+        $svc = $this->get('shipping_service');
+        return !empty($services[$svc]) ? $services[$svc] : null;
+    }
+
     /**
      * @return null|Sellvana_Sales_Method_Payment_Interface
      */
@@ -546,7 +557,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $shipments = $this->shipments();
         foreach ($shipments as $shipment) {
-            $shipment->shipItems();
+            $shipment->register()->save();
         }
         $this->state()->calcAllStates();
         $this->saveAllDetails();
@@ -578,6 +589,101 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->addHistoryEvent('processing', 'Admin user has marked the order as paid');
         $this->state()->calcAllStates();
         $this->saveAllDetails();
+    }
+
+    public function getShippableItems()
+    {
+        $items = [];
+        foreach ($this->items() as $i => $item) {
+            if ($item->getQtyCanShip()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    public function getPayableItems()
+    {
+        $items = [];
+        foreach ($this->items() as $i => $item) {
+            if ($item->getQtyCanPay()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    public function getCancelableItems()
+    {
+        $items = [];
+        foreach ($this->items() as $i => $item) {
+            if ($item->getQtyCanCancel()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    public function getReturnableItems()
+    {
+        $items = [];
+        foreach ($this->items() as $i => $item) {
+            if ($item->getQtyCanReturn()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    public function getRefundableItems()
+    {
+        $items = [];
+        foreach ($this->items() as $i => $item) {
+            if ($item->getQtyCanRefund()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    public function getAllPayments()
+    {
+        return $this->Sellvana_Sales_Model_Order_Payment->orm()
+            ->where('order_id', $this->id())
+            ->order_by_asc('create_at')
+            ->find_many();
+    }
+
+    public function getAllShipments()
+    {
+        return $this->Sellvana_Sales_Model_Order_Shipment->orm()
+            ->where('order_id', $this->id())
+            ->order_by_asc('create_at')
+            ->find_many();
+    }
+
+    public function getAllReturns()
+    {
+        return $this->Sellvana_Sales_Model_Order_Return->orm()
+            ->where('order_id', $this->id())
+            ->order_by_asc('create_at')
+            ->find_many();
+    }
+
+    public function getAllRefunds()
+    {
+        return $this->Sellvana_Sales_Model_Order_Refund->orm()
+            ->where('order_id', $this->id())
+            ->order_by_asc('create_at')
+            ->find_many();
+    }
+
+    public function getAllCancellations()
+    {
+        return $this->Sellvana_Sales_Model_Order_Cancel->orm()
+            ->where('order_id', $this->id())
+            ->order_by_asc('create_at')
+            ->find_many();
     }
 
     public function __destruct()

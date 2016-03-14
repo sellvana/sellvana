@@ -12,6 +12,9 @@ trait Sellvana_Sales_Model_Trait_OrderChild
     {
         if (!empty($order)) {
             $this->_order = $order;
+            if ($this->get('order_id') !== $order->id()) {
+                $this->set('order_id', $order->id());
+            }
         } elseif (!$this->_order && $this->get('order_id')) {
             $this->_order = $this->Sellvana_Sales_Model_Order->load($this->get('order_id'));
         }

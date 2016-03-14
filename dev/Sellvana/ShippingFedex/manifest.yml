@@ -12,6 +12,8 @@ modules:
                 auto_use: [ views, layout ]
 
         default_config:
+            modules/Sellvana_ShippingFedex/conditionally_free_services: ['03', '11', '65']
+            modules/Sellvana_ShippingFedex/services: ['02', '03', '07', '08', '11', '12', '13', '14', '54', '59', '65']
             modules:
                 Sellvana_ShippingFedex:
                     enabled: 1
@@ -20,5 +22,3 @@ modules:
                     production_mode: 0
                     sort_order: 10
                     default_service: '03'
-                    conditionally_free_services: ['03', '11', '65']
-                    services: ['02', '03', '07', '08', '11', '12', '13', '14', '54', '59', '65']

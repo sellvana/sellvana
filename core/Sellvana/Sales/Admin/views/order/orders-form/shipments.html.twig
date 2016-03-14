@@ -1,5 +1,203 @@
-{% set m = THIS.get('model') %}
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').shipmentsGridConfig(m) %}
+{% set order = THIS.get('model') %}
 
 {# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
+{#
+{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').shipmentsGridConfig(m) %}
 {{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
+#}
+
+{% set shippableItems = order.getShippableItems() %}
+{% set allMethods = APP.instance('Sellvana_Sales_Main').getShippingMethods() %}
+{% set allServices = APP.instance('Sellvana_Sales_Main').getAllSelectedShippingServices() %}
+{% set allShipments = order.getAllShipments() %}
+
+<div class="f-section" id="order-container">
+
+    {{ THIS.view('core/messages') | raw }}
+
+    {% if shippableItems %}
+        <form method="post" action="{{ APP.href('shipments/create?id=' ~ order.id()) }}" id="shipment-create-form">
+            <h2>{{ 'Create a shipment'|_ }}</h2>
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Product SKU'|_ }}</th>
+                    <th>{{ 'Inventory SKU'|_ }}</th>
+                    <th>{{ 'Product Name'|_ }}</th>
+                    <th>{{ 'Qty Ordered'|_ }}</th>
+                    <th>{{ 'Qty To Ship'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in shippableItems %}
+                    <tr>
+                        <td>{{ i.get('product_sku') }}</td>
+                        <td>{{ i.get('inventory_sku') }}</td>
+                        <td>{{ i.get('product_name') }}</td>
+                        <td>{{ i.get('qty_ordered') }}</td>
+                        <td>
+                            <select name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
+                                <option value=""></option>
+                                {% set qtyCanShip = i.getQtyCanShip() %}
+                                {% for q in range(1, qtyCanShip) %}
+                                    <option value="{{ q }}" {{ q == qtyCanShip ? 'selected' }}>{{ q }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Method'|_ }}</th>
+                    <th>{{ 'Service'|_ }}</th>
+                    <th>{{ 'Ship Weight'|_ }}</th>
+                    <th>{{ 'Ship Size'|_ }}</th>
+                    <th>{{ 'Carrier Price'|_ }}</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <select name="shipment[carrier_code]" class="form-control input-sm" id="shipment-carrier_code">
+                                {% for m in allMethods %}
+                                    <option value="{{ m.getCode() }}" {{ m.getCode() == order.get('shipping_method') ? 'selected' }}>{{ m.getDescription() }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="shipment[service_code]" class="form-control input-sm" id="shipment-service_code">
+                                {% for s in allServices[order.get('shipping_method')].services %}
+                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_method') ~ ':' ~ order.get('shipping_service') ? 'selected' }}>{{ s.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control input-sm" name="shipment[shipping_weight]">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control input-sm" name="shipment[shipping_size]">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control input-sm" name="shipment[carrier_price]">
+                        </td>
+                        <td>
+                            <button class="btn btn-xs btn-primary" type="submit">{{ 'Create'|_ }}</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    {% endif %}
+
+    {% if shippableItems and allShipments %}
+        <hr>
+    {% endif %}
+
+    {% if allShipments %}
+        <h2>{{ 'Existing Shipments' }}</h2>
+        <form method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}" id="shipment-update-form">
+        <table class="table table-bordered table-striped dataTable">
+            <thead>
+                <tr>
+                    <th>{{ 'Method/Service'|_ }}</th>
+                    <th>{{ 'Status'|_ }}</th>
+                    <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Packages'|_ }}</th>
+                    <th>{{ 'Delete'|_ }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in allShipments %}
+                    {% set allOverallStates = s.state().overall().getAllValueLabels() %}
+                    {% set allCustomStates = s.state().custom().getAllValueLabels() %}
+                    <tr>
+                        <td>
+                            <p><strong>{{ s.get('carrier_desc') }}</strong></p>
+                            <p><strong>{{ s.get('service_desc') }}</strong></p>
+                        </td>
+                        <td>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ s.state().overall().getValueLabel() }}</strong></p>
+                            {% if allCustomStates %}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="shipments[{{ s.id() }}][state_custom]" class="form-control">
+                                    {{ UTIL.optionsHtml(allCustomStates, s.state().custom().getValue()) | raw }}
+                                </select></p>
+                            {% endif %}
+                            {% for k, v in allOverallStates %}
+                                {% if k != s.get('state_overall') %}
+                                    <input type="button" name="shipments[{{ s.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-shipment-action">
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>{{ 'Created:'|_ }} <strong>{{ LOCALE.datetimeDbToLocal(s.get('create_at'), constant('BLocale::FORMAT_SHORT_DATE')) }}</strong></p>
+                        </td>
+                        <td>
+                            {% for p in s.packages() %}
+                                {% for i in p.items() %}
+                                    <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
+                                {% endfor %}
+                                <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
+                                <hr>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><button name="update" class="btn btn-xs btn-primary" type="submit" value="1">{{ 'Update'|_ }}</button></td>
+                <td></td>
+            </tr>
+            </tfoot>
+        </table>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    require(['jquery', 'underscore'], function($, _) {
+        $('#shipment-create-form,#shipment-update-form').submit(function(ev) {
+            var $form = $(ev.target);
+            $.post($form.attr('action'), $form.serializeArray(), function(data, status, xhr) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            });
+            ev.preventDefault();
+            return false;
+        });
+
+        var $carrier = $('#shipment-carrier_code'), $service = $('#shipment-service_code');
+        var allServices = {{ UTIL.toJson(allServices) | raw }};
+        $carrier.change(function(ev) {
+            $service.find('option').remove();
+            $service.append($('<option>'));
+            var services = allServices[$carrier.val()].services;
+            if (services) {
+                for (var i in services) {
+                    $service.append($('<option>').val(services[i].value).html(services[i].label));
+                }
+            }
+        });
+
+        $('.js-shipment-action').click(function(ev) {
+            var $el = $(ev.target), $form = $el.parents('form'), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post($form.attr('action'), postData, function(data, status, xhr) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            });
+        });
+    })
+</script>

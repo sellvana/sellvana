@@ -19,9 +19,9 @@ modules:
             - [ "Sellvana_Sales_Model_Order_State_Custom::changeState", Sellvana_MultiVendor_Main.onOrderChangeState ]
 
         default_config:
+            modules/Sellvana_MultiVendor/notify_on_order_states: [ "payment:paid" ]
             modules:
                 Sellvana_MultiVendor:
                     enable_notifications: 1
                     store_contact_email:
                     store_contact_name:
-                    notify_on_order_states: [ "payment:paid" ]

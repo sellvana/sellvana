@@ -4,8 +4,15 @@
 
 <h2>{{ "ShippingUPS Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_ShippingUps'}) }}
+    {% set fieldData = { model: c, settings_module:'Sellvana_ShippingUps' } %}
+    {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-Sellvana_ShippingUps-group0', in:1 }) }}
+        {{ forms.boolean(fieldData, {field:'enabled', label:'Is Method Enabled?'|_ }) }}
+        {{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}
+        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services}) }}
+    {{ forms.accordion_panel_end }}
+
     {% set fieldData = { model: c, settings_module: 'Sellvana_ShippingUps', attr: 'size="50"' } %}
-    {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-Sellvana_ShippingUps-group0', in:1}) }}
+    {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-Sellvana_ShippingUps-group1'}) }}
         {{ forms.input(fieldData, {field:'access_key', label:'Access Key'|_ }) }}
         {{ forms.input(fieldData, {field:'shipper_number', label:'Shipper Number'|_ }) }}
         {{ forms.input(fieldData, {field:'user_id', label:'User ID'|_ }) }}
@@ -14,10 +21,5 @@
         {{ forms.input(fieldData, {field:'max_package_weight', label:'Max Package Weight'|_ }) }}
     {{ forms.accordion_panel_end }}
 
-    {% set fieldData = { model: c, settings_module:'Sellvana_ShippingUps' } %}
-    {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-Sellvana_ShippingUps-group1' }) }}
-        {{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}
-        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services}) }}
-    {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

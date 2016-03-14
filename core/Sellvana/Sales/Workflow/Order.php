@@ -26,8 +26,6 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         }
 
         $order->save();
-
-        $this->Sellvana_Sales_Model_Order_Shipment->createShipmentFromOrder($order);
     }
 
     /**

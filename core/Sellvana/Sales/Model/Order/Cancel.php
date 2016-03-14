@@ -8,6 +8,7 @@
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
  * @property Sellvana_Sales_Model_Order_Cancel_State $Sellvana_Sales_Model_Order_Cancel_State
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
+ * @property Sellvana_Sales_Model_Order_Cancel_Item $Sellvana_Sales_Model_Order_Cancel_Item
  */
 
 class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
@@ -30,42 +31,66 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function cancelOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
     {
-        if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
-            return $this;
-        }
-        $qtys = [];
-        foreach ($matches as $m) {
-            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-        }
-        $skus = array_keys($qtys);
+        $this->order($order);
+        $this->state()->overall()->setDefaultState();
+        $this->state()->custom()->setDefaultState();
+        $this->save();
+
         $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
+        if ($qtys === null) {
+            $qtys = [];
+            foreach ($items as $item) {
+                $qtys[$item->id()] = true;
             }
         }
-        if (!$items) {
-            return [
-                'error' => ['message' => 'No valid SKUs found'],
-            ];
+
+        foreach ($qtys as $itemId => $qty) {
+            if (empty($items[$itemId])) {
+                throw new BException($this->BLocale->_('Invalid item id: %s', $itemId));
+            }
+            /** @var Sellvana_Sales_Model_Order_Item $item */
+            $item = $items[$itemId];
+            $qtyCanCancel = $item->getQtyCanCancel();
+            if ($qty === true) {
+                $qty = $qtyCanCancel;
+            } elseif ($qty <= 0 || $qty > $qtyCanCancel) {
+                throw new BException($this->BLocale->_('Invalid quantity to cancel for %s: %s', [$item->get('product_sku'), $qty]));
+            }
+            $this->Sellvana_Sales_Model_Order_Cancel_Item->create([
+                'order_id' => $order->id(),
+                'cancel_id' => $this->id(),
+                'order_item_id' => $item->id(),
+                'qty' => $qty,
+            ])->save();
         }
 
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanCancel() : $qtys[$sku];
+        return $this;
+    }
+
+    public function cancelOrderItems(Sellvana_Sales_Model_Order $order, array $qtys)
+    {
+        $items = $order->items();
+        foreach ($qtys as $itemId => $qty) {
+            if (empty($items[$itemId])) {
+                continue;
+            }
+            $item = $items[$itemId];
+            if ($qty === true) {
+                $qty = $item->getQtyCanCancel();
+            }
             $item->set('qty_to_cancel', $qty);
         }
 
         $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminCancelsOrderItems', [
+        $this->Sellvana_Sales_Main->workflowAction('customerRequests', [
             'order' => $order,
             'items' => $items,
             'result' => &$result,
         ]);
 
-        return $this;
+        return $result;
     }
 
     public function cancelItem($item)

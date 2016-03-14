@@ -3,12 +3,14 @@
 class Sellvana_Sales_Model_Order_Item_State_Cancel extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const NONE = 'none',
+        REQUESTED = 'requested',
         PROCESSING = 'processing',
         PARTIAL = 'partial',
         CANCELED = 'canceled';
 
     protected $_valueLabels = [
         self::NONE => 'None',
+        self::REQUESTED => 'Requested',
         self::PROCESSING => 'Processing',
         self::PARTIAL => 'Partial',
         self::CANCELED => 'Canceled',
@@ -19,6 +21,11 @@ class Sellvana_Sales_Model_Order_Item_State_Cancel extends Sellvana_Sales_Model_
     public function setNone()
     {
         return $this->changeState(self::NONE);
+    }
+
+    public function setRequested()
+    {
+        return $this->changeState(self::REQUESTED);
     }
 
     public function setProcessing()
