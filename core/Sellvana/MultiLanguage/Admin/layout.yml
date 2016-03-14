@@ -5,3 +5,6 @@ base:
     - view: settings
         do:
             - [ addTab, Sellvana_MultiLanguage, { label: Multi Language, group: catalog, pos: 150, async: true, permission: settings/Sellvana_MultiLanguage } ]
+
+/my_account:
+    - { hook: my_account:after, views: my_account/locale }

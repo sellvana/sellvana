@@ -11,7 +11,11 @@ modules:
 
         auto_use: [ bootstrap ]
 
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+
         default_config:
-            modules:
-                Sellvana_ShippingPlain:
-                    conditionally_free_services: ['01', '02']
+            modules/Sellvana_ShippingPlain/enabled: 1
+            modules/Sellvana_ShippingPlain/conditionally_free_services: ['_02']
+            modules/Sellvana_ShippingPlain/services: ['_01', '_02']

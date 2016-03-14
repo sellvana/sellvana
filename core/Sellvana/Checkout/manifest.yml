@@ -12,7 +12,7 @@ modules:
                 auto_use: [ layout ]
 
             FCom_Frontend:
-                auto_use: [ bootstrap, layout ]
+                auto_use: [ bootstrap, layout, views ]
                 routing:
                     - [ /checkout/?.action, Sellvana_Checkout_Frontend_Controller_CheckoutSimple ]
                     #- [ /checkout, Sellvana_Checkout_Frontend_Controller_Checkout.checkout ]

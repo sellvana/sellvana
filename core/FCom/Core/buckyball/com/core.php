@@ -646,6 +646,12 @@ class BConfig extends BClass
         return $this;
     }
 
+    public function addDefault(array $config)
+    {
+        $this->_config = $this->BUtil->arrayMerge($config, $this->_config);
+        return $this;
+    }
+
     /**
      * Add configuration from file
      *

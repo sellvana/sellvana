@@ -57,6 +57,7 @@ class FCom_LibTwig_Main extends BClass
         foreach ([
             '_' => [$this->BLocale, '_'],
             'currency' => [$this->BLocale, 'currency'],
+            'locdate' => [$this->BLocale, 'datetimeDbToLocal'],
             'safehtml' => [$this->BResponse, 'safeHtml'],
             'min' => 'min',
             'max' => 'max',

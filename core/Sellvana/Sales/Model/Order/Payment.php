@@ -90,27 +90,48 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_transactions;
     }
 
-    public function importFromOrder(Sellvana_Sales_Model_Order $order)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
     {
         $this->order($order);
 
         $this->set([
-            'order_id' => $order->id(),
             'payment_method' => $order->get('payment_method'),
             'amount_due' => $order->get('amount_due'),
-        ])->save();
+        ]);
 
-        foreach ($order->items() as $item) {
+        $this->state()->overall()->setDefaultState();
+        $this->state()->custom()->setDefaultState();
+
+        $this->save();
+
+        $items = $order->items();
+        if ($qtys === null) {
+            $qtys = [];
+            foreach ($items as $item) {
+                $qtys[$item->id()] = true;
+            }
+        }
+
+        foreach ($qtys as $itemId => $qty) {
+            if (empty($items[$itemId])) {
+                throw new BException($this->BLocale->_('Invalid item id: %s', $itemId));
+            }
+            /** @var Sellvana_Sales_Model_Order_Item $item */
+            $item = $items[$itemId];
+            $qtyCanPay = $item->getQtyCanPay();
+            if ($qty === true) {
+                $qty = $qtyCanPay;
+            } elseif ($qty <= 0 || $qty > $qtyCanPay) {
+                throw new BException($this->BLocale->_('Invalid quantity to pay for %s: %s', [$item->get('product_sku'), $qty]));
+            }
             $this->Sellvana_Sales_Model_Order_Payment_Item->create([
                 'order_id' => $order->id(),
                 'payment_id' => $this->id(),
                 'order_item_id' => $item->id(),
-                'qty' => $item->get('qty_ordered'),
+                'qty' => $qty,
             ])->save();
         }
 
-        $this->state()->overall()->setDefaultState();
-        $this->state()->custom()->setDefaultState();
         return $this;
     }
 
@@ -270,11 +291,6 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             $oItem = $orderItems[$oItemId];
             $oItem->set('qty_paid', $oItem->get('qty_ordered'));
         }
-        return $this;
-    }
-
-    public function payOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
-    {
         return $this;
     }
 

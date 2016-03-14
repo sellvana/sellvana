@@ -34,7 +34,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
 
         $config = parent::gridConfig();
 
-        $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at'];
+        $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at', 'cell' => 'datetime'];
 
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -140,6 +140,34 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
             'oi_state_refund' => 'Refund State (Item)',
             'oi_state_cancel' => 'Cancel State (Item)',
             'oi_state_custom' => 'Custom State (Item)',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getCellFormats()
+    {
+        return [
+            'create_at' => 'datetime',
+            'o_subtotal' => 'currency',
+            'o_shipping_price' => 'currency',
+            'o_shipping_discount' => 'currency',
+            'o_tax_amount' => 'currency',
+            'o_discount_amount' => 'currency',
+            'o_update_at' => 'datetime',
+            'o_grand_total' => 'currency',
+            'o_amount_paid' => 'currency',
+            'o_amount_due' => 'currency',
+            'o_amount_refunded' => 'currency',
+            'c_create_at' => 'datetime',
+            'c_update_at' => 'datetime',
+            'c_last_login' => 'datetime',
+            'oi_price' => 'currency',
+            'oi_cost' => 'currency',
+            'oi_row_total' => 'currency',
+            'oi_row_tax' => 'currency',
+            'oi_row_discount' => 'currency',
         ];
     }
 

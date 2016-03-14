@@ -6,6 +6,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
  * @property Sellvana_Sales_Model_Order_Refund_State $Sellvana_Sales_Model_Order_Refund_State
+ * @property Sellvana_Sales_Model_Order_Refund_Item $Sellvana_Sales_Model_Order_Refund_Item
  */
 
 class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
@@ -18,7 +19,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
     protected $_state;
 
     /**
-     * @return Sellvana_Sales_Model_Order_Refund_State
+     * @refund Sellvana_Sales_Model_Order_Refund_State
      */
     public function state()
     {
@@ -28,40 +29,40 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function refundOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
     {
-        if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
-            return $this;
-        }
-        $qtys = [];
-        foreach ($matches as $m) {
-            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-        }
-        $skus = array_keys($qtys);
+        $this->order($order);
+        $this->state()->overall()->setDefaultState();
+        $this->state()->custom()->setDefaultState();
+        $this->save();
+
         $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
+        if ($qtys === null) {
+            $qtys = [];
+            foreach ($items as $item) {
+                $qtys[$item->id()] = true;
             }
         }
-        if (!$items) {
-            return [
-                'error' => ['message' => 'No valid SKUs found'],
-            ];
-        }
 
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanRefund() : $qtys[$sku];
-            $item->set('qty_to_refund', $qty);
+        foreach ($qtys as $itemId => $qty) {
+            if (empty($items[$itemId])) {
+                throw new BException($this->BLocale->_('Invalid item id: %s', $itemId));
+            }
+            /** @var Sellvana_Sales_Model_Order_Item $item */
+            $item = $items[$itemId];
+            $qtyCanRefund = $item->getQtyCanRefund();
+            if ($qty === true) {
+                $qty = $qtyCanRefund;
+            } elseif ($qty <= 0 || $qty > $qtyCanRefund) {
+                throw new BException($this->BLocale->_('Invalid quantity to refund for %s: %s', [$item->get('product_sku'), $qty]));
+            }
+            $this->Sellvana_Sales_Model_Order_Refund_Item->create([
+                'order_id' => $order->id(),
+                'refund_id' => $this->id(),
+                'order_item_id' => $item->id(),
+                'qty' => $qty,
+            ])->save();
         }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminRefundsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
 
         return $this;
     }

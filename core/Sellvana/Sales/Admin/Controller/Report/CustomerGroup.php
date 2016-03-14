@@ -24,18 +24,18 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
             ['name' => 'group_id', 'index' => 'group_id', 'width' => 70],
             ['name' => 'group_title', 'index' => 'group_title', 'width' => 100],
 
-            ['name' => 'subtotal_aggr', 'index' => 'subtotal_aggr'],
-            ['name' => 'tax_amount_aggr', 'index' => 'tax_amount_aggr'],
-            ['name' => 'shipping_price_aggr', 'index' => 'shipping_price_aggr'],
-            ['name' => 'discount_amount_aggr', 'index' => 'discount_amount_aggr'],
-            ['name' => 'grand_total_aggr', 'index' => 'grand_total_aggr'],
+            ['name' => 'subtotal_aggr', 'index' => 'subtotal_aggr', 'cell' => 'currency'],
+            ['name' => 'tax_amount_aggr', 'index' => 'tax_amount_aggr', 'cell' => 'currency'],
+            ['name' => 'shipping_price_aggr', 'index' => 'shipping_price_aggr', 'cell' => 'currency'],
+            ['name' => 'discount_amount_aggr', 'index' => 'discount_amount_aggr', 'cell' => 'currency'],
+            ['name' => 'grand_total_aggr', 'index' => 'grand_total_aggr', 'cell' => 'currency'],
 
-            ['name' => 'amount_paid_aggr', 'index' => 'amount_paid_aggr'],
-            ['name' => 'amount_refunded_aggr', 'index' => 'amount_refunded_aggr'],
+            ['name' => 'amount_paid_aggr', 'index' => 'amount_paid_aggr', 'cell' => 'currency'],
+            ['name' => 'amount_refunded_aggr', 'index' => 'amount_refunded_aggr', 'cell' => 'currency'],
 
             ['name' => 'item_qty_aggr', 'index' => 'item_qty_aggr'],
             ['name' => 'pc_of_sales', 'index' => 'pc_of_sales'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],

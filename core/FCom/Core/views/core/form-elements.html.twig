@@ -84,6 +84,9 @@ Using custom id/name:
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             {% if p.multiple %}
                 <input type="hidden" name="{{ view.getInputName(p) }}" value="PLACEHOLDER~TO~REMOVE">
+                {% if p.remove_old is not defined or p.remove_old == true %}
+                    <input type="hidden" name="{{ view.getInputNameRemoveOld(p) }}" value="1">
+                {% endif %}
             {% endif %}
             <select
                 id="{{ view.getInputId(p) }}"
@@ -98,6 +101,9 @@ Using custom id/name:
             >
                 {{ UTIL.optionsHtml(view.getOptions(p), view.getInputValue(p)|default(p.default)) | raw }}
             </select>
+            {% if p.help_block_text %}
+                {{ forms.help_block(p) }}
+            {% endif %}
         </div>
     </div>
     {% if p.select2 is defined %}

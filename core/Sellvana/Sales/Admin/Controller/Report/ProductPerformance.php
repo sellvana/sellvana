@@ -21,10 +21,10 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
             ['name' => 'product_sku', 'index' => 'product_sku', 'width' => 70],
             ['name' => 'product_name', 'index' => 'product_name'],
             ['name' => 'qty_sold', 'index' => 'qty_sold'],
-            ['name' => 'row_total_amount', 'index' => 'row_total_amount'],
+            ['name' => 'row_total_amount', 'index' => 'row_total_amount', 'cell' => 'currency'],
 
             ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],

@@ -11,7 +11,7 @@
                 <input type="radio" name="shipping_method" id="shipping_method-{{ service.value }}" required
                        value="{{ service.value }}" {{ service.selected ? 'checked' }}>
                 {{ service.title |_ }}
-                {{ service.price ? service.price|currency : 'FREE' }}
+                {{ service.price ? service.price|currency(cart.get('store_currency_code')) : 'FREE' }}
                 {% if service.max_days %}({{ service.max_days }} days){% endif %}
             </label>
         </dd>

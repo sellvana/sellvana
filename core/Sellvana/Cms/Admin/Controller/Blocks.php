@@ -40,7 +40,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'meta_title', 'label' => 'Meta Title', 'hidden' => true],
             ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
             ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
-            ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true],
+            ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -128,7 +128,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config['columns']   = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 30],
-            ['name' => 'create_at', 'label' => 'Submitted On', 'width' => 200,],
+            ['name' => 'create_at', 'label' => 'Submitted On', 'width' => 200, 'cell' => 'datetime'],
             ['name' => 'customer_id', 'label' => 'Customer ID', 'width' => 50,],
             ['name' => 'post_status', 'label' => 'Post Status', 'width' => 200,],
             ['name' => 'email', 'label' => 'Email', 'width' => 250,],

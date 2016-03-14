@@ -8,7 +8,7 @@
             <th>{{ "Name"|_ }}</th>
             <th>{{ "Revenue"|_ }}</th>
             <th>{{ "Qty"|_ }}</th>
-            <th>{{ "Profit ($)"|_ }}</th>
+            <th>{{ "Profit"|_ }}</th>
             <th>{{ "Profit (%%)"|_ }}</th>
         </tr>
         </thead>
@@ -21,9 +21,9 @@
                 <tr>
                     <td>{{ product.get('product_sku') }}</td>
                     <td>{{ product.get('product_name') }}</td>
-                    <td>{{ product.get('revenue') }}</td>
+                    <td>{{ product.get('revenue')|currency('base') }}</td>
                     <td>{{ product.get('qty') }}</td>
-                    <td>{{ product.get('profit_fixed') }}</td>
+                    <td>{{ product.get('profit_fixed')|currency('base') }}</td>
                     <td>{{ product.get('profit_pc') }}</td>
                 </tr>
             {% endfor %}

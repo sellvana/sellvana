@@ -31,10 +31,10 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
             ['name' => 'shipping_service', 'index' => 'o.shipping_service'],
             ['name' => 'order_count', 'index' => 'order_count'],
             ['name' => 'qty_sold', 'index' => 'qty_sold'],
-            ['name' => 'total_shipping_amount', 'index' => 'total_shipping_amount'],
+            ['name' => 'total_shipping_amount', 'index' => 'total_shipping_amount', 'cell' => 'currency'],
 
             ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -55,7 +55,7 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
             'shipping_service' => 'Shipping Method',
             'order_count' => '# of Orders',
             'qty_sold' => '# of Items',
-            'total_shipping_amount' => 'Shipping $ Collected',
+            'total_shipping_amount' => 'Shipping Amount Collected',
             'period_type' => 'Period',
             'create_at' => 'Created',
         ];

@@ -32,11 +32,11 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
             ['name' => 'payment_method', 'index' => 'o.payment_method', 'width' => 70, 'options' => $methodOptions],
             ['name' => 'order_count', 'index' => 'order_count'],
             ['name' => 'pc_orders', 'index' => 'pc_orders'],
-            ['name' => 'total_amount', 'index' => 'total_amount'],
+            ['name' => 'total_amount', 'index' => 'total_amount', 'cell' => 'currency'],
             ['name' => 'pc_total_amount', 'index' => 'pc_total_amount'],
-            ['name' => 'received', 'index' => 'received'],
+            ['name' => 'received', 'index' => 'received', 'cell' => 'currency'],
             ['name' => 'pc_received', 'index' => 'pc_received'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -54,10 +54,10 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
             'payment_method' => 'Payment Type',
             'order_count' => '# of Orders',
             'pc_orders' => '% of Orders',
-            'total_amount' => 'Total $',
-            'pc_total_amount' => '% of $ Total',
-            'received' => '$ Received',
-            'pc_received' => '% of $ Received',
+            'total_amount' => 'Total Amount',
+            'pc_total_amount' => '% of Total',
+            'received' => 'Received Amount',
+            'pc_received' => '% of Received',
             'create_at' => 'Created',
         ];
     }

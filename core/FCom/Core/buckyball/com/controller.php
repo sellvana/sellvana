@@ -82,7 +82,7 @@ class BRequest extends BClass
     /**
      * Returns area of the current request
      *
-     * @var string
+     * @return string
      */
     public function area()
     {

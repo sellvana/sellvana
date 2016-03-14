@@ -10,8 +10,10 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    public function action_customerRequestsRMA($args)
+    public function action_customerRequestsToReturnItems($args)
     {
+        $order = $args['order'];
+        $items = $args['items'];
     }
 
     public function action_adminCreatesRMA($args)

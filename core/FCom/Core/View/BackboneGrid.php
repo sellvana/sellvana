@@ -725,6 +725,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
             }
             */
+            foreach ($grid['config']['columns'] as $col) {
+                if (empty($col['cell']) || empty($col['name']) || empty($r[$col['name']])) {
+                    continue;
+                }
+
+                $field = $col['name'];
+                $r[$field] = $this->_formatValue($r[$field], $col['cell']);
+            }
             $data[] = $r;
         }
 
@@ -779,14 +787,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
 
                 if (!empty($col['cell'])) {
-                    switch ($col['cell']) {
-                        case 'number':
-                            $value = floatval($value);
-                            break;
-                        case 'integer':
-                            $value = intval($value);
-                            break;
-                    }
+                    $value = $this->_formatValue($value, $col['cell'], $export);
                 }
 
                 if ($oldValue !== $value) {
@@ -795,6 +796,51 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
         }
         return $data;
+    }
+
+    /**
+     * @param string $value
+     * @param string $type
+     * @param bool|false $export
+     * @return float|int|string
+     */
+    protected function _formatValue($value, $type, $export = false)
+    {
+        switch ($type) {
+            case 'number':
+                $value = floatval($value);
+                break;
+            case 'integer':
+                $value = intval($value);
+                break;
+            case 'currency':
+                if (!$export) {
+                    $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
+                    if ($currency) {
+                        $value = $this->BLocale->currency($value, $currency);
+                    } else {
+                        $value = $this->BLocale->currency($value);
+                    }
+                }
+                break;
+            case 'date':
+                if (!$export) {
+                    $value = $this->BLocale->datetimeDbToLocal($value);
+                }
+                break;
+            case 'datetime':
+                if (!$export) {
+                    $value = $this->BLocale->datetimeDbToLocal($value, BLocale::FORMAT_SHORT_DATETIME);
+                }
+                break;
+            case 'datetime_full':
+                if (!$export) {
+                    $value = $this->BLocale->datetimeDbToLocal($value, BLocale::FORMAT_FULL_DATETIME);
+                }
+                break;
+        }
+
+        return $value;
     }
 
     /**

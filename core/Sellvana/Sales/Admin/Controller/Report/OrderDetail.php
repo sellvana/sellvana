@@ -31,7 +31,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
 
         $config = parent::gridConfig();
 
-        $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at'];
+        $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at', 'cell' => 'datetime'];
         $config['columns'][] = ['name' => 'inventory_sku', 'index' => 'inventory_sku'];
 
         $config['filters'] = [
@@ -111,6 +111,29 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
             'c_payment_method' => 'Customer Payment Method',
             'c_payment_details' => 'Customer Payment Details',
             'c_status' => 'Customer Status'
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getCellFormats()
+    {
+        return [
+            'create_at' => 'datetime',
+            'o_subtotal' => 'currency',
+            'o_shipping_price' => 'currency',
+            'o_shipping_discount' => 'currency',
+            'o_tax_amount' => 'currency',
+            'o_discount_amount' => 'currency',
+            'o_update_at' => 'datetime',
+            'o_grand_total' => 'currency',
+            'o_amount_paid' => 'currency',
+            'o_amount_due' => 'currency',
+            'o_amount_refunded' => 'currency',
+            'c_create_at' => 'datetime',
+            'c_update_at' => 'datetime',
+            'c_last_login' => 'datetime',
         ];
     }
 

@@ -24,11 +24,11 @@ class Sellvana_Sales_Admin_Controller_Report_AbandonedCarts extends FCom_Admin_C
             ['name' => 'customer_email', 'index' => 'customer_email'],
             ['name' => 'skus', 'index' => 'skus'],
             ['name' => 'item_qty', 'index' => 'c.item_qty'],
-            ['name' => 'subtotal', 'index' => 'c.subtotal'],
+            ['name' => 'subtotal', 'index' => 'c.subtotal', 'cell' => 'currency'],
             ['name' => 'coupon_code', 'index' => 'c.coupon_code'],
             ['name' => 'last_page', 'index' => 'last_page'],
-            ['name' => 'create_at', 'index' => 'c.create_at'],
-            ['name' => 'update_at', 'index' => 'c.update_at'],
+            ['name' => 'create_at', 'index' => 'c.create_at', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'index' => 'c.update_at', 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],

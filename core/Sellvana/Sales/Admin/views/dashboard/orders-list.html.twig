@@ -22,10 +22,10 @@
                 <tr>
                     <td>{{ order.id() }}</td>
                     <td>{{ order.get('firstname') }} {{ order.get('lastname') }}</td>
-                    <td>{{ order.get('grand_total') }}</td>
-                    <td>{{ order.get('amount_due') }}</td>
+                    <td>{{ order.get('grand_total')|currency('base') }}</td>
+                    <td>{{ order.get('amount_due')|currency('base') }}</td>
                     <td>{{ order.state().overall().getValueLabel() }}</td>
-                    <td>{{ order.get('create_at')|date }}</td>
+                    <td>{{ order.get('create_at')|locdate('datetime_short') }}</td>
                 </tr>
             {% endfor %}
         {% endif %}

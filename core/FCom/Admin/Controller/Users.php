@@ -52,8 +52,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                 'multirow_edit' => true,
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')
             ],
-            ['name' => 'create_at', 'label' => 'Created', 'width' => 100],
-            ['name' => 'update_at', 'label' => 'Updated', 'width' => 100],
+            ['name' => 'create_at', 'label' => 'Created', 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'width' => 100, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => ['caption' => 'status'],

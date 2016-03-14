@@ -29,11 +29,11 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
             ['name' => 'customer_id', 'index' => 'customer_id', 'options' => $customersOptions],
             ['name' => 'order_count', 'index' => 'order_count'],
             ['name' => 'item_count', 'index' => 'item_count'],
-            ['name' => 'total_amount', 'index' => 'total_amount'],
-            ['name' => 'total_received', 'index' => 'total_received'],
-            ['name' => 'total_refunded', 'index' => 'total_refunded'],
+            ['name' => 'total_amount', 'index' => 'total_amount', 'cell' => 'currency'],
+            ['name' => 'total_received', 'index' => 'total_received', 'cell' => 'currency'],
+            ['name' => 'total_refunded', 'index' => 'total_refunded', 'cell' => 'currency'],
 
-            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
             ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
         ];
         $config['filters'] = [

@@ -83,7 +83,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             if (empty($item['title'])) {
                 $item['title'] = $item['content'];
             }
-            $item['ts'] = $this->BLocale->datetimeDbToLocal($item['ts'], true);
+            $item['ts'] = $this->BLocale->datetimeDbToLocal($item['ts'], BLocale::FORMAT_SHORT_DATETIME);
             if (empty($item['icon_class'])) {
                 switch ($item['type']) {
                     case 'error':
