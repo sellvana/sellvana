@@ -18,31 +18,6 @@ class FCom_AdminChat_Admin extends BClass
         $this->FCom_AdminChat_Model_Participant->delete_many(['user_id' => $userId]);
     }
 
-    public function onClientSetStatus($args)
-    {
-        return; // not needed, status set from pushclient
-
-        $userId = $args['client']->admin_user_id;
-        if (!$userId) {
-            return;
-        }
-        if ($args['status'] === 'offline') {
-            $clients = $this->FCom_PushServer_Model_Client->findByAdminUser($userId);
-            foreach ($clients as $c) { // check other clients
-                if ($c->id !== $args['client']->id && $c->status !== 'offline') {
-                    return; // if at least one of the not offline, abort
-                }
-            }
-        } else {
-            $args['client']->send(['signal' => 'status', 'status' => $args['status']]); // update other clients of the user
-        }
-
-        // send admin user status change
-        $user = $this->FCom_Admin_Model_User->load($userId);
-        $this->FCom_PushServer_Model_Channel->getChannel('adminuser:' . $user->username, true)
-            ->send(['signal' => 'status', 'status' => $args['status']]);
-    }
-
     public function getInitialState()
     {
         $p = $this->BDebug->debug('ADMINCHAT INITIAL STATE');
