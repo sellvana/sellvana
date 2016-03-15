@@ -78,7 +78,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         if (!parent::onBeforeDispatch()) return false;
 
-        $this->view('head')->addTitle($this->BLocale->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
+        $this->view('head')->addTitle($this->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
 
         return true;
     }
@@ -111,9 +111,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'admin', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, [$this->BLocale, '_']);
+            array_walk($msg, [$this->BLocale, 'translate']);
         } else {
-            $msg = $this->BLocale->_($msg);
+            $msg = $this->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;

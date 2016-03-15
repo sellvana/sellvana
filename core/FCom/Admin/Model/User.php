@@ -186,7 +186,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         $password = $data[$args['field']];
         if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
-            return $this->BLocale->_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
+            return $this->_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
         }
         return true;
     }

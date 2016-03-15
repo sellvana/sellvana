@@ -1653,7 +1653,6 @@ class BUtil extends BClass
         if (!$options) {
             return '';
         }
-        $locale = $this->BLocale;
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
@@ -1663,10 +1662,10 @@ class BUtil extends BClass
             }
             if (is_array($v)) {
                 $attr = $v;
-                $v = !empty($attr['text']) ? $locale->_($attr['text']) : '';
+                $v = !empty($attr['text']) ? $this->_($attr['text']) : '';
                 unset($attr['text']);
             } else {
-                $v = $locale->_($v);
+                $v = $this->_($v);
                 $attr = [];
             }
             $attr['value'] = $k;
@@ -4420,7 +4419,7 @@ class BValidate extends BClass
 
             if (!$result) {
                 $message = $this->BUtil->injectVars($r['message'], $r['args']);
-                $message = $this->BLocale->_($message);
+                $message = $this->_($message);
                 $this->_validateErrors[$r['field']][] = $message;
                 if (!empty($r['args']['break'])) {
                     break;
@@ -4702,7 +4701,7 @@ class BValidateViewHelper extends BClass
         if (empty($this->_errors[$field]['msg']['error'])) {
             return '';
         }
-        return $this->BLocale->_($this->_errors[$field]['msg']['error']);
+        return $this->_($this->_errors[$field]['msg']['error']);
     }
 
     /**

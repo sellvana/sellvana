@@ -166,7 +166,7 @@ class Sellvana_Blog_Model_Post extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->BLocale->_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->_('The URL Key entered is already in use. Please enter a valid URL Key.');
         }
         return true;
     }

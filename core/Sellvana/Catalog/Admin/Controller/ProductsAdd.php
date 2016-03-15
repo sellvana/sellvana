@@ -39,7 +39,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
             try {
                 $p = $prodHlp->load($prodData['product_sku'], 'product_sku');
                 if ($p) {
-                    $this->message($this->BLocale->_('Product with SKU %s already exists', $prodData['product_sku']), 'error');
+                    $this->message($this->_('Product with SKU %s already exists', $prodData['product_sku']), 'error');
                     $errors++;
                     continue;
                 }
@@ -88,7 +88,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
 
         $this->BEvents->fire(__METHOD__ . ':after', ['products' => $products]);
 
-        $this->message($this->BLocale->_('Total %s product(s) created, with %s error(s)', [$created, $errors]));
+        $this->message($this->_('Total %s product(s) created, with %s error(s)', [$created, $errors]));
         $this->BResponse->redirect('/catalog/products/quick-add');
     }
 

@@ -151,7 +151,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_sku" class="btn grid-new btn-primary _modal">'
-                . $this->BLocale->_('New Sku') . '</button>']]);
+                . $this->_('New Sku') . '</button>']]);
     }
 
     /**

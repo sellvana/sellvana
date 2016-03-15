@@ -393,22 +393,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                 switch ($k) {
                     case 'refresh':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Refresh');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Refresh');
                         $class   = 'js-change-url grid-refresh btn';
                         $html    = $this->BUtil->tagHtml('a', ['href' => '#', 'class' => $class], $caption);
                         break;
                     case 'export':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Export');
                         $class   = 'grid-export btn';
                         $html    = $this->BUtil->tagHtml('button', ['type' => 'button', 'class' => $class], $caption);
                         break;
                     case 'link_to_page':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Export');
                         $class   = 'grid-export btn';
                         $html    = $this->BUtil->tagHtml('a', ['href' => $action['href'], 'class' => $class], $caption);
                         break;
                     case 'edit':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Edit');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Edit');
                         $class   = 'btn grid-mass-edit mass-action btn-success';
                         $html    = $this->BUtil->tagHtml('a',
                             ['class' => $class .' disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid['config']['id'] . '-mass-edit', 'role' => 'button'],
@@ -416,17 +416,17 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         );
                         break;
                     case 'delete':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Delete');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Delete');
                         $class   = 'btn grid-mass-delete mass-action btn-danger' . ((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : '');
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class . ' disabled', 'type' => 'button'], $caption);
                         break;
                     case 'add': //todo: confirm with Boris merge this action with 'new'
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
                         $class   = 'btn grid-add btn-primary';
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
                     case 'new':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
                         $class   = 'btn grid-new btn-primary' . (isset($action['modal']) && $action['modal'] ? ' _modal' : '');
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
@@ -434,7 +434,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         $action = static::$_defaultActions[$k];
                 }
             } elseif (!isset($action['html']) || !$action['html']) {
-                $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
                 $class = isset($action['class']) ? 'btn ' . $action['class'] : 'btn';
                 $html = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button', 'id' => isset($action['id']) ? $action['id'] : ''], $caption);
             }

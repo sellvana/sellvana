@@ -86,7 +86,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
 
         $payment->addHistoryEvent('complete',
-            $this->BLocale->_('Customer completed payment by %s', $order->getPaymentMethod()->getName()),
+            $this->_('Customer completed payment by %s', $order->getPaymentMethod()->getName()),
             ['entity_id' => $payment->id()]
         );
     }
@@ -105,7 +105,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
 
         $order->addHistoryEvent('failed',
-            $this->BLocale->_('Customer failed payment by %s', $order->get('payment_method')),
+            $this->_('Customer failed payment by %s', $order->get('payment_method')),
             ['entity_id' => $payment->id()]
         );
     }
@@ -131,7 +131,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             $historyData['entity_id'] = $payment->id();
 
             $order->addHistoryEvent('error',
-                $this->BLocale->_($message),
+                $this->_($message),
                 $historyData
             );
         } else {

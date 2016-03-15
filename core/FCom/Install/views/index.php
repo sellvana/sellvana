@@ -1,14 +1,14 @@
 <form method="POST" action="<?=$this->BApp->href('install')?>" class="form-horizontal">
     <input type="hidden" name="X-CSRF-TOKEN" value="<?= $this->BSession->csrfToken() ?>"/>
     <div class="panel-heading">
-        <h1 class="panel-title"><?=$this->BLocale->_('Welcome to Fulleron installation wizard!')?></h1>
+        <h1 class="panel-title"><?=$this->_('Welcome to Sellvana installation wizard!')?></h1>
     </div>
 
     <div class="form-group">
-        <label for="language" class="col-lg-2 control-label"><?=$this->BLocale->_('Language')?></label>
+        <label for="language" class="col-lg-2 control-label"><?=$this->_('Language')?></label>
         <div class="col-lg-3">
             <select class="form-control" id="language">
-                <option value="en_US"><?=$this->BLocale->_('English')?></option>
+                <option value="en_US"><?=$this->_('English')?></option>
             </select>
         </div>
     </div>
@@ -65,13 +65,13 @@
     </div>
     <div class="clearfix">
         <div class="checkbox pull-right">
-            <label class="required"><input type="checkbox" name="w[agree]" value="Agree" required> <?=$this->BLocale->_('I agree')?></label>
+            <label class="required"><input type="checkbox" name="w[agree]" value="Agree" required> <?=$this->_('I agree')?></label>
         </div>
     </div>
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item clearfix">
-            <button type="submit" class="btn btn-primary pull-right" name="do" value="next"><?=$this->BLocale->_('Continue')?></button>
+            <button type="submit" class="btn btn-primary pull-right" name="do" value="next"><?=$this->_('Continue')?></button>
         </li>
     </ul>
 </form>

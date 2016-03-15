@@ -41,23 +41,22 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
             $messages = $this->BSession->messages($namespace);
         }
         $out = [];
-        $locale = $this->BLocale;
         foreach ((array)$messages as $m) {
             if (!empty($m['msgs'])) {
                 foreach ($m['msgs'] as &$msg) {
-                    $msg = (string)$locale->_($msg);
+                    $msg = (string)$this->_($msg);
                 }
                 unset($msg);
             }
             $out[] = [
                 'type' => $m['type'],
-                'msg' => !empty($m['msg']) ? (string)$locale->_($m['msg']) : null,
+                'msg' => !empty($m['msg']) ? (string)$this->_($m['msg']) : null,
                 'msgs' => !empty($m['msgs']) ? $m['msgs'] : null,
                 'class' => !empty($this->_classes[$m['type']]) ? $this->_classes[$m['type']] : $m['type'],
                 'title' => isset($m['title']) ? (string)$m['title'] :
-                    (!empty($this->_titles[$m['type']]) ? (string)$locale->_($this->_titles[$m['type']]) : null),
+                    (!empty($this->_titles[$m['type']]) ? (string)$this->_($this->_titles[$m['type']]) : null),
                 'icon' => isset($m['icon']) ? $m['icon'] :
-                    (!empty($this->_icons[$m['type']]) ? (string)$locale->_($this->_icons[$m['type']]) : $m['type']),
+                    (!empty($this->_icons[$m['type']]) ? (string)$this->_($this->_icons[$m['type']]) : $m['type']),
             ];
         }
         return $out;

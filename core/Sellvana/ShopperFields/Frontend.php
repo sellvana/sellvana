@@ -181,7 +181,7 @@ class Sellvana_ShopperFields_Frontend extends BClass
                 if (!$skuModel->canOrder()) {
                     $sku = $skuModel->get('inventory_sku');
                     foreach ($skus[$sku] as $s) {
-                        $args['items'][$s['item_idx']]['error'] = $this->BLocale->_('Bundled SKU %s out of stock', $sku);
+                        $args['items'][$s['item_idx']]['error'] = $this->_('Bundled SKU %s out of stock', $sku);
                     }
                 }
             }
