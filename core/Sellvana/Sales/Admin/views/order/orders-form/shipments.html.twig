@@ -168,32 +168,39 @@
     require(['jquery', 'underscore'], function($, _) {
         var shipmentCreateUrl = "{{ APP.href('shipments/create?id=' ~ order.id()) }}";
         var shipmentUpdateUrl = "{{ APP.href('shipments/update?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        // Create shipments or update shipments data
         $(document).unbind().on('click', '#btnShipmentCreate, #btnShipmentUpdate', function(ev) {
-            var $dataContainer = $(ev.target.dataset.container);
             var postUrl = !ev.target.dataset.action ? shipmentCreateUrl : shipmentUpdateUrl;
-            var serializeData = $dataContainer.find('input, select').serializeArray();
-            $.post(postUrl, serializeData, function(data, status, xhr) {
-                if (data.tabs && status == 'success') {
-                    _.each(data.tabs, function (tabHtml, i) {
-                        $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
-                    });
-                    $.bootstrapGrowl("{{ 'Successfully saved.' | _ }}", {
-                        type: 'success',
-                        align: 'center',
-                        width: 'auto',
-                        delay: 1000
-                    });
-                } else {
-                    $.bootstrapGrowl("{{ 'Oops, looks like something went wrong.' | _ }}", {
-                        type: 'error',
-                        align: 'center',
-                        width: 'auto',
-                        delay: 1000
-                    });
-                }
-            });
+            var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
+            $.post(postUrl, serializeData, processPostResponse);
         });
 
+        // Update shipment status
+        $(document).on('click', '.js-shipment-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(shipmentUpdateUrl, postData, processPostResponse);
+        });
+
+        // link carrier and service dropdowns
         var $carrier = $('#shipment-carrier_code'), $service = $('#shipment-service_code');
         var allServices = {{ UTIL.toJson(allServices) | raw }};
         $carrier.change(function(ev) {
@@ -207,30 +214,5 @@
             }
         });
 
-        // Update shipment status
-        $(document).on('click', '.js-shipment-action', function(ev) {
-            var $el = $(ev.target)/*, $form = $el.parents('form')*/, postData = {};
-            postData[$el.attr('name')] = $el.val();
-            $.post(shipmentUpdateUrl, postData, function(data, status, xhr) {
-                if (data.tabs && status == 'success') {
-                    _.each(data.tabs, function (tabHtml, i) {
-                        $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
-                    });
-                    $.bootstrapGrowl("{{ 'Status has been updated.' | _ }}", {
-                        type: 'success',
-                        align: 'center',
-                        width: 'auto',
-                        delay: 1000
-                    });
-                } else {
-                    $.bootstrapGrowl("{{ 'Oops, looks like something went wrong.' | _ }}", {
-                        type: 'error',
-                        align: 'center',
-                        width: 'auto',
-                        delay: 1000
-                    });
-                }
-            });
-        });
     })
 </script>

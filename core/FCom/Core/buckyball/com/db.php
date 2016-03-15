@@ -3526,6 +3526,23 @@ class BModel extends Model
         }
         return $this;
     }
+
+    /**
+     * @param $string
+     * @param array|string $params
+     * @param null $module
+     * @return false|string
+     * @throws BException
+     */
+    public function _($string, $params = [], $module = null)
+    {
+        /** @var BLocale $locale */
+        static $locale;
+        if (!$locale) {
+            $locale = $this->BLocale;
+        }
+        return $locale->translate($string, $params, $module);
+    }
 }
 
 /**

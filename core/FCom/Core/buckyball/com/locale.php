@@ -1061,7 +1061,7 @@ class BLocale extends BClass
         return $this;
     }
 
-    public function _($string, $params = [], $module = null)
+    public function translate($string, $params = [], $module = null)
     {
 /*
         if ($string instanceof BTranslated) {
@@ -1154,16 +1154,16 @@ class BLocale extends BClass
         if (is_array($sources)) {
             foreach ($sources as $string) {
                 if (is_string($string)) {
-                    $results[$string] = static::_($string);
+                    $results[$string] = static::translate($string);
                 } else if (is_array($string) && !empty($string)) {
                     $str = (string) $string[0];
                     $params = isset($string[1]) ? (array) $string[1] : [];
                     $module = isset($string[2]) ? (string) $string[2] : null;
-                    $results[$str] = static::_($str, $params, $module);
+                    $results[$str] = static::translate($str, $params, $module);
                 }
             }
         } else {
-            $results[(string) $sources] = static::_((string) $sources);
+            $results[(string) $sources] = static::translate((string) $sources);
         }
 
         return $this->BUtil->toJson($results);

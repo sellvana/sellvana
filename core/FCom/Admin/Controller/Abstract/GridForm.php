@@ -306,7 +306,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'onclick' => "location.href='{$this->BApp->href($this->_gridHref)}'",
             ],
             [
-                ['span', null, $this->BLocale->_('Back to list')],
+                ['span', null, $this->_('Back to list')],
             ], 10
         ];
 
@@ -321,7 +321,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     'onclick' => 'return confirm(\'Are you sure?\')',
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Delete')],
+                    ['span', null, $this->_('Delete')],
                 ], 20
             ];
         }
@@ -334,7 +334,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'data-style' => 'expand-left',
             ],
             [
-                ['span', null, $this->BLocale->_('Save')],
+                ['span', null, $this->_('Save')],
             ], 30
         ];
 
@@ -346,7 +346,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'data-style' => 'expand-left',
             ],
             [
-                ['span', null, $this->BLocale->_('Save And Continue')],
+                ['span', null, $this->_('Save And Continue')],
             ], 1000
         ];
 
@@ -354,9 +354,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $titleFieldValue = is_string($this->_formTitleField) && preg_match('#^[a-z0-9_]+$#i', $this->_formTitleField)
                 ? $m->get($this->_formTitleField)
                 : $this->BUtil->call($this->_formTitleField, $m);
-            $this->_formTitle = $this->BLocale->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
+            $this->_formTitle = $this->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
         } else {
-            $this->_formTitle = $this->BLocale->_('Create New %s', [$this->_recordName]);
+            $this->_formTitle = $this->_('Create New %s', [$this->_recordName]);
         }
 
         $args['view']->set([
@@ -513,9 +513,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function message($msg, $type = 'success', $tag = 'admin', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, [$this->BLocale, '_']);
+            array_walk($msg, [$this->BLocale, 'translate']);
         } else {
-            $msg = $this->BLocale->_($msg);
+            $msg = $this->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;

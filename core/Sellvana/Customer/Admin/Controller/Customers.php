@@ -31,7 +31,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
-                    'title' => $this->BLocale->_('Log in as customer'), 'target' => 'AdminCustomer'],
+                    'title' => $this->_('Log in as customer'), 'target' => 'AdminCustomer'],
                 ['name' => 'delete'],
             ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'c.id'],
@@ -112,11 +112,11 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
                 'a',
                 [
                     'class' => ['btn', 'btn-default'],
-                    'title' => $this->BLocale->_('Redirect to frontend and create order'),
+                    'title' => $this->_('Redirect to frontend and create order'),
                     'href' => $this->BApp->href('customers/start_session?id=' . $m->id()),
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Log in as Customer')],
+                    ['span', null, $this->_('Log in as Customer')],
                 ]
             ];
         }

@@ -185,7 +185,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     'class' => ['btn', 'btn-default'],
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Ship All Items')],
+                    ['span', null, $this->_('Ship All Items')],
                 ]
             ];
 
@@ -198,7 +198,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     'class' => ['btn', 'btn-default'],
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Mark as Paid')],
+                    ['span', null, $this->_('Mark as Paid')],
                 ]
             ];
 
@@ -570,7 +570,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 $curSeqId = $seq->get('current_seq_id');
                 if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $curSeqId) {
                     $result['status'] = false;
-                    $result['messages'] = $this->BLocale->_('Order number must larger than order current: ' . $curSeqId);
+                    $result['messages'] = $this->_('Order number must larger than order current: ' . $curSeqId);
                 }
             }
         }

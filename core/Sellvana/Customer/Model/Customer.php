@@ -202,19 +202,18 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function validateCustomerStatus()
     {
         $result = ['allow_login' => false];
-        $locale = $this->BLocale;
         switch ($this->get('status')) {
             case 'active':
                 $result['allow_login'] = true;
                 break;
             case 'review':
-                $result['error']['message'] = $locale->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
+                $result['error']['message'] = $this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
                 break;
             case 'disabled':
-                $result['error']['message'] = $locale->_('Your account is disabled. Please contact us for more details.');
+                $result['error']['message'] = $this->_('Your account is disabled. Please contact us for more details.');
                 break;
             default:
-                $result['error']['message'] = $locale->_('Your account status has a problem. Please contact us for more details.');
+                $result['error']['message'] = $this->_('Your account status has a problem. Please contact us for more details.');
                 break;
         }
         return $result;

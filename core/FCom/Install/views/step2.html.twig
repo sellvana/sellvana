@@ -9,7 +9,7 @@
 
     {{ forms.input(fieldData, {field:'firstname', label:'First Name'|_, required:1}) }}
     {{ forms.input(fieldData, {field:'lastname', label:'Last Name'|_, required:1}) }}
-    {{ forms.input(fieldData, {field:'email', type:'email', label:'Email'|_, required:1}) }}
+    {{ forms.input(fieldData, {field:'email', type:'email', label:'Email'|_, required:1, type:'email'}) }}
     {{ forms.input(fieldData, {field:'username', label:'User Name'|_, required:1}) }}
     {{ forms.input(fieldData, {field:'password', type:'password', label:'Password'|_, required:1, placeholder:'*****', attr:{pattern:".{6,}"}, input_class:'has-progress-bar'}) }}
     {{ forms.input(fieldData, {field:'password_confirm', type:'password', label:'Confirm Password'|_, required:1, placeholder:'*****', attr:{pattern:".{6,}"}}) }}

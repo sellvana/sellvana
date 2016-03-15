@@ -65,7 +65,6 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $post     = $this->BRequest->post();
         $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->create();
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        $locale   = $this->BLocale;
         $error    = false;
 
         // Set model attributes
@@ -81,9 +80,9 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         if ($this->BRequest->xhr()) {
             if (!$error) {
-                $r = ['success' => true, 'title' => $locale->_('Create wishlist successfull.')];
+                $r = ['success' => true, 'title' => $this->_('Create wishlist successfull.')];
             } else {
-                $r = ['success' => false, 'title' => $locale->_('Create wishlist failure due to system error.')];
+                $r = ['success' => false, 'title' => $this->_('Create wishlist failure due to system error.')];
             }
 
             $this->BResponse->json($r);
@@ -103,13 +102,12 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlistHref = $this->BApp->href('wishlist');
         $post         = $this->BRequest->post();
         $wishlist     = $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true);
-        $locale       = $this->BLocale;
 
         if ($this->BRequest->xhr()) {
             $result = [];
             $p = $this->Sellvana_Catalog_Model_Product->load($post['id']);
             if (!$p) {
-                $this->BResponse->json(['title' => $locale->_('Incorrect product id')]);
+                $this->BResponse->json(['title' => $this->_('Incorrect product id')]);
                 return;
             }
             switch ($post['action']) {
@@ -120,7 +118,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         'success' => true,
                         'title' => 'Added to wishlist',
                         'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
-                            . '<br><br><a href="' . $wishlistHref . '" class="button">'. $locale->_('Go to wishlist') .'</a>'
+                            . '<br><br><a href="' . $wishlistHref . '" class="button">'. $this->_('Go to wishlist') .'</a>'
                     ];
                     break;
                 case 'remove':
@@ -129,7 +127,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         'success' => true,
                         'title' => 'Removed from wishlist',
                         'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
-                            . '<br><br><a href="' . $wishlistHref . '" class="button">'. $locale->_('Go to wishlist') .'</a>'
+                            . '<br><br><a href="' . $wishlistHref . '" class="button">'. $this->_('Go to wishlist') .'</a>'
                     ];
                     break;
             }
@@ -210,7 +208,6 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlists  = $post['Wishlist'];
         $deletedIds = isset($post['delete']) ? $post['delete'] : [];
         $error      = false;
-        $locale     = $this->BLocale;
         $r          = [];
 
         foreach ($wishlists as $id => $wishlist) {
@@ -234,9 +231,9 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         if ($this->BRequest->xhr()) {
             if ($error) {
-                $r = ['success' => false, 'title' => $locale->_('Update wishlists failure deal to system error.')];
+                $r = ['success' => false, 'title' => $this->_('Update wishlists failure deal to system error.')];
             } else {
-                $r = ['success' => true, 'title' => $locale->_('Update wishlists successfull.')];
+                $r = ['success' => true, 'title' => $this->_('Update wishlists successfull.')];
             }
 
             $this->BResponse->json($r);

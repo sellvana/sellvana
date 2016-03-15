@@ -196,7 +196,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 'onclick' => "$('#util-form').attr('action', '{$this->BApp->href('modules/migrate')}').submit()",
             ],
             [
-                ['span', null, $this->BLocale->_('Run Migration Scripts')]
+                ['span', null, $this->_('Run Migration Scripts')]
             ]
         ];
         unset($actions['new']);

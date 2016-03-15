@@ -211,6 +211,23 @@ class BClass
         }
         return static::$_diGlobal[$class];
     }
+
+    /**
+     * @param $string
+     * @param array|string $params
+     * @param null $module
+     * @return false|string
+     * @throws BException
+     */
+    public function _($string, $params = [], $module = null)
+    {
+        /** @var BLocale $locale */
+        static $locale;
+        if (!$locale) {
+            $locale = $this->BLocale;
+        }
+        return $locale->translate($string, $params, $module);
+    }
 }
 
 /**
@@ -259,7 +276,7 @@ class BApp extends BClass
                 break;
 
             default:
-                BDebug::error($this->BLocale->_('Unknown feature: %s', $feature));
+                BDebug::error($this->_('Unknown feature: %s', $feature));
         }
         static::$_compat[$feature] = $compat;
         return $compat;
@@ -366,7 +383,7 @@ class BApp extends BClass
      */
     public function t($string, $args = [])
     {
-        return $this->BLocale->_($string, $args);
+        return $this->_($string, $args);
     }
 
     /**
@@ -662,7 +679,7 @@ class BConfig extends BClass
         if (preg_match('#^@([^/]+)(.*)#', $filename, $m)) {
             $module = $this->BModuleRegistry->module($m[1]);
             if (!$module) {
-                BDebug::error($this->BLocale->_('Invalid module name: %s', $m[1]));
+                BDebug::error($this->_('Invalid module name: %s', $m[1]));
             }
             $filename = $module->root_dir . $m[2];
         }
@@ -676,7 +693,7 @@ class BConfig extends BClass
             $filename = $configDir . '/' . $filename;
         }
         if (!is_readable($filename)) {
-            BDebug::error($this->BLocale->_('Invalid configuration file name: %s', $filename));
+            BDebug::error($this->_('Invalid configuration file name: %s', $filename));
         }
 
         switch ($ext) {
@@ -696,7 +713,7 @@ class BConfig extends BClass
                 break;
         }
         if (!is_array($config)) {
-            BDebug::error($this->BLocale->_('Invalid configuration contents: %s', $filename));
+            BDebug::error($this->_('Invalid configuration contents: %s', $filename));
         }
         $this->add($config, $toSave);
         return $this;
@@ -1173,10 +1190,10 @@ class BClassRegistry extends BClass
     public function augmentProperty($class, $property, $op, $type, $callback)
     {
         if ($op !== 'set' && $op !== 'get') {
-            BDebug::error($this->BLocale->_('Invalid property augmentation operator: %s', $op));
+            BDebug::error($this->_('Invalid property augmentation operator: %s', $op));
         }
         if ($type !== 'override' && $type !== 'before' && $type !== 'after') {
-            BDebug::error($this->BLocale->_('Invalid property augmentation type: %s', $type));
+            BDebug::error($this->_('Invalid property augmentation type: %s', $type));
         }
         $entry = [
             'module_name' => $this->BModuleRegistry->currentModuleName(),
