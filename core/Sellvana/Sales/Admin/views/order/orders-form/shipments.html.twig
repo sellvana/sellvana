@@ -97,6 +97,10 @@
         <hr>
     {% endif %}
 
+    {% if not shippableItems %}
+        {{ 'There are no items available for a new shipment' | _ }}
+    {% endif %}
+
     {% if allShipments %}
         <h2>{{ 'Existing Shipments' }}</h2>
         <div {#method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}"#} id="shipment-update-container">

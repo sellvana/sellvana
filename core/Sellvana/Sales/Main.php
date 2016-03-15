@@ -171,6 +171,9 @@ class Sellvana_Sales_Main extends BClass
     public function getAllSelectedShippingServices()
     {
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
+        if (!$cart) {
+            return [];
+        }
         $estimates = $cart->getData('shipping_estimates');
 
         $services = [];

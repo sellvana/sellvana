@@ -63,7 +63,8 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function isShippable()
     {
-        return $this->get('shipping_weight') > 0;
+        return $this->get('shipping_weight') > 0
+            && $this->state()->delivery()->getValue() != Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
     }
 
     public function getQtyCanPay()
