@@ -45,7 +45,7 @@ class FCom_Test_Core_Codeception extends BClass
      * Initialization of the Codeception class.
      *
      * @param array $config The codeception.php configuration file.
-     * @param null $site
+     * @param FCom_Test_Core_Site|null $site
      */
     public function __construct($config = array(), $site = null)
     {
@@ -134,8 +134,8 @@ class FCom_Test_Core_Codeception extends BClass
                 ) {
                     continue;
                 }
-                $rootDir = $module->root_dir;
-                $testsDir = $rootDir . '/Test/tests/' . strtolower($type);
+
+                $testsDir = $module->root_dir . '/Test/tests/' . strtolower($type);
                 if (is_dir($testsDir)) {
                     $files = new \RecursiveIteratorIterator(
                         new \RecursiveDirectoryIterator(realpath($testsDir)),
@@ -258,7 +258,7 @@ class FCom_Test_Core_Codeception extends BClass
     {
         // Build all the different parameters as part of the console command
         $params = array(
-            $this->config['php_executable'] ?: 'php', // Php executable | Unix base system please ignore it
+            $this->config['php_executable'] ?: PHP_BINARY, // Php executable | Unix base system please ignore it
             $this->config['codecept_executable'], // Codeception Executable
             "run", // Command to Codeception
             "--no-colors", // Forcing Codeception to not use colors, if enabled in codeception.yml
@@ -298,7 +298,7 @@ class FCom_Test_Core_Codeception extends BClass
     public function getInitCodeceptCmd($module = null, $dir = '')
     {
         $params = array(
-            $this->config['php_executable'] ?: 'php',
+            $this->config['php_executable'] ?: PHP_BINARY,
             $this->config['codecept_executable'],
             'bootstrap',
             $dir,

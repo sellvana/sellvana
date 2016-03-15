@@ -137,7 +137,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->BLocale->_('The SKU number entered is already in use. Please enter a valid SKU number.');
+            return $this->_('The SKU number entered is already in use. Please enter a valid SKU number.');
         }
         return true;
     }
@@ -155,7 +155,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->BLocale->_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->_('The URL Key entered is already in use. Please enter a valid URL Key.');
         }
         return true;
     }
@@ -976,9 +976,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->left_outer_join('Sellvana_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
         $productLink = [
-            'related'=> ['title' => $this->BLocale->_('Related Products'), 'products' => [] ],
-            'similar' => ['title' => $this->BLocale->_('You may also like these items'), 'products' => [] ],
-            'cross_sell' => ['title' => $this->BLocale->_('You may also like these items'), 'products' => [] ]
+            'related'=> ['title' => $this->_('Related Products'), 'products' => [] ],
+            'similar' => ['title' => $this->_('You may also like these items'), 'products' => [] ],
+            'cross_sell' => ['title' => $this->_('You may also like these items'), 'products' => [] ]
         ];
         foreach ($arrProduct as $product) {
             if (isset($productLink[$product->get('link_type')])) {
@@ -1166,8 +1166,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function backOrders()
     {
         return [
-            "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
-            "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
+            "NOT_BACK_ORDERS"         => $this->_("No Back Orders"),
+            "ALLOW_QUANTITY_BELOW" => $this->_("Allow Quantity Below 0")
         ];
     }
 
@@ -1299,7 +1299,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($mapPriceModel) {
             $mapPrice = $mapPriceModel->getPrice();
             if ($mapPrice > $finalPrice) {
-                $finalText = $this->BLocale->_('Add to cart');
+                $finalText = $this->_('Add to cart');
             }
         }
 

@@ -780,17 +780,6 @@ class BUtil extends BClass
     }
 
     /**
-     * Return the default value of the given value.
-     *
-     * @param  mixed $value
-     * @return mixed
-     */
-    protected function _ret($value)
-    {
-        return $value instanceof Closure ? $value() : $value;
-    }
-
-    /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param  string|array $value
@@ -855,7 +844,7 @@ class BUtil extends BClass
         while (($segment = array_shift($key)) !== null) {
             if (is_array($target)) {
                 if (!array_key_exists($segment, $target)) {
-                    return static::_ret($default);
+                    return static::maybeCallback($default);
                 }
 
                 $target = $target[$segment];
@@ -864,13 +853,13 @@ class BUtil extends BClass
                     $target = $target->get($segment);
                 } else {
                     if (!isset($target->{$segment})) {
-                        return static::_ret($default);
+                        return static::maybeCallback($default);
                     }
 
                     $target = $target->{$segment};
                 }
             } else {
-                return static::_ret($default);
+                return static::maybeCallback($default);
             }
         }
 
@@ -1664,7 +1653,6 @@ class BUtil extends BClass
         if (!$options) {
             return '';
         }
-        $locale = $this->BLocale;
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
@@ -1674,10 +1662,10 @@ class BUtil extends BClass
             }
             if (is_array($v)) {
                 $attr = $v;
-                $v = !empty($attr['text']) ? $locale->_($attr['text']) : '';
+                $v = !empty($attr['text']) ? $this->_($attr['text']) : '';
                 unset($attr['text']);
             } else {
-                $v = $locale->_($v);
+                $v = $this->_($v);
                 $attr = [];
             }
             $attr['value'] = $k;
@@ -4431,7 +4419,7 @@ class BValidate extends BClass
 
             if (!$result) {
                 $message = $this->BUtil->injectVars($r['message'], $r['args']);
-                $message = $this->BLocale->_($message);
+                $message = $this->_($message);
                 $this->_validateErrors[$r['field']][] = $message;
                 if (!empty($r['args']['break'])) {
                     break;
@@ -4713,7 +4701,7 @@ class BValidateViewHelper extends BClass
         if (empty($this->_errors[$field]['msg']['error'])) {
             return '';
         }
-        return $this->BLocale->_($this->_errors[$field]['msg']['error']);
+        return $this->_($this->_errors[$field]['msg']['error']);
     }
 
     /**

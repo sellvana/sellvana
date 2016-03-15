@@ -2141,7 +2141,7 @@ class BRouting extends BClass
 
         if ($attempts >= 100) {
             echo "<pre>"; print_r($route); echo "</pre>";
-            $this->BDebug->error($this->BLocale->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
+            $this->BDebug->error($this->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
         }
     }
 
@@ -2360,7 +2360,7 @@ class BRouteNode extends BClass
             }
         }
         if ($attempts >= 100) {
-            $this->BDebug->error($this->BLocale->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
+            $this->BDebug->error($this->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
         }
         return false;
     }
@@ -2785,6 +2785,6 @@ class BActionController extends BClass
         if (empty($module)) {
             $module = $this->BModuleRegistry->currentModuleName();
         }
-        return $this->BLocale->_($string, $params, $module);
+        return parent::_($string, $params, $module);
     }
 }

@@ -92,7 +92,7 @@ class Sellvana_MarketClient_Main extends BClass
             $this->progress([
                 'cur' => $i,
                 'modules' => [
-                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
+                    $modName => $this->_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -112,7 +112,7 @@ class Sellvana_MarketClient_Main extends BClass
 
             $this->progress([
                 'modules' => [
-                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
+                    $modName => $this->_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -143,7 +143,7 @@ class Sellvana_MarketClient_Main extends BClass
             }
             $this->progress([
                 'modules' => [
-                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
+                    $modName => $this->_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
                 ],
             ]);
         }

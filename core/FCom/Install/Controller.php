@@ -33,9 +33,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'install', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, [$this->BLocale, '_']);
+            array_walk($msg, [$this->BLocale, 'translate']);
         } else {
-            $msg = $this->BLocale->_($msg);
+            $msg = $this->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;

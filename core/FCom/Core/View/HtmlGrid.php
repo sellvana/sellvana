@@ -209,13 +209,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                     case 'refresh':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'js-change-url grid-refresh btn'],
-                            $this->BLocale->_('Refresh')
+                            $this->_('Refresh')
                         )];
                         break;
                     case 'link_to_page':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            $this->BLocale->_('Link')
+                            $this->_('Link')
                         )];
                         break;
 

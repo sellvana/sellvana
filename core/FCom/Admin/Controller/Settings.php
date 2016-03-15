@@ -74,7 +74,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!$xhr) {
                 $this->message('Settings updated');
             } else {
-                $result = ['message' => $this->BLocale->_('Settings has been saved successfully'), 'status' => 'success'];
+                $result = ['message' => $this->_('Settings has been saved successfully'), 'status' => 'success'];
             }
 
         } catch (Exception $e) {
@@ -83,7 +83,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!$xhr) {
                 $this->message($e->getMessage(), 'error');
             } else {
-                $result = ['message' => $this->BLocale->_($e->getMessage()), 'status' => 'error'];
+                $result = ['message' => $this->_($e->getMessage()), 'status' => 'error'];
             }
         }
         if (!empty($post['current_tab'])) {

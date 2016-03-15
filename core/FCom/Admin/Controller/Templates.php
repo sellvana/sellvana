@@ -93,7 +93,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $actions = $view->get('actions');
         $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" '
             . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
-            .  $this->BLocale->_('Remove/Revert') . '</span></button>';
+            .  $this->_('Remove/Revert') . '</span></button>';
         $view->set('actions', $actions);
 
         $view->set('tab_view_prefix', $this->_formViewPrefix);

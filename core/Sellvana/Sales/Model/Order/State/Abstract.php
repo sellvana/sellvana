@@ -14,13 +14,13 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
         $model = $context->getModel();
 
         if ($this->getValue()) {
-            $comment = $this->BLocale->_('%s state was changed from %s to %s', [
+            $comment = $this->_('%s state was changed from %s to %s', [
                 $context->getStateLabel($this->_type),
                 $this->getValueLabel(),
                 $newState->getValueLabel(),
             ]);
         } else {
-            $comment = $this->BLocale->_('%s state was set to %s', [
+            $comment = $this->_('%s state was set to %s', [
                 $context->getStateLabel($this->_type),
                 $newState->getValueLabel(),
             ]);

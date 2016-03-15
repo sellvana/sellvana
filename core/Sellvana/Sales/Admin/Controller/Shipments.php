@@ -47,9 +47,10 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
                 'qtys' => $qtys,
             ]);
             $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
-            $this->message('Shipment has been created');
+            $result['message'] = $this->_('Shipment has been created');
         } catch (Exception $e) {
-            $this->message($e->getMessage(), 'error');
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
         }
 
         $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
@@ -95,9 +96,11 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
                     ]);
                 }
             }
+            $result['message'] = $this->_('Shipment updates have been applied');
             $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
         } catch (Exception $e) {
-            $this->message($e->getMessage(), 'error');
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
         }
 
         $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);

@@ -167,7 +167,7 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $rootCats = $this->orm()->where('parent_id', null)->find_many_assoc('id', 'node_name');
         foreach ($rootCats as $id => $name) {
             if (!$name) {
-                $rootCats[$id] = $this->BLocale->_('Default');
+                $rootCats[$id] = $this->_('Default');
             }
         }
         return $rootCats;
@@ -345,7 +345,7 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             ->find_many();
 
         if (empty($importData)) {
-            $this->BDebug->log($this->BLocale->_("Could not update category data, missing import details"));
+            $this->BDebug->log($this->_("Could not update category data, missing import details"));
             return;
         }
 
