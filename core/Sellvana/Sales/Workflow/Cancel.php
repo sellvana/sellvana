@@ -83,4 +83,27 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $args['cancel']->addHistoryEvent('custom_state', 'Admin user has changed custom cancel state to "' . $label . '"');
         $args['cancel']->save();
     }
+
+    public function action_adminCreatesCancel($args)
+    {
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+        $data = $this->BRequest->sanitize($args['data'], []);
+        $qtys = isset($args['qtys']) ? $args['qtys'] : null;
+        foreach ($qtys as $id => $qty) {
+            if ($qty < 1) {
+                unset($qtys[$id]);
+            }
+        }
+        if (!$qtys) {
+            throw new BException('Please add some items to create a cancel');
+        }
+        /** @var Sellvana_Sales_Model_Order_Cancel $cancel */
+        $cancel = $this->Sellvana_Sales_Model_Order_Cancel->create($data);
+        $cancel->importFromOrder($order, $qtys);
+        $cancel->register();
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
+    }
+
 }
