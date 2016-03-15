@@ -635,9 +635,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'edit_url' => $this->BApp->href('payments/mass_change_state'),
             'columns' => [
                 ['type' => 'row_select'],
-                ['type' => 'btn_group', 'buttons' => [
+                /*['type' => 'btn_group', 'buttons' => [
                     ['name' => 'edit'],
-                ]],
+                ]],*/
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'payment_method', 'label' => 'Method', 'options' => $methodOptions],
                 ['name' => 'amount_authorized', 'label' => 'Authorized', 'cell' => 'currency'],
@@ -651,7 +651,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'transactions', 'label' => 'Transactions'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add payment'],
+                'new' => ['caption' => 'Add payment', 'addClass' => '_modal'],
                 'delete' => ['caption' => 'Remove'],
                 'mark_paid' => [
                     'caption'      => 'Mark as paid',

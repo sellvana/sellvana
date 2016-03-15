@@ -33,7 +33,7 @@ class FCom_Test_Core_LoadDump extends BClass
     private $charset = '';
 
     /**
-     * Mysql connection
+     * Current connection
      *
      * @var $conn
      */
@@ -42,13 +42,15 @@ class FCom_Test_Core_LoadDump extends BClass
     /**
     * Constructor initializes database
     */
-    public function __construct($host = null, $username = null, $passwd = null, $dbName = null, $charset = 'utf8')
+    public function __construct()
     {
-        $this->host = $host ?: $this->BConfig->get('db/host');
-        $this->username = $username ?: $this->BConfig->get('db/username');
-        $this->passwd = $passwd;
-        $this->dbName = $dbName ?: $this->BConfig->get('db/dbname');
-        $this->charset = $charset;
+        // Init current connection info for loading raw sql dump
+        // So that do not touch to main db while testing
+        $this->host = $this->BConfig->get('db/host');
+        $this->username = $this->BConfig->get('db/username');
+        $this->passwd = $this->BConfig->get('db/password');
+        $this->dbName = $this->BConfig->get('db/dbname');
+        $this->charset = 'utf8';
 
         $this->initializeDatabase();
     }
@@ -71,7 +73,7 @@ class FCom_Test_Core_LoadDump extends BClass
      * @param bool $raw If true will load dump with data
      * @return bool
      */
-    public function make($tables = '*', $outputDir = '.', $raw = true)
+    public function make($tables = '*', $outputDir = '.', $options = [])
     {
         try {
             /**
@@ -88,9 +90,20 @@ class FCom_Test_Core_LoadDump extends BClass
             }
 
             $this->dumpName = $this->dbName . '_test.sql';
+            $dbTestName = rtrim($this->dumpName, '.sql');
 
-            $sql = 'CREATE DATABASE IF NOT EXISTS ' . $this->dumpName . ";\n\n";
-            $sql .= 'USE ' . $this->dumpName . ";\n\n";
+            $sql = 'CREATE DATABASE IF NOT EXISTS ' . $dbTestName . ";\n\n";
+
+            $testConn = mysqli_select_db($this->conn, $dbTestName);
+            if (!$testConn && isset($options['auto_create_db']) && $options['auto_create_db'] === true) {
+                try {
+                    mysqli_query($this->conn, $sql);
+                } catch (Exception $e) {
+                    throw new PDOException('Can not create database for test.');
+                }
+            }
+
+            $sql .= 'USE ' . $dbTestName . ";\n\n";
 
             /**
              * Iterate tables
@@ -101,7 +114,7 @@ class FCom_Test_Core_LoadDump extends BClass
                 $row2 = mysqli_fetch_row(mysqli_query($this->conn, 'SHOW CREATE TABLE ' . $table));
                 $sql .= "\n\n" . $row2[1] . ";\n\n";
 
-                if (!$raw) {
+                if (isset($options['raw']) && $options['raw'] === true) {
                     $result = mysqli_query($this->conn, 'SELECT * FROM ' . $table);
                     $numFields = mysqli_num_fields($result);
 
