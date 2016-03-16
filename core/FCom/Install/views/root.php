@@ -26,11 +26,8 @@
             require(['bootstrap-ladda', 'bootstrap-ladda-spin'], function (Ladda) {
                 var loader = Ladda.create(document.querySelector('.ladda-button'));
                 $('form').on('submit', function (e) {
+                    if (!$(this).valid()) return false;
                     loader.start();
-                    if (!$(this).valid()) {
-                        loader.stop();
-                        return false;
-                    }
                 });
             });
         </script>
