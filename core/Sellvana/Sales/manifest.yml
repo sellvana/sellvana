@@ -24,6 +24,7 @@ modules:
                     - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
                     - [ /shipments/?.action, Sellvana_Sales_Admin_Controller_Shipments ]
                     - [ /cancels/?.action, Sellvana_Sales_Admin_Controller_Cancels ]
+                    - [ /returns/?.action, Sellvana_Sales_Admin_Controller_Returns ]
                     - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
                     - [ /sales/report/product_performance/?.action, Sellvana_Sales_Admin_Controller_Report_ProductPerformance ]

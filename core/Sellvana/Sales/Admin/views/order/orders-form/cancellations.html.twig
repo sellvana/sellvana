@@ -1,6 +1,6 @@
 {% set order = THIS.get('model') %}
 
-{% set cancelableItems = order.getcancelableItems() %}
+{% set cancelableItems = order.getCancelableItems() %}
 {% set allCancellations = order.getAllCancellations() %}
 
 <div class="f-section" id="order-container">
@@ -142,7 +142,6 @@
 
         // Update cancel status
         container.on('click', '.js-cancel-action', function(ev) {
-            debugger;
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(cancelUpdateUrl, postData, processPostResponse);
