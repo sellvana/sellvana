@@ -19,6 +19,11 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
     protected $_state;
 
     /**
+     * @var Sellvana_Sales_Model_Order_Return_Item[]
+     */
+    protected $_items;
+
+    /**
      * @return Sellvana_Sales_Model_Order_Return_State
      */
     public function state()
@@ -27,6 +32,24 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
             $this->_state = $this->Sellvana_Sales_Model_Order_Return_State->factory($this);
         }
         return $this->_state;
+    }
+
+    /**
+     * Return the return items
+     *
+     * @param boolean $assoc
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
+    public function items($assoc = true)
+    {
+        if (!$this->_items) {
+            $this->_items = $this->Sellvana_Sales_Model_Order_Return_Item->orm('ori')
+                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'ori.order_item_id'], 'oi')
+                ->select('ori.*')->select(['oi.product_id', 'product_sku', 'inventory_id',
+                    'inventory_sku', 'product_name'])
+                ->where('return_id', $this->id())->find_many_assoc();
+        }
+        return $assoc ? $this->_items : array_values($this->_items);
     }
 
     public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
@@ -46,7 +69,7 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
 
         foreach ($qtys as $itemId => $qty) {
             if (empty($items[$itemId])) {
-                throw new BException($this->BLocale->_('Invalid item id: %s', $itemId));
+                throw new BException($this->_('Invalid item id: %s', $itemId));
             }
             /** @var Sellvana_Sales_Model_Order_Item $item */
             $item = $items[$itemId];
@@ -54,7 +77,7 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
             if ($qty === true) {
                 $qty = $qtyCanReturn;
             } elseif ($qty <= 0 || $qty > $qtyCanReturn) {
-                throw new BException($this->BLocale->_('Invalid quantity to return for %s: %s', [$item->get('product_sku'), $qty]));
+                throw new BException($this->_('Invalid quantity to return for %s: %s', [$item->get('product_sku'), $qty]));
             }
             $this->Sellvana_Sales_Model_Order_Return_Item->create([
                 'order_id' => $order->id(),
@@ -91,6 +114,34 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
         ]);
 
         return $result;
+    }
+
+    public function register()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $returnItems = $this->items();
+
+        foreach ($returnItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add('qty_returned', $cItem->get('qty'));
+        }
+
+        return $this;
+    }
+
+    public function unregister()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $returnItems = $this->items();
+
+        foreach ($returnItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add('qty_returned', -$cItem->get('qty'));
+        }
+
+        return $this;
     }
 
     public function __destruct()

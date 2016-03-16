@@ -50,7 +50,7 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_group" class="btn grid-new btn-primary _modal">'
-                . $this->BLocale->_('Add New Customer Group') . '</button>']]);
+                . $this->_('Add New Customer Group') . '</button>']]);
     }
 
     public function formPostAfter($args)

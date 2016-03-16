@@ -31,7 +31,7 @@ class FCom_Test_Core_Site extends BClass
     /**
      * Set the current site.
      *
-     * @param string if set, false if not.
+     * @param string [if set, false if not].
      */
     public function set($hash = false)
     {

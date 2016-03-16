@@ -3334,7 +3334,7 @@ class BModel extends Model
     {
         $collection = $this->get($var);
         if (!$collection) {
-            $collection = $this-> {$var};
+            $collection = $this->{$var};
             if (!$collection) return null;
         }
         foreach ($collection as $k => $v) {
@@ -3525,6 +3525,23 @@ class BModel extends Model
             $this->set($field, date("Y-m-d", $date));
         }
         return $this;
+    }
+
+    /**
+     * @param $string
+     * @param array|string $params
+     * @param null $module
+     * @return false|string
+     * @throws BException
+     */
+    public function _($string, $params = [], $module = null)
+    {
+        /** @var BLocale $locale */
+        static $locale;
+        if (!$locale) {
+            $locale = $this->BLocale;
+        }
+        return $locale->translate($string, $params, $module);
     }
 }
 

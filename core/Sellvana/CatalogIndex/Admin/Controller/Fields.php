@@ -111,7 +111,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
                 'data-style' => 'expand-left'
             ],
             [
-                ['span', null, $this->BLocale->_('Force Reindex')]
+                ['span', null, $this->_('Force Reindex')]
             ]
         ];
         $actions['new'] = [
@@ -121,7 +121,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
                 'class' => ['btn', 'grid-new', 'btn-primary hidden', '_modal'],
             ],
             [
-                ['span', null, $this->BLocale->_('Add New Index Field')],
+                ['span', null, $this->_('Add New Index Field')],
             ]
         ];
         $gridView->set('actions', $actions);

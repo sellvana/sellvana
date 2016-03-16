@@ -51,7 +51,7 @@ class Sellvana_CustomerSegments_Admin_Controller_Segments extends FCom_Admin_Con
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_segment" class="btn grid-new btn-primary _modal">'
-                     . $this->BLocale->_('Add New Customer Segment') . '</button>']]);
+                     . $this->_('Add New Customer Segment') . '</button>']]);
     }
 
     public function formPostAfter($args)

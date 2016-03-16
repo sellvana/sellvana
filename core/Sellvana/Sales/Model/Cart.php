@@ -316,9 +316,9 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
             $sku = $item->get('product_sku');
             if (!$qty) {
-                $this->BSession->addMessage($this->BLocale->_('The product is not in stock: %s', $sku), 'warning', 'frontend');
+                $this->BSession->addMessage($this->_('The product is not in stock: %s', $sku), 'warning', 'frontend');
             } elseif ($qty < $item->get('qty')) {
-                $this->BSession->addMessage($this->BLocale->_('Maximum quantity reached for item %s', $sku), 'warning', 'frontend');
+                $this->BSession->addMessage($this->_('Maximum quantity reached for item %s', $sku), 'warning', 'frontend');
             }
 
             if ($inv->getAllowBackorder()) {

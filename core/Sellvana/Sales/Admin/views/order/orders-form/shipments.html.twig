@@ -16,7 +16,7 @@
     {{ THIS.view('core/messages') | raw }}
 
     {% if shippableItems %}
-        <form method="post" action="{{ APP.href('shipments/create?id=' ~ order.id()) }}" id="shipment-create-form">
+        <div {#method="post" action="{{ APP.href('shipments/create?id=' ~ order.id()) }}"#} id="shipment-create-container">
             <h2>{{ 'Create a shipment'|_ }}</h2>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -85,21 +85,25 @@
                             <input type="text" class="form-control input-sm" name="shipment[carrier_price]">
                         </td>
                         <td>
-                            <button class="btn btn-xs btn-primary" type="submit">{{ 'Create'|_ }}</button>
+                            <button id="btnShipmentCreate" data-container="#shipment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
                         </td>
                     </tr>
                 </tfoot>
             </table>
-        </form>
+        </div>
     {% endif %}
 
     {% if shippableItems and allShipments %}
         <hr>
     {% endif %}
 
+    {% if not shippableItems %}
+        {{ 'There are no items available for a new shipment' | _ }}
+    {% endif %}
+
     {% if allShipments %}
         <h2>{{ 'Existing Shipments' }}</h2>
-        <form method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}" id="shipment-update-form">
+        <div {#method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}"#} id="shipment-update-container">
         <table class="table table-bordered table-striped dataTable">
             <thead>
                 <tr>
@@ -155,34 +159,59 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><button name="update" class="btn btn-xs btn-primary" type="submit" value="1">{{ 'Update'|_ }}</button></td>
+                <td><button id="btnShipmentUpdate" data-action="update" data-container="#shipment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Update'|_ }}</button></td>
                 <td></td>
             </tr>
             </tfoot>
         </table>
-        </form>
+        </div>
     {% endif %}
 </div>
 
 <script>
     require(['jquery', 'underscore'], function($, _) {
-        $('#shipment-create-form,#shipment-update-form').submit(function(ev) {
-            var $form = $(ev.target);
-            $.post($form.attr('action'), $form.serializeArray(), function(data, status, xhr) {
+        var shipmentCreateUrl = "{{ APP.href('shipments/create?id=' ~ order.id()) }}";
+        var shipmentUpdateUrl = "{{ APP.href('shipments/update?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-shipments');
+
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
                 _.each(data.tabs, function (tabHtml, i) {
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
                 });
-            });
-            ev.preventDefault();
-            return false;
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        // Create shipments or update shipments data
+        container.unbind().on('click', '#btnShipmentCreate, #btnShipmentUpdate', function(ev) {
+            var postUrl = !ev.target.dataset.action ? shipmentCreateUrl : shipmentUpdateUrl;
+            var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
+            $.post(postUrl, serializeData, processPostResponse);
         });
 
+        // Update shipment status
+        container.on('click', '.js-shipment-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(shipmentUpdateUrl, postData, processPostResponse);
+        });
+
+        // link carrier and service dropdowns
         var $carrier = $('#shipment-carrier_code'), $service = $('#shipment-service_code');
         var allServices = {{ UTIL.toJson(allServices) | raw }};
         $carrier.change(function(ev) {
             $service.find('option').remove();
             $service.append($('<option>'));
-            var services = allServices[$carrier.val()].services;
+            var services = allServices[$carrier.val()] ? allServices[$carrier.val()].services : {};
             if (services) {
                 for (var i in services) {
                     $service.append($('<option>').val(services[i].value).html(services[i].label));
@@ -190,14 +219,5 @@
             }
         });
 
-        $('.js-shipment-action').click(function(ev) {
-            var $el = $(ev.target), $form = $el.parents('form'), postData = {};
-            postData[$el.attr('name')] = $el.val();
-            $.post($form.attr('action'), postData, function(data, status, xhr) {
-                _.each(data.tabs, function (tabHtml, i) {
-                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
-                });
-            });
-        });
     })
 </script>

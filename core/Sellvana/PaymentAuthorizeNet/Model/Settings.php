@@ -106,8 +106,8 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
     public function paymentActions()
     {
         return [
-            "AUTH_ONLY"         => $this->BLocale->_("Authorize Only"),
-            "AUTH_CAPTURE" => $this->BLocale->_("Authorize and Capture")
+            "AUTH_ONLY"         => $this->_("Authorize Only"),
+            "AUTH_CAPTURE" => $this->_("Authorize and Capture")
         ];
     }
 /*
@@ -122,7 +122,7 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => $this->BLocale->_("Other")
+            "OT" => $this->_("Other")
         ];
     }
 

@@ -595,7 +595,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
-            if ($item->getQtyCanShip()) {
+            if ($item->isShippable() && $item->getQtyCanShip()) {
                 $items[] = $item;
             }
         }

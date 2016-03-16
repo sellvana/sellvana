@@ -63,7 +63,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         if (is_string($params) || is_object($params) && method_exists($params, '__toString')) {
             $params = ['title' => $params];
         }
-        $params['title'] = $this->BLocale->_($params['title']);
+        $params['title'] = $this->_($params['title']);
         if (empty($params['module_name'])) {
             $params['module_name'] = $this->BModuleRegistry->currentModuleName();
         }

@@ -114,7 +114,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($qtys as $itemId => $qty) {
             if (empty($items[$itemId])) {
-                throw new BException($this->BLocale->_('Invalid item id: %s', $itemId));
+                throw new BException($this->_('Invalid item id: %s', $itemId));
             }
             /** @var Sellvana_Sales_Model_Order_Item $item */
             $item = $items[$itemId];
@@ -122,7 +122,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             if ($qty === true) {
                 $qty = $qtyCanPay;
             } elseif ($qty <= 0 || $qty > $qtyCanPay) {
-                throw new BException($this->BLocale->_('Invalid quantity to pay for %s: %s', [$item->get('product_sku'), $qty]));
+                throw new BException($this->_('Invalid quantity to pay for %s: %s', [$item->get('product_sku'), $qty]));
             }
             $this->Sellvana_Sales_Model_Order_Payment_Item->create([
                 'order_id' => $order->id(),

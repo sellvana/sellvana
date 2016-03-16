@@ -185,7 +185,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     'class' => ['btn', 'btn-default'],
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Ship All Items')],
+                    ['span', null, $this->_('Ship All Items')],
                 ]
             ];
 
@@ -198,7 +198,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     'class' => ['btn', 'btn-default'],
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Mark as Paid')],
+                    ['span', null, $this->_('Mark as Paid')],
                 ]
             ];
 
@@ -570,7 +570,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 $curSeqId = $seq->get('current_seq_id');
                 if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $curSeqId) {
                     $result['status'] = false;
-                    $result['messages'] = $this->BLocale->_('Order number must larger than order current: ' . $curSeqId);
+                    $result['messages'] = $this->_('Order number must larger than order current: ' . $curSeqId);
                 }
             }
         }
@@ -635,9 +635,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'edit_url' => $this->BApp->href('payments/mass_change_state'),
             'columns' => [
                 ['type' => 'row_select'],
-                ['type' => 'btn_group', 'buttons' => [
+                /*['type' => 'btn_group', 'buttons' => [
                     ['name' => 'edit'],
-                ]],
+                ]],*/
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'payment_method', 'label' => 'Method', 'options' => $methodOptions],
                 ['name' => 'amount_authorized', 'label' => 'Authorized', 'cell' => 'currency'],
@@ -651,7 +651,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'transactions', 'label' => 'Transactions'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add payment'],
+                'new' => ['caption' => 'Add payment', 'addClass' => '_modal'],
                 'delete' => ['caption' => 'Remove'],
                 'mark_paid' => [
                     'caption'      => 'Mark as paid',

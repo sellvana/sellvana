@@ -20,7 +20,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         }
 
         $this->config = include $codeceptConfigFile;
-        $this->ensureCodeception($this->getCodecetionExecutable());
+        $this->ensureCodeception($this->getCodeceptionExecutable());
         // Register to app
         $site = $this->initSite($this->config['codecept_sites']);
         $this->codecept = $this->BApp->instance('FCom_Test_Core_Codeception', false,
@@ -172,7 +172,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     /**
      * @return string
      */
-    protected function getCodecetionExecutable()
+    protected function getCodeceptionExecutable()
     {
         $base = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
         $codecept = $base . '/codecept.phar';
