@@ -1,12 +1,150 @@
-{% set m = THIS.get('model') %}
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').cancellationsGridConfig(m) %}
+{% set order = THIS.get('model') %}
 
+{% set cancelableItems = order.getCancelableItems() %}
+{% set allCancellations = order.getAllCancellations() %}
 
-{% import THIS.view('core/form-elements').twigName() as forms %}
-<div class="f-section">
-    {{ forms.textarea({ id:'cancel-items', name:'cancel[items]', label:'Cancel Items (SKU:QTY)'|_}) }}
+<div class="f-section" id="order-container">
+
+    {{ THIS.view('core/messages') | raw }}
+
+    {% if cancelableItems %}
+        <div {#method="post" action="{{ APP.href('cancels/create?id=' ~ order.id()) }}"#} id="cancel-create-container">
+            <h2>{{ 'Create a cancellation'|_ }}</h2>
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Product SKU'|_ }}</th>
+                    <th>{{ 'Inventory SKU'|_ }}</th>
+                    <th>{{ 'Product Name'|_ }}</th>
+                    <th>{{ 'Qty Ordered'|_ }}</th>
+                    <th>{{ 'Qty To Cancel'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in cancelableItems %}
+                    <tr>
+                        <td>{{ i.get('product_sku') }}</td>
+                        <td>{{ i.get('inventory_sku') }}</td>
+                        <td>{{ i.get('product_name') }}</td>
+                        <td>{{ i.get('qty_ordered') }}</td>
+                        <td>
+                            <select name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
+                                <option value=""></option>
+                                {% set qtyCanCancel = i.getQtyCanCancel() %}
+                                {% for q in range(1, qtyCanCancel) %}
+                                    <option value="{{ q }}" {{ q == qtyCanCancel ? 'selected' }}>{{ q }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button id="btnCancelCreate" data-container="#cancel-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
+        </div>
+    {% endif %}
+
+    {% if cancelableItems and allCancels %}
+        <hr>
+    {% endif %}
+
+    {% if not cancelableItems %}
+        {{ 'There are no items available for a new cancellation' | _ }}
+    {% endif %}
+
+    {% if allCancellations %}
+        <h2>{{ 'Existing Cancellations' }}</h2>
+        <div {#method="post" action="{{ APP.href('cancels/update?id=' ~ order.id()) }}"#} id="cancel-update-container">
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Status'|_ }}</th>
+                    <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Items'|_ }}</th>
+                    <th>{{ 'Delete'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in allCancellations %}
+                    {% set allOverallStates = c.state().overall().getAllValueLabels() %}
+                    {% set allCustomStates = c.state().custom().getAllValueLabels() %}
+                    <tr>
+                        <td>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ c.state().overall().getValueLabel() }}</strong></p>
+                            {% if allCustomStates %}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="cancels[{{ c.id() }}][state_custom]" class="form-control">
+                                        {{ UTIL.optionsHtml(allCustomStates, c.state().custom().getValue()) | raw }}
+                                    </select></p>
+                            {% endif %}
+                            {% for k, v in allOverallStates %}
+                                {% if k != c.get('state_overall') %}
+                                    <input type="button" name="cancels[{{ c.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-cancel-action">
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>{{ 'Created:'|_ }} <strong>{{ c.get('create_at') | locdate }}</strong></p>
+                        </td>
+                        <td>
+                            {% for i in c.items() %}
+                                <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ c.id }}]" value="1">
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><button id="btnCancelUpdate" data-action="update" data-container="#cancel-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Update'|_ }}</button></td>
+                    <td></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    {% endif %}
 </div>
 
+<script>
+    require(['jquery', 'underscore'], function($, _) {
+        var cancelCreateUrl = "{{ APP.href('cancels/create?id=' ~ order.id()) }}";
+        var cancelUpdateUrl = "{{ APP.href('cancels/update?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-cancellations');
 
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
-{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        // Create cancellation or update cancel data
+        container.unbind().on('click', '#btnCancelCreate, #btnCancelUpdate', function(ev) {
+            var postUrl = !ev.target.dataset.action ? cancelCreateUrl : cancelUpdateUrl;
+            var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
+            $.post(postUrl, serializeData, processPostResponse);
+        });
+
+        // Update cancel status
+        container.on('click', '.js-cancel-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(cancelUpdateUrl, postData, processPostResponse);
+        });
+    })
+</script>
