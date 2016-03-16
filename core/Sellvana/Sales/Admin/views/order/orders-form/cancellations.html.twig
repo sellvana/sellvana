@@ -65,35 +65,33 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for s in cancelableItems %}
-                    {% set allOverallStates = s.state().overall().getAllValueLabels() %}
-                    {% set allCustomStates = s.state().custom().getAllValueLabels() %}
+                {% for c in allCancellations %}
+                    {% set allOverallStates = c.state().overall().getAllValueLabels() %}
+                    {% set allCustomStates = c.state().custom().getAllValueLabels() %}
                     <tr>
                         <td>
-                            <p>{{ 'Overall:'|_ }} <strong>{{ s.state().overall().getValueLabel() }}</strong></p>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ c.state().overall().getValueLabel() }}</strong></p>
                             {% if allCustomStates %}
-                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="cancels[{{ s.id() }}][state_custom]" class="form-control">
-                                        {{ UTIL.optionsHtml(allCustomStates, s.state().custom().getValue()) | raw }}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="cancels[{{ c.id() }}][state_custom]" class="form-control">
+                                        {{ UTIL.optionsHtml(allCustomStates, c.state().custom().getValue()) | raw }}
                                     </select></p>
                             {% endif %}
                             {% for k, v in allOverallStates %}
-                                {% if k != s.get('state_overall') %}
-                                    <input type="button" name="cancels[{{ s.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-cancel-action">
+                                {% if k != c.get('state_overall') %}
+                                    <input type="button" name="cancels[{{ c.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-cancel-action">
                                 {% endif %}
                             {% endfor %}
                         </td>
                         <td>
-                            <p>{{ 'Created:'|_ }} <strong>{{ LOCALE.datetimeDbToLocal(s.get('create_at'), constant('BLocale::FORMAT_SHORT_DATE')) }}</strong></p>
+                            <p>{{ 'Created:'|_ }} <strong>{{ c.get('create_at') | locdate }}</strong></p>
                         </td>
                         <td>
-                            {% for i in p.items() %}
+                            {% for i in c.items() %}
                                 <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
                             {% endfor %}
-                            <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
-                            <hr>
                         </td>
                         <td>
-                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ c.id }}]" value="1">
                         </td>
                     </tr>
                 {% endfor %}
@@ -118,6 +116,7 @@
         var cancelUpdateUrl = "{{ APP.href('cancels/update?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-cancellations');
 
         function processPostResponse(data, status, xhr) {
             data = data || {};
@@ -135,32 +134,18 @@
         }
 
         // Create cancellation or update cancel data
-        $(document).unbind().on('click', '#btnCancelCreate, #btnCancelUpdate', function(ev) {
+        container.unbind().on('click', '#btnCancelCreate, #btnCancelUpdate', function(ev) {
             var postUrl = !ev.target.dataset.action ? cancelCreateUrl : cancelUpdateUrl;
             var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
             $.post(postUrl, serializeData, processPostResponse);
         });
 
         // Update cancel status
-        $(document).on('click', '.js-cancel-action', function(ev) {
+        container.on('click', '.js-cancel-action', function(ev) {
+            debugger;
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(cancelUpdateUrl, postData, processPostResponse);
         });
-
-        // link carrier and service dropdowns
-        var $carrier = $('#cancel-carrier_code'), $service = $('#cancel-service_code');
-        var allServices = {{ UTIL.toJson(allServices) | raw }};
-        $carrier.change(function(ev) {
-            $service.find('option').remove();
-            $service.append($('<option>'));
-            var services = allServices[$carrier.val()] ? allServices[$carrier.val()].services : {};
-            if (services) {
-                for (var i in services) {
-                    $service.append($('<option>').val(services[i].value).html(services[i].label));
-                }
-            }
-        });
-
     })
 </script>

@@ -44,7 +44,10 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
     public function items($assoc = true)
     {
         if (!$this->_items) {
-            $this->_items = $this->Sellvana_Sales_Model_Order_Cancel_Item->orm()
+            $this->_items = $this->Sellvana_Sales_Model_Order_Cancel_Item->orm('oci')
+                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'oci.order_item_id'], 'oi')
+                ->select('oci.*')->select(['oi.product_id', 'product_sku', 'inventory_id', 'inventory_sku',
+                    'product_name', 'shipping_size', 'shipping_weight'])
                 ->where('cancel_id', $this->id())->find_many_assoc();
         }
         return $assoc ? $this->_items : array_values($this->_items);
@@ -98,8 +101,6 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
             $oItem = $orderItems[$cItem->get('order_item_id')];
             $oItem->add('qty_canceled', $cItem->get('qty'));
         }
-
-        $this->state()->overall()->setApproved();
 
         return $this;
     }

@@ -10,24 +10,6 @@
 
 class Sellvana_Sales_Admin_Controller_Cancels extends FCom_Admin_Controller_Abstract_GridForm
 {
-    public function action_mass_change_state__POST()
-    {
-        exit('change state');
-        $request = $this->BRequest;
-        $ids = explode(',', $request->post('id'));
-        $shipments = $this->Sellvana_Sales_Model_Order_Shipment->orm('os')->where_in('id', $ids)->find_many();
-        $action = 'adminMarksShipmentAs' . ucfirst($request->post('state_overall'));
-
-        foreach ($shipments as $shipment) {
-            $this->Sellvana_Sales_Main->workflowAction($action, [
-                'shipment' => $shipment
-            ]);
-        }
-
-        $result = ['success' => true];
-        $this->BResponse->json($result);
-    }
-
     public function action_create__POST()
     {
         try {
@@ -68,14 +50,14 @@ class Sellvana_Sales_Admin_Controller_Cancels extends FCom_Admin_Controller_Abst
                 throw new BException('Invalid order');
             }
 
-            $cancellations = $this->BRequest->post('cancel');
+            $cancellations = $this->BRequest->post('cancels');
             $delete = $this->BRequest->post('delete');
             if ($cancellations) {
-                foreach ($cancellations as $id => $s) {
+                foreach ($cancellations as $id => $c) {
                     $this->Sellvana_Sales_Main->workflowAction('adminUpdatesCancel', [
                         'order' => $order,
-                        'shipment_id' => $id,
-                        'data' => $s,
+                        'cancel_id' => $id,
+                        'data' => $c,
                     ]);
                 }
             }
@@ -83,7 +65,7 @@ class Sellvana_Sales_Admin_Controller_Cancels extends FCom_Admin_Controller_Abst
                 foreach ($delete as $id => $_) {
                     $this->Sellvana_Sales_Main->workflowAction('adminDeletesCancel', [
                         'order' => $order,
-                        'shipment_id' => $id,
+                        'cancel_id' => $id,
                     ]);
                 }
             }
