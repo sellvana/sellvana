@@ -1,5 +1,13 @@
 <?php
 
+class Test
+{
+    public static function getDummyTest()
+    {
+        return 'Sellvana is the best.';
+    }
+}
+
 class BUtilTest extends \Codeception\TestCase\Test
 {
     /**
@@ -106,7 +114,7 @@ class BUtilTest extends \Codeception\TestCase\Test
         $this->assertEquals($expected, $res);
     }
 
-    public function testArrayGet()
+    public function testDataGet()
     {
         $arr = [
             'foo' => [
@@ -115,8 +123,20 @@ class BUtilTest extends \Codeception\TestCase\Test
         ];
 
         $expected = 'test';
-        $res = BUtil::i()->arrayGet($arr, 'foo.bar');
-        $this->assertEquals($expected, $res);
+        $res = BUtil::i()->dataGet($arr, 'foo.bar');
+        $this->assertEquals($expected, $res, 'Getting array item fail.');
+
+        $res = BUtil::i()->dataGet($arr, 'foo.Bar', function() use ($arr) {
+            return BUtil::i()->dataGet($arr, 'foo.bar');
+        });
+        $this->assertEquals($expected, $res, 'Getting array item through callback fail.');
+
+        $res = BUtil::i()->dataGet($arr, 'foo.Bar', Test::getDummyTest());
+        $this->assertEquals('Sellvana is the best.', $res, 'Getting array item through external callback fail.');
+
+        $obj = new stdClass();
+        $obj->name = 'testObject';
+        $this->assertEquals('testObject', BUtil::i()->dataGet($obj, 'name'), 'Getting object property fail.');
     }
 
     public function testRandomStrng()
