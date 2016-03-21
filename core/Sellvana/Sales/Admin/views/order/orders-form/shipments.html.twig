@@ -97,6 +97,10 @@
         <hr>
     {% endif %}
 
+    {% if not shippableItems %}
+        {{ 'There are no items available for a new shipment' | _ }}
+    {% endif %}
+
     {% if allShipments %}
         <h2>{{ 'Existing Shipments' }}</h2>
         <div {#method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}"#} id="shipment-update-container">
@@ -170,6 +174,7 @@
         var shipmentUpdateUrl = "{{ APP.href('shipments/update?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-shipments');
 
         function processPostResponse(data, status, xhr) {
             data = data || {};
@@ -187,14 +192,14 @@
         }
 
         // Create shipments or update shipments data
-        $(document).unbind().on('click', '#btnShipmentCreate, #btnShipmentUpdate', function(ev) {
+        container.unbind().on('click', '#btnShipmentCreate, #btnShipmentUpdate', function(ev) {
             var postUrl = !ev.target.dataset.action ? shipmentCreateUrl : shipmentUpdateUrl;
             var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
             $.post(postUrl, serializeData, processPostResponse);
         });
 
         // Update shipment status
-        $(document).on('click', '.js-shipment-action', function(ev) {
+        container.on('click', '.js-shipment-action', function(ev) {
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(shipmentUpdateUrl, postData, processPostResponse);

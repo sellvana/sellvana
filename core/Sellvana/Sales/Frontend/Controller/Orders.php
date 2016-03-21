@@ -201,7 +201,7 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         $order = $this->getOrder();
         $return = $this->BRequest->post('return');
         try {
-            $this->Sellvana_Sales_Main->workfflowAction('customerRequestsToReturnItems', [
+            $this->Sellvana_Sales_Main->workflowAction('customerRequestsToReturnItems', [
                 'order' => $order,
                 'qtys' => $return,
             ]);
