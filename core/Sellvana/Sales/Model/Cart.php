@@ -886,6 +886,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                     'title' => $serviceTitle,
                     'price' => $this->convertToStoreCurrency($serviceRate['price']),
                     'max_days' => $serviceRate['max_days'],
+                    'exact_time' => !empty($serviceRate['exact_time']) ? $serviceRate['exact_time'] : null,
                     'selected' => $selMethod == $methodCode && $selService == $serviceCode,
                 ];
             }

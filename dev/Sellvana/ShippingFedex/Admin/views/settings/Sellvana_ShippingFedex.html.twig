@@ -1,23 +1,30 @@
 {% set c = THIS.get('model') %}
-{% set services = APP.instance('Sellvana_ShippingUps_ShippingMethod').getServices() %}
+{% set method = APP.instance('Sellvana_ShippingFedex_ShippingMethod') %}
+{% set dropoffLocations = method.getDropoffLocations() %}
+{% set services = method.getServices() %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
-<h2>{{ "ShippingUPS Settings"|_}}</h2>
+<h2>{{ "ShippingFedex Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_ShippingFedex'}) }}
     {% set fieldData = { model: c, settings_module: 'Sellvana_ShippingFedex', attr: 'size="50"' } %}
-    {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-Sellvana_ShippingFedex-group0', in:1}) }}
+    {{ forms.accordion_panel_start({label:'FedEx API'|_, id:'settings-Sellvana_ShippingFedex-group0', in:1}) }}
         {{ forms.input(fieldData, {field:'access_key', label:'Access Key'|_ }) }}
-        {{ forms.input(fieldData, {field:'shipper_number', label:'Shipper Number'|_ }) }}
+        {{ forms.input(fieldData, {field:'shipper_number', label:'Account Number'|_ }) }}
+        {{ forms.input(fieldData, {field:'shipper_meter', label:'Meter Number'|_ }) }}
         {{ forms.input(fieldData, {field:'user_id', label:'User ID'|_ }) }}
         {{ forms.input(fieldData, {field:'password', label:'Password'|_, type:'password' }) }}
-        {{ forms.input(fieldData, {field:'rate_api_url', label:'Rate API URL'|_ }) }}
         {{ forms.input(fieldData, {field:'max_package_weight', label:'Max Package Weight'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, settings_module:'Sellvana_ShippingFedex' } %}
     {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-Sellvana_ShippingFedex-group1' }) }}
-        {{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}
+        {#{{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}#}
         {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services}) }}
+
+        {{ forms.select(fieldData, {field:'dropoff_location', label:'Dropoff Location', options:dropoffLocations}) }}
+        {{ forms.select(fieldData, {field:'insurance', label:'Shipment Insurance', options:{0: 'No'|_, 1: 'Yes'|_}}) }}
+        {{ forms.input(fieldData, {field:'max_package_weight', label:'Max Package Weight'|_ }) }}
+        {{ forms.input(fieldData, {field:'package_size', label:'Package Size (LxWxH)'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

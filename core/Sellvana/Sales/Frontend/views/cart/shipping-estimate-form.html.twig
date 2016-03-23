@@ -26,6 +26,7 @@
 			  {{ service.title |_ }}
 			  <span class="f-price">{{ service.price ? service.price|currency : 'FREE'|_ }}</span>
 			  {% if service.max_days %}({{ '%s days'|_(service.max_days) }}){% endif %}
+			  {% if service.exact_time %}({{ service.exact_time|locdate('datetime_short') }}){% endif %}
 		      </label>
 		  </dd>
 	      {% endfor %}
