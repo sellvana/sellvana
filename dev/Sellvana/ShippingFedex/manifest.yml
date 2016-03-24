@@ -12,8 +12,7 @@ modules:
                 auto_use: [ views, layout ]
 
         default_config:
-            modules/Sellvana_ShippingFedex/conditionally_free_services: ['03', '11', '65']
-            modules/Sellvana_ShippingFedex/services: ['02', '03', '07', '08', '11', '12', '13', '14', '54', '59', '65']
+            modules/Sellvana_ShippingFedex/services: ['_INTERNATIONAL_ECONOMY']
             modules:
                 Sellvana_ShippingFedex:
                     enabled: 1
@@ -21,4 +20,5 @@ modules:
                     max_package_weight: 150
                     production_mode: 0
                     sort_order: 10
-                    default_service: '03'
+                    dropoff_location: 'REGULAR_PICKUP'
+                    insurance: 1

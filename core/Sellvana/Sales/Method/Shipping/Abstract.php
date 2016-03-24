@@ -123,6 +123,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                         'price' => 0,
                         'weight' => 0,
                         'max_days' => 0,
+                        'exact_time' => null,
                     ];
                 }
                 $packageRate = $packageRates['rates'][$code];
@@ -132,6 +133,9 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                 $cartRates[$code]['price'] += $packageRates['rates'][$code]['price'];
                 if (!empty($packageRates['rates'][$code]['max_days'])) {
                     $cartRates[$code]['max_days'] = max($cartRates[$code]['max_days'], $packageRates['rates'][$code]['max_days']);
+                }
+                if (!empty($packageRates['rates'][$code]['exact_time'])) {
+                    $cartRates[$code]['exact_time'] = $packageRates['rates'][$code]['exact_time'];
                 }
             }
         }
