@@ -7,12 +7,16 @@ base:
 
     - view: head
         do:
+            - [ css, "@FCom_Install/css/bootstrap-ladda.css" ]
             - [ css, "@FCom_Core/css/bootstrap-3.min.css" ]
             #- [ css, "@FCom_Core/css/bootstrap-3.3.5/css/boostrap.min.css" ]
             - [ css, "@FCom_Core/css/fcom.core.css" ]
             - [ css, "@FCom_Install/css/styles.css" ]
-            - [ requireJs, jquery.validate, "@FCom_Install/js/jquery.validate.min", { deps: [ jquery ] }]
-            - [ requireJs, fcom.password, "@FCom_Core/js/fcom/fcom.password"     ]
+            - [ requireJs, bootstrap, "@FCom_Install/js/bootstrap-3", { deps: [ jquery ] } ]
+            - [ requireJs, bootstrap-ladda-spin, "@FCom_Install/js/bootstrap-ladda-spin.min", { deps: [ bootstrap ] } ]
+            - [ requireJs, bootstrap-ladda, "@FCom_Install/js/bootstrap-ladda.min", { deps: [ bootstrap, bootstrap-ladda-spin ] } ]
+            - [ requireJs, jquery.validate, "@FCom_Install/js/jquery.validate.min", { deps: [ jquery ] } ]
+            - [ requireJs, fcom.password, "@FCom_Core/js/fcom/fcom.password" ]
             - [ requireRun, fcom.password ]
             #- [ css, @FCom_Core/../FrontendThemeBootSimple/css/fulleron-base.css ]
             #- [ requireRun, fcom.core ]

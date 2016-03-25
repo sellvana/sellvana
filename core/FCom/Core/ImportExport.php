@@ -1238,6 +1238,7 @@ class FCom_Core_ImportExport extends BClass
                 }
             }
 
+            /** @var FCom_Core_Model_ImportExport_Site $importSite */
             $importSite = $this->FCom_Core_Model_ImportExport_Site->load($importID, 'site_code');
             if (!$importSite) {
                 $importSite = $this->FCom_Core_Model_ImportExport_Site->create(['site_code' => $importID])->save();

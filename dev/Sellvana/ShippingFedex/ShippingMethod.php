@@ -241,7 +241,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
 
     protected function _data($path, $default = null)
     {
-        $result = $this->BUtil->arrayGet($this->_requestData, $path);
+        $result = $this->BUtil->dataGet($this->_requestData, $path);
         if (null === $result) {
             $result = $this->BConfig->get("modules/Sellvana_ShippingFedex/{$path}");
         }

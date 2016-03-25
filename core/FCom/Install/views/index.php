@@ -71,7 +71,7 @@
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item clearfix">
-            <button type="submit" class="btn btn-primary pull-right" name="do" value="next"><?=$this->_('Continue')?></button>
+            <button type="submit" class="btn btn-primary pull-right ladda-button" data-style="expand-left" name="do" value="next"><?=$this->_('Continue')?></button>
         </li>
     </ul>
 </form>

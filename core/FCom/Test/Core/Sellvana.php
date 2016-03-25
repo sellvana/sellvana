@@ -48,7 +48,7 @@ class FCom_Test_Core_Sellvana extends BClass
                 $this->BConfig->add([
                     'db' => [
                         'named' => [
-                            'codeception' => $this->BUtil->arrayGet($this->getConfig(), 'codecept_test_db')
+                            'codeception' => $this->BUtil->dataGet($this->getConfig(), 'codecept_test_db')
                         ]
                     ]
                 ]);

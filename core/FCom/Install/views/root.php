@@ -21,5 +21,15 @@
                 <?= $this->hook('main') ?>
             </div>
         </div>
+
+        <script type="text/javascript">
+            require(['bootstrap-ladda', 'bootstrap-ladda-spin'], function (Ladda) {
+                var loader = Ladda.create(document.querySelector('.ladda-button'));
+                $('form').on('submit', function (e) {
+                    if (!$(this).valid()) return false;
+                    loader.start();
+                });
+            });
+        </script>
     </body>
 </html>

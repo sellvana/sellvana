@@ -35,16 +35,14 @@
 
         var helper = {
 
-            data: function()
-            {
+            data: function () {
                 if (location.search.indexOf('test=') >= 0)
-                    return {'test' : helper.getParameterByName('test') };
+                    return {'test': helper.getParameterByName('test')};
 
                 return {};
             },
 
-            getParameterByName: function(name)
-            {
+            getParameterByName: function (name) {
                 name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
                 var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
                         results = regex.exec(location.search);
@@ -75,10 +73,10 @@
                         label: '<strong class="label label-danger">{{ "Error" | _ }}</strong>'
                     },
                     'stopped': {
-                        label: '<strong class="label label-info">{{ "Stopped" | _ }}</strong>'
+                        label: '<strong class="label label-warning">{{ "Stopped" | _ }}</strong>'
                     },
                     'failed': {
-                        label: '<strong class="label label-danger">{{ "Failed" | _ }}</strong>'
+                        label: '<strong class="label label-warning">{{ "Failed" | _ }}</strong>'
                     },
                     'passed': {
                         label: '<strong class="label label-success">{{ "Passed" | _ }}</strong>'
@@ -88,16 +86,15 @@
                     }
                 }
             },
-            init: function() {
+            init: function () {
                 Test.binds();
             },
             /**
              * Test Runner.
              *
-             * @param Array  List of test IDs.
+             * @param tests List of test IDs.
              */
-            run: function(tests)
-            {
+            run: function (tests) {
                 if (State.isRunning() && tests.length > 0) {
                     var test = tests.shift();
                     var type = test.type.toLowerCase();
@@ -105,19 +102,22 @@
 
                     // Run the test
                     $.ajax({
-                        url         : Test.vars.url + '?type=' + type + '&id=' + hash,
-                        method      : 'GET',
-                        cache       : false,
-                        dataType    : "json",
-                        beforeSend  : function (xhr, settings)
-                        {
-                            $.bootstrapGrowl("{{ 'Please wait while' | _ }} " + test.test + " {{ 'running' | _ }}.", { type: 'success', align: 'center', width: 'auto', delay: 1000});
+                        url: Test.vars.url + '?type=' + type + '&id=' + hash,
+                        method: 'GET',
+                        cache: false,
+                        dataType: "json",
+                        beforeSend: function (xhr, settings) {
+                            $.bootstrapGrowl("{{ 'Please wait while' | _ }} " + test.test + " {{ 'running' | _ }}.", {
+                                type: 'success',
+                                align: 'center',
+                                width: 'auto',
+                                delay: 300
+                            });
                             ++State.vars.countRun; // Update number of test had runned
                             Test.refresh(test, 'running'); // Refresh test
                             State.refresh('running'); // Refresh test state
                         },
-                        success     : function(data, status, xhr)
-                        {
+                        success: function (data, status, xhr) {
                             // After a successful run, update the test status.
                             Test.complete(test, data, xhr);
                             // Carry on running the tests...
@@ -137,8 +137,7 @@
             /**
              * Set the test state after it's been run (whether it's pass or fail)
              */
-            complete: function(test, data, xhr)
-            {
+            complete: function (test, data, xhr) {
                 // Check the state of the completed test and
                 // set the UI state and updated counts.
                 var state = (data.passed === true) ? 'passed' : typeof data.passed === 'string' ? data.passed : 'failed';
@@ -152,7 +151,7 @@
             /**
              * Start running the tests.
              */
-            start: function() {
+            start: function () {
                 var tests = Test.find();
                 // If there are tests available...
                 if (tests.length > 0) {
@@ -165,7 +164,12 @@
                     State.refresh('running'); // Update state to running
                     Test.run(tests); // Run test
                 } else {
-                    $.bootstrapGrowl("{{ 'Error: Please select some tests to run.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 3000});
+                    $.bootstrapGrowl("{{ 'Error: Please select some tests to run.' | _ }}", {
+                        type: 'warning',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 1000
+                    });
                 }
             },
             find: function () {
@@ -179,7 +183,7 @@
             /**
              * Stop the tests from running.
              */
-            stop: function() {
+            stop: function () {
                 // Re-enable the checkboxes
                 Test.checkboxToggle();
 
@@ -189,8 +193,8 @@
             /**
              * Set the state of the given test to Running.
              *
-             * @param Form Object   test
-             * @param String        state
+             * @param test
+             * @param state
              */
             refresh: function (test, state) {
 
@@ -203,8 +207,7 @@
                 $tr.find(Test.vars.ckbTest).prop('checked', false);
             },
             binds: function () {
-                $(document).on('change', Test.vars.ckbTest, function(e)
-                {
+                $(document).on('change', Test.vars.ckbTest, function (e) {
                     var state = 'normal';
                     if ($(this).is(':checked')) {
                         state = 'ready';
@@ -218,12 +221,12 @@
                             .html(chosenState.label);
                 });
 
-                $(document).on('click', Test.vars.aCheckAll, function(e) {
+                $(document).on('click', Test.vars.aCheckAll, function (e) {
                     var chosenState = Test.vars.states['ready'];
                     $('td[data-col="status"]').html(chosenState.label);
                 });
 
-                $(document).on('click', Test.vars.aUncheckAll, function(e) {
+                $(document).on('click', Test.vars.aUncheckAll, function (e) {
                     var chosenState = Test.vars.states['normal'];
                     $('td[data-col="status"]').html(chosenState.label);
                 });
@@ -231,10 +234,9 @@
             /**
              * Reset the Application state to ready.
              */
-            reset: function()
-            {
+            reset: function () {
                 // Reset all the tests
-                _(codeceptGrid.getRows()).each(function(row) {
+                _(codeceptGrid.getRows()).each(function (row) {
                     Test.refresh(row, 'ready');
                 });
             },
@@ -244,14 +246,13 @@
              * On start, they're disabled.
              * On reset, they're enabled.
              */
-            checkboxToggle: function()
-            {
+            checkboxToggle: function () {
                 $('input:checkbox').toggleDisabled();
             }
         };
 
         var Console = {
-            init: function() {
+            init: function () {
                 //
             },
             vars: {
@@ -262,18 +263,20 @@
              *
              * @param object Test
              */
-            add: function(test)
-            {
+            add: function (test) {
                 var consoleContainer = $(Console.vars.eConsoleContainer);
                 consoleContainer.show();
                 // Load the details of the current state
                 var chosenState = Test.vars.states[test.state];
 
-                var testResult = $('<div/>', {'class': test.state +' all'});
-                var state = $('<span/>', {'class': Test.vars.sButton + chosenState.css,
-                }).html(chosenState.label).appendTo(testResult);
+                var testResult = $('<div/>', {'class': test.state + ' all'});
+                /*var state = $('<span/>', {
+                    'class': Test.vars.sButton + chosenState.css,
+                }).html(chosenState.label).appendTo(testResult);*/
 
-                $('<h5/>', {'text': test.title}).appendTo(testResult);
+                $('<h5/>', {'text': test.title})
+                        .append($(chosenState.label).addClass('pull-right'))
+                        .appendTo(testResult);
                 $('<pre/>', {'text': test.log}).appendTo(testResult);
                 $('<hr>').appendTo(testResult);
 
@@ -286,7 +289,7 @@
             /**
              * Empty the content of the console
              */
-            clear: function() {
+            clear: function () {
                 $(Console.vars.eConsoleContainer).html('');
             }
         };
@@ -306,7 +309,7 @@
                 stopped: false,
 
                 // All possible states
-                states : {
+                states: {
                     'ready': {
                         running: false,
                         stopped: false
@@ -329,7 +332,7 @@
                     }
                 }
             },
-            init: function() {
+            init: function () {
 
                 // Initial count of all the available tests
                 State.updateCount();
@@ -342,7 +345,7 @@
              *
              * @param String state
              */
-            refresh: function(state) {
+            refresh: function (state) {
 
                 // Get the current state
                 State.vars.currentState = state;
@@ -356,14 +359,13 @@
                 var chosenState = State.vars.states[state];
 
                 // Update the message state and button states.
-                State.vars.running = chosenState.running ;
+                State.vars.running = chosenState.running;
                 State.vars.stopped = chosenState.stopped;
             },
             /**
              * Update the count of chosen tests.
              */
-            updateCount: function()
-            {
+            updateCount: function () {
                 var tests = Test.find();
                 if (_.isEmpty(tests)) {
                     tests = codeceptGrid.getSelectedRows();
@@ -374,19 +376,19 @@
             /*
              * State Check: Return if the Tests are running.
              */
-            isRunning: function() {
+            isRunning: function () {
                 return State.vars.running;
             },
             /*
              * State Check: Return if the Tests have been stopped.
              */
-            isStopped: function() {
+            isStopped: function () {
                 return State.vars.stopped;
             },
             /*
              * State Check: Return if the chosen tests have been run.
              */
-            isCompleted: function() {
+            isCompleted: function () {
                 return State.vars.countRun == State.vars.countTests
             }
         };
@@ -404,8 +406,7 @@
                 }
             },
 
-            init: function()
-            {
+            init: function () {
                 $(Codeception.vars.btnRunCgi).prop('disabled', true);
                 Codeception.check('executable');
             },
@@ -413,34 +414,50 @@
             /**
              * Make an AJAX call to see if Codeception is executable.
              */
-            check: function(type)
-            {
+            check: function (type) {
                 var cType = Codeception.vars.checks[type];
 
                 $.ajax({
-                    url         : cType.url,
-                    method      : 'GET',
-                    cache       : false,
-                    dataType    : 'json',
-                    data        : helper.data(),
-                    beforeSend  : function (xhr, settings)
-                    {
-                        $.bootstrapGrowl("{{ 'Please wait while codeception is checking.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 2000});
+                    url: cType.url,
+                    method: 'GET',
+                    cache: false,
+                    dataType: 'json',
+                    data: helper.data(),
+                    beforeSend: function (xhr, settings) {
+                        $.bootstrapGrowl("{{ 'Please wait while codeception is checking.' | _ }}", {
+                            type: 'warning',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 1000
+                        });
                         Test.refresh(test, 'running');
                     },
-                    success: function(data, status, xhr)
-                    {
+                    success: function (data, status, xhr) {
                         // Update the Codeception button to indicate success!
                         if (data.ready) {
-                            $.bootstrapGrowl("{{ 'Done, codeception is now available.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 2000});
+                            $.bootstrapGrowl("{{ 'Done, codeception is now available.' | _ }}", {
+                                type: 'success',
+                                align: 'center',
+                                width: 'auto',
+                                delay: 1000
+                            });
                             $(Codeception.vars.btnRunCgi).prop('disabled', false);
                         } else {
-                            $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + data.error, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                            $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + data.error, {
+                                type: 'danger',
+                                align: 'center',
+                                width: 'auto',
+                                delay: 1000
+                            });
                         }
                     },
-                    error: function(xhr, status, message)
-                    {
-                        $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    error: function (xhr, status, message) {
+                        $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + message, {
+                            type: 'danger',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 1000
+                        });
                     }
                 });
             }
@@ -469,8 +486,7 @@
         /**
          * If refresh page then confirm to force stop
          */
-        $(document).keydown(function (e)
-        {
+        $(document).keydown(function (e) {
             if (e.which == 116 || e.which == 17) {
                 if (State.isRunning() && window.confirm('Do you want to force shutdown test.')) {
                     Test.stop();
@@ -480,8 +496,8 @@
             }
         });
 
-        $.fn.toggleDisabled = function() {
-            return this.each(function() {
+        $.fn.toggleDisabled = function () {
+            return this.each(function () {
                 this.disabled = !this.disabled;
             });
         }
