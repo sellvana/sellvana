@@ -814,14 +814,15 @@ class BUtil extends BClass
         list($value, $key) = static::_parsePluckParams($value, $key);
 
         foreach ($array as $item) {
-            $itemValue = static::arrayGet($item, $value);
+            $itemValue = static::dataGet($item, $value);
             if (is_null($key)) {
                 $results[] = $itemValue;
             } else {
-                $itemKey = static::arrayGet($item, $key);
+                $itemKey           = static::dataGet($item, $key);
                 $results[$itemKey] = $itemValue;
             }
         }
+
         return $results;
     }
 
@@ -833,7 +834,7 @@ class BUtil extends BClass
      * @param  mixed $default
      * @return mixed
      */
-    public function arrayGet($target, $key, $default = null)
+    public function dataGet($target, $key, $default = null)
     {
         if (is_null($key)) {
             return $target;
@@ -848,7 +849,7 @@ class BUtil extends BClass
                 }
 
                 $target = $target[$segment];
-            }  elseif (is_object($target)) {
+            } elseif (is_object($target)) {
                 if ($target instanceof Model) {
                     $target = $target->get($segment);
                 } else {

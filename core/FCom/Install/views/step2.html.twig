@@ -1,7 +1,7 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { model:SESSION.get('w'), id_prefix:'admin', name_prefix:'w[admin]', get_prefix:'admin', label_class:'col-lg-4', input_div_class:'col-lg-7' } %}
 
-<form method="post" action="{{APP.href('install/step2')}}" class="form-horizontal">
+<form method="post" action="{{ APP.href('install/step2') }}" class="form-horizontal">
     <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
     <div class="panel-heading">
         <h1 class="panel-title">{{ 'Step 2 of 3: First Admin User' |_ }}</h1>
@@ -16,8 +16,8 @@
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item clearfix">
-            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{APP.href('install/step1')}}">&laquo; {{ 'Back' |_ }}</a>-->
-            <button type="submit" class="btn btn-primary pull-right" name="do" value="next">{{ 'Continue' |_ }}</button>
+            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{ APP.href('install/step1') }}">&laquo; {{ 'Back' |_ }}</a>-->
+            <button type="submit" class="btn btn-primary pull-right ladda-button" data-style="expand-left"   name="do" value="next">{{ 'Continue' |_ }}</button>
         </li>
     </ul>
 </form>

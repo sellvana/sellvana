@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Sellvana_Sales_Tests_Model_CartTest
+ * Class Sellvana_Sales_Test_Unit_CartTest
  *
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  */
@@ -119,6 +119,7 @@ class CartTest extends \Codeception\TestCase\Test
         /** @var Sellvana_Sales_Model_Cart $cart */
         $cart = Sellvana_Sales_Model_Cart::i()->load(1);
         $item = $cart->addProduct(3, ['qty' => 3, 'price' => 5]);
+        $this->tester->seeNumRecords(4, 'fcom_sales_cart_item');
         $this->tester->assertEquals(3, count($cart->items()), "Items count is not correct");
         $this->tester->assertEquals(8, $cart->itemQty(), "Items count is not correct");
 
