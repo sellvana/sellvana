@@ -7,6 +7,9 @@ modules:
         description: "Fedex shipping module"
         auto_use: [ bootstrap ]
 
+        observe:
+            - [ Sellvana_Sales_Model_Order_Shipment_State_Overall::changeState, Sellvana_ShippingFedex_Main.onShipmentStateChange ]
+
         areas:
             FCom_Admin:
                 auto_use: [ views, layout ]
