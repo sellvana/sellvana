@@ -1,0 +1,4 @@
+[
+    {"_default_model": "Sellvana_Test_Model_Test", "_default_fields": ["id", "name"]},
+    ["1", "Test Import Model"]
+]

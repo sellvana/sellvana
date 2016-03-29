@@ -49,18 +49,18 @@ class ModelAbstractTest extends \Codeception\TestCase\Test
         $this->tester->assertEquals($data, $p->get('data_custom'));
 
         $p->setData('price/cost', 1000)->save(false);
-        $this->tester->assertEquals(1000, $util->arrayGet($p->get('data_custom'), 'price.cost'), 'Data set is not correct');
+        $this->tester->assertEquals(1000, $util->dataGet($p->get('data_custom'), 'price.cost'), 'Data set is not correct');
 
         $p->setData('base')->save(false);
         $this->tester->assertNull($p->get('data_custom/base'), 'Data set is not correct');
 
         $p->setData('price/tier', 100)->save(false);
-        $this->tester->assertFalse(is_array($util->arrayGet($p->get('data_custom'), 'price.tier')), 'Data set is not correct');
+        $this->tester->assertFalse(is_array($util->dataGet($p->get('data_custom'), 'price.tier')), 'Data set is not correct');
         $this->tester->assertContains('tier', array_keys($p->get('data_custom')['price']), 'Data set is not correct.');
 
         $p->setData('price/tier', 200, true)->save(false);
-        $this->tester->assertTrue(is_array($util->arrayGet($p->get('data_custom'), 'price.tier')), 'Data set is not correct');
-        $this->tester->assertTrue(is_array($util->arrayGet($p->get('data_custom'), 'price.tier')), 'Data set is not correct.');
+        $this->tester->assertTrue(is_array($util->dataGet($p->get('data_custom'), 'price.tier')), 'Data set is not correct');
+        $this->tester->assertTrue(is_array($util->dataGet($p->get('data_custom'), 'price.tier')), 'Data set is not correct.');
     }
 
     public function testGetData()

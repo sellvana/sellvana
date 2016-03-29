@@ -855,8 +855,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
         foreach (['related', 'similar', 'cross_sell'] as $type) {
             $typeName = 'linked_products_' . $type;
-            if ($linkedData = $this->BUtil->arrayGet($data, $typeName)) {
-                if ($deletedIds = $this->BUtil->arrayGet($linkedData, "del")) {
+            if ($linkedData = $this->BUtil->dataGet($data, $typeName)) {
+                if ($deletedIds = $this->BUtil->dataGet($linkedData, "del")) {
                     $hlp->delete_many([
                         'product_id' => $model->id(),
                         'link_type' => $type,
@@ -866,10 +866,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 unset($linkedData['del']);
 
                 // Process for new rows
-                if ($linkedIds = $this->BUtil->arrayGet($linkedData, "add")) {
+                if ($linkedIds = $this->BUtil->dataGet($linkedData, "add")) {
                     $linkedIds = $this->BUtil->arrayCleanInt($linkedIds);
                     foreach ($linkedIds as $lid) {
-                        $position = (int)$this->BUtil->arrayGet($linkedData, "{$lid}.product_link_position", 0);
+                        $position = (int)$this->BUtil->dataGet($linkedData, "{$lid}.product_link_position", 0);
                         $hlp->create([
                             'product_id' => $model->id(),
                             'link_type' => $type,
@@ -890,7 +890,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                         ]);
 
                         if ($productLink) {
-                            $position = (int)$this->BUtil->arrayGet($arr, "product_link_position", 0);
+                            $position = (int)$this->BUtil->dataGet($arr, "product_link_position", 0);
                             $productLink->set('position', $position)->save();
                         }
                     }
@@ -911,7 +911,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $hlp = $this->Sellvana_Catalog_Model_ProductMedia;
         foreach (['A' => 'attachments', 'I' => 'images', 'V' => 'videos'] as $type => $typeName) {
 
-            if ($del = $this->BUtil->arrayGet($data, "grid.{$typeName}.del")) {
+            if ($del = $this->BUtil->dataGet($data, "grid.{$typeName}.del")) {
                 $hlp->delete_many([
                     'product_id' => $model->id,
                     'media_type' => $type,
@@ -920,7 +920,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             }
 
             $rows = $this->BUtil->fromJson(
-                $this->BUtil->arrayGet($data, "grid.{$typeName}.rows", '')
+                $this->BUtil->dataGet($data, "grid.{$typeName}.rows", '')
             );
 
             if (!empty($rows)) {
@@ -931,22 +931,22 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                         $mediaModel = $hlp->load($key);
                         $is_thumb = $is_default = $is_rollover = $in_gallery = 0;
                         if ($type == 'I' || $type == 'V') {
-                            if ($key == $this->BUtil->arrayGet($data, "product_{$typeName}.is_thumb")) {
+                            if ($key == $this->BUtil->dataGet($data, "product_{$typeName}.is_thumb")) {
                                 $is_thumb = 1;
                             }
                             $media['is_thumb'] = $is_thumb;
 
-                            if ($key == $this->BUtil->arrayGet($data, "product_{$typeName}.is_default")) {
+                            if ($key == $this->BUtil->dataGet($data, "product_{$typeName}.is_default")) {
                                 $is_default = 1;
                             }
                             $media['is_default'] = $is_default;
 
-                            if ($key == $this->BUtil->arrayGet($data, "product_{$typeName}.is_rollover")) {
+                            if ($key == $this->BUtil->dataGet($data, "product_{$typeName}.is_rollover")) {
                                 $is_rollover = 1;
                             }
                             $media['is_rollover'] = $is_rollover;
 
-                            $in_gallery = $this->BUtil->arrayGet($data, "product_{$typeName}.{$key}.in_gallery", 0);
+                            $in_gallery = $this->BUtil->dataGet($data, "product_{$typeName}.{$key}.in_gallery", 0);
                             if ($media['is_default']) {
                                 $in_gallery = 1;
                             }
@@ -1027,9 +1027,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     protected function _processSystemLangFieldsPost($model, $data)
     {
-        $model->setData('product_name_lang_fields', $this->BUtil->arrayGet($data, 'name_lang_fields'));
-        $model->setData('short_description_lang_fields', $this->BUtil->arrayGet($data, 'short_desc_lang_fields'));
-        $model->setData('description_lang_fields', $this->BUtil->arrayGet($data, 'desc_lang_fields'));
+        $model->setData('product_name_lang_fields', $this->BUtil->dataGet($data, 'name_lang_fields'));
+        $model->setData('short_description_lang_fields', $this->BUtil->dataGet($data, 'short_desc_lang_fields'));
+        $model->setData('description_lang_fields', $this->BUtil->dataGet($data, 'desc_lang_fields'));
     }
 
     /**
@@ -1271,7 +1271,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->_savePrices($model, $data['productPrice']);
         
         // Process delete product prices
-        if ($deletedIds = $this->BUtil->arrayGet($data, 'prices.delete')) {
+        if ($deletedIds = $this->BUtil->dataGet($data, 'prices.delete')) {
             $this->Sellvana_Catalog_Model_ProductPrice->delete_many([
                 'id' => $this->BUtil->arrayCleanInt($deletedIds)
             ]);
@@ -1294,17 +1294,17 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $vpData = $data['variantPrice'];
 
             // Process delete variant prices
-            if ($deletedPrices = $this->BUtil->arrayGet($vpData, 'delete')) {
+            if ($deletedPrices = $this->BUtil->dataGet($vpData, 'delete')) {
                 $deletedPrices = is_string($deletedPrices) ? $this->BUtil->fromJson($deletedPrices) : $deletedPrices;
                 $this->Sellvana_Catalog_Model_ProductPrice->delete_many([
                     'id' => $this->BUtil->arrayCleanInt($deletedPrices)
                 ]);
             }
 
-            if ($prices = $this->BUtil->arrayGet($vpData, 'prices')) {
+            if ($prices = $this->BUtil->dataGet($vpData, 'prices')) {
                 foreach ($prices as $vId => $price) {
                     parse_str($price, $vPrice);
-                    $this->_savePrices($model, $this->BUtil->arrayGet($vPrice, 'variantPrice'));
+                    $this->_savePrices($model, $this->BUtil->dataGet($vPrice, 'variantPrice'));
                 }
             }
         }
