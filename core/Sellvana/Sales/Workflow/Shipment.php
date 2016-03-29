@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
 {
@@ -37,10 +38,41 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         if (!$qtys) {
             throw new BException('Please add some items to create a shipment');
         }
-        /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
-        $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create($data);
-        $shipment->importFromOrder($order, $qtys);
-        $shipment->register();
+        $method = $order->get('shipping_method');
+        $packages = [];
+        if ($methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method)) {
+            $cart = $order->cart();
+            foreach ($order->items() as $oItem) {
+                foreach ($cart->items() as $cItem) {
+                    if ($cItem->id() != $oItem->get('cart_item_id')) {
+                        continue;
+                    }
+                    $qty = (array_key_exists($oItem->id(), $qtys)) ? $qtys[$oItem->id()] : 0;
+                    $cItem->set('qty', $qty);
+                }
+            }
+            $packages = $this->$methodClass->calcCartPackages($cart);
+        }
+
+        if (count($packages)) {
+            $itemIds = []; // cartItem => orderItem
+            foreach ($order->items() as $item) {
+                $itemIds[$item->get('cart_item_id')] = $item->id();
+            }
+            foreach ($packages as $package) {
+                $packQtys = [];
+                foreach ($package['items'] as $cartItemId => $qty) {
+                    $packQtys[$itemIds[$cartItemId]] = $qty;
+                }
+                $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create($data);
+                $shipment->importFromOrder($order, $packQtys);
+                $shipment->register();
+            }
+        } else {
+            $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create($data);
+            $shipment->importFromOrder($order, $qtys);
+            $shipment->register();
+        }
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
