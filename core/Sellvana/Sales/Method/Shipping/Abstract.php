@@ -155,17 +155,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     {
         $packages = [];
         $pkgIdx = 0;
-        $pkgTpl = [
-            'customer_context' => $cart->id(),
-            'to_street1' => $cart->get('shipping_street1'),
-            'to_street2' => $cart->get('shipping_street2'),
-            'to_city' => $cart->get('shipping_city'),
-            'to_region' => $cart->get('shipping_region'),
-            'to_postcode' => $cart->get('shipping_postcode'),
-            'to_country' => $cart->get('shipping_country'),
-            'to_phone' => $cart->get('shipping_phone'),
-            'to_email' => $cart->get('customer_email'),
-        ];
+        $pkgTpl = $this->_getPackageTemplate($cart);
 
         foreach ($cart->items() as $item) {
             $qty = $item->get('qty');
@@ -238,6 +228,25 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     public function fetchPackageRates($package)
     {
         return $this->_fetchRates($package);
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Cart $cart
+     * @return array
+     */
+    protected function _getPackageTemplate(Sellvana_Sales_Model_Cart $cart)
+    {
+        return [
+            'customer_context' => $cart->id(),
+            'to_street1' => $cart->get('shipping_street1'),
+            'to_street2' => $cart->get('shipping_street2'),
+            'to_city' => $cart->get('shipping_city'),
+            'to_region' => $cart->get('shipping_region'),
+            'to_postcode' => $cart->get('shipping_postcode'),
+            'to_country' => $cart->get('shipping_country'),
+            'to_phone' => $cart->get('shipping_phone'),
+            'to_email' => $cart->get('customer_email'),
+        ];
     }
 
     protected function _applyDefaultPackageConfig($data)

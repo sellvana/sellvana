@@ -71,7 +71,7 @@
                         <td>
                             <select name="shipment[service_code]" class="form-control input-sm" id="shipment-service_code">
                                 {% for s in allServices[order.get('shipping_method')].services %}
-                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_method') ~ ':' ~ order.get('shipping_service') ? 'selected' }}>{{ s.label }}</option>
+                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_service') ? 'selected' }}>{{ s.label }}</option>
                                 {% endfor %}
                             </select>
                         </td>

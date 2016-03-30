@@ -182,7 +182,7 @@ class Sellvana_Sales_Main extends BClass
                 continue;
             }
             foreach ($method->getServicesSelected() as $sKey => $sLabel) {
-                $services[$mKey]['services'][$sKey]['value'] = $mKey . ':' . $sKey;
+                $services[$mKey]['services'][$sKey]['value'] = $sKey;
                 $services[$mKey]['services'][$sKey]['label'] = $sLabel;
                 if ($estimates && !empty($estimates[$mKey][$sKey])) {
                     $services[$mKey]['services'][$sKey]['estimate'] = $estimates[$mKey][$sKey];
