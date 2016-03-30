@@ -22,11 +22,12 @@ class Sellvana_ShippingFedex_Main extends BClass
          * @var Sellvana_Sales_Model_Order_Shipment_State_Overall $newState
          */
         $newState = $args['new_state'];
+        $shipment = $newState->getModel();
         if ($newState->getValue() === Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPING) {
             $orderId = $newState->getModel()->get('order_id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
             if ($order->get('shipping_method') === $this->_methodCode) {
-                $this->Sellvana_ShippingFedex_ShippingMethod->buyShipment();
+                $this->Sellvana_ShippingFedex_ShippingMethod->buyShipment($shipment);
             }
         }
     }

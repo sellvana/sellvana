@@ -122,12 +122,19 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return $result;
     }
 
-    public function buyShipment()
+    public function buyShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
     {
+        $cart = $shipment->order()->cart();
+        $this->_requestData = array_merge($this->_requestData, $this->_getPackageTemplate($cart));
+        $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
         $client = $this->_getSoapClient(self::SERVICE_SHIP);
         $request = $this->_buildRequest();
         $request = array_merge($request, $this->_buildShipmentData());
+        $request['RequestedShipment']['ServiceType'] = trim($shipment->get('service_code'), '_');
+        $request['TransactionDetail'] = ['CustomerTransactionId' => 'Process shipment request for order N' . $shipment->order()->id()];
         $result = $client->processShipment($request);
+        var_dump($request);
+        exit();
 
         if ($result->HighestSeverity == 'ERROR') {
             $message = '';
@@ -261,7 +268,8 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
                 ],
                 'Recipient' => [
                     'Contact' => [
-                        'PhoneNumber' => $this->_data('to_phone'),
+                        'PhoneNumber' => $this->_data('to_phone') ?: '1234567890',
+                        'PersonName' => $this->_data('John Smith'),
                     ],
                     'Address' => [
                         'StreetLines' => [
@@ -288,15 +296,16 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
                 ],
                 'LabelSpecification' => [
                     'LabelFormatType' => 'COMMON2D',
-                    'ImageType' => 'PNG',
-                    'LabelStockType' => 'PAPER_8.5X11_TOP_HALF_LABEL',
+                    'ImageType' => 'PDF',
+                    'LabelStockType' => 'PAPER_7X4.75',
                 ],
                 'PackageCount' => 1,
+                'PackageDetail' => 'INDIVIDUAL_PACKAGES',
                 'RequestedPackageLineItems' => [
                     'SequenceNumber' => 1,
                     'GroupPackageCount' => 1,
                     'Weight' => [
-                        'Value' => $this->_data('weight'),
+                        'Value' => $this->_data('weight') ?: $this->_data('shipping_weight'),
                         'Units' => strtoupper($catalogConfig['weight_unit'])
                     ],
                     'Dimensions' => [
