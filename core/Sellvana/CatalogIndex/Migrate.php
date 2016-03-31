@@ -378,10 +378,16 @@ EOT
         $functionsExist = $orm->raw_query("SHOW FUNCTION STATUS LIKE 'levenshtein%'")
             ->find_many_assoc('Name');
         foreach ($functions as $name => $func) {
-            if (!empty($functionsExist[$name]) && $functionsExist[$name]->get('Db') === $dbName) {
-                $orm->raw_query("DROP FUNCTION {$name}")->execute();
+            try {
+                if (!empty($functionsExist[$name]) && $functionsExist[$name]->get('Db') === $dbName) {
+                    $orm->raw_query("DROP FUNCTION {$name}")->execute();
+                }
+                $orm->raw_query($func)->execute();
+            } catch (Exception $e) {
+                if (!preg_match('/FUNCTION .* already exists/i', $e->getMessage())) {
+                    throw $e;
+                }
             }
-            $orm->raw_query($func)->execute();
         }
     }
 
