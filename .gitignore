@@ -5,6 +5,8 @@ local/*
 vendor/
 index.local.php
 .idea
+.kdev4
+*.kdev4/
 .sass-cache/
 *.scssc
 .phpintel
