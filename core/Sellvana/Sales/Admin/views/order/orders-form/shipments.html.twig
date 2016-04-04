@@ -1,4 +1,5 @@
 {% set order = THIS.get('model') %}
+{% set rates = THIS.get('rates') %}
 
 {# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
 {#
@@ -71,7 +72,7 @@
                         <td>
                             <select name="shipment[service_code]" class="form-control input-sm" id="shipment-service_code">
                                 {% for s in allServices[order.get('shipping_method')].services %}
-                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_service') ? 'selected' }}>{{ s.label }}</option>
+                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_service') ? 'selected' }}>{{ s.label }}{% if rates[s.value] %} ({{ rates[s.value].price }}){% endif %}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -85,6 +86,7 @@
                             <input type="text" class="form-control input-sm" name="shipment[carrier_price]">
                         </td>
                         <td>
+                            <button id="btnShipmentGetRates" data-container="#shipment-get-rates-container" class="btn btn-xs" type="button">{{ 'Get Rates'|_ }}</button>
                             <button id="btnShipmentCreate" data-container="#shipment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
                         </td>
                     </tr>
@@ -172,6 +174,7 @@
     require(['jquery', 'underscore'], function($, _) {
         var shipmentCreateUrl = "{{ APP.href('shipments/create?id=' ~ order.id()) }}";
         var shipmentUpdateUrl = "{{ APP.href('shipments/update?id=' ~ order.id()) }}";
+        var ratesUrl = "{{ APP.href('shipments/rates?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-shipments');
@@ -203,6 +206,12 @@
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(shipmentUpdateUrl, postData, processPostResponse);
+        });
+
+        // Get rates for the selected shipping method
+        container.on('click', '#btnShipmentGetRates', function(ev) {
+            var serializeData = $(container).find('input, select').serializeArray();
+            $.post(ratesUrl, serializeData, processPostResponse);
         });
 
         // link carrier and service dropdowns
