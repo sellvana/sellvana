@@ -246,6 +246,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
             'to_country' => $cart->get('shipping_country'),
             'to_phone' => $cart->get('shipping_phone'),
             'to_email' => $cart->get('customer_email'),
+            'to_name' => $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname'),
         ];
     }
 

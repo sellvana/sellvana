@@ -92,7 +92,12 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             'rates' => []
         ];
 
-        foreach ($rates->RateReplyDetails as $service) {
+        $rateReplyDetails = $rates->RateReplyDetails;
+        if (!is_array($rateReplyDetails)) {
+            $rateReplyDetails = [$rateReplyDetails];
+        }
+
+        foreach ($rateReplyDetails as $service) {
             $serviceType = $service->ServiceType;
             $details = (is_array($service->RatedShipmentDetails)) ? $service->RatedShipmentDetails[0] : $service->RatedShipmentDetails;
             $amount = $details->ShipmentRateDetail->TotalNetCharge->Amount;
@@ -131,28 +136,22 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $request = $this->_buildRequest();
         $request = array_merge($request, $this->_buildShipmentData());
         $request['RequestedShipment']['ServiceType'] = trim($shipment->get('service_code'), '_');
-        $request['TransactionDetail'] = ['CustomerTransactionId' => 'Process shipment request for order N' . $shipment->order()->id()];
+        $request['TransactionDetail'] = ['CustomerTransactionId' => 'Process shipment request for order ID: ' . $shipment->order()->id()];
         $result = $client->processShipment($request);
-        var_dump($request);
-        exit();
 
         if ($result->HighestSeverity == 'ERROR') {
             $message = '';
-            if (is_array($result->Notifications)) {
-                foreach ($result->Notifications as $notification) {
-                    $message .= $notification->LocalizedMessage;
-                }
-            } else {
-                $message = $result->Notifications->LocalizedMessage;
+            $notifications = $result->Notifications;
+            if (!is_array($notifications)) {
+                $notifications = [$notifications];
             }
-            $result = [
-                'error' => 1,
-                'message' => $message,
-            ];
-            return $result;
+
+            foreach ($notifications as $notification) {
+                $message .= $notification->LocalizedMessage;
+            }
+
+            throw new Exception($message);
         }
-
-
     }
 
     /**
@@ -268,8 +267,8 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
                 ],
                 'Recipient' => [
                     'Contact' => [
-                        'PhoneNumber' => $this->_data('to_phone') ?: '1234567890',
-                        'PersonName' => $this->_data('John Smith'),
+                        'PhoneNumber' => $this->_data('to_phone'),
+                        'PersonName' => $this->_data('to_name'),
                     ],
                     'Address' => [
                         'StreetLines' => [

@@ -190,7 +190,7 @@
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
                 });
             }
-            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
             $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
         }
 
