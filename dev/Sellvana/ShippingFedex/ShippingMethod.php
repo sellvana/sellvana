@@ -130,6 +130,12 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return $result;
     }
 
+    /**
+     * Send shipment confirmation to FedEx
+     *
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @throws BException
+     */
     public function buyShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
     {
         $cart = $shipment->order()->cart();
@@ -150,15 +156,52 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             }
 
             foreach ($notifications as $notification) {
-                $message .= $notification->LocalizedMessage;
+                $message .= empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
             }
 
-            throw new Exception($message);
+            throw new BException($message);
         }
 
         $shipmentDetail = $result->CompletedShipmentDetail;
         $shipment->setData('CompletedShipmentDetail', $shipmentDetail);
         $shipment->setData('JobId', $result->JobId);
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @throws BException
+     */
+    public function cancelShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        $cart = $shipment->order()->cart();
+        $this->_requestData = array_merge($this->_requestData, $this->_getPackageTemplate($cart));
+        $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
+        $client = $this->_getSoapClient(self::SERVICE_SHIP);
+        $request = $this->_buildRequest();
+        $shipmentDetail = $shipment->getData('CompletedShipmentDetail');
+        if (!empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
+            $trackingId = $shipmentDetail['CompletedPackageDetails']['TrackingIds'];
+            $request['TrackingId'] = [
+                'TrackingIdType' => $trackingId['TrackingIdType'],
+                'TrackingNumber' => $trackingId['TrackingNumber'],
+            ];
+        }
+        $request['DeletionControl'] = 'DELETE_ALL_PACKAGES';
+        $result = $client->deleteShipment($request);
+
+        if ($result->HighestSeverity == 'ERROR') {
+            $message = '';
+            $notifications = $result->Notifications;
+            if (!is_array($notifications)) {
+                $notifications = [$notifications];
+            }
+
+            foreach ($notifications as $notification) {
+                $message .= empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+            }
+
+            throw new BException($message);
+        }
     }
 
     /**

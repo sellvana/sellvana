@@ -18,17 +18,26 @@ class Sellvana_ShippingFedex_Main extends BClass
 
     public function onShipmentStateChange($args)
     {
-        /**
-         * @var Sellvana_Sales_Model_Order_Shipment_State_Overall $newState
-         */
+        /** @var Sellvana_Sales_Model_Order_Shipment_State_Overall $newState */
         $newState = $args['new_state'];
+
+        /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
         $shipment = $newState->getModel();
-        if ($newState->getValue() === Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPING) {
-            $orderId = $newState->getModel()->get('order_id');
-            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
-            if ($order->get('shipping_method') === $this->_methodCode) {
+
+        $order = $shipment->order();
+        if ($order->get('shipping_method') !== $this->_methodCode) {
+            return;
+        }
+
+        switch ($newState->getValue()) {
+            case Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPING:
                 $this->Sellvana_ShippingFedex_ShippingMethod->buyShipment($shipment);
-            }
+                break;
+            case Sellvana_Sales_Model_Order_Shipment_State_Overall::CANCELED:
+                $this->Sellvana_ShippingFedex_ShippingMethod->cancelShipment($shipment);
+                break;
+            default:
+                break;
         }
     }
 }
