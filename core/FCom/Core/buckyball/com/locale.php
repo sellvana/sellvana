@@ -1467,7 +1467,12 @@ class BLocale extends BClass
      * @param $locale
      * @return bool
      */
-    protected function _isLocaleAvailableInIntl($locale) {
+    protected function _isLocaleAvailableInIntl($locale)
+    {
+        if (!class_exists('ResourceBundle')) {
+            return false;
+        }
+
         $availableLocales = ResourceBundle::getLocales('');
 
         return in_array($locale, $availableLocales);
@@ -1495,6 +1500,9 @@ class BLocale extends BClass
      */
     protected function _createFormatters($locale)
     {
+        if (!class_exists('IntlDateFormatter')) {
+            return [];
+        }
         $formatters = [];
         $formatters[self::FORMAT_SHORT_DATE] = new IntlDateFormatter(
             $locale,
