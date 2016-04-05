@@ -70,6 +70,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $request = array_merge($request, $this->_buildShipmentData());
 
         $rates = $rateClient->getRates($request);
+        $this->BDebug->log(print_r($rates, 1), 'fedex.log');
 
         if ($rates->HighestSeverity == 'ERROR') {
             $message = '';
