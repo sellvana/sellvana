@@ -154,4 +154,25 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
         ]);
         $this->BResponse->json($result);
     }
+
+    public function action_printLabel()
+    {
+        $shipmentId = $this->BRequest->get('id');
+        $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($shipmentId);
+        $label = $shipment->label();
+        $fileName = 'shipmentLabel.pdf';
+
+        $this->BResponse->header([
+            'Pragma: public',
+            'Cache-Control: must-revalidate, post-check=0, pre-check=0',
+            'Content-Length: ' . strlen($label),
+            'Last-Modified: ' . date('r'),
+            'Content-Type: application/pdf',
+            'Content-Disposition: inline; filename=' . $fileName,
+        ]);
+
+        echo $label;
+
+        $this->BResponse->shutdown(__METHOD__);
+    }
 }

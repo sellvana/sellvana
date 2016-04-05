@@ -335,4 +335,13 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         return ['error' => true, 'message' => 'Not implemented'];
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @return bool|string
+     */
+    public function getShipmentLabel(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        return false;
+    }
+
 }

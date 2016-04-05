@@ -149,6 +149,9 @@
                                 <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
                                 <hr>
                             {% endfor %}
+                            {% if s.label() %}
+                                <a href="{{ APP.href('shipments/printLabel?id=' ~ s.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
+                            {% endif %}
                         </td>
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">

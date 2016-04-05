@@ -73,12 +73,15 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
 
         if ($rates->HighestSeverity == 'ERROR') {
             $message = '';
-            if (is_array($rates->Notifications)) {
-                foreach ($rates->Notifications as $notification) {
-                    $message .= $notification->LocalizedMessage;
-                }
-            } else {
-                $message = $rates->Notifications->LocalizedMessage;
+            $notifications = $rates->Notifications;
+
+            if (!is_array($notifications)) {
+                $notifications = [$notifications];
+            }
+
+            foreach ($notifications as $notification) {
+                $curMessage = empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+                $message .= $curMessage . "<br>";
             }
             $result = [
                 'error' => 1,
@@ -152,6 +155,10 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
 
             throw new Exception($message);
         }
+
+        $shipmentDetail = $result->CompletedShipmentDetail;
+        $shipment->setData('CompletedShipmentDetail', $shipmentDetail);
+        $shipment->setData('JobId', $result->JobId);
     }
 
     /**
@@ -391,6 +398,20 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             '_GROUND_HOME_DELIVERY' => 'Ground Home Delivery',
             '_FEDEX_GROUND' => 'Ground',
         ];
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @return bool|string
+     */
+    public function getShipmentLabel(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        $data = $shipment->getData('CompletedShipmentDetail');
+        if (!empty($data)) {
+            return $data['CompletedPackageDetails']['Label']['Parts']['Image'];
+        }
+
+        return false;
     }
 
 
