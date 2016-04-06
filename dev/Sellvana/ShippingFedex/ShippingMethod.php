@@ -144,7 +144,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
         $client = $this->_getSoapClient(self::SERVICE_SHIP);
         $request = $this->_buildRequest();
-        $request = array_merge($request, $this->_buildShipmentData());
+        $request = array_merge($request, $this->_buildShipmentData($shipment));
         $request['RequestedShipment']['ServiceType'] = trim($shipment->get('service_code'), '_');
         $request['TransactionDetail'] = ['CustomerTransactionId' => 'Process shipment request for order ID: ' . $shipment->order()->id()];
         $result = $client->processShipment($request);
@@ -282,7 +282,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return $request;
     }
 
-    protected function _buildShipmentData()
+    protected function _buildShipmentData(Sellvana_Sales_Model_Order_Shipment $shipment = null)
     {
         $catalogConfig = $this->BConfig->get('modules/Sellvana_Catalog');
         $dimensions = explode('x', $this->_data('package_size'));
@@ -294,6 +294,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             return $result;
         }
 
+        $weight = $this->_data('weight') ?: $this->_data('shipping_weight');
         $request = [
             'ReturnTransitAndCommit' => true,
             'RequestedShipment' => [
@@ -355,7 +356,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
                     'SequenceNumber' => 1,
                     'GroupPackageCount' => 1,
                     'Weight' => [
-                        'Value' => $this->_data('weight') ?: $this->_data('shipping_weight'),
+                        'Value' => $weight,
                         'Units' => strtoupper($catalogConfig['weight_unit'])
                     ],
                     'Dimensions' => [
@@ -368,9 +369,72 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             ],
         ];
 
-        if ($this->_data('insurance')) {
+        if ($shipment && $this->BConfig->get("modules/Sellvana_Sales/store_country") !== ('to_country')) {
+            $request['RequestedShipment']['CustomsClearanceDetail'] = [
+                'DutiesPayment' => [
+                    'PaymentType' => 'SENDER',
+                    'Payor' => [
+                        'ResponsibleParty' => [
+                            'AccountNumber' => $this->_data('shipper_number'),
+                            'Contact' => null,
+                            'Address' => [
+                                'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country")
+                            ],
+                        ],
+                    ]
+                ],
+                'DocumentContent' => 'NON_DOCUMENTS',
+                'CustomsValue' => [
+                    'Amount' => $this->_data('amount'),
+                    'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                ],
+                'Commodities' => [],
+                'ExportDetail' => [
+                    'B13AFilingOption' => 'NOT_REQUIRED'
+                ],
+            ];
+
+            $oItems = $shipment->order()->items();
+            foreach ($shipment->items() as $item) {
+                /** @var false|Sellvana_Catalog_Model_Product $product */
+                $product = false;
+                foreach ($oItems as $oItem) {
+                    if ($oItem->id() == $item->get('order_item_id')) {
+                        $product = $oItem->product();
+                        break;
+                    }
+                }
+
+                if (!$product || !isset($oItem)) {
+                    throw new BException('Product for order item with ID ' . $item->get('order_item_id') . ' does not exist');
+                }
+
+                $inventory = $product->getInventoryModel();
+                $request['RequestedShipment']['CustomsClearanceDetail']['Commodities'][] = [
+                    'NumberOfPieces' => 1,
+                    'Description' => $product->getName(),
+                    'CountryOfManufacture' => $inventory->get('origin_country'),
+                    'Weight' => [
+                        'Units' => strtoupper($catalogConfig['weight_unit']),
+                        'Value' => $inventory->get('shipping_weight')
+                    ],
+                    'Quantity' => ceil((float)$item->get('qty')),
+                    'QuantityUnits' => 'pcs',
+                    'UnitPrice' => [
+                        'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                        'Amount' =>  $oItem->get('price')
+                    ],
+                    'CustomsValue' => [
+                        'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                        'Amount' =>  $oItem->get('row_total')
+                    ]
+                ];
+            }
+        }
+
+        if ($shipment && $this->_data('insurance')) {
             $request['TotalInsuredValue'] = [
-                'Amount' => $this->_data('amount'),
+                'Amount' => $shipment->order()->get('subtotal'),
                 'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
             ];
         }
