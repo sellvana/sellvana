@@ -1,6 +1,6 @@
 modules:
     Sellvana_Sales:
-        version: 0.6.4.0
+        version: 0.6.5.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"

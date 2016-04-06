@@ -51,6 +51,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         $data['carrier_desc'] = $this->$methodClass->getDescription();
         $serviceCode = $data['service_code'];
         $data['service_desc'] = !empty($shippingServices[$serviceCode]) ? $shippingServices[$serviceCode] : null;
+        $data['shipping_weight'] = 0;
 
         $cart = $order->cart();
         foreach ($order->items() as $oItem) {
@@ -60,6 +61,10 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
                 }
                 $qty = (array_key_exists($oItem->id(), $qtys)) ? $qtys[$oItem->id()] : 0;
                 $cItem->set('qty', $qty);
+                /** @var Sellvana_Catalog_Model_Product $product */
+                if ($product = $oItem->product()) {
+                    $data['shipping_weight'] += $product->getInventoryModel()->get('shipping_weight') * $qty;
+                }
             }
         }
         $packages = $this->$methodClass->calcCartPackages($cart);

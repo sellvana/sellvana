@@ -171,7 +171,7 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
             $oItem->add('qty_shipped', $sItem->get('qty'));
         }
 
-        $this->state()->overall()->setShipped();
+        $this->state()->overall()->setPending();
 
         return $this;
     }
