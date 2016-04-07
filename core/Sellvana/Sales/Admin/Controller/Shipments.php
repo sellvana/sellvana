@@ -161,19 +161,7 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
         $packageId = $this->BRequest->get('id');
         $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
         $label = $package->label();
-        $fileName = 'shipmentLabel.pdf';
 
-        $this->BResponse->header([
-            'Pragma: public',
-            'Cache-Control: must-revalidate, post-check=0, pre-check=0',
-            'Content-Length: ' . strlen($label),
-            'Last-Modified: ' . date('r'),
-            'Content-Type: application/pdf',
-            'Content-Disposition: inline; filename=' . $fileName,
-        ]);
-
-        echo $label;
-
-        $this->BResponse->shutdown(__METHOD__);
+        $this->BResponse->sendContent($label, 'shipmentLabel.pdf');
     }
 }
