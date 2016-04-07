@@ -165,17 +165,17 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
 
         $shipmentDetail = $result->CompletedShipmentDetail;
         $trackingNumber = '';
-        if (!empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
+        if (!empty($shipmentDetail->CompletedPackageDetails->TrackingIds)) {
             // while multi-package shipments aren't implemented, we will receive only one tracking number
-            $trackingNumber = $shipmentDetail['CompletedPackageDetails']['TrackingIds']['TrackingNumber'];
+            $trackingNumber = $shipmentDetail->CompletedPackageDetails->TrackingIds->TrackingNumber;
         }
         foreach ($shipment->packages() as $package) {
             $package->set('tracking_number', $trackingNumber);
-            $package->setData('CompletedPackageDetails', $shipmentDetail['CompletedPackageDetails']);
+            $package->setData('completed_package_details', $shipmentDetail->CompletedPackageDetails);
             $package->save();
         }
-        $shipment->setData('CompletedShipmentDetail', $shipmentDetail);
-        $shipment->setData('JobId', $result->JobId);
+        $shipment->setData('completed_shipment_detail', $shipmentDetail);
+        $shipment->setData('job_id', $result->JobId);
     }
 
     /**
@@ -189,7 +189,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
         $client = $this->_getSoapClient(self::SERVICE_SHIP);
         $request = $this->_buildRequest();
-        $shipmentDetail = $shipment->getData('CompletedShipmentDetail');
+        $shipmentDetail = $shipment->getData('completed_shipment_detail');
         if (!empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
             $trackingId = $shipmentDetail['CompletedPackageDetails']['TrackingIds'];
             $request['TrackingId'] = [
@@ -524,7 +524,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
      */
     public function getPackageLabel(Sellvana_Sales_Model_Order_Shipment_Package $package)
     {
-        $data = $package->getData('CompletedPackageDetails');
+        $data = $package->getData('completed_package_details');
         if (!empty($data)) {
             return $data['Label']['Parts']['Image'];
         }
