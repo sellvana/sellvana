@@ -3,7 +3,9 @@
 /**
  * Class Sellvana_Sales_Model_Order_Shipment_Package
  *
+ * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstract
 {
@@ -14,6 +16,8 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
      * @var Sellvana_Sales_Model_Order_Shipment_Item[]
      */
     protected $_items;
+
+    protected $_shipment;
 
     /**
      * @return Sellvana_Sales_Model_Order_Shipment_Item[]
@@ -29,5 +33,21 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
                 ->find_many();
         }
         return $this->_items;
+    }
+
+
+    public function label()
+    {
+        if (!$this->_shipment) {
+            $this->_shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($this->get('shipment_id'));
+        }
+
+        $method = $this->_shipment->get('carrier_code');
+        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
+        if (!$methodClass) {
+            return false;
+        }
+
+        return $this->$methodClass->getPackageLabel($this);
     }
 }

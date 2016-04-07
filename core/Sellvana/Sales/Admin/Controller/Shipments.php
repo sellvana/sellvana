@@ -6,6 +6,7 @@
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
+ * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
  */
 
 class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Abstract_GridForm
@@ -157,9 +158,9 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
 
     public function action_printLabel()
     {
-        $shipmentId = $this->BRequest->get('id');
-        $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($shipmentId);
-        $label = $shipment->label();
+        $packageId = $this->BRequest->get('id');
+        $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
+        $label = $package->label();
         $fileName = 'shipmentLabel.pdf';
 
         $this->BResponse->header([

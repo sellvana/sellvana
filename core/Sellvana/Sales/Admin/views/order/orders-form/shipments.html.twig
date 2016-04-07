@@ -147,11 +147,11 @@
                                     <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
                                 {% endfor %}
                                 <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
+                                {% if p.label() %}
+                                    <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
+                                {% endif %}
                                 <hr>
                             {% endfor %}
-                            {% if s.label() %}
-                                <a href="{{ APP.href('shipments/printLabel?id=' ~ s.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
-                            {% endif %}
                         </td>
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">

@@ -164,6 +164,16 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         }
 
         $shipmentDetail = $result->CompletedShipmentDetail;
+        $trackingNumber = '';
+        if (!empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
+            // while multi-package shipments aren't implemented, we will receive only one tracking number
+            $trackingNumber = $shipmentDetail['CompletedPackageDetails']['TrackingIds']['TrackingNumber'];
+        }
+        foreach ($shipment->packages() as $package) {
+            $package->set('tracking_number', $trackingNumber);
+            $package->setData('CompletedPackageDetails', $shipmentDetail['CompletedPackageDetails']);
+            $package->save();
+        }
         $shipment->setData('CompletedShipmentDetail', $shipmentDetail);
         $shipment->setData('JobId', $result->JobId);
     }
@@ -509,14 +519,14 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
     }
 
     /**
-     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @param Sellvana_Sales_Model_Order_Shipment_Package $package
      * @return bool|string
      */
-    public function getShipmentLabel(Sellvana_Sales_Model_Order_Shipment $shipment)
+    public function getPackageLabel(Sellvana_Sales_Model_Order_Shipment_Package $package)
     {
-        $data = $shipment->getData('CompletedShipmentDetail');
+        $data = $package->getData('CompletedPackageDetails');
         if (!empty($data)) {
-            return $data['CompletedPackageDetails']['Label']['Parts']['Image'];
+            return $data['Label']['Parts']['Image'];
         }
 
         return false;

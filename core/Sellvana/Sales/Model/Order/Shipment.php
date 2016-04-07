@@ -8,7 +8,6 @@
  * @property Sellvana_Sales_Model_Order_Shipment_State $Sellvana_Sales_Model_Order_Shipment_State
  * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
  * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
- * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 
 class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
@@ -188,17 +187,6 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
         }
 
         return $this;
-    }
-
-    public function label()
-    {
-        $method = $this->get('carrier_code');
-        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
-        if (!$methodClass) {
-            return false;
-        }
-
-        return $this->$methodClass->getShipmentLabel($this);
     }
 
     public function __destruct()
