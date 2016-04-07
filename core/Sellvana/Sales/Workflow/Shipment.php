@@ -51,7 +51,6 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         $data['carrier_desc'] = $this->$methodClass->getDescription();
         $serviceCode = $data['service_code'];
         $data['service_desc'] = !empty($shippingServices[$serviceCode]) ? $shippingServices[$serviceCode] : null;
-        $data['shipping_weight'] = 0;
 
         $cart = $order->cart();
         foreach ($order->items() as $oItem) {
@@ -61,28 +60,36 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
                 }
                 $qty = (array_key_exists($oItem->id(), $qtys)) ? $qtys[$oItem->id()] : 0;
                 $cItem->set('qty', $qty);
-                /** @var Sellvana_Catalog_Model_Product $product */
-                if ($product = $oItem->product()) {
-                    $data['shipping_weight'] += $product->getInventoryModel()->get('shipping_weight') * $qty;
-                }
             }
         }
         $packages = $this->$methodClass->calcCartPackages($cart);
 
         /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
         if (count($packages)) {
-            $itemIds = []; // cartItem => orderItem
+            $itemsData = []; // cartItem => orderItem
             foreach ($order->items() as $item) {
-                $itemIds[$item->get('cart_item_id')] = $item->id();
+                /** @var Sellvana_Catalog_Model_Product $product */
+                if ($product = $item->product()) { // in case that product was already deleted from DB
+                    $itemWeight = $product->getInventoryModel()->get('shipping_weight');
+                }
+
+                $itemsData[$item->get('cart_item_id')] = [
+                    'id' => $item->id(),
+                    'weight' => isset($itemWeight) ? $itemWeight : 0
+                ];
             }
             foreach ($packages as $package) {
+                $packageData = $data;
+                $packageData['shipping_weight'] = 0;
                 $packQtys = [];
                 foreach ($package['items'] as $cartItemId => $qty) {
-                    $packQtys[$itemIds[$cartItemId]] = $qty;
+                    $packQtys[$itemsData[$cartItemId]['id']] = $qty;
+                    $packageData['shipping_weight'] += $qty * $itemsData[$cartItemId]['weight'];
                 }
+
                 $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create();
                 $shipment->importFromOrder($order, $packQtys);
-                $shipment->set($data);
+                $shipment->set($packageData);
                 $shipment->register();
                 $shipment->save();
             }
