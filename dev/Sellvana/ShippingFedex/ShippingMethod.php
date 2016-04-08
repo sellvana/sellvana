@@ -157,7 +157,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             }
 
             foreach ($notifications as $notification) {
-                $message .= empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+                $message .= !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
             }
 
             throw new BException($message);
@@ -208,7 +208,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             }
 
             foreach ($notifications as $notification) {
-                $message .= empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+                $message .= !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
             }
 
             throw new BException($message);
