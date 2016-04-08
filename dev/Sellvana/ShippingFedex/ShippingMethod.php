@@ -81,7 +81,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             }
 
             foreach ($notifications as $notification) {
-                $curMessage = empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+                $curMessage = !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
                 $message .= $curMessage . "<br>";
             }
             $result = [
