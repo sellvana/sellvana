@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
 {
@@ -26,7 +27,11 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['order'];
         $data = $this->BRequest->sanitize($args['data'], [
+            'carrier_price' => 'float',
             'shipping_weight' => 'float',
+            'shipping_size' => 'int',
+            'carrier_code' => 'plain',
+            'service_code' => 'plain',
         ]);
         $qtys = isset($args['qtys']) ? $args['qtys'] : null;
         foreach ($qtys as $id => $qty) {
@@ -37,10 +42,64 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         if (!$qtys) {
             throw new BException('Please add some items to create a shipment');
         }
+        $method = $order->get('shipping_method');
+        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
+        if (!$methodClass) {
+            throw new BException('Invalid shipping method');
+        }
+        $shippingServices = $this->$methodClass->getServices();
+        $data['carrier_desc'] = $this->$methodClass->getDescription();
+        $serviceCode = $data['service_code'];
+        $data['service_desc'] = !empty($shippingServices[$serviceCode]) ? $shippingServices[$serviceCode] : null;
+
+        $cart = $order->cart();
+        foreach ($order->items() as $oItem) {
+            foreach ($cart->items() as $cItem) {
+                if ($cItem->id() != $oItem->get('cart_item_id')) {
+                    continue;
+                }
+                $qty = (array_key_exists($oItem->id(), $qtys)) ? $qtys[$oItem->id()] : 0;
+                $cItem->set('qty', $qty);
+            }
+        }
+        $packages = $this->$methodClass->calcCartPackages($cart);
+
         /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
-        $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create($data);
-        $shipment->importFromOrder($order, $qtys);
-        $shipment->register();
+        if (count($packages)) {
+            $itemsData = []; // cartItem => orderItem
+            foreach ($order->items() as $item) {
+                /** @var Sellvana_Catalog_Model_Product $product */
+                if ($product = $item->product()) { // in case that product was already deleted from DB
+                    $itemWeight = $product->getInventoryModel()->get('shipping_weight');
+                }
+
+                $itemsData[$item->get('cart_item_id')] = [
+                    'id' => $item->id(),
+                    'weight' => isset($itemWeight) ? $itemWeight : 0
+                ];
+            }
+            foreach ($packages as $package) {
+                $packageData = $data;
+                $packageData['shipping_weight'] = 0;
+                $packQtys = [];
+                foreach ($package['items'] as $cartItemId => $qty) {
+                    $packQtys[$itemsData[$cartItemId]['id']] = $qty;
+                    $packageData['shipping_weight'] += $qty * $itemsData[$cartItemId]['weight'];
+                }
+
+                $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create();
+                $shipment->importFromOrder($order, $packQtys);
+                $shipment->set($packageData);
+                $shipment->register();
+                $shipment->save();
+            }
+        } else {
+            $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create();
+            $shipment->importFromOrder($order, $qtys);
+            $shipment->set($data);
+            $shipment->register();
+            $shipment->save();
+        }
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

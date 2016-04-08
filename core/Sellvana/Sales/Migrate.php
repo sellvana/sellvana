@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_6_4_0()
+    public function install__0_6_5_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -326,7 +326,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'carrier_code' => 'varchar(20)',
-                'service_code' => 'varchar(20)',
+                'service_code' => 'varchar(50)',
                 'carrier_desc' => 'varchar(50)',
                 'service_desc' => 'varchar(50)',
                 'carrier_price' => 'decimal(12,2)',
@@ -2192,6 +2192,17 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
+        ]);
+    }
+
+    public function upgrade__0_6_4_0__0_6_5_0()
+    {
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'service_code' => "varchar(50)"
+            ]
         ]);
     }
 }

@@ -6,6 +6,7 @@
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
+ * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
  */
 
 class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Abstract_GridForm
@@ -105,5 +106,62 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
 
         $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
         $this->BResponse->json($result);
+    }
+
+    public function action_rates__POST()
+    {
+        $rates = [];
+
+        try {
+            $result = ['tabs' => []];
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $qtys = $this->BRequest->post('qtys');
+
+            $shipmentData = $this->BRequest->post('shipment');
+            $method = $shipmentData['carrier_code'];
+            $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
+            if (!$methodClass) {
+                throw new BException('Invalid shipping method');
+            }
+
+            $cart = $order->cart();
+            foreach ($order->items() as $oItem) {
+                foreach ($cart->items() as $cItem) {
+                    if ($cItem->id() != $oItem->get('cart_item_id')) {
+                        continue;
+                    }
+                    $qty = (array_key_exists($oItem->id(), $qtys)) ? $qtys[$oItem->id()] : 0;
+                    $cItem->set('qty', $qty);
+                }
+            }
+            $rates = $this->$methodClass->fetchCartRates($cart);
+
+            $result['message'] = $this->_('Shipping rates have been updated');
+            $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set([
+            'model' => $order,
+            'rates'=> $rates,
+        ]);
+        $this->BResponse->json($result);
+    }
+
+    public function action_printLabel()
+    {
+        $packageId = $this->BRequest->get('id');
+        $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
+        $label = $package->label();
+
+        $this->BResponse->sendContent($label, 'shipmentLabel.pdf');
     }
 }

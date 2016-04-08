@@ -8,6 +8,7 @@
 class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
     const SERVICE_RATE = 'Rate';
+    const SERVICE_SHIP = 'Ship';
 
     protected $_name       = 'FedEx';
     protected $_code       = 'fedex';
@@ -65,108 +66,23 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
     {
         $this->_requestData = array_merge($this->_requestData, $data);
         $rateClient = $this->_getSoapClient(self::SERVICE_RATE);
-
         $request = $this->_buildRequest();
-        $dimensions = explode('x', $this->_data('package_size'));
-        if (count($dimensions) !== 3) {
-            $result = [
-                'error' => 1,
-                'message' => 'Dimensions in wrong format (Product ID: ' . array_shift($data['items']) . ')',
-            ];
-            return $result;
-        }
-
-        $catalogConfig = $this->BConfig->get('modules/Sellvana_Catalog');
-
-        $request = array_merge($request, [
-            'ReturnTransitAndCommit' => true,
-            'RequestedShipment' => [
-                'DropoffType' => $this->_data('dropoff_location'),
-                'ShipTimestamp' => date('c'),
-                'PackagingType' => 'YOUR_PACKAGING',
-                'Shipper' => [
-                    'Contact' => [
-                        'CompanyName' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
-                        'PhoneNumber' => $this->BConfig->get("modules/Sellvana_Sales/store_phone"),
-                    ],
-                    'Address' => [
-                        'StreetLines' => [
-                            $this->BConfig->get("modules/Sellvana_Sales/store_street1"),
-                            $this->BConfig->get("modules/Sellvana_Sales/store_street2"),
-                        ],
-                        'City' => $this->BConfig->get("modules/Sellvana_Sales/store_city"),
-                        'StateOrProvinceCode' => $this->BConfig->get("modules/Sellvana_Sales/store_region"),
-                        'PostalCode' => $this->BConfig->get("modules/Sellvana_Sales/store_postcode"),
-                        'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country"),
-                    ],
-                ],
-                'Recipient' => [
-                    'Contact' => [
-                        'PhoneNumber' => $this->_data('to_phone'),
-                    ],
-                    'Address' => [
-                        'StreetLines' => [
-                            $this->_data('to_street1'),
-                            $this->_data('to_street2'),
-                        ],
-                        'City' => $this->_data('to_city'),
-                        'StateOrProvinceCode' => substr($this->_data('to_region'), 0, 2),
-                        'PostalCode' => $this->_data('to_postcode'),
-                        'CountryCode' => $this->_data('to_country'),
-                    ],
-                ],
-                'ShippingChargesPayment' => [
-                    'PaymentType' => 'SENDER',
-                    'Payor' => [
-                        'ResponsibleParty' => [
-                            'AccountNumber' => $this->_data('shipper_number'),
-                            'Contact' => null,
-                            'Address' => [
-                                'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country")
-                            ],
-                        ],
-                    ],
-                ],
-                'LabelSpecification' => [
-                    'LabelFormatType' => 'COMMON2D',
-                    'ImageType' => 'PNG',
-                    'LabelStockType' => 'PAPER_8.5X11_TOP_HALF_LABEL',
-                ],
-                'PackageCount' => 1,
-                'RequestedPackageLineItems' => [
-                    'SequenceNumber' => 1,
-                    'GroupPackageCount' => 1,
-                    'Weight' => [
-                        'Value' => $this->_data('weight'),
-                        'Units' => strtoupper($catalogConfig['weight_unit'])
-                    ],
-                    'Dimensions' => [
-                        'Length' => $dimensions[0],
-                        'Width' => $dimensions[1],
-                        'Height' => $dimensions[2],
-                        'Units' => strtoupper($catalogConfig['length_unit'])
-                    ],
-                ],
-            ],
-        ]);
-
-        if ($this->_data('insurance')) {
-            $request['TotalInsuredValue'] = [
-                'Amount' => $this->_data('amount'),
-                'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
-            ];
-        }
+        $request = array_merge($request, $this->_buildShipmentData());
 
         $rates = $rateClient->getRates($request);
+        $this->BDebug->log(print_r($rates, 1), 'fedex.log');
 
         if ($rates->HighestSeverity == 'ERROR') {
             $message = '';
-            if (is_array($rates->Notifications)) {
-                foreach ($rates->Notifications as $notification) {
-                    $message .= $notification->LocalizedMessage;
-                }
-            } else {
-                $message = $rates->Notifications->LocalizedMessage;
+            $notifications = $rates->Notifications;
+
+            if (!is_array($notifications)) {
+                $notifications = [$notifications];
+            }
+
+            foreach ($notifications as $notification) {
+                $curMessage = !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+                $message .= $curMessage . "<br>";
             }
             $result = [
                 'error' => 1,
@@ -180,7 +96,12 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             'rates' => []
         ];
 
-        foreach ($rates->RateReplyDetails as $service) {
+        $rateReplyDetails = $rates->RateReplyDetails;
+        if (!is_array($rateReplyDetails)) {
+            $rateReplyDetails = [$rateReplyDetails];
+        }
+
+        foreach ($rateReplyDetails as $service) {
             $serviceType = $service->ServiceType;
             $details = (is_array($service->RatedShipmentDetails)) ? $service->RatedShipmentDetails[0] : $service->RatedShipmentDetails;
             $amount = $details->ShipmentRateDetail->TotalNetCharge->Amount;
@@ -208,6 +129,90 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         }
 
         return $result;
+    }
+
+    /**
+     * Send shipment confirmation to FedEx
+     *
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @throws BException
+     */
+    public function buyShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        $cart = $shipment->order()->cart();
+        $this->_requestData = array_merge($this->_requestData, $this->_getPackageTemplate($cart));
+        $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
+        $client = $this->_getSoapClient(self::SERVICE_SHIP);
+        $request = $this->_buildRequest();
+        $request = array_merge($request, $this->_buildShipmentData($shipment));
+        $request['RequestedShipment']['ServiceType'] = trim($shipment->get('service_code'), '_');
+        $request['TransactionDetail'] = ['CustomerTransactionId' => 'Process shipment request for order ID: ' . $shipment->order()->id()];
+        $result = $client->processShipment($request);
+
+        if ($result->HighestSeverity == 'ERROR') {
+            $message = '';
+            $notifications = $result->Notifications;
+            if (!is_array($notifications)) {
+                $notifications = [$notifications];
+            }
+
+            foreach ($notifications as $notification) {
+                $message .= !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+            }
+
+            throw new BException($message);
+        }
+
+        $shipmentDetail = $result->CompletedShipmentDetail;
+        $trackingNumber = '';
+        if (!empty($shipmentDetail->CompletedPackageDetails->TrackingIds)) {
+            // while multi-package shipments aren't implemented, we will receive only one tracking number
+            $trackingNumber = $shipmentDetail->CompletedPackageDetails->TrackingIds->TrackingNumber;
+        }
+        foreach ($shipment->packages() as $package) {
+            $package->set('tracking_number', $trackingNumber);
+            $package->setData('completed_package_details', $shipmentDetail->CompletedPackageDetails);
+            $package->save();
+        }
+        $shipment->setData('completed_shipment_detail', $shipmentDetail);
+        $shipment->setData('job_id', $result->JobId);
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @throws BException
+     */
+    public function cancelShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        $cart = $shipment->order()->cart();
+        $this->_requestData = array_merge($this->_requestData, $this->_getPackageTemplate($cart));
+        $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
+        $client = $this->_getSoapClient(self::SERVICE_SHIP);
+        $request = $this->_buildRequest();
+        $shipmentDetail = $shipment->getData('completed_shipment_detail');
+        if (!empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
+            $trackingId = $shipmentDetail['CompletedPackageDetails']['TrackingIds'];
+            $request['TrackingId'] = [
+                'TrackingIdType' => $trackingId['TrackingIdType'],
+                'TrackingNumber' => $trackingId['TrackingNumber'],
+            ];
+        }
+        $request['DeletionControl'] = 'DELETE_ALL_PACKAGES';
+        $result = $client->deleteShipment($request);
+
+        if ($result->HighestSeverity == 'ERROR') {
+            $message = '';
+            $notifications = $result->Notifications;
+            if (!is_array($notifications)) {
+                $notifications = [$notifications];
+            }
+
+            foreach ($notifications as $notification) {
+                $message .= !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+            }
+
+            throw new BException($message);
+        }
     }
 
     /**
@@ -287,6 +292,166 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return $request;
     }
 
+    protected function _buildShipmentData(Sellvana_Sales_Model_Order_Shipment $shipment = null)
+    {
+        $catalogConfig = $this->BConfig->get('modules/Sellvana_Catalog');
+        $dimensions = explode('x', $this->_data('package_size'));
+        if (count($dimensions) !== 3) {
+            $result = [
+                'error' => 1,
+                'message' => 'Dimensions in wrong format',
+            ];
+            return $result;
+        }
+
+        $weight = $this->_data('weight') ?: $this->_data('shipping_weight');
+        $request = [
+            'ReturnTransitAndCommit' => true,
+            'RequestedShipment' => [
+                'DropoffType' => $this->_data('dropoff_location'),
+                'ShipTimestamp' => date('c'),
+                'PackagingType' => 'YOUR_PACKAGING',
+                'Shipper' => [
+                    'Contact' => [
+                        'CompanyName' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
+                        'PhoneNumber' => $this->BConfig->get("modules/Sellvana_Sales/store_phone"),
+                    ],
+                    'Address' => [
+                        'StreetLines' => [
+                            $this->BConfig->get("modules/Sellvana_Sales/store_street1"),
+                            $this->BConfig->get("modules/Sellvana_Sales/store_street2"),
+                        ],
+                        'City' => $this->BConfig->get("modules/Sellvana_Sales/store_city"),
+                        'StateOrProvinceCode' => $this->BConfig->get("modules/Sellvana_Sales/store_region"),
+                        'PostalCode' => $this->BConfig->get("modules/Sellvana_Sales/store_postcode"),
+                        'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country"),
+                    ],
+                ],
+                'Recipient' => [
+                    'Contact' => [
+                        'PhoneNumber' => $this->_data('to_phone'),
+                        'PersonName' => $this->_data('to_name'),
+                    ],
+                    'Address' => [
+                        'StreetLines' => [
+                            $this->_data('to_street1'),
+                            $this->_data('to_street2'),
+                        ],
+                        'City' => $this->_data('to_city'),
+                        'StateOrProvinceCode' => substr($this->_data('to_region'), 0, 2),
+                        'PostalCode' => $this->_data('to_postcode'),
+                        'CountryCode' => $this->_data('to_country'),
+                    ],
+                ],
+                'ShippingChargesPayment' => [
+                    'PaymentType' => 'SENDER',
+                    'Payor' => [
+                        'ResponsibleParty' => [
+                            'AccountNumber' => $this->_data('shipper_number'),
+                            'Contact' => null,
+                            'Address' => [
+                                'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country")
+                            ],
+                        ],
+                    ],
+                ],
+                'LabelSpecification' => [
+                    'LabelFormatType' => 'COMMON2D',
+                    'ImageType' => 'PDF',
+                    'LabelStockType' => 'PAPER_7X4.75',
+                ],
+                'PackageCount' => 1,
+                'PackageDetail' => 'INDIVIDUAL_PACKAGES',
+                'RequestedPackageLineItems' => [
+                    'SequenceNumber' => 1,
+                    'GroupPackageCount' => 1,
+                    'Weight' => [
+                        'Value' => $weight,
+                        'Units' => strtoupper($catalogConfig['weight_unit'])
+                    ],
+                    'Dimensions' => [
+                        'Length' => $dimensions[0],
+                        'Width' => $dimensions[1],
+                        'Height' => $dimensions[2],
+                        'Units' => strtoupper($catalogConfig['length_unit'])
+                    ],
+                ],
+            ],
+        ];
+
+        if ($shipment && $this->BConfig->get("modules/Sellvana_Sales/store_country") !== ('to_country')) {
+            $request['RequestedShipment']['CustomsClearanceDetail'] = [
+                'DutiesPayment' => [
+                    'PaymentType' => 'SENDER',
+                    'Payor' => [
+                        'ResponsibleParty' => [
+                            'AccountNumber' => $this->_data('shipper_number'),
+                            'Contact' => null,
+                            'Address' => [
+                                'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country")
+                            ],
+                        ],
+                    ]
+                ],
+                'DocumentContent' => 'NON_DOCUMENTS',
+                'CustomsValue' => [
+                    'Amount' => $this->_data('amount'),
+                    'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                ],
+                'Commodities' => [],
+                'ExportDetail' => [
+                    'B13AFilingOption' => 'NOT_REQUIRED'
+                ],
+            ];
+
+            $oItems = $shipment->order()->items();
+            foreach ($shipment->items() as $item) {
+                /** @var false|Sellvana_Catalog_Model_Product $product */
+                $product = false;
+                foreach ($oItems as $oItem) {
+                    if ($oItem->id() == $item->get('order_item_id')) {
+                        $product = $oItem->product();
+                        break;
+                    }
+                }
+
+                if (!$product || !isset($oItem)) {
+                    throw new BException('Product for order item with ID ' . $item->get('order_item_id') . ' does not exist');
+                }
+
+                $inventory = $product->getInventoryModel();
+                $request['RequestedShipment']['CustomsClearanceDetail']['Commodities'][] = [
+                    'NumberOfPieces' => 1,
+                    'Description' => $product->getName(),
+                    'CountryOfManufacture' => $inventory->get('origin_country'),
+                    'Weight' => [
+                        'Units' => strtoupper($catalogConfig['weight_unit']),
+                        'Value' => $inventory->get('shipping_weight')
+                    ],
+                    'Quantity' => ceil((float)$item->get('qty')),
+                    'QuantityUnits' => 'pcs',
+                    'UnitPrice' => [
+                        'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                        'Amount' =>  $oItem->get('price')
+                    ],
+                    'CustomsValue' => [
+                        'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                        'Amount' =>  $oItem->get('row_total')
+                    ]
+                ];
+            }
+        }
+
+        if ($shipment && $this->_data('insurance')) {
+            $request['TotalInsuredValue'] = [
+                'Amount' => $shipment->order()->get('subtotal'),
+                'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+            ];
+        }
+
+        return $request;
+    }
+
     /**
      * Get missing data from wsdl file
      *
@@ -351,6 +516,20 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             '_GROUND_HOME_DELIVERY' => 'Ground Home Delivery',
             '_FEDEX_GROUND' => 'Ground',
         ];
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment_Package $package
+     * @return bool|string
+     */
+    public function getPackageLabel(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        $data = $package->getData('completed_package_details');
+        if (!empty($data)) {
+            return $data['Label']['Parts']['Image'];
+        }
+
+        return false;
     }
 
 
