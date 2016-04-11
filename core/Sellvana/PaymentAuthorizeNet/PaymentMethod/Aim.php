@@ -10,7 +10,7 @@
 
 class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Method_Payment_Abstract
 {
-    static protected $_methodKey = "authorizenet_aim";
+    protected $_code = "authorizenet_aim";
 
     function __construct()
     {
@@ -22,7 +22,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->getView('authorizenet/aim')->set('key', static::$_methodKey);
+        return $this->BLayout->getView('authorizenet/aim')->set('key', $this->_code);
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)

@@ -175,6 +175,13 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }*/
     }
 
+    public function setClientData($windowName, $connId)
+    {
+        static::$_windowName = $windowName;
+        static::$_connId = $connId;
+        return $this;
+    }
+
     /**
      * @param $request
      * @return $this
@@ -267,7 +274,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 
-        if($newWindows){
+        if ($newWindows) {
             foreach ($newWindows as $windowName => $window) { // some cleanup
                 if (empty($window['connections'])) {
                     unset($newWindows[$windowName]);
@@ -280,8 +287,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
         $newWindows[static::$_windowName]['connections'][static::$_connId] = 1; // set new connection
 
-        $this->setData('windows', $newWindows)->save(); // save new state
-
+        $this->setData('windows', $newWindows);
+#print_r($this->getData());
+        $this->save(); // save new state
         if (!$oldWindows) { // is this first connection for the client
             $this->subscribe();
             $this->set('status', 'online')->save(); // set as connected

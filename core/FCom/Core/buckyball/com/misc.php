@@ -1350,7 +1350,7 @@ class BUtil extends BClass
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                IF (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
+                if (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
                     static::$_lastRemoteHttpInfo['headers']['http'] = [
                         'unparsed' => $line,
                         'full' => $m[0],

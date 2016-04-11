@@ -1,12 +1,6 @@
 {% set order = THIS.get('model') %}
 {% set rates = THIS.get('rates') %}
 
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
-{#
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').shipmentsGridConfig(m) %}
-{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
-#}
-
 {% set shippableItems = order.getShippableItems() %}
 {% set allMethods = APP.instance('Sellvana_Sales_Main').getShippingMethods() %}
 {% set allServices = APP.instance('Sellvana_Sales_Main').getAllSelectedShippingServices() %}
@@ -17,7 +11,7 @@
     {{ THIS.view('core/messages') | raw }}
 
     {% if shippableItems %}
-        <div {#method="post" action="{{ APP.href('shipments/create?id=' ~ order.id()) }}"#} id="shipment-create-container">
+        <div id="shipment-create-container">
             <h2>{{ 'Create a shipment'|_ }}</h2>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -105,7 +99,7 @@
 
     {% if allShipments %}
         <h2>{{ 'Existing Shipments' }}</h2>
-        <div {#method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}"#} id="shipment-update-container">
+        <div id="shipment-update-container">
         <table class="table table-bordered table-striped dataTable">
             <thead>
                 <tr>

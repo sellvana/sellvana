@@ -7,7 +7,7 @@
  */
 class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
-    static protected $_methodKey = 'stripe';
+    protected $_code = 'stripe';
 
     protected $_name = 'Stripe';
 

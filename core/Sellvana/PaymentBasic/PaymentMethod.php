@@ -6,7 +6,7 @@
 class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
     protected $_name = 'Check / Money Order';
-    static protected $_methodKey = 'check_mo';
+    protected $_code = 'check_mo';
 
     protected $_capabilities = [
         'pay'             => 1,

@@ -4,12 +4,13 @@
  * Class Sellvana_Sales_Admin_Controller_Orders
  *
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
  * @property Sellvana_Sales_Model_Order_Payment_State_Overall $Sellvana_Sales_Model_Order_Payment_State_Overall
  * @property Sellvana_Sales_Model_Order_Payment_State_Custom $Sellvana_Sales_Model_Order_Payment_State_Custom
  */
 
-class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abstract_GridForm
+class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Controller_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'payments';
@@ -106,6 +107,83 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
         $result = ['success' => true];
         $this->BResponse->json($result);
     }
+    
+    public function action_create__POST()
+    {
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
 
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
 
+            $paymentData = $this->BRequest->post('payment');
+            $qtys = $this->BRequest->post('qtys');
+
+            $this->Sellvana_Sales_Main->workflowAction('adminCreatesPayment', [
+                'order' => $order,
+                'data' => $paymentData,
+                'qtys' => $qtys,
+            ]);
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Payment has been created');
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $this->BResponse->json($result);
+    }
+
+    public function action_update__POST()
+    {
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $payments = $this->BRequest->post('payments');
+            $transactions = $this->BRequest->post('transactions');
+            $delete = $this->BRequest->post('delete');
+            if ($payments) {
+                foreach ($payments as $id => $s) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPayment', [
+                        'order' => $order,
+                        'payment_id' => $id,
+                        'data' => $s,
+                    ]);
+                }
+            }
+            if ($transactions) {
+                foreach ($transactions as $id => $p) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesTransaction', [
+                        'order' => $order,
+                        'transaction_id' => $id,
+                        'data' => $p,
+                    ]);
+                }
+            }
+            if ($delete) {
+                foreach ($delete as $id => $_) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminDeletesPayment', [
+                        'order' => $order,
+                        'payment_id' => $id,
+                    ]);
+                }
+            }
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Payment updates have been applied');
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $this->BResponse->json($result);
+    }
 }

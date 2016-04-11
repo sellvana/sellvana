@@ -66,6 +66,34 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
 
         return $this;
     }
+    
+    public function register()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $refundItems = $this->items();
+
+        foreach ($refundItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add('qty_refunded', $cItem->get('qty'));
+        }
+
+        return $this;
+    }
+
+    public function unregister()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $refundItems = $this->items();
+
+        foreach ($refundItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add('qty_refunded', -$cItem->get('qty'));
+        }
+
+        return $this;
+    }
 
     public function __destruct()
     {

@@ -9,7 +9,7 @@
  * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
  */
 
-class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Abstract_GridForm
+class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Controller_Abstract
 {
     public function action_mass_change_state__POST()
     {
@@ -31,7 +31,6 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
     public function action_create__POST()
     {
         try {
-            $result = ['tabs' => []];
             $orderId = $this->BRequest->get('id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
 
@@ -47,7 +46,7 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
                 'data' => $shipmentData,
                 'qtys' => $qtys,
             ]);
-            $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
+            $result = $this->_resetOrderTabs($order);
             $result['message'] = $this->_('Shipment has been created');
         } catch (Exception $e) {
             $result['error'] = true;
@@ -97,8 +96,8 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
                     ]);
                 }
             }
+            $result = $this->_resetOrderTabs($order);
             $result['message'] = $this->_('Shipment updates have been applied');
-            $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();

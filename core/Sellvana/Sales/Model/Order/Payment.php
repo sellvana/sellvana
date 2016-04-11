@@ -294,6 +294,34 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function register()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $paymentItems = $this->items();
+
+        foreach ($paymentItems as $sItem) {
+            $oItem = $orderItems[$sItem->get('order_item_id')];
+            $oItem->add('qty_paid', $sItem->get('qty'));
+        }
+
+        return $this;
+    }
+
+    public function unregister()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $paymentItems = $this->items();
+
+        foreach ($paymentItems as $sItem) {
+            $oItem = $orderItems[$sItem->get('order_item_id')];
+            $oItem->add('qty_paid', -$sItem->get('qty'));
+        }
+
+        return $this;
+    }
+
     public function payOffline($amount = null)
     {
         $method = $this->getMethodObject();
