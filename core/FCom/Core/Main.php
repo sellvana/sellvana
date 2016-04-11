@@ -197,7 +197,7 @@ class FCom_Core_Main extends BClass
         foreach ([
             /*'bcmath', */
             'date', 'hash', 'iconv', 'json', 'SPL', 'pcre', 'session',
-            'zip', 'pdo_mysql', 'curl', 'gd', 'intl', 'mbstring', 'soap',
+            'zip', 'pdo_mysql', 'curl', 'gd', 'intl', 'mbstring', 'soap', 'xml',
         ] as $ext) {
             if (empty($extLoaded[$ext])) {
                 $errors['phpext'][] = $ext;
