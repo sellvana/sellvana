@@ -6,6 +6,9 @@ modules:
         description: "Universal Post Service shipping module"
         auto_use: [ bootstrap ]
 
+        observe:
+            - [ Sellvana_Sales_Model_Order_Shipment_State_Overall::changeState, Sellvana_ShippingUps_Main.onShipmentStateChange ]
+
         areas:
             FCom_Admin:
                 auto_use: [ views, layout ]

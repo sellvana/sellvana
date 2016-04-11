@@ -127,11 +127,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 </RatingServiceSelectionRequest>";
 
         $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request, [], ['timeout' => 2]);
-#echo "<xmp>"; print_r($request); print_r($response); echo "</xmp>"; exit;
-        //echo '<!-- '. $response. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
-if (strpos($response, '<') !== 0) {
-    echo "<xmp>"; echo $response; echo "</xmp>"; exit;
-}
+
         $parsed = new SimpleXMLElement($response);
 
         $result = [];
@@ -150,7 +146,6 @@ if (strpos($response, '<') !== 0) {
             $result['message'] = $parsed->Response->Error->ErrorDescription;
             $this->_lastError = $result['message'];
         }
-        //echo "<pre>"; var_dump($result); exit;
         return $result;
     }
 
@@ -338,6 +333,7 @@ if (strpos($response, '<') !== 0) {
         echo "Request.......\n";
         print_r($request);
         echo "\n\n";
+//        exit('aa');
         #return $request;
 //        }
 
@@ -379,4 +375,14 @@ if (strpos($response, '<') !== 0) {
             print_r ($ex);
         }
     }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     */
+    public function buyShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+
+    }
+    
+    
 }
