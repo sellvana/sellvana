@@ -34,7 +34,6 @@ class Sellvana_ShippingUps_Main extends BClass
 
         switch ($newState->getValue()) {
             case Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPING:
-                exit('aaaa');
                 $this->Sellvana_ShippingUps_ShippingMethod->buyShipment($shipment);
                 break;
 //            case Sellvana_Sales_Model_Order_Shipment_State_Overall::CANCELED:
