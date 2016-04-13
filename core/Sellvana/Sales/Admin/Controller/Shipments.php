@@ -162,6 +162,13 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
         $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
         $label = $package->label();
 
-        $this->BResponse->sendContent($label, 'shipmentLabel.pdf');
+        $fileName = 'shipmentLabel.pdf';
+
+        if (is_array($label)){
+            $fileName = $label['filename'];
+            $label = $label['content'];
+        }
+        
+        $this->BResponse->sendContent($label, $fileName);
     }
 }

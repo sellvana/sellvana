@@ -4,6 +4,7 @@
  * Class Sellvana_ShippingUps_ShippingMethod
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
@@ -44,7 +45,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 'error' => 1,
                 'message' => 'Origin Postcode and Country are required',
             ];
-            return $result;        
+            return $result;
         }
         if (empty($data['to_postcode']) || empty($data['to_country'])) {
             $result = [
@@ -78,7 +79,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $data['weight_units'] = 'LBS';
         }
 
-        $request ="<?xml version=\"1.0\"?>
+        $request = "<?xml version=\"1.0\"?>
 <AccessRequest xml:lang=\"en-US\">
     <AccessLicenseNumber>" . addslashes($data['access_key']) . "</AccessLicenseNumber>
     <UserId>" . addslashes($data['user_id']) . "</UserId>
@@ -186,7 +187,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     }
 
     /**
+     * Send shipment confirmation to FedEx
+     *
      * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @throws BException
      */
     public function buyShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
     {
@@ -194,31 +198,35 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         $this->_requestData = array_merge($this->_requestData, $this->_getPackageTemplate($cart));
         $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
 
-        try
-        {
+        try {
             $client = $this->_getSoapClient(self::SERVICE_SHIP);
-
-            //get response
             $result = $client->__soapCall('ProcessShipment', array($this->_buildShipmentData()));
-            var_dump($result->Response->ResponseStatus->Code);
-            exit();
+        } catch (SoapFault $e) {
+            //$details = $e->detail;
+            throw new BException($e->getMessage());
+        }
 
-            //save soap request and response to file
-            $outputFileName = $this->BConfig->get('fs/log_dir') . '/' . "XOLTResult.xml";
-            $fw = fopen($outputFileName, 'w');
-            fwrite($fw, "Request: \n" . $client->__getLastRequest() . "\n");
-            fwrite($fw, "Response: \n" . $client->__getLastResponse() . "\n");
-            fclose($fw);
-            
+        if ($result->Response->ResponseStatus->Code != 1) {
+            $message = '(' . $result->Response->Allert->Code . ') ';
+            $message .= $result->Response->Allert->Description;
+            throw new BException($message);
         }
-        catch(Exception $e)
-        {
-//            var_dump($e);
-            var_dump($e->getMessage());
-            var_dump($e->detail);
-            exit();
+
+        $this->_getFilesFromResponse($result, $shipment);
+        $shipmentResults = $result->ShipmentResults;
+
+        $trackingNumber = '';
+        if (!empty($shipmentResults->PackageResults->TrackingNumber)) {
+            // while multi-package shipments aren't implemented, we will receive only one tracking number
+            $trackingNumber = $shipmentResults->PackageResults->TrackingNumber;
         }
-        exit();
+        foreach ($shipment->packages() as $package) {
+            $package->set('tracking_number', $trackingNumber);
+            $package->setData('package_results', $shipmentResults->PackageResults);
+            $package->save();
+        }
+        $shipment->setData('shipment_results', $shipmentResults);
+        $shipment->setData('shipment_identification_number', $shipmentResults->ShipmentIdentificationNumber);
     }
 
     protected function _data($path, $default = null)
@@ -441,14 +449,14 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         $UPSSecurity = [
             'UsernameToken' => [
                 'Username' => $this->_data('user_id'),
-                'Password' => 'a'//$this->_data('password'),
+                'Password' => $this->_data('password'),
             ],
             'ServiceAccessToken' => [
                 'AccessLicenseNumber' => $this->_data('access_key'),
             ],
         ];
 
-        $header = new SoapHeader('http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0','UPSSecurity',$UPSSecurity);
+        $header = new SoapHeader('http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0', 'UPSSecurity', $UPSSecurity);
         $client->__setSoapHeaders($header);
 
         $this->_clientCache[$serviceKey] = $client;
@@ -462,28 +470,81 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
      */
     public function getPackageLabel(Sellvana_Sales_Model_Order_Shipment_Package $package)
     {
-        $logDir = $this->BConfig->get('fs/log_dir');
-        $outputFileName = $logDir . '/' . "XOLTResult.xml";
-        $fw = fopen($outputFileName , 'r');
-        $line = false;
-        while (!feof($fw)){
-            $line = fgets($fw);
-            $line = trim($line);
-            if (strcmp($line, 'Response:') == 0) {
-                $line = fgets($fw);
-                fclose($fw);
-                break;
+        $label = [];
+
+        $data = $package->getData('package_results');
+        $file = $data['ShippingLabel']['GraphicImage'];
+        $file = explode('/', $file);
+        $filename = array_pop($file);
+        $path = implode('/', $file);
+        $realPath = $this->FCom_Core_Main->dir($this->_parseFolder($path));
+        $realPath .= '/' . $filename;
+
+        if (!is_file($realPath)) {
+            return false;
+        }
+        $label['content'] = file_get_contents($realPath);
+        $label['filename'] = $filename;
+
+        return $label;
+    }
+
+    /**
+     * @param $folder
+     * @return mixed
+     */
+    protected function _parseFolder($folder)
+    {
+        if (strpos($folder, '{random}') !== false) {
+            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
+            $folder = str_replace('{random}', $random, $folder);
+        }
+        return $folder;
+    }
+
+    /**
+     * @param stdClass $response
+     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     */
+    protected function _getFilesFromResponse(stdClass $response, Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        $path = '{random}/order/shipment/' . $shipment->get('id');
+        $realPath = $this->FCom_Core_Main->dir($this->_parseFolder($path));
+
+        $files = [
+            'label',
+            'label_html',
+            'requested_international_forms'
+        ];
+
+        $shippingLabel = $response->ShipmentResults->PackageResults->ShippingLabel;
+        foreach ($files as $file) {
+            switch ($file) {
+                case 'label':
+                    $fileExtension = strtolower($shippingLabel->ImageFormat->Code);
+                    $fileContent = base64_decode($shippingLabel->GraphicImage);
+                    $fileName = 'label.' . $fileExtension;
+                    $fileRealPath = $realPath . '/' . $fileName;
+                    file_put_contents($fileRealPath, $fileContent);
+                    $shippingLabel->GraphicImage = $path . '/' . $fileName;
+                    break;
+                case 'label_html':
+                    $fileContent = base64_decode($shippingLabel->HTMLImage);
+                    $fileName = 'label.html';
+                    $fileRealPath = $realPath . '/' . $fileName;
+                    file_put_contents($fileRealPath, $fileContent);
+                    $shippingLabel->HTMLImage = $path . '/' . $fileName;
+                    break;
+                case 'requested_international_forms':
+                    $form = $response->ShipmentResults->Form;
+                    $fileExtension = strtolower($form->Image->ImageFormat->Code);
+                    $fileContent = base64_decode($form->Image->GraphicImage);
+                    $fileName = 'form.' . $fileExtension;
+                    $fileRealPath = $realPath . '/' . $fileName;
+                    file_put_contents($fileRealPath, $fileContent);
+                    $form->Image->GraphicImage = $path . '/' . $fileName;
+                    break;
             }
-            $line = false;
         }
-
-        if ($line) {
-            $xml = simplexml_load_string($line, NULL, NULL, "http://schemas.xmlsoap.org/soap/envelope/");
-
-            $xml->registerXPathNamespace('soapenv', 'http://schemas.xmlsoap.org/soap/envelope/');
-            return (base64_decode((string)$xml->Body->children('ship', true)->ShipmentResponse->ShipmentResults->PackageResults->ShippingLabel->GraphicImage));
-        }
-
-        return false;
     }
 }
