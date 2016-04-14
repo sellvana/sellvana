@@ -187,7 +187,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     }
 
     /**
-     * Send shipment confirmation to FedEx
+     * Send shipment confirmation to UPS
      *
      * @param Sellvana_Sales_Model_Order_Shipment $shipment
      * @throws BException
@@ -470,23 +470,20 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
      */
     public function getPackageLabel(Sellvana_Sales_Model_Order_Shipment_Package $package)
     {
-        $label = [];
-
         $data = $package->getData('package_results');
-        $file = $data['ShippingLabel']['GraphicImage'];
-        $file = explode('/', $file);
-        $filename = array_pop($file);
-        $path = implode('/', $file);
-        $realPath = $this->FCom_Core_Main->dir($this->_parseFolder($path));
-        $realPath .= '/' . $filename;
+        $fileName = $data['ShippingLabel']['GraphicImage'];
+        if ($fileName) {
+            /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
+            $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
+            $label = [
+                'content' => $shipment->getShipmentFileContent($fileName),
+                'filename' => $fileName
+            ];
 
-        if (!is_file($realPath)) {
-            return false;
+            return $label;
         }
-        $label['content'] = file_get_contents($realPath);
-        $label['filename'] = $filename;
 
-        return $label;
+        return false;
     }
 
     /**
@@ -508,9 +505,6 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
      */
     protected function _getFilesFromResponse(stdClass $response, Sellvana_Sales_Model_Order_Shipment $shipment)
     {
-        $path = '{random}/order/shipment/' . $shipment->get('id');
-        $realPath = $this->FCom_Core_Main->dir($this->_parseFolder($path));
-
         $files = [
             'label',
             'label_html',
@@ -519,31 +513,34 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
         $shippingLabel = $response->ShipmentResults->PackageResults->ShippingLabel;
         foreach ($files as $file) {
+            $fileName = null;
+            $fileContent = null;
+            $responseContent = null;
+            
             switch ($file) {
                 case 'label':
                     $fileExtension = strtolower($shippingLabel->ImageFormat->Code);
-                    $fileContent = base64_decode($shippingLabel->GraphicImage);
+                    $responseContent = $shippingLabel->GraphicImage;
                     $fileName = 'label.' . $fileExtension;
-                    $fileRealPath = $realPath . '/' . $fileName;
-                    file_put_contents($fileRealPath, $fileContent);
-                    $shippingLabel->GraphicImage = $path . '/' . $fileName;
+                    $shippingLabel->GraphicImage = $fileName;
                     break;
                 case 'label_html':
-                    $fileContent = base64_decode($shippingLabel->HTMLImage);
+                    $responseContent = $shippingLabel->HTMLImage;
                     $fileName = 'label.html';
-                    $fileRealPath = $realPath . '/' . $fileName;
-                    file_put_contents($fileRealPath, $fileContent);
-                    $shippingLabel->HTMLImage = $path . '/' . $fileName;
+                    $shippingLabel->HTMLImage = $fileName;
                     break;
                 case 'requested_international_forms':
                     $form = $response->ShipmentResults->Form;
                     $fileExtension = strtolower($form->Image->ImageFormat->Code);
-                    $fileContent = base64_decode($form->Image->GraphicImage);
+                    $responseContent = $form->Image->GraphicImage;
                     $fileName = 'form.' . $fileExtension;
-                    $fileRealPath = $realPath . '/' . $fileName;
-                    file_put_contents($fileRealPath, $fileContent);
-                    $form->Image->GraphicImage = $path . '/' . $fileName;
+                    $form->Image->GraphicImage = $fileName;
                     break;
+            }
+            
+            $fileContent = base64_decode($responseContent);
+            if ($fileName && $fileContent) {
+                $shipment->putShipmentFile($fileName, $fileContent);
             }
         }
     }
