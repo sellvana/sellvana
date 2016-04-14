@@ -487,19 +487,6 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     }
 
     /**
-     * @param $folder
-     * @return mixed
-     */
-    protected function _parseFolder($folder)
-    {
-        if (strpos($folder, '{random}') !== false) {
-            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
-            $folder = str_replace('{random}', $random, $folder);
-        }
-        return $folder;
-    }
-
-    /**
      * @param stdClass $response
      * @param Sellvana_Sales_Model_Order_Shipment $shipment
      */
