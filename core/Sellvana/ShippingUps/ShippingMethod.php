@@ -9,9 +9,9 @@
 class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
     const SERVICE_SHIP = 'Ship';
-    
-    protected $_name       = 'Universal post service';
-    protected $_code       = 'ups';
+
+    protected $_name = 'Universal post service';
+    protected $_code = 'ups';
     protected $_configPath = 'modules/Sellvana_ShippingUps';
 
     /**
@@ -170,19 +170,47 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
      */
     public function getServices()
     {
+//        return [
+//            '_01' => 'UPS Next Day Air',
+//            '_02' => 'UPS Second Day Air',
+//            '_03' => 'UPS Ground',
+//            '_07' => 'UPS Worldwide Express',
+//            '_08' => 'UPS Worldwide Expedited',
+//            '_11' => 'UPS Standard',
+//            '_12' => 'UPS Three-Day Select',
+//            '_13' => 'Next Day Air Saver',
+//            '_14' => 'UPS Next Day Air Early AM',
+//            '_54' => 'UPS Worldwide Express Plus',
+//            '_59' => 'UPS Second Day Air AM',
+//            '_65' => 'UPS Saver',
+//        ];
+
+        //The commented Services are not available to return shipment
         return [
-            '_01' => 'UPS Next Day Air',
-            '_02' => 'UPS Second Day Air',
-            '_03' => 'UPS Ground',
-            '_07' => 'UPS Worldwide Express',
-            '_08' => 'UPS Worldwide Expedited',
+            '_01' => 'Next Day Air',
+            '_02' => '2nd Day Air',
+            '_03' => 'Ground',
+            '_07' => 'Express',
+            '_08' => 'Expedited',
             '_11' => 'UPS Standard',
-            '_12' => 'UPS Three-Day Select',
-            '_13' => 'Next Day Air Saver',
-            '_14' => 'UPS Next Day Air Early AM',
-            '_54' => 'UPS Worldwide Express Plus',
-            '_59' => 'UPS Second Day Air AM',
+            '_12' => '3 Day Select',
+            //'_13' => 'Next Day Air Saver',//
+            '_14' => 'UPS Next Day Air Early',
+            '_54' => 'Express Plus',
+            //'_59' => '2nd Day Air A.M.',//
             '_65' => 'UPS Saver',
+            '_M2' => 'First Class Mail',
+            '_M3' => 'Priority Mail',
+            '_M4' => 'Expedited MaiI Innovations',
+            '_M5' => 'Priority Mail Innovations',
+            '_M6' => 'Economy Mail Innovations',
+            '_70' => 'UPS Access Point Economy',
+            //'_82' => 'UPS Today Standard',//
+            //'_83' => 'UPS Today Dedicated Courier',//
+            //'_84' => 'UPS Today Intercity',//
+            //'_85' => 'UPS Today Express',//
+            //'_86' => 'UPS Today Express Saver',//
+            '_96' => 'UPS Worldwide Express Freight',
         ];
     }
 
@@ -200,7 +228,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
         try {
             $client = $this->_getSoapClient(self::SERVICE_SHIP);
-            $result = $client->__soapCall('ProcessShipment', array($this->_buildShipmentData()));
+            $result = $client->__soapCall('ProcessShipment', array($this->_buildShipmentData($shipment)));
         } catch (SoapFault $e) {
             //$details = $e->detail;
             throw new BException($e->getMessage());
@@ -244,6 +272,21 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     protected function _buildShipmentData(Sellvana_Sales_Model_Order_Shipment $shipment = null)
     {
         $config = $this->BConfig;
+        $services = $this->getServices();
+        $catalogConfig = $this->BConfig->get('modules/Sellvana_Catalog');
+        $dimensions = explode('x', $this->_data('package_size'));
+        $weightCode = [
+            'lb' => 'LBS',
+            'kg' => 'KGS'
+        ];
+        $weight = $this->_data('weight') ?: $this->_data('shipping_weight');
+        if (count($dimensions) !== 3) {
+            $result = [
+                'error' => 1,
+                'message' => 'Dimensions in wrong format',
+            ];
+            return $result;
+        }
         return [
             'Request' => [
                 'RequestOption' => 'nonvalidate',
@@ -271,32 +314,40 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                     ],
                 ],
                 'ShipTo' => [
-                    'Name' => 'Happy Dog Pet Supply',
-                    'AttentionName' => 'Ship To Attention Name',
+                    'Name' => $this->_data('to_name'),
+                    'AttentionName' => $this->_data('to_name'),
                     'Address' => [
-                        'AddressLine' => 'GOERLITZER STR.1',
-                        'City' => 'Neuss',
-                        'PostalCode' => '41456',
-                        'CountryCode' => 'DE',
+                        'AddressLine' => [
+                            $this->_data('to_street1'),
+                            $this->_data('to_street2'),
+                        ],
+                        'City' => $this->_data('to_city'),
+                        'StateProvinceCode' => substr($this->_data('to_region'), 0, 2),
+                        'PostalCode' => $this->_data('to_postcode'),
+                        'CountryCode' => $this->_data('to_country'),
                     ],
                     'Phone' => [
-                        'Number' => '9225377171',
+                        'Number' => $this->_data('to_phone'),
                     ],
                 ],
                 'ShipFrom' => [
-                    'Name' => 'T and T Designs',
-                    'AttentionName' => '1160b_74',
+                    'Name' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
+                    'AttentionName' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
                     'Address' => [
-                        'AddressLine' => '2311 York Rd',
-                        'City' => 'Timonium',
-                        'StateProvinceCode' => 'MD',
-                        'PostalCode' => '21093',
-                        'CountryCode' => 'US',
+                        'AddressLine' => [
+                            $this->BConfig->get("modules/Sellvana_Sales/store_street1"),
+                            $this->BConfig->get("modules/Sellvana_Sales/store_street2"),
+                        ],
+                        'City' => $this->BConfig->get("modules/Sellvana_Sales/store_city"),
+                        'StateProvinceCode' => $this->BConfig->get("modules/Sellvana_Sales/store_region"),
+                        'PostalCode' => $this->BConfig->get("modules/Sellvana_Sales/store_postcode"),
+                        'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country"),
                     ],
                     'Phone' => [
-                        'Number' => '1234567890',
+                        'Number' => $this->BConfig->get("modules/Sellvana_Sales/store_phone"),
                     ],
                 ],
+                //TODO: What to do with this section?
                 'PaymentInformation' => [
                     'ShipmentCharge' => [
                         'Type' => '01',
@@ -318,103 +369,33 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                     ],
                 ],
                 'Service' => [
-                    'Code' => '08',
-                    'Description' => 'Expedited',
-                ],
-                'ShipmentServiceOptions' => [
-                    'InternationalForms' => [
-                        'FormType' => '01',
-                        'InvoiceNumber' => 'asdf123',
-                        'InvoiceDate' => '20151225',
-                        'PurchaseOrderNumber' => '999jjj777',
-                        'TermsOfShipment' => 'CFR',
-                        'ReasonForExport' => 'Sale',
-                        'Comments' => 'Your Comments',
-                        'DeclarationStatement' => 'Your Declaration Statement',
-                        'Contacts' => [
-                            'SoldTo' => [
-                                'Option' => '01',
-                                'AttentionName' => 'Sold To Attn Name',
-                                'Name' => 'Sold To Name',
-                                'Phone' => [
-                                    'Number' => '1234567890',
-                                    'Extension' => '1234',
-                                ],
-                                'Address' => [
-                                    'AddressLine' => '34 Queen St',
-                                    'City' => 'Frankfurt',
-                                    'PostalCode' => '60547',
-                                    'CountryCode' => 'DE',
-                                ],
-                            ],
-                        ],
-                        'Product' => [
-                            'Description' => 'Product 1',
-                            'CommodityCode' => '111222AA',
-                            'OriginCountryCode' => 'US',
-                            'Unit' => [
-                                'Number' => '147',
-                                'Value' => '478',
-                                'UnitOfMeasurement' =>
-                                    [
-                                        'Code' => 'BOX',
-                                        'Description' => 'BOX',
-                                    ],
-                            ],
-                            'ProductWeight' => [
-                                'Weight' => '10',
-                                'UnitOfMeasurement' =>
-                                    [
-                                        'Code' => 'LBS',
-                                        'Description' => 'LBS',
-                                    ],
-                            ],
-                        ],
-                        'Discount' => [
-                            'MonetaryValue' => '100',
-                        ],
-                        'FreightCharges' => [
-                            'MonetaryValue' => '50',
-                        ],
-                        'InsuranceCharges' => [
-                            'MonetaryValue' => '200',
-                        ],
-                        'OtherCharges' => [
-                            'MonetaryValue' => '50',
-                            'Description' => 'Misc',
-                        ],
-                        'CurrencyCode' => 'USD',
-                    ],
+                    'Code' => trim($shipment->get('service_code'), '_'),
+                    'Description' => $services[$shipment->get('service_code')],
                 ],
                 'Package' => [
                     'Description' => '',
                     'Packaging' => [
                         'Code' => '02',
-                        'Description' => 'Nails',
                     ],
                     'Dimensions' => [
-                        'UnitOfMeasurement' =>
-                            [
-                                'Code' => 'IN',
-                                'Description' => 'Inches',
-                            ],
-                        'Length' => '7',
-                        'Width' => '5',
-                        'Height' => '2',
+                        'UnitOfMeasurement' => [
+                            'Code' => strtoupper($catalogConfig['length_unit']),
+                        ],
+                        'Length' => $dimensions[0],
+                        'Width' => $dimensions[1],
+                        'Height' => $dimensions[2],
                     ],
                     'PackageWeight' => [
-                        'UnitOfMeasurement' =>
-                            [
-                                'Code' => 'LBS',
-                                'Description' => 'Pounds',
-                            ],
-                        'Weight' => '10',
+                        'UnitOfMeasurement' => [
+                            'Code' => $weightCode[$catalogConfig['weight_unit']],
+                        ],
+                        'Weight' => $weight,
                     ],
                 ],
                 'LabelSpecification' => [
                     'LabelImageFormat' => [
-                        'Code' => 'GIF',
-                        'Description' => 'GIF',
+                        'Code' => $this->_data('shipping_label_format'),
+                        'Description' => $this->_data('shipping_label_format'),
                     ],
                     'HTTPUserAgent' => 'Mozilla/4.5',
                 ],
@@ -503,7 +484,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $fileName = null;
             $fileContent = null;
             $responseContent = null;
-            
+
             switch ($file) {
                 case 'label':
                     $fileExtension = strtolower($shippingLabel->ImageFormat->Code);
@@ -517,18 +498,33 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                     $shippingLabel->HTMLImage = $fileName;
                     break;
                 case 'requested_international_forms':
-                    $form = $response->ShipmentResults->Form;
-                    $fileExtension = strtolower($form->Image->ImageFormat->Code);
-                    $responseContent = $form->Image->GraphicImage;
-                    $fileName = 'form.' . $fileExtension;
-                    $form->Image->GraphicImage = $fileName;
+                    if (isset($response->ShipmentResults->Form)) {
+                        $form = $response->ShipmentResults->Form;
+                        $fileExtension = strtolower($form->Image->ImageFormat->Code);
+                        $responseContent = $form->Image->GraphicImage;
+                        $fileName = 'form.' . $fileExtension;
+                        $form->Image->GraphicImage = $fileName;
+                    }
                     break;
             }
-            
+
             $fileContent = base64_decode($responseContent);
             if ($fileName && $fileContent) {
                 $shipment->putShipmentFile($fileName, $fileContent);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getLabelFormats()
+    {
+        return [
+            1 => 'EPL',
+            2 => 'SPL',
+            3 => 'ZPL',
+            4 => 'GIF'
+        ];
     }
 }
