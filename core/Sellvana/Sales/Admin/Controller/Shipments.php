@@ -149,6 +149,8 @@ class Sellvana_Sales_Admin_Controller_Shipments extends FCom_Admin_Controller_Ab
             $result['message'] = $e->getMessage();
         }
 
+        $order->set('shipping_method', $method);
+
         $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set([
             'model' => $order,
             'rates'=> $rates,
