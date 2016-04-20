@@ -295,10 +295,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             'RequestOption' => 'nonvalidate',
         ];
 
-        $shipment = [];
-        $shipment['Description'] = 'Ship WS test';
+        $shipmentSection = [];
+        $shipmentSection['Description'] = 'Ship WS test';
 
-        $shipment['Shipper'] = [
+        $shipmentSection['Shipper'] = [
             'Name' => $config->get("modules/Sellvana_Sales/store_name"),
             'AttentionName' => $config->get("modules/Sellvana_Sales/store_name"), //Required for: see doc.
             //'TaxIdentificationNumber' => '123456', //Required for: see doc.
@@ -319,7 +319,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ],
         ];
 
-        $shipment['ShipTo'] = [
+        $shipmentSection['ShipTo'] = [
             'Name' => $this->_data('to_name'),
             'AttentionName' => $this->_data('to_name'),
             'Address' => [
@@ -337,7 +337,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ],
         ];
 
-        $shipment['ShipFrom'] = [
+        $shipmentSection['ShipFrom'] = [
             'Name' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
             'AttentionName' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
             'Address' => [
@@ -355,12 +355,12 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ],
         ];
 
-        $shipment['Service'] = [
+        $shipmentSection['Service'] = [
             'Code' => trim($shipment->get('service_code'), '_'),
             'Description' => $services[$shipment->get('service_code')],
         ];
 
-        $shipment['Package'] = [
+        $shipmentSection['Package'] = [
             'Description' => '',
             'Packaging' => [
                 'Code' => '02',
@@ -381,26 +381,23 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ],
         ];
 
-        $shipment['LabelSpecification'] = [
+        $shipmentSection['LabelSpecification'] = [
             'LabelImageFormat' => [
                 'Code' => $labelFormat,
             ],
             'HTTPUserAgent' => 'Mozilla/4.5',
         ];
 
-        // PaymentInformation is required for non Ground services
-        if ($shipment->get('service_code') != '_03') {
-            $shipment['PaymentInformation'] = [
-                'ShipmentCharge' => [
-                    'Type' => '01',
-                    'BillShipper' => [
-                        'AccountNumber' => $this->_data('shipper_number'),
-                    ],
+        $shipmentSection['PaymentInformation'] = [
+            'ShipmentCharge' => [
+                'Type' => '01',
+                'BillShipper' => [
+                    'AccountNumber' => $this->_data('shipper_number'),
                 ],
-            ];
-        }
+            ],
+        ];
 
-        $request['Shipment'] = $shipment;
+        $request['Shipment'] = $shipmentSection;
 
         return $request;
     }
