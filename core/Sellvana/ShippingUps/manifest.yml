@@ -24,5 +24,5 @@ modules:
                     max_package_weight: 150
                     production_mode: 0
                     sort_order: 10
-                    default_service: '03'
+                    #default_service: '_03'
                     shipping_label_format: 4
