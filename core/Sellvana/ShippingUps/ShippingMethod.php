@@ -287,120 +287,122 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ];
             return $result;
         }
-        return [
-            'Request' => [
-                'RequestOption' => 'nonvalidate',
+        $labelFormat = $this->getLabelFormats();
+        $labelFormat = $labelFormat[$this->_data('shipping_label_format')];
+
+        $request = [];
+        $request['Request'] = [
+            'RequestOption' => 'nonvalidate',
+        ];
+
+        $shipment = [];
+        $shipment['Description'] = 'Ship WS test';
+
+        $shipment['Shipper'] = [
+            'Name' => $config->get("modules/Sellvana_Sales/store_name"),
+            'AttentionName' => $config->get("modules/Sellvana_Sales/store_name"), //Required for: see doc.
+            //'TaxIdentificationNumber' => '123456', //Required for: see doc.
+            'ShipperNumber' => $this->_data('shipper_number'),
+            'Address' => [
+                'AddressLine' => [
+                    $config->get("modules/Sellvana_Sales/store_street1"),
+                    $config->get("modules/Sellvana_Sales/store_street2"),
+                ],
+                'City' => $config->get("modules/Sellvana_Sales/store_city"),
+                'StateProvinceCode' => $config->get("modules/Sellvana_Sales/store_region"),
+                'PostalCode' => $config->get("modules/Sellvana_Sales/store_postcode"),
+                'CountryCode' => $config->get("modules/Sellvana_Sales/store_country"),
             ],
-            'Shipment' => [
-                'Description' => 'Ship WS test',
-                'Shipper' => [
-                    'Name' => $config->get("modules/Sellvana_Sales/store_name"),
-                    'AttentionName' => $config->get("modules/Sellvana_Sales/store_name"), //Required for: see doc.
-                    //'TaxIdentificationNumber' => '123456', //Required for: see doc.
-                    'ShipperNumber' => $this->_data('shipper_number'),
-                    'Address' => [
-                        'AddressLine' => [
-                            $config->get("modules/Sellvana_Sales/store_street1"),
-                            $config->get("modules/Sellvana_Sales/store_street2"),
-                        ],
-                        'City' => $config->get("modules/Sellvana_Sales/store_city"),
-                        'StateProvinceCode' => $config->get("modules/Sellvana_Sales/store_region"),
-                        'PostalCode' => $config->get("modules/Sellvana_Sales/store_postcode"),
-                        'CountryCode' => $config->get("modules/Sellvana_Sales/store_country"),
-                    ],
-                    'Phone' => [
-                        'Number' => $config->get("modules/Sellvana_Sales/store_phone"),
-                        //'Extension' => '1',
-                    ],
-                ],
-                'ShipTo' => [
-                    'Name' => $this->_data('to_name'),
-                    'AttentionName' => $this->_data('to_name'),
-                    'Address' => [
-                        'AddressLine' => [
-                            $this->_data('to_street1'),
-                            $this->_data('to_street2'),
-                        ],
-                        'City' => $this->_data('to_city'),
-                        'StateProvinceCode' => substr($this->_data('to_region'), 0, 2),
-                        'PostalCode' => $this->_data('to_postcode'),
-                        'CountryCode' => $this->_data('to_country'),
-                    ],
-                    'Phone' => [
-                        'Number' => $this->_data('to_phone'),
-                    ],
-                ],
-                'ShipFrom' => [
-                    'Name' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
-                    'AttentionName' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
-                    'Address' => [
-                        'AddressLine' => [
-                            $this->BConfig->get("modules/Sellvana_Sales/store_street1"),
-                            $this->BConfig->get("modules/Sellvana_Sales/store_street2"),
-                        ],
-                        'City' => $this->BConfig->get("modules/Sellvana_Sales/store_city"),
-                        'StateProvinceCode' => $this->BConfig->get("modules/Sellvana_Sales/store_region"),
-                        'PostalCode' => $this->BConfig->get("modules/Sellvana_Sales/store_postcode"),
-                        'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country"),
-                    ],
-                    'Phone' => [
-                        'Number' => $this->BConfig->get("modules/Sellvana_Sales/store_phone"),
-                    ],
-                ],
-                //TODO: What to do with this section?
-                'PaymentInformation' => [
-                    'ShipmentCharge' => [
-                        'Type' => '01',
-                        'BillShipper' => [
-                            'CreditCard' => [
-                                'Type' => '06',
-                                'Number' => '4716995287640625',
-                                'SecurityCode' => '864',
-                                'ExpirationDate' => '12/2013',
-                                'Address' => [
-                                    'AddressLine' => '2010 warsaw road',
-                                    'City' => 'Roswell',
-                                    'StateProvinceCode' => 'GA',
-                                    'PostalCode' => '30076',
-                                    'CountryCode' => 'US',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                'Service' => [
-                    'Code' => trim($shipment->get('service_code'), '_'),
-                    'Description' => $services[$shipment->get('service_code')],
-                ],
-                'Package' => [
-                    'Description' => '',
-                    'Packaging' => [
-                        'Code' => '02',
-                    ],
-                    'Dimensions' => [
-                        'UnitOfMeasurement' => [
-                            'Code' => strtoupper($catalogConfig['length_unit']),
-                        ],
-                        'Length' => $dimensions[0],
-                        'Width' => $dimensions[1],
-                        'Height' => $dimensions[2],
-                    ],
-                    'PackageWeight' => [
-                        'UnitOfMeasurement' => [
-                            'Code' => $weightCode[$catalogConfig['weight_unit']],
-                        ],
-                        'Weight' => $weight,
-                    ],
-                ],
-                'LabelSpecification' => [
-                    'LabelImageFormat' => [
-                        'Code' => $this->_data('shipping_label_format'),
-                        'Description' => $this->_data('shipping_label_format'),
-                    ],
-                    'HTTPUserAgent' => 'Mozilla/4.5',
-                ],
+            'Phone' => [
+                'Number' => $config->get("modules/Sellvana_Sales/store_phone"),
+                //'Extension' => '1',
             ],
         ];
+
+        $shipment['ShipTo'] = [
+            'Name' => $this->_data('to_name'),
+            'AttentionName' => $this->_data('to_name'),
+            'Address' => [
+                'AddressLine' => [
+                    $this->_data('to_street1'),
+                    $this->_data('to_street2'),
+                ],
+                'City' => $this->_data('to_city'),
+                'StateProvinceCode' => substr($this->_data('to_region'), 0, 2),
+                'PostalCode' => $this->_data('to_postcode'),
+                'CountryCode' => $this->_data('to_country'),
+            ],
+            'Phone' => [
+                'Number' => $this->_data('to_phone'),
+            ],
+        ];
+
+        $shipment['ShipFrom'] = [
+            'Name' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
+            'AttentionName' => $this->BConfig->get("modules/Sellvana_Sales/store_name"),
+            'Address' => [
+                'AddressLine' => [
+                    $this->BConfig->get("modules/Sellvana_Sales/store_street1"),
+                    $this->BConfig->get("modules/Sellvana_Sales/store_street2"),
+                ],
+                'City' => $this->BConfig->get("modules/Sellvana_Sales/store_city"),
+                'StateProvinceCode' => $this->BConfig->get("modules/Sellvana_Sales/store_region"),
+                'PostalCode' => $this->BConfig->get("modules/Sellvana_Sales/store_postcode"),
+                'CountryCode' => $this->BConfig->get("modules/Sellvana_Sales/store_country"),
+            ],
+            'Phone' => [
+                'Number' => $this->BConfig->get("modules/Sellvana_Sales/store_phone"),
+            ],
+        ];
+
+        $shipment['Service'] = [
+            'Code' => trim($shipment->get('service_code'), '_'),
+            'Description' => $services[$shipment->get('service_code')],
+        ];
+
+        $shipment['Package'] = [
+            'Description' => '',
+            'Packaging' => [
+                'Code' => '02',
+            ],
+            'Dimensions' => [
+                'UnitOfMeasurement' => [
+                    'Code' => strtoupper($catalogConfig['length_unit']),
+                ],
+                'Length' => $dimensions[0],
+                'Width' => $dimensions[1],
+                'Height' => $dimensions[2],
+            ],
+            'PackageWeight' => [
+                'UnitOfMeasurement' => [
+                    'Code' => $weightCode[$catalogConfig['weight_unit']],
+                ],
+                'Weight' => $weight,
+            ],
+        ];
+
+        $shipment['LabelSpecification'] = [
+            'LabelImageFormat' => [
+                'Code' => $labelFormat,
+            ],
+            'HTTPUserAgent' => 'Mozilla/4.5',
+        ];
+
+        // PaymentInformation is required for non Ground services
+        if ($shipment->get('service_code') != '_03') {
+            $shipment['PaymentInformation'] = [
+                'ShipmentCharge' => [
+                    'Type' => '01',
+                    'BillShipper' => [
+                        'AccountNumber' => $this->_data('shipper_number'),
+                    ],
+                ],
+            ];
+        }
+
+        $request['Shipment'] = $shipment;
+
+        return $request;
     }
 
     /**
@@ -521,10 +523,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     public function getLabelFormats()
     {
         return [
-            1 => 'EPL',
-            2 => 'SPL',
-            3 => 'ZPL',
-            4 => 'GIF'
+            '_01' => 'EPL',
+            '_02' => 'SPL',
+            '_03' => 'ZPL',
+            '_04' => 'GIF'
         ];
     }
 }

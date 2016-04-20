@@ -25,4 +25,4 @@ modules:
                     production_mode: 0
                     sort_order: 10
                     #default_service: '_03'
-                    shipping_label_format: 4
+                    shipping_label_format: '_04'
