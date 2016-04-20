@@ -10,9 +10,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 {
     const SERVICE_SHIP = 'Ship';
 
-    protected $_name = 'Universal post service';
-    protected $_code = 'ups';
-    protected $_configPath = 'modules/Sellvana_ShippingUps';
+    protected $_name           = 'Universal post service';
+    protected $_code           = 'ups';
+    protected $_configPath     = 'modules/Sellvana_ShippingUps';
+    protected $_trackingUpdate = true;
 
     /**
      * @var array

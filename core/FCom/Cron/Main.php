@@ -61,6 +61,9 @@ class FCom_Cron_Main extends BClass
         } elseif (null !== $handles && !is_array($handles)) {
             throw new Exception('Invalid argument: ' . print_r($handles, 1));
         }
+        // bootstrap all modules
+        $this->BModuleRegistry->bootstrap();
+        
         // fetch configuration
         $c = $this->BConfig->get('modules/FCom_Cron');
         $leewayMins = !empty($c['leeway_mins']) ? $c['leeway_mins'] * 1 : 5;

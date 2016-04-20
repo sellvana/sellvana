@@ -13,6 +13,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     protected $_configPath;
     protected $_config;
     protected $_lastError;
+    protected $_trackingUpdate = false;
 
     public function getCode()
     {
@@ -344,4 +345,11 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function canTrackingUpdate()
+    {
+        return $this->_trackingUpdate;
+    }
 }

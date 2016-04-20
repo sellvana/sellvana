@@ -13,7 +13,7 @@ class Sellvana_ShippingUps_Main extends BClass
 
     public function bootstrap()
     {
-        $this->Sellvana_Sales_Main->addShippingMethod('ups', 'Sellvana_ShippingUps_ShippingMethod');
+        $this->Sellvana_Sales_Main->addShippingMethod($this->_methodCode, 'Sellvana_ShippingUps_ShippingMethod');
         $this->FCom_Admin_Model_Role->createPermission([
             'settings/Sellvana_ShippingUps' => 'Shipping UPS Settings',
         ]);

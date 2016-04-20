@@ -65,3 +65,5 @@ modules:
             FCom_Cron:
                 crontab:
                     - [ "* * * * *", Sellvana_Sales_Cron::runEveryMinute ]
+                    - [ "* * * * *", Sellvana_Sales_Cron::runDaily ]
+#                    - [ "0 0 * * *", Sellvana_Sales_Cron::runDaily ]

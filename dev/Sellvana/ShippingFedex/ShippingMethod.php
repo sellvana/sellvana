@@ -10,9 +10,10 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
     const SERVICE_RATE = 'Rate';
     const SERVICE_SHIP = 'Ship';
 
-    protected $_name       = 'FedEx';
-    protected $_code       = 'fedex';
-    protected $_configPath = 'modules/Sellvana_ShippingFedex';
+    protected $_name           = 'FedEx';
+    protected $_code           = 'fedex';
+    protected $_configPath     = 'modules/Sellvana_ShippingFedex';
+    protected $_trackingUpdate = true;
 
     /**
      * @var null
