@@ -25,6 +25,9 @@ class Sellvana_Sales_Cron extends BClass
         $this->_runShipmentUpdates();
     }
 
+    /**
+     * @return array|void
+     */
     protected function _runShipmentUpdates()
     {
         $shipmentMethods = $this->Sellvana_Sales_Main->getShippingMethods();
@@ -55,13 +58,22 @@ class Sellvana_Sales_Cron extends BClass
                     //Sellvana_Sales_Model_Order_Shipment_State_Overall::CANCELED,
                 ])
                 ->order_by_asc('s.carrier_code')
-                ->select(['s.id', 's.carrier_code'])
-                ;
-            $items = $orm->find_many();
-            /** @var Sellvana_Sales_Model_Order_Shipment_Package $item */
-            foreach ($items as $item) {
-                var_dump($item->as_array());
+                ->select(['s.id', 's.carrier_code', 's.state_overall', 'p.tracking_number']);
+
+            $packageIds = [];
+            /** @var Sellvana_Sales_Model_Order_Shipment_Package[] $packageList */
+            $packageList = $orm->find_many();
+            foreach ($packageList as $package) {
+                $packageIds[$package->get('carrier_code')][$package->get('id')] =  $package->get('tracking_number');
             }
+
+            $response = [];
+            foreach (array_keys($packageIds) as $methodName) {
+                $method = $this->Sellvana_Sales_Main->getShippingMethodClassName($methodName);
+                $response[$methodName] = $this->$method->fetchTrackingUpdates($packageIds[$methodName]);
+            }
+
+            return $response;
         }
     }
 }

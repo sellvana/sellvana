@@ -352,4 +352,18 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     {
         return $this->_trackingUpdate;
     }
+
+    /**
+     * @param array $data
+     *  - id => tracking_number
+     *
+     * @return array
+     *  - success
+     *  - error
+     *  - message
+     */
+    public function fetchTrackingUpdates($data)
+    {
+        return ['error' => true, 'message' => 'Not implemented'];
+    }
 }
