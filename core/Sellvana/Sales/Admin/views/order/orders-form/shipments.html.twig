@@ -149,6 +149,11 @@
                                 <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
                                 {% if p.label() %}
                                     <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
+                                    <br>
+                                {% endif %}
+                                {% if p.canTrackingUpdate() %}
+                                    <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Receiving tracking updates'|_ }}</a>
+                                    <br>
                                 {% endif %}
                                 <hr>
                             {% endfor %}

@@ -50,4 +50,19 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
 
         return $this->$methodClass->getPackageLabel($this);
     }
+
+    public function canTrackingUpdate()
+    {
+        if (!$this->_shipment) {
+            $this->_shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($this->get('shipment_id'));
+        }
+
+        $method = $this->_shipment->get('carrier_code');
+        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
+        if (!$methodClass) {
+            return false;
+        }
+
+        return $this->$methodClass->canTrackingUpdate();
+    }
 }
