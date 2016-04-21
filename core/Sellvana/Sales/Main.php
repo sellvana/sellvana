@@ -170,7 +170,7 @@ class Sellvana_Sales_Main extends BClass
      */
     public function getAllSelectedShippingServices()
     {
-        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
+        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
         if (!$cart) {
             return [];
         }
