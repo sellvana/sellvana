@@ -396,7 +396,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
                 ],
                 'DocumentContent' => 'NON_DOCUMENTS',
                 'CustomsValue' => [
-                    'Amount' => $this->_data('amount'),
+                    'Amount' => null === $this->_data('amount') ? 0.00 : $this->_data('amount'),
                     'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
                 ],
                 'Commodities' => [],
