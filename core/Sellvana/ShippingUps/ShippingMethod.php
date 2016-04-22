@@ -5,6 +5,8 @@
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property FCom_Core_Main $FCom_Core_Main
+ * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
+ * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  */
 class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
@@ -526,5 +528,55 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             '_03' => 'ZPL',
             '_04' => 'GIF'
         ];
+    }
+
+    /**
+     * @inheritdoc;
+     */
+    public function fetchTrackingUpdates($args)
+    {
+        try {
+            foreach ($args as $shipmentId => $trackingNumber) {
+                $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($shipmentId);
+                if (!$shipment) {
+                    throw new BException('Invalid shipment');
+                }
+
+                $order = $order = $this->Sellvana_Sales_Model_Order->load($shipment->get('order_id'));
+                if (!$order) {
+                    throw new BException('Invalid order');
+                }
+                
+                $data = $this->_fetchNewStates($shipment->get('tracking_number'));
+
+                if ($data) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesShipment', [
+                        'order' => $order,
+                        'shipment_id' => $shipmentId,
+                        'data' => $data,
+                    ]);
+                }
+
+                return ['message' => 'Success'];
+            }
+        } catch (Exception $e) {
+            return ['error' => true, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * @param $data
+     * @return false|array
+     */
+    protected function _fetchNewStates($data) {
+        //Todo: Here receiving tracking update with SOAP;
+        /**
+         * @var array $data
+         *  - state_custom[]
+         *      state => label
+         *  - state_overall[]
+         *      state => label
+         */
+        return false;
     }
 }
