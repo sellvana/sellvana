@@ -157,6 +157,63 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
         $this->BResponse->json($result);
     }
 
+    public function action_updateTracking__POST()
+    {
+        $result = [];
+        try {
+            $orderId = (int)$this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $packages = $this->BRequest->post('packages');
+            if (null !== $packages && !is_array($packages)) {
+                throw new BException('Invalid packages data');
+            }
+
+            $packagesIds = array_keys($packages);
+
+            $orm = $this->Sellvana_Sales_Model_Order_Shipment_Package->orm('p')
+                ->inner_join('Sellvana_Sales_Model_Order_Shipment', ['s.id', '=', 'p.shipment_id'], 's')
+                ->where_in('p.id', $packagesIds)
+                ->select(['s.id', 's.carrier_code', 's.carrier_desc', 's.state_overall', 'p.tracking_number']);
+
+            /** @var Sellvana_Sales_Model_Order_Shipment_Package[] $packageList */
+            $packageList = $orm->find_many();
+            $packageIds = [];
+            $shipmentMethodDesc = [];
+            foreach ($packageList as $package) {
+                $shipmentMethodDesc[$package->get('carrier_code')] = $package->get('carrier_desc');
+                $packageIds[$package->get('carrier_code')][$package->get('id')] =  $package->get('tracking_number');
+            }
+
+            $response = [];
+            foreach (array_keys($packageIds) as $methodName) {
+                $method = $this->Sellvana_Sales_Main->getShippingMethodClassName($methodName);
+                $response[$methodName] = $this->$method->fetchTrackingUpdates($packageIds[$methodName]);
+            }
+            $result['message'] = $this->_('Tracking updates has been received.');
+
+            foreach ($response as $method => $data) {
+                if (isset($data['error']) && $data['error']) {
+                    $result['error'] = $data['error'];
+                    $result['message'] = 'Shipping method: "'
+                        . $shipmentMethodDesc[$method] . '" Response: "' . $data['message'] . '"';
+                }
+            }
+            $result = array_merge($this->_resetOrderTabs($order), $result);
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
+
+        $this->BResponse->json($result);
+    }
+
     public function action_printLabel()
     {
         $packageId = $this->BRequest->get('id');

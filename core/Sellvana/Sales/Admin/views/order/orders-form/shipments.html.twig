@@ -145,8 +145,8 @@
                                     <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
                                     <br>
                                 {% endif %}
-                                {% if p.canTrackingUpdate() %}
-                                    <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Receiving tracking updates'|_ }}</a>
+                                {% if p.canTrackingUpdate() and p.get('tracking_number') %}
+                                    <a href="{{ APP.href('shipments/updateTracking?id=' ~ order.id()) }}" class="js-shipment-update-tracking">{{ 'Receiving tracking updates'|_ }}</a>
                                     <br>
                                 {% endif %}
                                 <hr>
@@ -224,6 +224,16 @@
         container.on('click', '#btnShipmentGetRates', function(ev) {
             var serializeData = $(container).find('input, select').serializeArray();
             $.post(ratesUrl, serializeData, processPostResponse);
+        });
+
+        // Receiving tracking updates
+        container.on('click', '.js-shipment-update-tracking', function (ev) {
+            ev.preventDefault();
+            var $el = $(ev.target);
+            var shipmentUpdateTrackingUrl = $el.attr('href');
+            var serializeData = $el.parent().find('input, select').serializeArray();
+
+            $.post(shipmentUpdateTrackingUrl, serializeData, processPostResponse);
         });
 
         // Recalculate package weight

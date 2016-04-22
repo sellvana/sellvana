@@ -355,7 +355,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
 
     /**
      * @param array $data
-     *  - id => tracking_number
+     *  - shipment_id => tracking_number
      *
      * @return array
      *  - success
