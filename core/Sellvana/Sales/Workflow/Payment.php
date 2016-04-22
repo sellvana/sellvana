@@ -5,11 +5,25 @@
  *
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
 
 class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
+
+    static protected $_paymentOverallStates = [
+        'pending' => 'setPending',
+        'offline' => 'setOffline',
+        'failed' => 'setFailed',
+        'canceled' => 'setCanceled',
+        'processing' => 'setProcessing',
+        'partial_paid' => 'setPartialPaid',
+        'paid' => 'setPaid',
+        'partial_refunded' => 'setPartialRefunded',
+        'refunded' => 'setRefunded',
+        'chargedback' => 'setChargedBack',
+    ];
 
     public function action_customerPaysOnCheckout($args)
     {
@@ -17,7 +31,8 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             $order = $args['order'];
 
             /** @var Sellvana_Sales_Model_Order_Payment $payment */
-            $payment = $this->Sellvana_Sales_Model_Order_Payment->create()->importFromOrder($order);
+            $payment = $this->Sellvana_Sales_Model_Order_Payment->create();
+            $payment->importFromOrder($order);
 
             $method = $payment->getMethodObject();
             $result = $method->payOnCheckout($payment);
@@ -144,6 +159,82 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     }
 
+    public function action_adminCreatesPayment($args)
+    {
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+        $data = $this->BRequest->sanitize($args['data'], []);
+        $qtys = isset($args['qtys']) ? $args['qtys'] : null;
+        foreach ($qtys as $id => $qty) {
+            if ($qty < 1) {
+                unset($qtys[$id]);
+            }
+        }
+        if (!$qtys) {
+            throw new BException('Please add some items to create a payment');
+        }
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        $payment = $this->Sellvana_Sales_Model_Order_Payment->create($data);
+        $payment->importFromOrder($order, $qtys);
+        $payment->register();
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
+    }
+
+    public function action_adminUpdatesPayment($args)
+    {
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+        $paymentId = $args['payment_id'];
+        $data = $args['data'];
+        $payment = $this->Sellvana_Sales_Model_Order_Payment->load($paymentId);
+        if (!$payment || $payment->get('order_id') != $order->id()) {
+            throw new BException('Invalid payment to update');
+        }
+        if (isset($data['state_custom'])) {
+            $payment->state()->custom()->changeState($data['state_custom']);
+        }
+        if (isset($data['state_overall'])) {
+            foreach ($data['state_overall'] as $state => $_) {
+                $method = static::$_paymentOverallStates[$state];
+                $payment->state()->overall()->$method();
+            }
+        }
+        $payment->save();
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
+    }
+
+    public function action_adminUpdatesTransaction($args)
+    {
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+        $packageId = $args['package_id'];
+        $data = $args['data'];
+        $trans = $this->Sellvana_Sales_Model_Order_Payment_Transaction->load($packageId);
+        if (!$trans || $trans->get('order_id') != $order->id()) {
+            throw new BException('Invalid transaction to update');
+        }
+        if (isset($data['tracking_number'])) {
+            $trans->set('tracking_number', $data['tracking_number']);
+        }
+        $trans->save();
+    }
+
+    public function action_adminDeletesPayment($args)
+    {
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+        $paymentId = $args['payment_id'];
+        $payment = $this->Sellvana_Sales_Model_Order_Payment->load($paymentId);
+        if (!$payment || $payment->get('order_id') != $order->id()) {
+            throw new BException('Invalid payment to delete');
+        }
+        $payment->unregister()->delete();
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
+    }
+
     public function action_adminReceivesOfflinePayment($args)
     {
 
@@ -179,7 +270,8 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
      */
     public function action_adminChangesPaymentCustomState($args)
     {
-        $newState = $args['payment']->state()->custom()->setState($args['state']);
+        /** @var Sellvana_Sales_Model_Order_Payment_State_Custom $newState */
+        $newState = $args['payment']->state()->custom()->changeState($args['state']);
         $label = $newState->getValueLabel();
         $args['payment']->addHistoryEvent('custom_state', 'Admin user has changed custom payment state to "' . $label . '"');
         $args['payment']->save();

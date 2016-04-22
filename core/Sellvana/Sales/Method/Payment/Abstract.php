@@ -11,7 +11,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     /**
      * @var string
      */
-    static protected $_methodKey = 'payment';
+    protected $_code;
 
     /**
      * @var Sellvana_Sales_Model_Order_Payment
@@ -71,9 +71,9 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return false;
     }
 
-    public function getKey()
+    public function getCode()
     {
-        return static::$_methodKey;
+        return $this->_code;
     }
 
     public function getName()
@@ -126,7 +126,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
 
     public function getCheckoutFormPrefix()
     {
-        return static::$_methodKey;
+        return $this->_code;
     }
 
     public function getCheckoutFormView()
@@ -149,7 +149,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
-    public function payOffline(Sellvana_Sales_Model_Order_Payment_Transaction $payment)
+    public function payOffline(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
         return [];
     }

@@ -8,7 +8,7 @@
     {{ THIS.view('core/messages') | raw }}
 
     {% if cancelableItems %}
-        <div {#method="post" action="{{ APP.href('cancels/create?id=' ~ order.id()) }}"#} id="cancel-create-container">
+        <div id="cancel-create-container">
             <h2>{{ 'Create a cancellation'|_ }}</h2>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -54,7 +54,7 @@
 
     {% if allCancellations %}
         <h2>{{ 'Existing Cancellations' }}</h2>
-        <div {#method="post" action="{{ APP.href('cancels/update?id=' ~ order.id()) }}"#} id="cancel-update-container">
+        <div id="cancel-update-container">
             <table class="table table-bordered table-striped dataTable">
                 <thead>
                 <tr>

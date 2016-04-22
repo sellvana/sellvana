@@ -1,5 +1,176 @@
-{% set m = THIS.get('model') %}
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').paymentsGridConfig(m) %}
+{% set order = THIS.get('model') %}
 
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
-{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
+{% set payableItems = order.getPayableItems() %}
+{% set allMethods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
+{% set allPayments = order.getAllPayments() %}
+
+<div class="f-section" id="order-container">
+
+    {{ THIS.view('core/messages') | raw }}
+
+    {% if payableItems %}
+        <div id="payment-create-container">
+            <h2>{{ 'Create a payment'|_ }}</h2>
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Product SKU'|_ }}</th>
+                    <th>{{ 'Inventory SKU'|_ }}</th>
+                    <th>{{ 'Product Name'|_ }}</th>
+                    <th>{{ 'Qty Ordered'|_ }}</th>
+                    <th>{{ 'Qty To Pay'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in payableItems %}
+                    <tr>
+                        <td>{{ i.get('product_sku') }}</td>
+                        <td>{{ i.get('inventory_sku') }}</td>
+                        <td>{{ i.get('product_name') }}</td>
+                        <td>{{ i.get('qty_ordered') }}</td>
+                        <td>
+                            <select name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
+                                <option value=""></option>
+                                {% set qtyCanPay = i.getQtyCanPay() %}
+                                {% for q in range(1, qtyCanPay) %}
+                                    <option value="{{ q }}" {{ q == qtyCanPay ? 'selected' }}>{{ q }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Method'|_ }}</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <td>
+                        <select name="payment[payment_method]" class="form-control input-sm" id="payment-payment_method">
+                            {% for m in allMethods %}
+                                <option value="{{ m.getCode() }}" {{ m.getCode() == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button id="btnPaymentCreate" data-container="#payment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if payableItems and allPayments %}
+        <hr>
+    {% endif %}
+
+    {% if not payableItems %}
+        {{ 'There are no items available for a new payment' | _ }}
+    {% endif %}
+
+    {% if allPayments %}
+        <h2>{{ 'Existing Payments' }}</h2>
+        <div id="payment-update-container">
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Method'|_ }}</th>
+                    <th>{{ 'Status'|_ }}</th>
+                    <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Items'|_ }}</th>
+                    <th>{{ 'Delete'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in allPayments %}
+                    {% set allOverallStates = s.state().overall().getAllValueLabels() %}
+                    {% set allCustomStates = s.state().custom().getAllValueLabels() %}
+                    <tr>
+                        <td>
+                            <p><strong>{{ allMethods[s.get('payment_method')].getName() }}</strong></p>
+                        </td>
+                        <td>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ s.state().overall().getValueLabel() }}</strong></p>
+                            {% if allCustomStates %}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="payments[{{ s.id() }}][state_custom]" class="form-control">
+                                        {{ UTIL.optionsHtml(allCustomStates, s.state().custom().getValue()) | raw }}
+                                    </select></p>
+                            {% endif %}
+                            {% for k, v in allOverallStates %}
+                                {% if k != s.get('state_overall') %}
+                                    <input type="button" name="payments[{{ s.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>{{ 'Created:'|_ }} <strong>{{ s.get('create_at')|locdate }}</strong></p>
+                        </td>
+                        <td>
+                            {% for i in s.items() %}
+                                <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Update'|_ }}</button></td>
+                    <td></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    require(['jquery', 'underscore'], function($, _) {
+        var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
+        var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-payments');
+
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        // Create payments or update payments data
+        container.unbind().on('click', '#btnPaymentCreate, #btnPaymentUpdate', function(ev) {
+            var postUrl = !ev.target.dataset.action ? paymentCreateUrl : paymentUpdateUrl;
+            var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
+            $.post(postUrl, serializeData, processPostResponse);
+        });
+
+        // Update payment status
+        container.on('click', '.js-payment-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(paymentUpdateUrl, postData, processPostResponse);
+        });
+    })
+</script>

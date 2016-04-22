@@ -294,10 +294,14 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         }
 
         // Carrier API is available only in production mode, so we must always use production access key
-        \EasyPost\EasyPost::setApiKey($config['access_key']);
-        $accounts = \EasyPost\CarrierAccount::all();
-        foreach ($accounts as $account) {
-            $services['_' . $account->readable] = $account->readable;
+        try {
+            \EasyPost\EasyPost::setApiKey($config['access_key']);
+            $accounts = \EasyPost\CarrierAccount::all();
+            foreach ($accounts as $account) {
+                $services['_' . $account->readable] = $account->readable;
+            }
+        } catch (Exception $e) {
+            $services = ['_' => 'Error: ' . $e->getMessage()];
         }
 
         return $services;

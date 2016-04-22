@@ -134,14 +134,14 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         $order = $args['order'];
         $packageId = $args['package_id'];
         $data = $args['data'];
-        $shipment = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
-        if (!$shipment || $shipment->get('order_id') != $order->id()) {
+        $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
+        if (!$package || $package->get('order_id') != $order->id()) {
             throw new BException('Invalid package to update');
         }
         if (isset($data['tracking_number'])) {
-            $shipment->set('tracking_number', $data['tracking_number']);
+            $package->set('tracking_number', $data['tracking_number']);
         }
-        $shipment->save();
+        $package->save();
     }
 
     public function action_adminDeletesShipment($args)
@@ -175,7 +175,9 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
      */
     public function action_adminMarksShipmentAsShipped($args)
     {
-        $args['shipment']->register()->save();
+        $args['shipment']->register();
+        $args['shipment']->state()->overall()->setShipped();
+        $args['shipment']->save();
 
         $args['shipment']->order()->state()->calcAllStates();
         $args['shipment']->order()->saveAllDetails();

@@ -2,10 +2,8 @@
 
 class Sellvana_PaymentOgone_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
-    function __construct()
-    {
-        $this->_name = 'Ogone';
-    }
+    protected $_code = 'ogone';
+    protected $_name = 'Ogone';
 
     public function getCheckoutFormView()
     {

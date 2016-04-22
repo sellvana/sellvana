@@ -9,6 +9,8 @@
 class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sales_Method_Payment_Abstract
 {
     protected static $_apiVersion = '72.0';
+
+    protected $_code = 'paypal_express';
     protected $_name = 'PayPal Express Checkout';
 
     protected $_transaction;

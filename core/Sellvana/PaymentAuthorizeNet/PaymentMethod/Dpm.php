@@ -8,7 +8,7 @@
 
 class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim
 {
-    static protected $_methodKey = "authorizenet_dpm";
+    protected $_code = "authorizenet_dpm";
 
     function __construct()
     {
@@ -18,7 +18,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->getView('authorizenet/dpm')->set('key', static::$_methodKey);
+        return $this->BLayout->getView('authorizenet/dpm')->set('key', $this->_code);
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)
@@ -117,7 +117,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
             $status = 'error';
         }
         $paymentData = [
-            'method'           => static::$_methodKey,
+            'method'           => $this->_code,
             'parent_id'        => $response->transaction_id,
             'order_id'         => $response->fp_sequence,
             'amount'           => $this->get('amount_due'),
