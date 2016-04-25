@@ -12,6 +12,7 @@
 class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
     const SERVICE_SHIP = 'Ship';
+    const SERVICE_TRACK = 'Track';
 
     protected $_name           = 'Universal post service';
     protected $_code           = 'ups';
@@ -549,8 +550,33 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 if (!$order) {
                     throw new BException('Invalid order');
                 }
-                
-                $data = $this->_fetchNewStates($shipment->get('tracking_number'));
+
+                $request['tracking_number'] = $trackingNumber;
+                $request['shipment_identification_number'] = $shipment->getData('shipment_identification_number');
+
+                //<-- Develop section
+                $str = '1Z12345E0205271688';
+                //$str = '1Z12345E6605272234';
+                //$str = '1Z12345E0305271640';
+                //$str = '1Z12345E0393657226';
+                //$str = '1Z12345E1305277940';
+                //$str = '1Z12345E6205277936';
+                //$str = '1Z12345E020527079';
+                //$str = '1Z12345E1505270452';
+                //$str = '990728071';
+                //$str = '3251026119';
+                //$str = '9102084383041101186729';
+                //$str = 'cgish000116630';
+                //$str = '1Z648616E192760718';
+                //$str = '5548789114';
+                //$str = 'ER751105042015062';
+                //$str = '1ZWX0692YP40636269';
+
+                $request['tracking_number'] = $str;
+                $request['shipment_identification_number'] = $str;
+                //Develop section -->
+
+                $data = $this->_fetchNewStates($request);
 
                 if ($data) {
                     $this->Sellvana_Sales_Main->workflowAction('adminUpdatesShipment', [
@@ -568,11 +594,52 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return false|array
+     * @throws BException
      */
-    protected function _fetchNewStates($data) {
-        //Todo: Here receiving tracking update with SOAP;
+    protected function _fetchNewStates($data)
+    {
+        try {
+            $client = $this->_getSoapClient(self::SERVICE_TRACK);
+            $request = [
+                'Request' => [
+                    'RequestOption' => '1',
+                    'TransactionReference' => [
+                        'CustomerContext' => 'Request of ' . $data['tracking_number']
+                    ],
+                ],
+                'TrackingNumber' => $data['tracking_number'],
+                'InquiryNumber' => $data['shipment_identification_number'],
+            ];
+            $result = $client->__soapCall('ProcessTrack', array($request));
+        } catch (SoapFault $e) {
+            $message = $e->getMessage();
+            if (property_exists($e, 'detail')) {
+                $message = $e->detail->Errors->ErrorDetail->PrimaryErrorCode->Description;
+            }
+            throw new BException($message);
+        }
+
+        if (!property_exists($result->Shipment, 'Package')){
+            throw new BException('Not implemented');
+        }
+
+        $activity = [];
+        $rActivity = $result->Shipment->Package->Activity;
+        if (!is_array($rActivity)){
+            $rActivity = [];
+            $rActivity[] = $result->Shipment->Package->Activity;
+        }
+        foreach ($rActivity as $item) {
+            $key = $item->Date . $item->Time;
+            $activity[$key] = $item->Status;
+        }
+        krsort($activity);
+
+        //TODO: Check to change state.
+        throw new BException('Not implemented');
+        
         /**
          * @var array $data
          *  - state_custom[]
