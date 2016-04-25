@@ -7,6 +7,7 @@
  * @property FCom_Core_Main $FCom_Core_Main
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
@@ -243,7 +244,6 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             throw new BException($message);
         }
 
-        $this->_getFilesFromResponse($result, $shipment);
         $shipmentResults = $result->ShipmentResults;
 
         $trackingNumber = '';
@@ -256,6 +256,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $package->setData('package_results', $shipmentResults->PackageResults);
             $package->save();
         }
+        $this->_getFilesFromResponse($result, $shipment->packages());
         $shipment->setData('shipment_results', $shipmentResults);
         $shipment->setData('shipment_identification_number', $shipmentResults->ShipmentIdentificationNumber);
     }
@@ -459,7 +460,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
             $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
             $label = [
-                'content' => $shipment->getShipmentFileContent($fileName),
+                'content' => $shipment->getFileContent($fileName),
                 'filename' => $fileName
             ];
 
@@ -471,9 +472,9 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
     /**
      * @param stdClass $response
-     * @param Sellvana_Sales_Model_Order_Shipment $shipment
+     * @param Sellvana_Sales_Model_Order_Shipment_Package[] $packages
      */
-    protected function _getFilesFromResponse(stdClass $response, Sellvana_Sales_Model_Order_Shipment $shipment)
+    protected function _getFilesFromResponse(stdClass $response, array $packages)
     {
         $files = [
             'label',
@@ -512,7 +513,9 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
             $fileContent = base64_decode($responseContent);
             if ($fileName && $fileContent) {
-                $shipment->putShipmentFile($fileName, $fileContent);
+                foreach ($packages as $package) {
+                    $package->putFile($fileName, $fileContent);
+                }
             }
         }
     }

@@ -65,4 +65,63 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
 
         return $this->$methodClass->canTrackingUpdate();
     }
+
+    /**
+     * @param $fileName
+     * @param $content
+     * @throws BException
+     */
+    public function putFile($fileName, $content)
+    {
+        $path = $this->getStoragePath() . '/' . $fileName;
+        if (!@file_put_contents($path, $content)){
+            throw new BException('Can\'t write file to package storage.');
+        }
+    }
+
+    /**
+     * @param $fileName
+     * @return string
+     * @throws BException
+     */
+    public function getFilePath($fileName)
+    {
+        $path = $this->getStoragePath() . '/' . $fileName;
+
+        if (!is_file($path)){
+            throw new BException('Requested file doesn\'t exist.' . $path);
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param $fileName
+     * @return string
+     * @throws BException
+     */
+    public function getFileContent($fileName)
+    {
+        $path = $this->getFilePath($fileName);
+
+        return @file_get_contents($path);
+    }
+
+    /**
+     * @return string
+     * @throws BException
+     */
+    public function getStoragePath()
+    {
+        if (null === $this->get('id')) {
+            throw new BException('Can\'t get package id.');
+        }
+
+        $randomPath = $this->BApp->storageRandomDir();
+        $path = $randomPath . '/order/shipment/' . $this->get('id') . '/' . $this->get('shipment_id');
+
+        $this->BUtil->ensureDir($path);
+
+        return $path;
+    }
 }

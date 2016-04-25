@@ -173,6 +173,9 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         foreach ($shipment->packages() as $package) {
             $package->set('tracking_number', $trackingNumber);
             $package->setData('completed_package_details', $shipmentDetail->CompletedPackageDetails);
+            if ($label = $this->getPackageLabel($package)) {
+
+            }
             $package->save();
         }
         $shipment->setData('completed_shipment_detail', $shipmentDetail);

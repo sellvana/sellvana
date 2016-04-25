@@ -148,7 +148,7 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return Sellvana_Sales_Model_Order_Shipment_Item[]
+     * @return Sellvana_Sales_Model_Order_Shipment_Package[]
      */
     public function packages()
     {
@@ -193,70 +193,28 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
         unset($this->_order, $this->_items, $this->_state);
     }
 
-    /**
-     * @param $fileName
-     * @param $content
-     * @throws BException
-     */
-    public function putShipmentFile($fileName, $content)
-    {
-        $path = $this->getShipmentStoragePath() . '/' . $fileName;
-        if (!@file_put_contents($path, $content)){
-            throw new BException('Can\'t write file to shipment storage.');
-        }
-    }
-
     public function onBeforeDelete()
     {
-        $this->deleteShipmentFiles();
+        $this->deleteFiles();
         return parent::onBeforeDelete();
     }
-
 
     /**
      * @return bool
      * @throws BException
      */
-    public function deleteShipmentFiles()
+    public function deleteFiles()
     {
-        $path = $this->getShipmentStoragePath();
+        $path = $this->getStoragePath();
 
         return $this->BFile->delTree($path);
     }
 
     /**
-     * @param $fileName
      * @return string
      * @throws BException
      */
-    public function getShipmentFilePath($fileName)
-    {
-        $path = $this->getShipmentStoragePath() . '/' . $fileName;
-
-        if (!is_file($path)){
-            throw new BException('Requested file don\'t exist.' . $path);
-        }
-
-        return $path;
-    }
-
-    /**
-     * @param $fileName
-     * @return string
-     * @throws BException
-     */
-    public function getShipmentFileContent($fileName)
-    {
-        $path = $this->getShipmentFilePath($fileName);
-
-        return @file_get_contents($path);
-    }
-
-    /**
-     * @return string
-     * @throws BException
-     */
-    public function getShipmentStoragePath()
+    public function getStoragePath()
     {
         if (null === $this->get('id')) {
             throw new BException('Can\'t get shipment id.');
