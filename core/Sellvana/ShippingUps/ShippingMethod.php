@@ -635,7 +635,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         krsort($activity);
 
         //TODO: Check to change state.
-        
+        throw new BException('Not implemented');
         
         /**
          * @var array $data
