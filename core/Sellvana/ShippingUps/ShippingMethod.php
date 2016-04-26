@@ -146,11 +146,17 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     </Shipment>
 </RatingServiceSelectionRequest>";
 
-        $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request, [], ['timeout' => 2]);
-
-        $parsed = new SimpleXMLElement($response);
-
         $result = [];
+        try {
+            $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request, [], ['timeout' => 2]);
+            $parsed = new SimpleXMLElement($response);
+        } catch (Exception $e) {
+            $result['error'] = 1;
+            $result['message'] = _('Couldn\'t get response from UPS');
+
+            return $result;
+        }
+
         if ($parsed->Response->ResponseStatusCode == 1) { //success
             $result['success'] = 1;
             foreach ($parsed->RatedShipment as $rate) {
@@ -199,10 +205,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             '_08' => 'Expedited',
             '_11' => 'UPS Standard',
             '_12' => '3 Day Select',
-            //'_13' => 'Next Day Air Saver',//
+            '_13' => 'Next Day Air Saver',//
             '_14' => 'UPS Next Day Air Early',
             '_54' => 'Express Plus',
-            //'_59' => '2nd Day Air A.M.',//
+            '_59' => '2nd Day Air A.M.',//
             '_65' => 'UPS Saver',
             '_M2' => 'First Class Mail',
             '_M3' => 'Priority Mail',
@@ -210,11 +216,11 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             '_M5' => 'Priority Mail Innovations',
             '_M6' => 'Economy Mail Innovations',
             '_70' => 'UPS Access Point Economy',
-            //'_82' => 'UPS Today Standard',//
-            //'_83' => 'UPS Today Dedicated Courier',//
-            //'_84' => 'UPS Today Intercity',//
-            //'_85' => 'UPS Today Express',//
-            //'_86' => 'UPS Today Express Saver',//
+            '_82' => 'UPS Today Standard',//
+            '_83' => 'UPS Today Dedicated Courier',//
+            '_84' => 'UPS Today Intercity',//
+            '_85' => 'UPS Today Express',//
+            '_86' => 'UPS Today Express Saver',//
             '_96' => 'UPS Worldwide Express Freight',
         ];
     }
@@ -236,6 +242,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $result = $client->__soapCall('ProcessShipment', array($this->_buildShipmentData($shipment)));
         } catch (SoapFault $e) {
             //$details = $e->detail;
+
             throw new BException($e->getMessage());
         }
 
@@ -252,12 +259,12 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             // while multi-package shipments aren't implemented, we will receive only one tracking number
             $trackingNumber = $shipmentResults->PackageResults->TrackingNumber;
         }
+        $this->_getFilesFromResponse($result, $shipment->packages());
         foreach ($shipment->packages() as $package) {
             $package->set('tracking_number', $trackingNumber);
             $package->setData('package_results', $shipmentResults->PackageResults);
             $package->save();
         }
-        $this->_getFilesFromResponse($result, $shipment->packages());
         $shipment->setData('shipment_results', $shipmentResults);
         $shipment->setData('shipment_identification_number', $shipmentResults->ShipmentIdentificationNumber);
     }
@@ -286,11 +293,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         ];
         $weight = $this->_data('weight') ?: $this->_data('shipping_weight');
         if (count($dimensions) !== 3) {
-            $result = [
-                'error' => 1,
-                'message' => 'Dimensions in wrong format',
-            ];
-            return $result;
+            throw new BException('Dimensions in wrong format');
         }
         $labelFormat = $this->getLabelFormats();
         $labelFormat = $labelFormat[$this->_data('shipping_label_format')];
@@ -459,9 +462,8 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         $fileName = $data['ShippingLabel']['GraphicImage'];
         if ($fileName) {
             /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
-            $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
             $label = [
-                'content' => $shipment->getFileContent($fileName),
+                'content' => $package->getFileContent($fileName),
                 'filename' => $fileName
             ];
 

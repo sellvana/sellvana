@@ -118,7 +118,7 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
         }
 
         $randomPath = $this->BApp->storageRandomDir();
-        $path = $randomPath . '/order/shipment/' . $this->get('id') . '/' . $this->get('shipment_id');
+        $path = $randomPath . '/order/shipment/' . $this->get('shipment_id') . '/' . $this->get('id');
 
         $this->BUtil->ensureDir($path);
 

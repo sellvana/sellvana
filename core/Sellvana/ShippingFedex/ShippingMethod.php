@@ -172,9 +172,10 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         }
         foreach ($shipment->packages() as $package) {
             $package->set('tracking_number', $trackingNumber);
-            $package->setData('completed_package_details', $shipmentDetail->CompletedPackageDetails);
+            $completedPackageDetails = json_decode(json_encode($shipmentDetail->CompletedPackageDetails), true);
+            $package->setData('completed_package_details', $completedPackageDetails);
             if ($label = $this->getPackageLabel($package)) {
-
+                $package->putFile('label.pdf', $label);
             }
             $package->save();
         }
