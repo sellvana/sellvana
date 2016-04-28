@@ -156,11 +156,16 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_packageOverallStates[$state];
-                $package->state()->overall()->$method();
+                if ($state != $package->state()->overall()->getValue()) {
+                    $method = static::$_packageOverallStates[$state];
+                    $package->state()->overall()->$method();
+                }
             }
         }
         $package->save();
+        $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
+        $shipment->state()->calcAllStates();
+        $shipment->save();
     }
 
     public function action_adminDeletesShipment($args)

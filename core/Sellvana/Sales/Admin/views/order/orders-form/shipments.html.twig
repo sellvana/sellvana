@@ -136,6 +136,7 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ LOCALE.datetimeDbToLocal(s.get('create_at'), constant('BLocale::FORMAT_SHORT_DATE')) }}</strong></p>
                         </td>
                         <td>
+                            {% set allowTracking = false %}
                             {% for p in s.packages() %}
                                 {% for i in p.items() %}
                                     <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
@@ -146,11 +147,16 @@
                                     <br>
                                 {% endif %}
                                 {% if p.canTrackingUpdate() and p.get('tracking_number') %}
-                                    <a href="{{ APP.href('shipments/updateTracking?id=' ~ order.id()) }}" class="js-shipment-update-tracking">{{ 'Receiving tracking updates'|_ }}</a>
+                                    {% set allowTracking = true %}
+                                    <a href="{{ APP.href('shipments/getPackageTracking?id=' ~ p.id()) }}" class="js-shipment-show-tracking">{{ 'Show tracking status'|_ }}</a>
                                     <br>
                                 {% endif %}
                                 <hr>
                             {% endfor %}
+                            {% if allowTracking %}
+                                <a href="{{ APP.href('shipments/updateTracking?id=' ~ order.id()) }}" class="js-shipment-update-tracking">{{ 'Receive tracking updates'|_ }}</a>
+                                <br>
+                            {% endif %}
                         </td>
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">

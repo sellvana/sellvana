@@ -550,12 +550,11 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
      */
     public function fetchTrackingUpdates($args)
     {
+        $states = [];
+
         try {
-            foreach ($args as $packageId => $trackingNumber) {
-                $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
-                if (!$package) {
-                    throw new BException('Invalid package');
-                }
+            foreach ($args as $packageId => $package) {
+                $trackingNumber = $package->get('tracking_number');
 
                 $order = $order = $this->Sellvana_Sales_Model_Order->load($package->get('order_id'));
                 if (!$order) {
@@ -573,10 +572,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 //<-- Develop section
                 //$str = '1Z12345E0205271688';
                 //$str = '1Z12345E6605272234';
-                $str = '1Z12345E0305271640';
+                //$str = '1Z12345E0305271640';
                 //$str = '1Z12345E0393657226';
                 //$str = '1Z12345E1305277940';
-                //$str = '1Z12345E6205277936';
+                $str = '1Z12345E6205277936';
                 //$str = '1Z12345E020527079';
                 //$str = '1Z12345E1505270452';
                 //$str = '990728071';
@@ -592,22 +591,13 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 $request['shipment_identification_number'] = $str;
                 //Develop section -->
 
-                $this->_fetchNewStates($request, $package);
-                $data = ['tracking_number' => $request['tracking_number']];
-
-                if ($data) {
-                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPackage', [
-                        'order' => $order,
-                        'package_id' => $packageId,
-                        'data' => $data,
-                    ]);
-                }
-
-                return ['message' => 'Success'];
+                $states[$packageId] = $this->_fetchNewStates($request, $package);
             }
         } catch (Exception $e) {
-            return ['error' => true, 'message' => $e->getMessage()];
+            return ['error' => true, 'message' => $e->getMessage(), 'states' => $states];
         }
+
+        return ['message' => 'Success', 'states' => $states];
     }
 
     /**
@@ -665,11 +655,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         krsort($activity);
         $package->setData('tracking_updates', $activity);
         $latestActivity = reset($activity);
+        $package->set('carrier_status', $latestActivity->Description);
         $upsStatus = isset($latestActivity->Type) ? $latestActivity->Type : $latestActivity->Description;
         if (array_key_exists($upsStatus, self::$_statusMapping)) {
-            return [
-                'state_overall' => [self::$_statusMapping[$upsStatus] => $latestActivity->Description]
-            ];
+            return [self::$_statusMapping[$upsStatus] => $latestActivity->Description];
         }
 
         return [];
