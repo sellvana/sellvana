@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
+ * @property Sellvana_Sales_Model_Order_Shipment_Package_State $Sellvana_Sales_Model_Order_Shipment_Package_State
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstract
@@ -17,6 +18,14 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
      */
     protected $_items;
 
+    /**
+     * @var Sellvana_Sales_Model_Order_Shipment_State
+     */
+    protected $_state;
+
+    /**
+     * @var Sellvana_Sales_Model_Order_Shipment
+     */
     protected $_shipment;
 
     /**
@@ -35,6 +44,16 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
         return $this->_items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Shipment_Package_State
+     */
+    public function state()
+    {
+        if (!$this->_state) {
+            $this->_state = $this->Sellvana_Sales_Model_Order_Shipment_Package_State->factory($this);
+        }
+        return $this->_state;
+    }
 
     public function label()
     {

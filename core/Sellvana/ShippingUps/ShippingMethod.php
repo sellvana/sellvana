@@ -6,6 +6,7 @@
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property FCom_Core_Main $FCom_Core_Main
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
+ * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
@@ -30,6 +31,14 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
      * @var array
      */
     protected $_clientCache = [];
+
+    protected static $_statusMapping = [
+        'D' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::DELIVERED,
+        'I' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::IN_TRANSIT,
+        'X' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::EXCEPTION,
+        'P' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::RECEIVED,
+        'M' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::PENDING
+    ];
 
     protected function _fetchRates($data)
     {
@@ -152,7 +161,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $parsed = new SimpleXMLElement($response);
         } catch (Exception $e) {
             $result['error'] = 1;
-            $result['message'] = _('Couldn\'t get response from UPS');
+            $result['message'] = $this->_('Couldn\'t get response from UPS');
 
             return $result;
         }
@@ -542,24 +551,29 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     public function fetchTrackingUpdates($args)
     {
         try {
-            foreach ($args as $shipmentId => $trackingNumber) {
-                $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($shipmentId);
-                if (!$shipment) {
-                    throw new BException('Invalid shipment');
+            foreach ($args as $packageId => $trackingNumber) {
+                $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
+                if (!$package) {
+                    throw new BException('Invalid package');
                 }
 
-                $order = $order = $this->Sellvana_Sales_Model_Order->load($shipment->get('order_id'));
+                $order = $order = $this->Sellvana_Sales_Model_Order->load($package->get('order_id'));
                 if (!$order) {
                     throw new BException('Invalid order');
+                }
+
+                $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
+                if (!$shipment) {
+                    throw new BException('Invalid shipment');
                 }
 
                 $request['tracking_number'] = $trackingNumber;
                 $request['shipment_identification_number'] = $shipment->getData('shipment_identification_number');
 
                 //<-- Develop section
-                $str = '1Z12345E0205271688';
+                //$str = '1Z12345E0205271688';
                 //$str = '1Z12345E6605272234';
-                //$str = '1Z12345E0305271640';
+                $str = '1Z12345E0305271640';
                 //$str = '1Z12345E0393657226';
                 //$str = '1Z12345E1305277940';
                 //$str = '1Z12345E6205277936';
@@ -578,12 +592,13 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 $request['shipment_identification_number'] = $str;
                 //Develop section -->
 
-                $data = $this->_fetchNewStates($request);
+                $this->_fetchNewStates($request, $package);
+                $data = ['tracking_number' => $request['tracking_number']];
 
                 if ($data) {
-                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesShipment', [
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPackage', [
                         'order' => $order,
-                        'shipment_id' => $shipmentId,
+                        'package_id' => $packageId,
                         'data' => $data,
                     ]);
                 }
@@ -597,10 +612,11 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
     /**
      * @param array $data
+     * @param Sellvana_Sales_Model_Order_Shipment_Package $package
      * @return false|array
      * @throws BException
      */
-    protected function _fetchNewStates($data)
+    protected function _fetchNewStates($data, Sellvana_Sales_Model_Order_Shipment_Package $package)
     {
         try {
             $client = $this->_getSoapClient(self::SERVICE_TRACK);
@@ -628,27 +644,34 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         }
 
         $activity = [];
-        $rActivity = $result->Shipment->Package->Activity;
+        $packageData = $result->Shipment->Package;
+        if (is_array($packageData)) {
+            foreach ($packageData as $pkg) {
+                if ($pkg->TrackingNumber == $data['tracking_number']) {
+                    $packageData = $pkg;
+                    break;
+                }
+            }
+        }
+        $rActivity = $packageData->Activity;
         if (!is_array($rActivity)){
             $rActivity = [];
-            $rActivity[] = $result->Shipment->Package->Activity;
+            $rActivity[] = $packageData->Activity;
         }
         foreach ($rActivity as $item) {
             $key = $item->Date . $item->Time;
             $activity[$key] = $item->Status;
         }
         krsort($activity);
+        $package->setData('tracking_updates', $activity);
+        $latestActivity = reset($activity);
+        $upsStatus = isset($latestActivity->Type) ? $latestActivity->Type : $latestActivity->Description;
+        if (array_key_exists($upsStatus, self::$_statusMapping)) {
+            return [
+                'state_overall' => [self::$_statusMapping[$upsStatus] => $latestActivity->Description]
+            ];
+        }
 
-        //TODO: Check to change state.
-        throw new BException('Not implemented');
-        
-        /**
-         * @var array $data
-         *  - state_custom[]
-         *      state => label
-         *  - state_overall[]
-         *      state => label
-         */
-        return false;
+        return [];
     }
 }

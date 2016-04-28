@@ -178,29 +178,34 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
             $orm = $this->Sellvana_Sales_Model_Order_Shipment_Package->orm('p')
                 ->inner_join('Sellvana_Sales_Model_Order_Shipment', ['s.id', '=', 'p.shipment_id'], 's')
                 ->where_in('p.id', $packagesIds)
-                ->select(['s.id', 's.carrier_code', 's.carrier_desc', 's.state_overall', 'p.tracking_number']);
+                ->select(['p.id', 's.carrier_code', 's.carrier_desc', 's.state_overall', 'p.tracking_number']);
 
             /** @var Sellvana_Sales_Model_Order_Shipment_Package[] $packageList */
             $packageList = $orm->find_many();
-            $packageIds = [];
-            $shipmentMethodDesc = [];
+            $packageTrackIds = [];
+            $carrierDescriptions = [];
             foreach ($packageList as $package) {
-                $shipmentMethodDesc[$package->get('carrier_code')] = $package->get('carrier_desc');
-                $packageIds[$package->get('carrier_code')][$package->get('id')] =  $package->get('tracking_number');
+                $carrierDescriptions[$package->get('carrier_code')] = $package->get('carrier_desc');
+
+                if (!isset($packageTrackIds[$package->get('carrier_code')])) {
+                    $packageTrackIds[$package->get('carrier_code')] = [];
+                }
+
+                $packageTrackIds[$package->get('carrier_code')][$package->get('id')] = $package->get('tracking_number');
             }
 
             $response = [];
-            foreach (array_keys($packageIds) as $methodName) {
+            foreach (array_keys($packageTrackIds) as $methodName) {
                 $method = $this->Sellvana_Sales_Main->getShippingMethodClassName($methodName);
-                $response[$methodName] = $this->$method->fetchTrackingUpdates($packageIds[$methodName]);
+                $response[$methodName] = $this->$method->fetchTrackingUpdates($packageTrackIds[$methodName]);
             }
-            $result['message'] = $this->_('Tracking updates has been received.');
+            $result['message'] = $this->_('Tracking updates have been received.');
 
             foreach ($response as $method => $data) {
                 if (isset($data['error']) && $data['error']) {
                     $result['error'] = $data['error'];
                     $result['message'] = 'Shipping method: "'
-                        . $shipmentMethodDesc[$method] . '" Response: "' . $data['message'] . '"';
+                        . $carrierDescriptions[$method] . '" Response: "' . $data['message'] . '"';
                 }
             }
             $result = array_merge($this->_resetOrderTabs($order), $result);

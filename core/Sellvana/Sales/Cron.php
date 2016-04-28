@@ -58,19 +58,19 @@ class Sellvana_Sales_Cron extends BClass
                     //Sellvana_Sales_Model_Order_Shipment_State_Overall::CANCELED,
                 ])
                 ->order_by_asc('s.carrier_code')
-                ->select(['s.id', 's.carrier_code', 's.state_overall', 'p.tracking_number']);
+                ->select(['p.id', 's.carrier_code', 's.state_overall', 'p.tracking_number']);
 
-            $packageIds = [];
+            $packageTrackIds = [];
             /** @var Sellvana_Sales_Model_Order_Shipment_Package[] $packageList */
             $packageList = $orm->find_many();
             foreach ($packageList as $package) {
-                $packageIds[$package->get('carrier_code')][$package->get('id')] =  $package->get('tracking_number');
+                $packageTrackIds[$package->get('carrier_code')][$package->get('id')] =  $package->get('tracking_number');
             }
 
             $response = [];
-            foreach (array_keys($packageIds) as $methodName) {
+            foreach (array_keys($packageTrackIds) as $methodName) {
                 $method = $this->Sellvana_Sales_Main->getShippingMethodClassName($methodName);
-                $response[$methodName] = $this->$method->fetchTrackingUpdates($packageIds[$methodName]);
+                $response[$methodName] = $this->$method->fetchTrackingUpdates($packageTrackIds[$methodName]);
             }
 
             return $response;
