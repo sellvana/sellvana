@@ -5,10 +5,13 @@
  *
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
+ * @property Sellvana_Sales_Model_Order_Shipment_Package_State $Sellvana_Sales_Model_Order_Shipment_Package_State
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstract
 {
+    use Sellvana_Sales_Model_Trait_OrderChild;
+
     protected static $_table = 'fcom_sales_order_shipment_package';
     protected static $_origClass = __CLASS__;
 
@@ -17,6 +20,14 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
      */
     protected $_items;
 
+    /**
+     * @var Sellvana_Sales_Model_Order_Shipment_State
+     */
+    protected $_state;
+
+    /**
+     * @var Sellvana_Sales_Model_Order_Shipment
+     */
     protected $_shipment;
 
     /**
@@ -35,6 +46,16 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
         return $this->_items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Shipment_Package_State
+     */
+    public function state()
+    {
+        if (!$this->_state) {
+            $this->_state = $this->Sellvana_Sales_Model_Order_Shipment_Package_State->factory($this);
+        }
+        return $this->_state;
+    }
 
     public function label()
     {
@@ -49,5 +70,79 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
         }
 
         return $this->$methodClass->getPackageLabel($this);
+    }
+
+    public function canTrackingUpdate()
+    {
+        if (!$this->_shipment) {
+            $this->_shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($this->get('shipment_id'));
+        }
+
+        $method = $this->_shipment->get('carrier_code');
+        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
+        if (!$methodClass) {
+            return false;
+        }
+
+        return $this->$methodClass->canTrackingUpdate();
+    }
+
+    /**
+     * @param $fileName
+     * @param $content
+     * @throws BException
+     */
+    public function putFile($fileName, $content)
+    {
+        $path = $this->getStoragePath() . '/' . $fileName;
+        if (!@file_put_contents($path, $content)){
+            throw new BException('Can\'t write file to package storage.');
+        }
+    }
+
+    /**
+     * @param $fileName
+     * @return string
+     * @throws BException
+     */
+    public function getFilePath($fileName)
+    {
+        $path = $this->getStoragePath() . '/' . $fileName;
+
+        if (!is_file($path)){
+            throw new BException('Requested file doesn\'t exist.' . $path);
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param $fileName
+     * @return string
+     * @throws BException
+     */
+    public function getFileContent($fileName)
+    {
+        $path = $this->getFilePath($fileName);
+
+        return @file_get_contents($path);
+    }
+
+    /**
+     * @return string
+     * @throws BException
+     */
+    public function getStoragePath()
+    {
+        if (null === $this->get('id')) {
+            throw new BException('Can\'t get package id.');
+        }
+
+        $randomPath = $this->BApp->storageRandomDir();
+        $path = $randomPath . '/order/shipment/' . $this->get('shipment_id') . '/' . $this->get('id');
+
+        $this->BUtil->ensureDir($path);
+
+        return $path;
     }
 }

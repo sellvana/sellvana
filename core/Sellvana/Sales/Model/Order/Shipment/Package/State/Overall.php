@@ -1,7 +1,9 @@
 <?php
 
-class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_Model_Order_State_Abstract
+class Sellvana_Sales_Model_Order_Shipment_Package_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
+    protected static $_origClass = __CLASS__;
+
     const NA = 'na',
         PENDING = 'pending',
         LABEL = 'label',
@@ -78,26 +80,27 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_M
         return $this->changeState(self::RETURNED);
     }
 
+    public function sendNotification($onUnset = false, $value = null)
+    {
+        return false;
+    }
+
+
+    /*
     public function calcState()
     {
-        /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
+        /** @var Sellvana_Sales_Model_Order_Shipment $shipment * /
         $shipment = $this->getContext()->getModel();
-        $currentState = ($this->getValue() !== '') ? $this->getValue() : $this->_defaultValue;
+        $order = $shipment->order();
 
-        $state = self::NA;
-        $orderedStates = array_keys($this->_valueLabels);
-        $statePriorities = array_flip($orderedStates);
-        $statePriorities[self::NA] = 999;
-        $statePriorities[self::EXCEPTION] = -1;
-        $orderedStates = array_flip($statePriorities);
+        $sItems = $shipment->items();
+        $oItems = $order->items();
 
-        foreach ($shipment->packages() as $package) {
-            $packageState = $package->state()->overall()->getValue();
-            $state = $orderedStates[min($statePriorities[$state], $statePriorities[$packageState])];
+        foreach ($sItems as $sItem) {
+            $oItem = $oItems[$sItem->get('order_item_id')];
         }
 
-        if ($statePriorities[$state] > $statePriorities[$currentState]) {
-            $this->changeState($state);
-        }
+        return $this;
     }
+    */
 }

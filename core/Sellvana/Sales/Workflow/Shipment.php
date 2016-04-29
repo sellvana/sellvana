@@ -22,6 +22,19 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         'canceled' => 'setCanceled',
     ];
 
+    static protected $_packageOverallStates = [
+        'na' => 'setNotApplicable',
+        'pending' => 'setPending',
+        'label' => 'setLabel',
+        'received' => 'setReceived',
+        'shipped' => 'setShipped',
+        'in_transit' => 'setInTransit',
+        'exception' => 'setException',
+        'delivered' => 'setDelivered',
+        'refused' => 'setRefused',
+        'returned' => 'setReturned',
+    ];
+
     public function action_adminCreatesShipment($args)
     {
         /** @var Sellvana_Sales_Model_Order $order */
@@ -141,7 +154,18 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         if (isset($data['tracking_number'])) {
             $package->set('tracking_number', $data['tracking_number']);
         }
+        if (isset($data['state_overall'])) {
+            foreach ($data['state_overall'] as $state => $_) {
+                if ($state != $package->state()->overall()->getValue()) {
+                    $method = static::$_packageOverallStates[$state];
+                    $package->state()->overall()->$method();
+                }
+            }
+        }
         $package->save();
+        $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
+        $shipment->state()->calcAllStates();
+        $shipment->save();
     }
 
     public function action_adminDeletesShipment($args)

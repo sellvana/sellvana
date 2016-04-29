@@ -136,6 +136,7 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ LOCALE.datetimeDbToLocal(s.get('create_at'), constant('BLocale::FORMAT_SHORT_DATE')) }}</strong></p>
                         </td>
                         <td>
+                            {% set allowTracking = false %}
                             {% for p in s.packages() %}
                                 {% for i in p.items() %}
                                     <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
@@ -143,9 +144,19 @@
                                 <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
                                 {% if p.label() %}
                                     <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
+                                    <br>
+                                {% endif %}
+                                {% if p.canTrackingUpdate() and p.get('tracking_number') %}
+                                    {% set allowTracking = true %}
+                                    <a href="{{ APP.href('shipments/getPackageTracking?id=' ~ p.id()) }}" class="js-shipment-show-tracking">{{ 'Show tracking status'|_ }}</a>
+                                    <br>
                                 {% endif %}
                                 <hr>
                             {% endfor %}
+                            {% if allowTracking %}
+                                <a href="{{ APP.href('shipments/updateTracking?id=' ~ order.id()) }}" class="js-shipment-update-tracking">{{ 'Receive tracking updates'|_ }}</a>
+                                <br>
+                            {% endif %}
                         </td>
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">
@@ -219,6 +230,16 @@
         container.on('click', '#btnShipmentGetRates', function(ev) {
             var serializeData = $(container).find('input, select').serializeArray();
             $.post(ratesUrl, serializeData, processPostResponse);
+        });
+
+        // Receiving tracking updates
+        container.on('click', '.js-shipment-update-tracking', function (ev) {
+            ev.preventDefault();
+            var $el = $(ev.target);
+            var shipmentUpdateTrackingUrl = $el.attr('href');
+            var serializeData = $el.parent().find('input, select').serializeArray();
+
+            $.post(shipmentUpdateTrackingUrl, serializeData, processPostResponse);
         });
 
         // Recalculate package weight

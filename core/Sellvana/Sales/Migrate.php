@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_6_5_0()
+    public function install__0_6_6_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -324,6 +324,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(20) not null default 'new'",
+                'state_carrier' => "varchar(20) not null default ''",
                 'state_custom' => "varchar(20) default null",
                 'carrier_code' => 'varchar(20)',
                 'service_code' => 'varchar(50)',
@@ -345,6 +346,7 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'IDX_state_overall' => '(state_overall)',
+                'IDX_state_carrier' => '(state_carrier)',
                 'IDX_state_custom' => '(state_custom)',
             ],
             BDb::CONSTRAINTS => [
@@ -358,6 +360,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_id' => 'int unsigned not null',
                 'shipment_id' => 'int unsigned not null',
                 'tracking_number' => 'varchar(50) default null',
+                'state_overall' => "varchar(20) not null default ''",
                 'carrier_status' => 'varchar(10) default null',
                 'data_serialized' => 'text',
             ],
@@ -2202,6 +2205,27 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderShipment, [
             BDb::COLUMNS => [
                 'service_code' => "varchar(50)"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_6_5_0__0_6_6_0()
+    {
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentPackage = $this->Sellvana_Sales_Model_Order_Shipment_Package->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'state_carrier' => "varchar(20) not null default ''"
+            ],
+            BDb::KEYS => [
+                'IDX_state_carrier' => '(state_carrier)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipmentPackage, [
+            BDb::COLUMNS => [
+                'state_overall' => "varchar(20) not null default ''"
             ]
         ]);
     }

@@ -6,6 +6,9 @@ modules:
         description: "Universal Post Service shipping module"
         auto_use: [ bootstrap ]
 
+        observe:
+            - [ Sellvana_Sales_Model_Order_Shipment_State_Overall::changeState, Sellvana_ShippingUps_Main.onShipmentStateChange ]
+
         areas:
             FCom_Admin:
                 auto_use: [ views, layout ]
@@ -21,4 +24,5 @@ modules:
                     max_package_weight: 150
                     production_mode: 0
                     sort_order: 10
-                    default_service: '03'
+                    #default_service: '_03'
+                    shipping_label_format: '_04'

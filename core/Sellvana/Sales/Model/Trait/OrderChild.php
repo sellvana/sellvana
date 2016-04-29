@@ -34,6 +34,8 @@ trait Sellvana_Sales_Model_Trait_OrderChild
             $entityType = 'return';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Shipment) {
             $entityType = 'shipment';
+        } elseif ($this instanceof Sellvana_Sales_Model_Order_Shipment_Package) {
+            $entityType = 'package';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Comment) {
             $entityType = 'comment';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Item) {

@@ -10,9 +10,10 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
     const SERVICE_RATE = 'Rate';
     const SERVICE_SHIP = 'Ship';
 
-    protected $_name       = 'FedEx';
-    protected $_code       = 'fedex';
-    protected $_configPath = 'modules/Sellvana_ShippingFedex';
+    protected $_name           = 'FedEx';
+    protected $_code           = 'fedex';
+    protected $_configPath     = 'modules/Sellvana_ShippingFedex';
+    protected $_trackingUpdate = true;
 
     /**
      * @var null
@@ -171,7 +172,11 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         }
         foreach ($shipment->packages() as $package) {
             $package->set('tracking_number', $trackingNumber);
-            $package->setData('completed_package_details', $shipmentDetail->CompletedPackageDetails);
+            $completedPackageDetails = json_decode(json_encode($shipmentDetail->CompletedPackageDetails), true);
+            $package->setData('completed_package_details', $completedPackageDetails);
+            if ($label = $this->getPackageLabel($package)) {
+                $package->putFile('label.pdf', $label);
+            }
             $package->save();
         }
         $shipment->setData('completed_shipment_detail', $shipmentDetail);
@@ -395,7 +400,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
                 ],
                 'DocumentContent' => 'NON_DOCUMENTS',
                 'CustomsValue' => [
-                    'Amount' => $this->_data('amount'),
+                    'Amount' => null === $this->_data('amount') ? 0.00 : $this->_data('amount'),
                     'Currency' => $this->BConfig->get('modules/FCom_Core/base_currency'),
                 ],
                 'Commodities' => [],

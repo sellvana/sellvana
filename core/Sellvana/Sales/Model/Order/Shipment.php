@@ -8,8 +8,8 @@
  * @property Sellvana_Sales_Model_Order_Shipment_State $Sellvana_Sales_Model_Order_Shipment_State
  * @property Sellvana_Sales_Model_Order_Shipment_Package $Sellvana_Sales_Model_Order_Shipment_Package
  * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
+ * @property BFile $BFile
  */
-
 class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
 {
     use Sellvana_Sales_Model_Trait_OrderChild;
@@ -148,7 +148,7 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return Sellvana_Sales_Model_Order_Shipment_Item[]
+     * @return Sellvana_Sales_Model_Order_Shipment_Package[]
      */
     public function packages()
     {
@@ -191,5 +191,40 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
     {
         parent::__destruct();
         unset($this->_order, $this->_items, $this->_state);
+    }
+
+    public function onBeforeDelete()
+    {
+        $this->deleteFiles();
+        return parent::onBeforeDelete();
+    }
+
+    /**
+     * @return bool
+     * @throws BException
+     */
+    public function deleteFiles()
+    {
+        $path = $this->getStoragePath();
+
+        return $this->BFile->delTree($path);
+    }
+
+    /**
+     * @return string
+     * @throws BException
+     */
+    public function getStoragePath()
+    {
+        if (null === $this->get('id')) {
+            throw new BException('Can\'t get shipment id.');
+        }
+
+        $randomPath = $this->BApp->storageRandomDir();
+        $path = $randomPath . '/order/shipment/' . $this->get('id');
+
+        $this->BUtil->ensureDir($path);
+
+        return $path;
     }
 }

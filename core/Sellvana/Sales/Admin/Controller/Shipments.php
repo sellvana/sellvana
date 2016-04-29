@@ -148,10 +148,89 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
             $result['message'] = $e->getMessage();
         }
 
+        $order->set('shipping_method', $method);
+
         $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set([
             'model' => $order,
             'rates'=> $rates,
         ]);
+        $this->BResponse->json($result);
+    }
+
+    public function action_updateTracking__POST()
+    {
+        $result = [];
+        try {
+            $orderId = (int)$this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $packageData = $this->BRequest->post('packages');
+            if (null !== $packageData && !is_array($packageData)) {
+                throw new BException('Invalid packages data');
+            }
+
+            $packagesIds = array_keys($packageData);
+
+            $orm = $this->Sellvana_Sales_Model_Order_Shipment_Package->orm('p')
+                ->inner_join('Sellvana_Sales_Model_Order_Shipment', ['s.id', '=', 'p.shipment_id'], 's')
+                ->where_in('p.id', $packagesIds)
+                ->select(['p.id', 'p.order_id', 'p.shipment_id', 's.carrier_code', 's.carrier_desc', 's.state_overall', 'p.tracking_number']);
+
+            /** @var Sellvana_Sales_Model_Order_Shipment_Package[] $packageList */
+            $packageList = $orm->find_many();
+            /** @var Sellvana_Sales_Model_Order_Shipment_Package[][] $packages */
+            $packages = [];
+            $carrierDescriptions = [];
+            foreach ($packageList as $package) {
+                $carrierDescriptions[$package->get('carrier_code')] = $package->get('carrier_desc');
+
+                if (!isset($packages[$package->get('carrier_code')])) {
+                    $packages[$package->get('carrier_code')] = [];
+                }
+
+                $packages[$package->get('carrier_code')][$package->get('id')] = $package;
+            }
+
+            $response = [];
+            foreach (array_keys($packages) as $methodName) {
+                $method = $this->Sellvana_Sales_Main->getShippingMethodClassName($methodName);
+                $response[$methodName] = $this->$method->fetchTrackingUpdates($packages[$methodName]);
+                foreach ($packages[$methodName] as $package) {
+                    $data = ['tracking_number' => $package->get('tracking_number')];
+                    if (array_key_exists($package->id(), $response[$methodName]['states'])) {
+                        $data['state_overall'] = $response[$methodName]['states'][$package->id()];
+                    }
+
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPackage', [
+                        'order' => $order,
+                        'package_id' => $package->id(),
+                        'data' => $data,
+                    ]);
+
+                    $package->save();
+                }
+            }
+            $result['message'] = $this->_('Tracking updates have been received.');
+
+            foreach ($response as $method => $data) {
+                if (isset($data['error']) && $data['error']) {
+                    $result['error'] = $data['error'];
+                    $result['message'] = 'Shipping method: "'
+                        . $carrierDescriptions[$method] . '" Response: "' . $data['message'] . '"';
+                }
+            }
+            $result = array_merge($this->_resetOrderTabs($order), $result);
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
+
         $this->BResponse->json($result);
     }
 
@@ -161,6 +240,13 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
         $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->load($packageId);
         $label = $package->label();
 
-        $this->BResponse->sendContent($label, 'shipmentLabel.pdf');
+        $fileName = 'shipmentLabel.pdf';
+
+        if (is_array($label)){
+            $fileName = $label['filename'];
+            $label = $label['content'];
+        }
+        
+        $this->BResponse->sendContent($label, $fileName);
     }
 }
