@@ -53,14 +53,6 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
 
     }
 
-    public function action_adminCreatesRMA($args)
-    {
-    }
-
-    public function action_adminApprovesRMA($args)
-    {
-    }
-
     public function action_adminReturnsOrderItems($args)
     {
         /** @var Sellvana_Sales_Model_Order_Return $returnModel */
@@ -76,7 +68,7 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         foreach ($args['items'] as $item) {
             $qtyToReturn = min($item->getQtyCanReturn(), $item->get('qty_to_return'));
 
-            $item->add('qty_returned', $qtyToReturn);
+            $item->add('qty_in_returns', $qtyToReturn);
 
             $this->Sellvana_Sales_Model_Order_Return_Item->create([
                 'order_id' => $args['order']->id(),

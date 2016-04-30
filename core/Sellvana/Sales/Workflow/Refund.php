@@ -25,7 +25,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         foreach ($args['items'] as $item) {
             $qtyToRefund = min($item->getQtyCanRefund(), $item->get('qty_to_refund'));
 
-            $item->add('qty_refunded', $qtyToRefund);
+            $item->add('qty_in_refunds', $qtyToRefund);
 
             $this->Sellvana_Sales_Model_Order_Refund_Item->create([
                 'order_id' => $args['order']->id(),

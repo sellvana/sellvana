@@ -159,7 +159,7 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
         return $this->_packages;
     }
 
-    public function register()
+    public function register($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -167,13 +167,13 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
 
         foreach ($shipmentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add('qty_shipped', $sItem->get('qty'));
+            $oItem->add($done ? 'qty_shipped' : 'qty_in_shipments', $sItem->get('qty'));
         }
 
         return $this;
     }
 
-    public function unregister()
+    public function unregister($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -181,7 +181,7 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
 
         foreach ($shipmentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add('qty_shipped', -$sItem->get('qty'));
+            $oItem->add($done ? 'qty_shipped' : 'qty_in_shipments', -$sItem->get('qty'));
         }
 
         return $this;

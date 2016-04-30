@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_6_6_0()
+    public function install__0_6_7_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -296,11 +296,18 @@ class Sellvana_Sales_Migrate extends BClass
 
                 'qty_ordered' => 'int not null',
                 'qty_backordered' => 'int not null default 0',
+
                 'qty_canceled' => 'int not null default 0',
                 'qty_shipped' => 'int not null default 0',
                 'qty_returned' => 'int not null default 0',
                 'qty_paid' => 'int not null default 0',
                 'qty_refunded' => 'int not null default 0',
+
+                'qty_in_cancels' => 'int not null default 0',
+                'qty_in_shipments' => 'int not null default 0',
+                'qty_in_returns' => 'int not null default 0',
+                'qty_in_payments' => 'int not null default 0',
+                'qty_in_refunds' => 'int not null default 0',
 
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
@@ -2229,13 +2236,48 @@ class Sellvana_Sales_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_6_6_0__0_6_7_0()
+    {
+        $hlpOrderItem = $this->Sellvana_Sales_Model_Order_Item;
+        $tOrderItem = $hlpOrderItem->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                /*
+                'qty_shipped' => 'RENAME qty_in_shipments int not null default 0',
+                'qty_canceled' => 'RENAME qty_in_cancels int not null default 0',
+                'qty_returned' => 'RENAME qty_in_returns int not null default 0',
+                'qty_paid' => 'RENAME qty_in_payments int not null default 0',
+                'qty_refunded' => 'RENAME qty_in_refunds int not null default 0',
+                 */
+                'qty_in_cancels' => 'int not null default 0',
+                'qty_in_shipments' => 'int not null default 0',
+                'qty_in_returns' => 'int not null default 0',
+                'qty_in_payments' => 'int not null default 0',
+                'qty_in_refunds' => 'int not null default 0',
+            ],
+        ]);
+
+        $hlpOrderItem->run_sql("UPDATE {$tOrderItem} SET qty_in_cancels=qty_canceled, qty_in_shipments=qty_shipped, 
+                                qty_in_returns=qty_returned, qty_in_payments=qty_paid, qty_in_refunds=qty_refunded");
+    }
 }
 
+/**
+ * Class Sellvana_Sales_Migrate_Model_Cart_Address
+ *
+ * This class is a stub to allow deletion of old table
+ */
 class Sellvana_Sales_Migrate_Model_Cart_Address extends BModel
 {
     protected static $_table = 'fcom_sales_cart_address';
 }
 
+/**
+ * Class Sellvana_Sales_Migrate_Model_Cart_Address
+ *
+ * This class is a stub to allow deletion of old table
+ */
 class Sellvana_Sales_Migrate_Model_Order_Address extends BModel
 {
     protected static $_table = 'fcom_sales_order_address';

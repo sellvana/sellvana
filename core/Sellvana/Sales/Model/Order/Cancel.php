@@ -92,7 +92,7 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function register()
+    public function register($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -100,13 +100,13 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
 
         foreach ($cancelItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_canceled', $cItem->get('qty'));
+            $oItem->add($done ? 'qty_canceled' : 'qty_in_cancels', $cItem->get('qty'));
         }
 
         return $this;
     }
 
-    public function unregister()
+    public function unregister($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -114,7 +114,7 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
 
         foreach ($cancelItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_canceled', -$cItem->get('qty'));
+            $oItem->add($done ? 'qty_canceled' : 'qty_in_cancels', -$cItem->get('qty'));
         }
 
         return $this;

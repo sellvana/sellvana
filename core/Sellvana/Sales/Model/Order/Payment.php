@@ -289,12 +289,12 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $orderItems = $this->order()->items();
         foreach ($this->items() as $oItemId => $pItem) {
             $oItem = $orderItems[$oItemId];
-            $oItem->set('qty_paid', $oItem->get('qty_ordered'));
+            $oItem->set('qty_in_payments', $oItem->get('qty_ordered'));
         }
         return $this;
     }
 
-    public function register()
+    public function register($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -302,13 +302,13 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($paymentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add('qty_paid', $sItem->get('qty'));
+            $oItem->add($done ? 'qty_paid' : 'qty_in_payments', $sItem->get('qty'));
         }
 
         return $this;
     }
 
-    public function unregister()
+    public function unregister($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -316,7 +316,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($paymentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add('qty_paid', -$sItem->get('qty'));
+            $oItem->add($done ? 'qty_paid' : 'qty_in_payments', -$sItem->get('qty'));
         }
 
         return $this;

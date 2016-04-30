@@ -116,7 +116,7 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function register()
+    public function register($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -124,13 +124,13 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
 
         foreach ($returnItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_returned', $cItem->get('qty'));
+            $oItem->add($done ? 'qty_returned' : 'qty_in_returns', $cItem->get('qty'));
         }
 
         return $this;
     }
 
-    public function unregister()
+    public function unregister($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -138,7 +138,7 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
 
         foreach ($returnItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_returned', -$cItem->get('qty'));
+            $oItem->add($done ? 'qty_returned' : 'qty_in_returns', -$cItem->get('qty'));
         }
 
         return $this;

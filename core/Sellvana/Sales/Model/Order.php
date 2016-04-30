@@ -557,7 +557,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $shipments = $this->shipments();
         foreach ($shipments as $shipment) {
-            $shipment->register();
+            $shipment->register(true);
             $shipment->state()->overall()->setShipped();
             $shipment->save();
         }

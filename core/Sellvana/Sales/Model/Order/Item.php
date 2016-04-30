@@ -69,34 +69,34 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getQtyCanPay()
     {
-        return $this->get('qty_ordered') - $this->get('qty_paid') - $this->get('qty_canceled');
+        return $this->get('qty_ordered') - $this->get('qty_in_payments') - $this->get('qty_in_cancels');
     }
 
     public function getQtyCanBackorder()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') - $this->get('qty_in_cancels')
                 - $this->get('qty_backordered');
     }
 
     public function getQtyCanShip()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') - $this->get('qty_in_cancels')
                 - $this->get('qty_backordered');
     }
 
     public function getQtyCanCancel()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') -  $this->get('qty_canceled');
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') -  $this->get('qty_in_cancels');
     }
 
     public function getQtyCanReturn()
     {
-        return $this->get('qty_shipped') - $this->get('qty_returned');
+        return $this->get('qty_in_shipments') - $this->get('qty_in_returns');
     }
 
     public function getQtyCanRefund()
     {
-        return $this->get('qty_paid') - $this->get('qty_refunded');
+        return $this->get('qty_in_payments') - $this->get('qty_in_refunds');
     }
 
     /**
@@ -107,10 +107,10 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         if ($qty === null) {
             $qty = $this->get('qty_ordered');
         } else {
-            $qty = min($this->get('qty_paid') + $qty, $this->get('qty_ordered'));
+            $qty = min($this->get('qty_in_payments') + $qty, $this->get('qty_ordered'));
         }
 
-        $this->set('qty_paid', $qty);
+        $this->set('qty_in_payments', $qty);
     }
 
     public function __destruct()
