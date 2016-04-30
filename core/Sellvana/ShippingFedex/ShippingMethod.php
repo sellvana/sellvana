@@ -384,7 +384,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             ],
         ];
 
-        if ($shipment && $this->BConfig->get("modules/Sellvana_Sales/store_country") !== ('to_country')) {
+        if ($shipment && $this->BConfig->get("modules/Sellvana_Sales/store_country") !== $this->_data('to_country')) {
             $request['RequestedShipment']['CustomsClearanceDetail'] = [
                 'DutiesPayment' => [
                     'PaymentType' => 'SENDER',
