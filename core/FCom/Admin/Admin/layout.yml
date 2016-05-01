@@ -27,9 +27,9 @@ base:
 
             - [ requireJs, jquery.equalHeights, "@FCom_LibJsCommon/js/jquery.equalHeights", { deps: [ jquery ] } ]
 
-            - [ requireJs, fcom.admin, "@FCom_Admin/Admin/js/fcom.admin" ]
+            - [ requireJs, fcom.admin, "@FCom_Admin/Admin/js/fcom/fcom.admin" ]
             - [ requireJs, fcom.admin.dynatree, "@FCom_Admin/Admin/js/fcom/fcom.admin.dynatree" ]
-            - [ requireJs, fcom.admin.form, "@FCom_Admin/Admin/js/fcom.admin.form" ]
+            - [ requireJs, fcom.admin.form, "@FCom_Admin/Admin/js/fcom/fcom.admin.form" ]
             - [ requireRun, fcom.admin ]
 
             #- [ requireJs, dynatree, "@FCom_Admin/Admin/js/dynatree/jquery.dynatree.min", { deps: [ jquery ] } ]

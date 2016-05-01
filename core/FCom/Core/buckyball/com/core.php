@@ -75,6 +75,7 @@
  * @property BDebug $BDebug
  * @property BLoginThrottle $BLoginThrottle
  * @property BYAML $BYAML
+ * @property Toml $Toml
  * @property BValidate $BValidate
  * @property BValidateViewHelper $BValidateViewHelper
  * @property Bcrypt $Bcrypt
@@ -706,6 +707,10 @@ class BConfig extends BClass
 
             case 'yml':
                 $config = $this->BYAML->load($filename);
+                break;
+            
+            case 'toml':
+                $config = $this->Toml->parse(file_get_contents($filename));
                 break;
 
             case 'json':

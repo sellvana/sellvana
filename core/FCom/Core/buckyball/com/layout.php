@@ -732,6 +732,9 @@ class BLayout extends BClass
                 }
                 $layoutData = include($layoutFilename);
                 break;
+            case 'toml':
+                $layoutData = $this->Toml->parse(file_get_contents($layoutFilename));
+                break;
             default:
                 throw new BException('Unknown layout file type: ' . $layoutFilename);
         }

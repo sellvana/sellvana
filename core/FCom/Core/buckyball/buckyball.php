@@ -32,11 +32,12 @@ define('BUCKYBALL_ROOT_DIR', __DIR__);
 
 $comDir = __DIR__ . '/com/';
 #$t = microtime(true);
+require_once $comDir . 'lib/Toml.php';
+require_once $comDir . 'lib/idiorm.php';
+require_once $comDir . 'lib/paris.php';
 require_once $comDir . 'core.php';
 require_once $comDir . 'misc.php';
 require_once $comDir . 'locale.php';
-require_once $comDir . 'lib/idiorm.php';
-require_once $comDir . 'lib/paris.php';
 require_once $comDir . 'db.php';
 require_once $comDir . 'cache.php';
 require_once $comDir . 'module.php';
