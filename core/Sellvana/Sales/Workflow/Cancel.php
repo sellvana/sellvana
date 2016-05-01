@@ -18,14 +18,6 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         'complete'  => 'setComplete',
     ];
 
-    static protected $_stateRegistration = [
-        'requested' => false,
-        'pending'   => true,
-        'approved'  => true,
-        'declined'  => false,
-        'complete'  => true,
-    ];
-
     public function action_customerRequestsToCancelItems($args)
     {
         /** @var Sellvana_Sales_Model_Order $order */
@@ -111,9 +103,10 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Cancel $cancel */
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->create($data);
         $cancel->importFromOrder($order, $qtys);
-        $cancel->register();
         $cancel->state()->overall()->setApproved();
+        $cancel->save();
 
+        $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -134,19 +127,12 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
                 $method = static::$_overallStates[$state];
-                $oldState = $cancel->state()->overall()->getValue();
                 $cancel->state()->overall()->$method();
-
-                if (self::$_stateRegistration[$oldState] != self::$_stateRegistration[$state]) {
-                    if (self::$_stateRegistration[$state]) {
-                        $cancel->register();
-                    } else {
-                        $cancel->unregister();
-                    }
-                }
             }
         }
         $cancel->save();
+
+        $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -160,10 +146,9 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
             throw new BException('Invalid shipment to delete');
         }
-        if (self::$_stateRegistration[$cancel->state()->overall()->getValue()]) {
-            $cancel->unregister();
-        }
         $cancel->delete();
+
+        $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

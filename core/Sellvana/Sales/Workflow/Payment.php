@@ -176,7 +176,8 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $this->Sellvana_Sales_Model_Order_Payment->create($data);
         $payment->importFromOrder($order, $qtys);
-        $payment->register();
+
+        $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -230,7 +231,9 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         if (!$payment || $payment->get('order_id') != $order->id()) {
             throw new BException('Invalid payment to delete');
         }
-        $payment->unregister()->delete();
+        $payment->delete();
+
+        $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

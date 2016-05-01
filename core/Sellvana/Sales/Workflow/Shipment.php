@@ -101,18 +101,14 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
                 }
 
                 $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create();
-                $shipment->importFromOrder($order, $packQtys);
-                $shipment->set($packageData);
-                $shipment->register();
-                $shipment->save();
+                $shipment->importFromOrder($order, $packQtys)->set($packageData)->save();
             }
         } else {
             $shipment = $this->Sellvana_Sales_Model_Order_Shipment->create();
-            $shipment->importFromOrder($order, $qtys);
-            $shipment->set($data);
-            $shipment->register();
-            $shipment->save();
+            $shipment->importFromOrder($order, $qtys)->set($data)->save();
         }
+
+        $order->calcItemQuantities('shipments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -177,7 +173,9 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         if (!$shipment || $shipment->get('order_id') != $order->id()) {
             throw new BException('Invalid shipment to delete');
         }
-        $shipment->unregister()->delete();
+        $shipment->delete();
+
+        $order->calcItemQuantities('shipments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -199,11 +197,14 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
      */
     public function action_adminMarksShipmentAsShipped($args)
     {
-        $args['shipment']->register();
-        $args['shipment']->state()->overall()->setShipped();
-        $args['shipment']->save();
+        $shipment = $args['shipment'];
+        $order = $shipment->order();
 
-        $args['shipment']->order()->state()->calcAllStates();
-        $args['shipment']->order()->saveAllDetails();
+        $shipment->state()->overall()->setShipped();
+        $shipment->save();
+
+        $order->calcItemQuantities('shipments');
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
     }
 }

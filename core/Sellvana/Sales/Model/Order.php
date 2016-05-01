@@ -41,6 +41,12 @@
  * @property Sellvana_Sales_Model_Order_Return $Sellvana_Sales_Model_Order_Return
  * @property Sellvana_Sales_Model_Order_Refund $Sellvana_Sales_Model_Order_Refund
  * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
+ *
+ * @property Sellvana_Sales_Model_Order_Cancel_Item $Sellvana_Sales_Model_Order_Cancel_Item
+ * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
+ * @property Sellvana_Sales_Model_Order_Payment_Item $Sellvana_Sales_Model_Order_Payment_Item
+ * @property Sellvana_Sales_Model_Order_Return_Item $Sellvana_Sales_Model_Order_Return_Item
+ * @property Sellvana_Sales_Model_Order_Refund_Item $Sellvana_Sales_Model_Order_Refund_Item
  */
 class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
@@ -539,6 +545,38 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param array $types [shipments, payments, cancels, returns, refunds]
+     * @return $this
+     */
+    public function calcItemQuantities($types = null)
+    {
+        $types = (array)$types;
+        $qtys = [];
+        if (null === $types || in_array('shipments', $types)) {
+            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Shipment_Item->getOrderItemsQtys());
+        }
+        if (null === $types || in_array('payments', $types)) {
+            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Payment_Item->getOrderItemsQtys());
+        }
+        if (null === $types || in_array('cancels', $types)) {
+            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Cancel_Item->getOrderItemsQtys());
+        }
+        if (null === $types || in_array('returns', $types)) {
+            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Return_Item->getOrderItemsQtys());
+        }
+        if (null === $types || in_array('refunds', $types)) {
+            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Refund_Item->getOrderItemsQtys());
+        }
+
+        foreach ($this->items() as $itemId => $item) {
+            if (!empty($qtys[$itemId])) {
+                $item->set($qtys[$itemId]);
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Save order with items and other details
      *
      * @param array $options
@@ -557,10 +595,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $shipments = $this->shipments();
         foreach ($shipments as $shipment) {
-            $shipment->register(true);
             $shipment->state()->overall()->setShipped();
             $shipment->save();
         }
+        $this->calcItemQuantities('shipments');
         $this->state()->calcAllStates();
         $this->saveAllDetails();
     }

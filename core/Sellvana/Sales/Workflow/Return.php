@@ -108,9 +108,10 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Return $return */
         $return = $this->Sellvana_Sales_Model_Order_Return->create($data);
         $return->importFromOrder($order, $qtys);
-        $return->register();
         $return->state()->overall()->setApproved();
+        $return->save();
 
+        $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -133,17 +134,11 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
                 $method = static::$_overallStates[$state];
                 $oldState = $return->state()->overall()->getValue();
                 $return->state()->overall()->$method();
-
-                if (self::$_stateRegistration[$oldState] != self::$_stateRegistration[$state]) {
-                    if (self::$_stateRegistration[$state]) {
-                        $return->register();
-                    } else {
-                        $return->unregister();
-                    }
-                }
             }
         }
         $return->save();
+
+        $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -157,10 +152,9 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
             throw new BException('Invalid shipment to delete');
         }
-        if (self::$_stateRegistration[$cancel->state()->overall()->getValue()]) {
-            $cancel->unregister();
-        }
         $cancel->delete();
+
+        $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
