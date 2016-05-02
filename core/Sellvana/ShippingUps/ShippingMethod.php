@@ -252,7 +252,11 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         } catch (SoapFault $e) {
             //$details = $e->detail;
 
-            throw new BException($e->getMessage());
+            $message = $e->getMessage();
+            if (isset($e->detail->Errors->ErrorDetail->PrimaryErrorCode->Description)) {
+                $message .= ' ' . $e->detail->Errors->ErrorDetail->PrimaryErrorCode->Description;
+            }
+            throw new BException($message);
         }
 
         if ($result->Response->ResponseStatus->Code != 1) {
