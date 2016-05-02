@@ -31,6 +31,11 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
     protected $_shipment;
 
     /**
+     * @var Sellvana_Sales_Method_Shipping_Abstract
+     */
+    protected $_shippingMethod;
+
+    /**
      * @return Sellvana_Sales_Model_Order_Shipment_Item[]
      */
     public function items()
@@ -57,34 +62,54 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
         return $this->_state;
     }
 
-    public function label()
+    /**
+     * @return bool|Sellvana_Sales_Method_Shipping_Abstract
+     * @throws BException
+     */
+    public function shippingMethod()
     {
-        if (!$this->_shipment) {
-            $this->_shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($this->get('shipment_id'));
+        if (!$this->_shippingMethod) {
+            if (!$this->_shipment) {
+                $this->_shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($this->get('shipment_id'));
+            }
+
+            $method = $this->_shipment->get('carrier_code');
+            $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
+            if (!$methodClass) {
+                return false;
+            }
+
+            $this->_shippingMethod = $this->$methodClass;
         }
 
-        $method = $this->_shipment->get('carrier_code');
-        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
-        if (!$methodClass) {
+        return $this->_shippingMethod;
+    }
+
+    public function label()
+    {
+        if (!($shippingMethod = $this->shippingMethod())) {
             return false;
         }
 
-        return $this->$methodClass->getPackageLabel($this);
+        return $shippingMethod->getPackageLabel($this);
     }
 
     public function canTrackingUpdate()
     {
-        if (!$this->_shipment) {
-            $this->_shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($this->get('shipment_id'));
-        }
-
-        $method = $this->_shipment->get('carrier_code');
-        $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
-        if (!$methodClass) {
+        if (!($shippingMethod = $this->shippingMethod())) {
             return false;
         }
 
-        return $this->$methodClass->canTrackingUpdate();
+        return $shippingMethod->canTrackingUpdate();
+    }
+
+    public function getTrackingUrl()
+    {
+        if (!($shippingMethod = $this->shippingMethod())) {
+            return false;
+        }
+
+        return $shippingMethod->getTrackingUrl($this);
     }
 
     /**

@@ -667,4 +667,16 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
         return [];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTrackingUrl(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        if (!$package->get('tracking_number')) {
+            return false;
+        }
+
+        return 'https://wwwapps.ups.com/tracking/tracking.cgi?tracknum=' . $package->get('tracking_number');
+    }
 }

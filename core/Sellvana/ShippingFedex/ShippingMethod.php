@@ -543,5 +543,16 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getTrackingUrl(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        if (!$package->get('tracking_number')) {
+            return false;
+        }
+
+        return 'https://www.fedex.com/apps/fedextrack/?action=track&trackingnumber=' . $package->get('tracking_number');
+    }
 
 }
