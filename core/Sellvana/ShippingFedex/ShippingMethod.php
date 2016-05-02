@@ -73,7 +73,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $rates = $rateClient->getRates($request);
         $this->BDebug->log(print_r($rates, 1), 'fedex.log');
 
-        if ($rates->HighestSeverity == 'ERROR') {
+        if (in_array($rates->HighestSeverity, ['ERROR', 'FAILURE'])) {
             $message = '';
             $notifications = $rates->Notifications;
 
@@ -97,6 +97,12 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             'rates' => []
         ];
 
+        if (!isset($rates->RateReplyDetails)) {
+            return [
+                'error' => 1,
+                'message' => $this->_('No rates available'),
+            ];
+        }
         $rateReplyDetails = $rates->RateReplyDetails;
         if (!is_array($rateReplyDetails)) {
             $rateReplyDetails = [$rateReplyDetails];
