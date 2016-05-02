@@ -553,19 +553,19 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $types = (array)$types;
         $qtys = [];
         if (null === $types || in_array('shipments', $types)) {
-            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Shipment_Item->getOrderItemsQtys());
+            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Shipment_Item->getOrderItemsQtys());
         }
         if (null === $types || in_array('payments', $types)) {
-            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Payment_Item->getOrderItemsQtys());
+            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Payment_Item->getOrderItemsQtys());
         }
         if (null === $types || in_array('cancels', $types)) {
-            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Cancel_Item->getOrderItemsQtys());
+            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Cancel_Item->getOrderItemsQtys());
         }
         if (null === $types || in_array('returns', $types)) {
-            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Return_Item->getOrderItemsQtys());
+            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Return_Item->getOrderItemsQtys());
         }
         if (null === $types || in_array('refunds', $types)) {
-            $qtys = array_merge_recursive($qtys, $this->Sellvana_Sales_Model_Order_Refund_Item->getOrderItemsQtys());
+            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Refund_Item->getOrderItemsQtys());
         }
 
         foreach ($this->items() as $itemId => $item) {

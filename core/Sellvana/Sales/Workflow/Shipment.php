@@ -133,6 +133,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
             }
         }
         $shipment->save();
+        $order->calcItemQuantities('shipments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

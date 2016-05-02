@@ -8,7 +8,7 @@ class Sellvana_Sales_Model_Order_Shipment_Item extends FCom_Core_Model_Abstract
     public function getOrderItemsQtys()
     {
         $sItems = $this->orm('si')
-            ->left_outer_join('Sellvana_Sales_Model_Order_Shipment', ['s.id', '=', 'si.return_id'], 's')
+            ->left_outer_join('Sellvana_Sales_Model_Order_Shipment', ['s.id', '=', 'si.shipment_id'], 's')
             ->select('si.*')
             ->select('s.state_overall')
             ->find_many();
