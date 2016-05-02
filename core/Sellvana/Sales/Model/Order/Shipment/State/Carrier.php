@@ -93,6 +93,9 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_M
 
         foreach ($shipment->packages() as $package) {
             $packageState = $package->state()->overall()->getValue();
+            if (!$packageState) {
+                continue;
+            }
             $state = $orderedStates[min($statePriorities[$state], $statePriorities[$packageState])];
         }
 

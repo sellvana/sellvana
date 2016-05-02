@@ -146,9 +146,9 @@
                                     <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
                                     <br>
                                 {% endif %}
-                                {% if p.canTrackingUpdate() and p.get('tracking_number') %}
+                                {% if p.canTrackingUpdate() and p.get('tracking_number') and p.getTrackingUrl() %}
                                     {% set allowTracking = true %}
-                                    <a href="{{ APP.href('shipments/getPackageTracking?id=' ~ p.id()) }}" class="js-shipment-show-tracking">{{ 'Show tracking status'|_ }}</a>
+                                    <a href="{{ p.getTrackingUrl() }}" class="js-shipment-show-tracking" target="_blank">{{ 'Show tracking status'|_ }}</a>
                                     <br>
                                 {% endif %}
                                 <hr>

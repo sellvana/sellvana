@@ -73,7 +73,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $rates = $rateClient->getRates($request);
         $this->BDebug->log(print_r($rates, 1), 'fedex.log');
 
-        if ($rates->HighestSeverity == 'ERROR') {
+        if (in_array($rates->HighestSeverity, ['ERROR', 'FAILURE'])) {
             $message = '';
             $notifications = $rates->Notifications;
 
@@ -97,6 +97,12 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
             'rates' => []
         ];
 
+        if (!isset($rates->RateReplyDetails)) {
+            return [
+                'error' => 1,
+                'message' => $this->_('No rates available'),
+            ];
+        }
         $rateReplyDetails = $rates->RateReplyDetails;
         if (!is_array($rateReplyDetails)) {
             $rateReplyDetails = [$rateReplyDetails];
@@ -537,5 +543,16 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getTrackingUrl(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        if (!$package->get('tracking_number')) {
+            return false;
+        }
+
+        return 'https://www.fedex.com/apps/fedextrack/?action=track&trackingnumber=' . $package->get('tracking_number');
+    }
 
 }

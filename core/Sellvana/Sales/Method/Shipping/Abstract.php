@@ -366,4 +366,13 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     {
         return ['error' => true, 'message' => 'Not implemented'];
     }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment_Package $package
+     * @return bool|string
+     */
+    public function getTrackingUrl(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        return false;
+    }
 }
