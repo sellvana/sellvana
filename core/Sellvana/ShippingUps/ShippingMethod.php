@@ -579,7 +579,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 //$str = '1Z12345E0305271640';
                 //$str = '1Z12345E0393657226';
                 //$str = '1Z12345E1305277940';
-                $str = '1Z12345E6205277936';
+                //$str = '1Z12345E6205277936';
                 //$str = '1Z12345E020527079';
                 //$str = '1Z12345E1505270452';
                 //$str = '990728071';
@@ -591,8 +591,8 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
                 //$str = 'ER751105042015062';
                 //$str = '1ZWX0692YP40636269';
 
-                $request['tracking_number'] = $str;
-                $request['shipment_identification_number'] = $str;
+                //$request['tracking_number'] = $str;
+                //$request['shipment_identification_number'] = $str;
                 //Develop section -->
 
                 $states[$packageId] = $this->_fetchNewStates($request, $package);
