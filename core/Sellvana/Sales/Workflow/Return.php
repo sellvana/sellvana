@@ -150,7 +150,7 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         $cancelId = $args['return_id'];
         $cancel = $this->Sellvana_Sales_Model_Order_Return->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid shipment to delete');
+            throw new BException('Invalid return to delete');
         }
         $cancel->delete();
 

@@ -119,7 +119,7 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $data = $args['data'];
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid cancel to update');
+            throw new BException('Invalid cancellation to update');
         }
         if (isset($data['state_custom'])) {
             $cancel->state()->custom()->changeState($data['state_custom']);
@@ -144,7 +144,7 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $cancelId = $args['cancel_id'];
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid shipment to delete');
+            throw new BException('Invalid cancellation to delete');
         }
         $cancel->delete();
 

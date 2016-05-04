@@ -16,7 +16,15 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_order_refund';
     protected static $_origClass = __CLASS__;
 
+    /**
+     * @var Sellvana_Sales_Model_Order_Refund_State
+     */
     protected $_state;
+
+    /**
+     * @var Sellvana_Sales_Model_Order_Return_Item[]
+     */
+    protected $_items;
 
     /**
      * @refund Sellvana_Sales_Model_Order_Refund_State
@@ -27,6 +35,24 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
             $this->_state = $this->Sellvana_Sales_Model_Order_Refund_State->factory($this);
         }
         return $this->_state;
+    }
+
+    /**
+     * Return the return items
+     *
+     * @param boolean $assoc
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
+    public function items($assoc = true)
+    {
+        if (!$this->_items) {
+            $this->_items = $this->Sellvana_Sales_Model_Order_Refund_Item->orm('ori')
+                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'ori.order_item_id'], 'oi')
+                ->select('ori.*')->select(['oi.product_id', 'product_sku', 'inventory_id',
+                    'inventory_sku', 'product_name'])
+                ->where('refund_id', $this->id())->find_many_assoc();
+        }
+        return $assoc ? $this->_items : array_values($this->_items);
     }
 
     public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
