@@ -13,7 +13,7 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Mod
         self::PENDING => 'Pending',
         self::APPROVED => 'Approved',
         self::DECLINED => 'Declined',
-        self::COMPLETE => 'Canceled',
+        self::COMPLETE => 'Complete',
     ];
 
     protected $_setValueNotificationTemplates =[
@@ -23,6 +23,14 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Mod
     ];
 
     protected $_defaultValue = self::PENDING;
+    
+    protected $_defaultMethods = [
+        self::REQUESTED => 'setRequested',
+        self::PENDING => 'setPending',
+        self::APPROVED => 'setApproved',
+        self::DECLINED => 'setDeclined',
+        self::COMPLETE => 'setComplete',
+    ];
 
     public function setRequested()
     {

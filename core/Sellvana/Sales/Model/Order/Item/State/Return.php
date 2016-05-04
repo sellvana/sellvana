@@ -16,6 +16,14 @@ class Sellvana_Sales_Model_Order_Item_State_Return extends Sellvana_Sales_Model_
         self::RETURNED => 'Returned',
     ];
 
+    protected $_defaultMethods = [
+        self::NONE => 'setNone',
+        self::REQUESTED => 'setRequested',
+        self::PROCESSING => 'setProcessing',
+        self::PARTIAL => 'setPartial',
+        self::RETURNED => 'setReturned',
+    ];
+
     protected $_setValueNotificationTemplates =[
         self::RETURNED => 'email/sales/order-item-state-return-returned',
     ];

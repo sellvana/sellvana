@@ -18,6 +18,14 @@ class Sellvana_Sales_Model_Order_Item_State_Cancel extends Sellvana_Sales_Model_
 
     protected $_defaultValue = self::NONE;
 
+    protected $_defaultMethods = [
+        self::NONE => 'setNone',
+        self::REQUESTED => 'setRequested',
+        self::PROCESSING => 'setProcessing',
+        self::PARTIAL => 'setPartial',
+        self::CANCELED => 'setCanceled',
+    ];
+
     public function setNone()
     {
         return $this->changeState(self::NONE);

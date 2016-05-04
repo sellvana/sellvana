@@ -10,14 +10,6 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_overallStates = [
-        'requested' => 'setRequested',
-        'pending'   => 'setPending',
-        'approved'  => 'setApproved',
-        'declined'  => 'setDeclined',
-        'complete'  => 'setComplete',
-    ];
-
     public function action_customerRequestsToCancelItems($args)
     {
         /** @var Sellvana_Sales_Model_Order $order */
@@ -126,8 +118,7 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_overallStates[$state];
-                $cancel->state()->overall()->$method();
+                $cancel->state()->overall()->invokeStateChange($state);
             }
         }
         $cancel->save();

@@ -2,7 +2,6 @@
 
 class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
-
     const REQUESTED = 'requested',
         PENDING = 'pending',
         RMA_SENT = 'rma_sent',
@@ -23,6 +22,18 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Mod
         self::APPROVED => 'Approved',
         self::RESTOCKED => 'Re-stocked',
         self::DECLINED => 'Declined',
+    ];
+
+    protected $_defaultMethods = [
+        self::REQUESTED => 'setRequested',
+        self::PENDING => 'setPending',
+        self::RMA_SENT => 'setRMASent',
+        self::EXPIRED => 'setExpired',
+        self::CANCELED => 'setCanceled',
+        self::RECEIVED => 'setReceived',
+        self::APPROVED => 'setApproved',
+        self::RESTOCKED => 'setRestocked',
+        self::DECLINED => 'setDeclined',
     ];
 
     protected $_setValueNotificationTemplates =[

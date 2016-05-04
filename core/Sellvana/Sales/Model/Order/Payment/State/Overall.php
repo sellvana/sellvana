@@ -30,6 +30,21 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
         self::CHARGEDBACK => 'Charged Back',
     ];
 
+    protected $_defaultMethods = [
+        self::PENDING => 'setPending',
+        self::OFFLINE => 'setOffline',
+        self::EXT_SENT => 'setExtSent',
+        self::EXT_RETURNED => 'setExtReturned',
+        self::FAILED => 'setFailed',
+        self::CANCELED => 'setCanceled',
+        self::PROCESSING => 'setProcessing',
+        self::PARTIAL_PAID => 'setPartialPaid',
+        self::PAID => 'setPaid',
+        self::PARTIAL_REFUNDED => 'setPartialRefunded',
+        self::REFUNDED => 'setRefunded',
+        self::CHARGEDBACK => 'setChargedBack',
+    ];
+
     protected $_setValueNotificationTemplates = [
         self::REFUNDED => 'email/sales/order-payment-state-overall-refunded',
     ];

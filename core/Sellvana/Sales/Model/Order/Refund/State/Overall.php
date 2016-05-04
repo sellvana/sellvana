@@ -20,6 +20,16 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
         self::CANCELED => 'Canceled',
     ];
 
+    protected $_defaultMethods = [
+        self::PENDING => 'setPending',
+        self::SUPERVISOR_PENDING => 'setSuperPending',
+        self::SUPERVISOR_AUTHORIZED => 'setSuperAuth',
+        self::PARTIAL => 'setPartial',
+        self::REFUNDED => 'setRefunded',
+        self::FAILED => 'setFailed',
+        self::CANCELED => 'setCanceled',
+    ];
+
     protected $_setValueNotificationTemplates = [
         self::SUPERVISOR_PENDING => 'email/sales/order-refund-state-payment-super_pending-admin',
         self::SUPERVISOR_AUTHORIZED => 'email/sales/order-refund-state-payment-super_auth',
@@ -47,7 +57,7 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
 
     public function setPartial()
     {
-        return $this->changeState(self::VOID);
+        return $this->changeState(self::PARTIAL);
     }
 
     public function setRefunded()

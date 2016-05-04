@@ -48,6 +48,11 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
     protected $_unsetValueNotificationTemplates = [];
 
     /**
+     * @var array
+     */
+    protected $_defaultMethods = [];
+
+    /**
      * FCom_Core_Model_Abstract_State_Concrete constructor.
      *
      * @param null $context

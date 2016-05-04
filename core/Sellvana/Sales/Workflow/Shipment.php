@@ -11,30 +11,6 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_shipmentOverallStates = [
-        'pending' => 'setPending',
-        'packing' => 'setPacking',
-        'shipping' => 'setShipping',
-        'shipped' => 'setShipped',
-        'exception' => 'setException',
-        'delivered' => 'setDelivered',
-        'returned' => 'setReturned',
-        'canceled' => 'setCanceled',
-    ];
-
-    static protected $_packageOverallStates = [
-        'na' => 'setNotApplicable',
-        'pending' => 'setPending',
-        'label' => 'setLabel',
-        'received' => 'setReceived',
-        'shipped' => 'setShipped',
-        'in_transit' => 'setInTransit',
-        'exception' => 'setException',
-        'delivered' => 'setDelivered',
-        'refused' => 'setRefused',
-        'returned' => 'setReturned',
-    ];
-
     public function action_adminCreatesShipment($args)
     {
         /** @var Sellvana_Sales_Model_Order $order */
@@ -128,8 +104,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_shipmentOverallStates[$state];
-                $shipment->state()->overall()->$method();
+                $shipment->state()->overall()->invokeStateChange($state);
             }
         }
         $shipment->save();
@@ -153,10 +128,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                if ($state != $package->state()->overall()->getValue()) {
-                    $method = static::$_packageOverallStates[$state];
-                    $package->state()->overall()->$method();
-                }
+                $package->state()->overall()->invokeStateChange($state);
             }
         }
         $package->save();

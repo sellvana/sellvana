@@ -10,30 +10,6 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_overallStates = [
-        'requested' => 'setRequested',
-        'pending'   => 'setPending',
-        'rma_sent'  => 'setRMASent',
-        'expired'   => 'setExpired',
-        'canceled'  => 'setCanceled',
-        'received'  => 'setReceived',
-        'approved'  => 'setApproved',
-        'restocked' => 'setRestocked',
-        'declined'  => 'setDeclined',
-    ];
-
-    static protected $_stateRegistration = [
-        'requested' => false,
-        'pending'   => true,
-        'rma_sent'  => true,
-        'expired'   => false,
-        'canceled'  => false,
-        'received'  => true,
-        'approved'  => true,
-        'restocked' => true,
-        'declined'  => false,
-    ];
-
     public function action_customerRequestsToReturnItems($args)
     {
         $order = $args['order'];
@@ -131,9 +107,7 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_overallStates[$state];
-                $oldState = $return->state()->overall()->getValue();
-                $return->state()->overall()->$method();
+                $return->state()->overall()->invokeStateChange($state);
             }
         }
         $return->save();
