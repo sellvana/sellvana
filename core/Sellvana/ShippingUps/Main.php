@@ -36,9 +36,9 @@ class Sellvana_ShippingUps_Main extends BClass
             case Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPING:
                 $this->Sellvana_ShippingUps_ShippingMethod->buyShipment($shipment);
                 break;
-//            case Sellvana_Sales_Model_Order_Shipment_State_Overall::CANCELED:
-//                $this->Sellvana_ShippingUps_ShippingMethod->cancelShipment($shipment);
-//                break;
+            case Sellvana_Sales_Model_Order_Shipment_State_Overall::CANCELED:
+                $this->Sellvana_ShippingUps_ShippingMethod->cancelShipment($shipment);
+                break;
             default:
                 break;
         }
