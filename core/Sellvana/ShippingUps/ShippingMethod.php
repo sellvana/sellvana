@@ -14,6 +14,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 {
     const SERVICE_SHIP = 'Ship';
     const SERVICE_TRACK = 'Track';
+    const SERVICE_VOID = 'Void';
 
     protected $_name           = 'Universal post service';
     protected $_code           = 'ups';
@@ -260,8 +261,8 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         }
 
         if ($result->Response->ResponseStatus->Code != 1) {
-            $message = '(' . $result->Response->Allert->Code . ') ';
-            $message .= $result->Response->Allert->Description;
+            $message = '(' . $result->Response->Alert->Code . ') ';
+            $message .= $result->Response->Alert->Description;
             throw new BException($message);
         }
 
@@ -280,6 +281,53 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         }
         $shipment->setData('shipment_results', $shipmentResults);
         $shipment->setData('shipment_identification_number', $shipmentResults->ShipmentIdentificationNumber);
+    }
+
+    public function cancelShipment(Sellvana_Sales_Model_Order_Shipment $shipment)
+    {
+        $cart = $shipment->order()->cart();
+        $this->_requestData = array_merge($this->_requestData, $this->_getPackageTemplate($cart));
+        $this->_requestData = array_merge($this->_requestData, $shipment->as_array());
+
+        $client = $this->_getSoapClient(self::SERVICE_VOID);
+        foreach ($shipment->packages() as $package) {
+            if (!$package->get('tracking_number') || !$shipment->getData('shipment_identification_number')) {
+                continue;
+            }
+
+            $request = [
+                'Request' => ['RequestOption' => 'nonvalidate'],
+                'VoidShipment' => [
+                    'ShipmentIdentificationNumber' => $shipment->getData('shipment_identification_number'),
+                    'TrackingNumber' => $package->get('tracking_number')
+                ]
+            ];
+            try {
+                $result = $client->__soapCall('ProcessVoid', ['VoidRequest' => $request]);
+
+                if ($result->Response->ResponseStatus->Code != 1) {
+                    $message = '(' . $result->Response->Alert->Code . ') ';
+                    $message .= $result->Response->Alert->Description;
+                    throw new BException($message);
+                }
+            } catch (SoapFault $e) {
+                //$details = $e->detail;
+
+                $message = $e->getMessage();
+                if (isset($e->detail->Errors->ErrorDetail->PrimaryErrorCode->Description)) {
+                    $message .= ' ' . $e->detail->Errors->ErrorDetail->PrimaryErrorCode->Description;
+                }
+                throw new BException($message);
+            }
+
+            if ($result->PackageLevelResult->Status->Code != 1) {
+                throw new BException($result->PackageLevelResult->Status->Description);
+            }
+
+            $package->state()->overall()->setNotApplicable();
+            $package->set('tracking_number', null);
+        }
+
     }
 
     protected function _data($path, $default = null)
