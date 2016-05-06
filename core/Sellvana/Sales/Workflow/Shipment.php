@@ -147,6 +147,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
             throw new BException('Invalid shipment to delete');
         }
         $shipment->state()->overall()->setCanceled();
+        $shipment->save();
         $shipment->delete();
 
         $order->calcItemQuantities('shipments');

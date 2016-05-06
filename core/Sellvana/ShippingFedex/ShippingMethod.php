@@ -220,13 +220,14 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $client = $this->_getSoapClient(self::SERVICE_SHIP);
         $request = $this->_buildRequest();
         $shipmentDetail = $shipment->getData('completed_shipment_detail');
-        if (!empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
-            $trackingId = $shipmentDetail['CompletedPackageDetails']['TrackingIds'];
-            $request['TrackingId'] = [
-                'TrackingIdType' => $trackingId['TrackingIdType'],
-                'TrackingNumber' => $trackingId['TrackingNumber'],
-            ];
+        if (empty($shipmentDetail['CompletedPackageDetails']['TrackingIds'])) {
+            return;
         }
+        $trackingId = $shipmentDetail['CompletedPackageDetails']['TrackingIds'];
+        $request['TrackingId'] = [
+            'TrackingIdType' => $trackingId['TrackingIdType'],
+            'TrackingNumber' => $trackingId['TrackingNumber'],
+        ];
         $request['DeletionControl'] = 'DELETE_ALL_PACKAGES';
         $result = $client->deleteShipment($request);
 
