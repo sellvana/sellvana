@@ -10,14 +10,6 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_overallStates = [
-        'requested' => 'setRequested',
-        'pending'   => 'setPending',
-        'approved'  => 'setApproved',
-        'declined'  => 'setDeclined',
-        'complete'  => 'setComplete',
-    ];
-
     public function action_customerRequestsToCancelItems($args)
     {
         /** @var Sellvana_Sales_Model_Order $order */
@@ -119,15 +111,14 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $data = $args['data'];
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid cancel to update');
+            throw new BException('Invalid cancellation to update');
         }
         if (isset($data['state_custom'])) {
             $cancel->state()->custom()->changeState($data['state_custom']);
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_overallStates[$state];
-                $cancel->state()->overall()->$method();
+                $cancel->state()->overall()->invokeStateChange($state);
             }
         }
         $cancel->save();
@@ -144,7 +135,7 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $cancelId = $args['cancel_id'];
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid shipment to delete');
+            throw new BException('Invalid cancellation to delete');
         }
         $cancel->delete();
 

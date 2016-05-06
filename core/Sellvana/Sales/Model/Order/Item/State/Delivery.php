@@ -17,6 +17,15 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
         self::DELIVERED => 'Delivered',
         self::PARTIAL => 'Partial',
     ];
+    
+    protected $_defaultMethods = [
+        self::VIRTUAL => 'setVirtual',
+        self::PENDING => 'setPending',
+        self::PACKED => 'setPacked',
+        self::SHIPPED => 'setShipped',
+        self::DELIVERED => 'setDelivered',
+        self::PARTIAL => 'setPartial',
+    ];
 
     protected $_setValueNotificationTemplates =[
         self::SHIPPED => 'email/sales/order-item-state-delivery-shipped',

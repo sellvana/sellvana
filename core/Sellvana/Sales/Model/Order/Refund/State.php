@@ -23,12 +23,12 @@ class Sellvana_Sales_Model_Order_Refund_State extends FCom_Core_Model_Abstract_S
      * @var array
      */
     static protected $_defaultStateClasses = [
-        self::OVERALL => 'Sellvana_Sales_Model_Order_Payment_State_Overall',
-        self::CUSTOM => 'Sellvana_Sales_Model_Order_Payment_State_Custom',
+        self::OVERALL => 'Sellvana_Sales_Model_Order_Refund_State_Overall',
+        self::CUSTOM => 'Sellvana_Sales_Model_Order_Refund_State_Custom',
     ];
 
     /**
-     * @return Sellvana_Sales_Model_Order_Payment_State_Overall
+     * @return Sellvana_Sales_Model_Order_Refund_State_Overall
      * @throws BException
      */
     public function overall()
@@ -37,7 +37,7 @@ class Sellvana_Sales_Model_Order_Refund_State extends FCom_Core_Model_Abstract_S
     }
 
     /**
-     * @return Sellvana_Sales_Model_Order_Payment_State_Custom
+     * @return Sellvana_Sales_Model_Order_Refund_State_Custom
      * @throws BException
      */
     public function custom()

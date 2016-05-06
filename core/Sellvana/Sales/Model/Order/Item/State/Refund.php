@@ -14,6 +14,13 @@ class Sellvana_Sales_Model_Order_Item_State_Refund extends Sellvana_Sales_Model_
         self::REFUNDED => 'Refunded',
     ];
 
+    protected $_defaultMethods = [
+        self::NONE => 'setNone',
+        self::PROCESSING => 'setProcessing',
+        self::PARTIAL => 'setPartial',
+        self::REFUNDED => 'setRefunded',
+    ];
+
     protected $_defaultValue = self::NONE;
 
     public function setNone()

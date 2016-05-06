@@ -16,6 +16,14 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
         self::CANCELED => 'Canceled',
     ];
 
+    protected $_defaultMethods = [
+        self::PENDING => 'setPending',
+        self::BACKORDERED => 'setBackordered',
+        self::PROCESSING => 'setProcessing',
+        self::COMPLETE => 'setComplete',
+        self::CANCELED => 'setCanceled',
+    ];
+
     protected $_setValueNotificationTemplates = [
         self::BACKORDERED => 'email/sales/order-item-state-overall-backordered',
         self::CANCELED => 'email/sales/order-item-state-overall-canceled',
@@ -25,27 +33,27 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
 
     public function setPending()
     {
-        return $this->changestate(self::PENDING);
+        return $this->changeState(self::PENDING);
     }
 
     public function setBackordered()
     {
-        return $this->changestate(self::BACKORDERED);
+        return $this->changeState(self::BACKORDERED);
     }
 
     public function setProcessing()
     {
-        return $this->changestate(self::PROCESSING);
+        return $this->changeState(self::PROCESSING);
     }
 
     public function setComplete()
     {
-        return $this->changestate(self::COMPLETE);
+        return $this->changeState(self::COMPLETE);
     }
 
     public function setCanceled()
     {
-        return $this->changestate(self::CANCELED);
+        return $this->changeState(self::CANCELED);
     }
 
     public function calcState()

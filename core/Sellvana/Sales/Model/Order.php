@@ -545,30 +545,28 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param array $types [shipments, payments, cancels, returns, refunds]
+     * @param string|array $types [shipments, payments, cancels, returns, refunds]
      * @return $this
      */
     public function calcItemQuantities($types = null)
     {
         $types = (array)$types;
         $qtys = [];
-        if (null === $types || in_array('shipments', $types)) {
-            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Shipment_Item->getOrderItemsQtys());
+        $items = $this->items();
+        foreach ([
+            'shipments' => 'Sellvana_Sales_Model_Order_Shipment_Item',
+            'payments' => 'Sellvana_Sales_Model_Order_Payment_Item',
+            'cancels' => 'Sellvana_Sales_Model_Order_Cancel_Item',
+            'returns' => 'Sellvana_Sales_Model_Order_Return_Item',
+            'refunds' => 'Sellvana_Sales_Model_Order_Refund_Item',
+                 ] as $type => $itemClass
+        ) {
+            if (null === $types || in_array($type, $types)) {
+                $qtys1 = $this->{$itemClass}->getOrderItemsQtys($items);
+                $qtys = array_replace_recursive($qtys, $qtys1);
+            }
         }
-        if (null === $types || in_array('payments', $types)) {
-            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Payment_Item->getOrderItemsQtys());
-        }
-        if (null === $types || in_array('cancels', $types)) {
-            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Cancel_Item->getOrderItemsQtys());
-        }
-        if (null === $types || in_array('returns', $types)) {
-            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Return_Item->getOrderItemsQtys());
-        }
-        if (null === $types || in_array('refunds', $types)) {
-            $qtys = array_replace_recursive($qtys, $this->Sellvana_Sales_Model_Order_Refund_Item->getOrderItemsQtys());
-        }
-
-        foreach ($this->items() as $itemId => $item) {
+        foreach ($items as $itemId => $item) {
             if (!empty($qtys[$itemId])) {
                 $item->set($qtys[$itemId]);
             }

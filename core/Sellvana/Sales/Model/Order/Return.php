@@ -16,6 +16,9 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_order_return';
     protected static $_origClass = __CLASS__;
 
+    /**
+     * @var Sellvana_Sales_Model_Order_Return_State
+     */
     protected $_state;
 
     /**

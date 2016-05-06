@@ -65,7 +65,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Refund $refund */
         $refund = $this->Sellvana_Sales_Model_Order_Refund->create($data);
         $refund->importFromOrder($order, $qtys);
-        $refund->state()->overall()->setApproved();
+        $refund->state()->overall()->setSuperPending();
         $refund->save();
 
         $order->calcItemQuantities('refunds');
@@ -88,9 +88,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_overallStates[$state];
-                $oldState = $refund->state()->overall()->getValue();
-                $refund->state()->overall()->$method();
+                $refund->state()->overall()->invokeStateChange($state);
             }
         }
         $refund->save();
@@ -107,7 +105,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         $cancelId = $args['refund_id'];
         $cancel = $this->Sellvana_Sales_Model_Order_Refund->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid shipment to delete');
+            throw new BException('Invalid refund to delete');
         }
         $cancel->delete();
 

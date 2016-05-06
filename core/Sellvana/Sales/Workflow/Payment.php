@@ -12,19 +12,6 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_paymentOverallStates = [
-        'pending' => 'setPending',
-        'offline' => 'setOffline',
-        'failed' => 'setFailed',
-        'canceled' => 'setCanceled',
-        'processing' => 'setProcessing',
-        'partial_paid' => 'setPartialPaid',
-        'paid' => 'setPaid',
-        'partial_refunded' => 'setPartialRefunded',
-        'refunded' => 'setRefunded',
-        'chargedback' => 'setChargedBack',
-    ];
-
     public function action_customerPaysOnCheckout($args)
     {
         try {
@@ -197,8 +184,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_paymentOverallStates[$state];
-                $payment->state()->overall()->$method();
+                $payment->state()->overall()->invokeStateChange($state);
             }
         }
         $payment->save();
