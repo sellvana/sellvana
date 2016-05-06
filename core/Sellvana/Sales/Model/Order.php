@@ -553,23 +553,40 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $types = (array)$types;
         $qtys = [];
         $items = $this->items();
-        foreach ([
+        $entities = [
             'shipments' => 'Sellvana_Sales_Model_Order_Shipment_Item',
             'payments' => 'Sellvana_Sales_Model_Order_Payment_Item',
             'cancels' => 'Sellvana_Sales_Model_Order_Cancel_Item',
             'returns' => 'Sellvana_Sales_Model_Order_Return_Item',
             'refunds' => 'Sellvana_Sales_Model_Order_Refund_Item',
-                 ] as $type => $itemClass
-        ) {
+        ];
+        foreach ($entities as $type => $itemClass) {
             if (null === $types || in_array($type, $types)) {
                 $qtys1 = $this->{$itemClass}->getOrderItemsQtys($items);
                 $qtys = array_replace_recursive($qtys, $qtys1);
             }
         }
         foreach ($items as $itemId => $item) {
-            if (!empty($qtys[$itemId])) {
-                $item->set($qtys[$itemId]);
+            if (empty($qtys[$itemId])) {
+                continue;
             }
+
+            $itemQtys = $qtys[$itemId];
+            foreach($entities as $type => $itemClass) {
+                if (null === $types || in_array($type, $types)) {
+                    $allField = $this->{$itemClass}->getAllField();
+                    if (!isset($itemQtys[$allField])) {
+                        $itemQtys[$allField] = 0;
+                    }
+
+                    $doneField = $this->{$itemClass}->getDoneField();
+                    if (!isset($itemQtys[$doneField])) {
+                        $itemQtys[$doneField] = 0;
+                    }
+                }
+            }
+
+            $item->set($itemQtys);
         }
         return $this;
     }

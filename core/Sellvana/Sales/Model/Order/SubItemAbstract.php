@@ -1,15 +1,48 @@
 <?php
 
-class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Model_Abstract
+abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Model_Abstract
 {
-    protected function _getOrderItemsQtys(array $items, $parentClass, $parentField, $allField, $doneField, $doneStates)
+    /**
+     * @var string
+     */
+    protected $_parentClass;
+
+    /**
+     * @var string
+     */
+    protected $_parentField;
+
+    /**
+     * @var string
+     */
+    protected $_allField;
+
+    /**
+     * @var string
+     */
+    protected $_doneField;
+
+    /**
+     * @var array
+     */
+    protected $_doneStates = [];
+
+    protected function _getOrderItemsQtys(array $items)
     {
+        $parentClass = $this->_parentClass;
+        $parentField = $this->_parentField;
+        $allField = $this->_allField;
+        $doneField = $this->_doneField;
+        $doneStates = $this->_doneStates;
+
         $cItems = $this->orm('si')
             ->join($parentClass, ['s.id', '=', 'si.' . $parentField], 's')
             ->select('si.*')
             ->select('s.state_overall')
             ->find_many();
 
+/*        var_dump($cItems);
+        exit();*/
         $result = [];
 
         if ($items) {
@@ -41,5 +74,21 @@ class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Model_Abstrac
         }
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAllField()
+    {
+        return $this->_allField;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDoneField()
+    {
+        return $this->_doneField;
     }
 }

@@ -354,7 +354,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     }
 
     /**
-     * @param Sellvana_Sales_Model_Order_Shipment_Package[] $data
+     * @param Sellvana_Sales_Model_Order_Shipment_Package[] $args
      *  - shipment_id => package
      *
      * @return array
@@ -362,7 +362,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
      *  - error
      *  - message
      */
-    public function fetchTrackingUpdates($data)
+    public function fetchTrackingUpdates($args)
     {
         return ['error' => true, 'message' => 'Not implemented'];
     }
