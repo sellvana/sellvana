@@ -4,11 +4,14 @@
  * Class Sellvana_ShippingFedex_ShippingMethod
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  */
 class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
-    const SERVICE_RATE = 'Rate';
-    const SERVICE_SHIP = 'Ship';
+    const SERVICE_RATE  = 'Rate';
+    const SERVICE_SHIP  = 'Ship';
+    const SERVICE_TRACK = 'Track';
 
     protected $_name           = 'FedEx';
     protected $_code           = 'fedex';
@@ -31,6 +34,22 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
      * @var array
      */
     protected $_requestData = [];
+
+
+    protected static $_statusMapping = [
+        'DL' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::DELIVERED,
+        'IT' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::IN_TRANSIT,
+        'DP' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::IN_TRANSIT,
+        'OD' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::IN_TRANSIT,
+        'DE' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::EXCEPTION,
+        'SE' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::EXCEPTION,
+        'PU' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::RECEIVED,
+        'AR' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::RECEIVED,
+        'AF' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::RECEIVED,
+        'CA' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::NA,
+        'OC' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::PENDING,
+        'RS' => Sellvana_Sales_Model_Order_Shipment_Package_State_Overall::RETURNED,
+    ];
 
     /**
      * XPaths to data we need to get from WSDL files
@@ -554,5 +573,103 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
 
         return 'https://www.fedex.com/apps/fedextrack/?action=track&trackingnumber=' . $package->get('tracking_number');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function fetchTrackingUpdates($args)
+    {
+        try {
+            $states = [];
+            $client = $this->_getSoapClient(self::SERVICE_TRACK);
+            $request = $this->_buildRequest();
+            foreach ($args as $packageId => $package) {
+                $trackingNumber = $package->get('tracking_number');
+
+                // tracking number for tests
+                //$trackingNumber = 449044304137821; // Shipment information sent to FedEx
+                //$trackingNumber = 149331877648230; // Tendered
+                //$trackingNumber = 020207021381215; // Picked Up
+                //$trackingNumber = 403934084723025; // Arrived at FedEx location
+                //$trackingNumber = 920241085725456; // At local FedEx facility
+                //$trackingNumber = 568838414941; // At destination sort facility
+                //$trackingNumber = 039813852990618; // Departed FedEx location
+                //$trackingNumber = 231300687629630; // On FedEx vehicle for delivery
+                //$trackingNumber = 797806677146; // International shipment release
+                //$trackingNumber = 377101283611590; // Customer not available or business closed
+                //$trackingNumber = 852426136339213; // Local Delivery Restriction
+                //$trackingNumber = 797615467620; // Incorrect Address
+                //$trackingNumber = 957794015041323; // Unable to Deliver
+                //$trackingNumber = 076288115212522; // Returned to Sender/Shipper
+                //$trackingNumber = 581190049992; // International Clearance delay
+                //$trackingNumber = 122816215025810; // Delivered
+                //$trackingNumber = 843119172384577; // Hold at Location
+                //$trackingNumber = 070358180009382; // Shipment Canceled
+
+                $order = $this->Sellvana_Sales_Model_Order->load($package->get('order_id'));
+                if (!$order) {
+                    throw new BException('Invalid order');
+                }
+
+                $shipment = $this->Sellvana_Sales_Model_Order_Shipment->load($package->get('shipment_id'));
+                if (!$shipment) {
+                    throw new BException('Invalid shipment');
+                }
+
+                $packageRequest = $request;
+
+                $packageRequest['SelectionDetails'] = [
+                    'PackageIdentifier' => [
+                        'Type' => 'TRACKING_NUMBER_OR_DOORTAG',
+                        'Value' => $trackingNumber
+                    ]
+                ];
+
+                $response = $client->track($packageRequest);
+                $trackDetails = $response->CompletedTrackDetails->TrackDetails;
+
+                if (is_array($trackDetails)) {
+                    $trackDetails = reset($trackDetails);
+                }
+
+                if (in_array($trackDetails->Notification->Severity, ['ERROR', 'FAILURE'])) {
+                    $message = '';
+                    $notifications = $trackDetails->Notification;
+
+                    if (!is_array($notifications)) {
+                        $notifications = [$notifications];
+                    }
+
+                    foreach ($notifications as $notification) {
+                        $curMessage = !empty($notification->LocalizedMessage) ? $notification->LocalizedMessage : $notification->Message;
+                        $message .= $curMessage . "<br>";
+                    }
+                    $result = [
+                        'error' => 1,
+                        'message' => $message,
+                    ];
+
+                    return $result;
+                }
+
+                $package->setData('tracking_updates', $trackDetails);
+                $status = $trackDetails->StatusDetail->Description;
+                if (isset($trackDetails->StatusDetail->AncillaryDetails->ActionDescription)) {
+                    $ancillaryDetails = $trackDetails->StatusDetail->AncillaryDetails;
+                    $status .= ' (' . $ancillaryDetails->ActionDescription . ': ' . $ancillaryDetails->Action . ')';
+                }
+                $package->set('carrier_status', $status);
+                $statusCode = $trackDetails->StatusDetail->Code;
+                $states[$packageId] = [];
+                if (array_key_exists($statusCode, self::$_statusMapping)) {
+                    $states[$packageId] = [self::$_statusMapping[$statusCode] => $trackDetails->StatusDetail->Description];
+                }
+            }
+        } catch (Exception $e) {
+            return ['error' => true, 'message' => $e->getMessage(), 'states' => $states];
+        }
+        return ['message' => 'Success', 'states' => $states];
+   }
+
 
 }

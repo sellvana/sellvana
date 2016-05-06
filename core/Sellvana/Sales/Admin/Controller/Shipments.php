@@ -201,7 +201,8 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
                 $response[$methodName] = $this->$method->fetchTrackingUpdates($packages[$methodName]);
                 foreach ($packages[$methodName] as $package) {
                     $data = ['tracking_number' => $package->get('tracking_number')];
-                    if (array_key_exists($package->id(), $response[$methodName]['states'])) {
+                    if (array_key_exists('states', $response[$methodName])
+                        && array_key_exists($package->id(), $response[$methodName]['states'])) {
                         $data['state_overall'] = $response[$methodName]['states'][$package->id()];
                     }
 
