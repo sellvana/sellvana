@@ -25,3 +25,4 @@ modules:
                     sort_order: 10
                     dropoff_location: 'REGULAR_PICKUP'
                     insurance: 1
+                    all_services: true

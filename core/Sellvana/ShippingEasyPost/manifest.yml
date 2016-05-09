@@ -23,3 +23,4 @@ modules:
                     max_package_weight: 150
                     mode: test
                     sort_order: 20
+                    all_services: true

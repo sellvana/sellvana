@@ -15,7 +15,7 @@ modules:
 
         default_config:
             modules/Sellvana_ShippingUps/conditionally_free_services: ['_03', '_11', '_65']
-            modules/Sellvana_ShippingUps/services: ['_02', '_03', '_07', '_08', '_11', '_12', '_13', '_14', '_54', '_59', '_65']
+            #modules/Sellvana_ShippingUps/services: ['_02', '_03', '_07', '_08', '_11', '_12', '_13', '_14', '_54', '_59', '_65']
             modules:
                 Sellvana_ShippingUps:
                     enabled: 1
@@ -26,3 +26,4 @@ modules:
                     sort_order: 10
                     #default_service: '_03'
                     shipping_label_format: '_04'
+                    all_services: true
