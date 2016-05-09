@@ -14,9 +14,4 @@ class Sellvana_Sales_Model_Order_Cancel_Item extends Sellvana_Sales_Model_Order_
         Sellvana_Sales_Model_Order_Cancel_State_Overall::APPROVED,
         Sellvana_Sales_Model_Order_Cancel_State_Overall::COMPLETE,
     ];
-
-    public function getOrderItemsQtys(array $items = null)
-    {
-        return $this->_getOrderItemsQtys($items);
-    }
 }

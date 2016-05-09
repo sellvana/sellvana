@@ -13,8 +13,4 @@ class Sellvana_Sales_Model_Order_Payment_Item extends Sellvana_Sales_Model_Order
         Sellvana_Sales_Model_Order_Payment_State_Overall::PAID,
     ];
 
-    public function getOrderItemsQtys(array $items = null)
-    {
-        return $this->_getOrderItemsQtys($items);
-    }
 }

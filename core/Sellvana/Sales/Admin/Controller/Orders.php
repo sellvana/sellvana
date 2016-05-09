@@ -905,10 +905,12 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
         return ['config' => $config];
     }
-
+    
     public function historyGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $entityTypes = $this->Sellvana_Sales_Model_Order_History->fieldOptions('entity_type');
+
+        $userOptions = $this->FCom_Admin_Model_User->options();
 
         $orm = $this->Sellvana_Sales_Model_Order_History->orm('s')
             ->select('s.*')->where('order_id', $model->id())->order_by_desc('id');
@@ -921,20 +923,22 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'columns' => [
                 ['type' => 'row_select'],
                 ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'entity_id', 'label' => 'Entity ID'],
-                ['name' => 'order_item_id', 'label' => 'Item ID'],
+                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'order_item_id', 'label' => 'Item ID', 'hidden' => true],
+                ['name' => 'user_id', 'label' => 'User', 'options' => $userOptions],
                 ['name' => 'entity_type', 'label' => 'Entity Type', 'options' => $entityTypes],
-                ['name' => 'event_type', 'label' => 'Event Type'],
+                ['name' => 'entity_id', 'label' => 'Entity ID'],
+                ['name' => 'event_type', 'label' => 'Event Type', 'hidden' => true],
                 ['name' => 'event_description', 'label' => 'Description'],
             ],
             'filters' => [
                 ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'id', 'type' => 'number-range'],
-                ['field' => 'entity_id', 'type' => 'number-range'],
-                ['field' => 'order_item_id', 'type' => 'number-range'],
+                ['field' => 'id', 'type' => 'number-range', 'hidden' => true],
+                ['field' => 'order_item_id', 'type' => 'number-range', 'hidden' => true],
+                ['field' => 'user_id', 'type' => 'multiselect'],
                 ['field' => 'entity_type', 'type' => 'multiselect'],
-                ['field' => 'event_type', 'type' => 'text'],
+                ['field' => 'entity_id', 'type' => 'number-range'],
+                ['field' => 'event_type', 'type' => 'text', 'hidden' => true],
                 ['field' => 'event_description', 'type' => 'text'],
 
             ],

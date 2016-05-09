@@ -22,6 +22,16 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends Sellvana_Sales_Model
 
     protected $_defaultValue = self::UNPAID;
 
+    protected $_defaultValueWorkflow = [
+        self::FREE => [],
+        self::UNPAID => [self::PROCESSING, self::PAID, self::OUTSTANDING, self::CANCELED, self::PARTIAL],
+        self::PROCESSING => [self::PAID, self::PARTIAL],
+        self::PAID => [],
+        self::OUTSTANDING => [self::PAID, self::PARTIAL, self::CANCELED],
+        self::CANCELED => [],
+        self::PARTIAL => [self::PAID, self::OUTSTANDING],
+    ];
+
     public function setFree()
     {
         return $this->changeState(self::FREE);

@@ -20,6 +20,15 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         self::VOID => 'Void',
     ];
 
+    protected $_defaultValueWorkflow = [
+        self::FREE => [],
+        self::UNPAID => [self::PROCESSING, self::PAID, self::PARTIAL_PAID, self::OUTSTANDING],
+        self::PROCESSING => [self::PAID, self::PARTIAL_PAID, self::OUTSTANDING, self::VOID],
+        self::PARTIAL_PAID => [self::PAID, self::OUTSTANDING],
+        self::OUTSTANDING => [self::PAID, self::PARTIAL_PAID, self::VOID],
+        self::VOID => [],
+    ];
+
     public function getDefaultValue()
     {
         /** @var Sellvana_Sales_Model_Order $model */

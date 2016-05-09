@@ -51,6 +51,21 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
 
     protected $_defaultValue = self::PENDING;
 
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::FAILED, self::CANCELED, self::PROCESSING],
+        self::OFFLINE => [self::FAILED, self::CANCELED, self::PAID, self::PARTIAL_PAID],
+        self::EXT_SENT => [],
+        self::EXT_RETURNED => [],
+        self::FAILED => [self::PENDING, self::CANCELED],
+        self::CANCELED => [],
+        self::PROCESSING => [self::PAID, self::PARTIAL_PAID],
+        self::PARTIAL_PAID => [self::PAID],
+        self::PAID => [self::CHARGEDBACK, self::REFUNDED, self::PARTIAL_REFUNDED],
+        self::PARTIAL_REFUNDED => [self::REFUNDED],
+        self::REFUNDED => [],
+        self::CHARGEDBACK => [],
+    ];
+
     public function setPending()
     {
         return $this->changeState(self::PENDING);

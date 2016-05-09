@@ -20,6 +20,13 @@ class Sellvana_Sales_Model_Order_State_Return extends Sellvana_Sales_Model_Order
 
     protected $_defaultValue = self::NONE;
 
+    protected $_defaultValueWorkflow = [
+        self::NONE => [self::PROCESSING],
+        self::PROCESSING => [self::RETURNED, self::PARTIAL],
+        self::PARTIAL => [self::RETURNED],
+        self::RETURNED => [],
+    ];
+
     public function setNone()
     {
         return $this->changeState(self::NONE);

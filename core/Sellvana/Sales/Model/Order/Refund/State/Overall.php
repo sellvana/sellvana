@@ -40,6 +40,16 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
 
     protected $_defaultValue = self::PENDING;
 
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::SUPERVISOR_PENDING],
+        self::SUPERVISOR_PENDING => [self::SUPERVISOR_AUTHORIZED],
+        self::SUPERVISOR_AUTHORIZED => [self::REFUNDED, self::PARTIAL],
+        self::PARTIAL => [self::REFUNDED],
+        self::REFUNDED => [],
+        self::FAILED => [self::PENDING],
+        self::CANCELED => [],
+    ];
+
     public function setPending()
     {
         return $this->changeState(self::PENDING);

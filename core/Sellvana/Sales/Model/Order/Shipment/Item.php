@@ -12,9 +12,4 @@ class Sellvana_Sales_Model_Order_Shipment_Item extends Sellvana_Sales_Model_Orde
     protected $_doneStates = [
         Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPED,
     ];
-
-    public function getOrderItemsQtys(array $items = null)
-    {
-        return $this->_getOrderItemsQtys($items);
-    }
 }

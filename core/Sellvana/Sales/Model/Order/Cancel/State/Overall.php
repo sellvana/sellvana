@@ -32,6 +32,13 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Mod
         self::COMPLETE => 'setComplete',
     ];
 
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::APPROVED, self::DECLINED],
+        self::APPROVED => [self::COMPLETE],
+        self::DECLINED => [self::COMPLETE],
+        self::COMPLETE => [],
+    ];
+
     public function setRequested()
     {
         return $this->changeState(self::REQUESTED);

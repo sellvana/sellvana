@@ -12,9 +12,5 @@ class Sellvana_Sales_Model_Order_Refund_Item extends Sellvana_Sales_Model_Order_
     protected $_doneStates = [
         Sellvana_Sales_Model_Order_Refund_State_Overall::REFUNDED,
     ];
-
-    public function getOrderItemsQtys(array $items = null)
-    {
-        return $this->_getOrderItemsQtys($items);
-    }
+    
 }

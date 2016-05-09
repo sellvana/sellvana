@@ -40,6 +40,17 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
         self::EXCEPTION => 'email/sales/order-shipment-state-overall-exception',
         self::DELIVERED => 'email/sales/order-shipment-state-overall-delivered',
     ];
+    
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::PACKING, self::SHIPPING, self::CANCELED],
+        self::PACKING => [self::SHIPPING, self::CANCELED],
+        self::SHIPPING => [self::SHIPPED],
+        self::SHIPPED => [self::DELIVERED, self::EXCEPTION, self::RETURNED],
+        self::DELIVERED => [self::RETURNED],
+        self::EXCEPTION => [self::DELIVERED, self::RETURNED, self::CANCELED],
+        self::RETURNED => [],
+        self::CANCELED => [],
+    ];
 
     protected $_defaultValue = self::PENDING;
 

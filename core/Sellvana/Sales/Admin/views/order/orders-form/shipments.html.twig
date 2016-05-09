@@ -112,8 +112,8 @@
             </thead>
             <tbody>
                 {% for s in allShipments %}
-                    {% set allOverallStates = s.state().overall().getAllValueLabels() %}
-                    {% set allCustomStates = s.state().custom().getAllValueLabels() %}
+                    {% set allOverallStates = s.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = s.state().custom().getNextValueLabels() %}
                     <tr>
                         <td>
                             <p><strong>{{ s.get('carrier_desc') }}</strong></p>
