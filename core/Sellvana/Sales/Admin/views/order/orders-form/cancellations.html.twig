@@ -66,8 +66,8 @@
                 </thead>
                 <tbody>
                 {% for c in allCancellations %}
-                    {% set allOverallStates = c.state().overall().getAllValueLabels() %}
-                    {% set allCustomStates = c.state().custom().getAllValueLabels() %}
+                    {% set allOverallStates = c.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = c.state().custom().getNextValueLabels() %}
                     <tr>
                         <td>
                             <p>{{ 'Overall:'|_ }} <strong>{{ c.state().overall().getValueLabel() }}</strong></p>

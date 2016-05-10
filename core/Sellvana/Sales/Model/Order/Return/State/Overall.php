@@ -2,8 +2,8 @@
 
 class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
-    const REQUESTED = 'requested',
-        PENDING = 'pending',
+    const PENDING = 'pending',
+        REQUESTED = 'requested',
         RMA_SENT = 'rma_sent',
         EXPIRED = 'expired',
         CANCELED = 'canceled',
@@ -13,8 +13,8 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Mod
         DECLINED = 'declined';
 
     protected $_valueLabels = [
-        self::REQUESTED => 'Requested',
         self::PENDING => 'Pending',
+        self::REQUESTED => 'Requested',
         self::RMA_SENT => 'RMA Sent',
         self::EXPIRED => 'Expired',
         self::CANCELED => 'Canceled',
@@ -25,8 +25,8 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Mod
     ];
 
     protected $_defaultMethods = [
-        self::REQUESTED => 'setRequested',
         self::PENDING => 'setPending',
+        self::REQUESTED => 'setRequested',
         self::RMA_SENT => 'setRMASent',
         self::EXPIRED => 'setExpired',
         self::CANCELED => 'setCanceled',
@@ -45,14 +45,25 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Mod
 
     protected $_defaultValue = self::PENDING;
 
-    public function setRequested()
-    {
-        return $this->changeState(self::REQUESTED);
-    }
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::REQUESTED],
+        self::REQUESTED => [self::RMA_SENT],
+        self::RMA_SENT => [self::RECEIVED, self::CANCELED, self::EXPIRED],
+        self::EXPIRED => [self::PENDING],
+        self::CANCELED => [self::PENDING],
+        self::RECEIVED => [self::APPROVED, self::DECLINED],
+        self::APPROVED => [self::RESTOCKED],
+        self::DECLINED => [self::RESTOCKED],
+    ];
 
     public function setPending()
     {
         return $this->changeState(self::PENDING);
+    }
+
+    public function setRequested()
+    {
+        return $this->changeState(self::REQUESTED);
     }
 
     public function setRMASent()

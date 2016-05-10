@@ -25,6 +25,15 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
 
     protected $_defaultValue = self::PENDING;
 
+    protected $_defaultValueWorkflow = [
+        self::VIRTUAL => [],
+        self::PENDING => [self::PACKED, self::SHIPPED, self::PARTIAL],
+        self::PACKED => [self::SHIPPED, self::PARTIAL],
+        self::SHIPPED => [self::DELIVERED],
+        self::DELIVERED => [],
+        self::PARTIAL => [self::SHIPPED, self::DELIVERED],
+    ];
+
     public function setVirtual()
     {
         return $this->changeState(self::VIRTUAL);

@@ -5,8 +5,6 @@
 {% set totals = order.getData('totals') %}
 {% set itemsGridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').itemsOrderGridConfig(order) %}
 {% set orderCustomStates = order.state().custom().getAllValueLabels() %}
-{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
-{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
 
 {{ THIS.view('core/geo-embed') | raw }}
 

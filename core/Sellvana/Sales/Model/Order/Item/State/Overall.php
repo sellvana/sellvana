@@ -31,6 +31,14 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
 
     protected $_defaultValue = self::PENDING;
 
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::BACKORDERED, self::PROCESSING, self::CANCELED],
+        self::BACKORDERED => [self::PROCESSING, self::CANCELED],
+        self::PROCESSING => [self::COMPLETE, self::CANCELED],
+        self::COMPLETE => [],
+        self::CANCELED => [],
+    ];
+
     public function setPending()
     {
         return $this->changeState(self::PENDING);

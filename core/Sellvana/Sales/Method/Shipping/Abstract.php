@@ -78,7 +78,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     {
         $allServices = $this->getServices();
         $enabled = $this->getConfig('services');
-        if (!$enabled) {
+        if ($this->getConfig('all_services') || !$enabled) {
             return $allServices;
         }
         $services = [];

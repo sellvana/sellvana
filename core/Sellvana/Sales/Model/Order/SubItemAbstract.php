@@ -27,7 +27,7 @@ abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Mode
      */
     protected $_doneStates = [];
 
-    protected function _getOrderItemsQtys(array $items)
+    public function getOrderItemsQtys(array $items = [])
     {
         $parentClass = $this->_parentClass;
         $parentField = $this->_parentField;

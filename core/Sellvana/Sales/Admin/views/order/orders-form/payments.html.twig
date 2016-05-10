@@ -89,8 +89,8 @@
                 </thead>
                 <tbody>
                 {% for s in allPayments %}
-                    {% set allOverallStates = s.state().overall().getAllValueLabels() %}
-                    {% set allCustomStates = s.state().custom().getAllValueLabels() %}
+                    {% set allOverallStates = s.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = s.state().custom().getNextValueLabels() %}
                     <tr>
                         <td>
                             <p><strong>{{ allMethods[s.get('payment_method')].getName() }}</strong></p>

@@ -43,6 +43,18 @@ class Sellvana_Sales_Model_Order_Shipment_Package_State_Overall extends Sellvana
 
     protected $_defaultValue = self::PENDING;
 
+    protected $_defaultValueWorkflow = [
+        self::NA => [],
+        self::PENDING => [self::LABEL, self::SHIPPED],
+        self::LABEL => [self::SHIPPED],
+        self::RECEIVED => [], //?
+        self::SHIPPED => [self::IN_TRANSIT, self::EXCEPTION, self::DELIVERED, self::REFUSED, self::RETURNED],
+        self::IN_TRANSIT => [self::DELIVERED, self::REFUSED, self::RETURNED],
+        self::DELIVERED => [self::RETURNED],
+        self::REFUSED => [],
+        self::RETURNED => [],
+    ];
+
     public function setNotApplicable()
     {
         return $this->changeState(self::NA);
