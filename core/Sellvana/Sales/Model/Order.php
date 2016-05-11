@@ -142,6 +142,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $assoc ? $this->shipments : array_values($this->shipments);
     }
 
+    /**
+     * @param bool $assoc
+     * @return Sellvana_Sales_Model_Order_Payment[]
+     */
     public function payments($assoc = true)
     {
         if (!$this->payments) {

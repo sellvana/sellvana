@@ -152,14 +152,17 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         switch ($paymentAction) {
             case 'Sale':
                 $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
+                $processorState = Sellvana_Sales_Model_Order_Payment_State_Processor::CAPTURED;
                 break;
 
             case 'Authorization':
                 $transType = Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION;
+                $processorState = Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED;
                 break;
 
             case 'Order':
                 $transType = Sellvana_Sales_Model_Order_Payment_Transaction::ORDER;
+                $processorState = Sellvana_Sales_Model_Order_Payment_State_Processor::ROOT_ORDER;
                 break;
         }
 
@@ -184,6 +187,9 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         }
 
         $transaction->complete();
+        if (isset($processorState)) {
+            $payment->state()->processor()->changeState($processorState);
+        }
 
         $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
             'payment' => $payment,

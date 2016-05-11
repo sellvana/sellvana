@@ -187,6 +187,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
                 $payment->state()->overall()->invokeStateChange($state);
             }
         }
+        if (isset($data['state_processor'])) {
+            foreach ($data['state_processor'] as $state => $_) {
+                $payment->state()->processor()->invokeStateChange($state);
+            }
+        }
         $payment->save();
         $order->state()->calcAllStates();
         $order->saveAllDetails();
@@ -231,27 +236,46 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     public function action_adminAuthorizesPayment($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminVoidsAuthorization($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminReAuthorizesPayment($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminCapturesPayment($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminRefundsPayment($args)
     {
+        $this->_adminChangesPaymentProcessor($args);
+    }
 
+    protected function _adminChangesPaymentProcessor($args)
+    {
+//        var_dump($args);
+//        exit();
+        $order = $args['order'];
+        $paymentId = $args['payment_id'];
+        $payment = $this->Sellvana_Sales_Model_Order_Payment->load($paymentId);
+        $data = $args['data'];
+        if (!$payment || $payment->get('order_id') != $order->id()) {
+            throw new BException('Invalid payment to delete');
+        }
+
+        $payment->state()->processor()->invokeStateChange($data);
+        //$payment->save();
+
+        //$order->state()->calcAllStates();
+        //$order->saveAllDetails();
     }
 
     /**

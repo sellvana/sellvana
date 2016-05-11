@@ -85,39 +85,46 @@
                     <th>{{ 'Timeline'|_ }}</th>
                     <th>{{ 'Items'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
+                    <th>{{ 'Actions'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for s in allPayments %}
-                    {% set allOverallStates = s.state().overall().getNextValueLabels() %}
-                    {% set allCustomStates = s.state().custom().getNextValueLabels() %}
+                {% for p in allPayments %}
+                    {% set allOverallStates = p.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = p.state().custom().getNextValueLabels() %}
                     <tr>
                         <td>
-                            <p><strong>{{ allMethods[s.get('payment_method')].getName() }}</strong></p>
+                            <p><strong>{{ allMethods[p.get('payment_method')].getName() }}</strong></p>
                         </td>
                         <td>
-                            <p>{{ 'Overall:'|_ }} <strong>{{ s.state().overall().getValueLabel() }}</strong></p>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ p.state().overall().getValueLabel() }}</strong></p>
+                            <p>{{ 'Processor:'|_ }} <strong>{{ p.state().processor().getValueLabel() }}</strong></p>
                             {% if allCustomStates %}
-                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="payments[{{ s.id() }}][state_custom]" class="form-control">
-                                        {{ UTIL.optionsHtml(allCustomStates, s.state().custom().getValue()) | raw }}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="payments[{{ p.id() }}][state_custom]" class="form-control">
+                                        {{ UTIL.optionsHtml(allCustomStates, p.state().custom().getValue()) | raw }}
                                     </select></p>
                             {% endif %}
                             {% for k, v in allOverallStates %}
-                                {% if k != s.get('state_overall') %}
-                                    <input type="button" name="payments[{{ s.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
+                                {% if k != p.get('state_overall') %}
+                                    <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
                                 {% endif %}
                             {% endfor %}
                         </td>
                         <td>
-                            <p>{{ 'Created:'|_ }} <strong>{{ s.get('create_at')|locdate }}</strong></p>
+                            <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
                         </td>
                         <td>
-                            {% for i in s.items() %}
+                            {% for i in p.items() %}
                                 <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
                             {% endfor %}
                         </td>
                         <td>
-                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ p.id }}]" value="1">
+                        </td>
+                        <td>
+                            {% for action, title in p.getAvailableActions() %}
+                                <button type="button" name="payments[{{ p.id() }}]" value="{{ action }}" class="btn btn-default btn-xs js-payment-processor-action">{{ title }}</button>
+                            {% endfor %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -140,6 +147,7 @@
     require(['jquery', 'underscore'], function($, _) {
         var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
         var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
+        var paymentProcessorUpdateUrl = "{{ APP.href('payments/processor?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
@@ -171,6 +179,13 @@
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(paymentUpdateUrl, postData, processPostResponse);
+        });
+
+        // Update payment status
+        container.on('click', '.js-payment-processor-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(paymentProcessorUpdateUrl, postData, processPostResponse);
         });
     })
 </script>
