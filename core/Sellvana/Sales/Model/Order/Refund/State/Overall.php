@@ -5,6 +5,7 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
     const PENDING = 'pending',
         SUPERVISOR_PENDING = 'super_pending',
         SUPERVISOR_AUTHORIZED = 'super_auth',
+        SUPERVISOR_DENIED = 'super_denied',
         PARTIAL = 'partial',
         REFUNDED = 'refunded',
         FAILED = 'failed',
@@ -14,6 +15,7 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
         self::PENDING => 'Pending',
         self::SUPERVISOR_PENDING => 'Pending Supervisor',
         self::SUPERVISOR_AUTHORIZED => 'Supervisor Authorized',
+        self::SUPERVISOR_DENIED => 'Supervisor Denied',
         self::PARTIAL => 'Partial',
         self::REFUNDED => 'Refunded',
         self::FAILED => 'Failed',
@@ -24,6 +26,7 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
         self::PENDING => 'setPending',
         self::SUPERVISOR_PENDING => 'setSuperPending',
         self::SUPERVISOR_AUTHORIZED => 'setSuperAuth',
+        self::SUPERVISOR_DENIED => 'setSuperDenied',
         self::PARTIAL => 'setPartial',
         self::REFUNDED => 'setRefunded',
         self::FAILED => 'setFailed',
@@ -33,6 +36,7 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
     protected $_setValueNotificationTemplates = [
         self::SUPERVISOR_PENDING => 'email/sales/order-refund-state-payment-super_pending-admin',
         self::SUPERVISOR_AUTHORIZED => 'email/sales/order-refund-state-payment-super_auth',
+        self::SUPERVISOR_DENIED => 'email/sales/order-refund-state-payment-super_denied',
         self::REFUNDED => 'email/sales/order-refund-state-payment-refunded',
         self::FAILED => 'email/sales/order-refund-state-overall-failed',
         self::CANCELED => 'email/sales/order-refund-state-overall-canceled',
@@ -42,8 +46,9 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
 
     protected $_defaultValueWorkflow = [
         self::PENDING => [self::SUPERVISOR_PENDING],
-        self::SUPERVISOR_PENDING => [self::SUPERVISOR_AUTHORIZED],
+        self::SUPERVISOR_PENDING => [self::SUPERVISOR_AUTHORIZED, self::SUPERVISOR_DENIED],
         self::SUPERVISOR_AUTHORIZED => [self::REFUNDED, self::PARTIAL],
+        self::SUPERVISOR_DENIED => [self::SUPERVISOR_AUTHORIZED, self::CANCELED],
         self::PARTIAL => [self::REFUNDED],
         self::REFUNDED => [],
         self::FAILED => [self::PENDING],
@@ -63,6 +68,11 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
     public function setSuperAuth()
     {
         return $this->changeState(self::SUPERVISOR_AUTHORIZED);
+    }
+
+    public function setSuperDenied()
+    {
+        return $this->changeState(self::SUPERVISOR_DENIED);
     }
 
     public function setPartial()

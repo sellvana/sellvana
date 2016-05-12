@@ -143,11 +143,12 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         $this->order($order);
 
-        $this->set([
-            'payment_method' => $order->get('payment_method'),
-            'amount_due' => $order->get('amount_due'),
-        ]);
-
+        if (!$this->get('payment_method')) {
+            $this->set('payment_method', $order->get('payment_method'));
+        }
+        if (!(float)$this->get('amount_due')) {
+            $this->set('amount_due', $order->get('amount_due'));
+        }
         $this->state()->overall()->setDefaultState();
         $this->state()->custom()->setDefaultState();
 

@@ -188,7 +188,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $transaction->complete();
         if (isset($processorState)) {
-            $payment->state()->processor()->changeState($processorState);
+            $payment->state()->processor()->invokeStateChange($processorState);
         }
 
         $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [

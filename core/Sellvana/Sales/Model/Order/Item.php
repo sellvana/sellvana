@@ -91,12 +91,12 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getQtyCanReturn()
     {
-        return $this->get('qty_in_shipments') - $this->get('qty_in_returns');
+        return $this->get('qty_shipped') - $this->get('qty_in_returns');
     }
 
     public function getQtyCanRefund()
     {
-        return $this->get('qty_in_payments') - $this->get('qty_in_refunds');
+        return $this->get('qty_paid') - $this->get('qty_in_refunds');
     }
 
     /**
