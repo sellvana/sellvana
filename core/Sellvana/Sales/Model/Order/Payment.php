@@ -53,7 +53,12 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         'reauthorize' => [
             'label' => 'Reauthorize',
             'capability' => 'reauth',
-            'states' => [],
+            'states' => [
+                Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::VOID,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
+            ],
         ],
         'capture' => [
             'label' => 'Capture',
@@ -61,6 +66,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
                 Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
             ],
         ],
         'partial_capture' => [
@@ -69,6 +75,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
                 Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
             ],
         ],
         'void' => [
@@ -77,6 +84,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
                 Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
             ]
         ],
         'refund' => [
@@ -245,6 +253,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function findTransaction($type, $status = null, $amount = null)
     {
         $orm = $this->Sellvana_Sales_Model_Order_Payment_Transaction->orm();
+        $orm->where('payment_id', $this->id());
         if (is_string($type)) {
             $orm->where('transaction_type', $type);
         } elseif (is_array($type)) {
@@ -389,7 +398,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('order', true);
+        $parent = $this->findTransaction('order', 'completed');
 
         $transaction = $this->createTransaction('auth', $amount, $parent)->start();
 
@@ -417,7 +426,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('auth', true);
+        $parent = $this->findTransaction('auth', 'completed');
 
         if (!$parent) {
             throw new BException('Unable to find authorization transaction');
@@ -446,7 +455,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction(['auth', 'reauth'], true);
+        $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
 
         if (!$parent) {
             throw new BException('Unable to find authorization transaction');
@@ -473,7 +482,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction(['auth', 'reauth'], true);
+        $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
 
         if (!$parent) {
             throw new BException('Unable to find authorization transaction');
@@ -500,7 +509,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('capture', true);
+        $parent = $this->findTransaction('capture', 'completed');
 
         if (!$parent) {
             throw new BException('Unable to find capture transaction');

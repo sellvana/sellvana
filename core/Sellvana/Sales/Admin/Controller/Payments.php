@@ -229,5 +229,8 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
             $result['error'] = true;
             $result['message'] = $e->getMessage();
         }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $this->BResponse->json($result);
     }
 }

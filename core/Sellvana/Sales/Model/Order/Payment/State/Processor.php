@@ -38,14 +38,36 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         self::REFUSED => 'Refused',
         self::EXPIRED => 'Expired',
         self::CAPTURED => 'Captured',
-        self::PARTIAL_CAPTURED => 'Partially Captured',
+        self::PARTIAL_CAPTURED => 'Partial Captured',
         self::DECLINED => 'Declined',
         self::ERROR => 'Error',
         self::CHARGEBACK => 'Charged Back',
         self::REFUNDED => 'Refunded',
-        self::PARTIAL_REFUNDED => 'Partially Refunded',
+        self::PARTIAL_REFUNDED => 'Partial Refunded',
         self::VOID => 'Void',
         self::CANCELED => 'Canceled',
+    ];
+
+    protected $_defaultMethods = [
+        self::NA => 'setNA',
+        self::PENDING => 'setPending',
+        self::EXT_REDIRECTED => 'setExtRedirected',
+        self::EXT_RETURNED => 'setExtReturned',
+        self::ROOT_ORDER => 'setRootOrder',
+        self::AUTHORIZING => 'setAuthorizing',
+        self::AUTHORIZED => 'setAuthorized',
+        self::REAUTHORIZED => 'setReAuthorized',
+        self::REFUSED => 'setRefused',
+        self::EXPIRED => 'setExpired',
+        self::CAPTURED => 'setCaptured',
+        self::PARTIAL_CAPTURED => 'setPartialCaptured',
+        self::DECLINED => 'setDeclined',
+        self::ERROR => 'setError',
+        self::CHARGEBACK => 'setChargedBack',
+        self::REFUNDED => 'setRefunded',
+        self::PARTIAL_REFUNDED => 'setPartialRefunded',
+        self::VOID => 'setVoid',
+        self::CANCELED => 'setCanceled',
     ];
 
     public function setNA()
@@ -103,7 +125,7 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         return $this->changeState(self::CAPTURED);
     }
 
-    public function setPartiallyCaptured()
+    public function setPartialCaptured()
     {
         return $this->changeState(self::PARTIAL_CAPTURED);
     }
@@ -128,7 +150,7 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         return $this->changeState(self::REFUNDED);
     }
 
-    public function setPartiallyRefunded()
+    public function setPartialRefunded()
     {
         return $this->changeState(self::PARTIAL_REFUNDED);
     }

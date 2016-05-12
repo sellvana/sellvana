@@ -222,7 +222,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function reauthorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-        $result = $this->_callDoAuthorization($transaction);
+        $result = $this->_callDoReauthorization($transaction);
 
         if (!empty($result['error'])) {
             $this->_setErrorStatus($result);
@@ -266,12 +266,36 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     {
         $result = $this->_callDoVoid($transaction);
 
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus($result);
+            return $result;
+        }
+
+        $this->_saveResultToTransaction($transaction, $result['response']);
+
         return $result;
     }
 
     public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $result = $this->_callRefundTransaction($transaction);
 
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus($result);
+            return $result;
+        }
+
+        $r = $result['response'];
+        $r['TRANSACTIONTYPE'] = 'refund';
+        $r['PAYMENTSTATUS'] = 'Refunded';
+        $r['PAYMENTTYPE'] = 'instant';
+        $r['REASONCODE'] = 'None';
+        $r['TRANSACTIONID'] = $r['REFUNDTRANSACTIONID'];
+
+        $this->_saveResultToTransaction($transaction, $r);
+        $transaction->set('transaction_id', $r['REFUNDTRANSACTIONID']);
+
+        return $result;
     }
 
     protected function _saveResultToTransaction(Sellvana_Sales_Model_Order_Payment_Transaction $transaction, $r, $n = null)
@@ -458,7 +482,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'AMT' => $transaction->get('amount'),
         ];
 
-        $result = $this->_call('DoAuthorization', $request);
+        $result = $this->_call('DoReauthorization', $request);
 
         return $result;
     }
@@ -483,7 +507,16 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     protected function _callRefundTransaction(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $request = [
+            'TRANSACTIONID' => $transaction->get('parent_transaction_id'),
+            'REFUNDTYPE' => 'Partial',
+            'CURRENCYCODE' => $transaction->payment()->order()->get('order_currency'),
+            'AMT' => $transaction->get('amount'),
+        ];
 
+        $result = $this->_call('RefundTransaction', $request);
+
+        return $result;
     }
 
     protected function _addOrderInfo(Sellvana_Sales_Model_Order_Payment $payment, $request, $n = null)
@@ -571,6 +604,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         parse_str($responseRaw, $response);
         $result = ['request' => $request, 'response' => $response/*, 'response_raw' => $responseRaw*/];
+        $this->BDebug->log(print_r($response, 1), 'paypal.log');
 
         if (!empty($response['ACK'])) {
             $ack = strtoupper($response['ACK']);
