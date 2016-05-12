@@ -377,3 +377,10 @@ form:
         do:
             - [ requireJs, fcom.admin.import, "@FCom_Admin/Admin/js/fcom/fcom.admin.import" ]
             - [ scss, "@FCom_Admin/Admin/theme1/assets/scss/admin-import.scss" ]
+
+
+/g2fa/login:
+    - { include: base }
+    - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
+    - { hook: main, views: g2fa/login }

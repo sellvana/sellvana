@@ -1,0 +1,67 @@
+{% set user = THIS.get('user') %}
+
+<div id="g2fa-container-notsetup" style="display:none">
+    {{ 'Your Google 2FA is not enabled.'|_ }}
+    <br>
+    <a href="#" id="g2fa-enable">{{ 'Please click here to enable.'|_ }}</a>
+</div>
+
+<div id="g2fa-container-confirm" style="display:none">
+    <img src="" id="g2fa-qrcode">
+    <br>
+    <form id="g2fa-code-form" method="post" action="#">
+        <input type="text" name="code" id="g2fa-code">
+        <input type="submit" value="{{ 'Verify'|_ }}">
+    </form>
+    <div id="g2fa-form-message" style="color:#AA0000"></div>
+</div>
+
+<div id="g2fa-container-setup" style="display:none">
+    {{ 'Your Google 2FA is configured and enabled.' }}
+    <br>
+    <a href="#" id="g2fa-disable">{{ 'Please click here to disable.'|_ }}</a>
+</div>
+
+<script>
+    require(['jquery'], function($) {
+        function switchVisible(status) {
+            console.log(status);
+            var $nosetup = $('#g2fa-container-notsetup'),
+                    $confirm = $('#g2fa-container-confirm'),
+                    $setup = $('#g2fa-container-setup');
+            $nosetup.hide(); $confirm.hide(); $setup.hide();
+            switch (status) {
+                case 0: $nosetup.show(); break;
+                case 5: $confirm.show(); break;
+                case 9: $setup.show(); break;
+            }
+        }
+        switchVisible({{ user.get('g2fa_status')|default(0) }});
+
+        $('#g2fa-enable').click(function(ev) {
+            $.post('{{ APP.href('g2fa/enable') }}', function(data, status, xhr) {
+                $('#g2fa-qrcode').attr('src', data.qrcode_url);
+                switchVisible(5);
+            });
+        });
+
+        $('#g2fa-code-form').submit(function(ev) {
+            ev.preventDefault();
+            var formData = {code: $('#g2fa-code').val()};
+            $.post('{{ APP.href('g2fa/verify') }}', formData, function(data, status, xhr) {
+                if (data.success) {
+                    switchVisible(9);
+                } else {
+                    $('#g2fa-form-message').html(data.message);
+                }
+            });
+            return false;
+        });
+
+        $('#g2fa-disable').click(function(ev) {
+            $.post('{{ APP.href('g2fa/disable') }}', function(data, status, xhr) {
+                switchVisible(0);
+            });
+        });
+    });
+</script>

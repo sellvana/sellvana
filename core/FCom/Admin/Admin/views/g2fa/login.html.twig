@@ -1,0 +1,31 @@
+<div class='login-container'>
+    <h1 class="login-logo">Sellvana Admin</h1>
+    <div class='container'>
+        {{ THIS.view('core/messages') | raw }}
+        <form id="g2fa-form" action='{{ APP.href('g2fa/login') }}' class='validate-form' method='post'>
+            <div class='form-group'>
+                <label for="g2fa-username" class="control-label">{{ "Google 2FA Code" | _ }}</label>
+                <div class='controls with-icon-over-input'>
+                    <input id="g2fa-code" value="" placeholder="{{ '******'|_ }}" class="required form-control"
+                           data-rule-required="true" name="g2fa[code]" type="text" />
+                </div>
+            </div>
+            <div class='checkbox'>
+                <label for='g2fa-remember_me'>
+                    <input id='g2fa-remember_me' name='g2fa[remember_me]' type='checkbox' value='1'>
+                    {{ 'Remember this browser for 30 days'|_ }}
+                </label>
+            </div>
+            <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Verify Code'|_ }}</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    require(['jquery', 'jquery.validate'], function($) {
+        $(function() {
+            $('#g2fa-form').validate();
+            $('#g2fa-code').focus();
+        });
+    })
+</script>

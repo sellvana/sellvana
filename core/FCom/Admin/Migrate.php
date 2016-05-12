@@ -9,12 +9,13 @@
  * @property FCom_Admin_Model_Personalize $FCom_Admin_Model_Personalize
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Admin_Model_UserG2FA $FCom_Admin_Model_UserG2FA
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  */
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_6_1_0()
+    public function install__0_6_2_0()
     {
         $tRole = $this->FCom_Admin_Model_Role->table();
         $this->BDb->run("
@@ -52,6 +53,8 @@ class FCom_Admin_Migrate extends BClass
             `api_password`  varchar(100) DEFAULT '' NOT NULL,
             `api_password_hash` varchar(255)  NULL,
             `password_session_token` varchar(16),
+            `g2fa_secret` varchar(16) default null,
+            `g2fa_status` tinyint not null default 0,
             `data_serialized` text  NULL,
             PRIMARY KEY (`id`),
             UNIQUE KEY `UNQ_email` (`email`),
@@ -134,6 +137,23 @@ class FCom_Admin_Migrate extends BClass
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
+            ],
+        ]);
+
+        $tUserG2FA = $this->FCom_Admin_Model_UserG2FA->table();
+        $this->BDb->ddlTableDef($tUserG2FA, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'user_id' => 'int unsigned not null',
+                'token' => 'varchar(32) not null',
+                'create_at' => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_user_token' => 'UNIQUE (user_id, token)',
+            ],
+            BDb::CONSTRAINTS => [
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }
@@ -335,6 +355,35 @@ class FCom_Admin_Migrate extends BClass
         $this->BDb->ddlTableDef($tUser, [
             BDb::COLUMNS => [
                 'create_at' => 'datetime default null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tUser = $this->FCom_Admin_Model_User->table();
+        $tUserG2FA = $this->FCom_Admin_Model_UserG2FA->table();
+
+        $this->BDb->ddlTableDef($tUser, [
+            BDb::COLUMNS => [
+                'g2fa_secret' => 'varchar(16) default null',
+                'g2fa_status' => 'tinyint not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tUserG2FA, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'user_id' => 'int unsigned not null',
+                'token' => 'varchar(32) not null',
+                'create_at' => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_user_token' => 'UNIQUE (user_id, token)',
+            ],
+            BDb::CONSTRAINTS => [
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }
