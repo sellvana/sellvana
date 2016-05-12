@@ -49,6 +49,55 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      */
     protected $_transactions;
 
+    protected static $_actions = [
+        'reauthorize' => [
+            'label' => 'Reauthorize',
+            'capability' => 'reauth',
+            'states' => [
+                Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::VOID,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
+            ],
+        ],
+        'capture' => [
+            'label' => 'Capture',
+            'capability' => 'capture',
+            'states' => [
+                Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
+            ],
+        ],
+        'partial_capture' => [
+            'label' => 'Partial Capture',
+            'capability' => 'partial_capture',
+            'states' => [
+                Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
+            ],
+        ],
+        'void' => [
+            'label' => 'Void',
+            'capability' => 'void',
+            'states' => [
+                Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
+            ]
+        ],
+        'refund' => [
+            'label' => 'Refund',
+            'capability' => 'refund',
+            'states' => [
+                Sellvana_Sales_Model_Order_Payment_State_Processor::CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+                Sellvana_Sales_Model_Order_Payment_State_Processor::SETTLED,
+            ]
+        ],
+    ];
+
     /**
      * @return Sellvana_Sales_Model_Order_Payment_State
      */
@@ -204,6 +253,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function findTransaction($type, $status = null, $amount = null)
     {
         $orm = $this->Sellvana_Sales_Model_Order_Payment_Transaction->orm();
+        $orm->where('payment_id', $this->id());
         if (is_string($type)) {
             $orm->where('transaction_type', $type);
         } elseif (is_array($type)) {
@@ -348,7 +398,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('order', true);
+        $parent = $this->findTransaction('order', 'completed');
 
         $transaction = $this->createTransaction('auth', $amount, $parent)->start();
 
@@ -376,7 +426,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('auth', true);
+        $parent = $this->findTransaction('auth', 'completed');
+
+        if (!$parent) {
+            throw new BException('Unable to find authorization transaction');
+        }
 
         $transaction = $this->createTransaction('reauth', $amount, $parent)->start();
 
@@ -401,7 +455,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction(['auth', 'reauth'], true);
+        $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+
+        if (!$parent) {
+            throw new BException('Unable to find authorization transaction');
+        }
 
         $transaction = $this->createTransaction('void', null, $parent)->start();
 
@@ -424,7 +482,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction(['auth', 'reauth'], true);
+        $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+
+        if (!$parent) {
+            throw new BException('Unable to find authorization transaction');
+        }
 
         $transaction = $this->createTransaction('capture', $amount, $parent)->start();
 
@@ -447,7 +509,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('capture', true);
+        $parent = $this->findTransaction('capture', 'completed');
+
+        if (!$parent) {
+            throw new BException('Unable to find capture transaction');
+        }
 
         $transaction = $this->createTransaction('refund', $amount, $parent)->start();
 
@@ -467,6 +533,34 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $this->state()->overall()->setPaid();
         $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
         $this->save();
+    }
+
+    public function isActionAvailable($action)
+    {
+        if (!array_key_exists($action, self::$_actions)) {
+            return false;
+        } else {
+            $data = self::$_actions[$action];
+        }
+
+        $method = $this->getMethodObject();
+        return $method->can($data['capability']) && in_array($this->state()->processor()->getValue(), $data['states']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailableActions()
+    {
+        $result = [];
+        foreach (self::$_actions as $action => $data) {
+            $title = $data['label'];
+            if ($this->isActionAvailable($action)) {
+                $result[$action] = $title;
+            }
+        }
+
+        return $result;
     }
 
     public function __destruct()

@@ -158,7 +158,7 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 }
 
                 $order->add('amount_refunded', $amount);
-                if ($order->get('amount_refunded') == $order->get('amount_captured')) {
+                if ($order->get('amount_refunded') == $order->get('amount_paid')) {
                     $order->state()->payment()->setRefunded();
                 } else {
                     $order->state()->payment()->setPartialRefunded();

@@ -11,6 +11,19 @@
 class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
+    
+    static protected $_transactionTypesToStates = [
+        'capture' => Sellvana_Sales_Model_Order_Payment_State_Processor::CAPTURED,
+        'auth' => Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
+        'reauth' => Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
+        'refund' => Sellvana_Sales_Model_Order_Payment_State_Processor::REFUNDED,
+        'void' => Sellvana_Sales_Model_Order_Payment_State_Processor::VOID,
+    ];
+
+    static protected $_transactionTypesToPartialStates = [
+        'capture' => Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
+        'refund' => Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_REFUNDED,
+    ];
 
     public function action_customerPaysOnCheckout($args)
     {
@@ -187,6 +200,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
                 $payment->state()->overall()->invokeStateChange($state);
             }
         }
+        if (isset($data['state_processor'])) {
+            foreach ($data['state_processor'] as $state => $_) {
+                $payment->state()->processor()->invokeStateChange($state);
+            }
+        }
         $payment->save();
         $order->state()->calcAllStates();
         $order->saveAllDetails();
@@ -231,27 +249,57 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     public function action_adminAuthorizesPayment($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminVoidsAuthorization($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminReAuthorizesPayment($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
     }
 
     public function action_adminCapturesPayment($args)
     {
-
+        $this->_adminChangesPaymentProcessor($args);
+        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
+        $transaction = $args['transaction'];
+        $order = $transaction->payment()->order();
+        $order->add('amount_captured', $transaction->get('amount'));
     }
 
     public function action_adminRefundsPayment($args)
     {
+        $this->_adminChangesPaymentProcessor($args);
+    }
 
+    protected function _adminChangesPaymentProcessor($args)
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
+        $transaction = $args['transaction'];
+        $payment = $transaction->payment();
+        if (!$payment) {
+            throw new BException('Invalid payment');
+        }
+
+        if ($transaction->get('transaction_status') != Sellvana_Sales_Model_Order_Payment_Transaction::COMPLETED) {
+            throw new BException('Transaction is not completed');
+        }
+
+        if (!array_key_exists($transaction->get('transaction_type'), self::$_transactionTypesToStates)) {
+            throw new BException('Unknown transaction type');
+        }
+
+        $newState = self::$_transactionTypesToStates[$transaction->get('transaction_type')];
+        $payment->state()->processor()->invokeStateChange($newState);
+        $payment->save();
+
+        $order = $payment->order();
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
     }
 
     /**

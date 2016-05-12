@@ -186,4 +186,51 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
         $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
         $this->BResponse->json($result);
     }
+
+    public function action_processor__POST()
+    {
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $payments = $this->BRequest->post('payments');
+            if ($payments) {
+                $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
+                foreach ($payments as $id => $action) {
+                    foreach ($order->payments() as $payment) {
+                        if ($payment->id() == $id) {
+                            break;
+                        }
+                    }
+
+                    if (!isset($payment)) {
+                        throw new BException('Payment doesn\'t belong to this order');
+                    }
+
+                    $code = $payment->get('payment_method');
+                    if (empty($methods[$code])) {
+                        throw new BException('Invalid payment method');
+                    }
+
+                    if (!$payment->isActionAvailable($action)) {
+                        throw new BException('This action is not available for this payment');
+                    }
+
+                    $payment->{$action}();
+
+                    unset($payment);
+                }
+            }
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $this->BResponse->json($result);
+    }
 }

@@ -2,28 +2,29 @@
 
 /**
  * Class Sellvana_Sales_Model_Order_Payment_State_Processor
- *
- * @deprecated not needed with new payment/transaction structure, keeping as backup
  */
 class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const NA = 'na',
         PENDING = 'pending',
-        EXT_REDIRECTED = 'ext_redirected',
-        EXT_RETURNED = 'ext_returned',
+        EXT_REDIRECTED = 'ext_redirected', // redirect to PayPal
+        EXT_RETURNED = 'ext_returned', // redirect from PayPal
         ROOT_ORDER = 'root_order',
         AUTHORIZING = 'authorizing',
         AUTHORIZED = 'authorized',
         REAUTHORIZED = 'reauthorized',
-        REFUSED = 'refused',
+        REFUSED = 'refused', // wrong CC
         EXPIRED = 'expired',
         CAPTURED = 'captured',
-        DECLINED = 'declined',
+        PARTIAL_CAPTURED = 'partial_captured',
+        SETTLED = 'settled',
+        DECLINED = 'declined', // insufficient balance
         ERROR = 'error',
-        CHARGEBACK = 'chargeback',
-        REFUNDED = 'refunded',
-        VOID = 'void',
-        CANCELED = 'canceled';
+        CHARGEBACK = 'chargeback', // bank returns the money
+        REFUNDED = 'refunded', // seller returns the money
+        PARTIAL_REFUNDED = 'partial_refunded',
+        VOID = 'void', // before settlement
+        CANCELED = 'canceled'; // before capture
 
     protected $_valueLabels = [
         self::NA => 'N/A',
@@ -37,12 +38,36 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         self::REFUSED => 'Refused',
         self::EXPIRED => 'Expired',
         self::CAPTURED => 'Captured',
+        self::PARTIAL_CAPTURED => 'Partial Captured',
         self::DECLINED => 'Declined',
         self::ERROR => 'Error',
         self::CHARGEBACK => 'Charged Back',
         self::REFUNDED => 'Refunded',
+        self::PARTIAL_REFUNDED => 'Partial Refunded',
         self::VOID => 'Void',
         self::CANCELED => 'Canceled',
+    ];
+
+    protected $_defaultMethods = [
+        self::NA => 'setNA',
+        self::PENDING => 'setPending',
+        self::EXT_REDIRECTED => 'setExtRedirected',
+        self::EXT_RETURNED => 'setExtReturned',
+        self::ROOT_ORDER => 'setRootOrder',
+        self::AUTHORIZING => 'setAuthorizing',
+        self::AUTHORIZED => 'setAuthorized',
+        self::REAUTHORIZED => 'setReAuthorized',
+        self::REFUSED => 'setRefused',
+        self::EXPIRED => 'setExpired',
+        self::CAPTURED => 'setCaptured',
+        self::PARTIAL_CAPTURED => 'setPartialCaptured',
+        self::DECLINED => 'setDeclined',
+        self::ERROR => 'setError',
+        self::CHARGEBACK => 'setChargedBack',
+        self::REFUNDED => 'setRefunded',
+        self::PARTIAL_REFUNDED => 'setPartialRefunded',
+        self::VOID => 'setVoid',
+        self::CANCELED => 'setCanceled',
     ];
 
     public function setNA()
@@ -100,6 +125,11 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         return $this->changeState(self::CAPTURED);
     }
 
+    public function setPartialCaptured()
+    {
+        return $this->changeState(self::PARTIAL_CAPTURED);
+    }
+
     public function setDeclined()
     {
         return $this->changeState(self::DECLINED);
@@ -118,6 +148,11 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
     public function setRefunded()
     {
         return $this->changeState(self::REFUNDED);
+    }
+
+    public function setPartialRefunded()
+    {
+        return $this->changeState(self::PARTIAL_REFUNDED);
     }
 
     public function setVoid()

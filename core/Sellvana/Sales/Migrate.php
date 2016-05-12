@@ -420,6 +420,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'transaction_fee'  => 'decimal(12,2)',
                 'online'           => 'BOOL',
                 'state_overall'    => "varchar(20) not null default 'new'",
+                'state_processor'  => "varchar(20) not null default ''",
                 'state_custom'     => "varchar(20) default null",
             ],
             BDb::PRIMARY => '(id)',
@@ -2260,6 +2261,17 @@ class Sellvana_Sales_Migrate extends BClass
 
         $hlpOrderItem->run_sql("UPDATE {$tOrderItem} SET qty_in_cancels=qty_canceled, qty_in_shipments=qty_shipped, 
                                 qty_in_returns=qty_returned, qty_in_payments=qty_paid, qty_in_refunds=qty_refunded");
+    }
+
+    public function upgrade__0_6_7_0__0_6_8_0()
+    {
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'state_processor' => "varchar(20) not null default 'pending'"
+            ],
+        ]);
     }
 }
 
