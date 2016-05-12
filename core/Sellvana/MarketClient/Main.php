@@ -165,23 +165,6 @@ class Sellvana_MarketClient_Main extends BClass
         return $this;
     }
 
-    public function onGetHeaderNotifications($args)
-    {
-        if (!$this->BConfig->get('modules/Sellvana_MarketClient/auto_check_enable')) {
-            return;
-        }
-
-        $updates = $this->Sellvana_MarketClient_RemoteApi->fetchUpdatesFeed();
-
-        if (!empty($updates['items'])) {
-            foreach ($updates['items'] as $item) {
-                //TODO: make sure correct structure
-                $item['feed'] = 'remote';
-                $args['items'][] = $item;
-            }
-        }
-    }
-
     public function onInstallStep3Post($args)
     {
         if (empty($args['data']['account'])) {

@@ -209,6 +209,22 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function collectActivityItems()
+    {
+        $items = [];
+        $this->BEvents->fire(__METHOD__, ['items' => &$items]);
+        $this->addActivityItems($items);
+        return $this;
+    }
+
+    public function fetchRemoteActivityItems()
+    {
+        $items = [];
+        $this->BEvents->fire(__METHOD__, ['items' => &$items]);
+        $this->addActivityItems($items);
+        return $this;
+    }
+
     public function addActivityItems($items)
     {
         if (!$items) {

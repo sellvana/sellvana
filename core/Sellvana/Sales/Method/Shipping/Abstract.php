@@ -294,14 +294,20 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
             $data['services'] = array_keys($this->getServicesSelected());
         }
 
+        if (empty($data['package_size'])) {
+            $data['package_size'] = $this->BConfig->get('modules/Sellvana_Sales_Shipping/package_size');
+        }
+        if (!empty($data['package_size'])) {
+            $sizeArr = explode('x', $data['package_size']);
+        }
         if (empty($data['length'])) {
-            $data['length'] = 10;
+            $data['length'] = !empty($sizeArr[0]) ? $sizeArr[0] : 5;
         }
         if (empty($data['width'])) {
-            $data['width'] = 10;
+            $data['width'] = !empty($sizeArr[1]) ? $sizeArr[1] : 5;
         }
         if (empty($data['height'])) {
-            $data['height'] = 10;
+            $data['height'] = !empty($sizeArr[2]) ? $sizeArr[2] : 5;
         }
 
         if (!isset($data['residential'])) {

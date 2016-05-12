@@ -28,7 +28,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         return $this;
     }
 
-    public function onGetHeaderNotifications()
+    public function onCollectActivityItems()
     {
         if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
             $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('activities_feed');
