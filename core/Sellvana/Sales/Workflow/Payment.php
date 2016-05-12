@@ -28,11 +28,16 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
     public function action_customerPaysOnCheckout($args)
     {
         try {
+            /** @var Sellvana_Sales_Model_Order $order */
             $order = $args['order'];
 
             /** @var Sellvana_Sales_Model_Order_Payment $payment */
             $payment = $this->Sellvana_Sales_Model_Order_Payment->create();
             $payment->importFromOrder($order);
+
+            $order->calcItemQuantities('payments');
+            $order->state()->calcAllStates();
+            $order->saveAllDetails();
 
             $method = $payment->getMethodObject();
             $result = $method->payOnCheckout($payment);
