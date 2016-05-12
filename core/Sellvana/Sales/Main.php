@@ -172,7 +172,7 @@ class Sellvana_Sales_Main extends BClass
     {
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
         if ($cart) {
-            $estimates = $cart->getData('shipping_estimates');
+            $estimates = $cart->getData('shipping_rates');
         } else {
             $estimates = [];
         }

@@ -24,8 +24,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
                 $recalc = true;
             }
         }
-
-        if (!$cart->getData('shipping_estimate')) {
+        if (!$cart->getData('shipping_rates')) {
             $cart->set(['recalc_shipping_rates' => 1]);
             $recalc = true;
         }

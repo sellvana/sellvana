@@ -1965,12 +1965,12 @@ class BEvents extends BClass
             unset($reObs);
         }
         $eventName    = strtolower($eventName);
-        $profileStart =
-            BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
         $result       = [];
         if (empty($this->_events[$eventName])) {
             return $result;
         }
+        $profileStart =
+            BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
         $observers =& $this->_events[$eventName]['observers'];
         // sort order observers
         do {

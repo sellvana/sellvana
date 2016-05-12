@@ -49,7 +49,7 @@ Using custom id/name:
     {% set conditions = view.jsVisibleConditions(p) %}
     {% if conditions %}
         {% set inputId = view.getInputId(p) %}
-        {% set toggleId = view.getVisibleToggleId(p) %}
+        {% set toggleId = view.jsVisibleToggleId(p) %}
         <script>
             require(['jquery'], function($) {
                 var $container = $('#{{ inputId }}-container');
