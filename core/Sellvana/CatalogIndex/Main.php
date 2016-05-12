@@ -404,7 +404,7 @@ class Sellvana_CatalogIndex_Main extends BClass
 
     }
 
-    public function onGetHeaderNotifications($args)
+    public function onCollectActivityItems($args)
     {
         $total = $this->BCache->load('index_progress_total');
         $reIndexed = $this->BCache->load('index_progress_reindexed');

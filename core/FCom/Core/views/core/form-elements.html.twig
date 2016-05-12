@@ -48,14 +48,17 @@ Using custom id/name:
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set conditions = view.jsVisibleConditions(p) %}
     {% if conditions %}
-        {% set id = view.getInputId(p) %}
+        {% set inputId = view.getInputId(p) %}
+        {% set toggleId = view.getVisibleToggleId(p) %}
         <script>
             require(['jquery'], function($) {
-                var $container = $('#{{ id }}-container');
+                var $container = $('#{{ inputId }}-container');
                 if ({{ conditions | raw }}) $container.show(); else $container.hide();
-                $('#{{ view.jsVisibleToggleId(p) }}').change(function(ev) {
-                    if ({{ conditions | raw }}) $container.show(); else $container.hide();
-                });
+                {% if toggleId %}
+                    $('#{{ toggleId }}').change(function(ev) {
+                        if ({{ conditions | raw }}) $container.show(); else $container.hide();
+                    });
+                {% endif %}
             });
         </script>
     {% endif %}

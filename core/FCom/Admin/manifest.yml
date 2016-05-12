@@ -1,6 +1,6 @@
 modules:
     FCom_Admin:
-        version: 0.6.1.0
+        version: 0.6.2.0
         channel: beta
         description: Admin Panel base functionality and platform
         custom:
@@ -17,6 +17,7 @@ modules:
                 FCom_Frontend: 0.5.0.0
                 FCom_LibScssPhp: 0.5.0.0
                 FCom_LibJsCkeditor: 0.5.0.0
+                FCom_LibGoogle2FA: 0.5.0.0
 
         translations:
             de: de.php
@@ -82,6 +83,8 @@ modules:
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 
                     - [ /switch_locale, FCom_Admin_Controller.switch_locale ]
+
+                    - [ "/g2fa/?.action", FCom_Admin_Controller_Google2FA ]
 
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]

@@ -205,7 +205,7 @@ class Sellvana_Sales_Main extends BClass
     /**
      * @param array $args
      */
-    public function checkDefaultShippingPayment($args)
+    public function onCollectActivityItems($args)
     {
         if (!$this->getShippingMethods()) {
             $args['items'][] = [

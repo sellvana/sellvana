@@ -16,7 +16,7 @@ modules:
             - [ "FCom_Core_ImportExport::import:beforeModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductBeforeImport" ]
             - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductAfterCoreImport" ]
             - [ "FCom_Core_ImportExport::afterImport", "Sellvana_CatalogIndex_Main::onAfterCoreImport" ]
-            - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_CatalogIndex_Main.onGetHeaderNotifications ]
+            - [ "FCom_Admin_Model_Activity::collectActivityItems", Sellvana_CatalogIndex_Main.onCollectActivityItems ]
         default_config:
             modules/Sellvana_CatalogIndex/show_root_categories: 1
             modules/Sellvana_CatalogIndex/show_sibling_categories: 1

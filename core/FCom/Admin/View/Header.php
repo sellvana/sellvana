@@ -47,7 +47,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
         $items = [];
         $this->BEvents->fire(__METHOD__, ['items' => &$items]);
 
-        $activity = $this->FCom_Admin_Model_Activity->addActivityItems($items)->getUserVisibleItems();
+        $activity = $this->FCom_Admin_Model_Activity->collectActivityItems()->getUserVisibleItems();
 
         $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');

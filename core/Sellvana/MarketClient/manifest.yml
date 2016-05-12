@@ -16,12 +16,11 @@ modules:
                 observe:
                     - [ "FCom_Admin_Controller_Modules::gridViewBefore", Sellvana_MarketClient_Admin.onModulesGridViewBefore ]
                     - [ "FCom_Admin_Controller_Modules::gridView", Sellvana_MarketClient_Admin.onModulesGridView ]
-                    - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_MarketClient_Main.onGetHeaderNotifications ]
 
 
             FCom_Cron:
                 crontab:
-                    #- [ * * * * *, Sellvana_MarketClient_Cron.collectModules ]
+                    - [ "* * * * *", Sellvana_MarketClient_Cron.collectMarketUpdates ]
 
             FCom_Install:
                 auto_use: [ layout, views ]

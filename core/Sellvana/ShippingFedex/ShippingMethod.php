@@ -88,7 +88,12 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $rateClient = $this->_getSoapClient(self::SERVICE_RATE);
         $request = $this->_buildRequest();
         $request = array_merge($request, $this->_buildShipmentData());
-
+        if (!empty($request['error'])) {
+            return [
+                'error' => 1,
+                'message' => $request['message'],
+            ];
+        }
         $rates = $rateClient->getRates($request);
         $this->BDebug->log(print_r($rates, 1), 'fedex.log');
 
@@ -275,11 +280,21 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return $this->_clientCache[$serviceKey];
     }
 
+    /**
+     * @param string $path
+     * @param mixed $default
+     * @return mixed|null
+     *
+     * @todo _applyDefaultPackageConfig
+     */
     protected function _data($path, $default = null)
     {
         $result = $this->BUtil->dataGet($this->_requestData, $path);
         if (null === $result) {
-            $result = $this->BConfig->get("modules/Sellvana_ShippingFedex/{$path}");
+            $result = $this->BConfig->get("{$this->_configPath}/{$path}");
+        }
+        if (null === $result || '' === $result) {
+            $result = $this->BConfig->get("modules/Sellvana_Sales_Shipping/{$path}");
         }
         if (null === $result) {
             $result = $default;

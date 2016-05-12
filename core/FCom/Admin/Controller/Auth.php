@@ -4,6 +4,7 @@
  * Class FCom_Admin_Controller_Auth
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Admin_Model_UserG2FA $FCom_Admin_Model_UserG2FA
  */
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
@@ -25,11 +26,23 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             if (!$user) {
                 throw new Exception($this->_('Invalid user name or password.'));
             }
-            $user->login();
+
             if (!empty($r['remember_me'])) {
                 $days = $this->BConfig->get('cookie/remember_days');
                 $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
             }
+
+            if ($user->get('g2fa_status') == 9) {
+                $token = $this->BRequest->cookie('g2fa_token');
+                $rec = $this->FCom_Admin_Model_UserG2FA->verifyToken($user->id(), $token);
+                if (!$rec) {
+                    $this->BSession->set('g2fa_user_id', $user->id());
+                    $this->BResponse->redirect('g2fa/login');
+                    return;
+                }
+            }
+
+            $user->login();
 
             $url = $this->BSession->get('admin_login_orig_url');
             $result = 'success';
