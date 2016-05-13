@@ -224,6 +224,8 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
 
                     unset($payment);
                 }
+                $result = $this->_resetOrderTabs($order);
+                $result['message'] = $this->_('Processor actions have been applied');
             }
         } catch (Exception $e) {
             $result['error'] = true;

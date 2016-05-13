@@ -1166,7 +1166,7 @@ class BUtil extends BClass
         $multipart = false;
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                if (is_string($v) && $v[0] === '@') {
+                if (is_string($v) && !empty($v[0]) && $v[0] === '@') {
                     $multipart = true;
                     break;
                 }

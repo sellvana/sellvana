@@ -598,6 +598,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         ], $request);
 
         $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request);
+
         if (!$responseRaw) {
             return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from grateway']];
         }
@@ -636,7 +637,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
                 $entity->setData('last_api_call', $result);
             }
         }
-        echo "<pre>"; var_dump($result); echo "<pre>";
+        echo "<pre>"; var_dump($result); echo "<pre>"; exit;
         return $result;
     }
 }

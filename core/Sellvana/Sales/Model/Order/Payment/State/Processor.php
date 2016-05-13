@@ -69,6 +69,28 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         self::VOID => 'setVoid',
         self::CANCELED => 'setCanceled',
     ];
+    
+    static protected $_transactionTypesToStates = [
+        'capture' => self::CAPTURED,
+        'auth' => self::AUTHORIZED,
+        'reauth' => self::REAUTHORIZED,
+        'refund' => self::REFUNDED,
+        'void' => self::VOID,
+    ];
+
+    static protected $_transactionTypesToPartialStates = [
+        'capture' => self::PARTIAL_CAPTURED,
+        'refund' => self::PARTIAL_REFUNDED,
+    ];
+
+    public function invokeAction($action, $partial = false)
+    {
+        $map = $partial ? static::$_transactionTypesToPartialStates : static::$_transactionTypesToStates;
+        if (empty($map[$action])) {
+            throw new BException('Invalid transaction type: ' . $action);
+        }
+        return $this->invokeStateChange($map[$action]);
+    }
 
     public function setNA()
     {

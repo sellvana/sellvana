@@ -11,19 +11,6 @@
 class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
-    
-    static protected $_transactionTypesToStates = [
-        'capture' => Sellvana_Sales_Model_Order_Payment_State_Processor::CAPTURED,
-        'auth' => Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
-        'reauth' => Sellvana_Sales_Model_Order_Payment_State_Processor::REAUTHORIZED,
-        'refund' => Sellvana_Sales_Model_Order_Payment_State_Processor::REFUNDED,
-        'void' => Sellvana_Sales_Model_Order_Payment_State_Processor::VOID,
-    ];
-
-    static protected $_transactionTypesToPartialStates = [
-        'capture' => Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_CAPTURED,
-        'refund' => Sellvana_Sales_Model_Order_Payment_State_Processor::PARTIAL_REFUNDED,
-    ];
 
     public function action_customerPaysOnCheckout($args)
     {
@@ -296,15 +283,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             throw new BException('Transaction is not completed');
         }
 
-        if (!array_key_exists($transaction->get('transaction_type'), self::$_transactionTypesToStates)) {
-            throw new BException('Unknown transaction type');
-        }
-
-        $newState = self::$_transactionTypesToStates[$transaction->get('transaction_type')];
-        $payment->state()->processor()->invokeStateChange($newState);
+        $payment->state()->processor()->invokeAction($transaction->get('transaction_type'));
         $payment->save();
 
         $order = $payment->order();
+        $order->calcItemQuantities(['payments', 'refunds']);
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

@@ -11,5 +11,6 @@ class Sellvana_Sales_Model_Order_Shipment_Item extends Sellvana_Sales_Model_Orde
     protected $_doneField = 'qty_shipped';
     protected $_doneStates = [
         Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPED,
+        Sellvana_Sales_Model_Order_Shipment_State_Overall::DELIVERED,
     ];
 }
