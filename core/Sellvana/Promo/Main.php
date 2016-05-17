@@ -34,6 +34,9 @@ class Sellvana_Promo_Main extends BClass
     {
         /** @var Sellvana_Sales_Model_Cart $cart */
         $cart = $args['cart'];
+        if (!$cart->id()) {
+            return;
+        }
         $validateResult = [];
         $result =& $args['result'];
         $stopFlag = 0;
