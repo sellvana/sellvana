@@ -72,6 +72,7 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
 
         $cart->setData('discount_details', !empty($result['details']) ? $result['details'] : []);
 
+        $cart->setData('store_currency/' . $this->_cartField, $this->_cart->convertToStoreCurrency($this->_value));
         $cart->set($this->_cartField, $this->_value);
 
         if ($this->_value) {

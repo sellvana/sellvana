@@ -528,7 +528,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $request["{$p}PAYMENTACTION"] = $this->getConfig("payment_action");
         $request["{$p}AMT"]           = number_format($payment->get("amount_due"), 2);
-        $request["{$p}ITEMAMT"]       = number_format($order->get("subtotal"), 2);
+        $request["{$p}ITEMAMT"]       = number_format($order->get("subtotal") - $order->get("discount_amount"), 2);
         $request["{$p}SHIPPINGAMT"]   = number_format($order->get("shipping_price"), 2);
         $request["{$p}TAXAMT"]        = number_format($order->get("tax_amount"), 2);
         $request["{$p}CURRENCYCODE"]  = $currency ? $currency : "USD";
@@ -548,6 +548,13 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             //$request["L_{$p}ITEMWEIGHTUNIT{$i}"] = $item->get('');
             //$request["L_{$p}ITEMURL{$i}"] = $item->get('');
             $i++;
+        }
+        if ($order->get('discount_amount') > 0) {
+            $request["L_{$p}NAME{$i}"] = $this->_('Discount');
+            $request["L_{$p}AMT{$i}"] = -number_format($order->get('discount_amount'), 2);
+            $request["L_{$p}QTY{$i}"] = 1;
+            $request["L_{$p}TAXAMT{$i}"] = 0;
+            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = 0;
         }
         return $request;
     }
