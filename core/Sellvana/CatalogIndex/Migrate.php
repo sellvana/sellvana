@@ -408,4 +408,10 @@ EOT
             'weight' => 0,
         ])->save();
     }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $this->Sellvana_CatalogIndex_Model_Field->load('color', 'field_name')
+            ->set('filter_custom_view', 'catalog/category/_filter_swatches')->save();
+    }
 }

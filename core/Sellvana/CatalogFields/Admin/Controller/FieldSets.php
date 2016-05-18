@@ -199,6 +199,9 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['type' => 'input', 'name' => 'multilanguage', 'label' => 'Multi Language', 'width' => 90,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'multirow_edit' => true,
                         'validation' => ['required' => true], 'options' => ['0' => 'No', '1' => 'Yes']],
+                    ['name' => 'swatch_type', 'label' => 'Swatch Type', 'width' => 90,
+                        'editable' => true, 'editor' => 'select', 'addable' => true, 'multirow_edit' => true,
+                        'validation' => ['required' => true], 'options' =>  $fld->fieldOptions('swatch_type')],
                     ['type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
                         'editor' => 'select', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                         'options' => ['1' => 'Yes', '0' => 'No']],
@@ -213,6 +216,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['field' => 'num_options', 'type' => 'text'],
                     ['field' => 'system', 'type' => 'multiselect'],
                     ['field' => 'multilanguage', 'type' => 'multiselect'],
+                    ['field' => 'swatch_type', 'type' => 'multiselect'],
                     ['field' => 'required', 'type' => 'multiselect'],
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
@@ -299,10 +303,14 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['name' => 'label', 'type' => 'input', 'label' => 'Label', 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
+                    ['name' => 'swatch_info', 'label' => 'Swatch Color/URL', 'addable' => true,
+                        'editable' => 'inline', 'sortable' => false, 'type' => 'input'],
                     ['name' => 'langs', 'label' => 'Multi Languages', 'width' => 400, 'editor' => 'select',
-                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => $this->BLocale->parseAllowedLocalesToOptions(true), 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
-                    ['name' => 'lang_vals', 'type' => 'input', 'label' => 'Language Value', 'width' => 300, 'editable' => 'inline',
-                        'sortable' => false],
+                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false,
+                        'options' => $this->BLocale->parseAllowedLocalesToOptions(true), 'select2' => true,
+                        'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
+                    ['name' => 'lang_vals', 'type' => 'input', 'label' => 'Language Value', 'width' => 300,
+                        'editable' => 'inline', 'sortable' => false],
                     ['type' => 'btn_group',
                         'buttons' => [['name' => 'delete', 'noconfirm' => true]]
                     ]
@@ -326,7 +334,25 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 ]
             ]
         ];
+/*
+        $field = $this->Sellvana_CatalogFields_Model_Field->load($this->BRequest->get('field_id'));
+        $swatchType = $field->get('swatch_type');
+        if ($swatchType !== 'N') {
+            switch ($swatchType) {
+                case 'C':
+                    $column = ['name' => 'swatch_info', 'label' => 'Swatch Color', 'addable' => true,
+                        'editable' => 'inline', 'sortable' => false];
+                    break;
 
+                case 'I':
+                    $column = ['name' => 'swatch_info', 'label' => 'Swatch Image URL', 'addable' => true,
+                        'editable' => 'inline', 'sortable' => false];
+                    break;
+            }
+            $config['config']['columns'] = $this->BUtil->arrayInsert($config['config']['columns'], $column,
+                'arr.after.name=label');
+        }
+*/
         return $config;
     }
 
@@ -509,10 +535,17 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                                     $models[$row['id']]->setData(sprintf('frontend_label_translation/%s', $lang['lang_code']), $lang['value']);
                                 }
                             }
-                            $models[$row['id']]->set('label', $row['label'])->save();
+                            $models[$row['id']]->set([
+                                'label' => $row['label'],
+                                'swatch_info' => $row['swatch_info'],
+                            ])->save();
                             $op++;
                         } else { //create option
-                            $rowData = ['field_id' => $model->id, 'label' => (string)$row['label']];
+                            $rowData = [
+                                'field_id' => $model->id(),
+                                'label' => (string)$row['label'],
+                                'swatch_info' => (string)$row['swatch_info'],
+                            ];
                             if (!$hlp->orm()->where($rowData)->find_one()) {
                                 $hlp->create($rowData)->save();
                                 $op++;
@@ -543,10 +576,17 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], '.id'))->find_many_assoc();
         foreach ($p['rows'] as $row) {
             if (!empty($models[$row['id']])) {
-                $models[$row['id']]->set('label', $row['label'])->save();
+                $models[$row['id']]->set([
+                    'label' => $row['label'],
+                    'swatch_info' => $row['swatch_info'],
+                ])->save();
                 $op++;
             } else {
-                $data = ['field_id' => (int)$p['field_id'], 'label' => (string)$row['label']];
+                $data = [
+                    'field_id' => (int)$p['field_id'],
+                    'label' => (string)$row['label'],
+                    'swatch_info' => (string)$row['swatch_info'],
+                ];
                 if (!$hlp->orm()->where($data)->find_one()) {
                     $hlp->create($data)->save();
                     $op++;

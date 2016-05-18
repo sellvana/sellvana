@@ -1,5 +1,5 @@
 {% set facets = THIS.get('products_data')['facets'] %}
-{% set s = THIS.products_data['state'] %}
+{% set s = THIS.get('products_data')['state'] %}
 {% set hlp = APP.instance('Sellvana_CatalogIndex_Main') %}
 {% set collapsed = UTIL.fromJson(REQUEST.cookie('collapsed_facets')) %}
 
@@ -36,8 +36,7 @@
                                         <li {{ collapsed[fKey] ? 'style="display:none"' }}>
                                             <a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
                                                 <span class="glyphicon glyphicon-unchecked"></span> {{ value['display']|_ }}
-                                                {% if value['cnt'] %}<span
-                                                        class="count">({{ value['cnt'] }})</span>{% endif %}
+                                                {% if value['cnt'] %}<span class="count">({{ value['cnt'] }})</span>{% endif %}
                                             </a>
                                         </li>
                                     {% endif %}

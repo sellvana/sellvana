@@ -23,6 +23,7 @@ catalog_product_form_tabs:
 
 /catalogfields/fields:
     - { include: base }
+    - { include: lib_colorpicker }
     - { hook: main, views: catalogfields/fields }
     - { view: admin/nav, do: [[ setNav, catalog/fields ]] }
 

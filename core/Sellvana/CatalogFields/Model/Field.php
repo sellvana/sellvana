@@ -55,6 +55,11 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
             '1'            => 'Yes',
             '0'            => 'No'
         ],
+        'swatch_type'      => [
+            'N' => 'None',
+            'C' => 'Color',
+            'I' => 'Image',
+        ],
     ];
 
     protected static $_fieldDefaults = [
