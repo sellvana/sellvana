@@ -10,7 +10,7 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
 {
     public function authenticate($args = [])
     {
-        if ($this->_action === 'login') {
+        if (in_array($this->_action, ['login', 'recover', 'reset'])) {
             return true;
         }
         return parent::authenticate($args);
@@ -47,10 +47,10 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
             return;
         }
 
-        $locked = $this->BLoginThrottle->init('G2FA-Admin', $userId);
+        $notLocked = $this->BLoginThrottle->init('admin:g2fa_login', $userId);
 
         $check = false;
-        if (!$locked) {
+        if ($notLocked) {
             $check = $this->FCom_LibGoogle2FA_Main->verifyCode($user->get('g2fa_secret'), $post['code'], 2);
             if ($check) {
                 $this->BLoginThrottle->success();
@@ -76,6 +76,95 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
         $this->BResponse->redirect(!empty($url) ? $url : $this->BApp->href());
     }
 
+    public function action_recover()
+    {
+        $this->layout('/g2fa/recover');
+    }
+
+    public function action_recover__POST()
+    {
+        $form = $this->BRequest->request('model');
+        if (empty($form) || empty($form['email'])) {
+            $this->message('Invalid or empty email', 'error');
+            $this->BResponse->redirect($this->BRequest->referrer());
+            return;
+        }
+        $notLocked = $this->BLoginThrottle->init('admin:g2fa_recover', $this->BRequest->ip());
+        if ($notLocked) {
+            $hlp = $this->FCom_Admin_Model_User;
+            /** @var FCom_Admin_Model_User $user */
+            $user = $hlp->orm()->where(['OR' => [
+                'email' => (string)$form['email'],
+                'username' => (string)$form['email'],
+            ]])->find_one();
+            if ($user) {
+                $this->BLoginThrottle->success();
+                $user->recoverG2FA();
+                sleep(1); // equalize time for success and failure
+            } else {
+                $this->BLoginThrottle->failure(1);
+            }
+        } else {
+            sleep(1); // equalize time for success and failure
+        }
+        $this->message('If the email address was correct, you should receive an email shortly with password recovery instructions.');
+        $this->BResponse->redirect('');
+    }
+
+    public function action_reset()
+    {
+        $token = $this->BRequest->request('token');
+        if ($token) {
+            $sessData =& $this->BSession->dataToUpdate();
+            $sessData['g2fa_reset_token'] = $token;
+            $this->BResponse->redirect('g2fa/reset');
+            return;
+        }
+        $token = $this->BSession->get('g2fa_reset_token');
+        if ($token && ($user = $this->FCom_Admin_Model_User->load($token, 'g2fa_token'))
+            && ($user->get('g2fa_token') === $token)
+        ) {
+            $this->layout('/g2fa/reset');
+        } else {
+            $this->message('Invalid link. It is possible your recovery link has expired.', 'error');
+            $this->BResponse->redirect('');
+        }
+    }
+
+    public function action_reset__POST()
+    {
+        if ($this->FCom_Admin_Model_User->isLoggedIn()) {
+            $this->BResponse->redirect('');
+            return;
+        }
+        $r = $this->BRequest;
+        $token = $this->BSession->get('g2fa_reset_token');
+        $form = $r->post('model');
+        $returnUrl = $this->BRequest->referrer();
+
+        $password = !empty($form['password']) ? $form['password'] : null;
+        if (!$password) {
+            $this->message('Invalid or empty password', 'error');
+            $this->BResponse->redirect($returnUrl);
+            return;
+        }
+
+        $user = $this->FCom_Admin_Model_User->validateResetG2FAToken($token);
+        if (!$user) {
+            $this->message('Invalid token', 'error');
+            $this->BResponse->redirect($returnUrl);
+            return;
+        }
+        $sessData =& $this->BSession->dataToUpdate();
+        $sessData['g2fa_reset_token'] = null;
+
+        $user->resetG2FA();
+
+        $this->message('2FA has been reset');
+        $this->BResponse->redirect('');
+    }
+
+    
     public function action_enable__POST()
     {
         $user = $this->FCom_Admin_Model_User->sessionUser();

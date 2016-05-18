@@ -417,6 +417,55 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
+    public function recoverG2FA()
+    {
+        $this->set(['g2fa_token' => $this->BUtil->randomString(), 'g2fa_token_at' => $this->BDb->now()])->save();
+        $this->BLayout->getView('email/admin/user-g2fa-recover')->set('user', $this)->email();
+        return $this;
+    }
+
+    /**
+     * @param $token
+     * @return FCom_Admin_Model_User|bool
+     * @throws BException
+     */
+    public function validateResetG2FAToken($token)
+    {
+        if (!$token) {
+            return false;
+        }
+        $user = $this->load($token, 'g2fa_token');
+        if (!$user || $user->get('g2fa_token') !== $token) {
+            return false;
+        }
+        $tokenTtl = $this->BConfig->get('modules/FCom_Admin/password_reset_token_ttl_hr');
+        if (!$tokenTtl) {
+            $tokenTtl = 24;
+        }
+        if (strtotime($user->get('g2fa_token_at')) < time() - $tokenTtl * 3600) {
+            $user->set(['g2fa_token' => null, 'g2fa_token_at' => null])->save();
+            return false;
+        }
+        return $user;
+    }
+
+    /**
+     * @param $password
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
+    public function resetG2FA()
+    {
+        $this->BSession->regenerateId();
+        $this->set(['g2fa_token' => null, 'g2fa_token_at' => null, 'g2fa_secret' => null, 'g2fa_status' => 0])->save();
+        $this->BLayout->getView('email/admin/user-g2fa-reset')->set('user', $this)->email();
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function tzOffset()

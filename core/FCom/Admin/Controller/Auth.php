@@ -87,12 +87,12 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
                 $user->recoverPassword();
                 sleep(1); // equalize time for success and failure
             } else {
-                if ($this->BDebug->is('DEBUG') && !$hlp->orm()->find_one()) {
-                    $hlp->create(['username' => 'admin', 'email' => $form['email'], 'is_superadmin' => 1])
-                        ->save()->recoverPassword();
-                } else {
+//                if ($this->BDebug->is('DEBUG') && !$hlp->orm()->find_one()) {
+//                    $hlp->create(['username' => 'admin', 'email' => $form['email'], 'is_superadmin' => 1])
+//                        ->save()->recoverPassword();
+//                } else {
                     $this->BLoginThrottle->failure(1);
-                }
+//                }
             }
         } else {
             sleep(1); // equalize time for success and failure

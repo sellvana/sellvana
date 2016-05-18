@@ -15,7 +15,7 @@
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_6_2_0()
+    public function install__0_6_3_0()
     {
         $tRole = $this->FCom_Admin_Model_Role->table();
         $this->BDb->run("
@@ -55,10 +55,13 @@ class FCom_Admin_Migrate extends BClass
             `password_session_token` varchar(16),
             `g2fa_secret` varchar(16) default null,
             `g2fa_status` tinyint not null default 0,
+            `g2fa_token` varchar(32) default null,
+            `g2fa_token_at` datetime default null,
             `data_serialized` text  NULL,
             PRIMARY KEY (`id`),
             UNIQUE KEY `UNQ_email` (`email`),
             UNIQUE KEY `UNQ_username` (`username`),
+            KEY `IDX_g2fa_token` (`g2fa_token`),
             CONSTRAINT `FK_{$tUser}_role` FOREIGN KEY (`role_id`) REFERENCES {$tRole} (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
             CONSTRAINT `FK_{$tUser}_superior` FOREIGN KEY (`superior_id`) REFERENCES {$tUser} (`id`) ON DELETE SET NULL ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -384,6 +387,21 @@ class FCom_Admin_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'user' => ['user_id', $tUser],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_2_0__0_6_3_0()
+    {
+        $tUser = $this->FCom_Admin_Model_User->table();
+
+        $this->BDb->ddlTableDef($tUser, [
+            BDb::COLUMNS => [
+                'g2fa_token' => 'varchar(32) default null',
+                'g2fa_token_at' => 'datetime default null',
+            ],
+            BDb::KEYS => [
+                'IDX_g2fa_token' => '(g2fa_token)',
             ],
         ]);
     }
