@@ -18,6 +18,7 @@ modules:
                 FCom_LibScssPhp: 0.5.0.0
                 FCom_LibJsCkeditor: 0.5.0.0
                 FCom_LibGoogle2FA: 0.5.0.0
+                FCom_LibRecaptcha: 0.5.0.0
 
         translations:
             de: de.php

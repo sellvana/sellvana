@@ -2,8 +2,10 @@
 
 /**
  * Class Sellvana_Customer_Frontend_Controller
+ *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
+ * @property FCom_LibRecaptcha_Main $FCom_LibRecaptcha_Main
  */
 class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -37,6 +39,14 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_login__POST()
     {
         try {
+            if ($this->BConfig->get('modules/Sellvana_Customer/recaptcha_login')
+                && !$this->FCom_LibRecaptcha_Main->check()
+            ) {
+                $this->message('Invalid or missing reCaptcha response', 'error');
+                $this->BResponse->redirect('login');
+                return;
+            }
+
             $r = $this->BRequest;
             $customerModel = $this->Sellvana_Customer_Model_Customer;
             $login = $r->post('login');
@@ -93,6 +103,14 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_password_recover__POST()
     {
         try {
+            if ($this->BConfig->get('modules/Sellvana_Customer/recaptcha_password_recover')
+                && !$this->FCom_LibRecaptcha_Main->check()
+            ) {
+                $this->message('Invalid or missing reCaptcha response', 'error');
+                $this->BResponse->redirect('customer/password/recover');
+                return;
+            }
+            
             $email = $this->BRequest->request('email');
             $customerModel = $this->Sellvana_Customer_Model_Customer;
             $data = ['email' => $email];
@@ -188,6 +206,14 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_register__POST()
     {
         try {
+            if ($this->BConfig->get('modules/Sellvana_Customer/recaptcha_register')
+                && !$this->FCom_LibRecaptcha_Main->check()
+            ) {
+                $this->message('Invalid or missing reCaptcha response', 'error');
+                $this->BResponse->redirect('customer/register');
+                return;
+            }
+            
             $r = $this->BRequest->post('model');
             $a = $this->BRequest->post('address');
             $customerModel = $this->Sellvana_Customer_Model_Customer;

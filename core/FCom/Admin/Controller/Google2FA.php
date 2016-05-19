@@ -83,6 +83,14 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
 
     public function action_recover__POST()
     {
+        if ($this->BConfig->get('modules/FCom_Admin/recaptcha_g2fa_recover')
+            && !$this->FCom_LibRecaptcha_Main->check()
+        ) {
+            $this->message('Invalid or missing reCaptcha response', 'error');
+            $this->BResponse->redirect('g2fa/recover');
+            return;
+        }
+
         $form = $this->BRequest->request('model');
         if (empty($form) || empty($form['email'])) {
             $this->message('Invalid or empty email', 'error');

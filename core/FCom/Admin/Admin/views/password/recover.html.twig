@@ -11,6 +11,12 @@
                 <input value="" placeholder="{{ 'E-mail or Username'|_ }}" class="required form-control" name="model[email]" type="text" />
             </div>
         </div>
+
+        {% set recaptcha = APP.instance('FCom_LibRecaptcha_Main') %}
+        {% if CONFIG.get('modules/FCom_Admin/recaptcha_password_recover') and recaptcha.isAvailable() %}
+            {{ recaptcha.html() | raw }}
+        {% endif %}
+
         <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Send me the instructions'|_ }}</button>
     </form>
     <div class='text-center'>

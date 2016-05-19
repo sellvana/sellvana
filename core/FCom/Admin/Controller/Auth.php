@@ -5,6 +5,7 @@
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Admin_Model_UserG2FA $FCom_Admin_Model_UserG2FA
+ * @property FCom_LibRecaptcha_Main $FCom_LibRecaptcha_Main
  */
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
@@ -17,6 +18,14 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     public function action_login__POST()
     {
         try {
+            if ($this->BConfig->get('modules/FCom_Admin/recaptcha_login')
+                && !$this->FCom_LibRecaptcha_Main->check()
+            ) {
+                $this->message('Invalid or missing reCaptcha response', 'error');
+                $this->BResponse->redirect('login');
+                return;
+            }
+
             $r = $this->BRequest->post('login');
             if (empty($r['username']) || empty($r['password'])) {
                 throw new Exception($this->_('Username and password cannot be blank.'));
@@ -69,6 +78,14 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 
     public function action_password_recover__POST()
     {
+        if ($this->BConfig->get('modules/FCom_Admin/recaptcha_password_recover')
+            && !$this->FCom_LibRecaptcha_Main->check()
+        ) {
+            $this->message('Invalid or missing reCaptcha response', 'error');
+            $this->BResponse->redirect('password/recover');
+            return;
+        }
+
         $form = $this->BRequest->request('model');
         if (empty($form) || empty($form['email'])) {
             $this->message('Invalid or empty email', 'error');

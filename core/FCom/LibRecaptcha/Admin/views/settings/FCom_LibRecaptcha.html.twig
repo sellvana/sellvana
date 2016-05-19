@@ -1,0 +1,11 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model: c, settings_module:'FCom_LibRecaptcha' } %}
+
+<h2>{{ "Google Recaptcha Settings"|_ }}</h2>
+{{ forms.accordion_start({id:'settings-FCom_LibRecaptcha'}) }}
+     {{ forms.accordion_panel_start({label:'Authentication'|_, id:'settings-FCom_LibRecaptcha-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'site_key', label:'Site Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'secret_key', label:'Secret Key'|_ }) }}
+     {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

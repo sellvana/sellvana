@@ -24,6 +24,12 @@
                   {{ 'Remember me'|_ }}
               </label>
           </div>
+
+          {% set recaptcha = APP.instance('FCom_LibRecaptcha_Main') %}
+          {% if CONFIG.get('modules/FCom_Admin/recaptcha_login') and recaptcha.isAvailable() %}
+              {{ recaptcha.html() | raw }}
+          {% endif %}
+
           <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Sign in'|_ }}</button>
       </form>
       <div class='text-center'>
