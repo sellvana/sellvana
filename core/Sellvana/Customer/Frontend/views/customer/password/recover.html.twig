@@ -13,7 +13,13 @@
             <input type="email" name="email" class="required form-control" id="recovery-email"/>
           </div>
         </div>
-        <div class="form-group">
+
+          {% set recaptcha = APP.instance('FCom_LibRecaptcha_Main') %}
+          {% if CONFIG.get('modules/Sellvana_Customer/recaptcha_password_recover') and recaptcha.isAvailable() %}
+              {{ recaptcha.html() | raw }}
+          {% endif %}
+
+          <div class="form-group">
             <input class="btn btn-primary btn-lg" type="submit" value="{{ "Send Reset Instructions" | _ }}"/>
             <a href="{{ APP.href() }}login" class="btn btn-link">&laquo; Back to login</a>
         </div>

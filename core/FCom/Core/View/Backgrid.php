@@ -18,7 +18,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $config['personalize_url'] = $this->BApp->href('my_account/personalize');
 
         if (empty($config['id'])) {
-            $config['id'] = $this->BUtil->simplifyString($this->param('view_name'));
+            $config['id'] = $this->BUtil->simplifyString($this->getParam('view_name'));
         }
         $config['container'] = '#' . $config['id'];
 

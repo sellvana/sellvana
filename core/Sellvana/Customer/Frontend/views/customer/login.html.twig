@@ -29,6 +29,12 @@
         <label for="remember-me"><input type="checkbox" id="remember-me" name="login[remember_me]"/>{{"Remember Me" | _}}</label>
       </div>
     </div>
+
+      {% set recaptcha = APP.instance('FCom_LibRecaptcha_Main') %}
+      {% if CONFIG.get('modules/Sellvana_Customer/recaptcha_login') and recaptcha.isAvailable() %}
+          {{ recaptcha.html() | raw }}
+      {% endif %}
+
     <div class="form-group">
       <button class="btn btn-primary btn-lg" type="submit"><span>{{"Login"|_}}</span></button>
       <a href="{{ APP.href('customer/password/recover')}}" class="btn btn-link">{{ "Forgot your password?" | _ }}</a>

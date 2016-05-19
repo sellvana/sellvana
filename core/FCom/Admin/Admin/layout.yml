@@ -384,3 +384,15 @@ form:
     - { include: form }
     - { view: root, do: [[ addBodyClass, login ]] }
     - { hook: main, views: g2fa/login }
+
+/g2fa/recover:
+    - { include: base }
+    - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
+    - { hook: main, views: g2fa/recover }
+
+/g2fa/reset:
+    - { include: base }
+    - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
+    - { hook: main, views: g2fa/reset }

@@ -1,6 +1,6 @@
 modules:
     FCom_Admin:
-        version: 0.6.2.0
+        version: 0.6.3.0
         channel: beta
         description: Admin Panel base functionality and platform
         custom:
@@ -18,6 +18,7 @@ modules:
                 FCom_LibScssPhp: 0.5.0.0
                 FCom_LibJsCkeditor: 0.5.0.0
                 FCom_LibGoogle2FA: 0.5.0.0
+                FCom_LibRecaptcha: 0.5.0.0
 
         translations:
             de: de.php

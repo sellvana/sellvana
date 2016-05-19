@@ -33,5 +33,5 @@ modules:
       default_config:
           modules:
               Sellvana_MarketClient:
-                  auto_check_enable: 0
+                  auto_check_enable: 1
                   auto_check_days: 1

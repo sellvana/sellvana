@@ -18,6 +18,10 @@
             </div>
             <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Verify Code'|_ }}</button>
         </form>
+        <div class='text-center'>
+            <hr class='hr-normal'>
+            <a href='{{ APP.href('g2fa/recover') }}'>{{ '2FA code is not available?'|_ }}</a>
+        </div>
     </div>
 </div>
 
