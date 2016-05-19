@@ -1,0 +1,134 @@
+{% set order = THIS.get('model') %}
+
+{% set allMethods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
+{% set allPayments = order.getAllPayments() %}
+
+{% if allPayments %}
+    <div id="payment-update-container">
+        <div class="f-section" id="transaction-container">
+            <h2>{{ 'Existing Payments' }}</h2>
+
+            {% for p in allPayments %}
+                <h3>{{ "Payment ID"|_ }}: {{ p.id() }}</h3>
+                {% set allTransactions = p.transactions() %}
+                {% set availableTransactionTypes = p.getAvailableTransactionTypes() %}
+
+                {{ THIS.view('core/messages') | raw }}
+
+                {% if availableTransactionTypes %}
+                    <div class="transaction-create-container">
+                        <h2>{{ 'Create a transaction'|_ }}</h2>
+                        <table class="table table-bordered table-striped dataTable">
+                            <thead>
+                            <tr>
+                                <th>{{ 'Type'|_ }}</th>
+                                <th>{{ 'Amount'|_ }}</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select name="types[{{ p.get('id') }}]" class="form-control input-sm transaction-create-type">
+                                            {% for type, typeData in availableTransactionTypes %}
+                                                <option value="{{ type }}" data-maxamount="{{ typeData.maxAmount }}">{{ typeData.label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td><input type="text" name="amounts[{{ p.get('id') }}]" value="" class="form-control input-sm transaction-create-amount" /></td>
+                                    <td>
+                                        <button class="btn btn-xs btn-primary btnTransactionCreate" type="button">{{ 'Create'|_ }}</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                <table class="table table-bordered table-striped dataTable">
+                    <thead>
+                    <tr>
+                        <th>{{ 'ID'|_ }}</th>
+                        <th>{{ 'Timeline'|_ }}</th>
+                        <th>{{ 'Type'|_ }}</th>
+                        <th>{{ 'Amount'|_ }}</th>
+                        <th>{{ 'Fee'|_ }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for t in allTransactions %}
+                        {% set allOverallStates = p.state().overall().getNextValueLabels() %}
+                        {% set allCustomStates = p.state().custom().getNextValueLabels() %}
+                        <tr>
+                            <td>
+                                <p>{{ t.get('transaction_id') }}</p>
+                            </td>
+                            <td>
+                                <p>{{ 'Created:'|_ }} <strong>{{ t.get('create_at')|locdate }}</strong></p>
+                            </td>
+                            <td>
+                                <p><strong>{{ t.get('transaction_type') }}</strong></p>
+                            </td>
+                            <td>
+                                <p>{{ t.get('amount')|currency }}</p>
+                            </td>
+                            <td>
+                                <p>{{ t.get('transaction_fee')|currency }}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    require(['jquery', 'underscore'], function($, _) {
+        var transactionCreateUrl = "{{ APP.href('transactions/create?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-transactions');
+
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        function updateAmount() {
+//            debugger;
+            $('.transaction-create-type').each(function(index, el) {
+                var type = $(el).val();
+                var amount = $(el).find('option[value="' + type + '"]').data('maxamount');
+                var input = $(el).parents('.transaction-create-container').find('.transaction-create-amount');
+                if (amount != '') {
+                    input.val(parseFloat(amount)).prop("disabled", false);
+                } else {
+                    input.val('').prop("disabled", true);
+                }
+            });
+        }
+
+        // Create transactions
+        container.unbind().on('click', 'button.btnTransactionCreate', function(ev) {
+            var serializeData = $(ev.target).parents('.transaction-create-container').find('input, select').serializeArray();
+            $.post(transactionCreateUrl, serializeData, processPostResponse);
+        });
+
+        // Update maximum amount for transaction
+        container.on('click', 'select.transaction-create-type', updateAmount);
+        updateAmount();
+    })
+</script>

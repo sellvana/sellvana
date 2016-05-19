@@ -124,6 +124,8 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         if (!$this->_items) {
             $this->_items = $this->Sellvana_Sales_Model_Order_Payment_Item->orm('opi')
+                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'opi.order_item_id'], 'oi')
+                ->select(['opi.*', 'oi.inventory_sku', 'oi.product_name'])
                 ->where('payment_id', $this->id())->find_many_assoc('order_item_id');
         }
         return $this->_items;
@@ -131,10 +133,9 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
     public function transactions()
     {
-
         if (!$this->_transactions) {
-            $this->_transactions = $this->Sellvana_Sales_Model_Order_Payment_Transaction()
-                ->where('parent_id', $this->id())->find_many();
+            $this->_transactions = $this->Sellvana_Sales_Model_Order_Payment_Transaction->orm('opt')
+                ->where('payment_id', $this->id())->find_many();
         }
         return $this->_transactions;
     }
@@ -559,6 +560,27 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             if ($this->isActionAvailable($action)) {
                 $result[$action] = $title;
             }
+        }
+
+        return $result;
+    }
+
+    public function getAvailableTransactionTypes()
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $virtualTransaction */
+        $virtualTransaction = $this->Sellvana_Sales_Model_Order_Payment_Transaction->create([
+            'payment_id' => $this->id()
+        ]);
+        $result = [];
+
+        $types = $this->state()->processor()->getAvailableTransactionTypes();
+        $allTypes = $virtualTransaction->fieldOptions('transaction_type');
+
+        foreach ($types as $type) {
+            $result[$type] = [
+                'label' => $allTypes[$type],
+                'maxAmount' => $virtualTransaction->getMaxAmountForType($type)
+            ];
         }
 
         return $result;

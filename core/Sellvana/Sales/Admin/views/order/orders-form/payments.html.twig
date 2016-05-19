@@ -19,6 +19,7 @@
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
                     <th>{{ 'Qty To Pay'|_ }}</th>
+                    <th>{{ 'Amount To Pay'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -29,7 +30,7 @@
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
                         <td>
-                            <select name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
+                            <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
                                 <option value=""></option>
                                 {% set qtyCanPay = i.getQtyCanPay() %}
                                 {% for q in range(1, qtyCanPay) %}
@@ -37,6 +38,7 @@
                                 {% endfor %}
                             </select>
                         </td>
+                        <td><input type="text" value="{{ i.getAmountCanPay() }}" /></td>
                     </tr>
                 {% endfor %}
                 </tbody>
