@@ -702,8 +702,7 @@ class BRequest extends BClass
                         $result[$key] = ['error' => 'invalid_type', 'tp' => 1, 'type' => $type, 'name' => $name];
                         continue;
                     }
-                    $this->BUtil->ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir . '/' . $name);
+                    $this->BUtil->moveUploadedFileSafely($tmpName, $targetDir . '/' . $name, ['@media_dir', '@random_dir']);
                     $result[$key] = ['name' => $name, 'tp' => 2, 'type' => $type, 'target' => $targetDir . '/' . $name];
                 } else {
                     $message = !empty($uploadErrors[$error]) ? $uploadErrors[$error] : null;
@@ -720,8 +719,7 @@ class BRequest extends BClass
                     $result[] = ['error' => 'invalid_type', 'tp' => 4, 'type' => $type, 'pattern' => $typesRegex,
                         'source' => $source, 'name' => $name];
                 } else {
-                    $this->BUtil->ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir . '/' . $name);
+                    $this->BUtil->moveUploadedFileSafely($tmpName, $targetDir . '/' . $name, ['@media_dir', '@random_dir']);
                     $result[] = ['name' => $name, 'type' => $type, 'target' => $targetDir . '/' . $name];
                 }
             } else {
@@ -1434,6 +1432,14 @@ class BResponse extends BClass
 
         if (!file_exists($source)) {
             $this->status(404, 'File not found', 'File not found');
+            $this->shutdown(__METHOD__);
+            return;
+        }
+
+        if (!$this->BUtil->isPathWithinRoot($source)) {
+            $this->status(403, 'Invalid file location', 'Invalid file location');
+            $this->shutdown(__METHOD__);
+            return;
         }
 
         if (!$fileName) {

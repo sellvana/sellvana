@@ -199,7 +199,7 @@ class FCom_Test_Core_Test extends BClass
      */
     public function filterTitle($title)
     {
-        return $this->BUtil->camelToSentance($title);
+        return $this->BUtil->camelToSentence($title);
     }
 
     /**

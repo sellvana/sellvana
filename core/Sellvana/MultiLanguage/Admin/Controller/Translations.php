@@ -71,11 +71,12 @@ class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Co
             $this->BDebug->error('Invalid Filename: ' . $id);
         }
 
-        $filename = $moduleClass->baseDir() . '/i18n/' . $file;
+        $dir = $moduleClass->baseDir() . '/i18n';
+        $filename = $dir . '/' . $file;
 
         $model = new stdClass();
         $model->id = $id;
-        $model->source = file_get_contents($filename);
+        $model->source = $this->BUtil->readFileSafely($filename, $dir);
         $this->layout($this->_formLayoutName);
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(['view' => $view, 'model' => $model]);

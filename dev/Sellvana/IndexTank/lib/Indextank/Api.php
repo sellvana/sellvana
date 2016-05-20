@@ -102,9 +102,9 @@ class Indextank_Api
         foreach ($http_options as $curlopt => $value) {
             curl_setopt($session, $curlopt, $value);
         }
-$start = $this->BDebug->debug('IndexTank API CURL call');
+$start = BDebug::i()->debug('IndexTank API CURL call');
         $response = curl_exec($session);
-$this->BDebug->profile($start);
+BDebug::i()->profile($start);
         $http_code = curl_getinfo($session, CURLINFO_HTTP_CODE);
         curl_close($session);
 
