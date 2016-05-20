@@ -1477,7 +1477,7 @@ class BUtil extends BClass
 
         if (is_array($root)) {
             foreach ($root as $r) {
-                if ($this->isPathWithinRoot($path, $root, true)) {
+                if ($this->isPathWithinRoot($path, $r, true)) {
                     return true;
                 }
             }
