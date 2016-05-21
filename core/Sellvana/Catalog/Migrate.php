@@ -19,6 +19,8 @@
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
  * @property Sellvana_Catalog_Model_ProductMediaSite $Sellvana_Catalog_Model_ProductMediaSite
+ *
+ * @property Sellvana_Cms_Model_Block $Sellvana_Cms_Model_Block
  */
 class Sellvana_Catalog_Migrate extends BClass
 {
@@ -936,6 +938,40 @@ class Sellvana_Catalog_Migrate extends BClass
             BDb::COLUMNS => [
                 'qty_cart_max' => 'int unsigned null after qty_cart_min',
             ],
+        ]);
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+
+        $this->BDb->ddlTableDef($tProduct, [
+            BDb::COLUMNS => [
+                'is_grid_ad' => 'tinyint not null default 0',
+                'custom_grid_view' => 'varchar(255) default null',
+                'custom_list_view' => 'varchar(255) default null',
+            ],
+        ]);
+
+        if (!$this->BMigrate->isModuleVersion('Sellvana_Cms', '0.6.0.0')) {
+            $this->after__Sellvana_Cms__0_6_0_0();
+        }
+    }
+
+    public function after__Sellvana_Cms__0_6_0_0()
+    {
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+        $tCmsBlock = $this->Sellvana_Cms_Model_Block->table();
+
+        $this->BDb->ddlTableDef($tProduct, [
+            BDb::COLUMNS => [
+                'grid_cms_block_id' => 'int unsigned default null',
+                'list_cms_block_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'grid_cms_block' => ['grid_cms_block_id', $tCmsBlock],
+                'list_cms_block' => ['list_cms_block_id', $tCmsBlock],
+            ]
         ]);
     }
 }

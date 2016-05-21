@@ -1,0 +1,5 @@
+{% set p = THIS.get('product') %}
+{% set viewType = THIS.get('view_type') %}{# grid or list#}
+{% set view = APP.instance('Sellvana_Cms_Frontend_View_Block').createView(p.get(viewType ~ '_cms_block_id')) %}
+
+{{ view.set({ product:p }) | raw }}

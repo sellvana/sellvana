@@ -569,9 +569,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         $data = $this->BDb->many_as_array(
             $this->Sellvana_Catalog_Model_Product->orm('p')
-                ->select(['p.id', 'p.product_name', 'p.product_sku'])
                 ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
+                ->select(['p.id', 'p.product_name', 'p.product_sku', 'cp.sort_order'])
                 ->where('cp.category_id', $model ? $model->id() : 0)
+                ->order_by_asc('cp.sort_order')
                 ->find_many()
         );
 
@@ -586,7 +587,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200]
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
+            ['name' => 'sort_order', 'label' => 'Position', 'index' => 'cp.sort_order', 'width' => 80,
+                'editable' => 'inline', 'type' => 'input', 'cssClass' => 'js-sort_order'],
         ];
         $config['config']['actions'] = [
             #'add' => ['caption' => 'Add products'],

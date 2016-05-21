@@ -114,8 +114,7 @@ class BUtil extends BClass
      */
     public function fromJson($json, $asObject = false)
     {
-        $obj = json_decode($json);
-        return $asObject ? $obj : static::objectToArray($obj);
+        return json_decode($json, !$asObject);
     }
 
     /**
@@ -255,10 +254,15 @@ class BUtil extends BClass
     public function objectToArray($d)
     {
         if (is_object($d)) {
-            $d = get_object_vars($d);
+            #$d = get_object_vars($d); // bug on HHVM and PHP7 (https://3v4l.org/bbleq)
+            $r = [];
+            foreach ($r as $k => $v) {
+                $r[$k] = $v;
+            }
+            $d = $r;
         }
         if (is_array($d)) {
-            return array_map([$this->BUtil, 'objectToArray'], $d);
+            return array_map([$this, 'objectToArray'], $d);
         }
         return $d;
     }
@@ -272,7 +276,7 @@ class BUtil extends BClass
     public function arrayToObject($d)
     {
         if (is_array($d)) {
-            return (object) array_map([$this->BUtil, 'arrayToObject'], $d);
+            return (object) array_map([$this, 'arrayToObject'], $d);
         }
         return $d;
     }
@@ -290,7 +294,7 @@ class BUtil extends BClass
         $map = [];
         foreach ($array as $k => $row) {
             if (is_array($mapFields)) {
-                $outRow = $this->BUtil->arrayMask($row, $mapFields);
+                $outRow = $this->arrayMask($row, $mapFields);
             } elseif (is_string($mapFields)) {
                 $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
             } else {
@@ -1245,7 +1249,7 @@ class BUtil extends BClass
             }
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = $this->BApp->storageRandomDir() . '/cache';
-                $this->BUtil->ensureDir($cookieDir);
+                $this->ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
                 $curlOpt += [
                     CURLOPT_COOKIEJAR => $cookie,
@@ -1735,7 +1739,7 @@ class BUtil extends BClass
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
                 $label = trim(substr($k, 1));
-                $htmlArr[] = $this->BUtil->tagHtml('optgroup', ['label' => $label], static::optionsHtml($v, $default));
+                $htmlArr[] = $this->tagHtml('optgroup', ['label' => $label], static::optionsHtml($v, $default));
                 continue;
             }
             if (is_array($v)) {
@@ -1748,7 +1752,7 @@ class BUtil extends BClass
             }
             $attr['value'] = $k;
             $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
-            $htmlArr[] = $this->BUtil->tagHtml('option', $attr, $v);
+            $htmlArr[] = $this->tagHtml('option', $attr, $v);
         }
 
         return join("\n", $htmlArr);
@@ -2172,7 +2176,7 @@ class BUtil extends BClass
         if (!$res) {
             throw new BException("Can't open zip archive for reading: " . $filename);
         }
-        $this->BUtil->ensureDir($targetDir);
+        $this->ensureDir($targetDir);
         $res = $zip->extractTo($targetDir);
         $zip->close();
         if (!$res) {
@@ -2193,7 +2197,7 @@ class BUtil extends BClass
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
         }
-        $files = $this->BUtil->globRecursive($sourceDir);
+        $files = $this->globRecursive($sourceDir);
         if (!$files) {
             throw new BException('Invalid or empty source dir');
         }

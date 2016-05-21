@@ -92,7 +92,7 @@ class Sellvana_IndexTank_Migrate extends BClass
         $productsTable = $this->Sellvana_Catalog_Model_Product->table();
         if (!$this->BDb->ddlFieldInfo($productsTable, 'indextank_indexed')) {
             $this->BDb->run(" ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
-            ADD indextank_indexed_at datetime not null; ");
+            ADD indextank_indexed_at datetime default null; ");
         }
 
         $pIndexingStatusTable = $this->Sellvana_IndexTank_Model_IndexingStatus->table();
