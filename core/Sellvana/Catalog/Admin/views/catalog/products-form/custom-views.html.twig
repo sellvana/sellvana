@@ -1,0 +1,22 @@
+<!--{ label: {{ 'Custom Views'|_ }} }-->
+
+{% set m = THIS.get('model') %}
+{% set fieldData = { model:m, label_class:'col-md-4' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set cmsBlocks = APP.instance('Sellvana_Cms_Model_Block').getAllBlocksAsOptions() %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        <h4>{{ "Custom Views"|_ }}</h4>
+        <hr>
+        {{ forms.input(fieldData, { field: 'custom_details_view', label: 'Custom Details Page View'|_ }) }}
+
+        {{ forms.select(fieldData, { field: 'grid_tile_type', label: 'Grid View Type'|_, options: m.fieldOptions('grid_tile_type') }) }}
+
+        {{ forms.select(fieldData, { field: 'grid_cms_block_id', label: 'Grid Cms Block'|_, options: cmsBlocks, select2: {}, js_toggle: 'grid_tile_type', js_visible: "{grid_tile_type}=='C'" }) }}
+        {{ forms.select(fieldData, { field: 'list_cms_block_id', label: 'List Cms Block'|_, options: cmsBlocks, select2: {}, js_toggle: 'grid_tile_type', js_visible: "{grid_tile_type}=='C'" }) }}
+
+        {{ forms.input(fieldData, { field: 'custom_grid_view', label: 'Custom Grid Tile View'|_, js_toggle: 'grid_tile_type', js_visible: "{grid_tile_type}=='V'" }) }}
+        {{ forms.input(fieldData, { field: 'custom_list_view', label: 'Custom List Row View'|_, js_toggle: 'grid_tile_type', js_visible: "{grid_tile_type}=='V'" }) }}
+    </div>
+</fieldset>

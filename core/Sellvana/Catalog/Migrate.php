@@ -974,4 +974,17 @@ class Sellvana_Catalog_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+
+        $this->BDb->ddlTableDef($tProduct, [
+            BDb::COLUMNS => [
+                'is_grid_ad' => BDb::DROP,
+                'grid_tile_type' => "char(1) not null default 'D'",
+                'custom_details_view' => 'varchar(255) default null',
+            ],
+        ]);
+    }
 }
