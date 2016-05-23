@@ -415,6 +415,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $r        = $this->BRequest;
                 $fileName = basename($r->get('file'));
                 $fullName = $this->FCom_Core_Main->dir($folder) . '/' . $fileName;
+                
+                if (!$this->BUtil->isPathWithinRoot($fullName, ['@media_dir', '@random_dir'])) {
+                    $this->BResponse->status(403, 'Invalid file source', 'Invalid file source');
+                }
 
                 $this->BResponse->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
                 break;
@@ -533,7 +537,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                             $id      = '';
                             $status  = static::ERROR;
                             $message = 'Invalid image uploaded';
-                        } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
+                        } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
                             $id      = '';
                             $status  = static::ERROR;
                             $message = 'Unable to save the file';
@@ -627,7 +631,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             case 'delete':
                 $files = (array)$r->post('delete');
                 foreach ($files as $fileName) {
-                    @unlink($targetDir . '/' . $fileName);
+                    $this->BUtil->deleteFileSafely($targetDir . '/' . $fileName);
                 }
                 $args = ['folder' => $folder, 'file_name' => $files];
                 $attModel->delete_many($args);

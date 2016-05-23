@@ -529,6 +529,9 @@ return [true, 'Testing error'];
         $dir = $this->BApp->storageRandomDir() . '/export';
         $this->BUtil->ensureDir($dir);
         $filename = $dir . '/' . $cfg['grid']['id'] . '.csv';
+        if (!$this->BUtil->isPathWithinRoot($filename, $dir)) {
+            throw new BException('Invalid file location');
+        }
         $fp = fopen($filename, 'w');
         fputcsv($fp, $headers);
         $orm->iterate(function($row) use($columns, $fp) {

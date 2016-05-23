@@ -124,7 +124,15 @@
                     }
                 });
         }
+
+        $('#' + mainGridId).on('change', '.js-sort_order', function(ev) {
+            var $dataField = $('#category_products_sort_order'), $input = $(ev.target);
+            var fData = JSON.parse($dataField.val()), pId = $input.attr('id').replace(mainGridId + '-sort_order-', '');
+            fData[pId] = $input.val();
+            $dataField.val(JSON.stringify(fData));
+        });
     });
 </script>
 
 {{ THIS.view('core/griddle').set('grid', catProductConfig) | raw }}
+<input type="hidden" id="category_products_sort_order" name="category_products_sort_order" value="{}">

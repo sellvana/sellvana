@@ -25,7 +25,7 @@ class Sellvana_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Contr
 
         $fld = $this->Sellvana_IndexTank_Model_ProductField;
         $config = parent::gridConfig();
-        $config['grid']['columns'] += [
+        $config['columns'] += [
             'field_nice_name' => ['label' => 'Name', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => [
                 'baseLinkUrl' => $this->BApp->href('indextank/product_fields/form'), 'idName' => 'id',
             ]],

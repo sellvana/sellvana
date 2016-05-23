@@ -2165,6 +2165,9 @@ class BSession extends BClass
         } else {
             $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         }
+        ini_set('session.gc_maxlifetime', $rememberMeTtl);
+        ini_set('session.gc_divisor', 100);
+        ini_set('session.gc_probability', 1);
 
         $domain = $this->BRequest->getCookieDomain();
         $path = $this->BRequest->getCookiePath();
@@ -2180,7 +2183,13 @@ class BSession extends BClass
             $this->BUtil->ensureDir($dir);
             session_save_path($dir);
         }
-        #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
+
+        $useStrictMode = $this->BConfig->get('cookie/use_strict_mode', '1');
+        ini_set('session.use_strict_mode', $useStrictMode);
+
+        $refererCheck = $this->BConfig->get('cookie/referer_check');
+        ini_set('session.referer_check', $refererCheck);
+
         if (!$id) {
             $id = $this->BRequest->get('SID');
             if (!$id && !empty($_COOKIE[session_name()])) {
@@ -2419,7 +2428,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $this->open();
 
         $oldSessionId = session_id();
-        @session_regenerate_id(true);
+        @session_regenerate_id((bool)$this->BConfig->get('cookie/delete_old_session'));
         $this->BEvents->fire(__METHOD__, ['old_session_id' => $oldSessionId, 'session_id' => session_id()]);
         //$this->BSession->set('_regenerate_id', 1);
         //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));

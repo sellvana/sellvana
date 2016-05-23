@@ -73,6 +73,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'pulsate' => 'Pulsate',
             'slide' => 'Slide'
         ],
+        'grid_tile_type' => [
+            'D' => 'Default',
+            'C' => 'Cms Block',
+            'V' => 'Custom View',
+        ],
     ];
 
     protected static $_fieldDefaults = [
@@ -269,22 +274,25 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $this->set('description', $this->get('short_description'));
         }
 
-        // Cleanup possible bad input
-        //if ($this->get('sale_price') === '') {
-        //    $this->set('sale_price', null);
-        //}
-        //if ($this->get('cost') === '') {
-        //    $this->set('cost', null);
-        //}
-        //if ($this->get('msrp') === '') {
-        //    $this->set('msrp', null);
-        //}
-        //if ($this->get('map') === '') {
-        //    $this->set('map', null);
-        //}
-        //if ($this->get('markup') === '') {
-        //    $this->set('markup', null);
-        //}
+        switch ($this->get('grid_tile_type')) {
+            case 'D':
+                $this->set([
+                    'custom_grid_view' => null,
+                    'custom_list_view' => null,
+                ]);
+                break;
+
+            case 'C':
+                $this->set([
+                    'custom_grid_view' => 'catalog/product/cms-tile',
+                    'custom_list_view' => 'catalog/product/cms-tile',
+                ]);
+                break;
+
+            case 'V':
+                //TODO: any changes necessary?
+                break;
+        }
 
         return true;
     }
@@ -1440,5 +1448,14 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function canOrder($qty = 1)
     {
         return !$this->get('manage_inventory') || $this->getInventoryModel()->canOrder($qty);
+    }
+
+    public function getGridTileTypeOptions()
+    {
+        $options = $this->fieldOption('grid_tile_type');
+        if (!$this->BModuleRegistry->isLoaded('Sellvana_Cms')) {
+            unset($options['C']);
+        }
+        return $options;
     }
 }

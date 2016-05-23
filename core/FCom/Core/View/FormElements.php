@@ -131,7 +131,10 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
     public function jsVisibleConditions($p)
     {
         if (!empty($p['js_visible'])) {
-            $conditions = $p['js_visible'];
+            $conditions = preg_replace_callback('#\{([a-zA-Z0-9_]+)\}#', function($m) use ($p) {
+                $p['field'] = $m[1];
+                return "\$('#{$this->getInputId($p)}').val()";
+            }, $p['js_visible']);
         } elseif (!empty($p['js_toggle'])) {
             $conditions = '';
             if ($p['js_toggle'][0] === '!') {

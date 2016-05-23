@@ -25,7 +25,7 @@ class Sellvana_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Co
         }
 
         $config = parent::gridConfig();
-        $config['grid']['columns'] += [
+        $config['columns'] += [
             'number' => ['label' => 'Function Number', 'size' => 5],
             'definition' => ['label' => 'Function definition'],
             'name' => ['label' => 'Function code', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => [

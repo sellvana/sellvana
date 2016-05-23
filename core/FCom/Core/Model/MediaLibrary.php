@@ -37,9 +37,7 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
         parent::onAfterDelete();
         //delete file
         $file = $this->FCom_Core_Main->dir($this->folder) .'/'.$this->file_name;
-        if (file_exists($file)) {
-            @unlink($file);
-        }
+        $this->BUtil->deleteFileSafely($file);
 
         return $this;
     }
@@ -61,9 +59,13 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
 
         if (!empty($this->file_name)) {
             /** @var BFile $file */
-            try {
+            #try {
                 $file = $this->BFile->load($link);
-                $file->save($this->file_name, $this->FCom_Core_Main->dir($this->folder));
+                $dir = $this->FCom_Core_Main->dir($this->folder);
+                if (!$this->BUtil->isPathWithinRoot($dir . '/' . $this->file_name, ['@media_dir', '@random_dir'])) {
+                    throw new BException('Invalid file path: ' . $dir . '/' . $file);
+                }
+                $file->save($this->file_name, $dir);
                 $fileInfo = $file->getFileInfo();
 
                 //TODO: in future need check to media type.
@@ -72,9 +74,9 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
                 $this->file_size = $fileInfo['file_size'];
 
                 unset($file);
-            } catch (BException $e) {
+            #} catch (BException $e) {
                 //TODO: what to do, when we can't get file?
-            }
+            #}
         }
 
         return $this;

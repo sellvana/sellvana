@@ -354,9 +354,9 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 $fileSize = 0;
                 if (strpos($realPath, $path) !== 0) {
                     $error = $this->_("Weird file path." . $realPath . '|' . $path);
-                } else if ($uploads['error'][$i]) {
+                } elseif ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
-                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);

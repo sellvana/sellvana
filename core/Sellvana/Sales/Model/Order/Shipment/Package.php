@@ -119,8 +119,9 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
      */
     public function putFile($fileName, $content)
     {
-        $path = $this->getStoragePath() . '/' . $fileName;
-        if (!@file_put_contents($path, $content)){
+        $dir = $this->getStoragePath();
+        $path = $dir . '/' . $fileName;
+        if (!$this->BUtil->writeFileSafely($path, $content, $dir)){
             throw new BException('Can\'t write file to package storage.');
         }
     }
@@ -150,7 +151,7 @@ class Sellvana_Sales_Model_Order_Shipment_Package extends FCom_Core_Model_Abstra
     {
         $path = $this->getFilePath($fileName);
 
-        return @file_get_contents($path);
+        return $this->BUtil->readFileSafely($path, '@random_dir/order/shipment');
     }
 
     /**

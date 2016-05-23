@@ -60,8 +60,10 @@ class Sellvana_IndexTank_Admin extends BClass
             return false;
         }
         $apiUrl = $post['post']['config']['modules']['Sellvana_IndexTank']['api_url'];
+        $indexName = $post['post']['config']['modules']['Sellvana_IndexTank']['index_name'];
 
         $this->BConfig->set('modules/Sellvana_IndexTank/api_url', $apiUrl);
+        $this->BConfig->set('modules/Sellvana_IndexTank/index_name', $indexName);
 
         //create product index
         $this->Sellvana_IndexTank_Index_Product->install();

@@ -51,8 +51,9 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return $this->FCom_Core_Main->dir('storage/' . $this->BConfig->get('core/storage_random_dir') . '/import/' . $this->_dir);
-        //return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
+        $dir = $this->BApp->storageRandomDir() . '/import/' . $this->_dir;
+        $this->BUtil->ensureDir($dir);
+        return $dir;
     }
 
     public function updateFieldsDueToInfo($info)
@@ -76,8 +77,9 @@ class BImport extends BClass
         }
 
         // open file for reading
-        if (!file_exists($file))
+        if (!file_exists($file)) {
             return false;
+        }
         $fp = fopen($file, 'r');
         // get first line in the file
         $r = fgets($fp);
@@ -122,10 +124,15 @@ class BImport extends BClass
      */
     public function config($config = null, $update = false)
     {
-        $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->_dir);
-        $this->BUtil->ensureDir($dir);
+        $dir = $this->BConfig->get('fs/storage_dir') . '/run/' . $this->_dir;
         $file = $this->BSession->sessionId() . '.json';
         $filename = $dir . '/' . $file;
+
+        if (!$this->BUtil->isPathWithinRoot($filename, '@storage_dir/run')) {
+            return false;
+        }
+        $this->BUtil->ensureDir($dir);
+
         if ($config) { // create config lock
             if ($update) {
                 $old = $this->config();
@@ -174,7 +181,11 @@ class BImport extends BClass
             throw new BException("Model should implement import method");
         }
         $config = $this->config();
-        $filename = $this->getImportDir() . '/' . $config['filename'];
+        $importDir = $this->getImportDir();
+        $filename = $importDir . '/' . $config['filename'];
+        if (!$this->BUtil->isPathWithinRoot($filename, $importDir)) {
+            throw new BException('Invalid file location');
+        }
         $status = [
             'start_time' => time(),
             'status' => 'running',

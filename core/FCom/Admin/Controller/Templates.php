@@ -72,13 +72,15 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $tplViewName = $this->BRequest->get('id');
         $this->layout($this->_formLayoutName);
         $areaLayout = $this->FCom_Frontend_Main->getLayout();
+        $tplContents = '';
         if ($tplViewName) {
             $tplView = $areaLayout->getView($tplViewName);
-            $tplViewFile = $tplView->getTemplateFileName();
-            $tplContents = file_get_contents($tplViewFile);
-        } else {
-            $tplViewName = '';
-            $tplContents = '';
+            if (!($tplView instanceof BViewEmpty)) {
+                $tplViewFile = $tplView->getTemplateFileName();
+                $tplContents = file_get_contents($tplViewFile);
+            } else {
+                $tplViewName = '';
+            }
         }
         $model = new BData([
             'id' => $tplViewName,
@@ -136,7 +138,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
                     throw new BException("The view doesn't use template file");
                 }
                 if (file_exists($targetFile)) {
-                    unlink($targetFile);
+                    $this->BUtil->deleteFileSafely($targetFile, $targetDir);
                     $this->message('Template file was reverted or removed');
                 } else {
                     $this->message('Template file is already reverted to original', 'warning');
@@ -144,9 +146,8 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
                 $this->BResponse->redirect('templates');
                 return;
             }
-
-            $this->BUtil->ensureDir(dirname($targetFile));
-            file_put_contents($targetFile, $model['view_contents']);
+            
+            $this->BUtil->writeFileSafely($targetFile, $model['view_contents'], $targetDir);
             $this->message('Updated template file has been saved in custom module');
             $this->BResponse->redirect('templates');
         } catch (Exception $e) {

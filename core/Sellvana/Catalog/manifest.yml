@@ -1,6 +1,6 @@
 modules:
     Sellvana_Catalog:
-        version: 0.6.0.0
+        version: 0.6.2.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         before: [ Sellvana_MultiSite ]

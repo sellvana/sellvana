@@ -47,6 +47,9 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         try {
             $post = $this->BRequest->post();
 
+            // Additional security measures
+            unset($post['config']['fs'], $post['config']['core']['storage_random_dir']);
+
             $skipDefaultHandler = false;
 
             $this->BEvents->fire(__METHOD__, ['post' => &$post, 'skip_default_handler' => &$skipDefaultHandler]);
