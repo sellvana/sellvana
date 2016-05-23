@@ -87,7 +87,6 @@
                     <th>{{ 'Timeline'|_ }}</th>
                     <th>{{ 'Items'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
-                    <th>{{ 'Actions'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -123,11 +122,6 @@
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ p.id }}]" value="1">
                         </td>
-                        <td>
-                            {% for action, title in p.getAvailableActions() %}
-                                <button type="button" name="payments[{{ p.id() }}]" value="{{ action }}" class="btn btn-default btn-xs js-payment-processor-action">{{ title }}</button>
-                            {% endfor %}
-                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -138,7 +132,6 @@
                     <td></td>
                     <td></td>
                     <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Update'|_ }}</button></td>
-                    <td></td>
                 </tr>
                 </tfoot>
             </table>
@@ -150,7 +143,6 @@
     require(['jquery', 'underscore'], function($, _) {
         var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
         var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
-        var paymentProcessorUpdateUrl = "{{ APP.href('payments/processor?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
@@ -182,13 +174,6 @@
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(paymentUpdateUrl, postData, processPostResponse);
-        });
-
-        // Update payment status
-        container.on('click', '.js-payment-processor-action', function(ev) {
-            var $el = $(ev.target), postData = {};
-            postData[$el.attr('name')] = $el.val();
-            $.post(paymentProcessorUpdateUrl, postData, processPostResponse);
         });
     })
 </script>

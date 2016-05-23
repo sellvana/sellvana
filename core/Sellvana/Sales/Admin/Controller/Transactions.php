@@ -56,7 +56,7 @@ class Sellvana_Sales_Admin_Controller_Transactions extends Sellvana_Sales_Admin_
             $result['message'] = $e->getMessage();
         }
 
-        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $result['tabs']['transactions'] = (string)$this->view('order/orders-form/transactions')->set('model', $order);
         $this->BResponse->json($result);
 
     }

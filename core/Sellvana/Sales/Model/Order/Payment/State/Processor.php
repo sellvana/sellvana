@@ -98,11 +98,11 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
             Sellvana_Sales_Model_Order_Payment_Transaction::REFUND
         ],
         self::PARTIAL_CAPTURED => [
+            Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE,
             Sellvana_Sales_Model_Order_Payment_Transaction::VOID,
             Sellvana_Sales_Model_Order_Payment_Transaction::REFUND,
         ],
         self::PARTIAL_REFUNDED => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::VOID,
             Sellvana_Sales_Model_Order_Payment_Transaction::REFUND,
         ],
     ];
@@ -219,5 +219,39 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         }
 
         return $types;
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        $payment = $this->getModel();
+        switch ($this->getValue()) {
+            case self::PENDING:
+            case self::AUTHORIZED:
+            case self::REAUTHORIZED:
+            case self::PARTIAL_CAPTURED:
+                if (!$payment->get('amount_captured')) {
+                    return;
+                }
+
+                if ($payment->get('amount_due') > 0) {
+                    $this->setPartialCaptured();
+                } else {
+                    $this->setCaptured();
+                }
+                break;
+            case self::CAPTURED:
+            case self::PARTIAL_REFUNDED:
+                if (!$payment->get('amount_refunded')) {
+                    return;
+                }
+
+                if ($payment->get('amount_refunded') < $payment->get('amount_captured')) {
+                    $this->setPartialRefunded();
+                } else {
+                    $this->setRefunded();
+                }
+                break;
+        }
     }
 }
