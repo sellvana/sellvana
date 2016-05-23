@@ -283,7 +283,8 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             throw new BException('Transaction is not completed');
         }
 
-        $payment->state()->processor()->invokeAction($transaction->get('transaction_type'));
+        //$payment->state()->processor()->invokeAction($transaction->get('transaction_type'));
+        $payment->state()->processor()->calcState();
         $payment->save();
 
         $order = $payment->order();

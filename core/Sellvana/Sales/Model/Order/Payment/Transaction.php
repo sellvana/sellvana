@@ -180,6 +180,30 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         return $this;
     }
 
+    /**
+     * Get maximum amount available for transaction type
+     *
+     * @param string $type
+     * @return mixed
+     */
+    public function getMaxAmountForType($type)
+    {
+        $payment = $this->payment();
+
+        $amount = null;
+        switch ($type) {
+            case self::CAPTURE:
+                $amount = $payment->get('amount_due');
+                break;
+            case self::REFUND:
+                $amount = $payment->get('amount_captured') - $payment->get('amount_refunded');
+                break;
+        }
+
+        return $amount;
+    }
+
+
     public function __destruct()
     {
         parent::__destruct();
