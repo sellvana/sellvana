@@ -1449,4 +1449,13 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         return !$this->get('manage_inventory') || $this->getInventoryModel()->canOrder($qty);
     }
+
+    public function getGridTileTypeOptions()
+    {
+        $options = $this->fieldOption('grid_tile_type');
+        if (!$this->BModuleRegistry->isLoaded('Sellvana_Cms')) {
+            unset($options['C']);
+        }
+        return $options;
+    }
 }

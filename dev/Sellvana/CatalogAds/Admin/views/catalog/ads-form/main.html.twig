@@ -1,0 +1,63 @@
+<!--{ label: {{ 'Ad Info'|_ }} }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
+{% set cmsBlocks = {'': 'Use Inline Content'|_ } + APP.instance('Sellvana_Cms_Model_Block').getAllBlocksAsOptions() %}
+{% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories(10) %}
+
+<fieldset class="form-horizontal">
+    <div class="f-section">
+        {{ forms.input(fieldData, {field:'name', label:'Name'|_, required: 1}) }}
+        {{ forms.input(fieldData, {field:'description', label:'Description'|_}) }}
+        {{ forms.select(fieldData, {field:'categories', label:'Matching Categories'|_, multiple:1, options:categories }) }}
+        {{ forms.select(fieldData, {field:'terms', label:'Matching Search Terms'|_, multiple:1 }) }}
+<hr>
+        {{ forms.input(fieldData, {field:'grid_position', label:'Grid Position'|_, type:'number'}) }}
+        {{ forms.select(fieldData, {field:'grid_cms_block_id', label:'Grid CMS Block'|_, options: cmsBlocks }) }}
+        {{ forms.wysiwyg(fieldData, {field:'grid_tile_content', label:'Grid Tile Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
+<hr>
+        {{ forms.input(fieldData, {field:'list_position', label:'List Position'|_, type:'number'}) }}
+        {{ forms.select(fieldData, {field:'list_cms_block_id', label:'Grid CMS Block'|_, options: cmsBlocks }) }}
+        {{ forms.wysiwyg(fieldData, {field:'list_row_content', label:'List Row Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
+    </div>
+</fieldset>
+
+<script>
+    require(['jquery', 'fcom.admin', 'select2'], function($) {
+        $('#model-categories').select2({
+            ajax: {
+                url: '{{ APP.href('catalog/ads/categories_search') }}',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                    // parse the results into the format expected by Select2
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data, except to indicate that infinite
+                    // scrolling can be used
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 1,
+            //templateResult: formatRepo, // omitted for brevity, see the source of this page
+            //templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+    });
+</script>
