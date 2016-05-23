@@ -65,6 +65,7 @@ modules:
                     X-Frame-Options: SAMEORIGIN
             cookie:
                 session_check_ip: 1
+                use_strict_mode: 1
 
             modules:
                 FCom_Core:
