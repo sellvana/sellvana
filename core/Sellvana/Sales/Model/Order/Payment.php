@@ -249,10 +249,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      * @param string|array $type
      * @param string $status
      * @param float $amount
-     * @return Sellvana_Sales_Model_Order_Payment_Transaction
+     * @param bool $all
+     * @return Sellvana_Sales_Model_Order_Payment_Transaction|Sellvana_Sales_Model_Order_Payment_Transaction[]
      * @throws BException
      */
-    public function findTransaction($type, $status = null, $amount = null)
+    public function findTransaction($type, $status = null, $amount = null, $all = false)
     {
         $orm = $this->Sellvana_Sales_Model_Order_Payment_Transaction->orm();
         $orm->where('payment_id', $this->id());
@@ -276,8 +277,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             $orm->where('amount', $amount);
         }
 
-        $transaction = $orm->find_one();
-        return $transaction;
+        if (!$all) {
+            return $orm->find_one();
+        } else {
+            return $orm->find_many();
+        }
     }
 
     public function fetchTransactionsTotalAmounts()
@@ -484,21 +488,61 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+        $authTransactions = $this->findTransaction(['auth'], 'completed', null, true);
+        $authorizations = $authAmounts = [];
+        foreach ($authTransactions as $transaction) {
+            $authorizations[$transaction->get('transaction_id')] = $transaction;
+            $authAmounts[$transaction->get('transaction_id')] = $transaction->get('amount');
+        }
+        
+        $reauthTransactions = $this->findTransaction(['reauth'], 'completed', null, true);
+        foreach ($reauthTransactions as $transaction) {
+            $authorizations[$transaction->get('transaction_id')] = $transaction;
+            $authAmounts[$transaction->get('transaction_id')] = $authAmounts[$transaction->get('parent_transaction_id')];
 
-        if (!$parent) {
+            unset($authorizations[$transaction->get('parent_transaction_id')]);
+            unset($authAmounts[$transaction->get('parent_transaction_id')]);
+        }
+
+        $captureTransactions = $this->findTransaction(['capture'], 'completed', null, true);
+        foreach ($captureTransactions as $transaction) {
+            $parentId = $transaction->get('parent_transaction_id');
+            if (!$parentId) {
+                continue;
+            }
+
+            $authAmounts[$parentId] -= $transaction->get('amount');
+            if ($authAmounts[$parentId] <= 0) {
+                unset($authorizations[$parentId]);
+            }
+        }
+
+        if (!count($authorizations)) {
             throw new BException('Unable to find authorization transaction');
         }
 
-        $transaction = $this->createTransaction('capture', $amount, $parent)->start();
+        $amount = is_null($amount) ? $this->get('amount_authorized') : $amount;
+        $amountToCapture = $amount;
 
-        $method->capture($transaction);
+        foreach ($authorizations as $transactionId => $parent) {
+            $availableTransactionAmount = $authAmounts[$transactionId];
+            $transactionAmount = min($availableTransactionAmount, $amountToCapture);
 
-        $transaction->complete();
+            $transaction = $this->createTransaction('capture', $transactionAmount, $parent)->start();
 
-        $this->Sellvana_Sales_Main->workflowAction('adminCapturesPayment', [
-            'transaction' => $transaction,
-        ]);
+            $method->capture($transaction);
+
+            $transaction->complete();
+
+            $this->Sellvana_Sales_Main->workflowAction('adminCapturesPayment', [
+                'transaction' => $transaction,
+            ]);
+
+            $amountToCapture -= $transactionAmount;
+            if ($amountToCapture <= 0) {
+                break;
+            }
+        }
 
         return $this;
     }
@@ -511,21 +555,48 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('capture', 'completed');
-
-        if (!$parent) {
-            throw new BException('Unable to find capture transaction');
+        $captureTransactions = $this->findTransaction(['capture'], 'completed', null, true);
+        $captures = $captureAmounts = [];
+        foreach ($captureTransactions as $transaction) {
+            $captures[$transaction->get('transaction_id')] = $transaction;
+            $captureAmounts[$transaction->get('transaction_id')] = $transaction->get('amount');
         }
 
-        $transaction = $this->createTransaction('refund', $amount, $parent)->start();
+        $refundTransactions = $this->findTransaction(['refund'], 'completed', null, true);
+        foreach ($refundTransactions as $transaction) {
+            $parentId = $transaction->get('parent_transaction_id');
+            if (!$parentId) {
+                continue;
+            }
 
-        $method->refund($transaction);
+            $captureAmounts[$parentId] -= $transaction->get('amount');
+            if ($captureAmounts[$parentId] <= 0) {
+                unset($captureAmounts[$parentId]);
+            }
+        }
 
-        $transaction->complete();
+        $amount = is_null($amount) ? $this->get('amount_captured') : $amount;
+        $amountToRefund = $amount;
 
-        $this->Sellvana_Sales_Main->workflowAction('adminRefundsPayment', [
-            'transaction' => $transaction,
-        ]);
+        foreach ($captures as $transactionId => $parent) {
+            $availableTransactionAmount = $captureAmounts[$transactionId];
+            $transactionAmount = min($availableTransactionAmount, $amountToRefund);
+
+            $transaction = $this->createTransaction('refund', $transactionAmount, $parent)->start();
+
+            $method->refund($transaction);
+
+            $transaction->complete();
+
+            $this->Sellvana_Sales_Main->workflowAction('adminRefundsPayment', [
+                'transaction' => $transaction,
+            ]);
+
+            $amountToRefund -= $transactionAmount;
+            if ($amountToRefund <= 0) {
+                break;
+            }
+        }
 
         return $this;
     }

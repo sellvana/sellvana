@@ -84,6 +84,9 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
     ];
 
     static protected $_statesToTransactionTypes = [
+        self::ROOT_ORDER => [
+            Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION,
+        ],
         self::AUTHORIZED => [
             Sellvana_Sales_Model_Order_Payment_Transaction::REAUTHORIZATION,
             Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE,
@@ -226,6 +229,11 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $this->getModel();
         switch ($this->getValue()) {
+            case self::ROOT_ORDER:
+                if ($payment->get('amount_authorized') > 0) {
+                    $this->setAuthorized();
+                }
+                break;
             case self::PENDING:
             case self::AUTHORIZED:
             case self::REAUTHORIZED:
