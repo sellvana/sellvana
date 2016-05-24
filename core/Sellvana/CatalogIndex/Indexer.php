@@ -600,7 +600,7 @@ DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt whe
             list($field, $dir) = is_string($sort) ? explode(' ', $sort) + ['', ''] : $sort;
             $method = 'order_by_' . (strtolower($dir) == 'desc' ? 'desc' : 'asc');
 
-            $this->_bus['result']['orm']->$method($field);
+            $this->_bus['result']['orm']->{$method}($field);
         }
     }
 }

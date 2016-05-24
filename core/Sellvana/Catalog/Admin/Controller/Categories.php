@@ -95,4 +95,50 @@ class Sellvana_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller
             }
         }
     }
+
+    public function action_xhr_search()
+    {
+        $q = $this->BRequest->get('q');
+        if (!$q) {
+            $this->BResponse->json([]);
+            exit;
+        }
+
+        $categories = $this->_indexCategories($q);
+
+        $this->BResponse->json($categories);
+        exit;
+    }
+
+    protected function _indexCategories($q)
+    {
+        $cacheKey = 'categories-index-'
+            . $this->FCom_Admin_Model_User->sessionUserId()
+            . '-' . str_replace(' ', '-', trim($q));
+
+        $cached = $this->BCache->load($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+
+        $q = explode(' ', $q);
+        /** @var BORM $orm */
+        $orm = $this->Sellvana_Catalog_Model_Category->orm()
+            ->select(['id', 'full_name', 'sort_order', 'is_enabled'])
+            ->order_by_asc('sort_order')
+            ->where('is_enabled', 1);
+
+        if (is_array($q)) {
+            foreach($q as $value) {
+                $orm->where_like('full_name', "%{$value}%");
+            }
+        } else {
+            $orm->where_like('full_name', "%{$q}%");
+        }
+
+        $categories = $orm->find_many_assoc('id', 'full_name');
+
+        $this->BCache->save($cacheKey, $categories);
+        return $categories;
+    }
 }

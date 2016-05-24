@@ -1,0 +1,23 @@
+modules:
+    Sellvana_CatalogAds:
+        version: 0.6.1.0
+        channel: beta
+        require: { module: { Sellvana_Catalog: 0.6.0.0, Sellvana_Cms: 0.6.0.0 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /catalog/ads/?.action, Sellvana_CatalogAds_Admin_Controller_Ads ]
+                security:
+                    request_fields_whitelist:
+                        /catalog/ads/form:
+                            POST/model/grid_tile_contents: "*"
+                            POST/model/list_row_contents: "*"
+            FCom_Frontend:
+                observe:
+                    - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_orm", "Sellvana_CatalogAds_Frontend.onCatalogCategorySearchOrm" ]
+                    - [ "Sellvana_Catalog_Frontend_Controller_Search::action_index:products_orm", "Sellvana_CatalogAds_Frontend.onCatalogCategorySearchOrm" ]
+
+                    - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_data_after", "Sellvana_CatalogAds_Frontend.onCatalogCategorySearchDataAfter" ]
+                    - [ "Sellvana_Catalog_Frontend_Controller_Search::action_index:products_data_after", "Sellvana_CatalogAds_Frontend.onCatalogCategorySearchDataAfter" ]
