@@ -545,7 +545,7 @@
                                 name: 'categories['+p.id+']',
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
-                                url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
+                                url: '{{ APP.href('catalog/categories/xhr_search') | raw }}',
                                 onChange: this.props._handleSelect2Change,
                                 value: p.categories,
                                 options: {{ UTIL.toJson(categories) | raw }},

@@ -11,8 +11,10 @@
     {% set count = 0 %}
     {% for p in THIS.get('products') %}
         {% if p.get('custom_list_view') %}
-            {{ THIS.view(p.get('custom_list_view')).set({ product:p, position:count, list_id:listId, view_type:'list',
-                list_name: THIS.get('list_name') }) | raw }}
+            <div class="row js-product-container" data-product-id="{{ p.id() }}">
+                {{ THIS.view(p.get('custom_list_view')).set({ product:p, position:count, list_id:listId, view_type:'list',
+                    list_name: THIS.get('list_name') }) | raw }}
+            </div>
         {% else %}
             {% set productName = p.getName() %}
             {% set productUrl = p.url(THIS.get('category')) %}

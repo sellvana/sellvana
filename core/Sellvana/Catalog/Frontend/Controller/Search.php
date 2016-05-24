@@ -44,6 +44,8 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             }
         }
 
+        $this->BApp->set('current_query', $q);
+
         $this->BEvents->fire(__METHOD__ . ':search_query', ['query' => &$q]);
         $this->layout('/catalog/search');
         $layout = $this->BLayout;
@@ -54,11 +56,14 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
         $productsData = null;
         $this->BEvents->fire(__METHOD__ . ':products_data', ['data' => &$productsData, 'query' => $q]);
 
+        $this->BApp->set('products_data', $productsData);
+        
         if (!$productsData) {
             $filter = $this->BRequest->get('f');
             $productsORM = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q, $filter);
-            $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsORM]);
-            $productsData = $productsORM->paginate(null, [
+            $request = $this->BRequest->request();
+            $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsORM, 'request' => &$request]);
+            $productsData = $productsORM->paginate($request, [
                 'ps' => $pagerView->default_page_size,
                 'sc' => $pagerView->default_sort,
                 'page_size_options' => $pagerView->page_size_options,
@@ -79,7 +84,6 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
 
         $this->BEvents->fire(__METHOD__ . ':products_data_after', ['data' => &$productsData]);
 
-        $this->BApp->set('current_query', $q);
         #$category = $this->Sellvana_Catalog_Model_Category->orm()->where_null('parent_id')->find_one();
         #$this->BApp->set('current_category', $category)
         #$this->BApp->set('products_data', $productsData);

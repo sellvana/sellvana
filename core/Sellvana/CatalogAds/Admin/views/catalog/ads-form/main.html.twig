@@ -1,0 +1,64 @@
+<!--{ label: {{ 'Ad Info'|_ }} }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model').collectCategoriesAndTerms() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model: m } %}
+{% set cmsBlocks = {'': 'Use Inline Content'|_ } + APP.instance('Sellvana_Cms_Model_Block').getAllBlocksAsOptions() %}
+
+<fieldset class="form-horizontal">
+    <div class="f-section">
+        {{ forms.input(fieldData, {field:'name', label:'Name'|_, required: 1}) }}
+        {{ forms.input(fieldData, {field:'description', label:'Description'|_}) }}
+        {{ forms.input(fieldData, {field:'category_ids', label:'Matching Categories'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'include_subcategories', label:'Include Subcategories'|_ }) }}
+        {{ forms.input(fieldData, {field:'terms', label:'Matching Search Terms'|_ }) }}
+        {{ forms.input(fieldData, {field:'priority', label:'Rule Priority'|_ }) }}
+        <hr>
+        {{ forms.input(fieldData, {field:'grid_position', label:'Grid Position'|_, type:'number'}) }}
+        {{ forms.select(fieldData, {field:'grid_cms_block_id', label:'Grid CMS Block'|_, options: cmsBlocks }) }}
+        {{ forms.wysiwyg(fieldData, {field:'grid_contents', label:'Grid Tile Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
+        <hr>
+        {{ forms.input(fieldData, {field:'list_position', label:'List Position'|_, type:'number'}) }}
+        {{ forms.select(fieldData, {field:'list_cms_block_id', label:'List CMS Block'|_, options: cmsBlocks }) }}
+        {{ forms.wysiwyg(fieldData, {field:'list_contents', label:'List Row Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
+    </div>
+</fieldset>
+
+<script>
+    require(['jquery', 'select2'], function($) {
+        var termsData = ({{ UTIL.toJson(m.get('selected_terms_data')) | raw }});
+        var categoriesData = ({{ UTIL.toJson(m.get('selected_categories_data')) | raw }});
+        var categoriesUrl = '{{ APP.href('catalog/categories/xhr_search') }}';
+
+        $('#model-category_ids').select2({
+            minimumInputLength: 0,
+            multiple: true,
+            data: categoriesData,
+            ajax: {
+                url: categoriesUrl,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {q: params};
+                },
+                results: function (data) {
+                    return {results: $.map(data, function (item, id) { return {id: id, text: item}; })};
+                },
+                cache: true
+            },
+            initSelection: function(element, callback) {
+                callback(categoriesData);
+            }
+        });
+
+        $('#model-terms').select2({
+            minimumInputLength: 0,
+            multiple: true,
+            data: termsData,
+            createSearchChoice: function(term, data) {
+                return {id: term, text: term};
+            }
+        });
+    });
+</script>

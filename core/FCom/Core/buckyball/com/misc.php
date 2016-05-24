@@ -309,6 +309,15 @@ class BUtil extends BClass
         return $map;
     }
 
+    public function arrayMapToSeq($array, $keyField = 'id', $valueField = 'text')
+    {
+        $seq = [];
+        foreach ($array as $k => $v) {
+            $seq[] = [$keyField => $k, $valueField => $v];
+        }
+        return $seq;
+    }
+
     public function arrayWalkToString($array)
     {
         array_walk_recursive($array, function(&$node) {
@@ -546,6 +555,9 @@ class BUtil extends BClass
 
     public function arrayCleanEmpty($arr)
     {
+        if (is_string($arr)) {
+            $arr = explode(',', $arr);
+        }
         foreach ($arr as $k => $v) {
             if (is_array($v)) {
                 $arr[$k] = $this->arrayCleanEmpty($v);

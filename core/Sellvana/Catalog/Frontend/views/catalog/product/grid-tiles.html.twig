@@ -27,8 +27,10 @@
     {% set count = 0 %}
     {% for p in THIS.get('products') %}
         {% if p.get('custom_grid_view') %}
-            {{ THIS.view(p.get('custom_grid_view')).set({ product:p, position:count, list_id:listId, view_type:'grid',
-                list_name: THIS.get('list_name') }) | raw }}
+            <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }} js-ga-product-container" data-product-id="{{ p.id() }}">
+                {{ THIS.view(p.get('custom_grid_view')).set({ product:p, position:count, list_id:listId, view_type:'grid',
+                    list_name: THIS.get('list_name') }) | raw }}
+            </div>
         {% else %}
             {% set productName = p.getName() %}
             {% set productUrl = p.url(THIS.get('category')) %}
