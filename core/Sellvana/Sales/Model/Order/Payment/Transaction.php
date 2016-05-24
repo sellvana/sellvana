@@ -192,6 +192,7 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
 
         $amount = null;
         switch ($type) {
+            //case self::AUTHORIZATION:
             case self::CAPTURE:
                 $amount = $payment->get('amount_due');
                 break;

@@ -50,8 +50,8 @@ class Sellvana_Sales_Admin_Controller_Transactions extends Sellvana_Sales_Admin_
             }
 
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Payment has been created');
-        } catch (Exception $e) {
+            $result['message'] = $this->_('Transaction has been created');
+        } catch (BException $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
         }

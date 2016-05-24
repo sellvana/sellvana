@@ -19,7 +19,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     protected $_payment;
 
     /**
-     * @var Sellvana_Sales_Model_Order_Transaction
+     * @var Sellvana_Sales_Model_Order_Payment_Transaction
      */
     protected $_transaction;
 
@@ -183,13 +183,19 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
      * Shortcut for payment gateway error
      *
      * @param array $result
+     * @throws BException
      */
     protected function _setErrorStatus($result = null)
     {
+        $payment = $this->_payment;
+        if (!$payment && $this->_transaction) {
+            $payment = $this->_transaction->payment();
+        }
         $this->Sellvana_Sales_Main->workflowAction('customerGetsPaymentError', [
-            'payment' => $this->_payment,
+            'payment' => $payment,
             'result' => $result,
         ]);
+        throw new BException($result['error']['message']);
     }
 
     public function __destruct()

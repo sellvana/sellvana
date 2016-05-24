@@ -202,6 +202,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function authorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callDoAuthorization($transaction);
 
         if (!empty($result['error'])) {
@@ -211,7 +212,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $r = $result['response'];
 
-        $transaction->set('transaction_id', $r['AUTHORIZATIONID']);
+        $transaction->set('transaction_id', $r['TRANSACTIONID']);
         $transaction->setData('result', [
             'payment_status' => $r['PAYMENTSTATUS'],
             'pending_reason' => $r['PENDINGREASON'],
@@ -222,6 +223,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function reauthorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callDoReauthorization($transaction);
 
         if (!empty($result['error'])) {
@@ -242,6 +244,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function capture(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callDoCapture($transaction);
 
         if (!empty($result['error'])) {
@@ -264,6 +267,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function void(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callDoVoid($transaction);
 
         if (!empty($result['error'])) {
@@ -278,6 +282,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callRefundTransaction($transaction);
 
         if (!empty($result['error'])) {
@@ -644,7 +649,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
                 $entity->setData('last_api_call', $result);
             }
         }
-        echo "<pre>"; var_dump($result); echo "<pre>"; exit;
+        //echo "<pre>"; var_dump($result); echo "<pre>"; exit;
         return $result;
     }
 }

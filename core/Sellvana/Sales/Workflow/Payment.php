@@ -117,7 +117,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         );
     }
 
-    public function customerGetsPaymentError($args)
+    public function action_customerGetsPaymentError($args)
     {
         $historyData = ['data' => $args['result']];
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
