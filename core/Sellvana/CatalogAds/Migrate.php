@@ -25,6 +25,7 @@ class Sellvana_CatalogAds_Migrate extends BClass
                 'name' => 'varchar(255) not null',
                 'description' => 'text',
                 'priority' => 'tinyint unsigned not null',
+                'include_subcategories' => 'tinyint not null default 0',
                 'grid_position' => 'tinyint unsigned not null',
                 'grid_cms_block_id' => 'int unsigned default null',
                 'grid_contents' => 'text',
