@@ -93,6 +93,7 @@
                 {% for p in allPayments %}
                     {% set allOverallStates = p.state().overall().getNextValueLabels() %}
                     {% set allCustomStates = p.state().custom().getNextValueLabels() %}
+                    {% set allTransactions = p.transactions() %}
                     <tr>
                         <td>
                             <p><strong>{{ allMethods[p.get('payment_method')].getName() }}</strong></p>
@@ -110,6 +111,11 @@
                                     <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
                                 {% endif %}
                             {% endfor %}
+                            {% if allTransactions %}
+                                <p>
+                                    <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-transactions" aria-expanded="false" aria-controls="payment{{ p.id() }}-transactions">{{ 'Transactions' | _ }}: {{ allTransactions|length }}</a>
+                                </p>
+                            {% endif %}
                         </td>
                         <td>
                             <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
@@ -123,6 +129,65 @@
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ p.id }}]" value="1">
                         </td>
                     </tr>
+                    {% if allTransactions %}
+                        <tr class="payment-transactions" id="payment{{ p.id() }}-transactions">
+                            <td></td>
+                            <td colspan="4">
+                                <table class="table table-bordered table-striped dataTable">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ 'ID'|_ }}</th>
+                                        <th>{{ 'Timeline'|_ }}</th>
+                                        <th>{{ 'Type'|_ }}</th>
+                                        <th>{{ 'Amount'|_ }}</th>
+                                        <th>{{ 'Fee'|_ }}</th>
+                                        <th>{{ 'Actions'|_ }}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for t in allTransactions %}
+                                            {% set availableActions = t.getAvailableActions() %}
+                                            <tr>
+                                                <td>
+                                                    <p>{{ t.get('transaction_id') }}</p>
+                                                </td>
+                                                <td>
+                                                    <p>{{ 'Created:'|_ }} <strong>{{ t.get('create_at')|locdate }}</strong></p>
+                                                </td>
+                                                <td>
+                                                    <p><strong>{{ t.get('transaction_type') }}</strong></p>
+                                                </td>
+                                                <td>
+                                                    <p>{{ t.get('amount')|currency }}</p>
+                                                </td>
+                                                <td>
+                                                    <p>{{ t.get('transaction_fee')|currency }}</p>
+                                                </td>
+                                                <td>
+                                                    {% if t.get('transaction_id') %}
+                                                        <div class="col-md-12">
+                                                            <div class="form-inline">
+                                                            {% for action, actionData in availableActions %}
+                                                                <div class="form-group form-group-sm">
+                                                                    {% if actionData.maxAmount %}
+                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" />
+                                                                    {% endif %}
+                                                                    <input type="hidden" name="actions[{{ p.id() }}][{{ t.id() }}][type]" value="{{ action }}" />
+                                                                    <button type="button" class="btn btn-xs transaction-action">{{ actionData.label }}</button>
+                                                                </div>
+                                                                <br>
+                                                            {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
                 </tbody>
                 <tfoot>
@@ -143,6 +208,7 @@
     require(['jquery', 'underscore'], function($, _) {
         var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
         var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
+        var transactionActionUrl = "{{ APP.href('payments/transaction_action?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
@@ -174,6 +240,16 @@
             var $el = $(ev.target), postData = {};
             postData[$el.attr('name')] = $el.val();
             $.post(paymentUpdateUrl, postData, processPostResponse);
+        });
+
+        container.on('click', '.transaction-action', function(ev) {
+            var serializeData = $(ev.target).parent('.form-group').find('input, button').serializeArray();
+            $.post(transactionActionUrl, serializeData, processPostResponse);
+        });
+
+        // Workaround to avoid conflict with FCom.Admin.Tabs
+        $('.payment-transactions').addClass('collapse').collapse({
+            toggle: false
         });
     })
 </script>

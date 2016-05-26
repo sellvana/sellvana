@@ -24,7 +24,6 @@ modules:
                     - [ /carts/?.action, Sellvana_Sales_Admin_Controller_Carts ]
                     - [ /orders/?.action, Sellvana_Sales_Admin_Controller_Orders ]
                     - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
-                    - [ /transactions/?.action, Sellvana_Sales_Admin_Controller_Transactions ]
                     - [ /shipments/?.action, Sellvana_Sales_Admin_Controller_Shipments ]
                     - [ /cancels/?.action, Sellvana_Sales_Admin_Controller_Cancels ]
                     - [ /returns/?.action, Sellvana_Sales_Admin_Controller_Returns ]
