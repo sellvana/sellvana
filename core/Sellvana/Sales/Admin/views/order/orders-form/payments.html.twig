@@ -173,7 +173,7 @@
                                                                         <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" />
                                                                     {% endif %}
                                                                     <input type="hidden" name="actions[{{ p.id() }}][{{ t.id() }}][type]" value="{{ action }}" />
-                                                                    <button type="button" class="btn btn-xs transaction-action">{{ actionData.label }}</button>
+                                                                    <button type="button" class="btn btn-xs transaction-action ladda-button" id="action-{{ t.id() }}-{{ action }}" data-style="expand-left">{{ actionData.label }}</button>
                                                                 </div>
                                                                 <br>
                                                             {% endfor %}
@@ -205,7 +205,7 @@
 </div>
 
 <script>
-    require(['jquery', 'underscore'], function($, _) {
+    require(['jquery', 'underscore', 'bootstrap-ladda', 'bootstrap-ladda-spin'], function($, _, Ladda) {
         var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
         var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
         var transactionActionUrl = "{{ APP.href('payments/transaction_action?id=' ~ order.id()) }}";
@@ -243,6 +243,8 @@
         });
 
         container.on('click', '.transaction-action', function(ev) {
+            var loader = Ladda.create(document.querySelector('#' + ev.target.id));
+            loader.start();
             var serializeData = $(ev.target).parent('.form-group').find('input, button').serializeArray();
             $.post(transactionActionUrl, serializeData, processPostResponse);
         });
