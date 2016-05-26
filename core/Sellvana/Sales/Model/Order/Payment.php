@@ -250,10 +250,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      * @param string $status
      * @param float $amount
      * @param bool $all
+     * @param null|string $parentId
      * @return Sellvana_Sales_Model_Order_Payment_Transaction|Sellvana_Sales_Model_Order_Payment_Transaction[]
      * @throws BException
      */
-    public function findTransaction($type, $status = null, $amount = null, $all = false)
+    public function findTransaction($type, $status = null, $amount = null, $all = false, $parentId = null)
     {
         $orm = $this->Sellvana_Sales_Model_Order_Payment_Transaction->orm();
         $orm->where('payment_id', $this->id());
@@ -275,6 +276,10 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         if (null !== $amount) {
             $orm->where('amount', $amount);
+        }
+
+        if (null !== $parentId) {
+            $orm->where('parent_transaction_id', $parentId);
         }
 
         if (!$all) {
@@ -396,7 +401,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function authorize($amount = null)
+    public function authorize($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
 
@@ -404,7 +409,9 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('order', 'completed');
+        if (null === $parent) {
+            $parent = $this->findTransaction('order', 'completed');
+        }
 
         $transaction = $this->createTransaction('auth', $amount, $parent)->start();
 
@@ -424,7 +431,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function reauthorize($amount = null)
+    public function reauthorize($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
 
@@ -432,7 +439,9 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction('auth', 'completed');
+        if (null === $parent) {
+            $parent = $this->findTransaction('auth', 'completed');
+        }
 
         if (!$parent) {
             throw new BException('Unable to find authorization transaction');
@@ -453,7 +462,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function void()
+    public function void($parent = null)
     {
         $method = $this->getMethodObject();
 
@@ -461,7 +470,9 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+        if (null === $parent) {
+            $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+        }
 
         if (!$parent) {
             throw new BException('Unable to find authorization transaction');
@@ -480,7 +491,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function capture($amount = null)
+    public function capture($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
 
@@ -488,66 +499,28 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $authTransactions = $this->findTransaction(['auth'], 'completed', null, true);
-        $authorizations = $authAmounts = [];
-        foreach ($authTransactions as $transaction) {
-            $authorizations[$transaction->get('transaction_id')] = $transaction;
-            $authAmounts[$transaction->get('transaction_id')] = $transaction->get('amount');
-        }
-        
-        $reauthTransactions = $this->findTransaction(['reauth'], 'completed', null, true);
-        foreach ($reauthTransactions as $transaction) {
-            $authorizations[$transaction->get('transaction_id')] = $transaction;
-            $authAmounts[$transaction->get('transaction_id')] = $authAmounts[$transaction->get('parent_transaction_id')];
-
-            unset($authorizations[$transaction->get('parent_transaction_id')]);
-            unset($authAmounts[$transaction->get('parent_transaction_id')]);
+        if (null === $parent) {
+            $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
         }
 
-        $captureTransactions = $this->findTransaction(['capture'], 'completed', null, true);
-        foreach ($captureTransactions as $transaction) {
-            $parentId = $transaction->get('parent_transaction_id');
-            if (!$parentId) {
-                continue;
-            }
-
-            $authAmounts[$parentId] -= $transaction->get('amount');
-            if ($authAmounts[$parentId] <= 0) {
-                unset($authorizations[$parentId]);
-            }
-        }
-
-        if (!count($authorizations)) {
+        if (!$parent) {
             throw new BException('Unable to find authorization transaction');
         }
 
-        $amount = is_null($amount) ? $this->get('amount_authorized') : $amount;
-        $amountToCapture = $amount;
+        $transaction = $this->createTransaction('capture', $amount, $parent)->start();
 
-        foreach ($authorizations as $transactionId => $parent) {
-            $availableTransactionAmount = $authAmounts[$transactionId];
-            $transactionAmount = min($availableTransactionAmount, $amountToCapture);
+        $method->capture($transaction);
 
-            $transaction = $this->createTransaction('capture', $transactionAmount, $parent)->start();
+        $transaction->complete();
 
-            $method->capture($transaction);
-
-            $transaction->complete();
-
-            $this->Sellvana_Sales_Main->workflowAction('adminCapturesPayment', [
-                'transaction' => $transaction,
-            ]);
-
-            $amountToCapture -= $transactionAmount;
-            if ($amountToCapture <= 0) {
-                break;
-            }
-        }
+        $this->Sellvana_Sales_Main->workflowAction('adminCapturesPayment', [
+            'transaction' => $transaction,
+        ]);
 
         return $this;
     }
 
-    public function refund($amount = null)
+    public function refund($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
 
@@ -555,48 +528,23 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('This payment method can not authorize transactions');
         }
 
-        $captureTransactions = $this->findTransaction(['capture'], 'completed', null, true);
-        $captures = $captureAmounts = [];
-        foreach ($captureTransactions as $transaction) {
-            $captures[$transaction->get('transaction_id')] = $transaction;
-            $captureAmounts[$transaction->get('transaction_id')] = $transaction->get('amount');
+        if (null === $parent) {
+            $parent = $this->findTransaction('capture', 'completed');
         }
 
-        $refundTransactions = $this->findTransaction(['refund'], 'completed', null, true);
-        foreach ($refundTransactions as $transaction) {
-            $parentId = $transaction->get('parent_transaction_id');
-            if (!$parentId) {
-                continue;
-            }
-
-            $captureAmounts[$parentId] -= $transaction->get('amount');
-            if ($captureAmounts[$parentId] <= 0) {
-                unset($captureAmounts[$parentId]);
-            }
+        if (!$parent) {
+            throw new BException('Unable to find capture transaction');
         }
 
-        $amount = is_null($amount) ? $this->get('amount_captured') : $amount;
-        $amountToRefund = $amount;
+        $transaction = $this->createTransaction('refund', $amount, $parent)->start();
 
-        foreach ($captures as $transactionId => $parent) {
-            $availableTransactionAmount = $captureAmounts[$transactionId];
-            $transactionAmount = min($availableTransactionAmount, $amountToRefund);
+        $method->refund($transaction);
 
-            $transaction = $this->createTransaction('refund', $transactionAmount, $parent)->start();
+        $transaction->complete();
 
-            $method->refund($transaction);
-
-            $transaction->complete();
-
-            $this->Sellvana_Sales_Main->workflowAction('adminRefundsPayment', [
-                'transaction' => $transaction,
-            ]);
-
-            $amountToRefund -= $transactionAmount;
-            if ($amountToRefund <= 0) {
-                break;
-            }
-        }
+        $this->Sellvana_Sales_Main->workflowAction('adminRefundsPayment', [
+            'transaction' => $transaction,
+        ]);
 
         return $this;
     }
@@ -631,27 +579,6 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             if ($this->isActionAvailable($action)) {
                 $result[$action] = $title;
             }
-        }
-
-        return $result;
-    }
-
-    public function getAvailableTransactionTypes()
-    {
-        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $virtualTransaction */
-        $virtualTransaction = $this->Sellvana_Sales_Model_Order_Payment_Transaction->create([
-            'payment_id' => $this->id()
-        ]);
-        $result = [];
-
-        $types = $this->state()->processor()->getAvailableTransactionTypes();
-        $allTypes = $virtualTransaction->fieldOptions('transaction_type');
-
-        foreach ($types as $type) {
-            $result[$type] = [
-                'label' => $allTypes[$type],
-                'maxAmount' => $virtualTransaction->getMaxAmountForType($type)
-            ];
         }
 
         return $result;

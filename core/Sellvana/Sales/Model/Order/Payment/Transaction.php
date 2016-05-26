@@ -4,6 +4,7 @@
  * Class Sellvana_Sales_Model_Order_Payment_Transaction
  *
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
 class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abstract
 {
@@ -43,6 +44,26 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
     ];
 
     protected $_payment;
+
+    static protected $_actions = [
+        self::ORDER => [
+            self::AUTHORIZATION,
+        ],
+        self::AUTHORIZATION => [
+            self::REAUTHORIZATION,
+            self::CAPTURE,
+            self::VOID,
+        ],
+        self::REAUTHORIZATION => [
+            self::REAUTHORIZATION,
+            self::CAPTURE,
+            self::VOID,
+        ],
+        self::CAPTURE => [
+            self::REFUND
+        ],
+    ];
+
 
     /**
      * @return Sellvana_Sales_Model_Order_Payment
@@ -186,24 +207,65 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
      * @param string $type
      * @return mixed
      */
-    public function getMaxAmountForType($type)
+    protected function _getMaxAvailableAmountForAction($type)
     {
         $payment = $this->payment();
 
-        $amount = null;
-        switch ($type) {
-            //case self::AUTHORIZATION:
-            case self::CAPTURE:
-                $amount = $payment->get('amount_due');
-                break;
-            case self::REFUND:
-                $amount = $payment->get('amount_captured') - $payment->get('amount_refunded');
-                break;
+        if (!in_array($type, [self::AUTHORIZATION, self::CAPTURE, self::REFUND])) {
+            return null;
+        }
+
+        $transactions = $payment->findTransaction(
+            [$type], 'completed', null, true, $this->get('transaction_id')
+        );
+
+
+        $amount = $this->get('amount');
+        foreach ($transactions as $transaction) {
+            if ($transaction->id() == $this->id()) {
+                continue;
+            }
+
+            $amount -= $transaction->get('amount');
         }
 
         return $amount;
     }
 
+    public function getAvailableActions()
+    {
+        $currentType = $this->get('transaction_type');
+        $newTypes = [];
+        if (array_key_exists($currentType, self::$_actions)) {
+            $newTypes = self::$_actions[$currentType];
+        }
+
+        $result = [];
+        foreach ($newTypes as $type) {
+            $typeLabels = self::$_fieldOptions['transaction_type'];
+            if (!array_key_exists($type, $typeLabels)) {
+                continue;
+            }
+
+            $types = [$type];
+            if (in_array($type, [self::REAUTHORIZATION, self::VOID])) {
+                $types = [self::CAPTURE];
+            }
+            $transactions = $this->payment()->findTransaction($types, 'completed', null, true, $this->get('transaction_id'));
+            $amount = $this->get('amount');
+            foreach ($transactions as $transaction) {
+                $amount -= $transaction->get('amount');
+            }
+
+            if (count($transactions) == 0 || $amount > 0) {
+                $result[$type] = [
+                    'label' => $typeLabels[$type],
+                    'maxAmount' => $this->_getMaxAvailableAmountForAction($type),
+                ];
+            }
+        }
+        return $result;
+    }
 
     public function __destruct()
     {

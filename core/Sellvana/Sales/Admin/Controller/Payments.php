@@ -8,6 +8,7 @@
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
  * @property Sellvana_Sales_Model_Order_Payment_State_Overall $Sellvana_Sales_Model_Order_Payment_State_Overall
  * @property Sellvana_Sales_Model_Order_Payment_State_Custom $Sellvana_Sales_Model_Order_Payment_State_Custom
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
 
 class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Controller_Abstract
@@ -21,6 +22,15 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
     protected $_permission = 'sales/payments';
     protected $_navPath = 'sales/payments';
     protected $_gridLayoutName = '/payments';
+
+    protected static $_typeToPaymentActions = [
+        Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE => 'capture',
+        Sellvana_Sales_Model_Order_Payment_Transaction::REFUND => 'refund',
+        Sellvana_Sales_Model_Order_Payment_Transaction::REAUTHORIZATION => 'reauthorize',
+        Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION => 'authorize',
+        Sellvana_Sales_Model_Order_Payment_Transaction::VOID => 'void',
+    ];
+
 
     public function gridViewBefore($args)
     {
@@ -187,4 +197,49 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
         $this->BResponse->json($result);
     }
 
+    public function action_transaction_action__POST()
+    {
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $actions = $this->BRequest->post('actions');
+            
+            foreach ($actions as $paymentId => $transactions) {
+                /** @var Sellvana_Sales_Model_Order_Payment $payment */
+                $payment = $this->Sellvana_Sales_Model_Order_Payment->load((int)$paymentId);
+
+                foreach ($transactions as $transactionId => $action) {
+                    if (empty($action['type']) || !array_key_exists($action['type'], self::$_typeToPaymentActions)) {
+                        throw new BException('Unknown transaction type');
+                    }
+
+                    $parent = $this->Sellvana_Sales_Model_Order_Payment_Transaction->load($transactionId);
+
+                    $type = $action['type'];
+                    $method = self::$_typeToPaymentActions[$type];
+                    if ($method != 'void') {
+                        $amount = array_key_exists('amount', $action) ? $action['amount'] : null;
+                        $payment->$method($amount, $parent);
+                    } else {
+                        $payment->$method($parent);
+                    }
+                }
+            }
+
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Transaction has been created');
+        } catch (BException $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $this->BResponse->json($result);
+
+    }
 }

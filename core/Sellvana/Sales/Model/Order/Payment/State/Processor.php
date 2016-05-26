@@ -83,33 +83,6 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
         'refund' => self::PARTIAL_REFUNDED,
     ];
 
-    static protected $_statesToTransactionTypes = [
-        self::ROOT_ORDER => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION,
-        ],
-        self::AUTHORIZED => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::REAUTHORIZATION,
-            Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE,
-            Sellvana_Sales_Model_Order_Payment_Transaction::VOID,
-        ],
-        self::REAUTHORIZED => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::REAUTHORIZATION,
-            Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE,
-            Sellvana_Sales_Model_Order_Payment_Transaction::VOID,
-        ],
-        self::CAPTURED => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::REFUND
-        ],
-        self::PARTIAL_CAPTURED => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE,
-            Sellvana_Sales_Model_Order_Payment_Transaction::VOID,
-            Sellvana_Sales_Model_Order_Payment_Transaction::REFUND,
-        ],
-        self::PARTIAL_REFUNDED => [
-            Sellvana_Sales_Model_Order_Payment_Transaction::REFUND,
-        ],
-    ];
-
     public function invokeAction($action, $partial = false)
     {
         $map = $partial ? static::$_transactionTypesToPartialStates : static::$_transactionTypesToStates;
@@ -212,16 +185,6 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
     public function setCanceled()
     {
         return $this->changeState(self::CANCELED);
-    }
-
-    public function getAvailableTransactionTypes()
-    {
-        $types = [];
-        if (array_key_exists($this->getValue(), self::$_statesToTransactionTypes)) {
-            $types = self::$_statesToTransactionTypes[$this->getValue()];
-        }
-
-        return $types;
     }
 
     public function calcState()
