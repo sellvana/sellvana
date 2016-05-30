@@ -31,6 +31,8 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         'recurring'       => 1,
     ];
 
+    protected $_manualStateManagement = false;
+
     public function can($capability)
     {
         $conf = $this->getConfig();
@@ -41,7 +43,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         if ($capability == 'auth_partial') {
             return (bool)$conf['multiple_auth'];
         }
-        
+
         return parent::can($capability);
     }
 

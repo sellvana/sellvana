@@ -106,11 +106,13 @@
                                         {{ UTIL.optionsHtml(allCustomStates, p.state().custom().getValue()) | raw }}
                                     </select></p>
                             {% endif %}
-                            {% for k, v in allOverallStates %}
-                                {% if k != p.get('state_overall') %}
-                                    <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
-                                {% endif %}
-                            {% endfor %}
+                            {% if p.isManualStateManagementAllowed() %}
+                                {% for k, v in allOverallStates %}
+                                    {% if k != p.get('state_overall') %}
+                                        <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                             {% if allTransactions %}
                                 <p>
                                     <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-transactions" aria-expanded="false" aria-controls="payment{{ p.id() }}-transactions">{{ 'Transactions' | _ }}: {{ allTransactions|length }}</a>

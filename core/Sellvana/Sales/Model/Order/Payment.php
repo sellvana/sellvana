@@ -561,6 +561,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $this->save();
     }
 
+    public function isManualStateManagementAllowed()
+    {
+        return $this->getMethodObject()->isManualStateManagementAllowed();
+    }
+
     public function __destruct()
     {
         parent::__destruct();

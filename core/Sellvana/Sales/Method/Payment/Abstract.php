@@ -63,6 +63,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         'recurring'       => 0,
     ];
 
+    /**
+     * @var bool
+     */
+    protected $_manualStateManagement = true;
+
     public function can($capability)
     {
         if (isset($this->_capabilities[strtolower($capability)])) {
@@ -177,6 +182,26 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
         return [];
+    }
+
+    public function getConfig($key = null)
+    {
+        if (empty($this->_config)) {
+            $name = explode('_', get_class($this));
+            $this->_config = $this->BConfig->get('modules/' . $name[0] . '_' . $name[1], []);
+        }
+        
+        return null === $key ? $this->_config : (isset($this->_config[$key]) ? $this->_config[$key] : null);
+    }
+    
+    public function isManualStateManagementAllowed()
+    {
+        $config = $this->getConfig();
+        if (array_key_exists('manual_state_management', $config)) {
+            return $config['manual_state_management'];
+        }
+
+        return $this->_manualStateManagement;
     }
 
     /**
