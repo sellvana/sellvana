@@ -404,9 +404,14 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function authorize($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
+        $isPartial = ($this->get('amount_due') == $amount);
 
         if (!$method->can('auth')) {
             throw new BException('This payment method can not authorize transactions');
+        }
+
+        if ($isPartial && !$method->can('auth_partial')) {
+            throw new BException('This payment method can not make partial authorizations');
         }
 
         if (null === $parent) {
@@ -554,34 +559,6 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $this->state()->overall()->setPaid();
         $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
         $this->save();
-    }
-
-    public function isActionAvailable($action)
-    {
-        if (!array_key_exists($action, self::$_actions)) {
-            return false;
-        } else {
-            $data = self::$_actions[$action];
-        }
-
-        $method = $this->getMethodObject();
-        return $method->can($data['capability']) && in_array($this->state()->processor()->getValue(), $data['states']);
-    }
-
-    /**
-     * @return array
-     */
-    public function getAvailableActions()
-    {
-        $result = [];
-        foreach (self::$_actions as $action => $data) {
-            $title = $data['label'];
-            if ($this->isActionAvailable($action)) {
-                $result[$action] = $title;
-            }
-        }
-
-        return $result;
     }
 
     public function __destruct()

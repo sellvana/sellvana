@@ -224,8 +224,8 @@
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
                 });
             }
-            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
-            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 5000});
         }
 
         // Create payments or update payments data

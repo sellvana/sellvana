@@ -37,6 +37,11 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         if (empty($conf['username']) || empty($conf['password']) || empty($conf['signature'])) {
             return false;
         }
+
+        if ($capability == 'auth_partial') {
+            return (bool)$conf['multiple_auth'];
+        }
+        
         return parent::can($capability);
     }
 
@@ -203,7 +208,19 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     public function authorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
         $this->_transaction = $transaction;
-        $result = $this->_callDoAuthorization($transaction);
+
+        $config = $this->getConfig();
+        $payment = $transaction->payment();
+        if (!$config['multiple_auth'] && $transaction->get('amount') < $payment->get('amount_due')) {
+            $str = 'You can authorize only the whole amount because multiple authorization mode is disabled. ';
+            $str .= 'If you are sure that your account supports multiple authorizations, enable it in the settings.';
+            $result = [
+                'error' => ['message' => $this->_($str)]
+            ];
+        } else {
+            $result = $this->_callDoAuthorization($transaction);
+        }
+
 
         if (!empty($result['error'])) {
             $this->_setErrorStatus($result);

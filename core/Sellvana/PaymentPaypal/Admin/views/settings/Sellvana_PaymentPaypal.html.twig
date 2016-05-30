@@ -19,6 +19,7 @@
         {{ forms.input(fieldData, {field:'signature', label:'Signature'|_, attr: 'size="50"' }) }}
         {{ forms.boolean(fieldData, {field:'show_shipping', label:'Show shipping address on PayPal'|_ }) }}
         {{ forms.select(fieldData, {field:'payment_action', label:'Payment Action', options:paymentActionOptions }) }}
+        {{ forms.select(fieldData, {field:'multiple_auth', label:'Multiple Authorizations', options:{0: 'No'|_, 1: 'Yes'|_} }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'Sellvana_PaymentPaypal-production', name_prefix:'config[modules][Sellvana_PaymentPaypal][production]', get_prefix:'modules/Sellvana_PaymentPaypal/production' } %}
@@ -28,6 +29,7 @@
         {{ forms.input(fieldData, {field:'signature', label:'Signature'|_, attr: 'size="50"' }) }}
         {{ forms.boolean(fieldData, {field:'show_shipping', label:'Show shipping address on PayPal'|_ }) }}
         {{ forms.select(fieldData, {field:'payment_action', label:'Payment Action', options:paymentActionOptions }) }}
+        {{ forms.select(fieldData, {field:'multiple_auth', label:'Multiple Authorizations', options:{0: 'No'|_, 1: 'Yes'|_} }) }}
     {{ forms.accordion_panel_end }}
 
 {{ forms.accordion_end }}
