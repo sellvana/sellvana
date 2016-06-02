@@ -157,6 +157,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $order = $args['order'];
         $data = $this->BRequest->sanitize($args['data'], ['payment_method' => 'plain']);
         $qtys = isset($args['qtys']) ? $args['qtys'] : null;
+        $amount = isset($args['amount']) ? $args['amount'] : null;
         foreach ($qtys as $id => $qty) {
             if ($qty < 1) {
                 unset($qtys[$id]);
@@ -167,7 +168,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $this->Sellvana_Sales_Model_Order_Payment->create($data);
-        $payment->importFromOrder($order, $qtys);
+        $payment->importFromOrder($order, $qtys, $amount);
 
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();

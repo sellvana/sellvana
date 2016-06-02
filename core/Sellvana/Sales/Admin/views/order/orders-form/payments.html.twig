@@ -3,6 +3,7 @@
 {% set payableItems = order.getPayableItems() %}
 {% set allMethods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
 {% set allPayments = order.getAllPayments() %}
+{% set currentLocale = LOCALE.getCurrentLocale() %}
 
 <div class="f-section" id="order-container">
 
@@ -23,8 +24,9 @@
                 </tr>
                 </thead>
                 <tbody>
+                {% set totalAmt = 0 %}
                 {% for i in payableItems %}
-                    <tr>
+                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ (i.get('row_total') - i.get('row_discount')) / i.get('qty_ordered') }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
@@ -38,10 +40,34 @@
                                 {% endfor %}
                             </select>
                         </td>
-                        <td><input type="text" value="{{ i.getAmountCanPay() }}" /></td>
+                        <td>
+                            <span class="item-amount-to-pay">{{ i.getAmountCanPay() | currency('base') }}</span>
+                            <input type="hidden" name="amounts[{{ i.id() }}]">
+                        </td>
                     </tr>
+                    {% set totalAmt = totalAmt + i.getAmountCanPay() %}
                 {% endfor %}
                 </tbody>
+                <tfoot>
+                    {% for totalCode, total in order.getData('totals') %}
+                        {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] %}
+                            <tr class="total-container" data-price="{{ total.value }}">
+                                <td colspan="4" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
+                                <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="1" checked></td>
+                                <td>{{ total.value | currency('base') }}</td>
+                            </tr>
+                            {% set totalAmt = totalAmt + total.value %}
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td colspan="5" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
+                        <td><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-right"><strong>{{ 'Payment Total' | _ }}</strong></td>
+                        <td><input type="text" value="{{ totalAmt }}" name="amount" id="payment-total-amount" class="form-control"></td>
+                    </tr>
+                </tfoot>
             </table>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -214,6 +240,7 @@
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
+        var locale = '{{ currentLocale }}'.replace('_', '-');
 
         function processPostResponse(data, status, xhr) {
             data = data || {};
@@ -228,6 +255,54 @@
             }
             var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
             $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 5000});
+        }
+
+        function recalculateTotalAmt() {
+            var total = 0;
+
+            $('.item-container').each(function(idx, el) {
+                var price = $(el).data('price');
+                var qty = $(el).find('select').first().val();
+                total += price * qty;
+            });
+
+            $('.total-container').each(function(idx, el) {
+                if ($(el).find('input[type=checkbox]').attr('checked')) {
+                    total += $(el).data('price');
+                }
+            });
+
+            total = Math.ceil(total * 100) / 100;
+            $('#payment-total-amount').val(total);
+            total = total.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
+            $('#total-amount-to-pay').text(total);
+        }
+
+        function recalculateItemAmts() {
+            var calculatedTotal = 0;
+
+            $('.item-container').each(function(idx, el) {
+                var price = $(el).data('price');
+                var qty = $(el).find('select').first().val();
+                calculatedTotal += price * qty;
+            });
+
+            var newTotal = $('#payment-total-amount').val();
+            var ratio = 0;
+
+            console.log(calculatedTotal);
+            console.log(newTotal);
+            if (calculatedTotal > 0 && newTotal > 0) {
+                ratio = newTotal / calculatedTotal;
+            }
+
+            $('.item-container').each(function(idx, el) {
+                var price = $(el).data('price');
+                var qty = $(el).find('select').first().val();
+                price = Math.ceil(price * qty * ratio * 100) / 100;
+                price = price.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
+                $(el).find('.item-amount-to-pay').text(price);
+            });
         }
 
         // Create payments or update payments data
@@ -250,6 +325,10 @@
             var serializeData = $(ev.target).parent('.form-group').find('input, button').serializeArray();
             $.post(transactionActionUrl, serializeData, processPostResponse);
         });
+
+        container.on('click', '.item-container select, .total-container label, .total-container input', recalculateTotalAmt);
+
+        container.on('keyup', '#payment-total-amount', recalculateItemAmts);
 
         // Workaround to avoid conflict with FCom.Admin.Tabs
         $('.payment-transactions').addClass('collapse').collapse({

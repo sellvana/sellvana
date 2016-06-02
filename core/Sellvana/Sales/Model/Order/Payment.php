@@ -140,7 +140,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_transactions;
     }
 
-    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null, $amount = null)
     {
         $this->order($order);
 
@@ -155,13 +155,25 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         $this->save();
 
-        $items = $order->items();
+        $items = $order->items(true);
+        $itemAmounts = [];
         if ($qtys === null) {
             $qtys = [];
             foreach ($items as $item) {
                 $qtys[$item->id()] = true;
             }
         }
+
+        foreach ($qtys as $itemId => $qty) {
+            if (!array_key_exists($itemId, $items)) {
+                throw new BException('Item with ID ' . $itemId . 'does not exist in this order');
+            }
+            $item = $items[$itemId];
+
+            $price = ($item->get('row_total') - $item->get('row_discount')) / $item->get('qty_ordered');
+            $itemAmounts[$itemId] = $price * $qtys[$item->id()];
+        }
+        $ratio = ($amount != 0 && !is_null($amount)) ? (array_sum($itemAmounts) / $amount) : 0;
 
         foreach ($qtys as $itemId => $qty) {
             if (empty($items[$itemId])) {
@@ -180,6 +192,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
                 'payment_id' => $this->id(),
                 'order_item_id' => $item->id(),
                 'qty' => $qty,
+                'amount' => $itemAmounts[$itemId] * $ratio,
             ])->save();
         }
 

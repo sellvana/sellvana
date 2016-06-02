@@ -101,7 +101,7 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getAmountCanPay()
     {
-        return $this->getQtyCanShip() * $this->get('price');
+        return $this->getQtyCanShip() * (($this->get('row_total') - $this->get('row_discount')) / $this->get('qty_ordered'));
     }
 
     /**

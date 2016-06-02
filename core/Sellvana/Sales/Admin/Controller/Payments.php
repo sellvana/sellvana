@@ -130,11 +130,15 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
 
             $paymentData = $this->BRequest->post('payment');
             $qtys = $this->BRequest->post('qtys');
+            $amount = $this->BRequest->post('amount');
+            $totals = $this->BRequest->post('totals');
 
             $this->Sellvana_Sales_Main->workflowAction('adminCreatesPayment', [
                 'order' => $order,
                 'data' => $paymentData,
                 'qtys' => $qtys,
+                'amount' => $amount,
+                'totals' => $totals,
             ]);
             $result = $this->_resetOrderTabs($order);
             $result['message'] = $this->_('Payment has been created');
