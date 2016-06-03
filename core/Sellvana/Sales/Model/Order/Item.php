@@ -99,9 +99,14 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->get('qty_paid') - $this->get('qty_in_refunds');
     }
 
+    public function getCalcPrice()
+    {
+        return ($this->get('row_total') - $this->get('row_discount')) / $this->get('qty_ordered');
+    }
+
     public function getAmountCanPay()
     {
-        return $this->getQtyCanShip() * (($this->get('row_total') - $this->get('row_discount')) / $this->get('qty_ordered'));
+        return $this->getQtyCanShip() * $this->getCalcPrice();
     }
 
     /**
