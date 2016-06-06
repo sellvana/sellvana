@@ -84,7 +84,7 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
             return $this->setComplete();
         }
 
-        if ($item->get('qty_shipped') > 0 || $item->get('qty_paid') > 0) {
+        if ($item->get('qty_shipped') > 0 || $item->get('amount_paid') > 0) {
             return $this->setProcessing();
         }
 

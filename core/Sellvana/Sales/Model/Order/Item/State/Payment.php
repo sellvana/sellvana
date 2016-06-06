@@ -80,10 +80,9 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends Sellvana_Sales_Model
         if ($model->get('row_total') == 0) {
             return $this->setFree();
         }
-        if ($model->get('qty_paid') == $model->get('qty_ordered')) {
+        if (($model->get('amount_paid') > 0) && ($model->getAmountCanPay() == 0)) {
             return $this->setPaid();
-        }
-        if ($model->get('qty_paid') > 0) {
+        } elseif ($model->get('amount_paid') > 0) {
             return $this->setPartial();
         }
 

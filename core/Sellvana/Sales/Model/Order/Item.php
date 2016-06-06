@@ -69,7 +69,7 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getQtyCanPay()
     {
-        return $this->get('qty_ordered') - $this->get('qty_in_payments') - $this->get('qty_in_cancels');
+        return $this->get('qty_ordered') - $this->get('qty_in_cancels');
     }
 
     public function getQtyCanBackorder()
@@ -96,6 +96,7 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getQtyCanRefund()
     {
+        // TODO: change qty to amounts for refunds
         return $this->get('qty_paid') - $this->get('qty_in_refunds');
     }
 
@@ -106,21 +107,21 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getAmountCanPay()
     {
-        return $this->getQtyCanShip() * $this->getCalcPrice();
+        return ($this->getQtyCanPay() * $this->getCalcPrice()) - $this->get('amount_in_payments');
     }
 
     /**
-     * @param float|null $qty
+     * @param float|null $amount
      */
-    public function markAsPaid($qty = null)
+    public function markAsPaid($amount = null)
     {
-        if ($qty === null) {
-            $qty = $this->get('qty_ordered');
+        if ($amount === null) {
+            $amount = $this->getAmountCanPay();
         } else {
-            $qty = min($this->get('qty_in_payments') + $qty, $this->get('qty_ordered'));
+            $amount = min($this->get('amount_in_payments') + $amount, $this->getAmountCanPay());
         }
 
-        $this->set('qty_in_payments', $qty);
+        $this->set('amount_in_payments', $amount);
     }
 
     public function __destruct()

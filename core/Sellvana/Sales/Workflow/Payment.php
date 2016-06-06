@@ -158,6 +158,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $data = $this->BRequest->sanitize($args['data'], ['payment_method' => 'plain']);
         $qtys = isset($args['qtys']) ? $args['qtys'] : null;
         $amount = isset($args['amount']) ? $args['amount'] : null;
+        $totals = isset($args['totals']) ? $args['totals'] : [];
         foreach ($qtys as $id => $qty) {
             if ($qty < 1) {
                 unset($qtys[$id]);
@@ -168,7 +169,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $this->Sellvana_Sales_Model_Order_Payment->create($data);
-        $payment->importFromOrder($order, $qtys, $amount);
+        $payment->importFromOrder($order, $qtys, $amount, $totals);
 
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
@@ -316,7 +317,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $items = [];
         /** @var Sellvana_Sales_Model_Order_Payment_Item $paymentItem */
         foreach ($args['payment']->items() as $paymentItem) {
-            $items[$paymentItem->get('order_item_id')] = $paymentItem->get('qty');
+            $items[$paymentItem->get('order_item_id')] = $paymentItem->get('amount');
         }
 
         /** @var Sellvana_Sales_Model_Order_Item $orderItem */

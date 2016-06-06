@@ -19,30 +19,25 @@
                     <th>{{ 'Inventory SKU'|_ }}</th>
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
-                    <th>{{ 'Qty To Pay'|_ }}</th>
-                    <th>{{ 'Amount To Pay'|_ }}</th>
+                    <th>{{ 'Balance'|_ }}</th>
+                    <th>{{ 'Paid'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% set totalAmt = 0 %}
                 {% for i in payableItems %}
-                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ (i.get('row_total') - i.get('row_discount')) / i.get('qty_ordered') }}">
+                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ (i.get('row_total') - i.get('row_discount') - i.get('amount_in_payments')) / i.get('qty_ordered') }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
+                        <td><strong class="item-amount-to-pay">{{ i.getAmountCanPay() | currency('base') }}</strong></td>
+                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
                         <td>
-                            <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
-                                <option value=""></option>
-                                {% set qtyCanPay = i.getQtyCanPay() %}
-                                {% for q in range(1, qtyCanPay) %}
-                                    <option value="{{ q }}" {{ q == qtyCanPay ? 'selected' }}>{{ q }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td>
-                            <span class="item-amount-to-pay">{{ i.getAmountCanPay() | currency('base') }}</span>
-                            <input type="hidden" name="amounts[{{ i.id() }}]">
+                            <span>{{ (i.getQtyCanPay() * i.getCalcPrice()) | currency('base') }}</span>
+                            <input type="hidden" name="amounts[{{ i.id() }}]" class="item-amounts">
+                            <input type="hidden" name="qtys[{{ i.get('id') }}]" value="{{ i.getQtyCanPay() }}" class="item-qtys">
                         </td>
                     </tr>
                     {% set totalAmt = totalAmt + i.getAmountCanPay() %}
@@ -52,20 +47,20 @@
                     {% for totalCode, total in order.getData('totals') %}
                         {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] %}
                             <tr class="total-container" data-price="{{ total.value }}">
-                                <td colspan="4" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
+                                <td colspan="3" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
                                 <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="1" checked></td>
-                                <td>{{ total.value | currency('base') }}</td>
+                                <td colspan="3"><strong>{{ total.value | currency('base') }}</strong></td>
                             </tr>
                             {% set totalAmt = totalAmt + total.value %}
                         {% endif %}
                     {% endfor %}
                     <tr>
-                        <td colspan="5" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
-                        <td><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
+                        <td colspan="4" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
+                        <td colspan="3"><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="text-right"><strong>{{ 'Payment Total' | _ }}</strong></td>
-                        <td><input type="text" value="{{ totalAmt }}" name="amount" id="payment-total-amount" class="form-control"></td>
+                        <td colspan="4" class="text-right"><strong>{{ 'Payment Total' | _ }}</strong></td>
+                        <td colspan="3"><input type="text" value="{{ totalAmt }}" name="amount" id="payment-total-amount" class="form-control"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -80,8 +75,8 @@
                 <tr>
                     <td>
                         <select name="payment[payment_method]" class="form-control input-sm" id="payment-payment_method">
-                            {% for m in allMethods %}
-                                <option value="{{ m.getCode() }}" {{ m.getCode() == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
+                            {% for key, m in allMethods %}
+                                <option value="{{ key }}" {{ key == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -111,6 +106,7 @@
                     <th>{{ 'Method'|_ }}</th>
                     <th>{{ 'Status'|_ }}</th>
                     <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
                     <th>{{ 'Items'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
                 </tr>
@@ -149,8 +145,11 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
                         </td>
                         <td>
+                            <p>{{ p.get('amount_due')|currency('base') }}</p>
+                        </td>
+                        <td>
                             {% for i in p.items() %}
-                                <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
+                                <strong>{% if i.get('inventory_sku') %}{{ i.get('inventory_sku') }}{% else %}{{ i.getData('custom_label') }}{% endif %}</strong>: {{ i.get('amount') | currency('base') }}<br>
                             {% endfor %}
                         </td>
                         <td>
@@ -241,6 +240,7 @@
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
         var locale = '{{ currentLocale }}'.replace('_', '-');
+        var maxTotal = {{ totalAmt }};
 
         function processPostResponse(data, status, xhr) {
             data = data || {};
@@ -262,7 +262,7 @@
 
             $('.item-container').each(function(idx, el) {
                 var price = $(el).data('price');
-                var qty = $(el).find('select').first().val();
+                var qty = $(el).find('.item-qtys').first().val();
                 total += price * qty;
             });
 
@@ -272,10 +272,11 @@
                 }
             });
 
-            total = Math.ceil(total * 100) / 100;
+            total = Math.round(total * 100) / 100;
+            total = Math.min(total, maxTotal);
             $('#payment-total-amount').val(total);
             total = total.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
-            $('#total-amount-to-pay').text(total);
+            //$('#total-amount-to-pay').text(total);
         }
 
         function recalculateItemAmts() {
@@ -283,23 +284,27 @@
 
             $('.item-container').each(function(idx, el) {
                 var price = $(el).data('price');
-                var qty = $(el).find('select').first().val();
+                var qty = $(el).find('.item-qtys').first().val();
                 calculatedTotal += price * qty;
             });
 
-            var newTotal = $('#payment-total-amount').val();
             var ratio = 0;
+            var newTotal = $('#payment-total-amount').val();
+            $('.total-container').each(function(idx, el) {
+                if ($(el).find('input[type=checkbox]').attr('checked')) {
+                    newTotal -= $(el).data('price');
+                }
+            });
 
-            console.log(calculatedTotal);
-            console.log(newTotal);
             if (calculatedTotal > 0 && newTotal > 0) {
                 ratio = newTotal / calculatedTotal;
             }
 
             $('.item-container').each(function(idx, el) {
                 var price = $(el).data('price');
-                var qty = $(el).find('select').first().val();
-                price = Math.ceil(price * qty * ratio * 100) / 100;
+                var qty = $(el).find('.item-qtys').first().val();
+                price = Math.round(price * qty * ratio * 100) / 100;
+                $(el).find('.item-amounts').val(price);
                 price = price.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
                 $(el).find('.item-amount-to-pay').text(price);
             });

@@ -124,7 +124,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         if (!$this->_items) {
             $this->_items = $this->Sellvana_Sales_Model_Order_Payment_Item->orm('opi')
-                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'opi.order_item_id'], 'oi')
+                ->left_outer_join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'opi.order_item_id'], 'oi')
                 ->select(['opi.*', 'oi.inventory_sku', 'oi.product_name'])
                 ->where('payment_id', $this->id())->find_many_assoc('order_item_id');
         }
@@ -140,7 +140,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_transactions;
     }
 
-    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null, $amount = null)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null, $amount = null, $totals = [])
     {
         $this->order($order);
 
@@ -164,16 +164,22 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             }
         }
 
+        $amountWithoutTotals = 0;
         foreach ($qtys as $itemId => $qty) {
             if (!array_key_exists($itemId, $items)) {
                 throw new BException('Item with ID ' . $itemId . 'does not exist in this order');
             }
             $item = $items[$itemId];
 
-            $price = ($item->get('row_total') - $item->get('row_discount')) / $item->get('qty_ordered');
+            $rowTotal = $item->get('row_total') - $item->get('row_discount');
+            $price = $rowTotal / $item->get('qty_ordered');
+            $amountWithoutTotals += $rowTotal;
             $itemAmounts[$itemId] = $price * $qtys[$item->id()];
         }
-        $ratio = ($amount != 0 && !is_null($amount)) ? (array_sum($itemAmounts) / $amount) : 0;
+        $ratio = $amountWithoutTotals != 0 ? (array_sum($itemAmounts) / $amountWithoutTotals) : 0;
+        if ($ratio <= 0 || $ratio > 1) {
+            throw new BException($this->_('Invalid amount to pay: %s', [$amount]));
+        }
 
         foreach ($qtys as $itemId => $qty) {
             if (empty($items[$itemId])) {
@@ -181,19 +187,27 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             }
             /** @var Sellvana_Sales_Model_Order_Item $item */
             $item = $items[$itemId];
-            $qtyCanPay = $item->getQtyCanPay();
-            if ($qty === true) {
-                $qty = $qtyCanPay;
-            } elseif ($qty <= 0 || $qty > $qtyCanPay) {
-                throw new BException($this->_('Invalid quantity to pay for %s: %s', [$item->get('product_sku'), $qty]));
-            }
             $this->Sellvana_Sales_Model_Order_Payment_Item->create([
                 'order_id' => $order->id(),
                 'payment_id' => $this->id(),
                 'order_item_id' => $item->id(),
-                'qty' => $qty,
                 'amount' => $itemAmounts[$itemId] * $ratio,
             ])->save();
+        }
+
+        foreach (array_keys($totals) as $totalType) {
+            $total = $this->order()->cart()->getTotalByType($totalType);
+            if (!$total) {
+                throw new BException($this->_('Invalid total: %s', $totalType));
+            }
+
+            $item = $this->Sellvana_Sales_Model_Order_Payment_Item->create([
+                'order_id' => $order->id(),
+                'payment_id' => $this->id(),
+                'amount' => $total->getValue(),
+            ]);
+            $item->setData('custom_label', $total->getLabel());
+            $item->save();
         }
 
         return $this;
@@ -363,7 +377,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $orderItems = $this->order()->items();
         foreach ($this->items() as $oItemId => $pItem) {
             $oItem = $orderItems[$oItemId];
-            $oItem->set('qty_in_payments', $oItem->get('qty_ordered'));
+            $oItem->set('amount_in_payments', $oItem->getAmountCanPay());
         }
         return $this;
     }
@@ -376,7 +390,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($paymentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add($done ? 'qty_paid' : 'qty_in_payments', $sItem->get('qty'));
+            $oItem->add($done ? 'amount_paid' : 'amount_in_payments', $sItem->get('amount'));
         }
 
         return $this;
@@ -390,7 +404,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($paymentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add($done ? 'qty_paid' : 'qty_in_payments', -$sItem->get('qty'));
+            $oItem->add($done ? 'amount_paid' : 'amount_in_payments', -$sItem->get('amount'));
         }
 
         return $this;
