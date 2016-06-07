@@ -19,6 +19,7 @@
                     <th>{{ 'Inventory SKU'|_ }}</th>
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
+                    <th>{{ 'Qty To Pay'|_ }}</th>
                     <th>{{ 'Balance'|_ }}</th>
                     <th>{{ 'Paid'|_ }}</th>
                     <th>{{ 'Total Amount'|_ }}</th>
@@ -32,35 +33,36 @@
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
-                        <td><strong class="item-amount-to-pay">{{ i.getAmountCanPay() | currency('base') }}</strong></td>
-                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
                         <td>
-                            <span>{{ (i.getQtyCanPay() * i.getCalcPrice()) | currency('base') }}</span>
-                            <input type="hidden" name="amounts[{{ i.id() }}]" class="item-amounts">
-                            <input type="hidden" name="qtys[{{ i.get('id') }}]" value="{{ i.getQtyCanPay() }}" class="item-qtys">
+                            <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
+                                <option value=""></option>
+                                {% set qtyCanPay = i.getQtyCanPay() %}
+                                {% for q in range(1, qtyCanPay) %}
+                                    <option value="{{ q }}" {{ q == qtyCanPay ? 'selected' }}>{{ q }}</option>
+                                {% endfor %}
+                            </select>
                         </td>
+                        <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
+                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
+                        <td><span>{{ (i.getQtyCanPay() * i.getCalcPrice()) | currency('base') }}</span></td>
                     </tr>
                     {% set totalAmt = totalAmt + i.getAmountCanPay() %}
                 {% endfor %}
                 </tbody>
                 <tfoot>
                     {% for totalCode, total in order.getData('totals') %}
-                        {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] %}
+                        {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] and totalCode not in order.getTotalsInPayments() %}
                             <tr class="total-container" data-price="{{ total.value }}">
-                                <td colspan="3" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
-                                <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="1" checked></td>
+                                <td colspan="4" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
+                                <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="{{ total.value }}" checked></td>
                                 <td colspan="3"><strong>{{ total.value | currency('base') }}</strong></td>
                             </tr>
                             {% set totalAmt = totalAmt + total.value %}
                         {% endif %}
                     {% endfor %}
                     <tr>
-                        <td colspan="4" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
+                        <td colspan="5" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
                         <td colspan="3"><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="text-right"><strong>{{ 'Payment Total' | _ }}</strong></td>
-                        <td colspan="3"><input type="text" value="{{ totalAmt }}" name="amount" id="payment-total-amount" class="form-control"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -262,8 +264,11 @@
 
             $('.item-container').each(function(idx, el) {
                 var price = $(el).data('price');
-                var qty = $(el).find('.item-qtys').first().val();
-                total += price * qty;
+                var qty = $(el).find('select').first().val();
+                var itemTotal = price * qty;
+                itemTotal = Math.ceil(itemTotal * 100) / 100;
+                $(el).find('input.item-amount-to-pay').val(itemTotal);
+                total += itemTotal;
             });
 
             $('.total-container').each(function(idx, el) {
@@ -272,42 +277,10 @@
                 }
             });
 
-            total = Math.round(total * 100) / 100;
             total = Math.min(total, maxTotal);
             $('#payment-total-amount').val(total);
             total = total.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
-            //$('#total-amount-to-pay').text(total);
-        }
-
-        function recalculateItemAmts() {
-            var calculatedTotal = 0;
-
-            $('.item-container').each(function(idx, el) {
-                var price = $(el).data('price');
-                var qty = $(el).find('.item-qtys').first().val();
-                calculatedTotal += price * qty;
-            });
-
-            var ratio = 0;
-            var newTotal = $('#payment-total-amount').val();
-            $('.total-container').each(function(idx, el) {
-                if ($(el).find('input[type=checkbox]').attr('checked')) {
-                    newTotal -= $(el).data('price');
-                }
-            });
-
-            if (calculatedTotal > 0 && newTotal > 0) {
-                ratio = newTotal / calculatedTotal;
-            }
-
-            $('.item-container').each(function(idx, el) {
-                var price = $(el).data('price');
-                var qty = $(el).find('.item-qtys').first().val();
-                price = Math.round(price * qty * ratio * 100) / 100;
-                $(el).find('.item-amounts').val(price);
-                price = price.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
-                $(el).find('.item-amount-to-pay').text(price);
-            });
+            $('#total-amount-to-pay').text(total);
         }
 
         // Create payments or update payments data
@@ -332,8 +305,6 @@
         });
 
         container.on('click', '.item-container select, .total-container label, .total-container input', recalculateTotalAmt);
-
-        container.on('keyup', '#payment-total-amount', recalculateItemAmts);
 
         // Workaround to avoid conflict with FCom.Admin.Tabs
         $('.payment-transactions').addClass('collapse').collapse({

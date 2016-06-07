@@ -156,20 +156,15 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['order'];
         $data = $this->BRequest->sanitize($args['data'], ['payment_method' => 'plain']);
-        $qtys = isset($args['qtys']) ? $args['qtys'] : null;
-        $amount = isset($args['amount']) ? $args['amount'] : null;
+        $amounts = isset($args['amounts']) ? $args['amounts'] : [];
         $totals = isset($args['totals']) ? $args['totals'] : [];
-        foreach ($qtys as $id => $qty) {
-            if ($qty < 1) {
-                unset($qtys[$id]);
-            }
-        }
-        if (!$qtys) {
+        $data['amount_due'] = array_sum($amounts) + array_sum($totals);
+        if (!$amounts) {
             throw new BException('Please add some items to create a payment');
         }
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $this->Sellvana_Sales_Model_Order_Payment->create($data);
-        $payment->importFromOrder($order, $qtys, $amount, $totals);
+        $payment->importFromOrder($order, $amounts, $totals);
 
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
