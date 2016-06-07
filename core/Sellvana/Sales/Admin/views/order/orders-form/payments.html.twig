@@ -4,6 +4,7 @@
 {% set allMethods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
 {% set allPayments = order.getAllPayments() %}
 {% set currentLocale = LOCALE.getCurrentLocale() %}
+{% set totalAmt = 0 %}
 
 <div class="f-section" id="order-container">
 
@@ -26,7 +27,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% set totalAmt = 0 %}
                 {% for i in payableItems %}
                     <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ (i.get('row_total') - i.get('row_discount') - i.get('amount_in_payments')) / i.get('qty_ordered') }}">
                         <td>{{ i.get('product_sku') }}</td>
@@ -147,7 +147,7 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
                         </td>
                         <td>
-                            <p>{{ p.get('amount_due')|currency('base') }}</p>
+                            <p>{{ (p.get('amount_due') +  + p.get('amount_captured'))|currency('base') }}</p>
                         </td>
                         <td>
                             {% for i in p.items() %}

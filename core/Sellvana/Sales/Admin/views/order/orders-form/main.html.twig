@@ -83,12 +83,18 @@
                     <h4><i class="fa fa-university"></i> {{ 'Payment'|_ }} <a href="#" id="payment-section-edit-link" class="section-edit-trigger"></a></h4>
                     <div id="payment-section-view">
                         <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().payment().getValueLabel() }}</strong></p>
-                        <p><strong>{{ paymentMethod.getName() }}</strong></p>
-                        {% if paymentDetails %}
-                            {% for k, v in paymentDetails %}
-                                <p><label>{{ k }}:</label> {{ v }}</p>
-                            {% endfor %}
-                        {% endif %}
+                        {% for p in order.payments() %}
+                            {% set paymentMethod = p.getMethodObject() %}
+                            <p>
+                                <strong>{{ paymentMethod.getName() }}</strong>
+                                <span>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</span>
+                            </p>
+                            {% if paymentDetails %}
+                                {% for k, v in paymentDetails %}
+                                    <p><label>{{ k }}:</label> {{ v }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
                     </div>
                     <div id="payment-section-edit" hidden>
 
