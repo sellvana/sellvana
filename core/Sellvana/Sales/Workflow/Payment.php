@@ -187,6 +187,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
                 $payment->state()->overall()->invokeStateChange($state);
+                if ($state == 'paid') {
+                    $payment->markAsPaid();
+                } elseif ($state == 'refunded') {
+                    $payment->markAsRefunded();
+                }
             }
         }
         if (isset($data['state_processor'])) {

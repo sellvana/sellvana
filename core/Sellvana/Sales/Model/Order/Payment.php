@@ -570,7 +570,17 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function markAsPaid()
     {
         $this->state()->overall()->setPaid();
+        $this->add('amount_captured', $this->get('amount_due'));
+        $this->set('amount_due', 0);
         $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
+        $this->save();
+    }
+
+    public function markAsRefunded()
+    {
+        $this->state()->overall()->setRefunded();
+        $this->add('amount_refunded', $this->get('amount_captured'));
+        $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Refunded"');
         $this->save();
     }
 
