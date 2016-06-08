@@ -118,10 +118,16 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         if ($amount === null) {
             $amount = $this->getAmountCanPay();
         } else {
-            $amount = min($this->get('amount_in_payments') + $amount, $this->getAmountCanPay());
+            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getAmountCanPay());
         }
 
         $this->set('amount_in_payments', $amount);
+    }
+
+    public function getResidualPrice()
+    {
+        $amount = $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
+        return $amount / $this->get('qty_ordered');
     }
 
     public function __destruct()

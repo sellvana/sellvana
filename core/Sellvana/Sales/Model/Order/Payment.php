@@ -417,7 +417,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function authorize($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
-        $isPartial = ($this->get('amount_due') == $amount);
+        $isPartial = ($this->get('amount_due') > $amount);
 
         if (!$method->can('auth')) {
             throw new BException('This payment method can not authorize transactions');

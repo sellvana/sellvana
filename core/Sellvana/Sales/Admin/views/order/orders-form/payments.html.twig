@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                 {% for i in payableItems %}
-                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ (i.get('row_total') - i.get('row_discount') - i.get('amount_in_payments')) / i.get('qty_ordered') }}">
+                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ i.getResidualPrice() }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
@@ -147,11 +147,11 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
                         </td>
                         <td>
-                            <p>{{ (p.get('amount_due') +  + p.get('amount_captured'))|currency('base') }}</p>
+                            <p>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</p>
                         </td>
                         <td>
                             {% for i in p.items() %}
-                                <strong>{% if i.get('inventory_sku') %}{{ i.get('inventory_sku') }}{% else %}{{ i.getData('custom_label') }}{% endif %}</strong>: {{ i.get('amount') | currency('base') }}<br>
+                                <strong>{{ i.get('inventory_sku') ?: i.getData('custom_label') }}</strong>: {{ i.get('amount') | currency('base') }}<br>
                             {% endfor %}
                         </td>
                         <td>
