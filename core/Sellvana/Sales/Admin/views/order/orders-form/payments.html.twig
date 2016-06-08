@@ -21,13 +21,16 @@
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
                     <th>{{ 'Qty To Pay'|_ }}</th>
-                    <th>{{ 'Balance'|_ }}</th>
+                    <th>{{ 'To Pay'|_ }}</th>
+                    <th>{{ 'Payable Amount'|_ }}</th>
                     <th>{{ 'Paid'|_ }}</th>
+                    <th>{{ 'Amount in Payments'|_ }}</th>
                     <th>{{ 'Total Amount'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for i in payableItems %}
+                    {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
                     <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ i.getResidualPrice() }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
@@ -35,16 +38,18 @@
                         <td>{{ i.get('qty_ordered') }}</td>
                         <td>
                             <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
-                                <option value=""></option>
+                                <option value="" selected></option>
                                 {% set qtyCanPay = i.getQtyCanPay() %}
                                 {% for q in range(1, qtyCanPay) %}
-                                    <option value="{{ q }}" {{ q == qtyCanPay ? 'selected' }}>{{ q }}</option>
+                                    <option value="{{ q }}">{{ q }}</option>
                                 {% endfor %}
                             </select>
                         </td>
                         <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
+                        <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
                         <td>{{ i.get('amount_paid') | currency('base') }}</td>
-                        <td><span>{{ (i.getQtyCanPay() * i.getCalcPrice()) | currency('base') }}</span></td>
+                        <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
+                        <td><span>{{ totalItemAmt | currency('base') }}</span></td>
                     </tr>
                     {% set totalAmt = totalAmt + i.getAmountCanPay() %}
                 {% endfor %}
