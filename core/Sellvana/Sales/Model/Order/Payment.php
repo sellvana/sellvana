@@ -180,18 +180,19 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             }
         }
 
+        $orderTotals = $this->order()->getData('totals');
         foreach (array_keys($totals) as $totalType) {
-            $total = $this->order()->cart()->getTotalByType($totalType);
-            if (!$total) {
+            if (!array_key_exists($totalType, $orderTotals)) {
                 throw new BException($this->_('Invalid total: %s', $totalType));
             }
+            $total = $orderTotals[$totalType];
 
             $item = $this->Sellvana_Sales_Model_Order_Payment_Item->create([
                 'order_id' => $order->id(),
                 'payment_id' => $this->id(),
-                'amount' => $total->getValue(),
+                'amount' => $total['value'],
             ]);
-            $item->setData('custom_label', $total->getLabel());
+            $item->setData('custom_label', $total['label']);
             $item->setData('code', $totalType);
             $item->save();
         }
