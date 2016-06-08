@@ -153,15 +153,23 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $this->state()->overall()->setDefaultState();
         $this->state()->custom()->setDefaultState();
 
-        $this->save();
-
         $items = $order->items(true);
         if (empty($amounts)) {
             $amounts = [];
             foreach ($items as $item) {
                 $amounts[$item->id()] = true;
             }
+        } else {
+            foreach ($amounts as $itemId => $amount) {
+                /** @var Sellvana_Sales_Model_Order_Item $item */
+                $item = $items[$itemId];
+                if ($item->getAmountCanPay() < $amount) {
+                    throw new BException($this->_('The amount for item %s is to large: %s', [$item->get('inventory_sku'), $amount]));
+                }
+            }
         }
+
+        $this->save();
 
         foreach ($amounts as $itemId => $amount) {
             if (empty($items[$itemId])) {
