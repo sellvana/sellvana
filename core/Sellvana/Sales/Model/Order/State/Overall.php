@@ -140,7 +140,7 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
             return $this;
         }
 
-        if ($model->get('qty_shipped') || $model->get('qty_paid')) {
+        if ($model->get('qty_shipped') || $model->get('amount_paid')) {
             $this->setProcessing();
             return $this;
         }

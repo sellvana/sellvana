@@ -156,18 +156,15 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['order'];
         $data = $this->BRequest->sanitize($args['data'], ['payment_method' => 'plain']);
-        $qtys = isset($args['qtys']) ? $args['qtys'] : null;
-        foreach ($qtys as $id => $qty) {
-            if ($qty < 1) {
-                unset($qtys[$id]);
-            }
-        }
-        if (!$qtys) {
+        $amounts = isset($args['amounts']) ? $args['amounts'] : [];
+        $totals = isset($args['totals']) ? $args['totals'] : [];
+        $data['amount_due'] = array_sum($amounts) + array_sum($totals);
+        if (!$amounts) {
             throw new BException('Please add some items to create a payment');
         }
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $this->Sellvana_Sales_Model_Order_Payment->create($data);
-        $payment->importFromOrder($order, $qtys);
+        $payment->importFromOrder($order, $amounts, $totals);
 
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
@@ -190,6 +187,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
                 $payment->state()->overall()->invokeStateChange($state);
+                if ($state == 'paid') {
+                    $payment->markAsPaid();
+                } elseif ($state == 'refunded') {
+                    $payment->markAsRefunded();
+                }
             }
         }
         if (isset($data['state_processor'])) {
@@ -315,7 +317,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $items = [];
         /** @var Sellvana_Sales_Model_Order_Payment_Item $paymentItem */
         foreach ($args['payment']->items() as $paymentItem) {
-            $items[$paymentItem->get('order_item_id')] = $paymentItem->get('qty');
+            $items[$paymentItem->get('order_item_id')] = $paymentItem->get('amount');
         }
 
         /** @var Sellvana_Sales_Model_Order_Item $orderItem */

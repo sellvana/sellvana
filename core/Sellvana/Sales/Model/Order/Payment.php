@@ -124,7 +124,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         if (!$this->_items) {
             $this->_items = $this->Sellvana_Sales_Model_Order_Payment_Item->orm('opi')
-                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'opi.order_item_id'], 'oi')
+                ->left_outer_join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'opi.order_item_id'], 'oi')
                 ->select(['opi.*', 'oi.inventory_sku', 'oi.product_name'])
                 ->where('payment_id', $this->id())->find_many_assoc('order_item_id');
         }
@@ -140,7 +140,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_transactions;
     }
 
-    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $amounts = [], $totals = [])
     {
         $this->order($order);
 
@@ -153,34 +153,56 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $this->state()->overall()->setDefaultState();
         $this->state()->custom()->setDefaultState();
 
-        $this->save();
-
-        $items = $order->items();
-        if ($qtys === null) {
-            $qtys = [];
+        $items = $order->items(true);
+        if (empty($amounts)) {
+            $amounts = [];
             foreach ($items as $item) {
-                $qtys[$item->id()] = true;
+                $amounts[$item->id()] = true;
+            }
+        } else {
+            foreach ($amounts as $itemId => $amount) {
+                /** @var Sellvana_Sales_Model_Order_Item $item */
+                $item = $items[$itemId];
+                if ($item->getAmountCanPay() < $amount) {
+                    throw new BException($this->_('The amount for item %s is to large: %s', [$item->get('inventory_sku'), $amount]));
+                }
             }
         }
 
-        foreach ($qtys as $itemId => $qty) {
+        $this->save();
+
+        foreach ($amounts as $itemId => $amount) {
             if (empty($items[$itemId])) {
                 throw new BException($this->_('Invalid item id: %s', $itemId));
             }
-            /** @var Sellvana_Sales_Model_Order_Item $item */
-            $item = $items[$itemId];
-            $qtyCanPay = $item->getQtyCanPay();
-            if ($qty === true) {
-                $qty = $qtyCanPay;
-            } elseif ($qty <= 0 || $qty > $qtyCanPay) {
-                throw new BException($this->_('Invalid quantity to pay for %s: %s', [$item->get('product_sku'), $qty]));
+
+            if ($amount > 0) {
+                /** @var Sellvana_Sales_Model_Order_Item $item */
+                $item = $items[$itemId];
+                $this->Sellvana_Sales_Model_Order_Payment_Item->create([
+                    'order_id' => $order->id(),
+                    'payment_id' => $this->id(),
+                    'order_item_id' => $item->id(),
+                    'amount' => $amount,
+                ])->save();
             }
-            $this->Sellvana_Sales_Model_Order_Payment_Item->create([
+        }
+
+        $orderTotals = $this->order()->getData('totals');
+        foreach (array_keys($totals) as $totalType) {
+            if (!array_key_exists($totalType, $orderTotals)) {
+                throw new BException($this->_('Invalid total: %s', $totalType));
+            }
+            $total = $orderTotals[$totalType];
+
+            $item = $this->Sellvana_Sales_Model_Order_Payment_Item->create([
                 'order_id' => $order->id(),
                 'payment_id' => $this->id(),
-                'order_item_id' => $item->id(),
-                'qty' => $qty,
-            ])->save();
+                'amount' => $total['value'],
+            ]);
+            $item->setData('custom_label', $total['label']);
+            $item->setData('code', $totalType);
+            $item->save();
         }
 
         return $this;
@@ -350,7 +372,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $orderItems = $this->order()->items();
         foreach ($this->items() as $oItemId => $pItem) {
             $oItem = $orderItems[$oItemId];
-            $oItem->set('qty_in_payments', $oItem->get('qty_ordered'));
+            $oItem->set('amount_in_payments', $oItem->getAmountCanPay());
         }
         return $this;
     }
@@ -363,7 +385,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($paymentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add($done ? 'qty_paid' : 'qty_in_payments', $sItem->get('qty'));
+            $oItem->add($done ? 'amount_paid' : 'amount_in_payments', $sItem->get('amount'));
         }
 
         return $this;
@@ -377,7 +399,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($paymentItems as $sItem) {
             $oItem = $orderItems[$sItem->get('order_item_id')];
-            $oItem->add($done ? 'qty_paid' : 'qty_in_payments', -$sItem->get('qty'));
+            $oItem->add($done ? 'amount_paid' : 'amount_in_payments', -$sItem->get('amount'));
         }
 
         return $this;
@@ -404,9 +426,14 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function authorize($amount = null, $parent = null)
     {
         $method = $this->getMethodObject();
+        $isPartial = ($this->get('amount_due') > $amount);
 
         if (!$method->can('auth')) {
             throw new BException('This payment method can not authorize transactions');
+        }
+
+        if ($isPartial && !$method->can('auth_partial')) {
+            throw new BException('This payment method can not make partial authorizations');
         }
 
         if (null === $parent) {
@@ -552,36 +579,23 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function markAsPaid()
     {
         $this->state()->overall()->setPaid();
+        $this->add('amount_captured', $this->get('amount_due'));
+        $this->set('amount_due', 0);
         $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
         $this->save();
     }
 
-    public function isActionAvailable($action)
+    public function markAsRefunded()
     {
-        if (!array_key_exists($action, self::$_actions)) {
-            return false;
-        } else {
-            $data = self::$_actions[$action];
-        }
-
-        $method = $this->getMethodObject();
-        return $method->can($data['capability']) && in_array($this->state()->processor()->getValue(), $data['states']);
+        $this->state()->overall()->setRefunded();
+        $this->add('amount_refunded', $this->get('amount_captured'));
+        $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Refunded"');
+        $this->save();
     }
 
-    /**
-     * @return array
-     */
-    public function getAvailableActions()
+    public function isManualStateManagementAllowed()
     {
-        $result = [];
-        foreach (self::$_actions as $action => $data) {
-            $title = $data['label'];
-            if ($this->isActionAvailable($action)) {
-                $result[$action] = $title;
-            }
-        }
-
-        return $result;
+        return $this->getMethodObject()->isManualStateManagementAllowed();
     }
 
     public function __destruct()

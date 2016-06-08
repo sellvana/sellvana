@@ -595,7 +595,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    /**
+     /**
      * Save order with items and other details
      *
      * @param array $options
@@ -665,11 +665,27 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
-            if ($item->getQtyCanPay()) {
+            if ($item->getQtyCanPay() && $item->getAmountCanPay()) {
                 $items[] = $item;
             }
         }
         return $items;
+    }
+
+    public function getTotalsInPayments()
+    {
+        $totals = [];
+        foreach ($this->payments() as $payment) {
+            foreach ($payment->items() as $pItem) {
+                if ($pItem->get('order_item_id')) {
+                    continue;
+                }
+
+                $totals[] = $pItem->getData('code');
+            }
+        }
+
+        return $totals;
     }
 
     public function getCancelableItems()

@@ -23,7 +23,11 @@ modules:
                         api_url: "https://api-3t.sandbox.paypal.com/nvp"
                         express_checkout_url: "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token="
                         payment_action: Sale
+                        multiple_auth: 0
+                        manual_state_management: 0
                     production:
                         api_url: "https://api-3t.paypal.com/nvp"
                         express_checkout_url: "https://www.paypal.com/webscr?cmd=_express-checkout&token="
                         payment_action: Sale
+                        multiple_auth: 0
+                        manual_state_management: 0

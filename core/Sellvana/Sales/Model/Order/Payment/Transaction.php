@@ -215,6 +215,10 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
             return null;
         }
 
+        if (!$payment->getMethodObject()->can($type . '_partial')) {
+            return null;
+        }
+
         $transactions = $payment->findTransaction(
             [$type], 'completed', null, true, $this->get('transaction_id')
         );

@@ -27,6 +27,8 @@ abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Mode
      */
     protected $_doneStates = [];
 
+    protected $_sumField = 'qty';
+
     public function getOrderItemsQtys(array $items = [])
     {
         $parentClass = $this->_parentClass;
@@ -58,7 +60,7 @@ abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Mode
 
         foreach ($cItems as $cItem) {
             $oiId = $cItem->get('order_item_id');
-            $qty = $cItem->get('qty');
+            $qty = $cItem->get($this->_sumField);
             if (empty($result[$oiId][$allField])) {
                 $result[$oiId][$allField] = $qty;
             } else {

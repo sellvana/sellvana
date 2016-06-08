@@ -186,7 +186,7 @@ class OrderTest extends \Codeception\TestCase\Test
         $order->markAsPaid();
         $items = $order->items();
         foreach ($items as $item) {
-            $this->tester->assertTrue($item->get('qty_ordered') == $item->get('qty_paid'), 'Marking order item as paid fail.');
+            $this->tester->assertTrue($item->getAmountCanPay() == 0 && $item->get('amount_paid'), 'Marking order item as paid fail.');
         }
     }
 

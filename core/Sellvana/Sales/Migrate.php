@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_6_7_0()
+    public function install__0_6_9_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -300,14 +300,14 @@ class Sellvana_Sales_Migrate extends BClass
                 'qty_canceled' => 'int not null default 0',
                 'qty_shipped' => 'int not null default 0',
                 'qty_returned' => 'int not null default 0',
-                'qty_paid' => 'int not null default 0',
                 'qty_refunded' => 'int not null default 0',
+                'amount_paid' => 'decimal(12,2) not null default 0',
 
                 'qty_in_cancels' => 'int not null default 0',
                 'qty_in_shipments' => 'int not null default 0',
                 'qty_in_returns' => 'int not null default 0',
-                'qty_in_payments' => 'int not null default 0',
                 'qty_in_refunds' => 'int not null default 0',
+                'amount_in_payments' => 'decimal(12,2) not null default 0',
 
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
@@ -442,9 +442,9 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
-                'order_item_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned default null',
                 'payment_id' => 'int unsigned not null',
-                'qty' => 'int unsigned not null',
+                'amount' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -2270,6 +2270,27 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderPayment, [
             BDb::COLUMNS => [
                 'state_processor' => "varchar(20) not null default 'pending'"
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_8_0__0_6_9_0()
+    {
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tOrderPaymentItem = $this->Sellvana_Sales_Model_Order_Payment_Item->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'amount_paid' => 'decimal(12,2) not null default 0',
+                'amount_in_payments' => 'decimal(12,2) not null default 0',
+                'qty_in_payments' => BDb::DROP,
+                'qty_paid' => BDb::DROP,
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'order_item_id' => 'int unsigned default null',
+                'amount' => 'decimal(12,2) not null default 0',
+                'qty' => BDb::DROP,
             ],
         ]);
     }

@@ -3,6 +3,8 @@
 {% set payableItems = order.getPayableItems() %}
 {% set allMethods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
 {% set allPayments = order.getAllPayments() %}
+{% set currentLocale = LOCALE.getCurrentLocale() %}
+{% set totalAmt = 0 %}
 
 <div class="f-section" id="order-container">
 
@@ -19,29 +21,55 @@
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
                     <th>{{ 'Qty To Pay'|_ }}</th>
-                    <th>{{ 'Amount To Pay'|_ }}</th>
+                    <th>{{ 'To Pay'|_ }}</th>
+                    <th>{{ 'Payable Amount'|_ }}</th>
+                    <th>{{ 'Paid'|_ }}</th>
+                    <th>{{ 'Amount in Payments'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for i in payableItems %}
-                    <tr>
+                    {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
+                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ i.getResidualPrice() }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
                         <td>
                             <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
-                                <option value=""></option>
+                                <option value="" selected></option>
                                 {% set qtyCanPay = i.getQtyCanPay() %}
                                 {% for q in range(1, qtyCanPay) %}
-                                    <option value="{{ q }}" {{ q == qtyCanPay ? 'selected' }}>{{ q }}</option>
+                                    <option value="{{ q }}">{{ q }}</option>
                                 {% endfor %}
                             </select>
                         </td>
-                        <td><input type="text" value="{{ i.getAmountCanPay() }}" /></td>
+                        <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
+                        <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
+                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
+                        <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
+                        <td><span>{{ totalItemAmt | currency('base') }}</span></td>
                     </tr>
+                    {% set totalAmt = totalAmt + i.getAmountCanPay() %}
                 {% endfor %}
                 </tbody>
+                <tfoot>
+                    {% for totalCode, total in order.getData('totals') %}
+                        {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] and totalCode not in order.getTotalsInPayments() %}
+                            <tr class="total-container" data-price="{{ total.value }}">
+                                <td colspan="4" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
+                                <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="{{ total.value }}" checked></td>
+                                <td colspan="3"><strong>{{ total.value | currency('base') }}</strong></td>
+                            </tr>
+                            {% set totalAmt = totalAmt + total.value %}
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td colspan="5" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
+                        <td colspan="3"><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
+                    </tr>
+                </tfoot>
             </table>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -54,8 +82,8 @@
                 <tr>
                     <td>
                         <select name="payment[payment_method]" class="form-control input-sm" id="payment-payment_method">
-                            {% for m in allMethods %}
-                                <option value="{{ m.getCode() }}" {{ m.getCode() == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
+                            {% for key, m in allMethods %}
+                                <option value="{{ key }}" {{ key == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -85,6 +113,7 @@
                     <th>{{ 'Method'|_ }}</th>
                     <th>{{ 'Status'|_ }}</th>
                     <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
                     <th>{{ 'Items'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
                 </tr>
@@ -106,11 +135,13 @@
                                         {{ UTIL.optionsHtml(allCustomStates, p.state().custom().getValue()) | raw }}
                                     </select></p>
                             {% endif %}
-                            {% for k, v in allOverallStates %}
-                                {% if k != p.get('state_overall') %}
-                                    <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
-                                {% endif %}
-                            {% endfor %}
+                            {% if p.isManualStateManagementAllowed() %}
+                                {% for k, v in allOverallStates %}
+                                    {% if k != p.get('state_overall') %}
+                                        <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                             {% if allTransactions %}
                                 <p>
                                     <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-transactions" aria-expanded="false" aria-controls="payment{{ p.id() }}-transactions">{{ 'Transactions' | _ }}: {{ allTransactions|length }}</a>
@@ -121,8 +152,11 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
                         </td>
                         <td>
+                            <p>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</p>
+                        </td>
+                        <td>
                             {% for i in p.items() %}
-                                <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
+                                <strong>{{ i.get('inventory_sku') ?: i.getData('custom_label') }}</strong>: {{ i.get('amount') | currency('base') }}<br>
                             {% endfor %}
                         </td>
                         <td>
@@ -212,6 +246,8 @@
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
+        var locale = '{{ currentLocale }}'.replace('_', '-');
+        var maxTotal = {{ totalAmt }};
 
         function processPostResponse(data, status, xhr) {
             data = data || {};
@@ -224,8 +260,32 @@
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
                 });
             }
-            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
-            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 5000});
+        }
+
+        function recalculateTotalAmt() {
+            var total = 0;
+
+            $('.item-container').each(function(idx, el) {
+                var price = $(el).data('price');
+                var qty = $(el).find('select').first().val();
+                var itemTotal = price * qty;
+                itemTotal = Math.ceil(itemTotal * 100) / 100;
+                $(el).find('input.item-amount-to-pay').val(itemTotal);
+                total += itemTotal;
+            });
+
+            $('.total-container').each(function(idx, el) {
+                if ($(el).find('input[type=checkbox]').attr('checked')) {
+                    total += $(el).data('price');
+                }
+            });
+
+            total = Math.min(total, maxTotal);
+            $('#payment-total-amount').val(total);
+            total = total.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
+            $('#total-amount-to-pay').text(total);
         }
 
         // Create payments or update payments data
@@ -248,6 +308,8 @@
             var serializeData = $(ev.target).parent('.form-group').find('input, button').serializeArray();
             $.post(transactionActionUrl, serializeData, processPostResponse);
         });
+
+        container.on('click', '.item-container select, .total-container label, .total-container input', recalculateTotalAmt);
 
         // Workaround to avoid conflict with FCom.Admin.Tabs
         $('.payment-transactions').addClass('collapse').collapse({
