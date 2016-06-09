@@ -5,6 +5,7 @@
 {% set allPayments = order.getAllPayments() %}
 {% set currentLocale = LOCALE.getCurrentLocale() %}
 {% set totalAmt = 0 %}
+{% set baseCurrency = CONFIG.get('modules/FCom_Core/base_currency') %}
 
 <div class="f-section" id="order-container">
 
@@ -278,7 +279,7 @@
 
             total = Math.min(total, maxTotal);
             $('#payment-total-amount').val(total);
-            total = total.toLocaleString(locale, {style: 'currency', currency: 'EUR'});
+            total = total.toLocaleString(locale, {style: 'currency', currency: '{{ baseCurrency }}'});
             $('#total-amount-to-pay').text(total);
         }
 
