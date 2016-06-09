@@ -953,12 +953,12 @@ class Sellvana_Catalog_Migrate extends BClass
             ],
         ]);
 
-        if (!$this->BMigrate->isModuleVersion('Sellvana_Cms', '0.6.0.0')) {
-            $this->after__Sellvana_Cms__0_6_0_0();
+        if ($this->BMigrate->isModuleVersion('Sellvana_Cms', '0.5.0.2~')) {
+            $this->after__Sellvana_Cms__0_5_0_2();
         }
     }
 
-    public function after__Sellvana_Cms__0_6_0_0()
+    public function after__Sellvana_Cms__0_5_0_2()
     {
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
         $tCmsBlock = $this->Sellvana_Cms_Model_Block->table();

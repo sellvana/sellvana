@@ -507,6 +507,9 @@ class BLayout extends BClass
         }
         $viewAlias = !empty($params['view_alias']) ? $params['view_alias'] : $viewName;
         $viewFile = !empty($params['view_file']) ? $params['view_file'] : $viewName;
+        if (empty($params['file_ext']) && !empty($params['template'])) {
+            $params['file_ext'] = '.' . pathinfo($params['template'], PATHINFO_EXTENSION);
+        }
         if (!isset($this->_views[$viewAlias]) || !empty($params['view_class'])) {
             if (empty($params['view_class'])) {
                 /*
