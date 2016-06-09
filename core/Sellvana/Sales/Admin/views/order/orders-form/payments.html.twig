@@ -20,12 +20,12 @@
                     <th>{{ 'Inventory SKU'|_ }}</th>
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
-                    <th>{{ 'Qty To Pay'|_ }}</th>
-                    <th>{{ 'To Pay'|_ }}</th>
-                    <th>{{ 'Payable Amount'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
                     <th>{{ 'Paid'|_ }}</th>
                     <th>{{ 'Amount in Payments'|_ }}</th>
-                    <th>{{ 'Total Amount'|_ }}</th>
+                    <th>{{ 'Payable Amount'|_ }}</th>
+                    <th>{{ 'Qty To Pay'|_ }}</th>
+                    <th>{{ 'Amount To Pay'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -36,6 +36,10 @@
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
+                        <td><span>{{ totalItemAmt | currency('base') }}</span></td>
+                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
+                        <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
+                        <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
                         <td>
                             <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
                                 <option value="" selected></option>
@@ -46,10 +50,6 @@
                             </select>
                         </td>
                         <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
-                        <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
-                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
-                        <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
-                        <td><span>{{ totalItemAmt | currency('base') }}</span></td>
                     </tr>
                     {% set totalAmt = totalAmt + i.getAmountCanPay() %}
                 {% endfor %}
@@ -58,39 +58,28 @@
                     {% for totalCode, total in order.getData('totals') %}
                         {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] and totalCode not in order.getTotalsInPayments() %}
                             <tr class="total-container" data-price="{{ total.value }}">
-                                <td colspan="4" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
+                                <td colspan="8" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
                                 <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="{{ total.value }}" checked></td>
-                                <td colspan="3"><strong>{{ total.value | currency('base') }}</strong></td>
+                                <td><strong>{{ total.value | currency('base') }}</strong></td>
                             </tr>
                             {% set totalAmt = totalAmt + total.value %}
                         {% endif %}
                     {% endfor %}
                     <tr>
-                        <td colspan="5" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
-                        <td colspan="3"><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
+                        <td colspan="9" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
+                        <td><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
                     </tr>
-                </tfoot>
-            </table>
-            <table class="table table-bordered table-striped dataTable">
-                <thead>
-                <tr>
-                    <th>{{ 'Method'|_ }}</th>
-                    <th>&nbsp;</th>
-                </tr>
-                </thead>
-                <tfoot>
-                <tr>
-                    <td>
-                        <select name="payment[payment_method]" class="form-control input-sm" id="payment-payment_method">
-                            {% for key, m in allMethods %}
-                                <option value="{{ key }}" {{ key == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                    <td>
-                        <button id="btnPaymentCreate" data-container="#payment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="6"></td>
+                        <td colspan="3" class="text-right">
+                            <select name="payment[payment_method]" class="form-control input-sm" id="payment-payment_method">
+                                {% for key, m in allMethods %}
+                                    <option value="{{ key }}" {{ key == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><button id="btnPaymentCreate" data-container="#payment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button></td>
+                    </tr>
                 </tfoot>
             </table>
         </div>
@@ -226,11 +215,8 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Update'|_ }}</button></td>
+                    <td colspan="5"></td>
+                    <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Apply Changes'|_ }}</button></td>
                 </tr>
                 </tfoot>
             </table>
