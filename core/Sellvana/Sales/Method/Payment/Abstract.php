@@ -204,6 +204,12 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return $this->_manualStateManagement;
     }
 
+    public function isRootTransactionNeeded()
+    {
+        //return !$this->isManualStateManagementAllowed();
+        return false;
+    }
+
     /**
      * Shortcut for payment gateway error
      *

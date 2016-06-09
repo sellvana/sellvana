@@ -671,4 +671,11 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         //echo "<pre>"; var_dump($result); echo "<pre>"; exit;
         return $result;
     }
+
+    public function isRootTransactionNeeded()
+    {
+        return true;
+    }
+
+
 }

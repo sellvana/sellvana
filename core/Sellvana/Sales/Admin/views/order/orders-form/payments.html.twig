@@ -146,6 +146,10 @@
                                 <p>
                                     <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-transactions" aria-expanded="false" aria-controls="payment{{ p.id() }}-transactions">{{ 'Transactions' | _ }}: {{ allTransactions|length }}</a>
                                 </p>
+                            {% elseif allMethods[p.get('payment_method')].isRootTransactionNeeded() %}
+                                <p>
+                                    <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-create-root-transaction" aria-expanded="false" aria-controls="payment{{ p.id() }}-create-root-transaction">{{ 'Create root transaction'|_ }}</a>
+                                </p>
                             {% endif %}
                         </td>
                         <td>
@@ -220,6 +224,10 @@
                                     </tbody>
                                 </table>
                             </td>
+                        </tr>
+                    {% elseif allMethods[p.get('payment_method')].isRootTransactionNeeded() %}
+                        <tr>
+
                         </tr>
                     {% endif %}
                 {% endfor %}
