@@ -15,6 +15,11 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         return true;
     }
 
+    public function action_login()
+    {
+        $this->BResponse->redirect('');
+    }
+
     public function action_login__POST()
     {
         try {
