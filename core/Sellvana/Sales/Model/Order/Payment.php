@@ -267,6 +267,15 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $trans;
     }
 
+    public function getRootTransactionUrl()
+    {
+        if (!$this->getMethodObject()->isRootTransactionNeeded()) {
+            return null;
+        }
+
+        return $this->BApp->href('payments/create_root_transaction?' . $this->id());
+    }
+
     /**
      * @param string|array $type
      * @param string $status

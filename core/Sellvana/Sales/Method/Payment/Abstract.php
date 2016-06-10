@@ -50,6 +50,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         'pay'             => 1,
         'pay_offline'     => 0,
         'pay_online'      => 0,
+        'pay_by_url'      => 0,
         'auth'            => 0,
         'auth_partial'    => 0,
         'reauth'          => 0,
@@ -154,6 +155,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
+    public function payByUrl(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        return [];
+    }
+
     public function payOffline(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
         return [];
@@ -202,6 +208,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         }
 
         return $this->_manualStateManagement;
+    }
+
+    public function isRootTransactionNeeded()
+    {
+        return false;
     }
 
     /**
