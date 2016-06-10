@@ -18,6 +18,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     protected $_capabilities = [
         'pay'             => 1,
         'pay_online'      => 1,
+        'pay_by_url'      => 1,
         'auth'            => 1,
         'auth_partial'    => 1,
         'reauth'          => 1,

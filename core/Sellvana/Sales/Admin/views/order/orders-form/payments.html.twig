@@ -113,9 +113,10 @@
                     {% set allOverallStates = p.state().overall().getNextValueLabels() %}
                     {% set allCustomStates = p.state().custom().getNextValueLabels() %}
                     {% set allTransactions = p.transactions() %}
+                    {% set method = allMethods[p.get('payment_method')] %}
                     <tr>
                         <td>
-                            <p><strong>{{ allMethods[p.get('payment_method')].getName() }}</strong></p>
+                            <p><strong>{{ method.getName() }}</strong></p>
                         </td>
                         <td>
                             <p>{{ 'Overall:'|_ }} <strong>{{ p.state().overall().getValueLabel() }}</strong></p>
@@ -136,9 +137,9 @@
                                 <p>
                                     <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-transactions" aria-expanded="false" aria-controls="payment{{ p.id() }}-transactions">{{ 'Transactions' | _ }}: {{ allTransactions|length }}</a>
                                 </p>
-                            {% elseif allMethods[p.get('payment_method')].isRootTransactionNeeded() %}
+                            {% elseif method.isRootTransactionNeeded() and method.can('pay_by_url') %}
                                 <p>
-                                    <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-create-root-transaction" aria-expanded="false" aria-controls="payment{{ p.id() }}-create-root-transaction">{{ 'Create root transaction'|_ }}</a>
+                                    <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-root-transaction-form" aria-expanded="false" aria-controls="payment{{ p.id() }}-root-transaction-form">{{ 'Create root transaction'|_ }}</a>
                                 </p>
                             {% endif %}
                         </td>
@@ -159,7 +160,7 @@
                     </tr>
                     {% if allTransactions %}
                         <tr class="payment-transactions" id="payment{{ p.id() }}-transactions">
-                            <td></td>
+                            <td>&nbsp;</td>
                             <td colspan="4">
                                 <table class="table table-bordered table-striped dataTable">
                                     <thead>
@@ -215,9 +216,19 @@
                                 </table>
                             </td>
                         </tr>
-                    {% elseif allMethods[p.get('payment_method')].isRootTransactionNeeded() %}
-                        <tr>
-
+                    {% elseif method.isRootTransactionNeeded() and method.can('pay_by_url') %}
+                        <tr class="payment-root-transaction-form" id="payment{{ p.id() }}-root-transaction-form">
+                            <td>&nbsp;</td>
+                            <td colspan="5">
+                                <p>{{ 'Transaction type'|_ }}: </p>
+                                <p>
+                                    <label>{{ 'Send URL to customer'|_ }}</label>
+                                    <input type="checkbox" name="payment{{ p.id() }}-send-to-customer">
+                                </p>
+                                <p>
+                                    <button type="button" class="btn btn-xs btn-primary">{{ 'Create'|_ }}</button>
+                                </p>
+                            </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -307,7 +318,7 @@
         container.on('click', '.item-container select, .total-container label, .total-container input', recalculateTotalAmt);
 
         // Workaround to avoid conflict with FCom.Admin.Tabs
-        $('.payment-transactions').addClass('collapse').collapse({
+        $('.payment-transactions, .payment-root-transaction-form').addClass('collapse').collapse({
             toggle: false
         });
     })

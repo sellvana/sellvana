@@ -41,6 +41,6 @@ class Sellvana_Sales_Frontend_Controller_Payments extends FCom_Frontend_Controll
             return false;
         }
 
-
+        $payment->getMethodObject()->payOnCheckout($payment);
     }
 }
