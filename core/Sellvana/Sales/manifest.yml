@@ -1,6 +1,6 @@
 modules:
     Sellvana_Sales:
-        version: 0.6.9.0
+        version: 0.6.10.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -59,6 +59,7 @@ modules:
                 routing:
                     - [ "/cart/?.action", Sellvana_Sales_Frontend_Controller_Cart ]
                     - [ /orders/?.action, Sellvana_Sales_Frontend_Controller_Orders ]
+                    - [ /payments/?.action, Sellvana_Sales_Frontend_Controller_Payments ]
                     - [ /guest/?.action, Sellvana_Sales_Frontend_Controller_Guest ]
 
                 observe:

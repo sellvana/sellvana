@@ -419,6 +419,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'transaction_type' => 'varchar(50)',
                 'transaction_fee'  => 'decimal(12,2)',
                 'online'           => 'BOOL',
+                'token'            => 'varchar(20) default null',
+                'token_at'         => 'datetime default null',
                 'state_overall'    => "varchar(20) not null default 'new'",
                 'state_processor'  => "varchar(20) not null default ''",
                 'state_custom'     => "varchar(20) default null",
@@ -2291,6 +2293,17 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_item_id' => 'int unsigned default null',
                 'amount' => 'decimal(12,2) not null default 0',
                 'qty' => BDb::DROP,
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_9_0__0_6_10_0()
+    {
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'token' => 'varchar(20) default null',
+                'token_at' => 'datetime default null',
             ],
         ]);
     }
