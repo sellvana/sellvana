@@ -157,7 +157,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         if (empty($amounts)) {
             $amounts = [];
             foreach ($items as $item) {
-                $amounts[$item->id()] = true;
+                $amounts[$item->id()] = $item->getAmountCanPay();
             }
         } else {
             foreach ($amounts as $itemId => $amount) {
