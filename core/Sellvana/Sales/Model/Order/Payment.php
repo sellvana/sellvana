@@ -273,7 +273,14 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             return null;
         }
 
-        return $this->BApp->href('payments/create_root_transaction?' . $this->id());
+        $token = $this->get('token');
+        if (!$token) {
+            $token = $this->BUtil->randomString(20);
+            $this->set(['token' => $token, 'token_at' => $this->BDb->now()]);
+            $this->save();
+        }
+
+        return $this->BApp->frontendHref('payments/create_root_transaction?token=' . $token );
     }
 
     /**
