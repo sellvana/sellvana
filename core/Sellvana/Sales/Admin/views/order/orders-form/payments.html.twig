@@ -151,7 +151,7 @@
                         </td>
                         <td>
                             {% for i in p.items() %}
-                                <strong>{{ i.get('inventory_sku') ?: i.getData('custom_label') }}</strong>: {{ i.get('amount') | currency('base') }}<br>
+                                <strong>{{ i.get('product_name') ?: i.getData('custom_label') }}</strong>: {{ i.get('amount') | currency('base') }}<br>
                             {% endfor %}
                         </td>
                         <td>

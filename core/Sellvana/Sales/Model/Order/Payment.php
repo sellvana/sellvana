@@ -164,7 +164,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
                 /** @var Sellvana_Sales_Model_Order_Item $item */
                 $item = $items[$itemId];
                 if ($item->getAmountCanPay() < $amount) {
-                    throw new BException($this->_('The amount for item %s is to large: %s', [$item->get('inventory_sku'), $amount]));
+                    throw new BException($this->_('The amount for item %s is too large: %s', [$item->get('inventory_sku'), $amount]));
                 }
             }
         }

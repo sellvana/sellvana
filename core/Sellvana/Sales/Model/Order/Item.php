@@ -107,7 +107,7 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getAmountCanPay()
     {
-        return ($this->getQtyCanPay() * $this->getCalcPrice()) - $this->get('amount_in_payments');
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
     }
 
     /**
