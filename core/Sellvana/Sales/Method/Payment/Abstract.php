@@ -190,6 +190,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
+    public function processReturnFromExternalCheckout()
+    {
+        return [];
+    }
+
     public function getConfig($key = null)
     {
         if (empty($this->_config)) {

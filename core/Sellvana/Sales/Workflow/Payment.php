@@ -37,6 +37,23 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
+    public function action_customerPaysByUrl($args)
+    {
+        try {
+            /** @var Sellvana_Sales_Model_Order_Payment $payment */
+            $payment = $args['payment'];
+
+            $method = $payment->getMethodObject();
+            $result = $method->payByUrl($payment);
+
+            $args['result']['payment'] = $result;
+            $args['result']['payment']['model'] = $payment;
+        } catch (Exception $e) {
+
+            //TODO: handle payment exception
+        }
+    }
+
     public function action_customerStartsExternalPayment($args)
     {
         /** @var Sellvana_Sales_Model_Order_Payment $payment */

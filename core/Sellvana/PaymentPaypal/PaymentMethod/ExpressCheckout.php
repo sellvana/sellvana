@@ -83,6 +83,33 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         return $result;
     }
 
+    public function payByUrl(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        $result = $this->_callSetExpressCheckoutForPayment($payment);
+
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus($result);
+            return $result;
+        }
+
+        $token = $result['response']['TOKEN'];
+
+        $payment->set([
+            'transaction_type' => $this->getConfig("payment_action"),
+            'transaction_token' => $token,
+            'online' => 1,
+        ])->save();
+
+        $sData =& $this->BSession->dataToUpdate();
+        $sData['paypal']['token'] = $token;
+
+        $result['redirect_to'] = $this->getConfig('express_checkout_url') . $token;
+
+        $this->Sellvana_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $payment]);
+
+        return $result;
+    }
+
     public function processReturnFromExternalCheckout()
     {
         $sData =& $this->BSession->dataToUpdate();
@@ -119,7 +146,6 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $this->_setErrorStatus($result);
             return $result;
         }
-
         $r = $result['response'];
         $checkoutStatus = strtoupper($r['CHECKOUTSTATUS']);
         if ($checkoutStatus === 'PAYMENTACTIONCOMPLETED') {
@@ -144,14 +170,18 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         if (!empty($r['ADDRESSSTATUS'])) {
             $transData['shipping'] = [
                 'address_status' => $r['ADDRESSSTATUS'],
-                'company'        => !empty($r['COMPANY']) ? $r['COMPANY'] : '',
-                'street1'        => $r['SHIPTOSTREET'],
-                'street2'        => !empty($r['SHIPTOSTREET2']) ? $r['SHIPTOSTREET2'] : '',
-                'city'           => $r['SHIPTOCITY'],
-                'region'         => !empty($r['SHIPTOSTATE']) ? $r['SHIPTOSTATE'] : '',
-                'postcode'       => !empty($r['SHIPTOZIP']) ? $r['SHIPTOZIP'] : '',
-                'country'        => $r['SHIPTOCOUNTRYCODE'],
             ];
+            if ($this->getConfig('show_shipping')) {
+                $transData['shipping'] += [
+                    'company'        => !empty($r['COMPANY']) ? $r['COMPANY'] : '',
+                    'street1'        => $r['SHIPTOSTREET'],
+                    'street2'        => !empty($r['SHIPTOSTREET2']) ? $r['SHIPTOSTREET2'] : '',
+                    'city'           => $r['SHIPTOCITY'],
+                    'region'         => !empty($r['SHIPTOSTATE']) ? $r['SHIPTOSTATE'] : '',
+                    'postcode'       => !empty($r['SHIPTOZIP']) ? $r['SHIPTOZIP'] : '',
+                    'country'        => $r['SHIPTOCOUNTRYCODE'],
+                ];
+            }
         }
         $payment->setData('transaction', $transData);
         $payment->save();
@@ -428,14 +458,22 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'CANCELURL' => $baseUrl . '/cancel',
         ];
 
-        $request = $this->_addOrderInfo($payment, $request);
-        if ($this->getConfig('show_shipping')) {
-            $request = $this->_addShippingInfo($payment, $request);
-        } else {
-            $request['NOSHIPPING'] = 1;
-        }
+        $result = $this->_prepareExpressCheckoutInfo($payment, $request);
 
-        $result = $this->_call('SetExpressCheckout', $request);
+        return $result;
+    }
+
+    protected function _callSetExpressCheckoutForPayment(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        $order = $payment->order();
+
+        $request = [
+            'INVNUM'    => $order->get('unique_id') . '/' . $payment->id(),
+            'RETURNURL' => $this->BApp->href('payments/root_transaction_return?root_token=' . $payment->get('token')),
+            'CANCELURL' => $this->BApp->href('payments/root_transaction_cancel?root_token=' . $payment->get('token')),
+        ];
+
+        $result = $this->_prepareExpressCheckoutInfo($payment, $request);
 
         return $result;
     }
@@ -553,7 +591,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $request["{$p}PAYMENTACTION"] = $this->getConfig("payment_action");
         $request["{$p}AMT"]           = number_format($payment->get("amount_due"), 2);
-        $request["{$p}ITEMAMT"]       = number_format($order->get("subtotal") - $order->get("discount_amount"), 2);
+        $request["{$p}ITEMAMT"]       = number_format($payment->get("amount_due") - $order->get("shipping_price") - $order->get("tax_amount"), 2);
         $request["{$p}SHIPPINGAMT"]   = number_format($order->get("shipping_price"), 2);
         $request["{$p}TAXAMT"]        = number_format($order->get("tax_amount"), 2);
         $request["{$p}CURRENCYCODE"]  = $currency ? $currency : "USD";
@@ -563,17 +601,48 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $request["{$p}REDEEMEDOFFERAMOUNT"] = $order->get('discount_amount');
         }
 
-        $i = 0;
+        $pItems = [];
+        foreach ($payment->items() as $item) {
+            if ($item->get('order_item_id')) {
+                $pItems[$item->get('order_item_id')] = $item;
+            }
+        }
+
+        $oItems = [];
         foreach ($order->items() as $item) {
-            $request["L_{$p}NAME{$i}"] = $item->get('product_name');
-            $request["L_{$p}AMT{$i}"] = number_format($item->get('price'), 2);
-            $request["L_{$p}QTY{$i}"] = (int)$item->get('qty_ordered');
-            $request["L_{$p}TAXAMT{$i}"] = number_format($item->get('tax_amount'), 2);
-            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = number_format($item->get('shipping_weight'), 2);
+            $pItem = $pItems[$item->id()];
+            $oItems[$pItem->id()] = $item;
+        }
+
+        $i = 0;
+        $itemsTotal = 0;
+        foreach ($payment->items() as $pItem) {
+            if (!array_key_exists($pItem->id(), $oItems)) {
+                continue; // we don't need totals here for now
+            }
+            $oItem = $oItems[$pItem->id()];
+            $qty = (int)$oItem->get('qty_ordered');
+            $itemAmount = (float)$pItem->get('amount');
+            $request["L_{$p}NAME{$i}"] = $oItem->get('product_name');
+            $request["L_{$p}AMT{$i}"] = number_format($itemAmount / $qty, 2);
+            $request["L_{$p}QTY{$i}"] = $qty;
+            $request["L_{$p}TAXAMT{$i}"] = number_format($oItem->get('tax_amount'), 2);
+            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = number_format($oItem->get('shipping_weight'), 2);
             //$request["L_{$p}ITEMWEIGHTUNIT{$i}"] = $item->get('');
             //$request["L_{$p}ITEMURL{$i}"] = $item->get('');
+            $itemsTotal += round($itemAmount / $qty, 2, PHP_ROUND_HALF_DOWN) * $qty;
             $i++;
         }
+
+        $roundDiff = round($payment->get("amount_due") - $itemsTotal, 2);
+        if ($payment->get("amount_due") != $itemsTotal && $roundDiff > 0) {
+            $request["L_{$p}NAME{$i}"] = $this->_('Rounding correction');
+            $request["L_{$p}AMT{$i}"] = $roundDiff;
+            $request["L_{$p}QTY{$i}"] = 1;
+            $request["L_{$p}TAXAMT{$i}"] = 0;
+            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = 0;
+        }
+
         if ($order->get('discount_amount') > 0) {
             $request["L_{$p}NAME{$i}"] = $this->_('Discount');
             $request["L_{$p}AMT{$i}"] = -number_format($order->get('discount_amount'), 2);
@@ -676,6 +745,24 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     public function isRootTransactionNeeded()
     {
         return true;
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Payment $payment
+     * @param $request
+     * @return array
+     */
+    protected function _prepareExpressCheckoutInfo(Sellvana_Sales_Model_Order_Payment $payment, $request)
+    {
+        $request = $this->_addOrderInfo($payment, $request);
+        if ($this->getConfig('show_shipping')) {
+            $request = $this->_addShippingInfo($payment, $request);
+        } else {
+            $request['NOSHIPPING'] = 1;
+        }
+
+        $result = $this->_call('SetExpressCheckout', $request);
+        return $result;
     }
 
 
