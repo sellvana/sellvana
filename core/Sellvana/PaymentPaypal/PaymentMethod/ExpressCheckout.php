@@ -634,7 +634,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $i++;
         }
 
-        $roundDiff = round($payment->get("amount_due") - $itemsTotal, 2);
+        $roundDiff = round($payment->get("amount_due") - $itemsTotal - $order->get("shipping_price") - $order->get("tax_amount"), 2);
         if ($payment->get("amount_due") != $itemsTotal && $roundDiff > 0) {
             $request["L_{$p}NAME{$i}"] = $this->_('Rounding correction');
             $request["L_{$p}AMT{$i}"] = $roundDiff;
