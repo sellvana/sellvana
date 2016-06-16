@@ -741,6 +741,24 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         return true;
     }
 
+    public function getRootTransactionType()
+    {
+        $labels = $this->Sellvana_Sales_Model_Order_Payment_Transaction->fieldOptions('transaction_type');
+        $paymentAction = $this->getConfig('payment_action');
+        switch ($paymentAction) {
+            case 'Sale':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
+                break;
+            case 'Authorization':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION;
+                break;
+            case 'Order':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::ORDER;
+                break;
+        }
+        return $labels[$transType];
+    }
+
     /**
      * @param Sellvana_Sales_Model_Order_Payment $payment
      * @param $request

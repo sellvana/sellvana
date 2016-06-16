@@ -220,7 +220,7 @@
                         <tr class="payment-root-transaction-form" id="payment{{ p.id() }}-root-transaction-form">
                             <td>&nbsp;</td>
                             <td colspan="5">
-                                <p>{{ 'Transaction type'|_ }}: </p>
+                                <p>{{ 'Root Transaction Type'|_ }}: {{ method.getRootTransactionType() }}</p>
                                 <p>{{ 'URL'|_ }}: <a href="#">{{ p.getRootTransactionUrl() }}</a></p>
                                 <p>
                                     <input type="hidden" name="payments[{{ p.id() }}][notify]" value="1">
