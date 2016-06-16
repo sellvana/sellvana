@@ -223,8 +223,8 @@
                                 <p>{{ 'Transaction type'|_ }}: </p>
                                 <p>{{ 'URL'|_ }}: <a href="#">{{ p.getRootTransactionUrl() }}</a></p>
                                 <p>
-                                    <input type="hidden" name="payment[{{ p.id() }}][notify]">
-                                    <button type="button" class="btn btn-xs btn-primary root-transaction-notify">{{ 'Send URL to customer'|_ }}</button>
+                                    <input type="hidden" name="payments[{{ p.id() }}][notify]" value="1">
+                                    <button type="button" id="payment{{ p.id() }}-create-root-transaction" class="btn btn-xs btn-primary root-transaction-notify">{{ 'Send URL to customer'|_ }}</button>
                                 </p>
                             </td>
                         </tr>
@@ -247,7 +247,7 @@
         var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
         var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
         var transactionActionUrl = "{{ APP.href('payments/transaction_action?id=' ~ order.id()) }}";
-        var rootTransactionActionUrl = "{{ APP.href('payments/create_root_transaction?id=' ~ order.id()) }}";
+        var rootTransactionActionUrl = "{{ APP.href('payments/send_root_transaction_url?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-payments');
@@ -317,7 +317,7 @@
         container.on('click', '.root-transaction-notify', function(ev) {
             var loader = Ladda.create(document.querySelector('#' + ev.target.id));
             loader.start();
-            var serializeData = $(ev.target).parent('.payment-root-transaction-form').find('input, button').serializeArray();
+            var serializeData = $(ev.target).parents('.payment-root-transaction-form').find('input, button').serializeArray();
             $.post(rootTransactionActionUrl, serializeData, processPostResponse);
         });
 

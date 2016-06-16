@@ -244,4 +244,50 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
         $this->BResponse->json($result);
 
     }
+
+    public function action_send_root_transaction_url__POST()
+    {
+        try {
+            $orderId = $this->BRequest->get('id');
+            $paymentIds = $this->BRequest->post('payments') ?: [];
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            if (!count($paymentIds)) {
+                throw new BException('Invalid payment');
+            }
+
+            /** @var Sellvana_Sales_Model_Order_Payment[] $payments */
+            $payments = $this->Sellvana_Sales_Model_Order_Payment->orm('p')
+                ->where_in('id', array_keys($paymentIds))
+                ->where('order_id', $orderId)
+                ->find_many();
+
+            if (!count($payments)) {
+                throw new BException('Invalid payment');
+            }
+
+            foreach ($payments as $payment) {
+                $url = $payment->getRootTransactionUrl();
+                $view = $this->BLayout->getView('email/sales/order-payment-create-root-transaction');
+                if (!$view instanceof BViewEmpty) {
+                    $view->set(['order' => $order, 'url' => $url, 'payment' => $payment])
+                        ->email();
+                }
+
+            }
+
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Customer has been notified');
+        } catch (BException $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $this->BResponse->json($result);
+    }
 }
