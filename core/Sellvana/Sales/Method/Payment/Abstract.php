@@ -4,6 +4,7 @@
  * Class Sellvana_Sales_Method_Payment_Abstract
  *
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
 abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     Sellvana_Sales_Method_Payment_Interface
@@ -218,6 +219,12 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     public function isRootTransactionNeeded()
     {
         return false;
+    }
+
+    public function getRootTransactionType()
+    {
+        $labels = $this->Sellvana_Sales_Model_Order_Payment_Transaction->fieldOptions('transaction_type');
+        return $labels[Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE];
     }
 
     /**

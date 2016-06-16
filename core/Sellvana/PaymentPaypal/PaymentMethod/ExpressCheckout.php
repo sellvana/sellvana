@@ -630,12 +630,13 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = number_format($oItem->get('shipping_weight'), 2);
             //$request["L_{$p}ITEMWEIGHTUNIT{$i}"] = $item->get('');
             //$request["L_{$p}ITEMURL{$i}"] = $item->get('');
-            $itemsTotal += round($itemAmount / $qty, 2, PHP_ROUND_HALF_DOWN) * $qty;
+            $itemsTotal += round($itemAmount / $qty, 2) * $qty;
             $i++;
         }
 
-        $roundDiff = round($payment->get("amount_due") - $itemsTotal, 2);
-        if ($payment->get("amount_due") != $itemsTotal && $roundDiff > 0) {
+        $totalsAmount = (float)$order->get("shipping_price") + (float)$order->get("tax_amount");
+        $roundDiff = round($payment->get("amount_due") - $itemsTotal - $totalsAmount, 2);
+        if ($payment->get("amount_due") != ($itemsTotal + $totalsAmount) && $roundDiff != 0) {
             $request["L_{$p}NAME{$i}"] = $this->_('Rounding correction');
             $request["L_{$p}AMT{$i}"] = $roundDiff;
             $request["L_{$p}QTY{$i}"] = 1;
@@ -643,13 +644,6 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = 0;
         }
 
-        if ($order->get('discount_amount') > 0) {
-            $request["L_{$p}NAME{$i}"] = $this->_('Discount');
-            $request["L_{$p}AMT{$i}"] = -number_format($order->get('discount_amount'), 2);
-            $request["L_{$p}QTY{$i}"] = 1;
-            $request["L_{$p}TAXAMT{$i}"] = 0;
-            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = 0;
-        }
         return $request;
     }
 
@@ -701,7 +695,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request);
 
         if (!$responseRaw) {
-            return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from grateway']];
+            return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from gateway']];
         }
 
         parse_str($responseRaw, $response);
@@ -745,6 +739,24 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     public function isRootTransactionNeeded()
     {
         return true;
+    }
+
+    public function getRootTransactionType()
+    {
+        $labels = $this->Sellvana_Sales_Model_Order_Payment_Transaction->fieldOptions('transaction_type');
+        $paymentAction = $this->getConfig('payment_action');
+        switch ($paymentAction) {
+            case 'Sale':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
+                break;
+            case 'Authorization':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION;
+                break;
+            case 'Order':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::ORDER;
+                break;
+        }
+        return $labels[$transType];
     }
 
     /**
