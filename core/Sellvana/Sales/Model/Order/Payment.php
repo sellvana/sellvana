@@ -120,7 +120,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_parent;
     }
 
-    public function items()
+    public function items($assoc = false)
     {
         if (!$this->_items) {
             $this->_items = $this->Sellvana_Sales_Model_Order_Payment_Item->orm('opi')
@@ -128,7 +128,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
                 ->select(['opi.*', 'oi.inventory_sku', 'oi.product_name'])
                 ->where('payment_id', $this->id())->find_many_assoc('order_item_id');
         }
-        return $this->_items;
+        return $assoc ? $this->_items : array_values($this->_items);
     }
 
     public function transactions()
@@ -387,6 +387,9 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         $orderItems = $this->order()->items();
         foreach ($this->items() as $oItemId => $pItem) {
+            if (!$oItemId) {
+                continue;
+            }
             $oItem = $orderItems[$oItemId];
             $oItem->set('amount_in_payments', $oItem->getAmountCanPay());
         }
