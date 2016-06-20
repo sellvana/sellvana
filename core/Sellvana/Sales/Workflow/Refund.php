@@ -113,4 +113,25 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
+
+    public function action_adminRefundsPayment($args)
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
+        $transaction = $args['transaction'];
+        /** @var Sellvana_Sales_Model_Order_Refund $refundModel */
+        $refundModel = $this->Sellvana_Sales_Model_Order_Refund->create([
+            'order_id' => $transaction->get('order_id'),
+            'payment_id' => $transaction->get('payment_id'),
+            'amount' => $transaction->get('amount'),
+            'refunded_at' => $this->BDb->now(),
+        ]);
+        $refundModel->state()->overall()->setDefaultState();
+        $refundModel->state()->custom()->setDefaultState();
+        $refundModel->save();
+
+        $order = $transaction->payment()->order();
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
+    }
+
 }
