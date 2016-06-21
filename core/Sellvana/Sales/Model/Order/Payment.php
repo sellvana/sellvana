@@ -387,6 +387,9 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         $orderItems = $this->order()->items();
         foreach ($this->items() as $oItemId => $pItem) {
+            if (!$oItemId) {
+                continue;
+            }
             $oItem = $orderItems[$oItemId];
             $oItem->set('amount_in_payments', $oItem->getAmountCanPay());
         }
