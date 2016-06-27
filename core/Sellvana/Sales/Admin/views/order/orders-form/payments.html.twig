@@ -192,11 +192,11 @@
                                                             <div class="form-inline">
                                                             {% for action, actionData in availableActions %}
                                                                 <div class="form-group form-group-sm">
-                                                                    {% if actionData.maxAmount %}
-                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" />
-                                                                    {% endif %}
                                                                     <input type="hidden" name="actions[{{ p.id() }}][{{ t.id() }}][type]" value="{{ action }}" />
                                                                     <button type="button" class="btn btn-xs transaction-action ladda-button" id="action-{{ t.id() }}-{{ action }}" data-style="expand-left">{{ actionData.label }}</button>
+                                                                    {% if actionData.maxAmount %}
+                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" /> of {{ actionData.maxAmount | currency('base') }}
+                                                                    {% endif %}
                                                                 </div>
                                                                 <br>
                                                             {% endfor %}
