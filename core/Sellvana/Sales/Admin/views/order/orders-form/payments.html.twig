@@ -93,6 +93,8 @@
                     <th>{{ 'Method'|_ }}</th>
                     <th>{{ 'Status'|_ }}</th>
                     <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Amount Captured'|_ }}</th>
+                    <th>{{ 'Balance'|_ }}</th>
                     <th>{{ 'Total Amount'|_ }}</th>
                     <th>{{ 'Items'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
@@ -135,6 +137,12 @@
                         </td>
                         <td>
                             <p><strong>{{ p.get('create_at')|locdate('datetime_short') }}</strong></p>
+                        </td>
+                        <td>
+                            <p>{{ p.get('amount_captured')|currency('base') }}</p>
+                        </td>
+                        <td>
+                            <p>{{ p.get('amount_due')|currency('base') }}</p>
                         </td>
                         <td>
                             <p>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</p>
