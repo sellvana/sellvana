@@ -25,14 +25,13 @@
                     <th>{{ 'Paid'|_ }}</th>
                     <th>{{ 'Amount in Payments'|_ }}</th>
                     <th>{{ 'Payable Amount'|_ }}</th>
-                    <th>{{ 'Qty To Pay'|_ }}</th>
                     <th>{{ 'Amount To Pay'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for i in payableItems %}
                     {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
-                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ i.getResidualPrice() }}">
+                    <tr class="item-container" id="item-{{ i.id() }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
@@ -41,15 +40,6 @@
                         <td>{{ i.get('amount_paid') | currency('base') }}</td>
                         <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
                         <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
-                        <td>
-                            <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
-                                <option value="" selected></option>
-                                {% set qtyCanPay = i.getQtyCanPay() %}
-                                {% for q in range(1, qtyCanPay) %}
-                                    <option value="{{ q }}">{{ q }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
                         <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
                     </tr>
                     {% set totalAmt = totalAmt + i.getAmountCanPay() %}
@@ -271,13 +261,10 @@
 
         function recalculateTotalAmt() {
             var total = 0;
+            var itemTotal;
 
             $('.item-container').each(function(idx, el) {
-                var price = $(el).data('price');
-                var qty = $(el).find('select').first().val();
-                var itemTotal = price * qty;
-                itemTotal = Math.ceil(itemTotal * 100) / 100;
-                $(el).find('input.item-amount-to-pay').val(itemTotal);
+                itemTotal = parseFloat($(el).find('input.item-amount-to-pay').val());
                 total += itemTotal;
             });
 
@@ -321,7 +308,8 @@
             $.post(rootTransactionActionUrl, serializeData, processPostResponse);
         });
 
-        container.on('click', '.item-container select, .total-container label, .total-container input', recalculateTotalAmt);
+        container.on('click', '.total-container label, .total-container input', recalculateTotalAmt);
+        container.on('keyup', '.item-container input', recalculateTotalAmt);
 
         // Workaround to avoid conflict with FCom.Admin.Tabs
         $('.payment-transactions, .payment-root-transaction-form').addClass('collapse').collapse({
