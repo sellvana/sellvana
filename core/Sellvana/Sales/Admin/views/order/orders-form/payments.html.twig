@@ -164,9 +164,11 @@
                                     <thead>
                                     <tr>
                                         <th>{{ 'ID'|_ }}</th>
+                                        <th>{{ 'Parent ID'|_ }}</th>
                                         <th>{{ 'Timeline'|_ }}</th>
                                         <th>{{ 'Type'|_ }}</th>
                                         <th>{{ 'Status'|_ }}</th>
+                                        <th>{{ 'Status Comment'|_ }}</th>
                                         <th>{{ 'Amount'|_ }}</th>
                                         <th>{{ 'Fee'|_ }}</th>
                                         <th>{{ 'Actions'|_ }}</th>
@@ -180,6 +182,9 @@
                                                     <p>{{ t.get('transaction_id') }}</p>
                                                 </td>
                                                 <td>
+                                                    <p>{{ t.get('parent_transaction_id') }}</p>
+                                                </td>
+                                                <td>
                                                     <p><strong>{{ t.get('create_at')|locdate('datetime_short') }}</strong></p>
                                                 </td>
                                                 <td>
@@ -187,6 +192,9 @@
                                                 </td>
                                                 <td>
                                                     {{ t.get('transaction_id') ? 'Success'|_ : 'Failure'|_ }}
+                                                </td>
+                                                <td>
+                                                    {{ t.getData('error') }}
                                                 </td>
                                                 <td>
                                                     <p>{{ t.get('amount')|currency }}</p>

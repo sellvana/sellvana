@@ -243,6 +243,8 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
             'payment' => $payment,
             'result' => $result,
         ]);
+        $this->_transaction->setData('error', $result['error']['message']);
+        $this->_transaction->save();
         throw new BException($result['error']['message']);
     }
 
