@@ -87,7 +87,7 @@
     {% if allPayments %}
         <h2>{{ 'Existing Payments' }}</h2>
         <div id="payment-update-container">
-            <table class="table table-bordered table-striped dataTable">
+            <table class="table table-bordered table-striped dataTable" style="width: 100%;">
                 <thead>
                 <tr>
                     <th>{{ 'Method'|_ }}</th>
@@ -159,8 +159,8 @@
                     {% if allTransactions %}
                         <tr class="payment-transactions" id="payment{{ p.id() }}-transactions">
                             <td>&nbsp;</td>
-                            <td colspan="4">
-                                <table class="table table-bordered table-striped dataTable">
+                            <td colspan="7">
+                                <table class="table table-bordered table-striped dataTable" style="width: 100%;">
                                     <thead>
                                     <tr>
                                         <th>{{ 'ID'|_ }}</th>
@@ -243,7 +243,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5"></td>
+                    <td colspan="7"></td>
                     <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Apply Changes'|_ }}</button></td>
                 </tr>
                 </tfoot>
