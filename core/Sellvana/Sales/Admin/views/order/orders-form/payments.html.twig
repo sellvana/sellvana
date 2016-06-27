@@ -134,7 +134,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
+                            <p><strong>{{ p.get('create_at')|locdate('datetime_short') }}</strong></p>
                         </td>
                         <td>
                             <p>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</p>
@@ -172,7 +172,7 @@
                                                     <p>{{ t.get('transaction_id') }}</p>
                                                 </td>
                                                 <td>
-                                                    <p>{{ 'Created:'|_ }} <strong>{{ t.get('create_at')|locdate }}</strong></p>
+                                                    <p><strong>{{ t.get('create_at')|locdate('datetime_short') }}</strong></p>
                                                 </td>
                                                 <td>
                                                     <p><strong>{{ t.get('transaction_type') }}</strong></p>
