@@ -158,6 +158,7 @@
                                         <th>{{ 'ID'|_ }}</th>
                                         <th>{{ 'Timeline'|_ }}</th>
                                         <th>{{ 'Type'|_ }}</th>
+                                        <th>{{ 'Status'|_ }}</th>
                                         <th>{{ 'Amount'|_ }}</th>
                                         <th>{{ 'Fee'|_ }}</th>
                                         <th>{{ 'Actions'|_ }}</th>
@@ -175,6 +176,9 @@
                                                 </td>
                                                 <td>
                                                     <p><strong>{{ t.get('transaction_type') }}</strong></p>
+                                                </td>
+                                                <td>
+                                                    {{ t.get('transaction_id') ? 'Success'|_ : 'Failure'|_ }}
                                                 </td>
                                                 <td>
                                                     <p>{{ t.get('amount')|currency }}</p>
