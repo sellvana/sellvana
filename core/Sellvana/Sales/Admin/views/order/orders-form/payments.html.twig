@@ -191,7 +191,7 @@
                                                     <p><strong>{{ t.get('transaction_type') }}</strong></p>
                                                 </td>
                                                 <td>
-                                                    {{ t.get('transaction_id') ? 'Success'|_ : 'Failure'|_ }}
+                                                    {{ t.get('transaction_status') == 'completed' ? 'Success'|_ : 'Failure'|_ }}
                                                 </td>
                                                 <td>
                                                     {{ t.getData('error') }}

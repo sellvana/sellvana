@@ -139,17 +139,20 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $historyData = ['data' => $args['result']];
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
+        $setErrorState = $args['setErrorState'];
         if ($payment) {
             $order = $payment->order();
             $cart = $order->cart();
 
-            $payment->state()->overall()->setFailed();
-            //$payment->state()->processor()->setError();
+            if ($setErrorState) {
+                $payment->state()->overall()->setFailed();
+                //$payment->state()->processor()->setError();
 
-            $cart->state()->payment()->setFailed();
+                $cart->state()->payment()->setFailed();
 
-            $payment->save();
-            $cart->save();
+                $payment->save();
+                $cart->save();
+            }
 
             $message = $order->get('payment_method') . ' error: ' . $args['result']['error']['message'];
             $historyData['entity_id'] = $payment->id();
