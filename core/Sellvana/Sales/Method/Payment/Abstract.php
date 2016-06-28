@@ -231,9 +231,10 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
      * Shortcut for payment gateway error
      *
      * @param array $result
+     * @param bool $setErrorState
      * @throws BException
      */
-    protected function _setErrorStatus($result = null)
+    protected function _setErrorStatus($result = null, $setErrorState = false)
     {
         $payment = $this->_payment;
         if (!$payment && $this->_transaction) {
@@ -242,7 +243,10 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         $this->Sellvana_Sales_Main->workflowAction('customerGetsPaymentError', [
             'payment' => $payment,
             'result' => $result,
+            'setErrorState' => $setErrorState,
         ]);
+        $this->_transaction->setData('error', $result['error']['message']);
+        $this->_transaction->save();
         throw new BException($result['error']['message']);
     }
 

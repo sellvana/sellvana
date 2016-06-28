@@ -30,6 +30,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
@@ -759,6 +760,17 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
             ->find_many();
+    }
+
+    public function getOrderCurrencyRate()
+    {
+        $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        $storeCurrency = $this->get('store_currency_code');
+        if ($storeCurrency === $baseCurrency || !$this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            return 1;
+        }
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
+        return $rate ?: 1;
     }
 
     public function __destruct()

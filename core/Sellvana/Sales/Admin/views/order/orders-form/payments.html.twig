@@ -25,14 +25,13 @@
                     <th>{{ 'Paid'|_ }}</th>
                     <th>{{ 'Amount in Payments'|_ }}</th>
                     <th>{{ 'Payable Amount'|_ }}</th>
-                    <th>{{ 'Qty To Pay'|_ }}</th>
                     <th>{{ 'Amount To Pay'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for i in payableItems %}
                     {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
-                    <tr class="item-container" id="item-{{ i.id() }}" data-price="{{ i.getResidualPrice() }}">
+                    <tr class="item-container" id="item-{{ i.id() }}">
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
@@ -41,15 +40,6 @@
                         <td>{{ i.get('amount_paid') | currency('base') }}</td>
                         <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
                         <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
-                        <td>
-                            <select id="qty-to-pay" name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
-                                <option value="" selected></option>
-                                {% set qtyCanPay = i.getQtyCanPay() %}
-                                {% for q in range(1, qtyCanPay) %}
-                                    <option value="{{ q }}">{{ q }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
                         <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
                     </tr>
                     {% set totalAmt = totalAmt + i.getAmountCanPay() %}
@@ -97,12 +87,14 @@
     {% if allPayments %}
         <h2>{{ 'Existing Payments' }}</h2>
         <div id="payment-update-container">
-            <table class="table table-bordered table-striped dataTable">
+            <table class="table table-bordered table-striped dataTable" style="width: 100%;">
                 <thead>
                 <tr>
                     <th>{{ 'Method'|_ }}</th>
                     <th>{{ 'Status'|_ }}</th>
                     <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Amount Captured'|_ }}</th>
+                    <th>{{ 'Balance'|_ }}</th>
                     <th>{{ 'Total Amount'|_ }}</th>
                     <th>{{ 'Items'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
@@ -144,7 +136,13 @@
                             {% endif %}
                         </td>
                         <td>
-                            <p>{{ 'Created:'|_ }} <strong>{{ p.get('create_at')|locdate }}</strong></p>
+                            <p><strong>{{ p.get('create_at')|locdate('datetime_short') }}</strong></p>
+                        </td>
+                        <td>
+                            <p>{{ p.get('amount_captured')|currency('base') }}</p>
+                        </td>
+                        <td>
+                            <p>{{ p.get('amount_due')|currency('base') }}</p>
                         </td>
                         <td>
                             <p>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</p>
@@ -161,13 +159,16 @@
                     {% if allTransactions %}
                         <tr class="payment-transactions" id="payment{{ p.id() }}-transactions">
                             <td>&nbsp;</td>
-                            <td colspan="4">
-                                <table class="table table-bordered table-striped dataTable">
+                            <td colspan="7">
+                                <table class="table table-bordered table-striped dataTable" style="width: 100%;">
                                     <thead>
                                     <tr>
                                         <th>{{ 'ID'|_ }}</th>
+                                        <th>{{ 'Parent ID'|_ }}</th>
                                         <th>{{ 'Timeline'|_ }}</th>
                                         <th>{{ 'Type'|_ }}</th>
+                                        <th>{{ 'Status'|_ }}</th>
+                                        <th>{{ 'Status Comment'|_ }}</th>
                                         <th>{{ 'Amount'|_ }}</th>
                                         <th>{{ 'Fee'|_ }}</th>
                                         <th>{{ 'Actions'|_ }}</th>
@@ -181,10 +182,19 @@
                                                     <p>{{ t.get('transaction_id') }}</p>
                                                 </td>
                                                 <td>
-                                                    <p>{{ 'Created:'|_ }} <strong>{{ t.get('create_at')|locdate }}</strong></p>
+                                                    <p>{{ t.get('parent_transaction_id') }}</p>
+                                                </td>
+                                                <td>
+                                                    <p><strong>{{ t.get('create_at')|locdate('datetime_short') }}</strong></p>
                                                 </td>
                                                 <td>
                                                     <p><strong>{{ t.get('transaction_type') }}</strong></p>
+                                                </td>
+                                                <td>
+                                                    {{ t.get('transaction_status') == 'completed' ? 'Success'|_ : 'Failure'|_ }}
+                                                </td>
+                                                <td>
+                                                    {{ t.getData('error') }}
                                                 </td>
                                                 <td>
                                                     <p>{{ t.get('amount')|currency }}</p>
@@ -198,11 +208,11 @@
                                                             <div class="form-inline">
                                                             {% for action, actionData in availableActions %}
                                                                 <div class="form-group form-group-sm">
-                                                                    {% if actionData.maxAmount %}
-                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" />
-                                                                    {% endif %}
                                                                     <input type="hidden" name="actions[{{ p.id() }}][{{ t.id() }}][type]" value="{{ action }}" />
                                                                     <button type="button" class="btn btn-xs transaction-action ladda-button" id="action-{{ t.id() }}-{{ action }}" data-style="expand-left">{{ actionData.label }}</button>
+                                                                    {% if actionData.maxAmount %}
+                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" /> of {{ actionData.maxAmount | currency('base') }}
+                                                                    {% endif %}
                                                                 </div>
                                                                 <br>
                                                             {% endfor %}
@@ -233,7 +243,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5"></td>
+                    <td colspan="7"></td>
                     <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Apply Changes'|_ }}</button></td>
                 </tr>
                 </tfoot>
@@ -271,13 +281,10 @@
 
         function recalculateTotalAmt() {
             var total = 0;
+            var itemTotal;
 
             $('.item-container').each(function(idx, el) {
-                var price = $(el).data('price');
-                var qty = $(el).find('select').first().val();
-                var itemTotal = price * qty;
-                itemTotal = Math.ceil(itemTotal * 100) / 100;
-                $(el).find('input.item-amount-to-pay').val(itemTotal);
+                itemTotal = parseFloat($(el).find('input.item-amount-to-pay').val());
                 total += itemTotal;
             });
 
@@ -321,7 +328,8 @@
             $.post(rootTransactionActionUrl, serializeData, processPostResponse);
         });
 
-        container.on('click', '.item-container select, .total-container label, .total-container input', recalculateTotalAmt);
+        container.on('click', '.total-container label, .total-container input', recalculateTotalAmt);
+        container.on('keyup', '.item-container input', recalculateTotalAmt);
 
         // Workaround to avoid conflict with FCom.Admin.Tabs
         $('.payment-transactions, .payment-root-transaction-form').addClass('collapse').collapse({
