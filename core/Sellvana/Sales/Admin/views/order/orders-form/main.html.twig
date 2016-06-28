@@ -105,8 +105,12 @@
         <div class="col-md-3">
             <h4><i class="fa fa-info-circle"></i> {{ 'Totals'|_ }}</h4>
             <table class="table table-bordered table-striped">
-                {% for total in totals %}
-                    <tr><th>{{ total.label }}</th><td style="text-align:right">{{ total.value|currency('base') }}</td></tr>
+                {% for code, total in totals %}
+                    {% if code == 'amount_due' %}
+                        <tr><th>{{ 'Amount Captured'|_ }}</th><td class="text-right">{{ order.get('amount_paid')|currency('base') }}</td></tr>
+                    {% endif %}
+                    {% set value = (code == 'amount_due') ? order.get('amount_due') : total.value %}
+                    <tr><th>{{ total.label }}</th><td class="text-right">{{ value|currency('base') }}</td></tr>
                 {% endfor %}
             </table>
         </div>

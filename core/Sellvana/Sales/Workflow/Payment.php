@@ -249,6 +249,17 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             throw new BException('Invalid payment to delete');
         }
         $payment->delete();
+        $amount = (float)$payment->get('amount_captured');
+        $order->add('amount_paid', -$amount);
+        $order->add('amount_due', $amount);
+
+        $rate = (float)$order->getOrderCurrencyRate();
+        $amountInStoreCurrency = $this->BLocale->roundCurrency($amount * $rate);
+
+        $paid = (float)$order->getData('store_currency/amount_paid');
+        $order->setData('store_currency/amount_paid', $paid - $amountInStoreCurrency);
+        $due = (float)$order->getData('store_currency/amount_due');
+        $order->setData('store_currency/amount_due', $due + $amountInStoreCurrency);
 
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
@@ -282,6 +293,15 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $transaction = $args['transaction'];
         $order = $transaction->payment()->order();
         $order->add('amount_captured', $transaction->get('amount'));
+
+        $rate = (float)$order->getOrderCurrencyRate();
+        $amountInStoreCurrency = $this->BLocale->roundCurrency((float)$transaction->get('amount') * $rate);
+
+        $paid = (float)$order->getData('store_currency/amount_paid');
+        $order->setData('store_currency/amount_paid', $paid + $amountInStoreCurrency);
+        $due = $order->getData('store_currency/amount_due');
+        $order->setData('store_currency/amount_due', $due - $amountInStoreCurrency);
+        $order->save();
     }
 
     public function action_adminRefundsPayment($args)
