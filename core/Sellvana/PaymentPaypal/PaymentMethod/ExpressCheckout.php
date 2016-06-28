@@ -692,7 +692,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'SIGNATURE' => $this->getConfig('signature'),
         ], $request);
 
-        $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request);
+        $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request, [], ['timeout' => 30]);
 
         if (!$responseRaw) {
             return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from gateway']];
