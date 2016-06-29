@@ -256,13 +256,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $order->add('amount_paid', -$amount);
         $order->add('amount_due', $amount);
 
-        $rate = (float)$order->getOrderCurrencyRate();
-        $amountInStoreCurrency = $this->BLocale->roundCurrency($amount * $rate);
-
-        $paid = (float)$order->getData('store_currency/amount_paid');
-        $order->setData('store_currency/amount_paid', $paid - $amountInStoreCurrency);
-        $due = (float)$order->getData('store_currency/amount_due');
-        $order->setData('store_currency/amount_due', $due + $amountInStoreCurrency);
+        $order->addStoreCurrencyAmount(-$amount);
 
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
@@ -281,6 +275,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     public function action_adminVoidsAuthorization($args)
     {
+        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
+        $transaction = $args['transaction'];
+        $payment = $transaction->payment();
+        $payment->set('amount_due', 0);
+
         $this->_adminChangesPaymentProcessor($args);
     }
 
@@ -296,15 +295,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $transaction = $args['transaction'];
         $order = $transaction->payment()->order();
         $order->add('amount_captured', $transaction->get('amount'));
-
-        $rate = (float)$order->getOrderCurrencyRate();
-        $amountInStoreCurrency = $this->BLocale->roundCurrency((float)$transaction->get('amount') * $rate);
-
-        $paid = (float)$order->getData('store_currency/amount_paid');
-        $order->setData('store_currency/amount_paid', $paid + $amountInStoreCurrency);
-        $due = $order->getData('store_currency/amount_due');
-        $order->setData('store_currency/amount_due', $due - $amountInStoreCurrency);
-        $order->save();
+        $order->addStoreCurrencyAmount((float)$transaction->get('amount'));
     }
 
     public function action_adminRefundsPayment($args)
