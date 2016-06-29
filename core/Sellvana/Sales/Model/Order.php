@@ -770,7 +770,19 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             return 1;
         }
         $rate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
-        return $rate ?: 1;
+        return (float)$rate ?: 1;
+    }
+
+    public function addStoreCurrencyAmount($amount)
+    {
+        $rate = $this->getOrderCurrencyRate();
+        $amountInStoreCurrency = $this->BLocale->roundCurrency($amount * $rate);
+
+        $paid = (float)$this->getData('store_currency/amount_paid');
+        $this->setData('store_currency/amount_paid', $paid + $amountInStoreCurrency);
+        $due = $this->getData('store_currency/amount_due');
+        $this->setData('store_currency/amount_due', $due - $amountInStoreCurrency);
+        $this->save();
     }
 
     public function __destruct()
