@@ -125,4 +125,30 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
     {
         return $this->changeState(self::CHARGEDBACK);
     }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        $payment = $this->getModel();
+        switch ($this->getValue()) {
+            case self::PARTIAL_PAID:
+                if (!$payment->get('amount_captured')) {
+                    return;
+                }
+
+                if ($payment->get('amount_due') == 0) {
+                    $this->setPaid();
+                }
+                break;
+            case self::PARTIAL_REFUNDED:
+                if (!$payment->get('amount_refunded')) {
+                    return;
+                }
+
+                if ($payment->get('amount_refunded') >= $payment->get('amount_captured')) {
+                    $this->setRefunded();
+                }
+                break;
+        }
+    }
 }

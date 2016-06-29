@@ -278,6 +278,25 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
         $transaction = $args['transaction'];
         $payment = $transaction->payment();
+        $oldTotal = $payment->get('amount_due') + $payment->get('amount_captured');
+        $totalCaptured = $payment->get('amount_captured');
+        foreach ($payment->items() as $pItem) {
+            if ($pItem->get('order_item_id') === null) {
+                $oldTotal -= (float)$pItem->get('amount');
+                $totalCaptured -= (float)$pItem->get('amount');
+                continue;
+            }
+        }
+        $totalRate = $totalCaptured / $oldTotal;
+        foreach ($payment->items() as $pItem) {
+            if ($pItem->get('order_item_id') === null) {
+                continue;
+            }
+
+            $pItemTotal = round((float)$pItem->get('amount') * $totalRate, 2);
+            $pItem->set('amount', $pItemTotal);
+            $pItem->save();
+        }
         $payment->set('amount_due', 0);
 
         $this->_adminChangesPaymentProcessor($args);
@@ -317,11 +336,13 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
 
         //$payment->state()->processor()->invokeAction($transaction->get('transaction_type'));
-        $payment->state()->processor()->calcState();
-        $payment->save();
-
         $order = $payment->order();
         $order->calcItemQuantities(['payments', 'refunds']);
+
+        $payment->state()->processor()->calcState();
+        $payment->state()->overall()->calcState();
+        $payment->save();
+
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
