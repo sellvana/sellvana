@@ -47,6 +47,7 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
 
     protected $_setValueNotificationTemplates = [
         self::REFUNDED => 'email/sales/order-payment-state-overall-refunded',
+        self::PROCESSING => 'email/sales/order-payment-state-overall-processing',
     ];
 
     protected $_defaultValue = self::PENDING;
