@@ -60,7 +60,7 @@
                 <tr>
                     <th>{{ 'Status'|_ }}</th>
                     <th>{{ 'Timeline'|_ }}</th>
-                    <th>{{ 'Items'|_ }}</th>
+                    <th>{{ 'Amount'|_ }}</th>
                     <th>{{ 'Delete'|_ }}</th>
                 </tr>
                 </thead>
@@ -86,9 +86,7 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ c.get('create_at') | locdate }}</strong></p>
                         </td>
                         <td>
-                            {% for i in c.items() %}
-                                <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
-                            {% endfor %}
+                            {{ c.get('amount') | currency('base') }}
                         </td>
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ c.id }}]" value="1">

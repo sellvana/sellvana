@@ -94,10 +94,9 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->get('qty_shipped') - $this->get('qty_in_returns');
     }
 
-    public function getQtyCanRefund()
+    public function getAmountCanRefund()
     {
-        // TODO: change qty to amounts for refunds
-        return $this->get('qty_paid') - $this->get('qty_in_refunds');
+        return $this->get('amount_paid') - $this->get('amount_in_refunds');
     }
 
     public function getCalcPrice()

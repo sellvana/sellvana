@@ -58,8 +58,8 @@
                                 {% if item.get('qty_returned') %}
                                     <p>{{ 'Returned: %s' | _(item.get('qty_returned')) }}</p>
                                 {% endif %}
-                                {% if item.get('qty_refunded') %}
-                                    <p>{{ 'Refunded: %s' | _(item.get('qty_refunded')) }}</p>
+                                {% if item.get('amount_refunded') %}
+                                    <p>{{ 'Refunded: %s' | _(item.get('amount_refunded') | currency) }}</p>
                                 {% endif %}
                             </td>
                         </tr>
