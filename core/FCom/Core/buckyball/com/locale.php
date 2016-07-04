@@ -1526,6 +1526,157 @@ class BLocale extends BClass
     }
 }
 
+/**
+ * Class BCurrencyValue
+ *
+ * The purpose of this class is to create and hold currency specific values, use bcmath calculations,
+ * and to make sure that operations are performed only between values of the same currency.
+ */
+class BCurrencyValue extends BClass
+{
+    /**
+     * @var string
+     */
+    protected $_currencyCode;
+
+    /**
+     * @var float
+     */
+    protected $_amountValue;
+
+    /**
+     * @var int
+     */
+    protected $_decimalScale = 2;
+
+    /**
+     * @var BModel
+     */
+    protected $_fromModel = null;
+
+    /**
+     * @var string
+     */
+    protected $_fromField = null;
+
+    public function __construct($amountValue, $currencyCode)
+    {
+        $this->_amountValue  = $amountValue;
+        $this->_currencyCode = $currencyCode;
+        //$this->_decimalScale = 2; // retrieve from currencies db
+    }
+
+    /**
+     * @param float $amountValue
+     * @param string $currencyCode
+     * @return $this
+     */
+    public function create($amountValue, $currencyCode)
+    {
+        return new static($amountValue, $currencyCode);
+    }
+
+    /**
+     * @param BModel $model
+     * @param string $field
+     * @return $this
+     */
+    public function setModelField(BModel $model, $field)
+    {
+        $this->_fromModel = $model;
+        $this->_fromField = $field;
+        return $this;
+    }
+
+    /**
+     * @param BModel $model
+     * @param string $field
+     * @return BCurrencyValue
+     */
+    public function fromModel(BModel $model, $field, $currencyCode)
+    {
+        $amount = $field[0] !== '/' ? $model->get($field) : $model->getData(trim($field, '/'));
+        return $this->create($amount, $currencyCode)->setModelField($model, $field);
+    }
+
+    protected function _updateModel()
+    {
+        if (!$this->_fromModel || !$this->_fromField) {
+            return $this;
+        }
+        if ($this->_fromField[0] !== '/') {
+            $this->_fromModel->set($this->_fromField, $this->getValue());
+        } else {
+            $this->_fromModel->setData(trim($this->_fromField, '/'), $this->getValue());
+        }
+        return $this;
+    }
+
+    public function getAmount()
+    {
+        return $this->_amountValue;
+    }
+    
+    public function getCurrencyCode()
+    {
+        return $this->_currencyCode;
+    }
+
+    protected function _validateCurrencyCode(BCurrencyValue $currencyValue)
+    {
+        if ($this->_currencyCode !== $currencyValue->getCurrencyCode()) {
+            throw new BException('Operand currency does not match');
+        }
+    }
+
+    public function add(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyCode($currencyValue);
+        $this->_amountValue = bcadd($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+
+    public function subtract(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyCode($currencyValue);
+        $this->_amountValue = bcsub($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+    public function multiply(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyCode($currencyValue);
+        $this->_amountValue = bcmul($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+    public function divide(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyCode($currencyValue);
+        $this->_amountValue = bcdiv($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        return $this;
+    }
+
+    public function compare(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyCode($currencyValue);
+        return bccomp($this->getAmount() - $currencyValue->getAmount(), $this->_decimalScale);
+    }
+
+    public function getFormatted()
+    {
+        return $this->BLocale->currency($this->getAmount(), $this->getCurrencyCode());
+    }
+
+    public function getConverted($newCurrencyCode)
+    {
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate($this->getCurrencyCode(), $newCurrencyCode);
+        $newAmount = $this->getAmount() * $rate;
+        return new static($newAmount, $newCurrencyCode);
+    }
+}
+
 class BTranslated extends BClass
 {
     /** @var BLocale */
