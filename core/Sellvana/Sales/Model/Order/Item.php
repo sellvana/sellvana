@@ -109,6 +109,11 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
     }
 
+    public function getBalanceAmount()
+    {
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_paid');
+    }
+
     /**
      * @param float|null $amount
      */
