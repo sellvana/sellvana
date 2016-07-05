@@ -55,39 +55,71 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
         return $assoc ? $this->_items : array_values($this->_items);
     }
 
-    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $amounts = [])
     {
         $this->order($order);
+        $this->set('amount', array_sum($amounts));
         $this->state()->overall()->setDefaultState();
         $this->state()->custom()->setDefaultState();
         $this->save();
 
         $items = $order->items();
-        if ($qtys === null) {
-            $qtys = [];
+        if ($amounts === null) {
+            $amounts = [];
             foreach ($items as $item) {
-                $qtys[$item->id()] = true;
+                $amounts[$item->id()] = true;
             }
         }
 
-        foreach ($qtys as $itemId => $qty) {
+        foreach ($amounts as $itemId => $amount) {
             if (empty($items[$itemId])) {
                 throw new BException($this->_('Invalid item id: %s', $itemId));
             }
             /** @var Sellvana_Sales_Model_Order_Item $item */
             $item = $items[$itemId];
-            $qtyCanRefund = $item->getQtyCanRefund();
-            if ($qty === true) {
-                $qty = $qtyCanRefund;
-            } elseif ($qty <= 0 || $qty > $qtyCanRefund) {
-                throw new BException($this->_('Invalid quantity to refund for %s: %s', [$item->get('product_sku'), $qty]));
+            $amountCanRefund = $item->getAmountCanRefund();
+            if ($amount === true) {
+                $amount = $amountCanRefund;
+            } elseif ($amount <= 0 || $amount > $amountCanRefund) {
+                throw new BException($this->_('Invalid amount to refund for %s: %s', [$item->get('product_sku'), $amount]));
             }
             $this->Sellvana_Sales_Model_Order_Refund_Item->create([
                 'order_id' => $order->id(),
                 'refund_id' => $this->id(),
                 'order_item_id' => $item->id(),
-                'qty' => $qty,
+                'amount' => $amount,
             ])->save();
+        }
+
+        return $this;
+    }
+
+    public function importItemsFromPayment(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        $amount = $this->get('amount');
+        $oItems = $payment->order()->items();
+        foreach ($payment->items() as $oItemId => $pItem) {
+            if ($pItem->get('amount') <= $pItem->get('amount_refunded')) {
+                continue;
+            }
+
+            $refundableAmount = $pItem->get('amount') - $pItem->get('amount_refunded');
+            $toRefund = min($amount, $refundableAmount);
+            $this->Sellvana_Sales_Model_Order_Refund_Item->create([
+                'refund_id' => $this->id(),
+                'order_id' => $payment->order()->id(),
+                'order_item_id' => $oItemId,
+                'amount' => $toRefund,
+                'payment_item_id' => $pItem->id(),
+            ])->save();
+            $pItem->add('amount_refunded', $toRefund);
+            $pItem->save();
+            $oItems[$oItemId]->add('amount_refunded', $toRefund)->save();
+            $amount -= $toRefund;
+
+            if ($amount <= 0) {
+                break;
+            }
         }
 
         return $this;
@@ -101,7 +133,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
 
         foreach ($refundItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add($done ? 'qty_refunded' : 'qty_in_refunds', $cItem->get('qty'));
+            $oItem->add($done ? 'amount_refunded' : 'amount_in_refunds', $cItem->get('amount'));
         }
 
         return $this;
@@ -115,7 +147,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
 
         foreach ($refundItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add($done ? 'qty_refunded' : 'qty_in_refunds', -$cItem->get('qty'));
+            $oItem->add($done ? 'amount_refunded' : 'amount_in_refunds', -$cItem->get('amount'));
         }
 
         return $this;

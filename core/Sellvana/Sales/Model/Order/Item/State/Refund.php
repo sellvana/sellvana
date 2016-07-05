@@ -55,10 +55,10 @@ class Sellvana_Sales_Model_Order_Item_State_Refund extends Sellvana_Sales_Model_
         /** @var Sellvana_Sales_Model_Order_Item $model */
         $model = $this->getContext()->getModel();
 
-        if ($model->get('qty_refunded') == $model->get('qty_ordered')) {
+        if ($model->get('amount_refunded') >= ($model->get('row_total') - $model->get('row_discount'))) {
             return $this->setRefunded();
         }
-        if ($model->get('qty_refunded') > 0) {
+        if ($model->get('amount_refunded') > 0) {
             return $this->setPartial();
         }
 

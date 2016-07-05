@@ -131,7 +131,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
             'oi_qty_canceled' => 'Qty Canceled',
             'oi_qty_shipped' => 'Qty Shipped',
             'oi_qty_returned' => 'Qty Returned',
-            'oi_qty_refunded' => 'Qty Refunded',
+            'oi_amount_refunded' => 'Amount Refunded',
             'oi_amount_paid' => 'Amount Paid',
             'oi_state_overall' => 'State (Item)',
             'oi_state_delivery' => 'Delivery State (Item)',

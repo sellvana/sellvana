@@ -20,13 +20,11 @@ class Sellvana_Sales_Admin_Controller_Refunds extends Sellvana_Sales_Admin_Contr
                 throw new BException('Invalid order');
             }
 
-            $refundData = $this->BRequest->post('refund');
-            $qtys = $this->BRequest->post('qtys');
+            $amounts = $this->BRequest->post('amounts');
 
             $this->Sellvana_Sales_Main->workflowAction('adminCreatesRefund', [
                 'order' => $order,
-                'data' => $refundData,
-                'qtys' => $qtys,
+                'amounts' => $amounts,
             ]);
             $result = $this->_resetOrderTabs($order);
             $result['message'] = $this->_('Refund has been created');

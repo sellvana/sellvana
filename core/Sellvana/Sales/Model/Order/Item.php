@@ -94,10 +94,24 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->get('qty_shipped') - $this->get('qty_in_returns');
     }
 
-    public function getQtyCanRefund()
+    /**
+     * Get amount available to create a new refund
+     *
+     * @return float
+     */
+    public function getAmountCanRefund()
     {
-        // TODO: change qty to amounts for refunds
-        return $this->get('qty_paid') - $this->get('qty_in_refunds');
+        return $this->get('amount_paid') - $this->get('amount_in_refunds');
+    }
+
+    /**
+     * Get amount available to complete a refund
+     *
+     * @return float
+     */
+    public function getRefundableAmount()
+    {
+        return $this->get('amount_paid') - $this->get('amount_refunded');
     }
 
     public function getCalcPrice()
@@ -108,6 +122,11 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     public function getAmountCanPay()
     {
         return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
+    }
+
+    public function getBalanceAmount()
+    {
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_paid');
     }
 
     /**

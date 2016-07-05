@@ -300,14 +300,14 @@ class Sellvana_Sales_Migrate extends BClass
                 'qty_canceled' => 'int not null default 0',
                 'qty_shipped' => 'int not null default 0',
                 'qty_returned' => 'int not null default 0',
-                'qty_refunded' => 'int not null default 0',
                 'amount_paid' => 'decimal(12,2) not null default 0',
+                'amount_refunded' => 'decimal(12,2) not null default 0',
 
                 'qty_in_cancels' => 'int not null default 0',
                 'qty_in_shipments' => 'int not null default 0',
                 'qty_in_returns' => 'int not null default 0',
-                'qty_in_refunds' => 'int not null default 0',
                 'amount_in_payments' => 'decimal(12,2) not null default 0',
+                'amount_in_refunds' => 'decimal(12,2) not null default 0',
 
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
@@ -447,6 +447,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_item_id' => 'int unsigned default null',
                 'payment_id' => 'int unsigned not null',
                 'amount' => 'decimal(12,2) not null default 0',
+                'amount_refunded' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -553,15 +554,17 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
-                'order_item_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned default null',
+                'payment_item_id' => 'int unsigned default null',
                 'refund_id' => 'int unsigned not null',
-                'qty' => 'int unsigned not null',
+                'amount' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
+                'payment_item' => ['payment_item_id', $tOrderPaymentItem],
                 'refund' => ['refund_id', $tOrderRefund],
             ],
         ]);
@@ -2304,6 +2307,47 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'token' => 'varchar(20) default null',
                 'token_at' => 'datetime default null',
+            ],
+        ]);
+    }
+
+
+    public function upgrade__0_6_10_0__0_6_11_0()
+    {
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tOrderRefundItem = $this->Sellvana_Sales_Model_Order_Refund_Item->table();
+        $tOrderPaymentItem = $this->Sellvana_Sales_Model_Order_Payment_Item->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+                'amount_in_refunds' => 'decimal(12,2) not null default 0',
+                'qty_in_refunds' => BDb::DROP,
+                'qty_refunded' => BDb::DROP,
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderRefundItem, [
+            BDb::COLUMNS => [
+                'order_item_id' => 'int unsigned default null',
+                'amount' => 'decimal(12,2) not null default 0',
+                'qty' => BDb::DROP,
+                'payment_item_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment_item' => ['payment_item_id', $tOrderPaymentItem],
+            ],
+        ]);
+        $tOrderPaymentTransaction = $this->Sellvana_Sales_Model_Order_Payment_Transaction->table();
+        $this->BDb->ddlTableDef($tOrderPaymentTransaction, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+                'amount_in_refunds' => 'decimal(12,2) not null default 0',
+                'qty_in_refunds' => BDb::DROP,
+                'qty_refunded' => BDb::DROP,
             ],
         ]);
     }

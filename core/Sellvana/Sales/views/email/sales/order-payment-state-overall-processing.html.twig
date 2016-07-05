@@ -1,0 +1,14 @@
+{% set payment = THIS.get('context').getModel() %}
+{% set order = payment.order() %}
+
+<!--{ Content-Type: text/html; charset=UTF-8 }-->
+<!--{ From: "{{ CONFIG.get('modules/FCom_Core/support_name') }}" <{{ CONFIG.get('modules/FCom_Core/support_email') }}> }-->
+<!--{ To: "{{ order.get('billing_firstname') ~ ' ' ~ order.get('billing_lastname') }}" <{{ order.get('customer_email') }}> }-->
+<!--{ Subject: {{ 'Payment received for your order %s' | _(order.get('unique_id')) }} }-->
+
+{{ 'Hello %s,'|_(order.get('billing_firstname')) }}
+
+<p>
+    {{ 'Thank you for your payment - it has been confirmed and order is being processed now'|_ }}:
+</p>
+

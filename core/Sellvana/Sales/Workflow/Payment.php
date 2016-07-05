@@ -313,6 +313,21 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
         $transaction = $args['transaction'];
         $order = $transaction->payment()->order();
+        $amount = (float)$transaction->get('amount');
+        foreach ($order->items() as $oItem) {
+            if ($oItem->getBalanceAmount() <= 0) {
+                continue;
+            }
+
+            $toPay = min($amount, $oItem->getBalanceAmount());
+            $oItem->add('amount_paid', $toPay);
+            $oItem->save();
+            $amount -= $toPay;
+
+            if (!$toPay) {
+                break;
+            }
+        }
         $order->add('amount_captured', $transaction->get('amount'));
         $order->addStoreCurrencyAmount((float)$transaction->get('amount'));
     }
@@ -320,6 +335,26 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
     public function action_adminRefundsPayment($args)
     {
         $this->_adminChangesPaymentProcessor($args);
+        /** @var Sellvana_Sales_Model_Order_Payment_Transaction $transaction */
+/*        $transaction = $args['transaction'];
+        $order = $transaction->payment()->order();
+        $amount = (float)$transaction->get('amount');
+        foreach ($order->items() as $oItem) {
+            if ($oItem->get('amount_paid') <= $oItem->get('amount_refunded')) {
+                continue;
+            }
+
+            $toRefund = min($amount, $oItem->getRefundableAmount());
+            $oItem->add('amount_refunded', $toRefund);
+            $oItem->save();
+            $amount -= $toRefund;
+
+            if (!$toRefund) {
+                break;
+            }
+        }
+        $order->add('amount_refunded', $transaction->get('amount'));
+        $order->addStoreCurrencyAmount((float)$transaction->get('amount'));*/
     }
 
     protected function _adminChangesPaymentProcessor($args)

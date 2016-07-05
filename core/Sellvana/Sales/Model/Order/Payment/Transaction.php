@@ -134,16 +134,13 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 break;
 
             case self::ORDER:
-                $payment->state()->overall()->setProcessing();
                 break;
 
             case self::AUTHORIZATION:
                 $payment->add('amount_authorized', $amount);
-                $payment->state()->overall()->setProcessing();
                 break;
 
             case self::REAUTHORIZATION:
-                $payment->state()->overall()->setProcessing();
                 break;
 
             case self::CAPTURE:
