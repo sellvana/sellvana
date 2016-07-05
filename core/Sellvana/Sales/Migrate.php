@@ -447,6 +447,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_item_id' => 'int unsigned default null',
                 'payment_id' => 'int unsigned not null',
                 'amount' => 'decimal(12,2) not null default 0',
+                'amount_refunded' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -2322,6 +2323,11 @@ class Sellvana_Sales_Migrate extends BClass
                 'amount_in_refunds' => 'decimal(12,2) not null default 0',
                 'qty_in_refunds' => BDb::DROP,
                 'qty_refunded' => BDb::DROP,
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
             ],
         ]);
         $this->BDb->ddlTableDef($tOrderRefundItem, [

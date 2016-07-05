@@ -126,12 +126,14 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
             'refunded_at' => $this->BDb->now(),
         ]);
         $payment = $transaction->payment();
-        $refundModel->importFromPayment($payment);
         $refundModel->state()->overall()->setRefunded();
         $refundModel->state()->custom()->setDefaultState();
         $refundModel->save();
+        $refundModel->importItemsFromPayment($payment);
 
         $order = $payment->order();
+        $order->calcItemQuantities(['refunds']);
+        $order->add('amount_refunded', (float)$transaction->get('amount'));
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
