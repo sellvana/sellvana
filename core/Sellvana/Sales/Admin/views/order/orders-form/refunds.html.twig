@@ -17,25 +17,28 @@
                     <th>{{ 'Inventory SKU'|_ }}</th>
                     <th>{{ 'Product Name'|_ }}</th>
                     <th>{{ 'Qty Ordered'|_ }}</th>
-                    <th>{{ 'Qty To Refund'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
+                    <th>{{ 'Amount Paid'|_ }}</th>
+                    <th>{{ 'Amount Refunded'|_ }}</th>
+                    <th>{{ 'Amount In Refunds'|_ }}</th>
+                    <th>{{ 'Refundable Amount'|_ }}</th>
+                    <th>{{ 'Amount To Refund'|_ }}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for i in refundableItems %}
+                    {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
                     <tr>
                         <td>{{ i.get('product_sku') }}</td>
                         <td>{{ i.get('inventory_sku') }}</td>
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
-                        <td>
-                            <select name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
-                                <option value=""></option>
-                                {% set qtyCanRefund = i.getQtyCanRefund() %}
-                                {% for q in range(1, qtyCanRefund) %}
-                                    <option value="{{ q }}" {{ q == qtyCanRefund ? 'selected' }}>{{ q }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
+                        <td>{{ totalItemAmt | currency('base') }}</td>
+                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
+                        <td>{{ i.get('amount_refunded') | currency('base') }}</td>
+                        <td>{{ i.get('amount_in_refunds')|currency('base') }}</td>
+                        <td>{{ i.getAmountCanRefund()|currency('base') }}</td>
+                        <td><input type="text" class="item-amount-to-refund form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanRefund()}}"></td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -127,7 +130,7 @@
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
                 });
             }
-            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
             $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
         }
 

@@ -555,7 +555,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
                 'order_item_id' => 'int unsigned default null',
-                'payment_item_id' => 'int unsigned not null',
+                'payment_item_id' => 'int unsigned default null',
                 'refund_id' => 'int unsigned not null',
                 'amount' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
@@ -2335,7 +2335,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_item_id' => 'int unsigned default null',
                 'amount' => 'decimal(12,2) not null default 0',
                 'qty' => BDb::DROP,
-                'payment_item_id' => 'int unsigned not null',
+                'payment_item_id' => 'int unsigned default null',
             ],
             BDb::CONSTRAINTS => [
                 'payment_item' => ['payment_item_id', $tOrderPaymentItem],

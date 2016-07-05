@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Sellvana_Sales_Model_Order_Refund_State_Overall
+ *
+ * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
+ */
 class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const PENDING = 'pending',

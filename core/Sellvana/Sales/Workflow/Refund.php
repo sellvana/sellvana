@@ -52,19 +52,18 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
     {
         /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['order'];
-        $data = $this->BRequest->sanitize($args['data'], []);
-        $qtys = isset($args['qtys']) ? $args['qtys'] : null;
-        foreach ($qtys as $id => $qty) {
-            if ($qty < 1) {
-                unset($qtys[$id]);
+        $amounts = isset($args['amounts']) ? $args['amounts'] : null;
+        foreach ($amounts as $id => $amount) {
+            if ($amount <= 0) {
+                unset($amounts[$id]);
             }
         }
-        if (!$qtys) {
+        if (!$amounts) {
             throw new BException('Please add some items to create a refund');
         }
         /** @var Sellvana_Sales_Model_Order_Refund $refund */
-        $refund = $this->Sellvana_Sales_Model_Order_Refund->create($data);
-        $refund->importFromOrder($order, $qtys);
+        $refund = $this->Sellvana_Sales_Model_Order_Refund->create();
+        $refund->importFromOrder($order, $amounts);
         $refund->state()->overall()->setSuperPending();
         $refund->save();
 

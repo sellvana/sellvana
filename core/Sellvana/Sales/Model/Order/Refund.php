@@ -58,6 +58,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
     public function importFromOrder(Sellvana_Sales_Model_Order $order, array $amounts = [])
     {
         $this->order($order);
+        $this->set('amount', array_sum($amounts));
         $this->state()->overall()->setDefaultState();
         $this->state()->custom()->setDefaultState();
         $this->save();
