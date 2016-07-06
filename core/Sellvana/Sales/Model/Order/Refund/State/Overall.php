@@ -87,6 +87,15 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
 
     public function setRefunded()
     {
+        /** @var Sellvana_Sales_Model_Order_Refund $refund */
+        $refund = $this->getModel();
+        foreach ($refund->items() as $rItem) {
+            $oItemId = $rItem->get('order_item_id');
+            $oItem = $this->Sellvana_Sales_Model_Order_Item->load($oItemId);
+            $oItem->add('amount_refunded', $refund->get('amount'));
+            $oItem->save();
+        }
+
         return $this->changeState(self::REFUNDED);
     }
 
