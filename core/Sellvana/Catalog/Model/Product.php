@@ -1452,7 +1452,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getGridTileTypeOptions()
     {
-        $options = $this->fieldOption('grid_tile_type');
+        $options = $this->fieldOptions('grid_tile_type');
         if (!$this->BModuleRegistry->isLoaded('Sellvana_Cms')) {
             unset($options['C']);
         }
