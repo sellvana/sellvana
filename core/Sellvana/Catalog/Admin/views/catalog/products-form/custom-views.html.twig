@@ -14,7 +14,7 @@
         <hr>
         {{ forms.input(fieldData, { field: 'custom_details_view', label: 'Custom Details Page View'|_ }) }}
 
-        {{ forms.select(fieldData, { field: 'grid_tile_type', label: 'Grid View Type'|_, options: m.getGridTileTypeOptions() }) }}
+        {{ forms.select(fieldData, { field: 'grid_tile_type', label: 'Grid & Tile View Type'|_, options: m.getGridTileTypeOptions() }) }}
 
         {% if cmsModuleLoaded %}
             {{ forms.select(fieldData, { field: 'grid_cms_block_id', label: 'Grid Cms Block'|_, options: cmsBlocks, select2: {}, js_toggle: 'grid_tile_type', js_visible: "{grid_tile_type}=='C'" }) }}

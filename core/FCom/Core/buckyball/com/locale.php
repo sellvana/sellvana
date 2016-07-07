@@ -1612,11 +1612,17 @@ class BCurrencyValue extends BClass
         return $this;
     }
 
+    /**
+     * @return float
+     */
     public function getAmount()
     {
         return $this->_amountValue;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getCurrencyCode()
     {
         return $this->_currencyCode;
@@ -1629,6 +1635,11 @@ class BCurrencyValue extends BClass
         }
     }
 
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return $this
+     * @throws BException
+     */
     public function add(BCurrencyValue $currencyValue)
     {
         $this->_validateCurrencyCode($currencyValue);
@@ -1637,6 +1648,11 @@ class BCurrencyValue extends BClass
         return $this;
     }
 
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return $this
+     * @throws BException
+     */
     public function subtract(BCurrencyValue $currencyValue)
     {
         $this->_validateCurrencyCode($currencyValue);
@@ -1644,6 +1660,12 @@ class BCurrencyValue extends BClass
         $this->_updateModel();
         return $this;
     }
+
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return $this
+     * @throws BException
+     */
     public function multiply(BCurrencyValue $currencyValue)
     {
         $this->_validateCurrencyCode($currencyValue);
@@ -1651,24 +1673,45 @@ class BCurrencyValue extends BClass
         $this->_updateModel();
         return $this;
     }
+
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return $this
+     * @throws BException
+     */
     public function divide(BCurrencyValue $currencyValue)
     {
         $this->_validateCurrencyCode($currencyValue);
         $this->_amountValue = bcdiv($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_updateModel();
         return $this;
     }
 
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return int
+     * @throws BException
+     */
     public function compare(BCurrencyValue $currencyValue)
     {
         $this->_validateCurrencyCode($currencyValue);
         return bccomp($this->getAmount() - $currencyValue->getAmount(), $this->_decimalScale);
     }
 
+    /**
+     * @return string
+     */
     public function getFormatted()
     {
         return $this->BLocale->currency($this->getAmount(), $this->getCurrencyCode());
     }
 
+    /**
+     * Depends on Sellvana_MultiCurrency_Main - refactor
+     *
+     * @param $newCurrencyCode
+     * @return static
+     */
     public function getConverted($newCurrencyCode)
     {
         $rate = $this->Sellvana_MultiCurrency_Main->getRate($this->getCurrencyCode(), $newCurrencyCode);
