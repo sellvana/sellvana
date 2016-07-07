@@ -107,6 +107,11 @@ class FCom_LibTwig_Main extends BClass
         static::$_fileLoader->prependPath($path, $namespace);
     }
 
+    public function renderFile($filename, $args)
+    {
+        return static::$_fileTwig->loadTemplate($filename)->render($args);
+    }
+
     public function renderer($view)
     {
         $viewName = $view->getParam('view_name');
