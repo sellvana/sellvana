@@ -1530,10 +1530,17 @@ class BLocale extends BClass
  * Class BCurrencyValue
  *
  * The purpose of this class is to create and hold currency specific values, use bcmath calculations,
- * and to make sure that operations are performed only between values of the same currency.
+ * and to make sure that operations are performed only between values of the same currency (bindMode)
+ *
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class BCurrencyValue extends BClass
 {
+    const BIND_NONE = 0;
+    const BIND_MODEL = 1;
+    #const BIND_VALUE = 2; // Not implemented
+    #const BIND_BOTH = 3; // Not implemented
+
     /**
      * @var string
      */
@@ -1559,6 +1566,11 @@ class BCurrencyValue extends BClass
      */
     protected $_fromField = null;
 
+    /**
+     * @var int
+     */
+    protected $_bindMode = self::BIND_NONE;
+
     public function __construct($amountValue, $currencyCode)
     {
         $this->_amountValue  = $amountValue;
@@ -1573,34 +1585,42 @@ class BCurrencyValue extends BClass
      */
     public function create($amountValue, $currencyCode)
     {
-        return new static($amountValue, $currencyCode);
+        $class = get_class($this);
+        return new $class($amountValue, $currencyCode);
     }
 
     /**
      * @param BModel $model
      * @param string $field
+     * @param int $bindMode
      * @return $this
      */
-    public function setModelField(BModel $model, $field)
+    public function setModelField(BModel $model, $field, $bindMode)
     {
         $this->_fromModel = $model;
         $this->_fromField = $field;
+        $this->_bindMode = $bindMode;
         return $this;
     }
 
     /**
      * @param BModel $model
-     * @param string $field
-     * @return BCurrencyValue
+     * @param $field
+     * @param $currencyCode
+     * @param int $bind
+     * @return $this
      */
-    public function fromModel(BModel $model, $field, $currencyCode)
+    public function fromModel(BModel $model, $field, $currencyCode, $bind = self::BIND_NONE)
     {
         $amount = $field[0] !== '/' ? $model->get($field) : $model->getData(trim($field, '/'));
-        return $this->create($amount, $currencyCode)->setModelField($model, $field);
+        return $this->create($amount, $currencyCode)->setModelField($model, $field, $bind);
     }
 
     protected function _updateModel()
     {
+        if ($this->_bindMode !== self::BIND_MODEL && $this->_bindMode !== self::BIND_BOTH) {
+            return $this;
+        }
         if (!$this->_fromModel || !$this->_fromField) {
             return $this;
         }
@@ -1613,11 +1633,15 @@ class BCurrencyValue extends BClass
     }
 
     /**
+     * @param boolean $raw
      * @return float
      */
-    public function getAmount()
+    public function getAmount($raw = false)
     {
-        return $this->_amountValue;
+        if ($raw) {
+            return $this->_amountValue;
+        }
+        return bcadd($this->_amountValue, 0, $this->_decimalScale);
     }
 
     /**
@@ -1662,27 +1686,25 @@ class BCurrencyValue extends BClass
     }
 
     /**
-     * @param BCurrencyValue $currencyValue
+     * @param int|float $operand
      * @return $this
      * @throws BException
      */
-    public function multiply(BCurrencyValue $currencyValue)
+    public function multiply($operand)
     {
-        $this->_validateCurrencyCode($currencyValue);
-        $this->_amountValue = bcmul($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_amountValue = bcmul($this->getAmount(), $operand, $this->_decimalScale);
         $this->_updateModel();
         return $this;
     }
 
     /**
-     * @param BCurrencyValue $currencyValue
+     * @param int|float $operand
      * @return $this
      * @throws BException
      */
-    public function divide(BCurrencyValue $currencyValue)
+    public function divide($operand)
     {
-        $this->_validateCurrencyCode($currencyValue);
-        $this->_amountValue = bcdiv($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_amountValue = bcdiv($this->getAmount(), $operand, $this->_decimalScale);
         $this->_updateModel();
         return $this;
     }
