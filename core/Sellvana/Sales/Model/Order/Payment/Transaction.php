@@ -16,12 +16,12 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         AUTHORIZATION = 'auth', // authorization of order transaction
         REAUTHORIZATION = 'reauth', // reauthorization after 3 days of authorization to secure funds
         CAPTURE = 'capture', // capture authorized transaction
-        VOID = 'void', // void authorization
         REFUND = 'refund', // refund captured funds
 
         PENDING = 'pending', // pending processing
         STARTED = 'started', // started transaction
         COMPLETED = 'completed', // completed transaction
+        VOID = 'void', // void authorization
         EXPIRED = 'expired'; // for order and authorization
 
     protected static $_fieldOptions = [
@@ -31,14 +31,15 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
             self::AUTHORIZATION => 'Authorization',
             self::REAUTHORIZATION => 'Re-Authorization',
             self::CAPTURE => 'Capture',
-            self::VOID => 'Void',
             self::REFUND => 'Refund',
+            self::VOID => 'Void',
         ],
 
         'transaction_status' => [
             self::PENDING => 'Pending',
             self::STARTED => 'Started',
             self::COMPLETED => 'Completed',
+            self::VOID => 'Void',
             self::EXPIRED => 'Expired',
         ],
     ];
@@ -186,6 +187,12 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         $this->set('transaction_status', self::COMPLETED)->save();
         $payment->save();
         $order->save();
+        return $this;
+    }
+
+    public function void()
+    {
+        $this->set('transaction_status', self::VOID)->save();
         return $this;
     }
 

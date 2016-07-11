@@ -191,7 +191,8 @@
                                                     <p><strong>{{ t.get('transaction_type') }}</strong></p>
                                                 </td>
                                                 <td>
-                                                    {{ t.get('transaction_status') == 'completed' ? 'Success'|_ : 'Failure'|_ }}
+                                                    {% set status = t.get('transaction_status') %}
+                                                    {{ status == 'completed' ? 'Success'|_ : (status == 'void') ? 'Void'|_ : 'Failure'|_ }}
                                                 </td>
                                                 <td>
                                                     {{ t.getData('error') }}
@@ -203,7 +204,7 @@
                                                     <p>{{ t.get('transaction_fee')|currency }}</p>
                                                 </td>
                                                 <td>
-                                                    {% if t.get('transaction_id') %}
+                                                    {% if t.get('transaction_id') and t.get('transaction_status') != 'void' %}
                                                         <div class="col-md-12">
                                                             <div class="form-inline">
                                                             {% for action, actionData in availableActions %}
