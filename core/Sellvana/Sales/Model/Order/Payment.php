@@ -537,6 +537,8 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'transaction' => $transaction,
         ]);
 
+        $parent->void();
+
         return $this;
     }
 

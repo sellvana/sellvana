@@ -1,59 +1,10 @@
 {% set order = THIS.get('model') %}
 
-{% set refundableItems = order.getRefundableItems() %}
 {% set allRefunds = order.getAllRefunds() %}
 
 <div class="f-section" id="order-container">
 
     {{ THIS.view('core/messages') | raw }}
-
-    {% if refundableItems %}
-        <div id="refund-create-container">
-            <h2>{{ 'Create a refund'|_ }}</h2>
-            <table class="table table-bordered table-striped dataTable">
-                <thead>
-                <tr>
-                    <th>{{ 'Product SKU'|_ }}</th>
-                    <th>{{ 'Inventory SKU'|_ }}</th>
-                    <th>{{ 'Product Name'|_ }}</th>
-                    <th>{{ 'Qty Ordered'|_ }}</th>
-                    <th>{{ 'Total Amount'|_ }}</th>
-                    <th>{{ 'Amount Paid'|_ }}</th>
-                    <th>{{ 'Amount Refunded'|_ }}</th>
-                    <th>{{ 'Amount In Refunds'|_ }}</th>
-                    <th>{{ 'Refundable Amount'|_ }}</th>
-                    <th>{{ 'Amount To Refund'|_ }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for i in refundableItems %}
-                    {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
-                    <tr>
-                        <td>{{ i.get('product_sku') }}</td>
-                        <td>{{ i.get('inventory_sku') }}</td>
-                        <td>{{ i.get('product_name') }}</td>
-                        <td>{{ i.get('qty_ordered') }}</td>
-                        <td>{{ totalItemAmt | currency('base') }}</td>
-                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
-                        <td>{{ i.get('amount_refunded') | currency('base') }}</td>
-                        <td>{{ i.get('amount_in_refunds')|currency('base') }}</td>
-                        <td>{{ i.getAmountCanRefund()|currency('base') }}</td>
-                        <td><input type="text" class="item-amount-to-refund form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanRefund()}}"></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <button id="btnRefundCreate" data-container="#refund-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
-        </div>
-    {% endif %}
-
-    {% if refundableItems and allRefunds %}
-        <hr>
-    {% endif %}
-
-    {% if not refundableItems %}
-        {{ 'There are no items available for a new refund' | _ }}
-    {% endif %}
 
     {% if allRefunds %}
         <h2>{{ 'Existing Refunds' }}</h2>

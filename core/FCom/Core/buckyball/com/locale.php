@@ -1538,8 +1538,8 @@ class BCurrencyValue extends BClass
 {
     const BIND_NONE = 0;
     const BIND_MODEL = 1;
-    #const BIND_VALUE = 2; // Not implemented
-    #const BIND_BOTH = 3; // Not implemented
+    const BIND_VALUE = 2; // Not implemented
+    const BIND_BOTH = 3; // Not implemented
 
     /**
      * @var string
