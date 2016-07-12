@@ -5,7 +5,7 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set cmsModuleLoaded = MODULES.isLoaded('Sellvana_Cms') %}
 {% if cmsModuleLoaded %}
-    {% set cmsBlocks = APP.instance('Sellvana_Cms_Model_Block').getAllBlocksAsOptions() %}
+    {% set cmsBlocks = UTIL.arrayAddEmptyOption(APP.instance('Sellvana_Cms_Model_Block').getAllBlocksAsOptions('id'), '* Please Select a Block'|_) %}
 {% endif %}
 
 <fieldset name="main-product">

@@ -843,6 +843,40 @@ class BUtil extends BClass
     }
 
     /**
+     * @param       $input
+     * @param       $offset
+     * @param       $length
+     * @param array $replacement
+     * @return array
+     */
+    public function arraySpliceAssoc($input, $offset, $length, $replacement = [])
+    {
+        $replacement = (array)$replacement;
+        $keyIndices = array_flip(array_keys($input));
+        if (isset($input[$offset]) && is_string($offset)) {
+            $offset = $keyIndices[$offset];
+        }
+        if (isset($input[$length]) && is_string($length)) {
+            $length = $keyIndices[$length] - $offset;
+        }
+
+        return array_slice($input, 0, $offset, TRUE)
+            + $replacement
+            + array_slice($input, $offset + $length, NULL, TRUE);
+    }
+
+    /**
+     * @param array  $array
+     * @param string $label
+     * @param string $key
+     * @return array
+     */
+    public function arrayAddEmptyOption(array $array, $label = '', $key = '')
+    {
+        return $this->arraySpliceAssoc($array, 0, 0, [$key => $label]);
+    }
+
+    /**
      * Get an item from an array|object using "dot" or "slash" notation.
      *
      * @param  mixed $target

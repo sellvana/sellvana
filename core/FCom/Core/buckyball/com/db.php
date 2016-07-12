@@ -1019,7 +1019,8 @@ class BORM extends ORMWrapper
             $password = static::$_config['password'];
             $driver_options = static::$_config['driver_options'];
             if (empty($driver_options[PDO::MYSQL_ATTR_INIT_COMMAND])) { //ADDED
-                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8, SESSION sql_mode = TRADITIONAL";//;SET SESSION sql_mode = 'TRADITIONAL';
+                $sqlMode = BDebug::i()->is(['DEBUG', 'DEVELOPMENT']) ? 'STRICT_TRANS_TABLES' : 'TRADITIONAL';
+                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8, SESSION sql_mode = {$sqlMode}";
             }
             if (empty($driver_options[PDO::ATTR_TIMEOUT])) {
                 $driver_options[PDO::ATTR_TIMEOUT] = 5;
@@ -2379,7 +2380,7 @@ class BModel extends Model
     *
     * @return BPDO
     */
-    public static function readDb()
+    public static function connectToReadDb()
     {
         if (null === static::$_readConnectionName) {
             $readConnection = BConfig::i()->get('db/read_connection');
@@ -2393,7 +2394,7 @@ class BModel extends Model
     *
     * @return BPDO
     */
-    public static function writeDb()
+    public static function connectToWriteDb()
     {
         if (null === static::$_writeConnectionName) {
             $writeConnectionName = BConfig::i()->get('db/write_connection');
@@ -2418,7 +2419,7 @@ class BModel extends Model
         }
         $class_name = BClassRegistry::className($class_name); // ADDED
 
-        static::readDb();
+        static::connectToReadDb();
         $table_name = static::_get_table_name($class_name);
         $orm = BORM::for_table($table_name); // CHANGED
         $orm->set_class_name($class_name);
@@ -2902,6 +2903,15 @@ class BModel extends Model
     */
     public function save($callBeforeAfter = true, $replace = false)
     {
+        $fields = $this->BDb->ddlFieldInfo($this->table());
+        foreach ($fields as $fName => $field) {
+            $value = $this->get($fName);
+            if ($value !== null && !is_numeric($value)
+                && preg_match('#^((|tiny|small|medium|big)int|dec|fixed|real|bit|date)#i', $field->get('Type'))
+            ) {
+                $this->set($fName, null);
+            }
+        }
         if ($callBeforeAfter) {
             try {
                 if (!$this->onBeforeSave()) {
@@ -2914,7 +2924,7 @@ class BModel extends Model
 
         $this->_newRecord = !$this->get(static::_get_id_column_name(get_called_class()));
 
-        static::writeDb();
+        static::connectToWriteDb();
         parent::save($replace);
 
         if ($callBeforeAfter) {
@@ -2988,7 +2998,7 @@ class BModel extends Model
             }
         }
 
-        static::writeDb();
+        static::connectToWriteDb();
         parent::delete();
 
         $this->onAfterDelete();
@@ -3014,7 +3024,7 @@ class BModel extends Model
     */
     public static function run_sql($sql, $params = [])
     {
-        return static::writeDb()->prepare($sql)->execute((array)$params);
+        return static::connectToWriteDb()->prepare($sql)->execute((array)$params);
     }
 
     /**
@@ -3054,7 +3064,7 @@ class BModel extends Model
 
     public static function create_many(array $data, array $defaults = [], array $options = [])
     {
-        static::writeDb();
+        static::connectToWriteDb();
         $fields = [];
         foreach ($data as $r) {
             foreach ($r as $f => $v) {
@@ -3096,7 +3106,7 @@ class BModel extends Model
      */
     public static function update_many(array $data, $where = null, $p = [])
     {
-        static::writeDb();
+        static::connectToWriteDb();
         $update = [];
         $params = [];
         foreach ($data as $k => $v) {
@@ -3137,7 +3147,7 @@ class BModel extends Model
      */
     public static function update_many_by_id(array $data, $idField = null, $updateField = null)
     {
-        static::writeDb();
+        static::connectToWriteDb();
         if (null === $idField) {
             $idField = static::_get_id_column_name(get_called_class());
         }
@@ -3192,7 +3202,7 @@ class BModel extends Model
     */
     public static function delete_many($where, $params = [])
     {
-        static::writeDb();
+        static::connectToWriteDb();
         BEvents::i()->fire(static::origClass() . '::delete_many:before', [
             'where' => &$where,
             'params' => &$params,
