@@ -53,8 +53,8 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         }
         $success = $response['response_code'] == 1;
         if ($success) {
-            $this->set($response['transaction_id'], $response);
-            $this->set('transaction_id', $response['transaction_id']);
+            //$this->set($response['transaction_id'], $response);
+            $transaction->set('transaction_id', $response['transaction_id']);
             $transaction->complete();
         } else {
             $result['error']['message'] = 'There has been an issue with your transaction';

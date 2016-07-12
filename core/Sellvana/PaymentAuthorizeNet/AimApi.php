@@ -94,6 +94,10 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
     {
         $payment = $transaction->payment();
         $order = $payment->order();
+        $paymentData = $this->BRequest->post('payment');
+        $methodData = $paymentData[$paymentMethod->getCode()];
+        $paymentMethod->setPaymentFormData($methodData);
+        
         $api->amount      = $transaction->get('amount');
         $api->card_num    = $paymentMethod->getCardNumber();
         $api->exp_date    = $paymentMethod->get('card_exp_date');
