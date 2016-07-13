@@ -2907,7 +2907,7 @@ class BModel extends Model
         foreach ($fields as $fName => $field) {
             $value = $this->get($fName);
             if ($value !== null && !is_numeric($value)
-                && preg_match('#^((|tiny|small|medium|big)int|dec|fixed|real|bit|date)#i', $field->get('Type'))
+                && preg_match('#^((|tiny|small|medium|big)int|dec|fixed|real|bit)#i', $field->get('Type'))
             ) {
                 $this->set($fName, null);
             }
