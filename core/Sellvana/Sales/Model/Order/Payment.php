@@ -485,7 +485,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $method = $this->getMethodObject();
 
         if (!$method->can('reauth')) {
-            throw new BException('This payment method can not authorize transactions');
+            throw new BException('This payment method can not reauthorize transactions');
         }
 
         if (null === $parent) {
@@ -516,7 +516,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $method = $this->getMethodObject();
 
         if (!$method->can('void')) {
-            throw new BException('This payment method can not authorize transactions');
+            throw new BException('This payment method can not void authorizations');
         }
 
         if (null === $parent) {
@@ -547,7 +547,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $method = $this->getMethodObject();
 
         if (!$method->can('capture')) {
-            throw new BException('This payment method can not authorize transactions');
+            throw new BException('This payment method can not capture transactions');
         }
 
         if (null === $parent) {
@@ -576,7 +576,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $method = $this->getMethodObject();
 
         if (!$method->can('refund')) {
-            throw new BException('This payment method can not authorize transactions');
+            throw new BException('This payment method can not refund transactions');
         }
 
         if (null === $parent) {

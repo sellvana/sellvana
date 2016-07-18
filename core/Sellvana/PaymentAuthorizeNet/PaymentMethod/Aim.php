@@ -11,13 +11,18 @@
 class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Method_Payment_Abstract
 {
     protected $_code = "authorizenet_aim";
+    protected $_manualStateManagement = false;
 
     function __construct()
     {
         $this->_name = 'Authorize.net';
+        $this->_capabilities['capture'] = 1;
         $this->_capabilities['pay_online'] = 1;
+        $this->_capabilities['void'] = 1;
         $this->_capabilities['void_online'] = 1;
         $this->_capabilities['refund_online'] = 1;
+        $this->_capabilities['refund'] = 1;
+        $this->_capabilities['pay_by_url'] = 1;
     }
 
     public function getCheckoutFormView()
@@ -36,7 +41,6 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
 
         $api = $this->Sellvana_PaymentAuthorizeNet_AimApi;
 
-        $result = [];
         switch ($action) {
             case 'AUTH_ONLY':
                 $transaction = $payment->createTransaction('auth')->start();
@@ -51,17 +55,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
                 return null;
                 break;
         }
-        $success = $response['response_code'] == 1;
-        if ($success) {
-            //$this->set($response['transaction_id'], $response);
-            $transaction->set('transaction_id', $response['transaction_id']);
-            $transaction->complete();
-        } else {
-            $result['error']['message'] = 'There has been an issue with your transaction';
-        }
-        $result['response'] = $response;
-        $this->_clear();
-        $transaction->setData('result', $result)->save();
+        $result = $this->_processResponse($response, $transaction);
 
         $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
             'payment' => $payment,
@@ -70,6 +64,44 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
 
         return $result;
     }
+
+    public function payByUrl(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        return $this->payOnCheckout($payment);
+    }
+
+    public function capture(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+        $api = $this->Sellvana_PaymentAuthorizeNet_AimApi;
+        $response = $api->capture($transaction, $this);
+        $result = $this->_processResponse($response, $transaction);
+
+        if (empty($result['success'])) {
+            $result['error']['message'] = "Your payment has not been accepted by AuthorizeNet";
+            $this->Sellvana_Sales_Main->workflowAction('customerFailsCheckoutPayment', [
+                'payment' => $transaction->payment(),
+            ]);
+        }
+
+        return $result;
+    }
+
+    public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+        $api = $this->Sellvana_PaymentAuthorizeNet_AimApi;
+        $response = $api->credit($transaction, $this);
+        $result = $this->_processResponse($response, $transaction);
+
+        if (empty($result['success'])) {
+            $result['error']['message'] = "Your payment has not been accepted by AuthorizeNet";
+            $this->Sellvana_Sales_Main->workflowAction('customerFailsCheckoutPayment', [
+                'payment' => $transaction->payment(),
+            ]);
+        }
+
+        return $result;
+    }
+
 
     public function getOrder()
     {
@@ -138,5 +170,34 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
     {
         $this->_lastFour();
         unset($this->_details['cc_num']);
+    }
+
+    /**
+     * @param array $response
+     * @param Sellvana_Sales_Model_Order_Payment_Transaction $transaction
+     * @return mixed
+     */
+    protected function _processResponse($response, $transaction)
+    {
+        $result = [];
+        $success = (isset($response['response_code']) && $response['response_code'] == 1);
+        if ($success) {
+            //$this->set($response['transaction_id'], $response);
+            $transaction->set('transaction_id', $response['transaction_id']);
+            $transaction->complete();
+        } else {
+            $result['error']['message'] = $response['response_reason_text'];
+            $this->_transaction = $transaction;
+            $this->_setErrorStatus($result);
+        }
+        $result['response'] = $response;
+        $this->_clear();
+        $transaction->setData('result', $result)->save();
+        return $result;
+    }
+
+    public function isRootTransactionNeeded()
+    {
+        return false;
     }
 }
