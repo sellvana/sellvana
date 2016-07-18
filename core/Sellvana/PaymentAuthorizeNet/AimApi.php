@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Sellvana_PaymentAuthorizeNet_AimApi
+ *
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
+ */
 class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
 {
     const AUTHORIZENET_LOG_FILE = "authorize.net.log";
@@ -47,6 +52,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
         $api = $this->getApi();
         // if we're going to allow multiple same method transactions, then we can namespace them with trans_id
         $api->trans_id = $transaction->get('parent_transaction_id');
+        $api->amount = $transaction->get('amount');
         // todo add amount to capture if needed
         $response = $api->priorAuthCapture();
         return $this->responseAsArray($response);
@@ -61,13 +67,27 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
     {
         $api = $this->getApi();
         $payment = $transaction->payment();
-        $trId = $transaction->getData('parent_transaction_id');
+        $trId = $transaction->get('parent_transaction_id');
+        $parentTransactions = $payment->findTransaction('capture', 'completed', null, true);
+        $parentTransaction = null;
+        foreach ($parentTransactions as $trans) {
+            if ($trans->get('transaction_id') == $trId) {
+                $parentTransaction = $trans;
+                break;
+            }
+        }
+        if ($parentTransaction === null) {
+            throw new BException('Unable to find the parent transaction');
+        }
         $api->trans_id = $trId;
-        // todo, get refund amount from order or credit object
         $api->amount = $transaction->get('amount');
         $api->card_num = $payment->getData('form/last_four');
         $api->exp_date = $payment->getData('form/card_exp_date');
-        $response = $api->credit();
+        if ((strtotime(date('Y-m-d')) - strtotime($parentTransaction->get('update_at'))) > 24 * 60 * 60) {
+            $response = $api->credit();
+        } else {
+            $response = $api->void();
+        }
         return $this->responseAsArray($response);
     }
 
@@ -141,6 +161,11 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
         }
         if ($order->customer_id) {
             $api->cust_id = $order->customer_id;
+        }
+
+        if ($paymentMethod->getCardNumber()) {
+            $payment->setData('form/last_four', substr($paymentMethod->getCardNumber(), -4));
+            $payment->setData('form/card_exp_date', $paymentMethod->get('card_exp_date'));
         }
 
         $api->po_num = $order->unique_id;
