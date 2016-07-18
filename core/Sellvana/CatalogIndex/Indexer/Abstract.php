@@ -121,14 +121,15 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
         $now = $this->BDb->now();
 
-        $start = 0;
+        #$start = 0;
         do {
-            $lostProducts = $orm
-                ->offset($start)
+            $chunkOrm = clone $orm;
+            $lostProducts = $chunkOrm
+                #->offset($start)
                 ->limit(static::$_maxChunkSize)
                 ->find_many()
             ;
-            $start += static::$_maxChunkSize;
+            #$start += static::$_maxChunkSize;
 
             $lostData = [];
             foreach ($lostProducts as $lostProduct) {
@@ -142,7 +143,6 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
                     'flag_reindex' => 1
                 ];
             }
-
             if (!empty($lostData)){
                 $this->Sellvana_CatalogIndex_Model_Doc->create_many($lostData);
             }
