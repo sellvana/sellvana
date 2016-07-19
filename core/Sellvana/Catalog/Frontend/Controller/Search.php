@@ -62,6 +62,9 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             $filter = $this->BRequest->get('f');
             $productsORM = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q, $filter);
             $request = $this->BRequest->request();
+            if (empty($request['sc']) && !empty($request['sort'])) {
+                $request['sc'] = $request['sort'];
+            }
             $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsORM, 'request' => &$request]);
             $productsData = $productsORM->paginate($request, [
                 'ps' => $pagerView->default_page_size,

@@ -207,14 +207,18 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $post       = $this->BRequest->post();
         $wishlists  = $post['Wishlist'];
         $deletedIds = isset($post['delete']) ? $post['delete'] : [];
-        $error      = false;
+        $errors     = [];
         $r          = [];
 
         foreach ($wishlists as $id => $wishlist) {
             $model = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
             if ($model) {
                 if (in_array($id, $deletedIds)) {
-                    $model->delete();
+                    if ($model->get('is_default')) {
+                        $errors[] = $this->_('Can not delete default wishlist');
+                    } else {
+                        $model->delete();
+                    }
                 } else {
                     $data = [
                         'title'      => $wishlist['title'],
@@ -222,7 +226,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                     ];
 
                     if (!$model->set($data)->save()) {
-                        $error = true;
+                        $errors[] = $this->_('Error while saving wishlist info');
                         return;
                     }
                 }
@@ -230,16 +234,16 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         if ($this->BRequest->xhr()) {
-            if ($error) {
-                $r = ['success' => false, 'title' => $this->_('Update wishlists failure deal to system error.')];
+            if ($errors) {
+                $r = ['success' => false, 'title' => join("\r\n", $errors)];
             } else {
                 $r = ['success' => true, 'title' => $this->_('Update wishlists successfull.')];
             }
 
             $this->BResponse->json($r);
         } else {
-            if ($error) {
-                $this->message('Update wishlists failure deal to system error.');
+            if ($errors) {
+                $this->message(join("\r\n", $errors), 'error');
             } else {
                 $this->message('Update wishlists successfull.');
             }

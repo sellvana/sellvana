@@ -117,7 +117,7 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
 
             $successMessage = $this->_('Thank you for your review!');
             if ($needApprove && $valid) {
-                $successMessage = $this->_('Thank you for your review! We will check and approve this review in 24 hours.');
+                $successMessage = $this->_('Thank you for your review! We will check and approve this review promptly.');
             }
 
             if ($this->BRequest->xhr()) { //ajax request

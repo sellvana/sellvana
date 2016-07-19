@@ -414,4 +414,24 @@ EOT
         $this->Sellvana_CatalogIndex_Model_Field->load('color', 'field_name')
             ->set('filter_custom_view', 'catalog/category/_filter_swatches')->save();
     }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tDocSort = $this->Sellvana_CatalogIndex_Model_DocSort->table();
+        $this->BDb->ddlTableDef($tDocSort, [
+            BDb::COLUMNS => [
+                'value' => 'RENAME sort_value varchar(255)',
+            ],
+        ]);
+
+        $fHlp = $this->Sellvana_CatalogIndex_Model_Field;
+        $this->BDb->ddlTableDef($fHlp->table(), [
+            BDb::COLUMNS => [
+                'sort_method' => "varchar(10) default 'na' after sort_type",
+                'sort_callback' => 'text after sort_method',
+            ],
+        ]);
+        $fHlp->update_many(['sort_method' => 'text']);
+        $fHlp->update_many(['sort_method' => 'decimal'], ['field_name' => ['price', 'avg_rating']]);
+    }
 }

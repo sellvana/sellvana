@@ -143,7 +143,6 @@ class Sellvana_ProductReviews_Migrate extends BClass
         }
     }
 
-
     public function upgrade__0_5_0_0__0_5_1_0()
     {
         $table = $this->Sellvana_ProductReviews_Model_Review->table();
@@ -155,5 +154,25 @@ class Sellvana_ProductReviews_Migrate extends BClass
                 'verified_purchase' => 'tinyint(1) unsigned not null after rating'
             ],
         ]);
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        /** @see http://planspace.org/2014/08/17/how-to-sort-by-average-rating/ */
+
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+        $this->BDb->ddlTableDef($tProduct, [
+            BDb::COLUMNS => [
+                'num_upvotes' => 'int null',
+            ],
+        ]);
+
+        $this->Sellvana_CatalogIndex_Model_Field->load('avg_rating', 'field_name')->set([
+            'sort_method' => 'decimal',
+            'sort_callback' => 'Sellvana_ProductReviews_Model_Review::indexAvgRatingLaplace',
+        ])->save();
+
+        $tReview = $this->Sellvana_ProductReviews_Model_Review->table();
+        $this->BDb->run("UPDATE {$tProduct} p SET p.num_upvotes=(select sum(rating) from {$tReview} r where r.product_id=p.id)");
     }
 }

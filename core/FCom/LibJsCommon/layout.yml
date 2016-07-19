@@ -87,7 +87,7 @@ lib_select2:
             #- [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.2/js/select2.full.min ]
             #- [ css, @FCom_LibJsCommon/js/select2-4.0.2/css/select2.min.css ]
 
-            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-3.5.4/select2 ]
+            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-3.5.4/select2, deps: [ jquery ] ]
             - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2.css ]
             - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2-bootstrap.css ]
 

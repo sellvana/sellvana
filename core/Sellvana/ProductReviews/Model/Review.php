@@ -79,15 +79,13 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         $pId = $this->get('product_id');
         if ($pId) { //make sure we have related product id
             $rating = $this->orm()->where('product_id', $pId)
-                           ->where('approved', 1)
-                           ->select('(avg(rating))', 'avg')
-                           ->select('(count(1))', 'num')
-                           ->find_one();
+                ->where('approved', 1)
+                ->select('(avg(rating))', 'avg_rating')
+                ->select('(count(1))', 'num_reviews')
+                ->select('(count(rating))', 'num_upvotes')
+                ->find_one();
 
-            $this->Sellvana_Catalog_Model_Product->load($pId)
-                                             ->set('avg_rating', $rating->get('avg'))
-                                             ->set('num_reviews', $rating->get('num'))
-                                             ->save();
+            $this->Sellvana_Catalog_Model_Product->load($pId)->set($rating->as_array())->save();
         }
 
         return $this;
@@ -118,12 +116,30 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         $data = [];
         foreach ($products as $p) {
             $m = $p->avg_rating;
-            if     ($m >= 4) $v = '4 ==> 4 Stars & Up';
+            if ($m == 5) $v = '5 ==> 5 Stars Only';
+            elseif ($m >= 4) $v = '4 ==> 4 Stars & Up';
             elseif ($m >= 3) $v = '3 ==> 3 Stars & Up';
             elseif ($m >= 2) $v = '2 ==> 2 Stars & Up';
             elseif ($m >= 1) $v = '1 ==> 1 Star & Up';
             else $v = '';
             $data[$p->id()] = $v;
+        }
+        return $data;
+    }
+
+    public function indexAvgRatingLaplace($products, $field)
+    {
+        /** @see http://planspace.org/2014/08/17/how-to-sort-by-average-rating/ */
+
+        $data = [];
+        $a = 1;
+        $b = 2;
+        foreach ($products as $p) {
+            $upvotes = $p->get('num_upvotes');
+            $reviews = $p->get('num_reviews') * 5;
+            if ($upvotes && $reviews) {
+                $data[$p->id()] = ($upvotes + $a) / ($reviews + $b);
+            }
         }
         return $data;
     }

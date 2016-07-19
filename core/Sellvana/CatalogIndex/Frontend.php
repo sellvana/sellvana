@@ -18,7 +18,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
     public function onCategoryProductsData($args)
     {
         $productsData = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
-            'sort' => false,
+            'sort' => $this->BRequest->get('sort'),
             'options' => ['category' => $args['category']]
         ]);
         $productsOrm = $productsData['orm'];
@@ -51,7 +51,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
 
         $productsData = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
             'query' => $args['query'],
-            'sort' => false,
+            'sort' => $this->BRequest->get('sort'),
         ]);
         $productsOrm = $productsData['orm'];
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_index:products_orm', ['orm' => $productsOrm]);
@@ -64,6 +64,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
         ]);
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
+
         $this->BLayout->getView('catalog/category/sidebar')->set('products_data', $productsData);
 
         $args['data'] = $productsData;

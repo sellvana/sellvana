@@ -12,6 +12,7 @@ customer_account_sidebar:
 
 /wishlist:
     - { include: base }
+    - { include: lib_select2 }
     - { hook: main, views: wishlist }
     - { include: customer_account_sidebar }
 

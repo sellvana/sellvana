@@ -23,7 +23,11 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             'text'     => 'Text',
             'category' => 'Category'
         ],
-        'source_type'       => ['field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback'],
+        'source_type'       => [
+            'field' => 'Field',
+            'method' => 'Model Method',
+            'callback' => 'Callback',
+        ],
         'filter_type'       => [
             'none'      => 'None',
             'exclusive' => 'Exclusive',
@@ -33,14 +37,38 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         'filter_multivalue' => [0 => 'No', 1 => 'Yes'],
         'filter_counts'     => [0 => 'No', 1 => 'Yes'],
         'filter_show_empty' => [0 => 'No', 1 => 'Yes'],
-        'search_type'       => ['none' => 'None', 'terms' => 'Terms'],
+        'search_type'       => [
+            'none' => 'None',
+            'terms' => 'Terms'
+        ],
         'sort_type'         => [
             'none' => 'None',
             'asc'  => 'Ascending Only',
             'desc' => 'Descending Only',
             'both' => 'Both Directions'
         ],
+        'sort_method'       => [
+            'text' => 'Text',
+            'signed' => 'Signed Integer',
+            'unsigned' => 'Unsigned Integer',
+            'decimal' => 'Decimal',
+            'date' => 'Date',
+            'time' => 'Time',
+            'datetime' => 'Datetime',
+            'binary' => 'Binary',
+            'char' => 'Char',
+        ],
     ];
+
+    protected static $_fieldDefaults = [
+        'field_type' => 'varchar',
+        'source_type' => 'field',
+        'filter_type' => 'none',
+        'search_type' => 'none',
+        'sort_type' => 'none',
+        'sort_method' => 'text',
+    ];
+
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['field_name', 'field_label','field_type'],
@@ -63,8 +91,8 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 static::$_indexedFields['all'][$k] = $f;
                 if ($f->get('sort_type') !== 'none') {
                     static::$_indexedFields['sort'][$k] = $f;
-                    $ft = $f->get('field_type');
-                    $f->set('sort_method', $ft === 'varchar' || $ft === 'text');
+                    #$ft = $f->get('field_type');
+                    #$f->set('sort_method', $ft === 'varchar' || $ft === 'text');
                 }
                 if ($f->get('filter_type') !== 'none') {
                     static::$_indexedFields['filter'][$k] = $f;
@@ -85,8 +113,8 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 $k = $f->get('field_name');
                 if ($f->get('sort_type') !== 'none') {
                     static::$_indexedFields['sort'][$k] = $f;
-                    $ft = $f->get('field_type');
-                    $f->set('sort_method', $ft === 'varchar' || $ft === 'text');
+                    #$ft = $f->get('field_type');
+                    #$f->set('sort_method', $ft === 'varchar' || $ft === 'text');
                 }
             }
         }
@@ -105,10 +133,10 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 $l2 = !empty($labels[1]) ? trim($labels[1]) : null;
                 $sortBoth = $sortType == 'both';
                 if ($sortType == 'asc' || $sortBoth) {
-                    static::$_sortingArray['sort_' . $field->get('field_name') . ' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
+                    static::$_sortingArray[$field->get('field_name') . ' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
                 }
                 if ($sortType == 'desc' || $sortBoth) {
-                    static::$_sortingArray['sort_' . $field->get('field_name') . ' desc'] = $sortBoth ? (empty($l2) ? $l1 . ' (Desc)' : $l2) : $l1;
+                    static::$_sortingArray[$field->get('field_name') . ' desc'] = $sortBoth ? (empty($l2) ? $l1 . ' (Desc)' : $l2) : $l1;
                 }
             }
         }
@@ -222,11 +250,5 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
     public function relevance($products, $field)
     {
         return [];
-    }
-
-    public function getSortMethod()
-    {
-        $ft = $this->get('field_type');
-        return $ft === 'varchar' || $ft === 'text' ? 'join' : 'column';
     }
 }

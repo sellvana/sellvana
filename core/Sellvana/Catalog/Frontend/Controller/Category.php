@@ -74,6 +74,9 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
             $productsOrm = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q, $filter, $category);
 
             $request = $this->BRequest->request();
+            if (empty($request['sc']) && !empty($request['sort'])) {
+                $request['sc'] = $request['sort'];
+            }
 
             $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsOrm, 'request' => &$request]);
 
