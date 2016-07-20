@@ -148,6 +148,7 @@
                             $('#prodreview-text').val(data.text);
                             $('#id-preview').val(data.id);
                             $('#f-prod-review-form').modal('show');
+                            $('#rating-star' + data.rating).attr('checked', true);
                         }
                     },
                     error: function (xhr, textStatus, errorThrown)

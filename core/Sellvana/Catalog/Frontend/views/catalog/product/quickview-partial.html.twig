@@ -50,7 +50,7 @@
             {% if MODULES.isLoaded('Sellvana_ProductReviews') %}
                 <div class="f-prod-avg-rating">
                     <div class="glyphicon f-rating-stars f-xs-stars">
-                        <span class="f-filled-stars" style="width:{{ m.getAverageStars() }}%;"></span>
+                        <span class="f-filled-stars" style="width:{{ m.getAverageRatingPercent() }}%;"></span>
                         <span class="f-empty-stars"></span>
                     </div>
                     <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(m.getNumReviews()) }}</a>

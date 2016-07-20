@@ -18,6 +18,7 @@ Order deny,allow
 <IfModule mod_security.c>
     SecFilterEngine Off
     SecFilterScanPOST Off
+    SecRule &REQUEST_HEADERS:Proxy "@gt 0"
 </IfModule>
 
 <IfModule mod_expires.c>
@@ -30,6 +31,7 @@ Order deny,allow
     Header unset If-None-Match
     Header unset ETag
     FileETag None
+    RequestHeader unset Proxy early
 </IfModule>
 
 <IfModule mod_php.c>
