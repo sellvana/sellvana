@@ -137,8 +137,13 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
                 $cart->state()->overall()->setOrdered();
                 $cart->save();
             }
+
             if (!empty($result['payment']['redirect_to'])) {
                 $args['result']['redirect_to'] = $result['payment']['redirect_to'];
+            }
+
+            if (!empty($result['payment']['post_params'])) {
+                $args['result']['post_params'] = $result['payment']['post_params'];
             }
         }
 

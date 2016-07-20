@@ -12,6 +12,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
 {
     protected $_code = "authorizenet_aim";
     protected $_manualStateManagement = false;
+    protected $_order;
 
     function __construct()
     {

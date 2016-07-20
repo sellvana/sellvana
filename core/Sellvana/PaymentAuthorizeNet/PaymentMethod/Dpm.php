@@ -8,6 +8,9 @@
 
 class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim
 {
+    const LIVE_URL = 'https://secure.authorize.net/gateway/transact.dll';
+    const SANDBOX_URL = 'https://test.authorize.net/gateway/transact.dll';
+
     protected $_code = "authorizenet_dpm";
 
     function __construct()
@@ -56,11 +59,16 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
     public function postUrl()
     {
         $config = $this->config();
-        $post_url = ($config['test'] ? AuthorizeNetDPM::SANDBOX_URL : AuthorizeNetDPM::LIVE_URL);
+        $post_url = ($config['test'] ? self::SANDBOX_URL : self::LIVE_URL);
         return $post_url;
     }
 
-    public function hiddenFields()
+    public function getRelayUrl()
+    {
+        return $this->BApp->href("authorizenet/dpm");
+    }
+
+    public function hiddenFields(Sellvana_Sales_Model_Order_Payment $payment)
     {
         $config = $this->config();
         $order = $this->getOrder();
@@ -69,19 +77,21 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
             "x_version"        => "3.1",
             "x_delim_char"     => ",",
             "x_delim_data"     => "TRUE",
-            'x_amount'         => $this->get('amount_due'),
+            'x_amount'         => $payment->get('amount_due'),
             'x_fp_sequence'    => $order->unique_id,
             'x_fp_timestamp'   => $time,
             'x_relay_response' => "TRUE",
-            'x_relay_url'      => $this->BApp->href("authorizenet/dpm"),
+            'x_test_request'   => "FALSE",
+            'x_relay_url'      => $this->getRelayUrl(),
             'x_login'          => $config['login'],
-            'x_description'    => $order->getTextDescription(),
+            //'x_description'    => $order->getTextDescription(),
         ];
         if (class_exists("AuthorizeNetSIM")) {
-            $fields['x_fp_hash'] = AuthorizeNetSIM_Form::getFingerprint($config['login'],
-                                                                        $config['trans_key'],
-                                                                        $this->get('amount_due'),
-                                                                        $order->unique_id, $time);
+            $form = new AuthorizeNetSIM_Form();
+            $fields['x_fp_hash'] = $form->getFingerprint($config['login'],
+                                                            $config['trans_key'],
+                                                            $payment->get('amount_due'),
+                                                            $order->get('unique_id'), $time);
         }
         return $fields;
     }

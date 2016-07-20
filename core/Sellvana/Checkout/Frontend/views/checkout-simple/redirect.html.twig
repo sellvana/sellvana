@@ -1,0 +1,8 @@
+<form method="post" action="{{ postUrl }}" id="redirectForm">
+    {% for name, value in hiddenFields %}
+        <input type="hidden" name="{{ name }}" value="{{ value }}">
+    {% endfor %}
+</form>
+<script>
+    document.getElementById('redirectForm').submit();
+</script>

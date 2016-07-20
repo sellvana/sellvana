@@ -35,4 +35,16 @@ class Sellvana_PaymentAuthorizeNet_Frontend_Controller extends FCom_Core_Control
             $response->redirect('checkout/checkout');
         }
     }
+
+    public function action_sim()
+    {
+        $this->BDebug->log(print_r($this->BRequest->post(), 1), 'sim.log');
+        $this->action_dpm();
+    }
+
+    public function isApiCall()
+    {
+        return true;
+    }
+
 }
