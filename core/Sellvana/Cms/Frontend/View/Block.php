@@ -100,6 +100,9 @@ class Sellvana_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
             $formText = $this->_prepareFormFields();
             $blockContent = str_replace($this->_formFieldsPlaceholder, $formText, $blockContent);
         }
+        if ($blockContent === null || $blockContent === '') {
+            $blockContent = ' ';
+        }
         $view->setParam([
             //'renderer'    => $subRenderer,
             'source' => $blockContent,
