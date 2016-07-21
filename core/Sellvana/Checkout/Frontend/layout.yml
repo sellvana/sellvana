@@ -37,3 +37,6 @@ checkout/base:
     - { hook: main, views: checkout-simple/success }
     - { hook: before_body_end, views: custom-tags }
     - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_success } }
+
+/checkout-simple/redirect:
+    - { hook: main, views: checkout-simple/redirect }

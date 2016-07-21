@@ -179,7 +179,14 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
         } else {
             $href = 'checkout';
         }
-        $this->BResponse->redirect($href);
+        if (!empty($result['post_params']) && !empty($result['redirect_to'])) {
+            $this->layout('/checkout-simple/redirect');
+            $view = $this->view('checkout-simple/redirect');
+            $view->set('hiddenFields', $result['post_params']);
+            $view->set('postUrl', $result['redirect_to']);
+        } else {
+            $this->BResponse->redirect($href);
+        }
     }
 
     public function action_success()

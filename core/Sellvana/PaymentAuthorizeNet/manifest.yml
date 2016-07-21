@@ -20,6 +20,8 @@ modules:
                         title: "Credit Card (Authorize.net)"
                     dpm:
                         title: "Credit Card Direct Post (Authorize.net)"
+                    sim:
+                        title: "Credit Card Server Integration (Authorize.net)"
                     url: "https://secure.authorize.net/gateway/transact.dll"
                     test_url: "https://test.authorize.net/gateway/transact.dll"
 
