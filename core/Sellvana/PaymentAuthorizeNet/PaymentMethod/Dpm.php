@@ -78,7 +78,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
             "x_delim_char"     => ",",
             "x_delim_data"     => "TRUE",
             'x_amount'         => $payment->get('amount_due'),
-            'x_fp_sequence'    => $order->unique_id,
+            'x_fp_sequence'    => $order->get('unique_id'),
             'x_fp_timestamp'   => $time,
             'x_relay_response' => "TRUE",
             'x_test_request'   => "FALSE",
@@ -107,6 +107,34 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
         return $data;
     }
 
+    public function processReturnFromExternalCheckout()
+    {
+        $config        = $this->config();
+        $apiResponse   = new AuthorizeNetSIM($config['login'], $config['trans_md5']);
+        $response      = $this->BResponse;
+        $result        = [];
+        if ($apiResponse->isAuthorizeNet()) {
+            $this->processApiResponse($apiResponse);
+            if ($apiResponse->approved) {
+                $redirect_url = $this->BApp->href('checkout/success') . '?response_code=1&transaction_id=' . $apiResponse->transaction_id;
+            } else {
+                // Redirect to error page.
+                $redirect_url = $this->BApp->href('checkout/checkout') . '?response_code=' . $apiResponse->response_code
+                    . '&response_reason_text=' . $apiResponse->response_reason_text;
+                $result['error']['message'] = 'Error -- transaction was not approved. Reason: ' . $apiResponse->response_reason_text;
+            }
+            // Send the Javascript back to AuthorizeNet, which will redirect user back to your site.
+            $response->set($this->BLayout->getView('authorizenet/dpm_relay')->set('redirect_url', $redirect_url)->render());
+
+            $response->render();
+        } else {
+            $result['error']['message'] = 'Error -- not AuthorizeNet. Check your MD5 Setting.';
+            $this->_setErrorStatus($result, true);
+        }
+
+        return $result;
+    }
+
     /**
      * @param AuthorizeNetSIM $response
      * @return AuthorizeNetSIM
@@ -114,11 +142,27 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
     public function processApiResponse($response)
     {
         $config = $this->config();
-        if (!$config['enabled']) {
+        if (array_key_exists('enabled', $config) && !$config['enabled']) {
             // log this and eventually show a message
             return null;
         }
+        $token = $this->BRequest->get('token');
+        $payment = $this->Sellvana_Sales_Model_Order_Payment->load($token, 'transaction_token');
+        $this->Sellvana_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
+
         $action = $config['payment_action'];
+        switch ($action) {
+            case 'AUTH_ONLY':
+                $transaction = $payment->createTransaction('auth');
+                break;
+            case 'AUTH_CAPTURE':
+                $transaction = $payment->createTransaction('sale');
+                break;
+            default :
+                throw new BException('Invalid payment action');
+                break;
+        }
+        $transaction->start();
         $this->set($response->transaction_id, $response);
         $this->set('transaction_id', $response->transaction_id);
         if ($response->approved) {
@@ -126,19 +170,21 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
         } else {
             $status = 'error';
         }
-        $paymentData = [
+        if (!$payment->id()) {
+            throw new BException('Unable to find the payment');
+        }
+        $transactionData = [
             'method'           => $this->_code,
-            'parent_id'        => $response->transaction_id,
-            'order_id'         => $response->fp_sequence,
-            'amount'           => $this->get('amount_due'),
+            'order_id'         => $payment->order()->id(),
+            'amount'           => $payment->get('amount_due'),
             'status'           => $status,
             'transaction_id'   => $response->transaction_id,
-            'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
+            'transaction_type' => $action == 'AUTH_ONLY' ? 'auth' : 'sale',
             'online'           => 1,
         ];
-        $paymentModel = $this->Sellvana_Sales_Model_Order_Payment->addNew($paymentData);
-        $paymentModel->setData('response', $response);
-        $paymentModel->save();
+        $transaction->set($transactionData);
+
+        $transaction->complete();
         return $response;
     }
 }

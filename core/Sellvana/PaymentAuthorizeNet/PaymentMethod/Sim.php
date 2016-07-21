@@ -46,6 +46,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Sim extends Sellvana_PaymentAut
         $fields['x_showform'] = 'PAYMENT_FORM';
         $fields['x_type'] = $config['payment_action'];
         $fields['x_method'] = 'CC';
+        $fields['x_relay_url'] .= '?token=' . $payment->get('transaction_token');
         unset($fields['x_delim_char']);
         unset($fields['x_delim_data']);
         return $fields;
@@ -54,9 +55,10 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Sim extends Sellvana_PaymentAut
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)
     {
         $this->_order = $payment->order();
+        $token = $this->BUtil->randomString(16);
         $payment->set([
             'transaction_type' => $this->getConfig("payment_action"),
-            //'transaction_token' => $token,
+            'transaction_token' => $token,
             'online' => 1,
         ])->save();
 
@@ -66,6 +68,35 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Sim extends Sellvana_PaymentAut
 
         return $result;
     }
+
+    public function processReturnFromExternalCheckout()
+    {
+        $config        = $this->config();
+        $apiResponse   = new AuthorizeNetSIM($config['login'], $config['trans_md5']);
+        $response      = $this->BResponse;
+        $result        = [];
+        if ($apiResponse->isAuthorizeNet()) {
+            $this->processApiResponse($apiResponse);
+            if ($apiResponse->approved) {
+                $redirect_url = $this->BApp->href('checkout/success') . '?response_code=1&transaction_id=' . $apiResponse->transaction_id;
+            } else {
+                // Redirect to error page.
+                $redirect_url = $this->BApp->href('checkout/checkout') . '?response_code=' . $apiResponse->response_code
+                    . '&response_reason_text=' . $apiResponse->response_reason_text;
+                $result['error']['message'] = 'Error -- transaction was not approved. Reason: ' . $apiResponse->response_reason_text;
+            }
+            // Send the Javascript back to AuthorizeNet, which will redirect user back to your site.
+            $response->set($this->BLayout->getView('authorizenet/dpm_relay')->set('redirect_url', $redirect_url)->render());
+
+            $response->render();
+        } else {
+            $result['error']['message'] = 'Error -- not AuthorizeNet. Check your MD5 Setting.';
+            $this->_setErrorStatus($result, true);
+        }
+
+        return $result;
+    }
+
 
     protected function _getPostString()
     {
