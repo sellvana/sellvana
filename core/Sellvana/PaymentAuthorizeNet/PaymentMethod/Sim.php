@@ -38,6 +38,12 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Sim extends Sellvana_PaymentAut
         return $this->BApp->href("authorizenet/sim");
     }
 
+    public function isRootTransactionNeeded()
+    {
+        return true;
+    }
+
+
     protected function _specialFields()
     {
         return [

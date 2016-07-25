@@ -25,7 +25,6 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         $this->_capabilities['void_online'] = 1;
         $this->_capabilities['refund_online'] = 1;
         $this->_capabilities['refund'] = 1;
-        $this->_capabilities['pay_by_url'] = 1;
     }
 
     public function getCheckoutFormView()
