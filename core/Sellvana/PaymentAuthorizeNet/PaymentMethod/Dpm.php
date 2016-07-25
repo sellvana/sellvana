@@ -26,7 +26,19 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)
     {
-        return [];
+        $this->_order = $payment->order();
+        $token = $this->BUtil->randomString(16);
+        $payment->set([
+            'transaction_type' => $this->getConfig("payment_action"),
+            'transaction_token' => $token,
+            'online' => 1,
+        ])->save();
+
+        $this->Sellvana_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $payment]);
+        $result['redirect_to'] = $this->postUrl();
+        $result['post_params'] = $this->hiddenFields($payment);
+
+        return $result;
     }
 
     public function getCardNumber()
@@ -75,15 +87,15 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
         $time = time();
         $fields = [
             "x_version"        => "3.1",
-            "x_delim_char"     => ",",
-            "x_delim_data"     => "TRUE",
             'x_amount'         => $payment->get('amount_due'),
             'x_fp_sequence'    => $order->get('unique_id'),
             'x_fp_timestamp'   => $time,
             'x_relay_response' => "TRUE",
             'x_test_request'   => "FALSE",
-            'x_relay_url'      => $this->getRelayUrl(),
+            'x_relay_url'      => $this->getRelayUrl() . '?token=' . $payment->get('transaction_token'),
             'x_login'          => $config['login'],
+            'x_method'         => 'CC',
+            'x_type'           => $config['payment_action'],
             //'x_description'    => $order->getTextDescription(),
         ];
         if (class_exists("AuthorizeNetSIM")) {
@@ -93,41 +105,43 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
                                                             $payment->get('amount_due'),
                                                             $order->get('unique_id'), $time);
         }
+        $fields = array_merge($fields, $this->_specialFields());
+
         return $fields;
     }
 
-    public function ajaxData()
+    protected function _specialFields()
     {
-        $order = $this->getOrder();
-        $data['order'] = $order->as_array();
-        //TODO: check for duplicate fields, if necessary
-        $data['billing']  = $order->addressAsArray('billing');
-        $data['shipping'] = $order->addressAsArray('shipping');
-        $data['x_fields'] = $this->hiddenFields();
-        return $data;
+        $paymentData = $this->BRequest->post('payment');
+        $this->setPaymentFormData($paymentData[$this->_code]);
+
+        return [
+            "x_delim_char"     => ",",
+            "x_delim_data"     => "TRUE",
+            'x_relay_always'   => 'TRUE',
+            'x_card_num'       => $this->getCardNumber(),
+            'x_exp_date'       => $this->_details['card_exp_date'],
+        ];
     }
 
     public function processReturnFromExternalCheckout()
     {
         $config        = $this->config();
         $apiResponse   = new AuthorizeNetSIM($config['login'], $config['trans_md5']);
-        $response      = $this->BResponse;
         $result        = [];
         if ($apiResponse->isAuthorizeNet()) {
             $this->processApiResponse($apiResponse);
             if ($apiResponse->approved) {
-                $redirect_url = $this->BApp->href('checkout/success') . '?response_code=1&transaction_id=' . $apiResponse->transaction_id;
+                $result['redirect_to'] = $this->BApp->href('checkout/success') . '?response_code=1&transaction_id=' . $apiResponse->transaction_id;
+                $result['success'] = true;
             } else {
                 // Redirect to error page.
-                $redirect_url = $this->BApp->href('checkout/checkout') . '?response_code=' . $apiResponse->response_code
+                $result['redirect_to'] = $this->BApp->href('checkout/checkout') . '?response_code=' . $apiResponse->response_code
                     . '&response_reason_text=' . $apiResponse->response_reason_text;
                 $result['error']['message'] = 'Error -- transaction was not approved. Reason: ' . $apiResponse->response_reason_text;
             }
-            // Send the Javascript back to AuthorizeNet, which will redirect user back to your site.
-            $response->set($this->BLayout->getView('authorizenet/dpm_relay')->set('redirect_url', $redirect_url)->render());
-
-            $response->render();
         } else {
+            $result['redirect_to'] = $this->BApp->href('checkout/checkout');
             $result['error']['message'] = 'Error -- not AuthorizeNet. Check your MD5 Setting.';
             $this->_setErrorStatus($result, true);
         }
@@ -137,9 +151,10 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
 
     /**
      * @param AuthorizeNetSIM $response
-     * @return AuthorizeNetSIM
+     * @return Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm
+     * @throws BException
      */
-    public function processApiResponse($response)
+    public function processApiResponse(AuthorizeNetSIM $response)
     {
         $config = $this->config();
         if (array_key_exists('enabled', $config) && !$config['enabled']) {
@@ -179,12 +194,18 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
             'amount'           => $payment->get('amount_due'),
             'status'           => $status,
             'transaction_id'   => $response->transaction_id,
-            'transaction_type' => $action == 'AUTH_ONLY' ? 'auth' : 'sale',
+            'transaction_type' => $action == 'AUTH_ONLY' ? 'auth' : 'capture',
             'online'           => 1,
         ];
         $transaction->set($transactionData);
 
         $transaction->complete();
-        return $response;
+        $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
+            'payment' => $payment,
+            'transaction' => $transaction,
+            'transaction_type' => $action == 'AUTH_ONLY' ? 'auth' : 'capture',
+        ]);
+
+        return $this;
     }
 }
