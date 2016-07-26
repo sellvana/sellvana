@@ -52,10 +52,10 @@ Using custom id/name:
         {% set toggleId = view.jsVisibleToggleId(p) %}
         <script>
             require(['jquery'], function($) {
-                var $container = $('#{{ inputId }}-container');
+                var {% if toggleId %}$toggle = $('#{{ toggleId }}'), {% endif %}$container = $('#{{ inputId }}-container');
                 if ({{ conditions | raw }}) $container.show(); else $container.hide();
                 {% if toggleId %}
-                    $('#{{ toggleId }}').change(function(ev) {
+                    $toggle.change(function(ev) {
                         if ({{ conditions | raw }}) $container.show(); else $container.hide();
                     });
                 {% endif %}

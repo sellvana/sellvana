@@ -115,9 +115,9 @@ class FCom_Core_Migrate extends BClass
                 ],
             ]
         );
-        if (!$this->BConfig->get('cache/default_backend')) {
+        if (!$this->BConfig->get('core/cache/default_backend')) {
             $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
-            $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
+            $this->BConfig->set('core/cache/default_backend', $this->_defaultBackend, false, true);
             $this->BConfig->writeConfigFiles('core');
         }
     }
@@ -231,9 +231,9 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
-        if (!$this->BConfig->get('cache/default_backend')) {
+        if (!$this->BConfig->get('core/cache/default_backend')) {
             $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
-            $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
+            $this->BConfig->set('core/cache/default_backend', $this->_defaultBackend, false, true);
             $this->BConfig->writeConfigFiles('core');
         }
     }

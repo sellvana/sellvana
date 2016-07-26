@@ -63,6 +63,7 @@ class FCom_LibTwig_Main extends BClass
             'max' => 'max',
             'floor' => 'floor',
             'debug' => function($v) { echo "<pre>"; print_r($v); echo "</pre>"; },
+            'replace1' => function($v, $from, $to) { return str_replace($from, $to, $v); },
         ] as $filterName => $filterCallback) {
             $filter = new Twig_SimpleFilter($filterName, $filterCallback);
             static::$_fileTwig->addFilter($filter);
