@@ -151,6 +151,9 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
 
     public function jsVisibleToggleId($p)
     {
+        if ($p['js_toggle'][0] === '#') {
+            return substr($p['js_toggle'], 1);
+        }
         $p1 = $p;
         $p1['field'] = ltrim($p1['js_toggle'], '!');
         return $this->getInputId($p1);
