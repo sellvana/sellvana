@@ -30,6 +30,11 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         'recurring'       => 1,
     ];
 
+    /**
+     * @var bool
+     */
+    protected $_manualStateManagement = false;
+
     protected function _initialize()
     {
         require_once __DIR__ . '/lib/Stripe.php';
@@ -132,6 +137,39 @@ echo "<pre>"; var_dump($e); exit;
         }
         return !$key ? $this->_config : (!empty($this->_config[$key]) ? $this->_config[$key] : null);
     }
+
+    public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+        $this->_initialize();
+        $this->_transaction = $transaction;
+        $result = [];
+
+        $payment = $transaction->payment();
+        try {
+            $parentTransaction = $payment->findTransaction(Sellvana_Sales_Model_Order_Payment_Transaction::SALE, 'completed');
+            $charge = Stripe_Charge::retrieve($parentTransaction->get('transaction_id'));
+            $refund = $charge->refund([
+                'amount' => round($transaction->get('amount') * 100),
+                'currency' => $transaction->payment()->order()->get('order_currency'),
+            ]);
+            $transaction
+                ->set('transaction_id', $refund->id)
+                ->setData('result', $refund->__toArray(true));
+
+            $result['success'] = true;
+        } catch (Stripe_CardError $e) {
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result);
+        } catch (Stripe_InvalidRequestError $e) {
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result);
+        } catch (Exception $e) {
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result);
+        }
+        return $result;
+    }
+
 
     /*
     protected function _call($method, $objectId = null, array $data = [])

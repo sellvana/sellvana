@@ -63,6 +63,9 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         self::CAPTURE => [
             self::REFUND
         ],
+        self::SALE => [
+            self::REFUND
+        ],
     ];
 
 
