@@ -12,6 +12,8 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
 {
     protected $_code = "authorizenet_aim";
     protected $_manualStateManagement = false;
+
+    /** @var  Sellvana_Sales_Model_Order */
     protected $_order;
 
     function __construct()
@@ -23,7 +25,6 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         $this->_capabilities['void_online'] = 1;
         $this->_capabilities['refund_online'] = 1;
         $this->_capabilities['refund'] = 1;
-        $this->_capabilities['pay_by_url'] = 1;
     }
 
     public function getCheckoutFormView()
@@ -185,7 +186,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         if ($success) {
             //$this->set($response['transaction_id'], $response);
             $transaction->set('transaction_id', $response['transaction_id']);
-            $transaction->complete();
+            $transaction->save();
         } else {
             $result['error']['message'] = $response['response_reason_text'];
             $this->_transaction = $transaction;

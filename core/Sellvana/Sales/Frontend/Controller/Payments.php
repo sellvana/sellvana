@@ -62,7 +62,16 @@ class Sellvana_Sales_Frontend_Controller_Payments extends FCom_Frontend_Controll
                 $href = $result['payment']['redirect_to'];
             }
 
-            $this->BResponse->redirect($href);
+            if (!empty($result['payment']['post_params']) && !empty($result['payment']['redirect_to'])) {
+                $this->layout('/checkout-simple/redirect');
+                $view = $this->view('checkout-simple/redirect');
+                $view->set('hiddenFields', $result['payment']['post_params']);
+                $view->set('postUrl', $result['payment']['redirect_to']);
+                $this->BResponse->set($view->render());
+                $this->BResponse->render();
+            } else {
+                $this->BResponse->redirect($href);
+            }
 
         } catch (BException $e) {
             $this->BResponse->redirect('orders');

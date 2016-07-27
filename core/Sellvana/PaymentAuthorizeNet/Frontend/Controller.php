@@ -11,7 +11,7 @@
 
 class Sellvana_PaymentAuthorizeNet_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    public function action_dpm()
+    public function action_dpm__POST()
     {
         $result = $this->Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm->processReturnFromExternalCheckout();
 
@@ -21,6 +21,8 @@ class Sellvana_PaymentAuthorizeNet_Frontend_Controller extends FCom_Frontend_Con
             return;
         }
 
+        $html = $this->BLayout->getView('authorizenet/dpm_relay')->set('redirect_url', $result['redirect_to'])->render();
+        echo $html;
         $this->BResponse->redirect('checkout/success');
     }
 
@@ -34,6 +36,13 @@ class Sellvana_PaymentAuthorizeNet_Frontend_Controller extends FCom_Frontend_Con
             return;
         }
 
+        // Send the Javascript back to AuthorizeNet, which will redirect user back to your site.
+        //$response = $this->BResponse;
+        $html = $this->BLayout->getView('authorizenet/dpm_relay')->set('redirect_url', $result['redirect_to'])->render();
+        //$response->set($html);
+        //$response->render();
+        // somehow AuthorizeNet doesn't see output if it is made via BResponse
+        echo $html;
         $this->BResponse->redirect('checkout/success');
     }
 
