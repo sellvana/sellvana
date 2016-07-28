@@ -59,6 +59,12 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         return $this->getConfig('test') ? $this->getConfig('test_public_key') : $this->getConfig('live_public_key');
     }
 
+    public function isAllDataPresent($data)
+    {
+        return parent::isAllDataPresent($data) && !empty($data['stripe']['token']);
+    }
+
+
     /**
      * @return mixed
      * @throws Exception
