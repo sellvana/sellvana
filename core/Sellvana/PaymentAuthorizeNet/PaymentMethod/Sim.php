@@ -43,6 +43,11 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Sim extends Sellvana_PaymentAut
         return true;
     }
 
+    public function isAllDataPresent($data)
+    {
+        return true;
+    }
+
 
     protected function _specialFields()
     {

@@ -99,7 +99,16 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         if (empty($args['post']['payment_method'])) {
             throw new BException('Payment method not set');
         }
+        $code = $args['post']['payment_method'];
+        $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
+        if (empty($methods[$code])) {
+            throw new BException('Invalid payment method');
+        }
 
+        $method = $methods[$code];
+        if (!$method->isAllDataPresent($args['post'])) {
+            throw new BException('Payment method data is incomplete');
+        }
         $cart->setPaymentMethod($args['post']['payment_method']);
         $cart->setPaymentDetails($args['post']);
 

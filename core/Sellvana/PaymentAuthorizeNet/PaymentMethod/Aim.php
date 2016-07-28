@@ -104,6 +104,22 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         return $result;
     }
 
+    public function isAllDataPresent($data)
+    {
+        if (!parent::isAllDataPresent($data)) {
+            return false;
+        }
+
+        if (empty($data['payment'][$this->_code])) {
+            return false;
+        }
+
+        $data = $data['payment'][$this->_code];
+        $isExpDateOk = !empty($data['expire']['year']) && !empty($data['expire']['month']) && $data['expire']['month'] <= 12;
+
+        return !empty($data['cc_type']) && !empty($data['cc_num']) && !empty($data['cc_cid']) && $isExpDateOk;
+    }
+
 
     public function getOrder()
     {

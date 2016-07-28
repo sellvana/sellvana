@@ -191,6 +191,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
+    public function isAllDataPresent($data)
+    {
+        return true;
+    }
+
     public function processReturnFromExternalCheckout()
     {
         return [];
