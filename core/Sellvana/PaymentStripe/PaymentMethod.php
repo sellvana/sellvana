@@ -74,7 +74,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         $data = [
             'form_prefix' => $this->getCheckoutFormPrefix(),
             'public_key' => $this->getPublicKey(),
-            'amount' => $this->Sellvana_Sales_Model_Cart->sessionCart()->get('subtotal'),
+            'amount' => $this->Sellvana_Sales_Model_Cart->sessionCart()->get('amount_due'),
             'description' => null,//'You will have opportunity to change address and shipping method on the next step',
         ];
         return $this->BLayout->getView('stripe/form')->set($data);
