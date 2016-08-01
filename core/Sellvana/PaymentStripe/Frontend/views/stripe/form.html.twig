@@ -22,7 +22,7 @@
     <button type="button" id="stripe-change-trigger" class="btn btn-primary">{{ 'Change'|_ }}</button>
 </div>
 
-<input type="hidden" id="stripe-token" name="{{ prefix }}[token]" value="" disabled>
+<input type="hidden" id="stripe-token" name="{{ prefix }}[token]" value="{{ token }}" {{ not token ? 'disabled' }}>
 
 <script>
     require(['jquery'], function($) {
@@ -47,9 +47,21 @@
                 name: '{{ cart.get('billing_firstname') ~ ' ' ~ cart.get('billing_lastname') }}',
                 description: '{{ 'Cart (%s)'|_(cart.get('grand_total')|currency) }}',
                 panelLabel: '{{ 'Authorize'|_ }}',
+                closed: function() {
+                    if (!$('#stripe-token').val()) {
+                        $('#stripe-button-container').prop('hidden', false);
+                        $('#stripe-success-message').prop('hidden', true);
+                        $('#stripe-wait-message').prop('hidden', true);
+                    } else {
+                        $('#stripe-button-container').prop('hidden', true);
+                        $('#stripe-success-message').prop('hidden', false);
+                        $('#stripe-wait-message').prop('hidden', true);
+                    }
+                },
                 //address: true,
                 token: token
             });
+
         });
     });
 </script>
