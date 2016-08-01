@@ -111,17 +111,14 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
 
             $result['success'] = true;
         } catch (Stripe_CardError $e) {
-            echo "<pre>";
-            var_dump($e);
-            exit;
             $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result, true);
         } catch (Stripe_InvalidRequestError $e) {
-            echo "<pre>";
-            var_dump($e);
-            exit;
             $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result, true);
         } catch (Exception $e) {
-echo "<pre>"; var_dump($e); exit;
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result, true);
         }
 
         return $result;
