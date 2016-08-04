@@ -1205,9 +1205,12 @@ class FCom_Core_ImportExport extends BClass
 
         if (strpos($fromFile, '://') !== false) {
             $path = $fromFile; // allow stream readers
-        } else {
+        } elseif ($fromFile[0] != '/') {
             $path = $this->getFullPath($fromFile, $type);
+        } else {
+            $path = $fromFile; // file path is already full
         }
+
         if (!is_readable($path)) {
             return false;
         }
