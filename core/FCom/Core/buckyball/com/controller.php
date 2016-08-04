@@ -483,7 +483,7 @@ class BRequest extends BClass
                 );*/
 
             if (!$path && !empty($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'][0] === '/') {
-                $path = $_SERVER['REQUEST_URI'];
+                $path = $path = preg_replace('#[?].*$#', '', $_SERVER['REQUEST_URI']);
             }
 
             // nginx rewrite fix
