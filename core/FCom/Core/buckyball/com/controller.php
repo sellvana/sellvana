@@ -473,14 +473,18 @@ class BRequest extends BClass
         static $path;
 
         if (null === $path) {
-    #echo "<pre>"; print_r($_SERVER); exit;
             $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
-                (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/');
+                (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : null);
                 /*
                     (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
                         (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
                     )
                 );*/
+
+            if (null === $path && !empty($_SERVER['REQUEST_URI'])) {
+                $rootPathRe = '#' . preg_quote(dirname($_SERVER['SCRIPT_NAME']), '#') . '#';
+                $path = preg_replace(['#[?].*$#', $rootPathRe], '', $_SERVER['REQUEST_URI']);
+            }
 
             // nginx rewrite fix
             $basename = basename($this->scriptName());
