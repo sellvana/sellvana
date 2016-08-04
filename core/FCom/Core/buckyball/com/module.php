@@ -275,8 +275,8 @@ class BModuleRegistry extends BClass
     public function scan($source, $validateManifests = false)
     {
         // if $source does not end with .json, assume it is a folder
-        if (!preg_match('/\.(json|yml|php)$/', $source)) {
-            $source .= '/manifest.{json,yml,php}';
+        if (!preg_match('/\.(json|yml|php|toml)$/', $source)) {
+            $source .= '/manifest.{json,yml,php,toml}';
         }
         $source = str_replace('\\', '/', $source);
         $manifests = glob($source, GLOB_BRACE);
@@ -302,6 +302,9 @@ class BModuleRegistry extends BClass
                     // already should be taken care of with filemtime()
                     $useCache = true;#!$this->BDebug->is(['DEBUG', 'DEVELOPMENT', 'INSTALLATION']);
                     $manifest = $this->BYAML->load($file, $useCache);
+                    break;
+                case 'toml':
+                    $manifest = $this->Toml->parse(file_get_contents($file));
                     break;
                 case 'json':
                     $json = file_get_contents($file);

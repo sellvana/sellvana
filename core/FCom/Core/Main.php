@@ -197,7 +197,7 @@ class FCom_Core_Main extends BClass
         foreach ([
             /*'bcmath', */
             'date', 'hash', 'iconv', 'json', 'SPL', 'pcre', 'session',
-            'zip', 'pdo_mysql', 'curl', 'gd', 'intl', 'mbstring',
+            'zip', 'pdo_mysql', 'curl', 'gd', 'intl', 'mbstring', 'soap', 'xml',
         ] as $ext) {
             if (empty($extLoaded[$ext])) {
                 $errors['phpext'][] = $ext;
@@ -249,10 +249,10 @@ class FCom_Core_Main extends BClass
         }
 
         // session files
-        $logDir = $config->get('fs/session_dir');
-        if (!$logDir) {
-            $logDir = $randomDir . '/session';
-            $config->set('fs/session_dir', $logDir);
+        $sessionDir = $config->get('fs/session_dir');
+        if (!$sessionDir) {
+            $sessionDir = $randomDir . '/session';
+            $config->set('fs/session_dir', $sessionDir);
         }
 
         $this->BRequest->setArea($area);

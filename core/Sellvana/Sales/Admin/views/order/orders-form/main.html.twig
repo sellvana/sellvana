@@ -5,8 +5,6 @@
 {% set totals = order.getData('totals') %}
 {% set itemsGridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').itemsOrderGridConfig(order) %}
 {% set orderCustomStates = order.state().custom().getAllValueLabels() %}
-{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
-{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
 
 {{ THIS.view('core/geo-embed') | raw }}
 
@@ -85,12 +83,18 @@
                     <h4><i class="fa fa-university"></i> {{ 'Payment'|_ }} <a href="#" id="payment-section-edit-link" class="section-edit-trigger"></a></h4>
                     <div id="payment-section-view">
                         <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().payment().getValueLabel() }}</strong></p>
-                        <p><strong>{{ paymentMethod.getName() }}</strong></p>
-                        {% if paymentDetails %}
-                            {% for k, v in paymentDetails %}
-                                <p><label>{{ k }}:</label> {{ v }}</p>
-                            {% endfor %}
-                        {% endif %}
+                        {% for p in order.payments() %}
+                            {% set paymentMethod = p.getMethodObject() %}
+                            <p>
+                                <strong>{{ paymentMethod.getName() }}</strong>
+                                <span>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</span>
+                            </p>
+                            {% if paymentDetails %}
+                                {% for k, v in paymentDetails %}
+                                    <p><label>{{ k }}:</label> {{ v }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
                     </div>
                     <div id="payment-section-edit" hidden>
 
@@ -101,8 +105,12 @@
         <div class="col-md-3">
             <h4><i class="fa fa-info-circle"></i> {{ 'Totals'|_ }}</h4>
             <table class="table table-bordered table-striped">
-                {% for total in totals %}
-                    <tr><th>{{ total.label }}</th><td style="text-align:right">{{ total.value|currency('base') }}</td></tr>
+                {% for code, total in totals %}
+                    {% if code == 'amount_due' %}
+                        <tr><th>{{ 'Amount Captured'|_ }}</th><td class="text-right">{{ order.get('amount_paid')|currency('base') }}</td></tr>
+                    {% endif %}
+                    {% set value = (code == 'amount_due') ? order.get('amount_due') : total.value %}
+                    <tr><th>{{ total.label }}</th><td class="text-right">{{ value|currency('base') }}</td></tr>
                 {% endfor %}
             </table>
         </div>

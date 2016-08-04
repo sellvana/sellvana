@@ -16,11 +16,27 @@ class Sellvana_Sales_Model_Order_Item_State_Return extends Sellvana_Sales_Model_
         self::RETURNED => 'Returned',
     ];
 
+    protected $_defaultMethods = [
+        self::NONE => 'setNone',
+        self::REQUESTED => 'setRequested',
+        self::PROCESSING => 'setProcessing',
+        self::PARTIAL => 'setPartial',
+        self::RETURNED => 'setReturned',
+    ];
+
     protected $_setValueNotificationTemplates =[
         self::RETURNED => 'email/sales/order-item-state-return-returned',
     ];
 
     protected $_defaultValue = self::NONE;
+
+    protected $_defaultValueWorkflow = [
+        self::NONE => [self::REQUESTED, self::PROCESSING],
+        self::REQUESTED => [self::PROCESSING],
+        self::PROCESSING => [self::RETURNED, self::PARTIAL],
+        self::PARTIAL => [self::RETURNED],
+        self::RETURNED => [],
+    ];
 
     public function setNone()
     {

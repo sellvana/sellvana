@@ -473,14 +473,18 @@ class BRequest extends BClass
         static $path;
 
         if (null === $path) {
-    #echo "<pre>"; print_r($_SERVER); exit;
             $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
-                (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/');
+                (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : null);
                 /*
                     (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
                         (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
                     )
                 );*/
+
+            if (null === $path && !empty($_SERVER['REQUEST_URI'])) {
+                $rootPathRe = '#' . preg_quote(dirname($_SERVER['SCRIPT_NAME']), '#') . '#';
+                $path = preg_replace(['#[?].*$#', $rootPathRe], '', $_SERVER['REQUEST_URI']);
+            }
 
             // nginx rewrite fix
             $basename = basename($this->scriptName());
@@ -702,8 +706,7 @@ class BRequest extends BClass
                         $result[$key] = ['error' => 'invalid_type', 'tp' => 1, 'type' => $type, 'name' => $name];
                         continue;
                     }
-                    $this->BUtil->ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir . '/' . $name);
+                    $this->BUtil->moveUploadedFileSafely($tmpName, $targetDir . '/' . $name, ['@media_dir', '@random_dir']);
                     $result[$key] = ['name' => $name, 'tp' => 2, 'type' => $type, 'target' => $targetDir . '/' . $name];
                 } else {
                     $message = !empty($uploadErrors[$error]) ? $uploadErrors[$error] : null;
@@ -720,8 +723,7 @@ class BRequest extends BClass
                     $result[] = ['error' => 'invalid_type', 'tp' => 4, 'type' => $type, 'pattern' => $typesRegex,
                         'source' => $source, 'name' => $name];
                 } else {
-                    $this->BUtil->ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir . '/' . $name);
+                    $this->BUtil->moveUploadedFileSafely($tmpName, $targetDir . '/' . $name, ['@media_dir', '@random_dir']);
                     $result[] = ['name' => $name, 'type' => $type, 'target' => $targetDir . '/' . $name];
                 }
             } else {
@@ -1434,6 +1436,14 @@ class BResponse extends BClass
 
         if (!file_exists($source)) {
             $this->status(404, 'File not found', 'File not found');
+            $this->shutdown(__METHOD__);
+            return;
+        }
+
+        if (!$this->BUtil->isPathWithinRoot($source)) {
+            $this->status(403, 'Invalid file location', 'Invalid file location');
+            $this->shutdown(__METHOD__);
+            return;
         }
 
         if (!$fileName) {

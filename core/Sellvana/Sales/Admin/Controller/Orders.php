@@ -247,31 +247,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ]);
         }
 
-        $pay = $this->BRequest->post('pay');
-        if (!empty($pay['items'])) {
-            $this->_payOrderItems($order, $pay['items']);
-        }
-
-        $ship = $this->BRequest->post('ship');
-        if (!empty($ship['items'])) {
-            $this->_shipOrderItemsBySku($order, $ship['items']);
-        }
-
-        $cancel = $this->BRequest->post('cancel');
-        if (!empty($cancel['items'])) {
-            $this->_cancelOrderItemsBySku($order, $cancel['items']);
-        }
-
-        $return = $this->BRequest->post('return');
-        if (!empty($return['items'])) {
-            $this->_returnOrderItemsBySku($order, $return['items']);
-        }
-
-        $refund = $this->BRequest->post('refund');
-        if (!empty($refund['items'])) {
-            $this->_refundOrderItemsBySku($order, $refund['items']);
-        }
-
         $order->save();
 
         $itemsPost = $this->BRequest->post('items');
@@ -294,152 +269,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             }
         }
     }
-
-
-    protected function _payOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
-    {
-        return $this;
-    }
-
-    protected function _shipOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData = null)
-    {
-        $qtys = null;
-        if ($itemsData !== null) {
-            $itemLines = preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_PATTERN_ORDER);
-            $qtys = [];
-            foreach ($matches as $m) {
-                $qtys[$m[1]] = $m[3];
-            }
-        }
-        $items = $order->items();
-        foreach ($items as $item) {
-            if (null === $qtys || empty($qtys[$item->get('product_sku')])) {
-                continue;
-            }
-
-        }
-    }
-
-    protected function _cancelOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData)
-    {
-        if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
-            throw new BException('Invalid items data string');
-        }
-        $qtys = [];
-        foreach ($matches as $m) {
-            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-        }
-        $skus = array_keys($qtys);
-        $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
-            }
-        }
-        if (!$items) {
-            throw new BException('No valid SKUs found');
-        }
-
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanCancel() : $qtys[$sku];
-            $item->set('qty_to_cancel', $qty);
-        }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminCancelsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
-
-        return $this;
-    }
-
-    protected function _returnOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData)
-    {
-        if (is_string($itemsData)) {
-            if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
-                throw new BException('Invalid items data string');
-            }
-            $qtys = [];
-            foreach ($matches as $m) {
-                $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-            }
-        } elseif (is_array($itemsData)) {
-            $qtys = $itemsData;
-        } else {
-            throw new BException('Invalid items data');
-        }
-        $skus = array_keys($qtys);
-        $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
-            }
-        }
-        if (!$items) {
-            throw new BException('No valid SKUs found');
-        }
-
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanReturn() : $qtys[$sku];
-            $item->set('qty_to_return', $qty);
-        }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminReturnsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
-
-        return $this;
-    }
-
-    protected function _refundOrderItemsBySku(Sellvana_Sales_Model_Order $order, $itemsData)
-    {
-        if (is_string($itemsData)) {
-            if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
-                throw new BException('Invalid items data string');
-            }
-            $qtys = [];
-            foreach ($matches as $m) {
-                $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-            }
-        } elseif (is_array($itemsData)) {
-            $qtys = $itemsData;
-        } else {
-            throw new BException('Invalid items data');
-        }
-        $skus = array_keys($qtys);
-        $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
-            }
-        }
-        if (!$items) {
-            throw new BException('No valid SKUs found');
-        }
-
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanRefund() : $qtys[$sku];
-            $item->set('qty_to_refund', $qty);
-        }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminRefundsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
-
-        return $this;
-    }
-
+    
     public function itemsOrderGridConfig(Sellvana_Sales_Model_Order $order)
     {
         $overallStates = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
@@ -905,10 +735,12 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
         return ['config' => $config];
     }
-
+    
     public function historyGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $entityTypes = $this->Sellvana_Sales_Model_Order_History->fieldOptions('entity_type');
+
+        $userOptions = $this->FCom_Admin_Model_User->options();
 
         $orm = $this->Sellvana_Sales_Model_Order_History->orm('s')
             ->select('s.*')->where('order_id', $model->id())->order_by_desc('id');
@@ -921,20 +753,22 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'columns' => [
                 ['type' => 'row_select'],
                 ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'entity_id', 'label' => 'Entity ID'],
-                ['name' => 'order_item_id', 'label' => 'Item ID'],
+                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'order_item_id', 'label' => 'Item ID', 'hidden' => true],
+                ['name' => 'user_id', 'label' => 'User', 'options' => $userOptions],
                 ['name' => 'entity_type', 'label' => 'Entity Type', 'options' => $entityTypes],
-                ['name' => 'event_type', 'label' => 'Event Type'],
+                ['name' => 'entity_id', 'label' => 'Entity ID'],
+                ['name' => 'event_type', 'label' => 'Event Type', 'hidden' => true],
                 ['name' => 'event_description', 'label' => 'Description'],
             ],
             'filters' => [
                 ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'id', 'type' => 'number-range'],
-                ['field' => 'entity_id', 'type' => 'number-range'],
-                ['field' => 'order_item_id', 'type' => 'number-range'],
+                ['field' => 'id', 'type' => 'number-range', 'hidden' => true],
+                ['field' => 'order_item_id', 'type' => 'number-range', 'hidden' => true],
+                ['field' => 'user_id', 'type' => 'multiselect'],
                 ['field' => 'entity_type', 'type' => 'multiselect'],
-                ['field' => 'event_type', 'type' => 'text'],
+                ['field' => 'entity_id', 'type' => 'number-range'],
+                ['field' => 'event_type', 'type' => 'text', 'hidden' => true],
                 ['field' => 'event_description', 'type' => 'text'],
 
             ],

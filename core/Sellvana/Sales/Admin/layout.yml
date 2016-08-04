@@ -39,10 +39,10 @@ base:
         do:
             - [ addTab, main, { label: General Info, pos: 10 } ]
             - [ addTab, payments, { label: Payments, pos: 20, async: true } ]
-            - [ addTab, shipments, { label: Shipments, pos: 30, async: true } ]
-            - [ addTab, cancellations, { label: Cancellations, pos: 40, async: true } ]
-            - [ addTab, returns, { label: Returns, pos: 50, async: true } ]
-            - [ addTab, refunds, { label: Refunds, pos: 60, async: true } ]
+            - [ addTab, shipments, { label: Shipments, pos: 40, async: true } ]
+            - [ addTab, cancellations, { label: Cancellations, pos: 50, async: true } ]
+            - [ addTab, returns, { label: Returns, pos: 60, async: true } ]
+            - [ addTab, refunds, { label: Refunds, pos: 70, async: true } ]
             - [ addTab, comments, { label: Comments, pos: 80, async: true } ]
             - [ addTab, history, { label: History, pos: 90, async: true } ]
     - { hook: main, views: payments/grid }

@@ -35,7 +35,7 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
-        $shippingEstimate = $cart->getData('shipping_estimate');
+        $shippingEstimate = $cart->getData('shipping_rates');
         $layout->getView('cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
     }
 

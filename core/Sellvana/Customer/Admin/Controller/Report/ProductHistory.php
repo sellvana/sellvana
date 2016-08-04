@@ -33,7 +33,6 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
             ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered'],
             ['name' => 'price', 'index' => 'oi.price', 'cell' => 'currency'],
             ['name' => 'row_total', 'index' => 'oi.row_total', 'cell' => 'currency'],
-            ['name' => 'qty_refunded', 'index' => 'oi.qty_refunded'],
             ['name' => 'amount_refunded', 'index' => 'o.amount_refunded', 'cell' => 'currency'],
         ];
         $config['filters'] = [
@@ -58,7 +57,6 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
             'qty_ordered' => 'Qty ordered',
             'price' => 'Price',
             'row_total' => 'Row total',
-            'qty_refunded' => 'Refunded Qty',
             'amount_refunded' => 'Refunded Amt',
         ];
     }

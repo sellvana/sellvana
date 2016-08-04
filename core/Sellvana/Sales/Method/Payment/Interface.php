@@ -30,6 +30,8 @@ interface Sellvana_Sales_Method_Payment_Interface
      */
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment);
 
+    public function payByUrl(Sellvana_Sales_Model_Order_Payment $payment);
+
     public function authorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction);
 
     public function reauthorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction);

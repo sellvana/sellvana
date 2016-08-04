@@ -30,6 +30,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
@@ -41,6 +42,12 @@
  * @property Sellvana_Sales_Model_Order_Return $Sellvana_Sales_Model_Order_Return
  * @property Sellvana_Sales_Model_Order_Refund $Sellvana_Sales_Model_Order_Refund
  * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
+ *
+ * @property Sellvana_Sales_Model_Order_Cancel_Item $Sellvana_Sales_Model_Order_Cancel_Item
+ * @property Sellvana_Sales_Model_Order_Shipment_Item $Sellvana_Sales_Model_Order_Shipment_Item
+ * @property Sellvana_Sales_Model_Order_Payment_Item $Sellvana_Sales_Model_Order_Payment_Item
+ * @property Sellvana_Sales_Model_Order_Return_Item $Sellvana_Sales_Model_Order_Return_Item
+ * @property Sellvana_Sales_Model_Order_Refund_Item $Sellvana_Sales_Model_Order_Refund_Item
  */
 class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
@@ -136,6 +143,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $assoc ? $this->shipments : array_values($this->shipments);
     }
 
+    /**
+     * @param bool $assoc
+     * @return Sellvana_Sales_Model_Order_Payment[]
+     */
     public function payments($assoc = true)
     {
         if (!$this->payments) {
@@ -539,6 +550,53 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param string|array $types [shipments, payments, cancels, returns, refunds]
+     * @return $this
+     */
+    public function calcItemQuantities($types = null)
+    {
+        $types = (array)$types;
+        $qtys = [];
+        $items = $this->items();
+        $entities = [
+            'shipments' => 'Sellvana_Sales_Model_Order_Shipment_Item',
+            'payments' => 'Sellvana_Sales_Model_Order_Payment_Item',
+            'cancels' => 'Sellvana_Sales_Model_Order_Cancel_Item',
+            'returns' => 'Sellvana_Sales_Model_Order_Return_Item',
+            'refunds' => 'Sellvana_Sales_Model_Order_Refund_Item',
+        ];
+        foreach ($entities as $type => $itemClass) {
+            if (null === $types || in_array($type, $types)) {
+                $qtys1 = $this->{$itemClass}->getOrderItemsQtys($items);
+                $qtys = array_replace_recursive($qtys, $qtys1);
+            }
+        }
+        foreach ($items as $itemId => $item) {
+            if (empty($qtys[$itemId])) {
+                continue;
+            }
+
+            $itemQtys = $qtys[$itemId];
+            foreach($entities as $type => $itemClass) {
+                if (null === $types || in_array($type, $types)) {
+                    $allField = $this->{$itemClass}->getAllField();
+                    if (!isset($itemQtys[$allField])) {
+                        $itemQtys[$allField] = 0;
+                    }
+
+                    $doneField = $this->{$itemClass}->getDoneField();
+                    if (!isset($itemQtys[$doneField])) {
+                        $itemQtys[$doneField] = 0;
+                    }
+                }
+            }
+
+            $item->set($itemQtys);
+        }
+        return $this;
+    }
+
+     /**
      * Save order with items and other details
      *
      * @param array $options
@@ -557,8 +615,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $shipments = $this->shipments();
         foreach ($shipments as $shipment) {
-            $shipment->register()->save();
+            $shipment->state()->overall()->setShipped();
+            $shipment->save();
         }
+        $this->calcItemQuantities('shipments');
         $this->state()->calcAllStates();
         $this->saveAllDetails();
     }
@@ -606,11 +666,27 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
-            if ($item->getQtyCanPay()) {
+            if ($item->getQtyCanPay() && $item->getAmountCanPay()) {
                 $items[] = $item;
             }
         }
         return $items;
+    }
+
+    public function getTotalsInPayments()
+    {
+        $totals = [];
+        foreach ($this->payments() as $payment) {
+            foreach ($payment->items() as $pItem) {
+                if ($pItem->get('order_item_id')) {
+                    continue;
+                }
+
+                $totals[] = $pItem->getData('code');
+            }
+        }
+
+        return $totals;
     }
 
     public function getCancelableItems()
@@ -639,7 +715,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
-            if ($item->getQtyCanRefund()) {
+            if ($item->getAmountCanRefund() > 0) {
                 $items[] = $item;
             }
         }
@@ -684,6 +760,29 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
             ->find_many();
+    }
+
+    public function getOrderCurrencyRate()
+    {
+        $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        $storeCurrency = $this->get('store_currency_code');
+        if ($storeCurrency === $baseCurrency || !$this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            return 1;
+        }
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
+        return (float)$rate ?: 1;
+    }
+
+    public function addStoreCurrencyAmount($amount)
+    {
+        $rate = $this->getOrderCurrencyRate();
+        $amountInStoreCurrency = $this->BLocale->roundCurrency($amount * $rate);
+
+        $paid = (float)$this->getData('store_currency/amount_paid');
+        $this->setData('store_currency/amount_paid', $paid + $amountInStoreCurrency);
+        $due = $this->getData('store_currency/amount_due');
+        $this->setData('store_currency/amount_due', $due - $amountInStoreCurrency);
+        $this->save();
     }
 
     public function __destruct()

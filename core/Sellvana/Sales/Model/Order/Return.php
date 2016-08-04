@@ -16,6 +16,9 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_order_return';
     protected static $_origClass = __CLASS__;
 
+    /**
+     * @var Sellvana_Sales_Model_Order_Return_State
+     */
     protected $_state;
 
     /**
@@ -92,31 +95,7 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function returnOrderItems(Sellvana_Sales_Model_Order $order, array $qtys)
-    {
-        $items = $order->items();
-        foreach ($qtys as $itemId => $qty) {
-            if (empty($items[$itemId])) {
-                continue;
-            }
-            $item = $items[$itemId];
-            if ($qty === true) {
-                $qty = $item->getQtyCanReturn();
-            }
-            $item->set('qty_to_return', $qty);
-        }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminCancelsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
-
-        return $result;
-    }
-
-    public function register()
+    public function register($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -124,13 +103,13 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
 
         foreach ($returnItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_returned', $cItem->get('qty'));
+            $oItem->add($done ? 'qty_returned' : 'qty_in_returns', $cItem->get('qty'));
         }
 
         return $this;
     }
 
-    public function unregister()
+    public function unregister($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -138,7 +117,7 @@ class Sellvana_Sales_Model_Order_Return extends FCom_Core_Model_Abstract
 
         foreach ($returnItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_returned', -$cItem->get('qty'));
+            $oItem->add($done ? 'qty_returned' : 'qty_in_returns', -$cItem->get('qty'));
         }
 
         return $this;

@@ -1,0 +1,16 @@
+{% set order = THIS.get('order') %}
+{% set payment = THIS.get('payment') %}
+{% set rootTransactionUrl = THIS.get('url') %}
+
+<!--{ Content-Type: text/html; charset=UTF-8 }-->
+<!--{ From: "{{ CONFIG.get('modules/FCom_Core/support_name') }}" <{{ CONFIG.get('modules/FCom_Core/support_email') }}> }-->
+<!--{ To: "{{ order.get('billing_firstname') ~ ' ' ~ order.get('billing_lastname') }}" <{{ order.get('customer_email') }}> }-->
+<!--{ Subject: {{ 'Payment for your order %s' | _(order.get('unique_id')) }} }-->
+
+{{ 'Hello %s,'|_(order.get('billing_firstname')) }}
+
+<p>
+    {{ 'Please authorize the payment for your order by visiting the following link'|_ }}:
+    <a href="{{ rootTransactionUrl }}">{{ rootTransactionUrl }}</a>
+</p>
+

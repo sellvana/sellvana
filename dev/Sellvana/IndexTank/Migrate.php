@@ -59,8 +59,8 @@ class Sellvana_IndexTank_Migrate extends BClass
               `name` varchar(1024)  NOT NULL,
               `number` int(11) NOT NULL DEFAULT '-1',
               `definition` varchar(1024)  NOT NULL,
-              `label` varchar(100)  NOT NULL,
-              `field_name` varchar(100) NOT NULL,
+              `label` varchar(100)  DEFAULT NULL,
+              `field_name` varchar(100) DEFAULT NULL,
               `sort_order` enum('asc','desc') NOT NULL DEFAULT 'asc',
               `use_custom_formula` tinyint(1) NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`)
@@ -70,14 +70,14 @@ class Sellvana_IndexTank_Migrate extends BClass
 
         //predefined functions
         $functions  =  [
-                'age'                   => ['number' => 0, 'definition' => '-age'         ],
-                'relevance'             => ['number' => 1, 'definition' => 'relevance'    ],
-                'base_price_asc'        => ['number' => 2, 'definition' => '-d[0]'  ],
-                'base_price_desc'       => ['number' => 3, 'definition' => 'd[0]'   ],
-                'product_name_asc'        => ['number' => 4, 'definition' => '-d[1]'  ],
-                'product_name_desc'       => ['number' => 5, 'definition' => 'd[1]'   ],
-                'product_sku_asc'        => ['number' => 6, 'definition' => '-d[2]'  ],
-                'product_sku_desc'       => ['number' => 7, 'definition' => 'd[2]'   ],
+                'age'                   => ['number' => 0, 'definition' => '-age', 'label' => 'Age'],
+                'relevance'             => ['number' => 1, 'definition' => 'relevance', 'label' => 'Relevance'],
+                'base_price_asc'        => ['number' => 2, 'definition' => '-d[0]', 'label' => 'Base Price Asc'],
+                'base_price_desc'       => ['number' => 3, 'definition' => 'd[0]' , 'label' => 'Base Price Desc'],
+                'product_name_asc'        => ['number' => 4, 'definition' => '-d[1]', 'label' => 'Product Name Asc'],
+                'product_name_desc'       => ['number' => 5, 'definition' => 'd[1]', 'label' => 'Product Name Desc'],
+                'product_sku_asc'        => ['number' => 6, 'definition' => '-d[2]', 'label' => 'Product SKU Asc'],
+                'product_sku_desc'       => ['number' => 7, 'definition' => 'd[2]', 'label' => 'Product SKU Asc'],
         ];
         $functionsList = $this->Sellvana_IndexTank_Model_ProductFunction->getList();
         //add initial functions
@@ -92,7 +92,7 @@ class Sellvana_IndexTank_Migrate extends BClass
         $productsTable = $this->Sellvana_Catalog_Model_Product->table();
         if (!$this->BDb->ddlFieldInfo($productsTable, 'indextank_indexed')) {
             $this->BDb->run(" ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
-            ADD indextank_indexed_at datetime not null; ");
+            ADD indextank_indexed_at datetime default null; ");
         }
 
         $pIndexingStatusTable = $this->Sellvana_IndexTank_Model_IndexingStatus->table();

@@ -167,6 +167,8 @@ some headers. The following is an example configuration:
 
         location ~ ^(.+\.php)(.*)$ {
             fastcgi_pass 127.0.0.1:9000;
+            ## or use unix socket, depepnding on your FPM config:
+            # fastcgi_pass unix:/run/php/php7.0-fpm.sock;
             fastcgi_split_path_info ^(.+\.php)(.*)$;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             fastcgi_param PATH_INFO $fastcgi_path_info;

@@ -160,26 +160,41 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
 
         }
         $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-        if (empty($post['same_address'])) {
-            $this->Sellvana_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
-            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-            if ($customer && !empty($post['save'])) {
-                $address = $customer->addAddress($this->_cart->addressAsArray('billing'), false);
-                $this->BSession->set('shipping_address_id', $address->get('id'));
-            }
-        }
-        $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
-        $this->Sellvana_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
-        $this->Sellvana_Sales_Main->workflowAction('customerPlacesOrder', $args);
 
-        if (!empty($result['redirect_to'])) {
-            $href = $result['redirect_to'];
-        } elseif (!empty($result['success'])) {
-            $href = 'checkout/success';
-        } else {
+        try {
+            if (empty($post['same_address'])) {
+                $this->Sellvana_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
+                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+                if ($customer && !empty($post['save'])) {
+                    $address = $customer->addAddress($this->_cart->addressAsArray('billing'), false);
+                    $this->BSession->set('shipping_address_id', $address->get('id'));
+                }
+            }
+            $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
+            $this->Sellvana_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+            $this->Sellvana_Sales_Main->workflowAction('customerPlacesOrder', $args);
+
+            if (!empty($result['redirect_to'])) {
+                $href = $result['redirect_to'];
+            } elseif (!empty($result['success'])) {
+                $href = 'checkout/success';
+            } else {
+                $href = 'checkout';
+            }
+
+            if (!empty($result['post_params']) && !empty($result['redirect_to'])) {
+                $this->layout('/checkout-simple/redirect');
+                $view = $this->view('checkout-simple/redirect');
+                $view->set('hiddenFields', $result['post_params']);
+                $view->set('postUrl', $result['redirect_to']);
+            } else {
+                $this->BResponse->redirect($href);
+            }
+        } catch (Exception $e) {
             $href = 'checkout';
+            $this->message($e->getMessage(), 'error');
+            $this->BResponse->redirect($href);
         }
-        $this->BResponse->redirect($href);
     }
 
     public function action_success()

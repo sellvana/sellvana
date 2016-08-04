@@ -4,6 +4,7 @@
  * Class Sellvana_Sales_Method_Payment_Abstract
  *
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
 abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     Sellvana_Sales_Method_Payment_Interface
@@ -11,7 +12,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     /**
      * @var string
      */
-    static protected $_methodKey = 'payment';
+    protected $_code;
 
     /**
      * @var Sellvana_Sales_Model_Order_Payment
@@ -19,7 +20,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     protected $_payment;
 
     /**
-     * @var Sellvana_Sales_Model_Order_Transaction
+     * @var Sellvana_Sales_Model_Order_Payment_Transaction
      */
     protected $_transaction;
 
@@ -50,6 +51,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         'pay'             => 1,
         'pay_offline'     => 0,
         'pay_online'      => 0,
+        'pay_by_url'      => 0,
         'auth'            => 0,
         'auth_partial'    => 0,
         'reauth'          => 0,
@@ -63,6 +65,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         'recurring'       => 0,
     ];
 
+    /**
+     * @var bool
+     */
+    protected $_manualStateManagement = true;
+
     public function can($capability)
     {
         if (isset($this->_capabilities[strtolower($capability)])) {
@@ -71,9 +78,9 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return false;
     }
 
-    public function getKey()
+    public function getCode()
     {
-        return static::$_methodKey;
+        return $this->_code;
     }
 
     public function getName()
@@ -126,7 +133,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
 
     public function getCheckoutFormPrefix()
     {
-        return static::$_methodKey;
+        return $this->_code;
     }
 
     public function getCheckoutFormView()
@@ -149,7 +156,12 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
-    public function payOffline(Sellvana_Sales_Model_Order_Payment_Transaction $payment)
+    public function payByUrl(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        return [];
+    }
+
+    public function payOffline(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
         return [];
     }
@@ -179,17 +191,68 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
+    public function isAllDataPresent($data)
+    {
+        return true;
+    }
+
+    public function processReturnFromExternalCheckout()
+    {
+        return [];
+    }
+
+    public function getConfig($key = null)
+    {
+        if (empty($this->_config)) {
+            $name = explode('_', get_class($this));
+            $this->_config = $this->BConfig->get('modules/' . $name[0] . '_' . $name[1], []);
+        }
+        
+        return null === $key ? $this->_config : (isset($this->_config[$key]) ? $this->_config[$key] : null);
+    }
+    
+    public function isManualStateManagementAllowed()
+    {
+        $config = $this->getConfig();
+        if (array_key_exists('manual_state_management', $config)) {
+            return $config['manual_state_management'];
+        }
+
+        return $this->_manualStateManagement;
+    }
+
+    public function isRootTransactionNeeded()
+    {
+        return false;
+    }
+
+    public function getRootTransactionType()
+    {
+        $labels = $this->Sellvana_Sales_Model_Order_Payment_Transaction->fieldOptions('transaction_type');
+        return $labels[Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE];
+    }
+
     /**
      * Shortcut for payment gateway error
      *
      * @param array $result
+     * @param bool $setErrorState
+     * @throws BException
      */
-    protected function _setErrorStatus($result = null)
+    protected function _setErrorStatus($result = null, $setErrorState = false)
     {
+        $payment = $this->_payment;
+        if (!$payment && $this->_transaction) {
+            $payment = $this->_transaction->payment();
+        }
         $this->Sellvana_Sales_Main->workflowAction('customerGetsPaymentError', [
-            'payment' => $this->_payment,
+            'payment' => $payment,
             'result' => $result,
+            'setErrorState' => $setErrorState,
         ]);
+        $this->_transaction->setData('error', $result['error']['message']);
+        $this->_transaction->save();
+        throw new BException($result['error']['message']);
     }
 
     public function __destruct()

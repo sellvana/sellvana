@@ -42,9 +42,6 @@ common_js_libs:
             - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
             - [ css, @FCom_LibJsCommon/js/css/bootstrap-ladda.css ]
 
-            #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
-            #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
-
             - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
             - [ requireJs, ajaxify, @FCom_LibJsCommon/js/ajaxify.min, { deps: [ jquery ] } ]
 
@@ -86,8 +83,16 @@ lib_griddle:
 lib_select2:
     - view: head
         do:
-            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.0/js/select2.full.min ]
-            - [ css, @FCom_LibJsCommon/js/select2-4.0.0/css/select2.min.css ]
+            #- [ requireJs, select2.en, @FCom_LibJsCommon/js/select2-4.0.2/js/i18n/en ]
+            #- [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.2/js/select2.full.min ]
+            #- [ css, @FCom_LibJsCommon/js/select2-4.0.2/css/select2.min.css ]
+
+            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-3.5.4/select2, deps: [ jquery ] ]
+            - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2.css ]
+            - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2-bootstrap.css ]
+
+            #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
+            #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
 
 lib_file_upload:
     - view: head
@@ -109,3 +114,9 @@ lib_media_player:
             - [ css, "@FCom_LibJsCommon/js/css/mediaelementplayer.min.css" ]
             - [ requireJs, jquery.vimeo, "@FCom_LibJsCommon/js/jquery.vimeo.api.min", { deps: [ jquery ] } ]
             - [ requireJs, jquery.media-element, "@FCom_LibJsCommon/js/mediaelement-and-player.min", { deps: [ jquery ] } ]
+
+lib_colorpicker;
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" ]
+            - [ requireJs, bootstrap.colorpicker, "@FCom_LibJsCommon/js/bootstrap-colorpicker/js/bootstrap-colorpicker.min" ]

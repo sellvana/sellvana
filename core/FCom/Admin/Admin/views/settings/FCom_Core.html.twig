@@ -35,6 +35,12 @@
         {{ forms.input(fieldData,   { field:'path', label:'Cookie Path'|_ }) }}
         {{ forms.input(fieldData,   { field:'session_namespace', label:'Cookie Namespace'|_ }) }}
         {{ forms.boolean(fieldData, { field:'session_check_ip', label:'Verify Session IP'|_ }) }}
+        {{ forms.input(fieldData, { field:'referer_check', label:'Referer Check String'|_,
+            help_block_text:'<a href="https://secure.php.net/manual/en/session.configuration.php#ini.session.referer-check" target="_blank">Details</a>'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'use_strict_mode', label:'Use Cookie Strict Mode'|_,
+            help_block_text:'<a href="https://secure.php.net/manual/en/session.configuration.php#ini.session.use-strict-mode" target="_blank">Details</a>'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'delete_old_session', label:'Delete Old Session on session_regenerate_id()'|_,
+            help_block_text:'<a href="https://wiki.php.net/rfc/precise_session_management" target="_blank">Details</a>'|_ }) }}
     {{ forms.accordion_panel_end }}
 
 {% if not REQUEST.get('site') %}
@@ -50,13 +56,20 @@
         {{ forms.boolean(fieldData, { field:'implicit_migration', label:'Implicit Migration'|_ }) }}
     {{ forms.accordion_panel_end }}
 
-    {% set fieldData = { model:c, name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', get_prefix:'core/cache',
-        options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_} } %}
-    {{ forms.accordion_panel_start({ label:'Optimizations'|_, id:'settings-FCom_Core-group5'}) }}
-        {{ forms.select(fieldData, { field:'manifest_files', label:'Module Manifest Files Cache'|_ }) }}
-        {{ forms.select(fieldData, { field:'layout_files', label:'Layout Files Cache'|_ }) }}
-        {{ forms.select(fieldData, { field:'view_files', label:'View Template Files Cache'|_ }) }}
-        {{ forms.select(fieldData, { field:'twig', label:'Twig Cache'|_ }) }}
+    {% set fieldData = { model:c, name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', get_prefix:'core/cache' } %}
+    {% set toggleFieldData = fieldData|merge({options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_}}) %}
+    {% set memcacheFieldData = { model:c, name_prefix: 'config[core][cache][memcache]', id_prefix:'config-core-cache-memcache', get_prefix:'core/cache/memcache', 
+        js_toggle: '#config-core-cache-default_backend', js_visible:"$toggle.val()=='memcache'" } %}
+    {{ forms.accordion_panel_start({ label:'Cache & Optimizations'|_, id:'settings-FCom_Core-group5'}) }}
+        {{ forms.select(toggleFieldData, { field:'manifest_files', label:'Module Manifest Files Cache'|_ }) }}
+        {{ forms.select(toggleFieldData, { field:'layout_files', label:'Layout Files Cache'|_ }) }}
+        {{ forms.select(toggleFieldData, { field:'view_files', label:'View Template Files Cache'|_ }) }}
+        {{ forms.select(toggleFieldData, { field:'twig', label:'Twig Cache'|_ }) }}
+        
+        {{ forms.select(fieldData, { field:'default_backend', label:'Default Backend'|_, options:APP.instance('BCache').getAllBackendsAsOptions() }) }}
+        {{ forms.input(memcacheFieldData, { field:'host', label: 'Memcached Host'|_ }) }}
+        {{ forms.input(memcacheFieldData, { field:'port', label: 'Memcached Port'|_ }) }}
+        {{ forms.input(memcacheFieldData, { field:'prefix', label: 'Memcached Prefix'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model:c, name_prefix: 'config[core][dev]', id_prefix: 'config-core-dev', get_prefix:'core/dev' } %}

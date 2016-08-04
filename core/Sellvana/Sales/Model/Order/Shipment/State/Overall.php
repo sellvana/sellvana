@@ -24,10 +24,32 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
         self::CANCELED => 'Canceled',
     ];
 
+    protected $_defaultMethods = [
+        self::PENDING => 'setPending',
+        self::PACKING => 'setPacking',
+        self::SHIPPING => 'setShipping',
+        self::SHIPPED => 'setShipped',
+        self::EXCEPTION => 'setException',
+        self::DELIVERED => 'setDelivered',
+        self::RETURNED => 'setReturned',
+        self::CANCELED => 'setCanceled',
+    ];
+
     protected $_setValueNotificationTemplates = [
         self::SHIPPED => 'email/sales/order-shipment-state-overall-shipped',
         self::EXCEPTION => 'email/sales/order-shipment-state-overall-exception',
         self::DELIVERED => 'email/sales/order-shipment-state-overall-delivered',
+    ];
+    
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::PACKING, self::SHIPPING, self::CANCELED],
+        self::PACKING => [self::SHIPPING, self::CANCELED],
+        self::SHIPPING => [self::SHIPPED],
+        self::SHIPPED => [self::DELIVERED, self::EXCEPTION, self::RETURNED],
+        self::DELIVERED => [self::RETURNED],
+        self::EXCEPTION => [self::DELIVERED, self::RETURNED, self::CANCELED],
+        self::RETURNED => [],
+        self::CANCELED => [],
     ];
 
     protected $_defaultValue = self::PENDING;
@@ -72,11 +94,12 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
         return $this->changeState(self::CANCELED);
     }
 
-    /*
+
     public function calcState()
     {
-        /** @var Sellvana_Sales_Model_Order_Shipment $shipment * /
-        $shipment = $this->getContext()->getModel();
+        return $this;
+        /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
+        /**$shipment = $this->getContext()->getModel();
         $order = $shipment->order();
 
         $sItems = $shipment->items();
@@ -86,7 +109,7 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
             $oItem = $oItems[$sItem->get('order_item_id')];
         }
 
-        return $this;
+        return $this;*/
     }
-    */
+
 }

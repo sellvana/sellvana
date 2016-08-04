@@ -9,6 +9,8 @@
 class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sales_Method_Payment_Abstract
 {
     protected static $_apiVersion = '72.0';
+
+    protected $_code = 'paypal_express';
     protected $_name = 'PayPal Express Checkout';
 
     protected $_transaction;
@@ -16,6 +18,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     protected $_capabilities = [
         'pay'             => 1,
         'pay_online'      => 1,
+        'pay_by_url'      => 1,
         'auth'            => 1,
         'auth_partial'    => 1,
         'reauth'          => 1,
@@ -29,12 +32,19 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         'recurring'       => 1,
     ];
 
+    protected $_manualStateManagement = false;
+
     public function can($capability)
     {
         $conf = $this->getConfig();
         if (empty($conf['username']) || empty($conf['password']) || empty($conf['signature'])) {
             return false;
         }
+
+        if ($capability == 'auth_partial') {
+            return (bool)$conf['multiple_auth'];
+        }
+
         return parent::can($capability);
     }
 
@@ -51,7 +61,34 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $result = $this->_callSetExpressCheckout($payment);
 
         if (!empty($result['error'])) {
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
+            return $result;
+        }
+
+        $token = $result['response']['TOKEN'];
+
+        $payment->set([
+            'transaction_type' => $this->getConfig("payment_action"),
+            'transaction_token' => $token,
+            'online' => 1,
+        ])->save();
+
+        $sData =& $this->BSession->dataToUpdate();
+        $sData['paypal']['token'] = $token;
+
+        $result['redirect_to'] = $this->getConfig('express_checkout_url') . $token;
+
+        $this->Sellvana_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $payment]);
+
+        return $result;
+    }
+
+    public function payByUrl(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        $result = $this->_callSetExpressCheckoutForPayment($payment);
+
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus($result, true);
             return $result;
         }
 
@@ -82,23 +119,23 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $result = ['token' => $token, 'payer_id' => $payerId];
         if (empty($sData['last_order_id'])) {
             $result['error']['message'] = 'Session Expired';
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
         if ($token !== $sData['paypal']['token']) {
             $result['error']['message'] = 'Invalid PayPal Return Token';
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
         $payment = $this->Sellvana_Sales_Model_Order_Payment->load($token, 'transaction_token');
         if (!$payment) {
             $result['error']['message'] = 'Payment associated with the token is not found';
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
         if ($payment->get('order_id') !== $sData['last_order_id']) {
             $result['error']['message'] = "Order doesn't match the payment token";
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
 
@@ -106,15 +143,14 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $result = $this->_callGetExpressCheckoutDetails($payment);
         if (!empty($result['error'])) {
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
-
         $r = $result['response'];
         $checkoutStatus = strtoupper($r['CHECKOUTSTATUS']);
         if ($checkoutStatus === 'PAYMENTACTIONCOMPLETED') {
             $result['error']['message'] = "Order has been already paid";
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
 
@@ -134,14 +170,18 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         if (!empty($r['ADDRESSSTATUS'])) {
             $transData['shipping'] = [
                 'address_status' => $r['ADDRESSSTATUS'],
-                'company'        => !empty($r['COMPANY']) ? $r['COMPANY'] : '',
-                'street1'        => $r['SHIPTOSTREET'],
-                'street2'        => !empty($r['SHIPTOSTREET2']) ? $r['SHIPTOSTREET2'] : '',
-                'city'           => $r['SHIPTOCITY'],
-                'region'         => !empty($r['SHIPTOSTATE']) ? $r['SHIPTOSTATE'] : '',
-                'postcode'       => !empty($r['SHIPTOZIP']) ? $r['SHIPTOZIP'] : '',
-                'country'        => $r['SHIPTOCOUNTRYCODE'],
             ];
+            if ($this->getConfig('show_shipping')) {
+                $transData['shipping'] += [
+                    'company'        => !empty($r['COMPANY']) ? $r['COMPANY'] : '',
+                    'street1'        => $r['SHIPTOSTREET'],
+                    'street2'        => !empty($r['SHIPTOSTREET2']) ? $r['SHIPTOSTREET2'] : '',
+                    'city'           => $r['SHIPTOCITY'],
+                    'region'         => !empty($r['SHIPTOSTATE']) ? $r['SHIPTOSTATE'] : '',
+                    'postcode'       => !empty($r['SHIPTOZIP']) ? $r['SHIPTOZIP'] : '',
+                    'country'        => $r['SHIPTOCOUNTRYCODE'],
+                ];
+            }
         }
         $payment->setData('transaction', $transData);
         $payment->save();
@@ -150,14 +190,17 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         switch ($paymentAction) {
             case 'Sale':
                 $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
+                $processorState = Sellvana_Sales_Model_Order_Payment_State_Processor::CAPTURED;
                 break;
 
             case 'Authorization':
                 $transType = Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION;
+                $processorState = Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED;
                 break;
 
             case 'Order':
                 $transType = Sellvana_Sales_Model_Order_Payment_Transaction::ORDER;
+                $processorState = Sellvana_Sales_Model_Order_Payment_State_Processor::ROOT_ORDER;
                 break;
         }
 
@@ -166,7 +209,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $result = $this->_callDoExpressCheckoutPayment($transaction);
 
         if (!empty($result['error'])) {
-            $this->_setErrorStatus($result);
+            $this->_setErrorStatus($result, true);
             return $result;
         }
 
@@ -182,6 +225,9 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         }
 
         $transaction->complete();
+        if (isset($processorState)) {
+            $payment->state()->processor()->invokeStateChange($processorState);
+        }
 
         $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
             'payment' => $payment,
@@ -194,7 +240,20 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function authorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-        $result = $this->_callDoAuthorization($transaction);
+        $this->_transaction = $transaction;
+
+        $config = $this->getConfig();
+        $payment = $transaction->payment();
+        if (!$config['multiple_auth'] && $transaction->get('amount') < $payment->get('amount_due')) {
+            $str = 'You can authorize only the whole amount because multiple authorization mode is disabled. ';
+            $str .= 'If you are sure that your account supports multiple authorizations, enable it in the settings.';
+            $result = [
+                'error' => ['message' => $this->_($str)]
+            ];
+        } else {
+            $result = $this->_callDoAuthorization($transaction);
+        }
+
 
         if (!empty($result['error'])) {
             $this->_setErrorStatus($result);
@@ -203,7 +262,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $r = $result['response'];
 
-        $transaction->set('transaction_id', $r['AUTHORIZATIONID']);
+        $transaction->set('transaction_id', $r['TRANSACTIONID']);
         $transaction->setData('result', [
             'payment_status' => $r['PAYMENTSTATUS'],
             'pending_reason' => $r['PENDINGREASON'],
@@ -214,7 +273,8 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function reauthorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-        $result = $this->_callDoAuthorization($transaction);
+        $this->_transaction = $transaction;
+        $result = $this->_callDoReauthorization($transaction);
 
         if (!empty($result['error'])) {
             $this->_setErrorStatus($result);
@@ -234,6 +294,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function capture(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callDoCapture($transaction);
 
         if (!empty($result['error'])) {
@@ -256,14 +317,40 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function void(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
         $result = $this->_callDoVoid($transaction);
+
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus($result);
+            return $result;
+        }
+
+        $this->_saveResultToTransaction($transaction, $result['response']);
 
         return $result;
     }
 
     public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $this->_transaction = $transaction;
+        $result = $this->_callRefundTransaction($transaction);
 
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus($result);
+            return $result;
+        }
+
+        $r = $result['response'];
+        $r['TRANSACTIONTYPE'] = 'refund';
+        $r['PAYMENTSTATUS'] = 'Refunded';
+        $r['PAYMENTTYPE'] = 'instant';
+        $r['REASONCODE'] = 'None';
+        $r['TRANSACTIONID'] = $r['REFUNDTRANSACTIONID'];
+
+        $this->_saveResultToTransaction($transaction, $r);
+        $transaction->set('transaction_id', $r['REFUNDTRANSACTIONID']);
+
+        return $result;
     }
 
     protected function _saveResultToTransaction(Sellvana_Sales_Model_Order_Payment_Transaction $transaction, $r, $n = null)
@@ -311,6 +398,11 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
          *      PENDINGREASON = None
          *      REASONCODE = None
          *
+         *  DoVoid (AUTHORIZATIONID = 7PW503195K5343512)
+         *      AUTHORIZATIONID = 7PW503195K5343512
+         *      TIMESTAMP = 2016-06-28T13:19:36Z
+         *      CORRELATIONID = 8ce1273924e10
+         *
          * when payment_action = sale
          *
          *  DoExpressCheckoutPayment
@@ -322,42 +414,47 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
          *      REASONCODE = None
          *
          */
-        $p = null === $n ? '' : 'PAYMENTINFO_' . $n . '_';
-        $transType = strtoupper($r[$p . 'TRANSACTIONTYPE']);
-        $paymentStatus = strtoupper($r[$p . 'PAYMENTSTATUS']);
-        $paymentType = strtoupper($r[$p . 'PAYMENTTYPE']);
-        $reasonCode = strtoupper($r[$p . 'REASONCODE']);
+
         $transData = [
-            'timestamp'        => $r['TIMESTAMP'],
-            'transaction_type' => $transType,
-            'payment_type'     => $paymentType,
-            'payment_status'   => $paymentStatus,
-            'reason_code'      => $reasonCode,
+            'timestamp' => $r['TIMESTAMP'],
         ];
+        if ($transaction->get('transaction_type') != Sellvana_Sales_Model_Order_Payment_Transaction::VOID) {
+            $p = null === $n ? '' : 'PAYMENTINFO_' . $n . '_';
+            $transType = strtoupper($r[$p . 'TRANSACTIONTYPE']);
+            $paymentStatus = strtoupper($r[$p . 'PAYMENTSTATUS']);
+            $paymentType = strtoupper($r[$p . 'PAYMENTTYPE']);
+            $reasonCode = strtoupper($r[$p . 'REASONCODE']);
+            $transData = array_merge($transData, [
+                'transaction_type' => $transType,
+                'payment_type'     => $paymentType,
+                'payment_status'   => $paymentStatus,
+                'reason_code'      => $reasonCode,
+            ]);
 
-        $pendingReason = null;
-        switch ($paymentStatus) {
-            case 'PENDING':
-                $pendingReason = strtoupper($r[$p . 'PENDINGREASON']);
-                $transData['pending_reason'] = $pendingReason;
-                break;
-            case 'COMPLETED-FUNDS-HELD':
-                $holdDecision = strtoupper($r[$p . 'HOLDDECISION']);
-                $transData['hold_decision'] = $holdDecision;
-                break;
-        };
+            $pendingReason = null;
+            switch ($paymentStatus) {
+                case 'PENDING':
+                    $pendingReason = strtoupper($r[$p . 'PENDINGREASON']);
+                    $transData['pending_reason'] = $pendingReason;
+                    break;
+                case 'COMPLETED-FUNDS-HELD':
+                    $holdDecision = strtoupper($r[$p . 'HOLDDECISION']);
+                    $transData['hold_decision'] = $holdDecision;
+                    break;
+            };
 
-        $successStatuses = ['COMPLETED', 'PROCESSED', 'IN-PROGRESS', 'REFUNDED', 'PARTIALLY-REFUNDED', 'CANCELED-REVERSAL'];
-        $transData['success'] = in_array($paymentStatus, $successStatuses)
-            || ($paymentStatus === 'PENDING' && in_array($pendingReason, ['AUTHORIZATION', 'ORDER']));
+            $successStatuses = ['COMPLETED', 'PROCESSED', 'IN-PROGRESS', 'REFUNDED', 'PARTIALLY-REFUNDED', 'CANCELED-REVERSAL'];
+            $transData['success'] = in_array($paymentStatus, $successStatuses)
+                || ($paymentStatus === 'PENDING' && in_array($pendingReason, ['AUTHORIZATION', 'ORDER']));
 
+            $transaction
+                ->set([
+                    'transaction_id'    => $r[$p . 'TRANSACTIONID'],
+                    'transaction_fee'   => !empty($r[$p . 'FEEAMT']) ? $r[$p . 'FEEAMT'] : null,
+                ]);
+        }
 
-        $transaction
-            ->set([
-                'transaction_id'    => $r[$p . 'TRANSACTIONID'],
-                'transaction_fee'   => !empty($r[$p . 'FEEAMT']) ? $r[$p . 'FEEAMT'] : null,
-            ])
-            ->setData('result', $transData, true);
+        $transaction->setData('result', $transData, true);
     }
 
     protected function _callSetExpressCheckout(Sellvana_Sales_Model_Order_Payment $payment)
@@ -371,14 +468,22 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'CANCELURL' => $baseUrl . '/cancel',
         ];
 
-        $request = $this->_addOrderInfo($payment, $request);
-        if ($this->getConfig('show_shipping')) {
-            $request = $this->_addShippingInfo($payment, $request);
-        } else {
-            $request['NOSHIPPING'] = 1;
-        }
+        $result = $this->_prepareExpressCheckoutInfo($payment, $request);
 
-        $result = $this->_call('SetExpressCheckout', $request);
+        return $result;
+    }
+
+    protected function _callSetExpressCheckoutForPayment(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        $order = $payment->order();
+
+        $request = [
+            'INVNUM'    => $order->get('unique_id') . '/' . $payment->id(),
+            'RETURNURL' => $this->BApp->href('payments/root_transaction_return?root_token=' . $payment->get('token')),
+            'CANCELURL' => $this->BApp->href('payments/root_transaction_cancel?root_token=' . $payment->get('token')),
+        ];
+
+        $result = $this->_prepareExpressCheckoutInfo($payment, $request);
 
         return $result;
     }
@@ -450,7 +555,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'AMT' => $transaction->get('amount'),
         ];
 
-        $result = $this->_call('DoAuthorization', $request);
+        $result = $this->_call('DoReauthorization', $request);
 
         return $result;
     }
@@ -475,7 +580,16 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     protected function _callRefundTransaction(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
+        $request = [
+            'TRANSACTIONID' => $transaction->get('parent_transaction_id'),
+            'REFUNDTYPE' => 'Partial',
+            'CURRENCYCODE' => $transaction->payment()->order()->get('order_currency'),
+            'AMT' => $transaction->get('amount'),
+        ];
 
+        $result = $this->_call('RefundTransaction', $request);
+
+        return $result;
     }
 
     protected function _addOrderInfo(Sellvana_Sales_Model_Order_Payment $payment, $request, $n = null)
@@ -487,7 +601,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $request["{$p}PAYMENTACTION"] = $this->getConfig("payment_action");
         $request["{$p}AMT"]           = number_format($payment->get("amount_due"), 2);
-        $request["{$p}ITEMAMT"]       = number_format($order->get("subtotal"), 2);
+        $request["{$p}ITEMAMT"]       = number_format($payment->get("amount_due") - $order->get("shipping_price") - $order->get("tax_amount"), 2);
         $request["{$p}SHIPPINGAMT"]   = number_format($order->get("shipping_price"), 2);
         $request["{$p}TAXAMT"]        = number_format($order->get("tax_amount"), 2);
         $request["{$p}CURRENCYCODE"]  = $currency ? $currency : "USD";
@@ -497,17 +611,49 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $request["{$p}REDEEMEDOFFERAMOUNT"] = $order->get('discount_amount');
         }
 
-        $i = 0;
+        $pItems = [];
+        foreach ($payment->items() as $item) {
+            if ($item->get('order_item_id')) {
+                $pItems[$item->get('order_item_id')] = $item;
+            }
+        }
+
+        $oItems = [];
         foreach ($order->items() as $item) {
-            $request["L_{$p}NAME{$i}"] = $item->get('product_name');
-            $request["L_{$p}AMT{$i}"] = number_format($item->get('price'), 2);
-            $request["L_{$p}QTY{$i}"] = (int)$item->get('qty_ordered');
-            $request["L_{$p}TAXAMT{$i}"] = number_format($item->get('tax_amount'), 2);
-            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = number_format($item->get('shipping_weight'), 2);
+            $pItem = $pItems[$item->id()];
+            $oItems[$pItem->id()] = $item;
+        }
+
+        $i = 0;
+        $itemsTotal = 0;
+        foreach ($payment->items() as $pItem) {
+            if (!array_key_exists($pItem->id(), $oItems)) {
+                continue; // we don't need totals here for now
+            }
+            $oItem = $oItems[$pItem->id()];
+            $qty = (int)$oItem->get('qty_ordered');
+            $itemAmount = (float)$pItem->get('amount');
+            $request["L_{$p}NAME{$i}"] = $oItem->get('product_name');
+            $request["L_{$p}AMT{$i}"] = number_format($itemAmount / $qty, 2);
+            $request["L_{$p}QTY{$i}"] = $qty;
+            $request["L_{$p}TAXAMT{$i}"] = number_format($oItem->get('tax_amount'), 2);
+            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = number_format($oItem->get('shipping_weight'), 2);
             //$request["L_{$p}ITEMWEIGHTUNIT{$i}"] = $item->get('');
             //$request["L_{$p}ITEMURL{$i}"] = $item->get('');
+            $itemsTotal += round($itemAmount / $qty, 2) * $qty;
             $i++;
         }
+
+        $totalsAmount = (float)$order->get("shipping_price") + (float)$order->get("tax_amount");
+        $roundDiff = round($payment->get("amount_due") - $itemsTotal - $totalsAmount, 2);
+        if ($payment->get("amount_due") != ($itemsTotal + $totalsAmount) && $roundDiff != 0) {
+            $request["L_{$p}NAME{$i}"] = $this->_('Rounding correction');
+            $request["L_{$p}AMT{$i}"] = $roundDiff;
+            $request["L_{$p}QTY{$i}"] = 1;
+            $request["L_{$p}TAXAMT{$i}"] = 0;
+            $request["L_{$p}ITEMWEIGHTVALUE{$i}"] = 0;
+        }
+
         return $request;
     }
 
@@ -556,13 +702,15 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'SIGNATURE' => $this->getConfig('signature'),
         ], $request);
 
-        $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request);
+        $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request, [], ['timeout' => 30]);
+
         if (!$responseRaw) {
-            return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from grateway']];
+            return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from gateway']];
         }
 
         parse_str($responseRaw, $response);
         $result = ['request' => $request, 'response' => $response/*, 'response_raw' => $responseRaw*/];
+        $this->BDebug->log(print_r($response, 1), 'paypal.log');
 
         if (!empty($response['ACK'])) {
             $ack = strtoupper($response['ACK']);
@@ -594,7 +742,50 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
                 $entity->setData('last_api_call', $result);
             }
         }
-        echo "<pre>"; var_dump($result); echo "<pre>";
+        //echo "<pre>"; var_dump($result); echo "<pre>"; exit;
         return $result;
     }
+
+    public function isRootTransactionNeeded()
+    {
+        return true;
+    }
+
+    public function getRootTransactionType()
+    {
+        $labels = $this->Sellvana_Sales_Model_Order_Payment_Transaction->fieldOptions('transaction_type');
+        $paymentAction = $this->getConfig('payment_action');
+        switch ($paymentAction) {
+            case 'Sale':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
+                break;
+            case 'Authorization':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION;
+                break;
+            case 'Order':
+                $transType = Sellvana_Sales_Model_Order_Payment_Transaction::ORDER;
+                break;
+        }
+        return $labels[$transType];
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Payment $payment
+     * @param $request
+     * @return array
+     */
+    protected function _prepareExpressCheckoutInfo(Sellvana_Sales_Model_Order_Payment $payment, $request)
+    {
+        $request = $this->_addOrderInfo($payment, $request);
+        if ($this->getConfig('show_shipping')) {
+            $request = $this->_addShippingInfo($payment, $request);
+        } else {
+            $request['NOSHIPPING'] = 1;
+        }
+
+        $result = $this->_call('SetExpressCheckout', $request);
+        return $result;
+    }
+
+
 }

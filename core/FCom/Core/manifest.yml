@@ -53,6 +53,11 @@ modules:
                     - [ "FCom_Core_ImportExport::_importBatch:afterBatch", "FCom_Core_Shell_DataIo.onAfterBatch" ]
 
         default_config:
+            core:
+                cache:
+                    memcache:
+                        host: localhost
+                        port: 11211
             db:
                 dbname: sellvana
                 username: root
@@ -65,6 +70,7 @@ modules:
                     X-Frame-Options: SAMEORIGIN
             cookie:
                 session_check_ip: 1
+                use_strict_mode: 1
 
             modules:
                 FCom_Core:

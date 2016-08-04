@@ -30,6 +30,15 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
         return $newState;
     }
 
+    public function invokeStateChange($value)
+    {
+        if (empty($this->_defaultMethods[$value])) {
+            throw new BException($this->_('Invalid state value: %s', $value));
+        }
+        $method = $this->_defaultMethods[$value];
+        return $this->{$method}();
+    }
+
     public function getItemStateStatistics($stateType)
     {
         /** @var Sellvana_Sales_Model_Order $model */

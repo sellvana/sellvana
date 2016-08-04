@@ -114,8 +114,7 @@ class BUtil extends BClass
      */
     public function fromJson($json, $asObject = false)
     {
-        $obj = json_decode($json);
-        return $asObject ? $obj : static::objectToArray($obj);
+        return json_decode($json, !$asObject);
     }
 
     /**
@@ -255,10 +254,15 @@ class BUtil extends BClass
     public function objectToArray($d)
     {
         if (is_object($d)) {
-            $d = get_object_vars($d);
+            #$d = get_object_vars($d); // bug on HHVM and PHP7 (https://3v4l.org/bbleq)
+            $r = [];
+            foreach ($r as $k => $v) {
+                $r[$k] = $v;
+            }
+            $d = $r;
         }
         if (is_array($d)) {
-            return array_map([$this->BUtil, 'objectToArray'], $d);
+            return array_map([$this, 'objectToArray'], $d);
         }
         return $d;
     }
@@ -272,7 +276,7 @@ class BUtil extends BClass
     public function arrayToObject($d)
     {
         if (is_array($d)) {
-            return (object) array_map([$this->BUtil, 'arrayToObject'], $d);
+            return (object) array_map([$this, 'arrayToObject'], $d);
         }
         return $d;
     }
@@ -290,7 +294,7 @@ class BUtil extends BClass
         $map = [];
         foreach ($array as $k => $row) {
             if (is_array($mapFields)) {
-                $outRow = $this->BUtil->arrayMask($row, $mapFields);
+                $outRow = $this->arrayMask($row, $mapFields);
             } elseif (is_string($mapFields)) {
                 $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
             } else {
@@ -303,6 +307,15 @@ class BUtil extends BClass
             }
         }
         return $map;
+    }
+
+    public function arrayMapToSeq($array, $keyField = 'id', $valueField = 'text')
+    {
+        $seq = [];
+        foreach ($array as $k => $v) {
+            $seq[] = [$keyField => $k, $valueField => $v];
+        }
+        return $seq;
     }
 
     public function arrayWalkToString($array)
@@ -542,6 +555,9 @@ class BUtil extends BClass
 
     public function arrayCleanEmpty($arr)
     {
+        if (is_string($arr)) {
+            $arr = explode(',', $arr);
+        }
         foreach ($arr as $k => $v) {
             if (is_array($v)) {
                 $arr[$k] = $this->arrayCleanEmpty($v);
@@ -824,6 +840,40 @@ class BUtil extends BClass
         }
 
         return $results;
+    }
+
+    /**
+     * @param       $input
+     * @param       $offset
+     * @param       $length
+     * @param array $replacement
+     * @return array
+     */
+    public function arraySpliceAssoc($input, $offset, $length, $replacement = [])
+    {
+        $replacement = (array)$replacement;
+        $keyIndices = array_flip(array_keys($input));
+        if (isset($input[$offset]) && is_string($offset)) {
+            $offset = $keyIndices[$offset];
+        }
+        if (isset($input[$length]) && is_string($length)) {
+            $length = $keyIndices[$length] - $offset;
+        }
+
+        return array_slice($input, 0, $offset, TRUE)
+            + $replacement
+            + array_slice($input, $offset + $length, NULL, TRUE);
+    }
+
+    /**
+     * @param array  $array
+     * @param string $label
+     * @param string $key
+     * @return array
+     */
+    public function arrayAddEmptyOption(array $array, $label = '', $key = '')
+    {
+        return $this->arraySpliceAssoc($array, 0, 0, [$key => $label]);
     }
 
     /**
@@ -1166,7 +1216,7 @@ class BUtil extends BClass
         $multipart = false;
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                if (is_string($v) && $v[0] === '@') {
+                if (is_string($v) && !empty($v[0]) && $v[0] === '@') {
                     $multipart = true;
                     break;
                 }
@@ -1245,7 +1295,7 @@ class BUtil extends BClass
             }
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = $this->BApp->storageRandomDir() . '/cache';
-                $this->BUtil->ensureDir($cookieDir);
+                $this->ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
                 $curlOpt += [
                     CURLOPT_COOKIEJAR => $cookie,
@@ -1350,7 +1400,7 @@ class BUtil extends BClass
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                IF (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
+                if (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
                     static::$_lastRemoteHttpInfo['headers']['http'] = [
                         'unparsed' => $line,
                         'full' => $m[0],
@@ -1396,7 +1446,7 @@ class BUtil extends BClass
      */
     public function normalizePath($path)
     {
-        $path = str_replace('\\', '/', $path);
+        $path = str_replace(['\\', "\0"], ['/', ''], $path);
         if (strpos($path, '/..') !== false) {
             $a = explode('/', $path);
             $b = [];
@@ -1463,6 +1513,83 @@ class BUtil extends BClass
     {
         return !empty($path) && ($path[0] === '/' || $path[0] === '\\') // starting with / or \
             || !empty($path[1]) && $path[1] === ':'; // windows drive letter C:
+    }
+
+    /**
+     * @param string $path
+     * @param array|string $root
+     * @param boolean $isPathNormalized
+     * @return bool
+     */
+    public function isPathWithinRoot($path, $root = null, $isPathNormalized = false)
+    {
+        $path = $this->normalizePath($path);
+
+        if (is_array($root)) {
+            foreach ($root as $r) {
+                if ($this->isPathWithinRoot($path, $r, true)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        $fs = $this->BConfig->get('fs');
+
+        if (!$root) {
+            $root = $fs['root_dir'];
+        } elseif ($root === '@random_dir') {
+            $root = $this->BApp->storageRandomDir();
+        } elseif ($root[0] === '@') {
+            $root = preg_replace_callback('#^@([a-z_]+)($|/.*)#', function($m) {
+                return $this->BConfig->get('fs/' . $m[1]) . $m[2];
+            }, $root);
+        }
+
+        $root = $this->normalizePath(realpath($root));
+
+        if (!$path || !$root || substr($path, 0, strlen($root)) !== $root) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function moveUploadedFileSafely($from, $to, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!$this->isPathWithinRoot($to, $root)) {
+            return false;
+        }
+        $this->ensureDir(dirname($to));
+        return @move_uploaded_file($from, $to);
+    }
+
+    public function readFileSafely($file, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!file_exists($file)) {
+            return false;
+        }
+        if (!$this->isPathWithinRoot($file, $root)) {
+            return false;
+        }
+        return @file_get_contents($file);
+    }
+
+    public function writeFileSafely($file, $content, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!$this->isPathWithinRoot($file, $root)) {
+            return false;
+        }
+        $this->ensureDir(dirname($file));
+        return @file_put_contents($file, $content);
+    }
+
+    public function deleteFileSafely($file, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!file_exists($file) || !$this->isPathWithinRoot($file, $root)) {
+            return false;
+        }
+        return @unlink($file);
     }
 
     /**
@@ -1658,7 +1785,7 @@ class BUtil extends BClass
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
                 $label = trim(substr($k, 1));
-                $htmlArr[] = $this->BUtil->tagHtml('optgroup', ['label' => $label], static::optionsHtml($v, $default));
+                $htmlArr[] = $this->tagHtml('optgroup', ['label' => $label], static::optionsHtml($v, $default));
                 continue;
             }
             if (is_array($v)) {
@@ -1671,7 +1798,7 @@ class BUtil extends BClass
             }
             $attr['value'] = $k;
             $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
-            $htmlArr[] = $this->BUtil->tagHtml('option', $attr, $v);
+            $htmlArr[] = $this->tagHtml('option', $attr, $v);
         }
 
         return join("\n", $htmlArr);
@@ -1983,11 +2110,16 @@ class BUtil extends BClass
     * DANGEROUS
     *
     * @param string $dir
+    * @param string|array $root
+    * @param boolean $first
     */
-    public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $first = true)
+    public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $root = ['@media_dir', '@random_dir'], $first = true)
     {
         if ($first) {
             $dir = realpath($dir);
+            if (!$this->isPathWithinRoot($dir, $root)) {
+                return false;
+            }
         }
         if (!$dir || !file_exists($dir)) {
             return true;
@@ -1999,9 +2131,9 @@ class BUtil extends BClass
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, $root, false)) {
                 chmod($dir . "/" . $item, 0777);
-                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, $root, false)) {
                     return false;
                 }
             }
@@ -2090,7 +2222,7 @@ class BUtil extends BClass
         if (!$res) {
             throw new BException("Can't open zip archive for reading: " . $filename);
         }
-        $this->BUtil->ensureDir($targetDir);
+        $this->ensureDir($targetDir);
         $res = $zip->extractTo($targetDir);
         $zip->close();
         if (!$res) {
@@ -2111,7 +2243,7 @@ class BUtil extends BClass
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
         }
-        $files = $this->BUtil->globRecursive($sourceDir);
+        $files = $this->globRecursive($sourceDir);
         if (!$files) {
             throw new BException('Invalid or empty source dir');
         }
@@ -2243,13 +2375,13 @@ class BUtil extends BClass
     }
 
     /**
-     * Take a camel cased string and turn it into a word seperated sentance.
-     * e.g. 'ThisIsASentance' would turn into 'This Is A Sentance'
+     * Take a camel cased string and turn it into a word separated sentence.
+     * e.g. 'ThisIsASentence' would turn into 'This Is A Sentence'
      *
      * @param  string $string
      * @return string
      */
-    public function camelToSentance($string)
+    public function camelToSentence($string)
     {
         return trim(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $string));
     }

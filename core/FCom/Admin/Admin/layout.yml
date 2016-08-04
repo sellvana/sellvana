@@ -27,9 +27,9 @@ base:
 
             - [ requireJs, jquery.equalHeights, "@FCom_LibJsCommon/js/jquery.equalHeights", { deps: [ jquery ] } ]
 
-            - [ requireJs, fcom.admin, "@FCom_Admin/Admin/js/fcom.admin" ]
+            - [ requireJs, fcom.admin, "@FCom_Admin/Admin/js/fcom/fcom.admin" ]
             - [ requireJs, fcom.admin.dynatree, "@FCom_Admin/Admin/js/fcom/fcom.admin.dynatree" ]
-            - [ requireJs, fcom.admin.form, "@FCom_Admin/Admin/js/fcom.admin.form" ]
+            - [ requireJs, fcom.admin.form, "@FCom_Admin/Admin/js/fcom/fcom.admin.form" ]
             - [ requireRun, fcom.admin ]
 
             #- [ requireJs, dynatree, "@FCom_Admin/Admin/js/dynatree/jquery.dynatree.min", { deps: [ jquery ] } ]
@@ -39,6 +39,7 @@ base:
     - { include: lib_griddle }
     - { include: lib_admin_theme1 }
     - { include: lib_media_player }
+    - { include: lib_select2 }
 
     - view: admin/nav
         do:
@@ -139,7 +140,7 @@ lib_admin_theme1:
             #- [ css, "@FCom_LibJsCommon/js/bootstrap-3.3.5/css/bootstrap" ]
 
             - [ css, "@FCom_Core/css/font-awesome/css/font-awesome.min.css" ]
-            - [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/select2/select2.css" ]
+            #- [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/select2/select2.css" ]
             #- [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/select2/select2-override.css" ]
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/jquery_fileupload/jquery.fileupload-ui.css" ]
             #- [ css, "@FCom_Admin/Admin/theme1/assets/css/theme-colors.css" ]
@@ -182,7 +183,7 @@ lib_admin_theme1:
             - [ requireJs, nestable, "@FCom_Admin/Admin/theme1/assets/js/plugins/nestable/jquery.nestable", { deps: [ jquery ] } ]
             - [ requireJs, pwstrength, "@FCom_Admin/Admin/theme1/assets/js/plugins/nestable/jpwstrength", { deps: [ jquery ] } ]
             - [ requireJs, retina, "@FCom_Admin/Admin/theme1/assets/js/plugins/retina/retina" ]
-            - [ requireJs, select2, "@FCom_Admin/Admin/theme1/assets/js/plugins/select2/select2", { deps: [ jquery ] } ]
+            #- [ requireJs, select2, "@FCom_Admin/Admin/theme1/assets/js/plugins/select2/select2", { deps: [ jquery ] } ]
             - [ requireJs, slidernav, "@FCom_Admin/Admin/theme1/assets/js/plugins/slider_nav/slidernav-min", { deps: [ jquery ] } ]
             - [ requireJs, slimscroll, "@FCom_Admin/Admin/theme1/assets/js/plugins/slimscroll/jquery.slimscroll.min", { deps: [ jquery ] } ]
             - [ requireJs, sparklines, "@FCom_Admin/Admin/theme1/assets/js/plugins/sparklines/jquery.sparkline.min", { deps: [ jquery ] } ]
@@ -377,3 +378,22 @@ form:
         do:
             - [ requireJs, fcom.admin.import, "@FCom_Admin/Admin/js/fcom/fcom.admin.import" ]
             - [ scss, "@FCom_Admin/Admin/theme1/assets/scss/admin-import.scss" ]
+
+
+/g2fa/login:
+    - { include: base }
+    - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
+    - { hook: main, views: g2fa/login }
+
+/g2fa/recover:
+    - { include: base }
+    - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
+    - { hook: main, views: g2fa/recover }
+
+/g2fa/reset:
+    - { include: base }
+    - { include: form }
+    - { view: root, do: [[ addBodyClass, login ]] }
+    - { hook: main, views: g2fa/reset }

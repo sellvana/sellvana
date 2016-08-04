@@ -1,0 +1,39 @@
+{% set fKey = THIS.get('facet_key') %}
+{% set facet = THIS.get('facet') %}
+{% set hlp = APP.instance('Sellvana_CatalogIndex_Main') %}
+{% set swatches = APP.instance('Sellvana_CatalogFields_Model_FieldOption').getFieldOptions(fKey, false, 'label', 'swatch_info') %}
+
+{% if facet['values'] %}
+    <dt>
+        <a href="#" id="facet-chevron-{{ fKey }}" class="f-facet-title" data-facet-key="{{ fKey }}">
+            {{ facet['display']|_ }} <span class="glyphicon glyphicon-chevron-{{ collapsed[fKey] ? 'up' : 'down' }}"></span>
+        </a>
+    </dt>
+    <dd>
+        <ul>
+            {% for vKey, value in facet['values'] %}
+                {% if value['selected'] %}
+                    <li class="active">
+                        <a class="active" href="{{ hlp.getUrl(null, { (fKey): vKey}) }}">
+                            <span class="glyphicon glyphicon-check"></span>
+                            <div style="display:inline-block; width:16px; height:16px; border:solid 1px #AAA; background:{{ swatches[value['display']] ?: vKey }}"></div>
+                            {{ value['display']|_ }}
+                        </a>
+                    </li>
+                    {% if s['save_filter'] %}
+                        <input type="hidden" name="{{ fKey }}" value="{{ vKey }}"/>
+                    {% endif %}
+                {% else %}
+                    <li {{ collapsed[fKey] ? 'style="display:none"' }}>
+                        <a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
+                            <span class="glyphicon glyphicon-unchecked"></span>
+                            <div style="display:inline-block; width:16px; height:16px; border:solid 1px #AAA; background:{{ swatches[value['display']] ?: vKey }}"></div>
+                            {{ value['display']|_ }}
+                            {% if value['cnt'] %}<span class="count">({{ value['cnt'] }})</span>{% endif %}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </dd>
+{% endif %}

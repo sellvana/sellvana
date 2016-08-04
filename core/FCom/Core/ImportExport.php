@@ -384,7 +384,7 @@ class FCom_Core_ImportExport extends BClass
         }
         fclose($fi);
         if($this->BConfig->get('modules/FCom_Core/import_export/delete_after_import')){
-            @unlink($this->getFullPath($fromFile));
+            $this->BUtil->deleteFileSafely($this->getFullPath($fromFile));
         }
         return true;
     }
@@ -1007,13 +1007,15 @@ class FCom_Core_ImportExport extends BClass
         if (!in_array($type, ['export', 'import'])){
             $type = 'export';
         }
+        $path = $this->BApp->storageRandomDir() . '/' . $type;
         if (!$file) {
             $file = $this->_defaultExportFile;
+        } elseif (!$this->BUtil->isPathWithinRoot($file, $path)) {
+            return false;
         }
         if ($this->BUtil->isPathAbsolute($file)) {
             return $file;
         }
-        $path = $this->BApp->storageRandomDir() . '/' . $type;
         $this->BUtil->ensureDir($path);
         $file = $path . '/' . trim($file, '\\/');
         $realpath = str_replace('\\', '/', realpath(dirname($file)));
@@ -1179,6 +1181,9 @@ class FCom_Core_ImportExport extends BClass
             if (!$path) {
                 throw new BException($this->_("Could not obtain export location."));
             }
+            if (!$this->BUtil->isPathWithinRoot($path, '@random_dir')) {
+                throw new BException('Invalid file location');
+            }
             $this->BUtil->ensureDir(dirname($path));
         }
         $fe = fopen($path, 'w');
@@ -1202,6 +1207,9 @@ class FCom_Core_ImportExport extends BClass
             $path = $this->getFullPath($fromFile, $type);
         }
         if (!is_readable($path)) {
+            return false;
+        }
+        if (!$this->BUtil->isPathWithinRoot($path, '@random_dir')) {
             return false;
         }
         ini_set("auto_detect_line_endings", 1);
@@ -1291,7 +1299,7 @@ class FCom_Core_ImportExport extends BClass
         }
 
         if (!$valid && $unlink) {
-            @unlink($fullFileName); // make sure invalid files are removed from the system;
+            $this->BUtil->deleteFileSafely($fullFileName); // make sure invalid files are removed from the system;
         }
         return $valid;
     }

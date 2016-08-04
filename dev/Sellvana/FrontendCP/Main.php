@@ -30,13 +30,15 @@ class Sellvana_FrontendCP_Main extends BClass
 
     public function saveCustomViewTemplate($viewName, $content, $options = [])
     {
+        //TODO: change to FCom_CustomModule
         $rootDir = $this->BApp->storageRandomDir() . '/custom';
         $area = !empty($options['area']) ? $options['area'] : 'FCom_Frontend';
         $viewsDir = $rootDir . '/' . $area . '/views';
         if (!file_exists($rootDir)) {
             $this->BUtil->ensureDir($viewsDir);
             //TODO: if area is not FCom_Frontend - developer is involved - edit manifest.yml manually?
-            file_put_contents($rootDir . '/manifest.yml', "modules: { Custom_Dev: { areas: { FCom_Frontend: { auto_use: [ layout, views ] } } } }");
+            $contents = "modules: { Custom_Dev: { areas: { FCom_Frontend: { auto_use: [ layout, views ] } } } }";
+            file_put_contents($rootDir . '/manifest.yml', $contents);
         }
         if (!is_writable($viewsDir)) {
             $this->BDebug->error('Unable to write to ' . $viewsDir);
@@ -53,6 +55,6 @@ class Sellvana_FrontendCP_Main extends BClass
             $this->BDebug->error('Unable to write to ' . $filePath);
             return false;
         }
-        return file_put_contents($filePath, $content);
+        return $this->BUtil->writeFileSafely($filePath, $content, $rootDir);
     }
 }

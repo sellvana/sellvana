@@ -12,6 +12,7 @@
         {{ forms.input(fieldData, {field:'access_key', label:'Production Access Key'|_ }) }}
         {{ forms.input(fieldData, {field:'max_package_weight', label:'Max Package Weight'|_ }) }}
         {{ forms.input(fieldData, {field:'package_size', label:'Package Size (LxWxH)'|_ }) }}
-        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services}) }}
+        {{ forms.boolean(fieldData, {field:'all_services', label:'Enable All Services'}) }}
+        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services, js_toggle:'!all_services'}) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

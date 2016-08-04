@@ -1,5 +1,340 @@
-{% set m = THIS.get('model') %}
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').paymentsGridConfig(m) %}
+{% set order = THIS.get('model') %}
 
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
-{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
+{% set payableItems = order.getPayableItems() %}
+{% set allMethods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
+{% set allPayments = order.getAllPayments() %}
+{% set currentLocale = LOCALE.getCurrentLocale() %}
+{% set totalAmt = 0 %}
+{% set baseCurrency = CONFIG.get('modules/FCom_Core/base_currency') %}
+
+<div class="f-section" id="order-container">
+
+    {{ THIS.view('core/messages') | raw }}
+
+    {% if payableItems %}
+        <div id="payment-create-container">
+            <h2>{{ 'Create a payment'|_ }}</h2>
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Product SKU'|_ }}</th>
+                    <th>{{ 'Inventory SKU'|_ }}</th>
+                    <th>{{ 'Product Name'|_ }}</th>
+                    <th>{{ 'Qty Ordered'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
+                    <th>{{ 'Paid'|_ }}</th>
+                    <th>{{ 'Amount in Payments'|_ }}</th>
+                    <th>{{ 'Payable Amount'|_ }}</th>
+                    <th>{{ 'Amount To Pay'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in payableItems %}
+                    {% set totalItemAmt = i.getQtyCanPay() * i.getCalcPrice() %}
+                    <tr class="item-container" id="item-{{ i.id() }}">
+                        <td>{{ i.get('product_sku') }}</td>
+                        <td>{{ i.get('inventory_sku') }}</td>
+                        <td>{{ i.get('product_name') }}</td>
+                        <td>{{ i.get('qty_ordered') }}</td>
+                        <td><span>{{ totalItemAmt | currency('base') }}</span></td>
+                        <td>{{ i.get('amount_paid') | currency('base') }}</td>
+                        <td>{{ i.get('amount_in_payments')|currency('base') }}</td>
+                        <td>{{ (totalItemAmt - i.get('amount_in_payments'))|currency('base') }}</td>
+                        <td><input type="text" class="item-amount-to-pay form-control" name="amounts[{{ i.id() }}]" value="{{ i.getAmountCanPay()}}"></td>
+                    </tr>
+                    {% set totalAmt = totalAmt + i.getAmountCanPay() %}
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    {% for totalCode, total in order.getData('totals') %}
+                        {% if total.value > 0 and totalCode not in ['subtotal', 'grand_total', 'amount_due', 'discount'] and totalCode not in order.getTotalsInPayments() %}
+                            <tr class="total-container" data-price="{{ total.value }}">
+                                <td colspan="8" class="text-right"><label for="total_{{ totalCode }}">{{ total.label }}</label></td>
+                                <td class="text-center"><input type="checkbox" name="totals[{{ totalCode }}]" id="total_{{ totalCode }}" value="{{ total.value }}" checked></td>
+                                <td><strong>{{ total.value | currency('base') }}</strong></td>
+                            </tr>
+                            {% set totalAmt = totalAmt + total.value %}
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td colspan="9" class="text-right"><strong>{{ 'Total Amount to Pay' | _ }}</strong></td>
+                        <td><strong id="total-amount-to-pay">{{ totalAmt | currency('base') }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6"></td>
+                        <td colspan="3" class="text-right">
+                            <select name="payment[payment_method]" class="form-control input-sm" id="payment-payment_method">
+                                {% for key, m in allMethods %}
+                                    <option value="{{ key }}" {{ key == order.get('payment_method') ? 'selected' }}>{{ m.getName() }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><button id="btnPaymentCreate" data-container="#payment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if payableItems and allPayments %}
+        <hr>
+    {% endif %}
+
+    {% if not payableItems %}
+        {{ 'There are no items available for a new payment' | _ }}
+    {% endif %}
+
+    {% if allPayments %}
+        <h2>{{ 'Existing Payments' }}</h2>
+        <div id="payment-update-container">
+            <table class="table table-bordered table-striped dataTable" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th>{{ 'Method'|_ }}</th>
+                    <th>{{ 'Status'|_ }}</th>
+                    <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Amount Captured'|_ }}</th>
+                    <th>{{ 'Balance'|_ }}</th>
+                    <th>{{ 'Total Amount'|_ }}</th>
+                    <th>{{ 'Items'|_ }}</th>
+                    <th>{{ 'Delete'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for p in allPayments %}
+                    {% set allOverallStates = p.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = p.state().custom().getNextValueLabels() %}
+                    {% set allTransactions = p.transactions() %}
+                    {% set method = allMethods[p.get('payment_method')] %}
+                    <tr>
+                        <td>
+                            <p><strong>{{ method.getName() }}</strong></p>
+                        </td>
+                        <td>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ p.state().overall().getValueLabel() }}</strong></p>
+                            <p>{{ 'Processor:'|_ }} <strong>{{ p.state().processor().getValueLabel() }}</strong></p>
+                            {% if allCustomStates %}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="payments[{{ p.id() }}][state_custom]" class="form-control">
+                                        {{ UTIL.optionsHtml(allCustomStates, p.state().custom().getValue()) | raw }}
+                                    </select></p>
+                            {% endif %}
+                            {% if p.isManualStateManagementAllowed() %}
+                                {% for k, v in allOverallStates %}
+                                    {% if k != p.get('state_overall') %}
+                                        <input type="button" name="payments[{{ p.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-payment-action">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if allTransactions %}
+                                <p>
+                                    <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-transactions" aria-expanded="false" aria-controls="payment{{ p.id() }}-transactions">{{ 'Transactions' | _ }}: {{ allTransactions|length }}</a>
+                                </p>
+                            {% elseif method.isRootTransactionNeeded() and method.can('pay_by_url') %}
+                                <p>
+                                    <a data-toggle="collapse" role="button" href="#payment{{ p.id() }}-root-transaction-form" aria-expanded="false" aria-controls="payment{{ p.id() }}-root-transaction-form">{{ 'Create root transaction'|_ }}</a>
+                                </p>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <p><strong>{{ p.get('create_at')|locdate('datetime_short') }}</strong></p>
+                        </td>
+                        <td>
+                            <p>{{ p.get('amount_captured')|currency('base') }}</p>
+                        </td>
+                        <td>
+                            <p>{{ p.get('amount_due')|currency('base') }}</p>
+                        </td>
+                        <td>
+                            <p>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</p>
+                        </td>
+                        <td>
+                            {% for i in p.items() %}
+                                <strong>{{ i.get('product_name') ?: i.getData('custom_label') }}</strong>: {{ i.get('amount') | currency('base') }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ p.id }}]" value="1">
+                        </td>
+                    </tr>
+                    {% if allTransactions %}
+                        <tr class="payment-transactions" id="payment{{ p.id() }}-transactions">
+                            <td>&nbsp;</td>
+                            <td colspan="7">
+                                <table class="table table-bordered table-striped dataTable" style="width: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ 'ID'|_ }}</th>
+                                        <th>{{ 'Parent ID'|_ }}</th>
+                                        <th>{{ 'Timeline'|_ }}</th>
+                                        <th>{{ 'Type'|_ }}</th>
+                                        <th>{{ 'Status'|_ }}</th>
+                                        <th>{{ 'Status Comment'|_ }}</th>
+                                        <th>{{ 'Amount'|_ }}</th>
+                                        <th>{{ 'Fee'|_ }}</th>
+                                        <th>{{ 'Actions'|_ }}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for t in allTransactions %}
+                                            {% set availableActions = t.getAvailableActions() %}
+                                            <tr>
+                                                <td>
+                                                    <p>{{ t.get('transaction_id') }}</p>
+                                                </td>
+                                                <td>
+                                                    <p>{{ t.get('parent_transaction_id') }}</p>
+                                                </td>
+                                                <td>
+                                                    <p><strong>{{ t.get('create_at')|locdate('datetime_short') }}</strong></p>
+                                                </td>
+                                                <td>
+                                                    <p><strong>{{ t.get('transaction_type') }}</strong></p>
+                                                </td>
+                                                <td>
+                                                    {% set status = t.get('transaction_status') %}
+                                                    {{ status == 'completed' ? 'Success'|_ : (status == 'void') ? 'Void'|_ : 'Failure'|_ }}
+                                                </td>
+                                                <td>
+                                                    {{ t.getData('error') }}
+                                                </td>
+                                                <td>
+                                                    <p>{{ t.get('amount')|currency }}</p>
+                                                </td>
+                                                <td>
+                                                    <p>{{ t.get('transaction_fee')|currency }}</p>
+                                                </td>
+                                                <td>
+                                                    {% if t.get('transaction_id') and t.get('transaction_status') != 'void' %}
+                                                        <div class="col-md-12">
+                                                            <div class="form-inline">
+                                                            {% for action, actionData in availableActions %}
+                                                                <div class="form-group form-group-sm">
+                                                                    <input type="hidden" name="actions[{{ p.id() }}][{{ t.id() }}][type]" value="{{ action }}" />
+                                                                    <button type="button" class="btn btn-xs transaction-action ladda-button" id="action-{{ t.id() }}-{{ action }}" data-style="expand-left">{{ actionData.label }}</button>
+                                                                    {% if actionData.maxAmount %}
+                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" /> of {{ actionData.maxAmount | currency('base') }}
+                                                                    {% endif %}
+                                                                </div>
+                                                                <br>
+                                                            {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {% elseif method.isRootTransactionNeeded() and method.can('pay_by_url') %}
+                        <tr class="payment-root-transaction-form" id="payment{{ p.id() }}-root-transaction-form">
+                            <td>&nbsp;</td>
+                            <td colspan="5">
+                                <p>{{ 'Root Transaction Type'|_ }}: {{ method.getRootTransactionType() }}</p>
+                                <p>{{ 'URL'|_ }}: <a href="#">{{ p.getRootTransactionUrl() }}</a></p>
+                                <p>
+                                    <input type="hidden" name="payments[{{ p.id() }}][notify]" value="1">
+                                    <button type="button" id="payment{{ p.id() }}-create-root-transaction" class="btn btn-xs btn-primary root-transaction-notify">{{ 'Send URL to customer'|_ }}</button>
+                                </p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="7"></td>
+                    <td><button id="btnPaymentUpdate" data-action="update" data-container="#payment-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Apply Changes'|_ }}</button></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    require(['jquery', 'underscore', 'bootstrap-ladda', 'bootstrap-ladda-spin'], function($, _, Ladda) {
+        var paymentCreateUrl = "{{ APP.href('payments/create?id=' ~ order.id()) }}";
+        var paymentUpdateUrl = "{{ APP.href('payments/update?id=' ~ order.id()) }}";
+        var transactionActionUrl = "{{ APP.href('payments/transaction_action?id=' ~ order.id()) }}";
+        var rootTransactionActionUrl = "{{ APP.href('payments/send_root_transaction_url?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-payments');
+        var locale = '{{ currentLocale }}'.replace('_', '-');
+        var maxTotal = {{ totalAmt }};
+
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 5000});
+        }
+
+        function recalculateTotalAmt() {
+            var total = 0;
+            var itemTotal;
+
+            $('.item-container').each(function(idx, el) {
+                itemTotal = parseFloat($(el).find('input.item-amount-to-pay').val());
+                total += itemTotal;
+            });
+
+            $('.total-container').each(function(idx, el) {
+                if ($(el).find('input[type=checkbox]').attr('checked')) {
+                    total += $(el).data('price');
+                }
+            });
+
+            total = Math.min(total, maxTotal);
+            $('#payment-total-amount').val(total);
+            total = total.toLocaleString(locale, {style: 'currency', currency: '{{ baseCurrency }}'});
+            $('#total-amount-to-pay').text(total);
+        }
+
+        // Create payments or update payments data
+        container.unbind().on('click', '#btnPaymentCreate, #btnPaymentUpdate', function(ev) {
+            var postUrl = !ev.target.dataset.action ? paymentCreateUrl : paymentUpdateUrl;
+            var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
+            $.post(postUrl, serializeData, processPostResponse);
+        });
+
+        // Update payment status
+        container.on('click', '.js-payment-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(paymentUpdateUrl, postData, processPostResponse);
+        });
+
+        container.on('click', '.transaction-action', function(ev) {
+            var loader = Ladda.create(document.querySelector('#' + ev.target.id));
+            loader.start();
+            var serializeData = $(ev.target).parent('.form-group').find('input, button').serializeArray();
+            $.post(transactionActionUrl, serializeData, processPostResponse);
+        });
+
+        container.on('click', '.root-transaction-notify', function(ev) {
+            var loader = Ladda.create(document.querySelector('#' + ev.target.id));
+            loader.start();
+            var serializeData = $(ev.target).parents('.payment-root-transaction-form').find('input, button').serializeArray();
+            $.post(rootTransactionActionUrl, serializeData, processPostResponse);
+        });
+
+        container.on('click', '.total-container label, .total-container input', recalculateTotalAmt);
+        container.on('keyup', '.item-container input', recalculateTotalAmt);
+
+        // Workaround to avoid conflict with FCom.Admin.Tabs
+        $('.payment-transactions, .payment-root-transaction-form').addClass('collapse').collapse({
+            toggle: false
+        });
+    })
+</script>

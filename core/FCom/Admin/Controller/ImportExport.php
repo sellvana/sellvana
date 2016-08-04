@@ -237,11 +237,10 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
 
                 $fullFileName = $importer->getFullPath($fileName, 'import');
-                $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
                 if ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
-                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);

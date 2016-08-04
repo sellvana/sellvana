@@ -25,6 +25,19 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_M
         self::REFUSED => 'Refused',
         self::RETURNED => 'Returned',
     ];
+    
+    protected $_defaultMethods = [
+        self::NA => 'setNotApplicable',
+        self::PENDING => 'setPending',
+        self::LABEL => 'setLabel',
+        self::RECEIVED => 'setReceived',
+        self::SHIPPED => 'setShipped',
+        self::IN_TRANSIT => 'setInTransit',
+        self::EXCEPTION => 'setException',
+        self::DELIVERED => 'setDelivered',
+        self::REFUSED => 'setRefused',
+        self::RETURNED => 'setReturned',
+    ];
 
     protected $_defaultValue = self::PENDING;
 
@@ -76,5 +89,31 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_M
     public function setReturned()
     {
         return $this->changeState(self::RETURNED);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
+        $shipment = $this->getContext()->getModel();
+        $currentState = ($this->getValue() !== '') ? $this->getValue() : $this->_defaultValue;
+
+        $state = self::NA;
+        $orderedStates = array_keys($this->_valueLabels);
+        $statePriorities = array_flip($orderedStates);
+        $statePriorities[self::NA] = 999;
+        $statePriorities[self::EXCEPTION] = -1;
+        $orderedStates = array_flip($statePriorities);
+
+        foreach ($shipment->packages() as $package) {
+            $packageState = $package->state()->overall()->getValue();
+            if (!$packageState) {
+                continue;
+            }
+            $state = $orderedStates[min($statePriorities[$state], $statePriorities[$packageState])];
+        }
+
+        if ($statePriorities[$state] > $statePriorities[$currentState]) {
+            $this->changeState($state);
+        }
     }
 }

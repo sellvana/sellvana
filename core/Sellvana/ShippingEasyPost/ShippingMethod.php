@@ -54,7 +54,17 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
             $data['name'] = $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname');
         }
 
-        $rates = $this->getRates($data, $cart);
+        try {
+            $rates = $this->getRates($data, $cart);
+            if (!empty($rates['error'])) {
+                return $rates;
+            }
+        } catch (Exception $e) {
+            $result = [
+                'error' => 1,
+                'message' => $e->getMessage(),
+            ];
+        }
 
         if (count($rates)) {
             foreach ($rates as $rate) {
@@ -90,11 +100,13 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
     public function getRates($data)
     {
         $shipmentData = $this->_prepareShipmentData($data);
+        if (!empty($shipmentData['error'])) {
+            return $shipmentData;
+        }
         if ($data['from_country'] !== $data['to_country']) {
             $shipmentData = array_merge($shipmentData, $this->_prepareCustomsData($data));
         }
         $shipment = \EasyPost\Shipment::create($shipmentData);
-
         $rates = \EasyPost\Rate::create($shipment);
 
         return $rates;
@@ -294,10 +306,14 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         }
 
         // Carrier API is available only in production mode, so we must always use production access key
-        \EasyPost\EasyPost::setApiKey($config['access_key']);
-        $accounts = \EasyPost\CarrierAccount::all();
-        foreach ($accounts as $account) {
-            $services['_' . $account->readable] = $account->readable;
+        try {
+            \EasyPost\EasyPost::setApiKey($config['access_key']);
+            $accounts = \EasyPost\CarrierAccount::all();
+            foreach ($accounts as $account) {
+                $services['_' . $account->readable] = $account->readable;
+            }
+        } catch (Exception $e) {
+            $services = ['_' => 'Error: ' . $e->getMessage()];
         }
 
         return $services;

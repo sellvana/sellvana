@@ -2,6 +2,8 @@
 
 abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
 {
+    const EMPTY_VALUE = '';
+
     /**
      * @var FCom_Core_Model_Abstract_State_Context
      */
@@ -46,6 +48,16 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
      * @var array
      */
     protected $_unsetValueNotificationTemplates = [];
+
+    /**
+     * @var array
+     */
+    protected $_defaultMethods = [];
+
+    /**
+     * @var array
+     */
+    protected $_defaultValueWorkflow = [];
 
     /**
      * FCom_Core_Model_Abstract_State_Concrete constructor.
@@ -212,6 +224,37 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
     public function getAllValueLabels()
     {
         return $this->_valueLabels;
+    }
+
+    public function getNextValues()
+    {
+        $value = $this->getValue();
+        if (empty($this->_defaultValueWorkflow)) {
+            return null;
+        }
+        if (!$value) {
+            $value = self::EMPTY_VALUE;
+        }
+        if (!isset($this->_defaultValueWorkflow[$value])) {
+            return false;
+        }
+        return $this->_defaultValueWorkflow[$value];
+    }
+
+    public function getNextValueLabels()
+    {
+        $allLabels = $this->getAllValueLabels();
+        $nextValues = $this->getNextValues();
+        if ($nextValues === null || $nextValues === true) {
+            return $allLabels;
+        } elseif ($nextValues === false) {
+            return [];
+        }
+        $nextLabels = [];
+        foreach ($nextValues as $value) {
+            $nextLabels[$value] = $allLabels[$value];
+        }
+        return $nextLabels;
     }
 
     public function __destruct()

@@ -308,7 +308,7 @@ class Sellvana_CatalogIndex_Main extends BClass
         // create products
         $products = [];
         if ($params['p']) {
-            echo $this->_('<p>Creating products...</p>');
+            echo $this->_('<p>Creating products and inventory...</p>');
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
@@ -404,7 +404,7 @@ class Sellvana_CatalogIndex_Main extends BClass
 
     }
 
-    public function onGetHeaderNotifications($args)
+    public function onCollectActivityItems($args)
     {
         $total = $this->BCache->load('index_progress_total');
         $reIndexed = $this->BCache->load('index_progress_reindexed');

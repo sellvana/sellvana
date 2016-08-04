@@ -16,6 +16,13 @@ class Sellvana_Sales_Model_Order_State_Refund extends Sellvana_Sales_Model_Order
 
     protected $_defaultValue = self::NONE;
 
+    protected $_defaultValueWorkflow = [
+        self::NONE => [self::PROCESSING],
+        self::PROCESSING => [self::REFUNDED, self::PARTIAL],
+        self::PARTIAL => [self::REFUNDED],
+        self::REFUNDED => [],
+    ];
+
     public function setNone()
     {
         return $this->changeState(self::NONE);

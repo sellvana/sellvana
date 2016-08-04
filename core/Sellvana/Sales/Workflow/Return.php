@@ -10,30 +10,6 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_overallStates = [
-        'requested' => 'setRequested',
-        'pending'   => 'setPending',
-        'rma_sent'  => 'setRMASent',
-        'expired'   => 'setExpired',
-        'canceled'  => 'setCanceled',
-        'received'  => 'setReceived',
-        'approved'  => 'setApproved',
-        'restocked' => 'setRestocked',
-        'declined'  => 'setDeclined',
-    ];
-
-    static protected $_stateRegistration = [
-        'requested' => false,
-        'pending'   => true,
-        'rma_sent'  => true,
-        'expired'   => false,
-        'canceled'  => false,
-        'received'  => true,
-        'approved'  => true,
-        'restocked' => true,
-        'declined'  => false,
-    ];
-
     public function action_customerRequestsToReturnItems($args)
     {
         $order = $args['order'];
@@ -53,14 +29,6 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
 
     }
 
-    public function action_adminCreatesRMA($args)
-    {
-    }
-
-    public function action_adminApprovesRMA($args)
-    {
-    }
-
     public function action_adminReturnsOrderItems($args)
     {
         /** @var Sellvana_Sales_Model_Order_Return $returnModel */
@@ -76,7 +44,7 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         foreach ($args['items'] as $item) {
             $qtyToReturn = min($item->getQtyCanReturn(), $item->get('qty_to_return'));
 
-            $item->add('qty_returned', $qtyToReturn);
+            $item->add('qty_in_returns', $qtyToReturn);
 
             $this->Sellvana_Sales_Model_Order_Return_Item->create([
                 'order_id' => $args['order']->id(),
@@ -116,9 +84,10 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Return $return */
         $return = $this->Sellvana_Sales_Model_Order_Return->create($data);
         $return->importFromOrder($order, $qtys);
-        $return->register();
         $return->state()->overall()->setApproved();
+        $return->save();
 
+        $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -138,20 +107,12 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_overallStates[$state];
-                $oldState = $return->state()->overall()->getValue();
-                $return->state()->overall()->$method();
-
-                if (self::$_stateRegistration[$oldState] != self::$_stateRegistration[$state]) {
-                    if (self::$_stateRegistration[$state]) {
-                        $return->register();
-                    } else {
-                        $return->unregister();
-                    }
-                }
+                $return->state()->overall()->invokeStateChange($state);
             }
         }
         $return->save();
+
+        $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -163,12 +124,11 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         $cancelId = $args['return_id'];
         $cancel = $this->Sellvana_Sales_Model_Order_Return->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid shipment to delete');
-        }
-        if (self::$_stateRegistration[$cancel->state()->overall()->getValue()]) {
-            $cancel->unregister();
+            throw new BException('Invalid return to delete');
         }
         $cancel->delete();
+
+        $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

@@ -92,7 +92,7 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function register()
+    public function register($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -100,13 +100,13 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
 
         foreach ($cancelItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_canceled', $cItem->get('qty'));
+            $oItem->add($done ? 'qty_canceled' : 'qty_in_cancels', $cItem->get('qty'));
         }
 
         return $this;
     }
 
-    public function unregister()
+    public function unregister($done = false)
     {
         $order = $this->order();
         $orderItems = $order->items();
@@ -114,39 +114,10 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
 
         foreach ($cancelItems as $cItem) {
             $oItem = $orderItems[$cItem->get('order_item_id')];
-            $oItem->add('qty_canceled', -$cItem->get('qty'));
+            $oItem->add($done ? 'qty_canceled' : 'qty_in_cancels', -$cItem->get('qty'));
         }
 
         return $this;
-    }
-
-    public function cancelOrderItems(Sellvana_Sales_Model_Order $order, array $qtys)
-    {
-        $items = $order->items();
-        foreach ($qtys as $itemId => $qty) {
-            if (empty($items[$itemId])) {
-                continue;
-            }
-            $item = $items[$itemId];
-            if ($qty === true) {
-                $qty = $item->getQtyCanCancel();
-            }
-            $item->set('qty_to_cancel', $qty);
-        }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('customerRequests', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
-
-        return $result;
-    }
-
-    public function cancelItem($item)
-    {
-
     }
 
     public function __destruct()

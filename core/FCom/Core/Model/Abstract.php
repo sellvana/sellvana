@@ -77,7 +77,7 @@ class FCom_Core_Model_Abstract extends BModel
         if (null === $path) {
             return $data;
         }
-        $pathArr = explode('/', $path);
+        $pathArr = explode('/', trim($path, '/'));
         foreach ($pathArr as $k) {
             if (!isset($data[$k])) {
                 return null;
@@ -107,7 +107,7 @@ class FCom_Core_Model_Abstract extends BModel
         }
         $data = $this->getData();
         $node =& $data;
-        foreach (explode('/', $path) as $key) {
+        foreach (explode('/', trim($path, '/')) as $key) {
             $node =& $node[$key];
         }
         if ($merge) {

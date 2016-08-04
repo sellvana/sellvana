@@ -706,4 +706,24 @@ class Sellvana_CatalogFields_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
+
+        $this->BDb->ddlTableDef($tField, [
+            BDb::COLUMNS => [
+                'swatch_type' => "char(1) not null default 'N'",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tFieldOption, [
+            BDb::COLUMNS => [
+                'swatch_info' => 'text default null',
+            ],
+        ]);
+
+        $this->Sellvana_CatalogFields_Model_Field->getField('color')->set('swatch_type', 'C')->save();
+    }
 }

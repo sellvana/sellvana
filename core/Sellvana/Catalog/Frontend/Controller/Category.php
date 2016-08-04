@@ -34,8 +34,8 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
             $this->forward(false);
             return $this;
         }
-
         $this->BApp->set('current_page_type', 'category');
+        $this->BApp->set('current_category', $category);
 
         $this->layout('/catalog/category');
         $layout = $this->BLayout;
@@ -60,6 +60,7 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
                 $q = $alias->get('target_term');
             }
         }
+        $this->BApp->set('current_query', $q);
 
         $productsData = null;
         $this->BEvents->fire(__METHOD__ . ':products_data', [
@@ -71,9 +72,15 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
         if (!$productsData) {
             $filter = $this->BRequest->get('f');
             $productsOrm = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q, $filter, $category);
-            $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsOrm]);
 
-            $productsData = $productsOrm->paginate($this->BRequest->get(), [
+            $request = $this->BRequest->request();
+            if (empty($request['sc']) && !empty($request['sort'])) {
+                $request['sc'] = $request['sort'];
+            }
+
+            $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsOrm, 'request' => &$request]);
+
+            $productsData = $productsOrm->paginate($request, [
                 'ps' => $pagerView->default_page_size,
                 'sc' => $pagerView->default_sort,
                 'page_size_options' => $pagerView->page_size_options,
@@ -88,10 +95,7 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
 
         $this->BEvents->fire(__METHOD__ . ':products_data_after', ['data' => &$productsData]);
 
-        $this->BApp
-            ->set('current_category', $category)
-            ->set('current_query', $q)
-            ->set('products_data', $productsData);
+        $this->BApp->set('products_data', $productsData);
 
         $this->FCom_Core_Main->lastNav(true);
 

@@ -14,9 +14,9 @@
  */
 abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
-
     protected static $_maxChunkSize = 100;
     protected static $_indexData;
+    protected static $_sortData;
     protected static $_filterValues;
     protected static $_cnt_reindexed;
     protected static $_cnt_total;
@@ -86,6 +86,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
             //TODO: for less memory usage chunk the products data
             $this->_indexFetchProductsData($products);
+            $this->_indexFetchSortData($products);
             $this->_indexFetchVariantsData($products);
             static::$_cnt_reindexed += count($products);
             unset($products);
@@ -121,14 +122,15 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
         $now = $this->BDb->now();
 
-        $start = 0;
+        #$start = 0;
         do {
-            $lostProducts = $orm
-                ->offset($start)
+            $chunkOrm = clone $orm;
+            $lostProducts = $chunkOrm
+                #->offset($start)
                 ->limit(static::$_maxChunkSize)
                 ->find_many()
             ;
-            $start += static::$_maxChunkSize;
+            #$start += static::$_maxChunkSize;
 
             $lostData = [];
             foreach ($lostProducts as $lostProduct) {
@@ -142,7 +144,6 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
                     'flag_reindex' => 1
                 ];
             }
-
             if (!empty($lostData)){
                 $this->Sellvana_CatalogIndex_Model_Doc->create_many($lostData);
             }
@@ -237,6 +238,28 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         }
     }
 
+    protected function _indexFetchSortData($products)
+    {
+        $sortFields = $this->Sellvana_CatalogIndex_Model_Field->getFields('sort');
+        foreach ($sortFields as $fName => $field) {
+            #$fId = $field->id();
+            $callback = $field->get('sort_callback');
+            if ($callback) {
+                $sortData = $this->BUtil->call($callback, [$products, $field], true);
+                foreach ($sortData as $pId => $value) {
+                    static::$_sortData[$pId][$fName] = $value;
+                }
+            } else {
+                foreach (static::$_indexData as $pId => $pData) {
+                    if (!isset($pData[$fName]) || $pData[$fName] === '') {
+                        continue;
+                    }
+                    static::$_sortData[$pId][$fName] = $pData[$fName];
+                }
+            }
+        }
+    }
+
     protected function _indexFetchVariantsData($products)
     {
         if (!$this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
@@ -274,8 +297,9 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
     protected function _indexCleanMemory($all = false)
     {
-        static::$_indexData = null;
-        static::$_filterValues = null;
+        static::$_indexData = [];
+        static::$_sortData = [];
+        static::$_filterValues = [];
         gc_collect_cycles();
     }
 
@@ -299,7 +323,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             'config' => $this->BConfig->get('modules/Sellvana_CatalogIndex'),
             'result' => [
                 'orm' => $this->Sellvana_Catalog_Model_Product->orm('p', 'catalog_products')
-                    ->join('Sellvana_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd'),
+                    ->join('Sellvana_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd')
+                    ->select('p.*'),
                 'facets' => [],
             ],
         ];

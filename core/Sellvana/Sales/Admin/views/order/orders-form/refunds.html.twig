@@ -1,10 +1,102 @@
-{% set m = THIS.get('model') %}
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').refundsGridConfig(m) %}
+{% set order = THIS.get('model') %}
 
-{% import THIS.view('core/form-elements').twigName() as forms %}
-<div class="f-section">
-    {{ forms.textarea({ id:'refund-items', name:'refund[items]', label:'Refund Items (SKU:QTY)'|_}) }}
+{% set allRefunds = order.getAllRefunds() %}
+
+<div class="f-section" id="order-container">
+
+    {{ THIS.view('core/messages') | raw }}
+
+    {% if allRefunds %}
+        <h2>{{ 'Existing Refunds' }}</h2>
+        <div id="refund-update-container">
+            <table class="table table-bordered table-striped dataTable">
+                <thead>
+                <tr>
+                    <th>{{ 'Status'|_ }}</th>
+                    <th>{{ 'Timeline'|_ }}</th>
+                    <th>{{ 'Amount'|_ }}</th>
+                    <th>{{ 'Delete'|_ }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in allRefunds %}
+                    {% set allOverallStates = c.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = c.state().custom().getNextValueLabels() %}
+                    <tr>
+                        <td>
+                            <p>{{ 'Overall:'|_ }} <strong>{{ c.state().overall().getValueLabel() }}</strong></p>
+                            {% if allCustomStates %}
+                                <p>{{ 'Custom:'|_ }}&nbsp;<select name="refunds[{{ c.id() }}][state_custom]" class="form-control">
+                                        {{ UTIL.optionsHtml(allCustomStates, c.state().custom().getValue()) | raw }}
+                                    </select></p>
+                            {% endif %}
+                            {% for k, v in allOverallStates %}
+                                {% if k != c.get('state_overall') %}
+                                    <input type="button" name="refunds[{{ c.id() }}][state_overall][{{ k }}]" value="{{ v }}" class="btn btn-default btn-xs js-refund-action">
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>{{ 'Created:'|_ }} <strong>{{ c.get('create_at') | locdate }}</strong></p>
+                        </td>
+                        <td>
+                            {{ c.get('amount') | currency('base') }}
+                        </td>
+                        <td>
+                            <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ c.id }}]" value="1">
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><button id="btnRefundUpdate" data-action="update" data-container="#refund-update-container" name="update" class="btn btn-xs btn-primary" type="button" value="1">{{ 'Update'|_ }}</button></td>
+                    <td></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    {% endif %}
 </div>
 
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
-{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
+<script>
+    require(['jquery', 'underscore'], function($, _) {
+        var refundCreateUrl = "{{ APP.href('refunds/create?id=' ~ order.id()) }}";
+        var refundUpdateUrl = "{{ APP.href('refunds/update?id=' ~ order.id()) }}";
+        var defSuccessMsg = "{{ 'Operation successful'|_ }}";
+        var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
+        var container = $('#tab-refunds');
+
+        function processPostResponse(data, status, xhr) {
+            data = data || {};
+            if (status !== 'success') {
+                data.error = true;
+                data.message = data.message || defErrorMsg;
+            }
+            if (data.tabs) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
+                });
+            }
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
+            $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        // Create refundlation or update refund data
+        container.unbind().on('click', '#btnRefundCreate, #btnRefundUpdate', function(ev) {
+            var postUrl = !ev.target.dataset.action ? refundCreateUrl : refundUpdateUrl;
+            var serializeData = $(ev.target.dataset.container).find('input, select').serializeArray();
+            $.post(postUrl, serializeData, processPostResponse);
+        });
+
+        // Update refund status
+        container.on('click', '.js-refund-action', function(ev) {
+            var $el = $(ev.target), postData = {};
+            postData[$el.attr('name')] = $el.val();
+            $.post(refundUpdateUrl, postData, processPostResponse);
+        });
+    })
+</script>

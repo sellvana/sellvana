@@ -1,0 +1,4 @@
+modules:
+    FCom_LibGoogle2FA:
+        version: 0.5.0.0
+        channel: beta

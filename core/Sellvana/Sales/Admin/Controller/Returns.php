@@ -8,12 +8,11 @@
  * @property Sellvana_Sales_Model_Order_Return $Sellvana_Sales_Model_Order_Return
  */
 
-class Sellvana_Sales_Admin_Controller_Returns extends FCom_Admin_Controller_Abstract_GridForm
+class Sellvana_Sales_Admin_Controller_Returns extends Sellvana_Sales_Admin_Controller_Abstract
 {
     public function action_create__POST()
     {
         try {
-            $result = ['tabs' => []];
             $orderId = $this->BRequest->get('id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
 
@@ -29,7 +28,7 @@ class Sellvana_Sales_Admin_Controller_Returns extends FCom_Admin_Controller_Abst
                 'data' => $returnData,
                 'qtys' => $qtys,
             ]);
-            $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
+            $result = $this->_resetOrderTabs($order);
             $result['message'] = $this->_('Return has been created');
         } catch (Exception $e) {
             $result['error'] = true;
@@ -69,8 +68,8 @@ class Sellvana_Sales_Admin_Controller_Returns extends FCom_Admin_Controller_Abst
                     ]);
                 }
             }
+            $result = $this->_resetOrderTabs($order);
             $result['message'] = $this->_('Return updates have been applied');
-            $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();

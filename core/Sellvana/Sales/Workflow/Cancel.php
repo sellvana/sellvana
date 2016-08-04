@@ -10,36 +10,15 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    static protected $_overallStates = [
-        'requested' => 'setRequested',
-        'pending'   => 'setPending',
-        'approved'  => 'setApproved',
-        'declined'  => 'setDeclined',
-        'complete'  => 'setComplete',
-    ];
-
-    static protected $_stateRegistration = [
-        'requested' => false,
-        'pending'   => true,
-        'approved'  => true,
-        'declined'  => false,
-        'complete'  => true,
-    ];
-
-    public function action_customerCancelsOrder($args)
-    {
-        $args['order']->state()->overall()->setCancelRequested();
-        $args['order']->addHistoryEvent('cancel_req', 'Customer has requested order cancellation');
-        $args['order']->save();
-    }
-
     public function action_customerRequestsToCancelItems($args)
     {
+        /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['order'];
         $qtys = $args['qtys'];
 
         /** @var Sellvana_Sales_Model_Order_Cancel $cancelModel */
-        $cancelModel = $this->Sellvana_Sales_Model_Order_Cancel->create()->importFromOrder($order, $qtys);
+        $cancelModel = $this->Sellvana_Sales_Model_Order_Cancel->create();
+        $cancelModel->importFromOrder($order, $qtys);
 
         $cancelModel->state()->overall()->setRequested();
         $cancelModel->state()->custom()->setDefaultState();
@@ -49,19 +28,20 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         foreach ($cancelModel->items() as $cItem) {
             $items[$cItem->get('order_item_id')]->state()->cancel()->setRequested();
         }
-    }
 
-    public function action_adminCancelsOrder($args)
-    {
-        $args['order']->state()->overall()->setCanceled();
-        $args['order']->save();
+        $order->addHistoryEvent('cancel_req', 'Customer has requested order items cancellation');
+        $order->state()->calcAllStates();
+        $order->saveAllDetails();
     }
 
     public function action_adminCancelsOrderItems($args)
     {
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+
         /** @var Sellvana_Sales_Model_Order_Cancel $cancelModel */
         $cancelModel = $this->Sellvana_Sales_Model_Order_Cancel->create([
-            'order_id' => $args['order']->id(),
+            'order_id' => $order->id(),
             'canceled_at' => $this->BDb->now(),
         ]);
         $cancelModel->state()->overall()->setDefaultState();
@@ -77,17 +57,15 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
                 $item->set('qty_backordered', max(0, $qtyBackordered - $qtyToCancel));
             }
 
-            $item->add('qty_canceled', $qtyToCancel);
+            $item->add('qty_in_cancels', $qtyToCancel);
 
             $this->Sellvana_Sales_Model_Order_Cancel_Item->create([
-                'order_id' => $args['order']->id(),
+                'order_id' => $order->id(),
                 'cancel_id' => $cancelModel->id(),
                 'order_item_id' => $item->id(),
                 'qty' => $qtyToCancel,
             ])->save();
         }
-        /** @var Sellvana_Sales_Model_Order $order */
-        $order = $args['order'];
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -117,9 +95,10 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Cancel $cancel */
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->create($data);
         $cancel->importFromOrder($order, $qtys);
-        $cancel->register();
         $cancel->state()->overall()->setApproved();
+        $cancel->save();
 
+        $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -132,27 +111,19 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $data = $args['data'];
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid cancel to update');
+            throw new BException('Invalid cancellation to update');
         }
         if (isset($data['state_custom'])) {
             $cancel->state()->custom()->changeState($data['state_custom']);
         }
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
-                $method = static::$_overallStates[$state];
-                $oldState = $cancel->state()->overall()->getValue();
-                $cancel->state()->overall()->$method();
-
-                if (self::$_stateRegistration[$oldState] != self::$_stateRegistration[$state]) {
-                    if (self::$_stateRegistration[$state]) {
-                        $cancel->register();
-                    } else {
-                        $cancel->unregister();
-                    }
-                }
+                $cancel->state()->overall()->invokeStateChange($state);
             }
         }
         $cancel->save();
+
+        $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }
@@ -164,12 +135,11 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $cancelId = $args['cancel_id'];
         $cancel = $this->Sellvana_Sales_Model_Order_Cancel->load($cancelId);
         if (!$cancel || $cancel->get('order_id') != $order->id()) {
-            throw new BException('Invalid shipment to delete');
-        }
-        if (self::$_stateRegistration[$cancel->state()->overall()->getValue()]) {
-            $cancel->unregister();
+            throw new BException('Invalid cancellation to delete');
         }
         $cancel->delete();
+
+        $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
     }

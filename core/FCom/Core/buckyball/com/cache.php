@@ -43,7 +43,7 @@ class BCache extends BClass
         foreach (['File', 'Shmop', 'Apc', 'Memcache', 'Db'] as $type) {
             $this->addBackend($type, 'BCache_Backend_' . $type);
         }
-        $this->_defaultBackend = $this->BConfig->get('cache/default_backend', 'file');
+        $this->_defaultBackend = $this->BConfig->get('core/cache/default_backend', 'file');
     }
 
     public function addBackend($type, $backend)
@@ -71,9 +71,18 @@ class BCache extends BClass
         return $this;
     }
 
-    public function getAllbackends()
+    public function getAllBackends()
     {
         return $this->_backends;
+    }
+    
+    public function getAllBackendsAsOptions()
+    {
+        $options = [];
+        foreach ($this->getAllBackends() as $type => $backend) {
+            $options[$type] = $type;
+        }
+        return $options;
     }
 
     public function getFastestAvailableBackend()
@@ -106,9 +115,10 @@ class BCache extends BClass
             if (empty($info['available'])) {
                 throw new BException('Cache backend is not available: ' . $type);
             }
-            $config = (array)$this->BConfig->get('cache/' . $type);
+            $config = (array)$this->BConfig->get('core/cache/' . $type);
             $backend->init($config);
             $this->_backendStatus[$type] = true;
+            $this->BDebug->debug('Default cache backend initialized: ' . $type);
         }
         return $this->_backends[$type];
     }
@@ -504,14 +514,14 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
         //TODO: explicit configuration
         if (class_exists('Memcache', false)) {
-            $type = 'Memcache';
+            $this->_type = 'Memcache';
         } elseif (class_exists('Memcached', false)) {
-            $type = 'Memcached';
+            $this->_type = 'Memcached';
         } else {
             return ['available' => false];
         }
 
-        return ['available' => $type && $this->init(), 'rank' => 10];
+        return ['available' => $this->_type && $this->init($this->_config), 'rank' => 10];
     }
 
     public function init($config = [])

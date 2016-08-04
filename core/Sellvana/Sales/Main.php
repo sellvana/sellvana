@@ -171,10 +171,11 @@ class Sellvana_Sales_Main extends BClass
     public function getAllSelectedShippingServices()
     {
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
-        if (!$cart) {
-            return [];
+        if ($cart) {
+            $estimates = $cart->getData('shipping_rates');
+        } else {
+            $estimates = [];
         }
-        $estimates = $cart->getData('shipping_estimates');
 
         $services = [];
         foreach ($this->getShippingMethods() as $mKey => $method) {
@@ -182,7 +183,7 @@ class Sellvana_Sales_Main extends BClass
                 continue;
             }
             foreach ($method->getServicesSelected() as $sKey => $sLabel) {
-                $services[$mKey]['services'][$sKey]['value'] = $mKey . ':' . $sKey;
+                $services[$mKey]['services'][$sKey]['value'] = $sKey;
                 $services[$mKey]['services'][$sKey]['label'] = $sLabel;
                 if ($estimates && !empty($estimates[$mKey][$sKey])) {
                     $services[$mKey]['services'][$sKey]['estimate'] = $estimates[$mKey][$sKey];
@@ -204,7 +205,7 @@ class Sellvana_Sales_Main extends BClass
     /**
      * @param array $args
      */
-    public function checkDefaultShippingPayment($args)
+    public function onCollectActivityItems($args)
     {
         if (!$this->getShippingMethods()) {
             $args['items'][] = [

@@ -7,7 +7,7 @@ modules:
         auto_use: [ layout, views ]
 
         observe:
-            - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_AdminLiveFeed_Main.onGetHeaderNotifications ]
+            - [ "FCom_Admin_Model_Activity::collectActivityItems", Sellvana_AdminLiveFeed_Main.onCollectActivityItems ]
 
             - [ "Sellvana_Catalog_Model_Product::onAfterSave", "Sellvana_AdminLiveFeed_Main.onProductAfterSave" ]
             - [ "Sellvana_Email_Model_Pref::onAfterSave", "Sellvana_AdminLiveFeed_Main.onPrefAfterSave" ]

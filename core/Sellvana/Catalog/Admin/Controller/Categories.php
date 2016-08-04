@@ -3,6 +3,7 @@
 /**
  * Class Sellvana_Catalog_Admin_Controller_Categories
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
+ * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
@@ -70,5 +71,74 @@ class Sellvana_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller
         parent::formPostBefore($args);
 
         $args['model']->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
+    }
+
+    public function formPostAfter($args)
+    {
+        parent::formPostAfter($args);
+
+        /** @var Sellvana_Catalog_Model_Category $category */
+        $category = $args['model'];
+        $pDataJson = $this->BRequest->post('category_products_sort_order');
+        $pDataRaw = $this->BUtil->fromJson($pDataJson);
+        $pData = [];
+        foreach ($pDataRaw as $k => $v) {
+            $pData[(int)$k] = (int)$v ?: null;
+        }
+        if ($pData) {
+            $cps = $this->Sellvana_Catalog_Model_CategoryProduct->orm('cp')
+                ->where('category_id', $category->id())
+                ->where_in('product_id', array_keys($pData))
+                ->find_many_assoc();
+            foreach ($cps as $cp) {
+                $cp->set('sort_order', $pData[$cp->get('product_id')])->save();
+            }
+        }
+    }
+
+    public function action_xhr_search()
+    {
+        $q = $this->BRequest->get('q');
+        if (!$q) {
+            $this->BResponse->json([]);
+            exit;
+        }
+
+        $categories = $this->_indexCategories($q);
+
+        $this->BResponse->json($categories);
+        exit;
+    }
+
+    protected function _indexCategories($q)
+    {
+        $cacheKey = 'categories-index-'
+            . $this->FCom_Admin_Model_User->sessionUserId()
+            . '-' . str_replace(' ', '-', trim($q));
+
+        $cached = $this->BCache->load($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+
+        $q = explode(' ', $q);
+        /** @var BORM $orm */
+        $orm = $this->Sellvana_Catalog_Model_Category->orm()
+            ->select(['id', 'full_name', 'sort_order', 'is_enabled'])
+            ->order_by_asc('sort_order')
+            ->where('is_enabled', 1);
+
+        if (is_array($q)) {
+            foreach($q as $value) {
+                $orm->where_like('full_name', "%{$value}%");
+            }
+        } else {
+            $orm->where_like('full_name', "%{$q}%");
+        }
+
+        $categories = $orm->find_many_assoc('id', 'full_name');
+
+        $this->BCache->save($cacheKey, $categories);
+        return $categories;
     }
 }

@@ -274,18 +274,27 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     public function fetchUpdatesFeed()
     {
         $cacheKey = 'marketclient_updates_last_fetch_at';
-        if ($this->BCache->load($cacheKey)) {
+        $ttlDays = $this->BConfig->get('modules/Sellvana_MarketClient/auto_check_days', 1);
+
+        $lastCheckAt = $this->BCache->load($cacheKey);
+        if ($lastCheckAt && is_numeric($lastCheckAt) && $lastCheckAt > (time() - $ttlDays * 86400)) {
             return [];
         }
-        $ttlDays = $this->BConfig->get('modules/Sellvana_MarketClient/auto_check_days', 1);
-        $this->BCache->save($cacheKey, $this->BDb->now(), $ttlDays * 86400);
 
-        $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('v1/market/site/updates', [
-            'site_key' => $siteKey,
-        ]);
+        $args = [
+            'site_key' => $this->BConfig->get('modules/Sellvana_MarketClient/site_key'),
+        ];
+        if ($lastCheckAt) {
+            $args['last_check'] = $lastCheckAt;
+        }
+
+        $url = $this->getUrl('v1/market/site/updates', $args);
         $response = $this->BUtil->remoteHttp('GET', $url);
         $result = $response ? $this->BUtil->fromJson($response) : [];
+
+        $lastCheckAt = time();
+        $this->BCache->save($cacheKey, $lastCheckAt);
+
         return $result;
     }
 }

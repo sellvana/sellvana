@@ -32,7 +32,7 @@ class FCom_LibTwig_Main extends BClass
 
         $config = $this->BConfig;
 
-        static::$_cacheDir = $config->get('fs/cache_dir') . '/twig';
+        static::$_cacheDir = $this->BApp->storageRandomDir() . '/twig';
         $this->BUtil->ensureDir(static::$_cacheDir);
         $cacheConfig = $this->BConfig->get('core/cache/twig');
         $useCache = !$cacheConfig && $this->BDebug->is(['DEBUG', 'DEVELOPMENT']) || $cacheConfig === 'enable';
@@ -63,6 +63,7 @@ class FCom_LibTwig_Main extends BClass
             'max' => 'max',
             'floor' => 'floor',
             'debug' => function($v) { echo "<pre>"; print_r($v); echo "</pre>"; },
+            'replace1' => function($v, $from, $to) { return str_replace($from, $to, $v); },
         ] as $filterName => $filterCallback) {
             $filter = new Twig_SimpleFilter($filterName, $filterCallback);
             static::$_fileTwig->addFilter($filter);
@@ -105,6 +106,11 @@ class FCom_LibTwig_Main extends BClass
             $this->init($path);
         }
         static::$_fileLoader->prependPath($path, $namespace);
+    }
+
+    public function renderFile($filename, $args)
+    {
+        return static::$_fileTwig->loadTemplate($filename)->render($args);
     }
 
     public function renderer($view)

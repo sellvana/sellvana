@@ -1,10 +1,5 @@
 {% set order = THIS.get('model') %}
-
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
-{#
-{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').shipmentsGridConfig(m) %}
-{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
-#}
+{% set rates = THIS.get('rates') %}
 
 {% set shippableItems = order.getShippableItems() %}
 {% set allMethods = APP.instance('Sellvana_Sales_Main').getShippingMethods() %}
@@ -16,7 +11,7 @@
     {{ THIS.view('core/messages') | raw }}
 
     {% if shippableItems %}
-        <div {#method="post" action="{{ APP.href('shipments/create?id=' ~ order.id()) }}"#} id="shipment-create-container">
+        <div id="shipment-create-container">
             <h2>{{ 'Create a shipment'|_ }}</h2>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -36,7 +31,7 @@
                         <td>{{ i.get('product_name') }}</td>
                         <td>{{ i.get('qty_ordered') }}</td>
                         <td>
-                            <select name="qtys[{{ i.get('id') }}]" class="form-control input-sm">
+                            <select name="qtys[{{ i.get('id') }}]" class="item-qty form-control input-sm" data-weight="{{ i.get('shipping_weight') }}">
                                 <option value=""></option>
                                 {% set qtyCanShip = i.getQtyCanShip() %}
                                 {% for q in range(1, qtyCanShip) %}
@@ -71,12 +66,12 @@
                         <td>
                             <select name="shipment[service_code]" class="form-control input-sm" id="shipment-service_code">
                                 {% for s in allServices[order.get('shipping_method')].services %}
-                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_method') ~ ':' ~ order.get('shipping_service') ? 'selected' }}>{{ s.label }}</option>
+                                    <option value="{{ s.value }}" {{ s.value == order.get('shipping_service') ? 'selected' }}>{{ s.label }}{% if rates[s.value] %} ({{ rates[s.value].price }}){% endif %}</option>
                                 {% endfor %}
                             </select>
                         </td>
                         <td>
-                            <input type="text" class="form-control input-sm" name="shipment[shipping_weight]">
+                            <input type="text" class="form-control input-sm" name="shipment[shipping_weight]" id="shipment-weight">
                         </td>
                         <td>
                             <input type="text" class="form-control input-sm" name="shipment[shipping_size]">
@@ -85,6 +80,7 @@
                             <input type="text" class="form-control input-sm" name="shipment[carrier_price]">
                         </td>
                         <td>
+                            <button id="btnShipmentGetRates" data-container="#shipment-get-rates-container" class="btn btn-xs" type="button">{{ 'Get Rates'|_ }}</button>
                             <button id="btnShipmentCreate" data-container="#shipment-create-container" class="btn btn-xs btn-primary" type="button">{{ 'Create'|_ }}</button>
                         </td>
                     </tr>
@@ -103,7 +99,7 @@
 
     {% if allShipments %}
         <h2>{{ 'Existing Shipments' }}</h2>
-        <div {#method="post" action="{{ APP.href('shipments/update?id=' ~ order.id()) }}"#} id="shipment-update-container">
+        <div id="shipment-update-container">
         <table class="table table-bordered table-striped dataTable">
             <thead>
                 <tr>
@@ -116,8 +112,8 @@
             </thead>
             <tbody>
                 {% for s in allShipments %}
-                    {% set allOverallStates = s.state().overall().getAllValueLabels() %}
-                    {% set allCustomStates = s.state().custom().getAllValueLabels() %}
+                    {% set allOverallStates = s.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = s.state().custom().getNextValueLabels() %}
                     <tr>
                         <td>
                             <p><strong>{{ s.get('carrier_desc') }}</strong></p>
@@ -140,13 +136,27 @@
                             <p>{{ 'Created:'|_ }} <strong>{{ LOCALE.datetimeDbToLocal(s.get('create_at'), constant('BLocale::FORMAT_SHORT_DATE')) }}</strong></p>
                         </td>
                         <td>
+                            {% set allowTracking = false %}
                             {% for p in s.packages() %}
                                 {% for i in p.items() %}
                                     <strong>{{ i.get('inventory_sku') ~ ' x' ~ i.get('qty') }}</strong>: {{ i.get('product_name') }}
                                 {% endfor %}
                                 <p>{{ 'Tracking:'|_ }} <input type="text" name="packages[{{ p.id() }}][tracking_number]" class="form-control input-sm" value="{{ p.get('tracking_number') }}"></p>
+                                {% if p.label() %}
+                                    <a href="{{ APP.href('shipments/printLabel?id=' ~ p.id()) }}" target="_blank">{{ 'Print shipment label'|_ }}</a>
+                                    <br>
+                                {% endif %}
+                                {% if p.canTrackingUpdate() and p.get('tracking_number') and p.getTrackingUrl() %}
+                                    {% set allowTracking = true %}
+                                    <a href="{{ p.getTrackingUrl() }}" class="js-shipment-show-tracking" target="_blank">{{ 'Show tracking status'|_ }}</a>
+                                    <br>
+                                {% endif %}
                                 <hr>
                             {% endfor %}
+                            {% if allowTracking %}
+                                <a href="{{ APP.href('shipments/updateTracking?id=' ~ order.id()) }}" class="js-shipment-update-tracking">{{ 'Receive tracking updates'|_ }}</a>
+                                <br>
+                            {% endif %}
                         </td>
                         <td>
                             <input type="checkbox" class="btn btn-xs btn-danger" name="delete[{{ s.id }}]" value="1">
@@ -172,6 +182,7 @@
     require(['jquery', 'underscore'], function($, _) {
         var shipmentCreateUrl = "{{ APP.href('shipments/create?id=' ~ order.id()) }}";
         var shipmentUpdateUrl = "{{ APP.href('shipments/update?id=' ~ order.id()) }}";
+        var ratesUrl = "{{ APP.href('shipments/rates?id=' ~ order.id()) }}";
         var defSuccessMsg = "{{ 'Operation successful'|_ }}";
         var defErrorMsg = "{{ 'There was an error during processing'|_ }}";
         var container = $('#tab-shipments');
@@ -187,8 +198,18 @@
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);
                 });
             }
-            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'error' : 'success';
+            var msg = data.message || (data.error ? defErrorMsg : defSuccessMsg), type = data.error ? 'danger' : 'success';
             $.bootstrapGrowl(msg, {type: type, align: 'center', width: 'auto', delay: 1000});
+        }
+
+        function calculateWeight() {
+            var totalWeight = 0;
+            $('.item-qty').each(function () {
+                var itemWeight = parseFloat($(this).data('weight'));
+                totalWeight += itemWeight * $(this).val();
+            });
+
+            $('#shipment-weight').val(totalWeight);
         }
 
         // Create shipments or update shipments data
@@ -205,6 +226,25 @@
             $.post(shipmentUpdateUrl, postData, processPostResponse);
         });
 
+        // Get rates for the selected shipping method
+        container.on('click', '#btnShipmentGetRates', function(ev) {
+            var serializeData = $(container).find('input, select').serializeArray();
+            $.post(ratesUrl, serializeData, processPostResponse);
+        });
+
+        // Receiving tracking updates
+        container.on('click', '.js-shipment-update-tracking', function (ev) {
+            ev.preventDefault();
+            var $el = $(ev.target);
+            var shipmentUpdateTrackingUrl = $el.attr('href');
+            var serializeData = $el.parent().find('input, select').serializeArray();
+
+            $.post(shipmentUpdateTrackingUrl, serializeData, processPostResponse);
+        });
+
+        // Recalculate package weight
+        container.on('click', 'select.item-qty', calculateWeight);
+
         // link carrier and service dropdowns
         var $carrier = $('#shipment-carrier_code'), $service = $('#shipment-service_code');
         var allServices = {{ UTIL.toJson(allServices) | raw }};
@@ -219,5 +259,6 @@
             }
         });
 
+        calculateWeight();
     })
 </script>

@@ -129,13 +129,14 @@ class BLayout extends BClass
      * @var array
      */
     protected static $_extRenderers = [
+        '.html' => ['callback' => null],
         '.php' => ['callback' => null],
     ];
 
     /**
      * @var string
      */
-    protected static $_extRegex = '\.php';
+    protected static $_extRegex = '\.html|\.php';
 
     protected $_rememberOverrides = false;
 
@@ -506,6 +507,9 @@ class BLayout extends BClass
         }
         $viewAlias = !empty($params['view_alias']) ? $params['view_alias'] : $viewName;
         $viewFile = !empty($params['view_file']) ? $params['view_file'] : $viewName;
+        if (empty($params['file_ext']) && !empty($params['template'])) {
+            $params['file_ext'] = '.' . pathinfo($params['template'], PATHINFO_EXTENSION);
+        }
         if (!isset($this->_views[$viewAlias]) || !empty($params['view_class'])) {
             if (empty($params['view_class'])) {
                 /*
@@ -731,6 +735,9 @@ class BLayout extends BClass
                     opcache_invalidate($layoutFilename);
                 }
                 $layoutData = include($layoutFilename);
+                break;
+            case 'toml':
+                $layoutData = $this->Toml->parse(file_get_contents($layoutFilename));
                 break;
             default:
                 throw new BException('Unknown layout file type: ' . $layoutFilename);
@@ -1634,7 +1641,7 @@ class BView extends BClass
      */
     public function view($viewName, $params = null)
     {
-        if ($viewName === $this->param('view_name')) {
+        if ($viewName === $this->getParam('view_name')) {
             throw new BException($this->_('Circular reference detected: %s', $viewName));
         }
 
@@ -1656,7 +1663,7 @@ class BView extends BClass
      */
     public function hook($hookName, $args = [])
     {
-        $args['_viewname'] = $this->param('view_name');
+        $args['_viewname'] = $this->getParam('view_name');
         $result = '';
 
         $debug = $this->BDebug->is('DEBUG');
@@ -1687,8 +1694,8 @@ class BView extends BClass
         if (null === $fileExt) {
             $fileExt = $this->getParam('file_ext');
         }
-        $template = $this->param('template');
-        if (!$template && ($viewName = $this->param('view_name'))) {
+        $template = $this->getParam('template');
+        if (!$template && ($viewName = $this->getParam('view_name'))) {
             $template = $viewName . $fileExt;
         }
         if ($template) {
@@ -1733,20 +1740,32 @@ class BView extends BClass
     protected function _render()
     {
         $renderer = $this->getParam('renderer');
+        $viewName = $this->getParam('view_name');
+
         if ($renderer) {
-            BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING ' . print_r($renderer, 1));
+            BDebug::debug('VIEW.RENDER "' . $viewName . '" USING ' . print_r($renderer, 1));
             return $this->BUtil->call($renderer, $this);
         }
 
         if ($this->getParam('source')) {
-            BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" RAW SOURCE');
+            BDebug::debug('VIEW.RENDER "' . $viewName . '" RAW SOURCE');
             return $this->getParam('source');
         }
+        
+        switch ($this->getParam('file_ext')) {
+            case '.html':
+                BDebug::debug('VIEW.RENDER "' . $viewName . '" USING HTML');
+                return file_get_contents($this->getTemplateFileName());
 
-        BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING PHP');
-        ob_start();
-        include $this->getTemplateFileName();
-        return ob_get_clean();
+            case '.php':
+                BDebug::debug('VIEW.RENDER "' . $viewName . '" USING PHP');
+                ob_start();
+                include $this->getTemplateFileName();
+                return ob_get_clean();
+
+            default:
+                throw new BException('Invalid view renderer for "' . $viewName);
+        }
     }
 
     /**
@@ -1759,12 +1778,12 @@ class BView extends BClass
     public function render(array $args = [], $retrieveMetaData = false)
     {
         $debug = $this->BDebug->is('DEBUG') && !$this->get('no_debug');
-        $viewName = $this->param('view_name');
-        $modName = $this->param('module_name');
+        $viewName = $this->getParam('view_name');
+        $modName = $this->getParam('module_name');
 
         $timer = BDebug::debug('RENDER.VIEW @' . $modName . '/' . $viewName);
-        if ($this->param('raw_text') !== null) {
-            return $this->param('raw_text');
+        if ($this->getParam('raw_text') !== null) {
+            return $this->getParam('raw_text');
         }
         foreach ($args as $k => $v) {
             $this->_params['args'][$k] = $v;
@@ -2034,11 +2053,11 @@ class BView extends BClass
 
         $body = $this->render($p, true);
 
-        $metaData = $this->param('meta_data') ? array_change_key_case($this->param('meta_data'), CASE_LOWER) : [];
+        $metaData = $this->getParam('meta_data') ? array_change_key_case($this->getParam('meta_data'), CASE_LOWER) : [];
         $data = array_merge($metaData, array_change_key_case($p, CASE_LOWER));
         $data['body'] = $body;
-        $data['view_name'] = $this->param('view_name');
-        $data['template'] = $this->param('template');
+        $data['view_name'] = $this->getParam('view_name');
+        $data['template'] = $this->getParam('template');
 
         return $this->BEmail->send($data);
     }
@@ -2724,7 +2743,7 @@ if ($this->BDebug->is('DEBUG')) {
      */
     public function render(array $args = [], $retrieveMetaData = true)
     {
-        if (!$this->param('template')) {
+        if (!$this->getParam('template')) {
             $html = $this->getTitle() . "\n" . $this->getMeta() . "\n" . $this->getAllElements();
 
             $scriptsArr = [];

@@ -69,48 +69,78 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function getQtyCanPay()
     {
-        return $this->get('qty_ordered') - $this->get('qty_paid') - $this->get('qty_canceled');
+        return $this->get('qty_ordered') - $this->get('qty_in_cancels');
     }
 
     public function getQtyCanBackorder()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') - $this->get('qty_in_cancels')
                 - $this->get('qty_backordered');
     }
 
     public function getQtyCanShip()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') - $this->get('qty_in_cancels')
                 - $this->get('qty_backordered');
     }
 
     public function getQtyCanCancel()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') -  $this->get('qty_canceled');
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') -  $this->get('qty_in_cancels');
     }
 
     public function getQtyCanReturn()
     {
-        return $this->get('qty_shipped') - $this->get('qty_returned');
-    }
-
-    public function getQtyCanRefund()
-    {
-        return $this->get('qty_paid') - $this->get('qty_refunded');
+        return $this->get('qty_shipped') - $this->get('qty_in_returns');
     }
 
     /**
-     * @param float|null $qty
+     * Get amount available to create a new refund
+     *
+     * @return float
      */
-    public function markAsPaid($qty = null)
+    public function getAmountCanRefund()
     {
-        if ($qty === null) {
-            $qty = $this->get('qty_ordered');
+        return $this->get('amount_paid') - $this->get('amount_in_refunds');
+    }
+
+    /**
+     * Get amount available to complete a refund
+     *
+     * @return float
+     */
+    public function getRefundableAmount()
+    {
+        return $this->get('amount_paid') - $this->get('amount_refunded');
+    }
+
+    public function getCalcPrice()
+    {
+        return ($this->get('row_total') - $this->get('row_discount')) / $this->get('qty_ordered');
+    }
+
+    public function getAmountCanPay()
+    {
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
+    }
+
+    public function getBalanceAmount()
+    {
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_paid');
+    }
+
+    /**
+     * @param float|null $amount
+     */
+    public function markAsPaid($amount = null)
+    {
+        if ($amount === null) {
+            $amount = $this->getAmountCanPay();
         } else {
-            $qty = min($this->get('qty_paid') + $qty, $this->get('qty_ordered'));
+            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getAmountCanPay());
         }
 
-        $this->set('qty_paid', $qty);
+        $this->set('amount_in_payments', $amount);
     }
 
     public function __destruct()

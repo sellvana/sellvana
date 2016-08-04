@@ -16,7 +16,7 @@
           <td class="f-price {{ price.final ? 'f-final-price' }}">
               {{ price.formatted ?: (price.value ? price.value|currency : 'FREE'|_) }}
               {% if price.final %}
-                  <meta itemprop="priceCurrency" content="{{ LOCALE.getCurrencyCode() }}"/>
+                  <meta itemprop="currency" content="{{ LOCALE.getCurrencyCode() }}"/>
                   <meta itemprop="price" content="{{ price.value }}"/>
                   <meta itemprop="availability" content="{{ prod.getInventoryModel().isInStock() ? 'in_stock' : 'out_of_stock' }}"/>
                   <meta itemprop="offerUrl" content="{{ prod.url() }}"/>

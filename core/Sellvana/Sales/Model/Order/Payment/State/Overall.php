@@ -30,11 +30,42 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
         self::CHARGEDBACK => 'Charged Back',
     ];
 
+    protected $_defaultMethods = [
+        self::PENDING => 'setPending',
+        self::OFFLINE => 'setOffline',
+        self::EXT_SENT => 'setExtSent',
+        self::EXT_RETURNED => 'setExtReturned',
+        self::FAILED => 'setFailed',
+        self::CANCELED => 'setCanceled',
+        self::PROCESSING => 'setProcessing',
+        self::PARTIAL_PAID => 'setPartialPaid',
+        self::PAID => 'setPaid',
+        self::PARTIAL_REFUNDED => 'setPartialRefunded',
+        self::REFUNDED => 'setRefunded',
+        self::CHARGEDBACK => 'setChargedBack',
+    ];
+
     protected $_setValueNotificationTemplates = [
         self::REFUNDED => 'email/sales/order-payment-state-overall-refunded',
+        self::PROCESSING => 'email/sales/order-payment-state-overall-processing',
     ];
 
     protected $_defaultValue = self::PENDING;
+
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::FAILED, self::CANCELED, self::PROCESSING],
+        self::OFFLINE => [self::FAILED, self::CANCELED, self::PAID, self::PARTIAL_PAID],
+        self::EXT_SENT => [],
+        self::EXT_RETURNED => [],
+        self::FAILED => [self::PENDING, self::CANCELED],
+        self::CANCELED => [],
+        self::PROCESSING => [self::PAID, self::PARTIAL_PAID],
+        self::PARTIAL_PAID => [self::PAID],
+        self::PAID => [self::CHARGEDBACK, self::REFUNDED, self::PARTIAL_REFUNDED],
+        self::PARTIAL_REFUNDED => [self::REFUNDED],
+        self::REFUNDED => [],
+        self::CHARGEDBACK => [],
+    ];
 
     public function setPending()
     {
@@ -94,5 +125,31 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
     public function setChargedBack()
     {
         return $this->changeState(self::CHARGEDBACK);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        $payment = $this->getModel();
+        switch ($this->getValue()) {
+            case self::PARTIAL_PAID:
+                if (!$payment->get('amount_captured')) {
+                    return;
+                }
+
+                if ($payment->get('amount_due') == 0) {
+                    $this->setPaid();
+                }
+                break;
+            case self::PARTIAL_REFUNDED:
+                if (!$payment->get('amount_refunded')) {
+                    return;
+                }
+
+                if ($payment->get('amount_refunded') >= $payment->get('amount_captured')) {
+                    $this->setRefunded();
+                }
+                break;
+        }
     }
 }

@@ -127,4 +127,35 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
     {
         return $this->BUtil->tagAttributes($attrs);
     }
+
+    public function jsVisibleConditions($p)
+    {
+        if (!empty($p['js_visible'])) {
+            $conditions = preg_replace_callback('#\{([a-zA-Z0-9_]+)\}#', function($m) use ($p) {
+                $p['field'] = $m[1];
+                return "\$('#{$this->getInputId($p)}').val()";
+            }, $p['js_visible']);
+        } elseif (!empty($p['js_toggle'])) {
+            $conditions = '';
+            if ($p['js_toggle'][0] === '!') {
+                $p['js_toggle'] = substr($p['js_toggle'], 1);
+                $conditions = '!';
+            }
+            $conditions .= "(\$('#{$this->jsVisibleToggleId($p)}').val() == 1)";
+        } else {
+            $conditions = false;
+        }
+
+        return $conditions;
+    }
+
+    public function jsVisibleToggleId($p)
+    {
+        if ($p['js_toggle'][0] === '#') {
+            return substr($p['js_toggle'], 1);
+        }
+        $p1 = $p;
+        $p1['field'] = ltrim($p1['js_toggle'], '!');
+        return $this->getInputId($p1);
+    }
 }

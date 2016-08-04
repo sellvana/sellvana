@@ -1,0 +1,31 @@
+<!--{ title: Reset Password }-->
+
+<div class='login-container'>
+    <h1 class="login-logo">Sellvana Admin</h1>
+    <div class='container'>
+        {{ THIS.view('core/messages') | raw }}
+        <h1 class='text-center title'>{{ 'Enter your current password to reset 2FA'|_ }}</h1>
+        <form id="password-form" action='{{ APP.href('g2fa/reset') }}' class="validate-form" method='post'>
+            <div class='form-group'>
+                <div class='controls with-icon-over-input'>
+                    <input value="" placeholder="{{ 'Password'|_ }}" class="required form-control" data-rule-required="true" id="password" name="model[password]" type="password" pattern=".{6,}" />
+                </div>
+            </div>
+            <input type="hidden" name="token" value="{{ REQUEST.get('token') }}">
+            <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Reset 2FA'|_ }}</button>
+        </form>
+    </div>
+</div>
+<script>
+    require(['jquery', 'jquery.validate', 'fcom.password'], function($) {
+        $(function() {
+            $('#password-form').validate({
+                rules:{
+                    'model[password]': {
+                        passwordSecurity: {{ CONFIG.get('modules/FCom_Admin/password_strength') ? 'true' : 'false' }}
+                    }
+                }
+            });
+        })
+    })
+</script>

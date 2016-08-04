@@ -1,0 +1,28 @@
+modules:
+    Sellvana_ShippingFedex:
+        version: 0.6.0.0
+
+        channel: beta
+        require: { module: { Sellvana_Checkout: 0.2.1 } }
+        description: "Fedex shipping module"
+        auto_use: [ bootstrap ]
+
+        observe:
+            - [ Sellvana_Sales_Model_Order_Shipment_State_Overall::changeState, Sellvana_ShippingFedex_Main.onShipmentStateChange ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+
+        default_config:
+            modules/Sellvana_ShippingFedex/services: ['_INTERNATIONAL_ECONOMY']
+            modules:
+                Sellvana_ShippingFedex:
+                    enabled: 1
+                    label: FedEx
+                    max_package_weight: 150
+                    production_mode: 0
+                    sort_order: 10
+                    dropoff_location: 'REGULAR_PICKUP'
+                    insurance: 1
+                    all_services: true

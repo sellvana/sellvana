@@ -8,7 +8,7 @@
     {{ THIS.view('core/messages') | raw }}
 
     {% if returnableItems %}
-        <div {#method="post" action="{{ APP.href('returns/create?id=' ~ order.id()) }}"#} id="return-create-container">
+        <div id="return-create-container">
             <h2>{{ 'Create a return'|_ }}</h2>
             <table class="table table-bordered table-striped dataTable">
                 <thead>
@@ -54,7 +54,7 @@
 
     {% if allReturns %}
         <h2>{{ 'Existing Returns' }}</h2>
-        <div {#method="post" action="{{ APP.href('returns/update?id=' ~ order.id()) }}"#} id="return-update-container">
+        <div id="return-update-container">
             <table class="table table-bordered table-striped dataTable">
                 <thead>
                 <tr>
@@ -66,8 +66,8 @@
                 </thead>
                 <tbody>
                 {% for c in allReturns %}
-                    {% set allOverallStates = c.state().overall().getAllValueLabels() %}
-                    {% set allCustomStates = c.state().custom().getAllValueLabels() %}
+                    {% set allOverallStates = c.state().overall().getNextValueLabels() %}
+                    {% set allCustomStates = c.state().custom().getNextValueLabels() %}
                     <tr>
                         <td>
                             <p>{{ 'Overall:'|_ }} <strong>{{ c.state().overall().getValueLabel() }}</strong></p>

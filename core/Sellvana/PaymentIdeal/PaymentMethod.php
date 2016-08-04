@@ -25,6 +25,8 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     protected $_config;
 
+    protected $_code = 'ideal';
+
     /**
      * @var string
      */

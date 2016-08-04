@@ -22,6 +22,7 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
     protected function _indexSaveData()
     {
         $this->_indexSaveDocs();
+        $this->_indexSaveSortData();
         $this->_indexSaveFilterData();
         $this->_indexSaveSearchData();
         $this->_indexCleanMemory();
@@ -30,36 +31,20 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
     protected function _indexSaveDocs()
     {
         $docHlp = $this->Sellvana_CatalogIndex_Model_Doc;
-        $sortHlp = $this->Sellvana_CatalogIndex_Model_DocSort;
         $now = $this->BDb->now();
-        $sortFields = $this->Sellvana_CatalogIndex_Model_Field->getFields('sort');
-        $sortColumn = [];
-        $sortJoin = [];
-        foreach ($sortFields as $fName => $field) {
-            if ($field->get('sort_method') === 'join') {
-                $sortJoin[$fName] = $field;
-            } else {
-                $sortColumn[$fName] = $field;
-            }
-        }
         foreach (static::$_indexData as $pId => $pData) {
-            $row = ['id' => $pId, 'last_indexed' => $now];
+            $docHlp->create(['id' => $pId, 'last_indexed' => $now])->save();
+        }
+    }
 
-            foreach ($sortColumn as $fName => $field) {
-                if (!array_key_exists($fName, $pData)) {
-                    continue;
-                }
-                $row['sort_' . $fName] = null !== $pData[$fName] ? substr((string)$pData[$fName], 0, 50) : null;
-            }
-
-            $docHlp->create($row)->save();
-
-            foreach ($sortJoin as $fName => $field) {
-                if (!isset($pData[$fName])) {
-                    continue;
-                }
-                $row = ['doc_id' => $pId, 'field_id' => $field->id(), 'value' => $pData[$fName]];
-                $sortHlp->create($row)->save();
+    protected function _indexSaveSortData()
+    {
+        $sortFields = $this->Sellvana_CatalogIndex_Model_Field->getFields('sort');
+        $sortHlp = $this->Sellvana_CatalogIndex_Model_DocSort;
+        foreach (static::$_sortData as $pId => $sData) {
+            foreach ($sData as $fName => $value) {
+                $fId = is_numeric($fName) ? $fName : $sortFields[$fName]->id();
+                $sortHlp->create(['doc_id' => $pId, 'field_id' => $fId, 'sort_value' => $value])->save();
             }
         }
     }
@@ -596,11 +581,26 @@ DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt whe
                 $sort = trim($req->get('s') . ' ' . $req->get('sd'));
             }
         }
+        $sort = preg_replace('#[^a-z0-9_. ]#', '', $sort);
         if ($sort) {
-            list($field, $dir) = is_string($sort) ? explode(' ', $sort) + ['', ''] : $sort;
-            $method = 'order_by_' . (strtolower($dir) == 'desc' ? 'desc' : 'asc');
+            list($f, $dir) = is_string($sort) ? explode(' ', $sort) + ['', ''] : $sort;
+            $sortFields = $this->Sellvana_CatalogIndex_Model_Field->getFields('sort');
+            if (empty($sortFields[$f])) {
+                return;
+            }
 
-            $this->_bus['result']['orm']->$method($field);
+            $fId = $sortFields[$f]->id();
+            $method = 'order_by_' . (strtolower($dir) == 'desc' ? 'desc' : 'asc');
+            $sortBy = 'ds.sort_value';
+            $castAs = $sortFields[$f]->get('sort_method');
+            if ($castAs !== 'text') {
+                $sortBy = "(cast(ds.sort_value as {$castAs}))";
+            }
+
+            $this->_bus['result']['orm']
+                ->left_outer_join('Sellvana_CatalogIndex_Model_DocSort', "ds.doc_id=p.id and ds.field_id={$fId}", 'ds')
+                ->{$method}($sortBy)
+            ;
         }
     }
 }
