@@ -532,7 +532,7 @@
             if (form.valid()) {
                 var rows = _(optionsModalGrid.getRows()).filter(function (row) {
                     row.label = _trimSpaces(row.label);
-                    $('tr[id="' + row.id + '"]').find('input[data-col="label"]').val(row.label);
+                    $('#options-tab tr[id="' + row.id + '"]').find('input[data-col="label"]').val(row.label);
                     if (row.edited) {
                         $(APP).trigger('edit', [row, true, false]);
                     }
