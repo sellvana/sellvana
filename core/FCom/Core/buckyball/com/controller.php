@@ -475,21 +475,25 @@ class BRequest extends BClass
         if (null === $path) {
             $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
                 (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : null);
-                /*
-                    (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
-                        (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
-                    )
-                );*/
+            /*
+                (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
+                    (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
+                )
+            );*/
 
             if (null === $path && !empty($_SERVER['REQUEST_URI'])) {
-                $rootPathRe = '#' . preg_quote(dirname($_SERVER['SCRIPT_NAME']), '#') . '#';
-                $path = preg_replace(['#[?].*$#', $rootPathRe], '', $_SERVER['REQUEST_URI']);
+                $path = $_SERVER['REQUEST_URI'];
+                $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+                if ($scriptDir && $scriptDir !== '/') {
+                    $rootPathRe = '#' . preg_quote(dirname($_SERVER['SCRIPT_NAME']), '#') . '#';
+                    $path = preg_replace(['#[?].*$#', $rootPathRe], '', $path);
+                }
             }
-
             // nginx rewrite fix
             $basename = basename($this->scriptName());
-            $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
-
+            if ($basename && $basename !== '/') {
+                $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
+            }
             $re = '#^/(([a-z]{2})(_[A-Z]{2})?)(/.*|$)#';
             if ($this->BConfig->get('web/language_in_url') && preg_match($re, $path, $match)) {
                 static::$_language = $match[2];
