@@ -3,7 +3,7 @@
 /**
  * FCom Row Component
  */
-define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], function (_, React, Components, FComSelect2) {
+define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'griddle.fcomLanguage'], function (_, React, Components, FComSelect2, FComMultiLanguage) {
     /*
      var React = require('react/addons');
      var _ = require('underscore');
@@ -59,6 +59,16 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                     }
                 }.bind(this));
             }
+        },
+        _parseLangToOptions: function (input_type, langs) {
+            var results = [];
+            if (_.keys(langs).length) {
+                _.each(langs, function (lang, code) {
+                    results.push({input_type: input_type, lang_code: code, value: lang});
+                });
+            }
+
+            return results;
         },
         render: function () {
             var that = this;
@@ -187,10 +197,26 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                                                   validationRules), selectOptions);
                                     break;
                                 default:
-                                    node = React.createElement("input", React.__spread({key: col.name, type: "text", 
-                                                  defaultValue: defaultValue, 
-                                                  onChange: that.handleChange.bind(null, col.callback)}, 
-                                                inlineProps,  col.attrs,  validationRules));
+                                    if (col.multilang != undefined) {
+                                        var langs = (row.multilanguage && row.multilanguage[col.multilang.id]) || [];
+                                        var multilangConfig = {
+                                            id: col.multilang.id + '_' + row.id,
+                                            dataId: row.id,
+                                            dataName: col.multilang.id,
+                                            inputType: row.input_type,
+                                            data: that._parseLangToOptions(row.input_type, langs),
+                                            locales: col.multilang.locales || [],
+                                            modalConfig: {
+                                                onSaved: col.multilang.callback || that.handleSaveLangField.bind(this)
+                                            },
+                                            select2Config: {}
+                                        };
+                                    }
+                                    node = React.createElement("div", null, React.createElement("input", React.__spread({key: col.name, type: "text", 
+                                                       defaultValue: defaultValue, 
+                                                       onChange: that.handleChange.bind(null, col.callback)},  inlineProps,  col.attrs,  validationRules)), 
+                                                col.multilang != undefined ? React.createElement(FComMultiLanguage, React.__spread({},  multilangConfig)) : null
+                                            );
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";

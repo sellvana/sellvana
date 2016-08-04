@@ -242,8 +242,10 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 $container.unwrap();
             }
 
-            if (valid && modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
-                window[modalConfig.onSaved](modal, this.state.data);
+            if (valid && modalConfig.onSaved) {
+                if (typeof window[modalConfig.onSaved] === 'function') {
+                    window[modalConfig.onSaved](modal, this.state.data, this.props.dataId, this.props.dataName);
+                }
 
                 // Update storage data
                 this.setStoreData('data', this.state.data);
@@ -328,6 +330,8 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
             return (
                 <div className={this.props.cClass || ''}>
                     <Components.Button type="button" style={{marginBottom: '10px'}}
+                                       data-id={this.props.dataId || ''}
+                                       data-name={this.props.dataName || ''}
                                        className={'btn btn-xs multilang ' + (langLabel ? 'btn-info' : '')}
                                        onClick={this.showModal}>
                         {!langLabel ? <i className="icon icon-globe"/> : ''} {langLabel || Locale._('Translate')}

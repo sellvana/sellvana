@@ -51,6 +51,21 @@
             shopperGrid.addRows([{id: guid()}]);
         };
 
+        window.saveShopperLangField = function (modal, data, id, name) {
+            var rows = shopperGrid.getRows();
+            var field = _.findWhere(rows, {id: id});
+            field.multilanguage = field.multilanguage || {};
+            field.multilanguage[name] = field.multilanguage[name] || {};
+
+            _.each(data, function (lang) {
+                if (field.multilanguage[name][lang.lang_code] == undefined) {
+                    field.multilanguage[name][lang.lang_code] = lang.value;
+                }
+            });
+
+            modal.close();
+        }
+
         /*
          *function to set attachment grid data into form fields to send them server
          *This function is callend when 'save' button of product form is clicked.
@@ -65,7 +80,7 @@
                 if (row.position == 0) {
                     row.position = 0;
                 }
-                var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position', 'group', 'qty_min', 'qty_max');
+                var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position', 'group', 'qty_min', 'qty_max', 'multilanguage');
                 data['id'] = ++index;
 
                 var $priceEle = $('input[data-shopper-id="' + row.id + '"]');
