@@ -1830,6 +1830,11 @@ class BUtil extends BClass
         return preg_replace('#[0 :-]#', '', (string)$date) === '';
     }
 
+    public function isValidDate($date)
+    {
+        return preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $date);
+    }
+
     /**
      * Get gravatar image src by email
      *

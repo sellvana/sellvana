@@ -482,16 +482,17 @@ class BRequest extends BClass
             );*/
 
             if (null === $path && !empty($_SERVER['REQUEST_URI'])) {
-                $path = $_SERVER['REQUEST_URI'];
+                $path = preg_replace('#[?].*$#', '', $_SERVER['REQUEST_URI']);
                 $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+
                 if ($scriptDir && $scriptDir !== '/') {
                     $rootPathRe = '#' . preg_quote(dirname($_SERVER['SCRIPT_NAME']), '#') . '#';
-                    $path = preg_replace(['#[?].*$#', $rootPathRe], '', $path);
+                    $path = preg_replace($rootPathRe, '', $path);
                 }
             }
             // nginx rewrite fix
             $basename = basename($this->scriptName());
-            if ($basename && $basename !== '/') {
+            if ($basename && ($basename !== '/' || $basename[0] !== '/')) {
                 $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
             }
             $re = '#^/(([a-z]{2})(_[A-Z]{2})?)(/.*|$)#';
