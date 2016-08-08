@@ -51,21 +51,6 @@
             shopperGrid.addRows([{id: guid()}]);
         };
 
-        window.saveShopperLangField = function (modal, data, id, name) {
-            var rows = shopperGrid.getRows();
-            var field = _.findWhere(rows, {id: id});
-            field.multilanguage = field.multilanguage || {};
-            field.multilanguage[name] = field.multilanguage[name] || {};
-
-            _.each(data, function (lang) {
-                if (field.multilanguage[name][lang.lang_code] == undefined) {
-                    field.multilanguage[name][lang.lang_code] = lang.value;
-                }
-            });
-
-            modal.close();
-        }
-
         /*
          *function to set attachment grid data into form fields to send them server
          *This function is callend when 'save' button of product form is clicked.
@@ -188,7 +173,7 @@
         }
     });
 
-    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.product.price', 'fcom.locale', 'fcom.catalog.components'], function (React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
+    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.product.price', 'fcom.locale', 'griddle.fcomLanguage', 'fcom.catalog.components'], function (React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale, FComMultiLanguage) {
 
         "use strict";
 
@@ -339,13 +324,8 @@
          * @param  {String} option
          */
         function _initOptionsSerializeItem(option) {
-            if (!shopper.option_serialized) {
-                shopper.option_serialized = {};
-            }
-
-            if (!shopper.option_serialized[_toggleSpace(option)]) {
-                shopper.option_serialized[_toggleSpace(option)] = {};
-            }
+            shopper.option_serialized = shopper.option_serialized || {};
+            shopper.option_serialized[_toggleSpace(option)] = shopper.option_serialized[_toggleSpace(option)] || {};
         }
 
 
@@ -475,6 +455,8 @@
                 _initOptionsSerializeItem(optionLabel);
                 shopper.option_serialized[optionLabel].sku = row.sku;
                 shopper.option_serialized[optionLabel].position = row.position;
+                // Reset multilanguage data for saving changes
+                shopper.option_serialized[optionLabel]['multilanguage'] = {};
 
                 data[optionLabel]['sku'] = row.sku;
                 data[optionLabel]['position'] = row.position;
@@ -492,6 +474,21 @@
                     });
                     prices.push(price);
                 });
+
+                var langFields = $('#' + optionLabel).find('.lang-field');
+                if (langFields.length) {
+                    var langs = {};
+                    _.each(langFields, function (field, i) {
+                        var code = field.dataset.code;
+                        var lang = {};
+
+                        langs[code] = field.value;
+                    });
+
+                    data[optionLabel]['multilanguage'] = langs;
+                    // update multi-languages for specific option
+                    shopper.option_serialized[optionLabel]['multilanguage'] = langs;
+                }
 
                 if (prices.length) {
                     data[optionLabel]['prices'] = prices;
@@ -547,7 +544,7 @@
             if (form.valid()) {
                 var rows = _(optionsModalGrid.getRows()).filter(function (row) {
                     row.label = _trimSpaces(row.label);
-                    $('tr[id="' + row.id + '"]').find('input[data-col="label"]').val(row.label);
+                    $('input#options-grid-label-' + row.id).val(row.label);
                     if (row.edited) {
                         $(APP).trigger('edit', [row, true, false]);
                     }
@@ -673,7 +670,7 @@
                                 onLoad: function (modal) {
                                     shopperModalNode = $(modal.getDOMNode());
                                     form = shopperModalNode.find('#{{ frontendFieldGrid.config.id }}_options_form');
-                                    shopperModalNode.find('.modal-dialog').css('width', '1280px')
+                                    shopperModalNode.find('.modal-dialog').css('width', '1100px')
                                 },
                                 onConfirm: window.saveShopperModal
                             },
@@ -933,7 +930,7 @@
                                             'aria-controls': 'options-tab',
                                             role: 'tab',
                                             'data-toggle': 'tab'
-                                        }, 'Options')
+                                        }, "{{ 'Options'|_ }}")
                                 ),
                                 React.DOM.li({className: '', role: 'presentation'},
                                         React.DOM.a({
@@ -943,7 +940,7 @@
                                             role: 'tab',
                                             'data-toggle': 'tab',
                                             onClick: window.applyPricesForAllFields
-                                        }, 'Price rule')
+                                        }, "{{ 'Prices & Translations'|_ }}")
                                 )
                         ),
                         React.DOM.div({className: "tab-content"},
@@ -1124,10 +1121,11 @@
             },
             render: function () {
                 var navTabs = [], tabPanes = [];
+                var option_serialized = this.props.row.option_serialized || {};
                 _(this.props.options).each(function (option, i) {
                     option = _toggleSpace(option);
                     var priceOptions = this.init(option);
-
+                    var langs = option_serialized[option].multilanguage || {};
                     var className = '';
                     if (this.props.init && i === 0) {
                         className = "active";
@@ -1158,7 +1156,18 @@
                             id: option,
                             key: option
                         },
-                        React.createElement(Price, {key: option, id: option, options: priceOptions})
+                        React.createElement(Price, {key: option, id: option, options: priceOptions}),
+                        React.DOM.hr(),
+                        React.DOM.h3(null, "{{ 'Option Label Translations'|_ }}"),
+                        React.createElement(FComMultiLanguage, {
+                            id: option,
+                            inputType: 'text',
+                            data: this.parseLangsToOption('text', langs),
+                            locales: {{ UTIL.toJson(LOCALE.parseAllowedLocalesToOptions()) | raw }},
+                            containerStyles: {
+                                width: '50%'
+                            }
+                        })
                     );
 
                     navTabs.push(navTab);

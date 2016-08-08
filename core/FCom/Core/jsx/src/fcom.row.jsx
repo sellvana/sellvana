@@ -60,15 +60,22 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'griddl
                 }.bind(this));
             }
         },
-        _parseLangToOptions: function (input_type, langs) {
-            var results = [];
-            if (_.keys(langs).length) {
-                _.each(langs, function (lang, code) {
-                    results.push({input_type: input_type, lang_code: code, value: lang});
-                });
-            }
+        handleSaveLangField: function (id, callback, modal, langs) {
+            var row = this.props.row;
+            row.multilanguage = row.multilanguage || {};
+            row.multilanguage[id] = row.multilanguage[name] || {};
 
-            return results;
+            _.each(langs, function (lang) {
+                if (row.multilanguage[id][lang.lang_code] == undefined) {
+                    row.multilanguage[id][lang.lang_code] = lang.value;
+                }
+            });
+            
+            if (typeof window[callback] === 'function') {
+                window[callback](modal, langs, id);
+            } else {
+                modal.close();
+            }
         },
         render: function () {
             var that = this;
@@ -201,20 +208,18 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'griddl
                                         var langs = (row.multilanguage && row.multilanguage[col.multilang.id]) || [];
                                         var multilangConfig = {
                                             id: col.multilang.id + '_' + row.id,
-                                            dataId: row.id,
-                                            dataName: col.multilang.id,
                                             inputType: row.input_type,
-                                            data: that._parseLangToOptions(row.input_type, langs),
+                                            data: that.parseLangsToOption(row.input_type, langs),
                                             locales: col.multilang.locales || [],
                                             modalConfig: {
-                                                onSaved: col.multilang.callback || that.handleSaveLangField.bind(this)
-                                            },
-                                            select2Config: {}
+                                                onSaved: that.handleSaveLangField.bind(null, col.multilang.id, col.multilang.callback)
+                                            }
                                         };
                                     }
                                     node = <div><input key={col.name} type="text"
                                                        defaultValue={defaultValue}
-                                                       onChange={that.handleChange.bind(null, col.callback)} {...inlineProps} {...col.attrs} {...validationRules}  />
+                                                       onChange={that.handleChange.bind(null, col.callback)}
+                                        {...inlineProps} {...col.attrs} {...validationRules}  />
                                                 {col.multilang != undefined ? <FComMultiLanguage {...multilangConfig} /> : null}
                                             </div>;
                                     break;

@@ -78,7 +78,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 <div>
                     {_(this.props.langs).map(function (lang, key) {
                         return (
-                            <div key={that.props.id + lang.lang_code} className="form-group">
+                            <div key={that.props.id + lang.lang_code} className="form-group col-md-12">
                                 <div className="col-md-3 control-label">
                                     <span className="badge badge-default">{lang.lang_code}</span>
                                 </div>
@@ -117,8 +117,6 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
             };
         },
         componentWillMount: function () {
-            this.props.modalConfig = this.getModalConfig();
-
             this.setStoreData('data', this.state.data);
             this.setStoreData('locales', this.state.locales);
 
@@ -126,6 +124,9 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 data: this.props.data,
                 locales: this.props.locales
             });
+        },
+        componentDidMount: function () {
+            
         },
         shouldComponentUpdate: function (nextProps, nextState) {
             return nextState.data != this.state.data || nextState.locales != this.state.locales;
@@ -243,8 +244,10 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
             }
 
             if (valid && modalConfig.onSaved) {
-                if (typeof window[modalConfig.onSaved] === 'function') {
-                    window[modalConfig.onSaved](modal, this.state.data, this.props.dataId, this.props.dataName);
+                if (typeof modalConfig.onSaved === 'function') {
+                    modalConfig.onSaved(modal, this.state.data);
+                } else if (typeof window[modalConfig.onSaved] === 'function') {
+                    window[modalConfig.onSaved](modal, this.state.data);
                 }
 
                 // Update storage data
@@ -319,7 +322,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
         warn: function (value) {
             console.warn(value);
         },
-        render: function () {
+        renderModal: function () {
             var inlineProps = this.getSelect2Config(),
                 locales = this.getLocales(),
                 langIds = _.pluck(this.state.data, 'lang_code'),
@@ -328,7 +331,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 }).join(',') : Locale._('Multi Languages ...') : null;
 
             return (
-                <div className={this.props.cClass || ''}>
+                <div style={this.props.containerStyles || {}} className={this.props.cClass || ''}>
                     <Components.Button type="button" style={{marginBottom: '10px'}}
                                        data-id={this.props.dataId || ''}
                                        data-name={this.props.dataName || ''}
@@ -364,6 +367,42 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                     </Components.Modal>
                 </div>
             );
+        },
+        renderNode: function () {
+            var inlineProps = this.getSelect2Config(),
+                locales = this.getLocales();
+            
+            return (
+                <div style={this.props.containerStyles || {}} className={this.props.cClass || ''}>
+                    <div className="well">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <FComSelect2 options={locales} onChange={this._handleSelect2Change}
+                                                 defaultValue={[]} {...inlineProps}/>
+                                </td>
+                                <td>
+                                    <Components.Button type="button" className='btn-sm btn-primary'
+                                                       onClick={this._handleAddField}>
+                                        {Locale._('Add Locale')}
+                                    </Components.Button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id={this.props.id + '-container'} ref='container'>
+                        <LangFields id={this.props.id}
+                                    langs={this.state.data || []}
+                                    removeField={this.handleRemoveField}
+                                    setLangVal={this.setLangVal} />
+                    </div>
+                </div>
+            );
+        },
+        render: function () {
+            return !_.isEmpty(this.props.modalConfig) ? this.renderModal() : this.renderNode();
         }
     });
 
