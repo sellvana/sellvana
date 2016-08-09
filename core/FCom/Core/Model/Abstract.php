@@ -144,8 +144,16 @@ class FCom_Core_Model_Abstract extends BModel
             $this->set(static::$_dataSerializedField, $this->BUtil->toJson($data));
         }
 
+        $createAt = $this->get('create_at');
+        if (null !== $createAt && '' !== $createAt && !$this->BUtil->isValidDate($createAt)) {
+            $this->BDebug->log("Reverting invalid create_at date: {$createAt} (" . get_class($this) . ".{$this->id()}");
+            $this->set('create_at', $this->old_values('create_at'));
+        }
         $now = $this->BDb->now();
-        $this->set('create_at', $now, 'IFNULL')->set('update_at', $now);
+        if (null === $createAt || '' === $createAt) {
+            $this->set('create_at', $now);
+        }
+        $this->set('update_at', $now);
 
         return true;
     }

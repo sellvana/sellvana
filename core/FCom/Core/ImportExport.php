@@ -185,9 +185,9 @@ class FCom_Core_ImportExport extends BClass
      */
     public function export($models = [], $toFile = null, $batch = null)
     {
-        $fe = $this->_getWriteHandle($toFile);
-
-        if (!$fe) {
+        try {
+            $fe = $this->_getWriteHandle($toFile);
+        } catch (BException $e) {
             $this->log([
                 'msg' => $this->_('Could not open file for writing, aborting export.'),
                 'data' => [
@@ -1010,7 +1010,9 @@ class FCom_Core_ImportExport extends BClass
         $path = $this->BApp->storageRandomDir() . '/' . $type;
         if (!$file) {
             $file = $this->_defaultExportFile;
-        } elseif (!$this->BUtil->isPathWithinRoot($file, $path)) {
+        }
+        $file = $path . '/' . $file;
+        if (!$this->BUtil->isPathWithinRoot($file, $path)) {
             return false;
         }
         if ($this->BUtil->isPathAbsolute($file)) {
@@ -1201,11 +1203,12 @@ class FCom_Core_ImportExport extends BClass
             return $fromFile;
         }
 
-        if (strpos($fromFile, '://') !== false) {
-            $path = $fromFile; // allow stream readers
+        if (strpos($fromFile, '://') !== false || $this->BUtil->isPathAbsolute($fromFile)) {
+            $path = $fromFile; // allow stream readers and absolute paths
         } else {
             $path = $this->getFullPath($fromFile, $type);
         }
+
         if (!is_readable($path)) {
             return false;
         }
