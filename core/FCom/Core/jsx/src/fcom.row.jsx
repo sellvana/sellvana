@@ -3,7 +3,7 @@
 /**
  * FCom Row Component
  */
-define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], function (_, React, Components, FComSelect2) {
+define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'griddle.fcomLanguage'], function (_, React, Components, FComSelect2, FComMultiLanguage) {
     /*
      var React = require('react/addons');
      var _ = require('underscore');
@@ -58,6 +58,23 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                         this.props.refresh();
                     }
                 }.bind(this));
+            }
+        },
+        handleSaveLangField: function (id, callback, modal, langs) {
+            var row = this.props.row;
+            row.multilanguage = row.multilanguage || {};
+            row.multilanguage[id] = row.multilanguage[name] || {};
+
+            _.each(langs, function (lang) {
+                if (row.multilanguage[id][lang.lang_code] == undefined) {
+                    row.multilanguage[id][lang.lang_code] = lang.value;
+                }
+            });
+            
+            if (typeof window[callback] === 'function') {
+                window[callback](modal, langs, id);
+            } else {
+                modal.close();
             }
         },
         render: function () {
@@ -187,10 +204,24 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                                                   {...validationRules}>{selectOptions}</select>;
                                     break;
                                 default:
-                                    node = <input key={col.name} type="text"
-                                                  defaultValue={defaultValue}
-                                                  onChange={that.handleChange.bind(null, col.callback)}
-                                                {...inlineProps} {...col.attrs} {...validationRules}  />;
+                                    if (col.multilang != undefined) {
+                                        var langs = (row.multilanguage && row.multilanguage[col.multilang.id]) || [];
+                                        var multilangConfig = {
+                                            id: col.multilang.id + '_' + row.id,
+                                            inputType: row.input_type,
+                                            data: that.parseLangsToOption(row.input_type, langs),
+                                            locales: col.multilang.locales || [],
+                                            modalConfig: {
+                                                onSaved: that.handleSaveLangField.bind(null, col.multilang.id, col.multilang.callback)
+                                            }
+                                        };
+                                    }
+                                    node = <div><input key={col.name} type="text"
+                                                       defaultValue={defaultValue}
+                                                       onChange={that.handleChange.bind(null, col.callback)}
+                                        {...inlineProps} {...col.attrs} {...validationRules}  />
+                                                {col.multilang != undefined ? <FComMultiLanguage {...multilangConfig} /> : null}
+                                            </div>;
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
