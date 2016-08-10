@@ -2174,7 +2174,10 @@ class BSession extends BClass
         $path = $this->BRequest->getCookiePath();
 
         session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
+        if (!empty($config['session_handler'])
+            && $config['session_handler'] !== 'default'
+            && !empty($this->_availableHandlers[$config['session_handler']])
+        ) {
             $class = $this->_availableHandlers[$config['session_handler']];
             $this->{$class}->register($ttl);
         } else {
