@@ -2562,10 +2562,10 @@ class BSession_Memcached extends BClass
             $savePath = 'localhost:11211';
         }
 
-        /*if (class_exists('Memcache', false)) {
+        if (class_exists('Memcache', false)) {
             ini_set('session.save_handler', 'memcache');
             ini_set('session.save_path', $savePath);
-        } else*/if (class_exists('Memcached', false)) {
+        } elseif (class_exists('Memcached', false)) {
             ini_set('session.save_handler', 'memcached');
             ini_set('session.save_path', $savePath);
         }
