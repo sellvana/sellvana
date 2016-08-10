@@ -1,7 +1,62 @@
 {% set m = THIS.get('model') %}
 {% set postCtrl =  APP.instance('Sellvana_Blog_Admin_Controller_Post') %}
+{% set allPostConfig = postCtrl.getAllPostConfig() %}
+{% set postsAttachConfigCompiled = THIS.view('core/griddle').set('grid', allPostConfig).getGridConfig() %}
 <script>
-    require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'jquery.validate'], function($, _, React, FComGriddleComponent, Components) {
+        var postGrid, postAllGrid;
+
+        window.postGridRegister = function (grid) {
+            postGrid = grid;
+        };
+
+        window.postAllGridRegister = function (grid) {
+            postAllGrid = grid;
+        };
+
+        window.addSelectedPosts = function (modal) {
+            var rows = postAllGrid.getSelectedRows();
+            if (rows.length) {
+                postGrid.addRows(rows);
+            }
+
+            modal.close();
+        };
+
+        $(document).on('submit', '#default-form', function () {
+            var currentPostIds = _.pluck(postGrid.getRows(), 'id').join(',');
+            $('#post_ids_add').val(currentPostIds);
+        });
+
+        window.showModalToAddPosts = function (grid) {
+            var modalContainer = document.getElementById(grid.getConfig('id') + '-modal');
+            React.unmountComponentAtNode(modalContainer);
+            React.render(
+                React.createElement(Components.Modal, {
+                        className: "productModal",
+                        show: true,
+                        title: "{{ 'Products List' |_ }}",
+                        confirm: "{{ 'Add' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
+                        onLoad: function(modal) {
+                            $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
+                        },
+                        onConfirm: window.addSelectedPosts
+                    },
+                    React.DOM.div({className: 'f-grid-wrapper', id: grid.getConfig('id')+'_tab'})
+                ), modalContainer
+            );
+
+            React.render(
+                React.createElement(FComGriddleComponent, {
+                    config: {{ UTIL.toJson(postsAttachConfigCompiled) | raw }}
+                }), document.getElementById(grid.getConfig('id') + '_tab')
+            );
+        };
+    });
+
+    /** Old backbonejs section
+    /*require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
         var postGrid, postAllGrid, originPostIds;
         var btnAddPosts = $('#btn_post_add');
 
@@ -53,32 +108,32 @@
 
             //return false;
         });
-    });
+    });*/
 </script>
 <input type='hidden' name='grid[post_category][add]' id='post_ids_add' />
 {#<input type='hidden' name='grid[post_category][del]' id='post_ids_remove'/>#}
 <div class='row'>
     <div class='col-sm-10'>
-        {{ THIS.view('core/backbonegrid').set('grid', postCtrl.postGridConfig(m)) | raw }}
+        {{ THIS.view('core/griddle').set('grid', postCtrl.postGridConfig(m)) | raw }}
     </div>
 </div>
-<div class='modal fade' id='prod-grid-add' tabindex='-1'>
-    <div class='modal-dialog' style='width:900px;'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>{{ "Add posts"|_ }}</h4>
-            </div>
-            <div class='modal-body'>
-                {{ THIS.view('core/backbonegrid').set('grid', postCtrl.getAllPostConfig()) | raw }}
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-primary btn-add disabled' id="btn_post_add" data-dismiss='modal' type='button'>{{ "Add Selected Posts"|_ }}</button>
-                <button class='btn btn-default btn-close post-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+{#<div class='modal fade' id='prod-grid-add' tabindex='-1'>#}
+    {#<div class='modal-dialog' style='width:900px;'>#}
+        {#<div class='modal-content'>#}
+            {#<div class='modal-header'>#}
+                {#<button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>#}
+                {#<h4 class='modal-title' id='myModalLabel'>{{ "Add posts"|_ }}</h4>#}
+            {#</div>#}
+            {#<div class='modal-body'>#}
+                {#{{ THIS.view('core/backbonegrid').set('grid', postCtrl.getAllPostConfig()) | raw }}#}
+            {#</div>#}
+            {#<div class='modal-footer'>#}
+                {#<button class='btn btn-primary btn-add disabled' id="btn_post_add" data-dismiss='modal' type='button'>{{ "Add Selected Posts"|_ }}</button>#}
+                {#<button class='btn btn-default btn-close post-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>#}
+            {#</div>#}
+        {#</div>#}
+    {#</div>#}
+{#</div>#}
 
 
 

@@ -59,13 +59,17 @@
         <span class="help-block">{{ "Leave empty for default file name, \"export.json\""|_ }}</span>
         </div>
     </div>
-    <button type="button" class="btn btn-lg btn-primary" id="btn_export_start">{{ "Export selected models"|_ }}</button>
+    <button type="button" class="btn btn-md btn-primary ladda-button" data-style="expand-left" id="btn_export_start">{{ "Export selected models"|_ }}</button>
 </div>
 
 <script>
     /*==========  React section  ==========*/
-    require(['jquery', 'underscore', 'react'], function($, _, React) {
+    require(['jquery', 'underscore', 'react', 'bootstrap-ladda', 'bootstrap-ladda-spin'], function($, _, React, Ladda) {
+        var mainGrid;
         window.modelsGridRegister = function (grid) {
+            mainGrid = grid;
+            var loader = Ladda.create(document.querySelector('.ladda-button'));
+
             $(grid.getDOMNode()).find('input[type=checkbox]').on('click', function(){
                 var isChecked = this.checked;
                 var addRows = [];
@@ -99,12 +103,39 @@
                 }
             });
 
-            $(document).on('click', '#btn_export_start', function(e){
+            /**
+             * Parse selected rows for post data
+             *
+             * @returns {*}
+             * @private
+             */
+            function _getDataForPost() {
+                var rows = mainGrid.getSelectedRows();
+                var results = _.map(rows, function (row) {
+                    return {
+                        name: 'ie_export_grid[checked]['+row.id+']',
+                        value: 'on'
+                    }
+                });
+
+                results.push({
+                    name: 'ie_export_grid[export_file_name]',
+                    value: $('#export_file_name').val()
+                });
+
+                return results;
+            }
+
+            $(document).on('click', '#btn_export_start', function (e) {
                 e.preventDefault();
-                var url = '{{ APP.href('importexport/export') }}';
-                var data = $('input[name^=ie_export_grid]').serializeArray();
-                $.post(url, data).done(function(d){
-                    console.log(d);
+                loader.start();
+                var data = _getDataForPost();
+                $.post('{{ APP.href('importexport/export') }}', data).done(function (response) {
+                    console.log('done', response);
+                }).fail(function (error) {
+                    console.log('fail', error);
+                }).always(function () {
+                    loader.stop();
                 });
             });
         }
