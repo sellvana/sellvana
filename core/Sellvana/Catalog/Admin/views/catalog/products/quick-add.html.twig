@@ -181,7 +181,7 @@
                         acceptedFiles: 'image/*',
 //                        hiddenInputContainer: '#products-quick-add-container',
                         headers: {
-                            'X-CSRF-TOKEN': $('input[name="X-CSRF-TOKEN"]').val()
+                            'X-CSRF-TOKEN': '{{ SESSION.csrfToken() }}'
                         }
                     }
                 };
