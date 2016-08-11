@@ -47,7 +47,17 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         removeSpecialChars: function (str) { //todo: put this function to global utilities object
             var label = str.substr(0, str.lastIndexOf('.'));
             return label.replace(/[^A-Z0-9]/ig, ' ');
-        }
+        },
+        parseLangsToOption: function (input_type, langs) {
+            var results = [];
+            if (_.keys(langs).length) {
+                _.each(langs, function (lang, code) {
+                    results.push({input_type: input_type, lang_code: code, value: lang});
+                });
+            }
+
+            return results;
+        },
     };
 
     /**
