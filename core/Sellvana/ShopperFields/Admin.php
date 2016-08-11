@@ -103,7 +103,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Field name (Product Name)', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Option Name (Bundle Part Name)', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
                     ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
                     ['type' => 'btn_group', 'buttons' => [
