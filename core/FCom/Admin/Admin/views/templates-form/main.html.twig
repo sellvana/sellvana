@@ -10,11 +10,10 @@
 <fieldset>
   <div class="f-section">
     <div class="form-group row">
-
-        {{ forms.input(fieldData, {field:'view_name', required:1, label:'View Name'|_, readonly: model.view_name }) }}
+        {{ forms.input(fieldData, {field:'view_name', required:1, label:'View Name'|_, readonly: model.get('view_name') }) }}
         <div class="col-md-12">
             <textarea id="model-view_contents" class="form-control col-md-10" type="text" name="model[view_contents]" style="height:400px; font-family:Consolas,monospace">{{ model.get('view_contents') }}</textarea>
         </div>
     </div>
-    </div>
+  </div>
 </fieldset>
