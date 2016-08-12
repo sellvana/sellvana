@@ -82,6 +82,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             $this->gridOrmConfig($config['orm']);
         }
         $config['grid_before_create'] = 'customerGridRegister';
+        $config['callbacks'] = ['componentDidMount' => 'customerGridRegister'];
         return $config;
     }
 

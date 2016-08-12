@@ -1,834 +1,574 @@
+{% set m = THIS.get('model') %}
 {% set ctrl = APP.instance('Sellvana_CustomerFields_Admin_Controller_Customers') %}
+{% set fieldCtrl = APP.instance('Sellvana_CustomerFields_Admin_Controller_Fields') %}
+{% set fieldsOptions = APP.instance('Sellvana_CustomerFields_Model_Field').as_values('field_name') %}
+{% set fieldsConfig = fieldCtrl.fieldsGridConfig() %}
+{% set fieldsConfigCompiled = THIS.view('core/griddle').set('grid', fieldsConfig).getGridConfig() %}
+{% set initialData = APP.instance('Sellvana_CustomerFields_Admin_Controller_Customers').getInitialData(m) %}
+<style rel="stylesheet">
+    @media (min-width: 768px) {
+        .form-horizontal .control-label {
+            padding: 0;
+        }
+    }
 
-<div id="cust-new-field-modal">
-    <a class="btn btn-success" role="button" href="#cust-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
-    <div id="cust-new-field-form" class="modal fade in" tabindex='-1'>
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                    <h4 class="modal-title" id="myModalLabel">{{ "Create Form"|_ }}</h4>
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="field_code">{{ "Field Code"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="field_name">{{ "Field Name"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="frontend_label">{{ "Frontend Label"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="frontend_show">{{ "Show on frontend"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
-                                <option value="1">{{ "Yes"|_ }}</option>
-                                <option value="0">{{ "No"|_ }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="sort_order">{{ "Sort order"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="table_field_type">{{ "DB Type"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
-                                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').fieldOptions('table_field_type')) | raw }}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="admin_input_type">{{ "Input Type"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
-                                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').fieldOptions('admin_input_type')) | raw }}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="system">{{ "System field"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="system" id="system" class="form-control" data-rule-required="true">
-                                <option value="1">{{ "Yes"|_ }}</option>
-                                <option value="0">{{ "No"|_ }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="required">{{ "Multi Language"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
-                                <option value="1">{{ "Yes"|_ }}</option>
-                                <option value="0">{{ "No"|_ }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="required">{{ "Required"|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="required" id="required" class="form-control" data-rule-required="true">
-                                <option value="1">{{ "Yes"|_ }}</option>
-                                <option value="0">{{ "No"|_ }}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">{{ 'Close'|_ }}</button>
-                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">{{ 'Save changes'|_ }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+    .dd3-handle {
+        height: 25px;
+        line-height: 17px;
+    }
+</style>
 <div class="well">
     <div class="row">
         <input type="hidden" id="custom_fields" name="custom_fields"/>
-        <div class="col-sm-6" id="field">
-            <select id="sel_fields" class="select2 form-control" style="width:150px;"
-                    placeholder='{{ 'Choose field...'|_ }}'>
-                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').as_values('field_name')) | raw }}
-            </select>
-            <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">{{ 'Add a Field'|_ }}</button>
-            <button class="btn btn-sm" type="button" id="btn_new_field">{{ 'New Field'|_ }}</button>
-        </div>
+        <div class="col-sm-6" id="fields"></div>
     </div>
 </div>
+<div id='fields_list'></div>
+<script>
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'ckeditor', 'jquery.validate', 'unique', 'fcom.admin'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage) {
+        var initData = {{ UTIL.toJson(initialData) | raw }};
+        var fieldsOptions = {{ UTIL.toJson(fieldsOptions) | raw }};
+        var fields = [];
+        var fieldsForm;
 
-<hr/>
-<div id="fields_list">
-    <div class="box-content">
-        <!-- content here -->
-    </div>
-</div>
+        var FieldsList = React.createClass({
+            displayName: "FieldsList",
+            propTypes: {
+                fields: React.PropTypes.array.isRequired
+            },
+            getDefaultProps: function () {
+                return {
+                    fields: []
+                }
+            },
+            getInitialState: function () {
+                return {
+                    fields: this.props.fields
+                };
+            },
+            componentWillMount: function () {
+            },
+            componentDidMount: function () {
+                this._renderFields();
+            },
+            componentDidUpdate: function () {
+                this._renderFields();
+            },
+            componentWillReceiveProps: function (nextProps) {
+                var that = this;
+                var fields = this.state.fields;
+                var index = _.findIndex(fields, {id: nextProps.field});
+                if (nextProps.field && (index !== -1 && fields[index].deleted === true)) {
+                    fields[index].deleted = false;
+                    this.refreshData();
+                } else {
+                    // If field does not exist on local data then fetch it
+                    var url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}' + nextProps.field;
+                    $.get(url, function (field) {
+                        fields.push(field);
+                        this.refreshData();
+                    }.bind(this), 'json');
+                }
+            },
+            componentWillUnmount: function () {
+                _(this.state.fields).each(function (field) {
+                    if (this.refs['field_' + field.id])
+                        React.unmountComponentAtNode(this.refs['field_' + field.id].getDOMNode());
+                }.bind(this));
+            },
+            removeField: function (e) {
+                var $target = $(e.currentTarget);
+                var fieldId = $target.data('field-id').toString();
+                var fields = this.state.fields;
 
-    <script type="template" id="field-template">
-        <div class="row">
-            <div class="col-md-9 col-lg-push-3">
-                <label class="col-md-2 control-label dd-handle control-handle" for="cust-review-text">
-                    <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                    <%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %>
-                </label>
-                <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
-                    <% switch(rc.admin_input_type) {
-                    case 'text':
-                    print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+                var index = _.findIndex(fields, {id: fieldId});
+                if (index != -1) fields[index].deleted = true;
 
-                    break;
-                    case 'textarea':
-                    print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
-                    break;
+                FieldComponent.setProps({state: 'remove', ids: fieldId});
+                this.setState({fields: fields});
+                this.refreshData();
+            },
+            refreshData: function () {
+                var fields = this.state.fields;
+                var data = [];
+
+                _(fields).each(function (field, i) {
+                    if (!field.deleted) data.push(field);
+                });
+
+                this.setState({fields: fields});
+                $customHiddenInput.val(JSON.stringify(data));
+            },
+            refreshChanges: function (code, value, type) {
+                var that = this;
+                var fields = this.state.fields;
+
+                _(fields).each(function (field, index) {
+                    switch (type) {
+                        case 'select':
+                        case 'multiselect':
+                            _(field.options).each(function (opt, key) {
+                                if (key == code) {
+                                    fields[index].value = value;
+                                }
+                            });
+                            break;
+                        default:
+                            if (field.field_code == code) {
+                                fields[index].value = value;
+                            }
+                            break;
+                    }
+                });
+
+                this.refreshData();
+            },
+            refreshLangs: function (code, langs) {
+                var fields = this.state.fields;
+                _(fields).each(function (field, i) {
+                    var fieldCodes = _.pluck(fields, 'field_code');
+                    if (_.contains(fieldCodes, code) && langs.length) {
+                        fields[_.indexOf(fieldCodes, code)].langFields = langs;
+                    }
+                });
+                this.refreshData();
+            },
+            _renderFields: function () {
+                _(this.state.fields).each(function (field) {
+                    if (field.deleted) return null;
+                    React.render(
+                            React.createElement(Field, {
+                                id: field.id,
+                                field: field,
+                                removeField: this.removeField,
+                                refreshData: this.refreshData,
+                                refreshChanges: this.refreshChanges,
+                                refreshLangs: this.refreshLangs
+                            }), this.refs['field_' + field.id].getDOMNode()
+                    );
+                }.bind(this));
+            },
+            render: function () {
+                return React.DOM.div(null,
+                        _(this.state.fields).map(function (field, index) {
+                            if (field.deleted) return null;
+                            return React.DOM.div({
+                                key: field.id,
+                                id: 'field_' + field.id,
+                                ref: 'field_' + field.id,
+                                className: 'box-content ui-sortable'
+                            })
+                        }.bind(this))
+                );
+            }
+        });
+
+        var Field = React.createClass({
+            displayName: "Field",
+            propTypes: {
+                field: React.PropTypes.object.isRequired
+            },
+            getDefaultProps: function () {
+                return {
+                    field: {},
+                    default_lang_fields: ['text', 'textarea', 'wysiwyg']
+                }
+            },
+            getInitialState: function () {
+                return {
+                    field: this.props.field
+                };
+            },
+            componentDidMount: function () {
+                this._renderField();
+            },
+            componentDidUpdate: function () {
+                this._renderField();
+            },
+            componentWillUnmount: function () {
+                if (this.refs['field_' + this.state.field.id])
+                    React.unmountComponentAtNode(this.refs['field_' + this.state.field.id].getDOMNode());
+                if (this.refs['lang_' + this.state.field.id])
+                    React.unmountComponentAtNode(this.refs['lang_' + this.state.field.id].getDOMNode());
+                if (this.refs['site_value_' + this.state.field.id])
+                    React.unmountComponentAtNode(this.refs['site_value_' + this.state.field.id].getDOMNode());
+            },
+            _getOptions: function () {
+                var options = this.state.field.options || [];
+                if (!_.isEmpty(options)) {
+                    return _(options).map(function (option, id) {
+                        return {
+                            id: id,
+                            text: option
+                        };
+                    });
+                } else {
+                    var field = this.state.field;
+                    switch (field.admin_input_type) {
+                        case 'boolean':
+                            return {
+                                0: "{{ 'no'|_ }}",
+                                1: "{{ 'YES'|_ }}"
+                            };
+                            break;
+                    }
+                }
+            },
+            _handleSelect2Change: function (e, callback, selection) {
+                this.props.refreshChanges(selection.id, selection.text, 'select');
+            },
+            _handleInputChange: function (e) {
+                var $input = $(e.target);
+                this.props.refreshChanges($input.data('code'), $input.val());
+            },
+            _handleWysiwygChange: function (editor, data) {
+                this.props.refreshChanges(this.state.field.field_code, data);
+            },
+            _getInputConfig: function (field, type) {
+                return {
+                    type: type || field.admin_input_type,
+                    value: field.value,
+                    onChange: this._handleInputChange,
+                    validation: {
+                        required: (field.required || 'false')
+                    },
+                    attrs: {
+                        disabled: field.disable || false,
+                        'data-code': field.field_code,
+                        'data-field-id': field.id
+                    }
+                };
+            },
+            _createWysiwyg: function (field) {
+                return React.createElement(Components.SpecialInput, {
+                    type: 'wysiwyg',
+                    value: field.value,
+                    className: 'ckeditor',
+                    disable: field.disable,
+                    attrs: {
+                        'data-rule-required': field.required || 'false',
+                        'data-field-id': field.id
+                    },
+                    onChange: this._handleWysiwygChange
+                });
+            },
+            _createSelect2: function (field) {
+                return React.createElement(FComSelect2, {
+                    id: guid(),
+                    name: guid(),
+                    className: '',
+                    placeholder: "{{ 'Select field options' |_ }}",
+                    multiple: false,
+                    options: this._getOptions(),
+                    enabled: !field.disable,
+                    'data-field-id': field.id,
+                    onChange: this._handleSelect2Change,
+                    defaultValue: [field.value]
+                });
+            },
+            _createInput: function (field) {
+                var type = null;
+                var config = this._getInputConfig(field);
+
+                if (field.admin_input_type === 'boolean') {
+                    type = 'select';
+                    config = this._getInputConfig(field, type);
+                    config['options'] = this._getOptions();
+                }
+
+                return React.createElement(Components.ControlInput, config);
+            },
+            _createLanguageComponent: function (field) {
+                return React.createElement(FComMultiLanguage, {
+                    id: field.field_code + '_lang_field_' + field.id,
+                    data: field.langFields || [],
+                    inputType: field.admin_input_type,
+                    locales: {{ UTIL.toJson(LOCALE.parseAllowedLocalesToOptions()) | raw }},
+                    cClass: 'col-sm-3',
+                    modalConfig: {
+                        fieldCode: field.field_code,
+                        onSaved: field.field_code + 'ModalSaveChange'
+                    },
+                    select2Config: {}
+                });
+            },
+            _renderField: function () {
+                var that = this;
+                var field = this.props.field;
+                field.disable = false;
+
+                React.render(this._createField(field), this.refs['field_' + field.id].getDOMNode());
+
+                // If admin_input_type in ['text', 'textarea', 'wysiwyg'] then render multi-langs component
+                if (_.contains(this.props.default_lang_fields, field.admin_input_type)) {
+                    React.render(this._createLanguageComponent(field), this.refs['lang_' + field.id].getDOMNode());
+                    window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
+                        var code = modal.props.fieldCode;
+                        that.props.refreshLangs(code, langs);
+                        modal.close();
+                    };
+                }
+            },
+            _createField: function (field) {
+                switch (field.admin_input_type) {
                     case 'wysiwyg':
-                    print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
-
-                    break;
+                        return this._createWysiwyg(field);
+                        break;
                     case 'select':
                     case 'multiselect':
-                    print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
-                    print("<option value=''>&nbsp;</option>");
-                    vals = rc.value.split(',');
-                    for(key in rc.options) {
-                    print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
-                    }
-                    print('</select>');
-
-                    break;
-                    case 'boolean':
-                    print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
-
-                    break;
-                    } %>
-                </div>
-                <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-                    <button class="btn btn-danger btn-xs field-remove"  style="margin-top: 5px;" type="button">
-                        <i class="icon-remove"></i>
-                    </button>
-
-                    <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
-                        <i class="icon-refresh"></i>
-                    </a-->
-                </div>
-            </div>
-
-        </div>
-        <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-9">
-                <button class="btn btn-info btn-xs multilang" style="margin-top: 5px;" type="button">
-                    Set Locale Field Value
-                </button>
-            </div>
-        </div>
-        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">show</a>
-        <div id="<%- rc.field_code+rc.id %>" class="modal fade in" tabindex='-1'>
-            <div class="modal-dialog" style="width:900px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                        <h4 class="modal-title" id="myLangLabel"><%= rc.field_name %></h4>
-                    </div>
-
-                    <div class="modal-body">
-                        <table>
-                            <tr>
-                                <td>
-                                    <select class="sel_locale form-control select2" style="width:150px;">
-                                    <% var langs = rc.avail_langs;
-                                    for(var i in langs) {
-                                    %>
-                                        <option value="<%=langs[i] %>"><%=langs[i] %></option>
-                                    <% } %>
-                                    </select>
-                                </td>
-                                <td>
-                                    <button class="btn btn-primary save" type="button">Add Locale</button>
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="lang_fields">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <% } %>
-    </script>
-
-    <script type="template" id="lang-field-template">
-        <div class="col-md-3 control-label">
-            <span class="badge badge-default"><%- rc.lang_code %></span>
-        </div>
-        <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
-            <% switch(rc.admin_input_type) {
-                case 'text':
-                    print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
-                    break;
-                case 'textarea':
-                    print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
-                    break;
-                case 'wysiwyg':
-                    print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
-                    break;
-            } %>
-        </div>
-        <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-            <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
-                <i class="icon-remove"></i>
-            </button>
-        </div>
-    </script>
-
-<script>
-$('#fcom_append_form').append('<form id="cust-new-field-form1" class="form form-horizontal validate-form"></form>');
-var $custModal = $("#cust-new-field-modal");
-var html = $custModal.html();
-$custModal.remove();
-$('#cust-new-field-form1').append(html);
-
-require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
-    _.templateSettings.variable = 'rc';
-    var setValidateForm = function(selector) {
-        if (selector == null) {
-          selector = $(".validate-form");
-        }
-        if (jQuery().validate) {
-          return selector.each(function(i, elem) {
-            return $(elem).validate({
-              errorElement: "span",
-              errorClass: "help-block has-error",
-              errorPlacement: function(e, t) {
-                return t.parents(".controls").first().append(e);
-              },
-              highlight: function(e) {
-                    $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
-                    return $(e).closest('.help-block').css('display','block');
-              },
-              success: function(e) {
-
-                    e.closest(".form-group").removeClass("has-error");
-                    return e.closest(".help-block").css('display','none');
-              }
-            });
-          });
-        }
-    };
-    var initialData = {{ ctrl.getInitialData(model) | raw }};
-
-    function refresh_selects()
-    {
-        var $selSets = $('#sel_sets');
-        var $selFields = $('#sel_fields');
-
-        $selSets.val('');
-        $selFields.val('');
-        $selSets.select2();
-        $selFields.select2();
-    }
-
-    function remove_options(set)
-    {
-        $("#sel_sets option[value='"+set.get('id')+"']").remove();
-        var fields = set.fields;
-        if (fields && typeof(fields.each) == 'function') {
-            fields.each(function (f) {
-                $("#sel_fields option[value='" + f.get('id') + "']").remove();
-            });
-        }
-        refresh_selects();
-    }
-
-    function add_options(set)
-    {
-        if ($("#sel_sets option[value='"+set.get('id')+"']").length === 0)
-            $('#sel_sets')
-             .append($("<option></option>")
-             .attr("value",set.get('id'))
-             .text(set.get('set_name')));
-        var fields = set.fields;
-        fields.each(function(f) {
-            if ($("#sel_fields option[value='"+f.get('id')+"']").length === 0)
-                $('#sel_fields')
-                 .append($("<option></option>")
-                 .attr("value",f.get('id'))
-                 .text(f.get('field_name')));
-        });
-
-        refresh_selects();
-    }
-
-    function remove_option(field)
-    {
-        $("#sel_fields option[value='"+field.get('id')+"']").remove();
-        refresh_selects();
-    }
-
-    function add_option(field)
-    {
-        if ($("#sel_fields option[value='"+field.get('id')+"']").length === 0)
-            $('#sel_fields')
-             .append($("<option></option>")
-             .attr("value",field.get('id'))
-             .text(field.get('field_name')));
-
-        refresh_selects();
-    }
-
-    $('#btn_add_field').click(function() {
-        var fieldId = $('#sel_fields').val();
-        var newField = new CustomField.Models.Field();
-        newField.url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}'+fieldId;
-        newField.fetch({
-            success: function() {
-                setCollection.add(newField);
-                remove_option(newField);
-            }
-        });
-    });
-
-    var _mainForm = $('#cust-customers-form');
-
-    $(_mainForm).submit(function(ev) {
-
-        var newVal = JSON.stringify(setCollection.toJSON());
-        $('#custom_fields').val(newVal);
-
-        if(!$(this).valid()) {
-            CustomField.checkingForm = true;
-            return false;
-        } else {
-            if (CustomField.checkingForm) {
-                CustomField.checkingForm = false;
-                $(this).submit();
-            }
-
-        }
-    });
-
-    var _appendForm = $('#cust-new-field-form1');
-    setValidateForm($(_appendForm));
-    $('#field_code').rules("add", {
-        onfocusout: false,
-        onkeyup: false,
-        remote: {
-            url: '{{ APP.href('/customerfields/fields/unique_field') | raw }}',
-            type: 'post',
-             data: {
-                _name: 'field_code'
+                        return this._createSelect2(field);
+                        break;
+                    default:
+                        return this._createInput(field);
+                        break;
+                }
             },
-            dataFilter: function (responseString) {
-                var response = jQuery.parseJSON(responseString);
-                currentMessage = response.Message;
-                return response.unique;
+            render: function () {
+                var field = this.props.field;
+                return React.DOM.div({
+                            id: field.field_code + '_field',
+                            className: 'form-group sort-item'
+                        },
+                        React.DOM.div({className: 'col-md-9 col-lg-push-2'},
+                                React.DOM.label({
+                                            className: 'col-md-2 control-label dd-handle control-handle',
+                                            htmlFor: 'prod-review-text',
+                                            'data-field-id': field.id
+                                        },
+                                        React.DOM.div({className: 'icon-ellipsis-vertical dd-handle dd3-handle'}),
+                                        React.DOM.span(null, field.field_name)
+                                ),
+                                React.DOM.div({className: 'col-md-3', ref: 'field_' + field.id}),
+                                React.DOM.div({className: 'col-md-6'},
+                                        React.DOM.button({
+                                                    className: 'btn btn-danger btn-xs field-remove',
+                                                    style: {
+                                                        float: 'left',
+                                                        marginRight: '5px'
+                                                    },
+                                                    type: 'button',
+                                                    onClick: this.props.removeField,
+                                                    'data-field-id': field.id,
+                                                    'data-field-value': field.field_name
+                                                },
+                                                React.DOM.i({className: 'icon-remove'})
+                                        ),
+                                        React.DOM.div({ref: 'lang_' + field.id, className: 'col-md-6'}),
+                                        React.DOM.div({ref: 'site_value_' + field.id, className: 'col-md-5'})
+                                )
+                        )
+                )
             }
-        },
-        messages: {
-            remote: "This field code is already taken place"
-        }
-    });
-
-    $('#btn_new_field').click(function() {
-        var $custNewFieldForm = $('#cust-new-field-form');
-        $custNewFieldForm.find('input').val('');
-        $custNewFieldForm.find('select').each(function(index) {
-            $(this).find('option').removeAttr('selected');
-            $(this).find('option:first').attr('selected','selected');
         });
-        $('#btn_show_modal').trigger('click');
 
-    });
-
-    $('#btn-newfield-save').click(function() {
-        if (!$(_appendForm).valid())
-            return;
-
-        var hash = {};
-        $('#cust-new-field-form').find('.form-control').each(function(index) {
-            hash[$(this).attr('id')] = $(this).val();
-        });
-        hash.oper = 'add';
-        $.post('{{ APP.href('/customerfields/fields/field_grid_data') | raw }}', hash, function(res) {
-            var field = new CustomField.Models.Field(res);
-            var flag = false;
-//            setCollection.each(function(set) {
-//                if (set.get('collapsed') === false) {
-//                    set.fields.add(field);
-//                    flag = true;
-//                }
-//            });
-//
-//            if (!flag)
-            add_option(field);
-            $('#btn-newfield-close').trigger('click');
-            //setCollection.trigger('change');
-        });
-    });
-
-
-    var CustomField = {
-        Models: {},
-        Collections: {},
-        Views: {},
-        Langs: ['en_US', 'de_DE', 'zh-CN', 'fr-FR', 'nl_NL']
-    };
-
-    CustomField.Models.LangField = Backbone.Model.extend({
-        defaults: {
-            value: '',
-            lang_code: ''
-        }
-    });
-
-    CustomField.Collections.LangFieldCollection = Backbone.Collection.extend({
-        model: CustomField.Models.LangField
-    });
-
-    CustomField.Models.Field = Backbone.Model.extend({
-        defaults: {
-            value: '',
-            position: 0,
-            avail_langs: -1
-        },
-        initialize: function(config) {
-
-            var avail_langs = this.get('avail_langs');
-            if (avail_langs === -1) {
-                this.set('avail_langs', CustomField.Langs);
-            }
-
-            if (typeof(config) === 'undefined') {
-                this.langFields = new CustomField.Collections.LangFieldCollection();
-                return;
-            }
-            this.langFields = new CustomField.Collections.LangFieldCollection((typeof(config.langFields) !== 'undefined') ? config.langFields : undefined);
-            if (typeof(config.langFields) !== 'undefined')
-                delete this.attributes['langFields'];
-        },
-        toJSON: function() {
-            var hash = Backbone.Model.prototype.toJSON.call(this);
-            if(typeof(this.langFields) !== 'undefined')
-                hash.langFields = this.langFields.toJSON();
-
-            return hash;
-        }
-    });
-
-    CustomField.Collections.FieldCollection = Backbone.Collection.extend({
-        model: CustomField.Models.Field,
-        comparator: function(col) {
-            return parseInt(col.get('position'));
-        }
-    });
-
-    CustomField.Models.FieldSet = Backbone.Model.extend({
-        defaults: {
-            collapsed: false
-        },
-        initialize: function(config) {
-            if (typeof(config) === 'undefined') {
-                this.fields = new CustomField.Collections.FieldCollection();
-                return;
-            }
-            this.fields = new CustomField.Collections.FieldCollection((typeof(config.fields) !== 'undefined') ? config.fields : undefined)
-            if (typeof(config.fields) !== 'undefined')
-                delete this.attributes['fields'];
-        },
-        parse: function(response) {
-            this.fields.set(response.fields);
-            delete response.fields;
-
-            return response;
-        },
-        toJSON: function() {
-            var hash = Backbone.Model.prototype.toJSON.call(this);
-            if(typeof(this.fields) !== 'undefined')
-                hash.fields = this.fields.toJSON();
-
-            return hash;
-        }
-    });
-
-    CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
-        model: CustomField.Models.FieldSet
-    });
-
-    CustomField.Views.LangFieldView = Backbone.View.extend({
-        className: 'row',
-        attributes: {
-            style: 'margin-top:3px; margin-bottom: 30px;'
-        },
-        events: {
-            'click button.field-remove': '_remove',
-            'change input[type="text"],textarea': '_changeVal'
-        },
-        template: _.template($('#lang-field-template').html()),
-        _changeVal: function() {
-            var val = this.$el.find('input[type="text"],textarea').val();
-            this.model.set('value', val);
-        },
-        _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
-            if (confirm) {
-                this.parentSet.langFields.remove(this.model);
-                this.undelegateEvents();
-                this.$el.removeData().unbind();
-                this.remove();
-                delete this.model;
-
-            }
-        },
-        getWYSIWYG: function() {
-            var id = this.$el.find('textarea').attr('id');
-            var self = this;
-            return CKEDITOR.instances[id];
-
-        },
-        render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            this.model.view = this;
-
-            return this;
-        }
-    });
-
-    CustomField.Views.FieldView = Backbone.View.extend({
-        className: 'form-group',
-        attributes: function() {
-            return { id: this.model.get('id')};
-        },
-        template: _.template($('#field-template').html()),
-        events: function (){
-            var hash = {
-                    'click button.field-remove': '_remove',
-                    'click a.field-refresh': '_refresh',
-                    'click button.multilang': '_showLangModal',
-                    'click button.btn-close': '_checkLangFieldVals',
-                    'click button.save': '_addLangField'
+        var Fields = React.createClass({
+            displayName: "Fields",
+            propTypes: {
+                options: React.PropTypes.object.isRequired
+            },
+            getDefaultProps: function () {
+                return {
+                    options: {}
                 };
-            switch (this.model.get('admin_input_type')) {
-                case 'multiselect':
-                case 'select':
-                    hash['change select'] = '_changeSelect2';
-                    break;
-                case 'textarea':
-                    hash['change textarea'] = '_changeVal';
-                    break;
-                case 'text':
-                    hash['change input[type="text"]'] = '_changeVal';
-            }
-            return hash;
-        },
-        initialize: function() {
-            this.model.langFields.on('add', this._addLangView, this);
-            this.model.langFields.on('remove', this._removeLangView, this);
-        },
-        _refresh: function() {
-            this.model.url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}'+this.model.get('id');
-            var self = this;
-            this.model.fetch({
-                success: function() {
-                    self.render();
+            },
+            getInitialState: function () {
+                return {
+                    selection: null,
+                    removedOptions: []
+                };
+            },
+            componentWillMount: function () {
+                this.setState({
+                    removedOptions: _.pluck(this.props.fields, 'id')
+                });
+            },
+            componentDidMount: function () {
+            },
+            componentWillReceiveProps: function (nextProps) {
+                this._reloadFields(nextProps.ids, nextProps.state);
+            },
+            componentDidUpdate: function (prevProps, prevState) {
+                // Reset selection
+                this.state.selection = null;
+            },
+            componentWillUnmount: function () {
+            },
+            _handleSelect2Change: function (event, callback, selection) {
+                this.state.selection = selection.id;
+            },
+            _handleModalLoad: function (modal) {
+                fieldsModalNode = $(modal.getDOMNode());
+                fieldsForm = fieldsModalNode.find('#fields-modal-form');
+                fieldsModalNode.find('.modal-dialog').css('width', '600px');
+                $.fn.setValidateForm(fieldsForm);
+                fieldsForm.find('#field_code').rules("add", {
+                    onfocusout: false,
+                    onkeyup: false,
+                    remote: {
+                        url: '{{ APP.href('/customerfields/fields/unique_field') | raw }}',
+                        type: 'post',
+                        data: {
+                            _name: 'field_code'
+                        },
+                        dataFilter: function (responseString) {
+                            var response = jQuery.parseJSON(responseString);
+                            currentMessage = response.Message;
+                            return response.unique;
+                        }
+                    },
+                    messages: {
+                        remote: "{{ 'This field code is already taken place.' |_ }}"
+                    }
+                });
+            },
+            _handleModalConfirm: function (modal) {
+                if (!fieldsForm.valid())
+                    return;
+
+                var hash = {
+                    oper: 'add'
+                };
+
+                fieldsForm.find('input, select').each(function (index) {
+                    hash[$(this).attr('id')] = $(this).val();
+                });
+
+                $.post('{{ APP.href('/customerfields/fields/field_grid_data') | raw }}', hash, function (field) {
+                    this._reloadFields(field.id, 'new', field);
+                    modal.close();
+                }.bind(this));
+            },
+            initSelect2: function () {
+                return $.extend({}, {
+                    id: 'sel_fields',
+                    className: '',
+                    placeholder: "{{ 'Select field' |_ }}",
+                    multiple: false
+                }, this.props.select2Config);
+            },
+            _getOptions: function () {
+                if (this.props.options) {
+                    var os = [];
+                    _(this.props.options).each(function (option, id) {
+                        if (!_.contains(this.state.removedOptions, id)) {
+                            os.push({id: id, text: option});
+                        }
+                    }.bind(this));
+                    return os;
                 }
-            });
-        },
+                return [];
+            },
+            _showAddFieldModal: function (grid) {
+                var that = this;
+                var modalContainer = document.getElementById('fcom_append_form');
+                React.unmountComponentAtNode(modalContainer);
+                var config = {{ UTIL.toJson(fieldsConfigCompiled) | raw }};
+                React.render(
+                        React.createElement(Components.Modal, {
+                                    id: "editFieldsModal",
+                                    show: true,
+                                    title: "{{ 'Add Fields' |_ }}",
+                                    confirm: "{{ 'Save changes' |_ }}",
+                                    cancel: "{{ 'Cancel' |_ }}",
+                                    onLoad: that._handleModalLoad,
+                                    onConfirm: that._handleModalConfirm
+                                },
+                                React.DOM.div({className: "row f-grid-wrapper"},
+                                        React.createElement(FComModalForm, {
+                                            columnMetadata: config.columns,
+                                            id: config.id
+                                        })
+                                )
+                        ), modalContainer);
+            },
+            _reloadFields: function (ids, state, field) {
+                var removedOptions = this.state.removedOptions;
 
-        _showLangModal: function() {
-            //CustomField.currentFieldView = this;
-
-            var langFields = this.model.langFields;
-            var langs = _.clone(CustomField.Langs);
-            langFields.each(function(langField) {
-                langs = _.difference(langs, [langField.get('lang_code')]);
-            });
-
-            $('#myLangLabel').html(this.model.get('field_name'));
-            this.$el.find('.btn-show').trigger('click');
-            //adminForm.wysiwygInit();
-        },
-        _updateLangTag: function() {
-            var langs = _.difference(CustomField.Langs, this.model.get('avail_langs'));
-            var html = 'Set Locale...';
-            if(langs.length>0) {
-                html = langs.join(',');
-            }
-            this.$el.find('.multilang').html(html);
-            this.$el.find('select.sel_locale').select2();
-            if(this.model.get('avail_langs').length === 0 ) {
-                this.$el.find('button.save').addClass('disabled');
-            } else {
-                this.$el.find('button.save').removeClass('disabled');
-            }
-        },
-        _addLangField: function() {
-            var lang_code = this.$el.find('select.sel_locale').val();
-            var langField = new CustomField.Models.LangField({value: '', lang_code: lang_code, admin_input_type: this.model.get('admin_input_type')});
-
-            this.model.langFields.add(langField);
-            this.$el.find('select.sel_locale option[value="'+lang_code+'"]').remove();
-            this.model.set('avail_langs', _.difference(this.model.get('avail_langs'),[lang_code]));
-            //this.$el.find('.select2').select2();
-            //$('#btn-locale-close').trigger('click');
-            this._updateLangTag();
-        },
-        _removeLangView: function(langField) {
-            var lang_code = langField.get('lang_code');
-            var langs= this.model.get('avail_langs');
-            langs[langs.length] = lang_code;
-            this.model.set('avail_langs', langs);
-            this.$el.find('select.sel_locale').append('<option value="'+lang_code+'">'+lang_code+'</option>');
-            //this.$el.find('.select2').select2();
-            this._updateLangTag();
-        },
-        _changeCheckbox: function() {
-            var val = this.$el.find('input[type="hidden"]').val();
-        },
-        _changeSelect2: function() {
-            var val = this.$el.find('select').val();
-            if (typeof(val) === 'object')
-                val = val.join(',');
-
-            this.model.set('value', val);
-        },
-        _changeVal: function() {
-            var val = this.$el.find('input[type="text"],textarea').val();
-            this.model.set('value', val);
-        },
-        _remove: function() {
-            var confirm = window.confirm("{{ "Do you want to really remove?"|_ }}");
-            if (confirm) {
-                add_option(this.model);
-                if (this.options.parentSet) {
-                    console.log("removing");
-                    this.options.parentSet.remove(this.model);
+                switch (state) {
+                    case 'add':
+                        removedOptions = this.state.removedOptions.concat(ids);
+                        break;
+                    case 'remove':
+                        if ($.isArray(ids)) {
+                            removedOptions = _.difference(this.state.removedOptions, ids);
+                        } else {
+                            removedOptions = _.without(this.state.removedOptions, ids);
+                        }
+                        break;
+                    case 'new':
+                        this.props.options[field.id] = field.field_name;
+                        break;
                 }
-                this.undelegateEvents();
-                this.$el.removeData().unbind();
-                this.remove();
-                delete this.model;
 
+                this.setState({removedOptions: removedOptions});
+            },
+            _handleAddField: function () {
+                var that = this;
+                var id = this.state.selection;
+
+                if (!id) {
+                    $.bootstrapGrowl("{{ 'Please choose field.' |_ }}", {
+                        type: 'danger',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 3000
+                    });
+                    return;
+                }
+
+                that._reloadFields(id, 'add');
+                FieldsListComponent.setProps({field: id});
+            },
+            render: function () {
+                return React.DOM.div({className: ""},
+                        React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
+                            options: this._getOptions(),
+                            onChange: this._handleSelect2Change,
+                            style: {
+                                height: '28px',
+                                width: '150px',
+                                fontSize: '0.8em'
+                            }
+                        })),
+                        React.DOM.button({
+                            type: 'button',
+                            className: 'btn btn-primary btn-sm',
+                            id: 'btn_add_field',
+                            onClick: this._handleAddField
+                        }, "{{ 'Add a Field'|_ }}"),
+                        React.DOM.button({
+                            type: 'button',
+                            className: 'btn btn-sm btn-warning',
+                            id: 'btn_new_field',
+                            onClick: this._showAddFieldModal
+                        }, "{{ 'New Field'|_ }}")
+                );
             }
-        },
-        _addLangView: function(langField) {
-            var langView = new CustomField.Views.LangFieldView({model: langField});
-            this.$el.find('div.lang_fields').append(langView.render().el);
-
-            if (langField.get('admin_input_type') === 'wysiwyg') {
-                adminForm.wysiwygInit();
-                langField.wysiwyg = true;
-                var p = langView.$el.find('textarea:first').parent();
-                p.append('<textarea name="'+guid()+'"' +(this.model.get('required') === '1' ? 'data-rule-required="true"' : '')+ ' style="display:none;">'+langView.$el.find('textarea:first').val()+'</textarea>');
-
-            } else if (this.model.get('required') === '1') {
-                langView.$el.find('input,textarea').attr('data-rule-required','true');
-            }
-
-            langView.parentSet = this.model;
-            setModalHeight();
-        },
-        getWYSIWYG: function() {
-            var id = this.$el.find('textarea').attr('id');
-            var self = this;
-            return CKEDITOR.instances[id];
-
-        },
-        getSwitch: function() {
-            return this.$el.find('input[type="checkbox"]').parent();
-        },
-
-        render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            this.model.langFields.each(this._addLangView, this);
-            this.model.view = this;
-
-            //this.$el.find('.select2').select2();
-            this._updateLangTag();
-            return this;
-        }
-    });
-
-    CustomField.Views.MainView = Backbone.View.extend({
-        el: '#fields_list',
-        initialize: function() {
-            this.collection.on('add', this._addFieldView, this);
-        },
-        _addFieldView: function(field) {
-//            var setView = new  CustomField.Views.FieldSetView({model: set});
-            var fieldView = new CustomField.Views.FieldView({model: field, parentSet: setCollection});
-            this.$el.find('div.box-content').append(fieldView.render().el);
-
-            switch (field.get('admin_input_type')) {
-                case 'multiselect':
-                case 'select':
-                    this.$el.find('select:last').val(field.get('value'));
-                    this.$el.find('select:last').select2();
-                    break;
-                case 'boolean':
-                    field.switch = true;
-                    fieldView.$el.find('.switch-cbx:last').wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
-
-                    break;
-                case 'wysiwyg':
-                    field.wysiwyg = true;
-                    adminForm.wysiwygInit();
-                    var p = fieldView.$el.find('textarea:first').parent();
-                    p.append('<textarea name="' + guid() + '" ' + (field.get('required') === '1' ? 'data-rule-required="true"' : '') + ' style="display:none;">' + fieldView.$el.find('textarea:first').val() + '</textarea>');
-                    break;
-            }
-//            this.$el.append(setView.render().el);
-        },
-        render: function() {
-            this.$el.find('div.box-content').html('');
-            this.collection.each(this._addFieldView, this);
-            adminForm.wysiwygInit();
-            adminForm.createSwitchButton();
-        }
-    });
-
-    var setCollection = new CustomField.Collections.FieldCollection();
-    if (initialData !== -1) {
-        for (var i in initialData) {
-            var fSet = initialData[i];
-            //var fields = _.clone(set.fields);
-            //delete set.fields;
-            var field = new CustomField.Models.Field(fSet);
-            //setModel.fields.set(fields);
-            setCollection.add(field);
-            remove_option(field);
-        }
-        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
-    }
-
-    refresh_selects();
-
-    var mainView = new CustomField.Views.MainView({collection: setCollection});
-    mainView.render();
-//    if (setCollection.length === 0) {
-//        $('#td_fields').css('display', 'none');
-//        $('#field').hide();
-//        $('#btn_add_field').css('display', 'none');
-//    }
-    setCollection.on('add remove change', function (ev, data) {
-        var newVal = JSON.stringify(setCollection.toJSON());
-        $('#custom_fields').val(newVal);
-
-//        if (setCollection.length === 0) {
-//            $('#td_fields').css('display', 'none');
-//            $('#field').hide();
-//            $('#btn_add_field').css('display', 'none');
-//        } else {
-//            $('#td_fields').css('display', 'block');
-//            $('#field').show();
-//            $('#btn_add_field').css('display', 'inline-block');
-//        }
-
-        $(".prod-fieldset .box-content").sortable({
-            revert: true,
-            axis: 'y',
-            connectWith: ".prod-fieldset .box-content",
-            handle: '.control-handle'
         });
+
+        var $customHiddenInput = $('#custom_fields');
+        if (initData !== -1) {
+            $customHiddenInput.val(initData);
+        }
+
+//        console.log('initData', initData);
+
+        var fieldsContainer = document.getElementById('fields');
+        React.unmountComponentAtNode(fieldsContainer);
+        var FieldComponent = React.render(
+                React.createElement(Fields, {
+                    fields: initData !== -1 ? JSON.parse(initData) : [],
+                    options: fieldsOptions
+                }), fieldsContainer
+        );
+
+        var fieldsListContainer = document.getElementById('fields_list');
+        React.unmountComponentAtNode(fieldsListContainer);
+        var FieldsListComponent = React.render(
+                React.createElement(FieldsList, {
+                    fields: initData !== -1 ? JSON.parse(initData) : []
+                }), fieldsListContainer
+        );
     });
-
-    $(".prod-fieldset .box-content").sortable({
-        revert: true,
-        axis: 'y',
-        connectWith: ".prod-fieldset .box-content",
-        handle: '.control-handle'
-    });
-
-});
-
-/*$('body').on('click', 'a', function(e){
-    if( $(this).attr('href') === '#' ) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        return false;
-    }
-});*/
-
-
 </script>

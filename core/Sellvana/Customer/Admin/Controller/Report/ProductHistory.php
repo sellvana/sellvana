@@ -33,7 +33,7 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
             ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered'],
             ['name' => 'price', 'index' => 'oi.price', 'cell' => 'currency'],
             ['name' => 'row_total', 'index' => 'oi.row_total', 'cell' => 'currency'],
-            ['name' => 'amount_refunded', 'index' => 'o.amount_refunded', 'cell' => 'currency'],
+            ['name' => 'amount_refunded', 'index' => 'o_amount_refunded', 'cell' => 'currency'],
         ];
         $config['filters'] = [
             ['field' => 'order_date', 'type' => 'date-range'],
@@ -70,7 +70,7 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
 
         $orm->join('Sellvana_Sales_Model_Order', 'oi.order_id = o.id', 'o')
             ->select(['unique_id' => 'o.unique_id', 'order_date' => 'o.create_at', 'customer_id' => 'o.customer_id'])
-            ->select_expr('IFNULL(o.amount_refunded, 0)', 'amount_refunded')
+            ->select_expr('IFNULL(o.amount_refunded, 0)', 'o_amount_refunded')
             ->where_not_null('o.customer_id')
             ->group_by('oi.id');
     }
