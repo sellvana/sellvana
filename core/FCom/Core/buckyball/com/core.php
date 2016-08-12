@@ -2109,7 +2109,8 @@ class BSession extends BClass
     protected $_dirty = false;
 
     protected $_availableHandlers = [
-        '' => 'Default',
+        'default' => 'Default',
+        'memcached' => 'BSession_Memcached',
     ];
 
     protected $_defaultSessionCookieName = 'fulleron';
@@ -2172,16 +2173,20 @@ class BSession extends BClass
         $domain = $this->BRequest->getCookieDomain();
         $path = $this->BRequest->getCookiePath();
 
-        if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
-            $class = $this->_availableHandlers[$config['session_handler']];
-            $class::i()->register($ttl);
-        }
-        //session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (($dir = $this->BApp->storageRandomDir())) {
-            $dir .= '/session';
-            $this->BUtil->ensureDir($dir);
-            session_save_path($dir);
+        if (!empty($config['session_handler'])
+            && $config['session_handler'] !== 'default'
+            && !empty($this->_availableHandlers[$config['session_handler']])
+        ) {
+            $class = $this->_availableHandlers[$config['session_handler']];
+            $this->{$class}->register($ttl);
+        } else {
+            //session_set_cookie_params($ttl, $path, $domain);
+            if (($dir = $this->BApp->storageRandomDir())) {
+                $dir .= '/session';
+                $this->BUtil->ensureDir($dir);
+                session_save_path($dir);
+            }
         }
 
         $useStrictMode = $this->BConfig->get('cookie/use_strict_mode', '1');
@@ -2548,6 +2553,25 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     public function __destruct()
     {
         //$this->close();
+    }
+}
+
+class BSession_Memcached extends BClass
+{
+    public function register($ttl = null)
+    {
+        $savePath = $this->BConfig->get('cookie/session_savepath');
+        if (!$savePath) {
+            $savePath = 'localhost:11211';
+        }
+
+        if (class_exists('Memcache', false)) {
+            ini_set('session.save_handler', 'memcache');
+            ini_set('session.save_path', $savePath);
+        } elseif (class_exists('Memcached', false)) {
+            ini_set('session.save_handler', 'memcached');
+            ini_set('session.save_path', $savePath);
+        }
     }
 }
 

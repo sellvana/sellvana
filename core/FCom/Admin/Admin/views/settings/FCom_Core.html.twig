@@ -30,6 +30,7 @@
     {% set fieldData = { model: c, id_prefix:'config-cookie', name_prefix:'config[cookie]', get_prefix:'cookie' } %}
     {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Core-group4'}) }}
         {{ forms.select(fieldData,  { field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() }) }}
+        {{ forms.input(fieldData,   { field:'session_savepath', label:'Session Save Path'|_ }) }}
         {{ forms.input(fieldData,   { field:'remember_days', label:'Remember Me Timeout (days)'|_ }) }}
         {{ forms.input(fieldData,   { field:'domain', label:'Cookie Domain'|_ }) }}
         {{ forms.input(fieldData,   { field:'path', label:'Cookie Path'|_ }) }}
