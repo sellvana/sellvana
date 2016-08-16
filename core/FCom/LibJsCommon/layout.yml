@@ -88,6 +88,14 @@ lib_select2:
             - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2.css ]
             - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2-bootstrap.css ]
 
+lib_select2-4.0:
+    - view: head
+        do:
+            - [ requireJs, select2.en, @FCom_LibJsCommon/js/select2-4.0.2/js/i18n/en ]
+            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.2/js/select2.full.min ]
+            - [ css, @FCom_LibJsCommon/js/select2-4.0.2/css/select2.min.css ]
+
+
 lib_file_upload:
     - view: head
         do:

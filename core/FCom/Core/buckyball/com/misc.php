@@ -2499,10 +2499,10 @@ class BEmail extends BClass
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return bool|mixed
      */
-    public function send($data)
+    public function send(array $data)
     {
         static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|list-unsubscribe|x-.*)$/';
 
@@ -2554,13 +2554,19 @@ class BEmail extends BClass
         $this->_formatAlternative($headers, $body);
         $body = trim(preg_replace('#<!--.*?-->#', '', $body));//strip comments
 
+        if (empty($headers['content-type'])) {
+            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
+        }
+
         if ($files) {
             // $body and $headers will be updated
             $this->_addAttachments($files, $headers, $body);
         }
 
-        if (empty($headers['content-type'])) {
-            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
+        if (!empty($headers['bcc'])) { // workaround some weird bug in php send()
+            $bcc = $headers['bcc'];
+            unset($headers['bcc']);
+            $headers['bcc'] = $bcc;
         }
 
         $emailData = [
@@ -5287,6 +5293,9 @@ if (!function_exists('hash_hmac')) {
     function hash_hmac($algo, $data, $key, $raw_output = false)
     {
         $algo = strtolower($algo);
+        if (!is_callable($algo)) {
+            throw new BException('Invalid Algo');
+        }
         $pack = 'H' . strlen($algo('test'));
         $size = 64;
         $opad = str_repeat(chr(0x5C), $size);

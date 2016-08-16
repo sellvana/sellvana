@@ -1763,6 +1763,6 @@ class BTranslated extends BClass
         if (!static::$_locale) {
             static::$_locale = $this->BLocale;
         }
-        return static::$_locale->translateToString($this->_string, $this->_params, $this->_module);
+        return (string)static::$_locale->translateToString($this->_string, $this->_params, $this->_module);
     }
 }

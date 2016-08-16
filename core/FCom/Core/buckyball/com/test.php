@@ -164,7 +164,7 @@ class BTestSpec extends BClass
     public function expect($x)
     {
         $this->_expectations[] = $expectation = BTestExpectation::i(true, [['spec' => $this, 'value' => $x]]);
-        return $expect;
+        return $expectation;
     }
 
     public function spyOn($class, $method)
