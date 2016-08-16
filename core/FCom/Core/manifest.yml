@@ -37,6 +37,7 @@ modules:
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Core_LayoutEditor.onFetchLibrary" ]
             - [ "BORM::find_one:after", FCom_Core_Main.onFindOneAfter ]
             - [ "BORM::find_many:after", FCom_Core_Main.onFindManyAfter ]
+            - [ "FCom_Core_ImportExport::import:afterModel:FCom_Core_Model_ExternalConfig", "FCom_Core_Main.onConfigAfterCoreImport" ]
 
         areas:
             FCom_Shell:
