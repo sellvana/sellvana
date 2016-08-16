@@ -45,12 +45,18 @@ modules:
                         - FCom_Core_Shell_Cache
                         - FCom_Core_Shell_Config
                         - FCom_Core_Shell_DataIo
+                        - FCom_Core_Shell_Help
                         - FCom_Core_Shell_Migrate
                         - FCom_Core_Shell_Module
                 observe:
                     - [ "FCom_Core_ImportExport::beforeImport", "FCom_Core_Shell_DataIo.onBeforeImport" ]
                     - [ "FCom_Core_ImportExport::import:beforeModel", "FCom_Core_Shell_DataIo.onBeforeModel" ]
                     - [ "FCom_Core_ImportExport::_importBatch:afterBatch", "FCom_Core_Shell_DataIo.onAfterBatch" ]
+
+            FCom_Install:
+                custom:
+                    actions:
+                        - FCom_Shell_Action_Help
 
         default_config:
             core:

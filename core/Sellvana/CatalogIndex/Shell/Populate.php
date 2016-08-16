@@ -8,7 +8,7 @@
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_AdminLiveFeed_Main $Sellvana_AdminLiveFeed_Main
  */
-class Sellvana_CatalogIndex_Shell_Populate extends FCom_Shell_Action_Abstract
+class Sellvana_CatalogIndex_Shell_Populate extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 

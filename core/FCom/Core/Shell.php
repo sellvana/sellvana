@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Shell_Shell extends BClass
+class FCom_Core_Shell extends BClass
 {
     const CURSOR_CMD_POS     = 'pos';
     const CURSOR_CMD_UP      = 'up';
@@ -103,7 +103,7 @@ class FCom_Shell_Shell extends BClass
 
         // collect action classes and convert to instances
         foreach ($this->_actionClasses as $class) {
-            /** @var FCom_Shell_Action_Abstract $inst */
+            /** @var FCom_Core_Shell_Abstract $inst */
             $inst = $this->{$class};
             $this->_actions[$inst->getActionName()] = $inst;
         }

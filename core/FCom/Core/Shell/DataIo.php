@@ -3,10 +3,10 @@
 /**
  * Class FCom_Core_Shell_Import
  *
- * @property FCom_Shell_Shell $FCom_Shell_Shell
+ * @property FCom_Core_Shell $FCom_Core_Shell
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  */
-class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
+class FCom_Core_Shell_DataIo extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 
@@ -94,10 +94,10 @@ EOT;
         $answer = false;
         $offset = 0;
         while (true) {
-            $shell = $this->FCom_Shell_Shell;
+            $shell = $this->FCom_Core_Shell;
             $this->out('{yellow}' . $question . '{/} [Y/N] ' . str_pad('', $offset));
             if ($offset) {
-                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+                $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_BACK, $offset));
             }
             $answer = strtolower($shell->stdin());
             $offset = strlen($answer);
@@ -105,7 +105,7 @@ EOT;
                 $answer = ($answer == 'y' ? true : false);
                 break;
             }
-            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
         }
         return $answer;
     }
@@ -141,7 +141,7 @@ EOT;
     protected function _run()
     {
         if ($this->getOption(self::OPTION_QUIET)) {
-            $this->FCom_Shell_Shell->setOutMode(FCom_Shell_Shell::OUT_MODE_QUIET);
+            $this->FCom_Core_Shell->setOutMode(FCom_Core_Shell::OUT_MODE_QUIET);
         }
         $this->_processCommand();
     }
@@ -302,10 +302,10 @@ EOT;
         $tryCount = 1;
         $offset = 0;
         while (true) {
-            $shell = $this->FCom_Shell_Shell;
+            $shell = $this->FCom_Core_Shell;
             $this->out('{yellow}Filename ids: {/}'  . str_pad('', $offset));
             if ($offset) {
-                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+                $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_BACK, $offset));
             }
             $fileIds = $shell->stdin();
 
@@ -320,7 +320,7 @@ EOT;
             if ($tryCount == 3) {
                 break;
             }
-            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
             $tryCount++;
         }
 
@@ -402,14 +402,14 @@ EOT;
             return;
         }
 
-        $shell = $this->FCom_Shell_Shell;
+        $shell = $this->FCom_Core_Shell;
         if ($this->getOption(self::OPTION_VERBOSE) !== true) {
-            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
             $this->println($args['modelName']);
             return;
         }
 
-        $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 2));
+        $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 2));
 
         $statistic = $args["statistic"];
 
@@ -467,7 +467,7 @@ EOT;
 
             $this->println(PHP_EOL . '{green*}Export in progress.{/}');
             $this->FCom_Core_ImportExport->export($models, $file);
-            $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->out($this->FCom_Core_Shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
             $this->println('{green*}Export finished.   {/}');
 
         } catch (Exception $e) {
@@ -518,14 +518,14 @@ EOT;
         $error = false;
         while (true) {
             $error = false;
-            $shell = $this->FCom_Shell_Shell;
+            $shell = $this->FCom_Core_Shell;
             $this->out(
                 '{yellow}Please enter filename for export:{/}{white} ['
                 . $defaultName . '] {/}'
                 . str_pad('', $offset)
             );
             if ($offset) {
-                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+                $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_BACK, $offset));
             }
             $filename = $shell->stdin();
 
@@ -544,7 +544,7 @@ EOT;
                 break;
             }
 
-            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 2));
+            $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 2));
 
             $tryCount++;
         }
@@ -679,10 +679,10 @@ EOT;
         $tryCount = 1;
         $offset = 0;
         while (true) {
-            $shell = $this->FCom_Shell_Shell;
+            $shell = $this->FCom_Core_Shell;
             $this->out('{yellow}Module ids: {/} [All] '  . str_pad('', $offset));
             if ($offset) {
-                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+                $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_BACK, $offset));
             }
             $moduleIds = $shell->stdin();
 
@@ -701,7 +701,7 @@ EOT;
             if ($tryCount == 3) {
                 break;
             }
-            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
             $tryCount++;
         }
 

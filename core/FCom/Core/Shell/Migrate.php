@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Core_Shell_Migrate extends FCom_Shell_Action_Abstract
+class FCom_Core_Shell_Migrate extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 
