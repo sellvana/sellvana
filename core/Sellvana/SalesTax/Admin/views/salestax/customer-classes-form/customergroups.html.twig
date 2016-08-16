@@ -50,7 +50,7 @@
                                             var relatedNode = $(modal.getDOMNode());
                                             relatedNode.find('.modal-dialog').css('width', '900px');
                                         },
-                                        onConfirm: window.addSelectedCustomer
+                                        onConfirm: window.addSelectedCustomerGroups
                                     },
                                     React.createElement('div', {className: 'f-grid-wrapper', id: 'taxProductList'})
                             ), modalContainerEle);
@@ -70,7 +70,7 @@
                  * add selected customers from full customers grid to tax-customers grid
                  * @param modal
                  */
-                window.addSelectedCustomer = function (modal) {
+                window.addSelectedCustomerGroups = function (modal) {
                     var selectedRows = attachGrid.getSelectedRows();
                     if (selectedRows.length) {
                         var addRows = [];
@@ -86,7 +86,7 @@
                         });
                         modal.close();
                     } else {
-                        alert('please choose at least one product');
+                        alert('please choose at least one customer group');
                     }
                 };
 

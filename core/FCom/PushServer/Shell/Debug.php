@@ -5,7 +5,7 @@
  *
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
-class FCom_PushServer_Shell_Debug extends FCom_Shell_Action_Abstract
+class FCom_PushServer_Shell_Debug extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 

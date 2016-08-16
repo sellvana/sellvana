@@ -1720,6 +1720,8 @@ class BResponse extends BClass
     {
         if (!$tags) {
             $tags = $this->BRequest->getAllowedTags();
+        } elseif ($tags[0] === '+') {
+            $tags = $this->BRequest->getAllowedTags() . substr($tags, 1);
         }
         $html = strip_tags($html, $tags);
 

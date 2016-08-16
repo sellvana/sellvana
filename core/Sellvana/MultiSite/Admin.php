@@ -59,6 +59,9 @@ class Sellvana_MultiSite_Admin extends BClass
     {
         $uId = $args['model']->id();
         $new = $this->BRequest->post('multisite');
+        if (!$new) {
+            $new = [];
+        }
         foreach ($new as $sId => $roles) {
             $new[$sId] = array_flip($roles);
         }

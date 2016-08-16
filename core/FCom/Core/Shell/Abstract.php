@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class FCom_Shell_Action_Abstract
+ * Class FCom_Core_Shell_Abstract
  *
- * @property FCom_Shell_Shell $FCom_Shell_Shell
+ * @property FCom_Core_Shell $FCom_Core_Shell
  */
-abstract class FCom_Shell_Action_Abstract extends BClass
+abstract class FCom_Core_Shell_Abstract extends BClass
 {
     const PARAM_SELF = 0;
     const PARAM_ACTION = 1;
@@ -115,7 +115,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
      */
     protected function _collectOptions()
     {
-        $params =& $this->FCom_Shell_Shell->getAllParams();
+        $params =& $this->FCom_Core_Shell->getAllParams();
 
         $this->_options = [];
         $this->_optionErrors = [];
@@ -214,7 +214,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
 
     public function getParam($num)
     {
-        return $this->FCom_Shell_Shell->getParam($num);
+        return $this->FCom_Core_Shell->getParam($num);
     }
 
     /**
@@ -230,7 +230,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
 
     public function out($string)
     {
-        $shell = $this->FCom_Shell_Shell;
+        $shell = $this->FCom_Core_Shell;
         $shell->stdout($shell->colorize($string), false, '');
         return $this;
     }
@@ -240,7 +240,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         if (!empty($params['ts'])) {
             $string  = '{blue*}[' . $this->BDb->now() . ']{/} ' . $string;
         }
-        $shell = $this->FCom_Shell_Shell;
+        $shell = $this->FCom_Core_Shell;
         $shell->stdout($shell->colorize($string));
         return $this;
     }
@@ -258,7 +258,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         $out = $start . str_pad('', $pos, $pass) . $head . str_pad('', $size - $pos, $fill) . $end .
                ' {blue*}' . $done . '/' . $total . ' ' . $percent . '%{/}';
         $this->println($out);
-        $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+        $this->out($this->FCom_Core_Shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
         return $this;
     }
 }

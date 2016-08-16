@@ -10,6 +10,7 @@ customer_form_tabs:
     - view: admin/form
         do:
             - [ addTab, fields, { label: Additional Info, pos: 82, view: customerfields/customers/fields-tab, async: true } ]
+            - [ addTab, fields-backbone, { label: Backbone Additional Info, pos: 84, view: customerfields/customers/fields-tab-backbone, async: true } ]
 
 /customerfields/fields:
     - { include: base }

@@ -14,7 +14,7 @@
                 panes:    '.adm-tabs-content',
                 url_get:  '{{ formUrl }}',
                 url_post: '{{ formUrl }}',
-                is_new:   {% if model.id is same as(null) %}true{% else %}false{% endif %}
+                is_new:   {% if model.get('id') is same as(null) %}true{% else %}false{% endif %}
             });
 
             var mainForm = '{{ formId }}';

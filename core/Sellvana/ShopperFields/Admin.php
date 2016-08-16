@@ -33,6 +33,8 @@ class Sellvana_ShopperFields_Admin extends BClass
             $data = [];
         }
 
+        // Get allowed locales for render in multi-language module
+        $locales = $this->BLocale->parseAllowedLocalesToOptions();
         $config = [
             'config' => [
                 'id' => 'frontend-field-grid',
@@ -46,9 +48,9 @@ class Sellvana_ShopperFields_Admin extends BClass
                         ['name' => 'delete'],
                     ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'name', 'label' => 'Field Name', 'width' => 200, 'editable' => 'inline',
+                    ['name' => 'name', 'label' => 'Field Name', 'multilang' => ['id' => 'name', 'locales' => $locales, 'callback' => 'saveShopperLangField'], 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'type' => 'input', 'validation' => ['required' => true]],
-                    ['name' => 'label', 'label' => 'Field Label', 'editable' => 'inline',
+                    ['name' => 'label', 'label' => 'Field Label', 'multilang' => ['id' => 'label', 'locales' => $locales, 'callback' => 'saveShopperLangField'], 'editable' => 'inline',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
                     ['name' => 'input_type', 'label' => 'Field Type', 'width' => 120, 'editable' => 'inline','editor' => 'select',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
@@ -103,7 +105,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Field name (Product Name)', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Option Name (Bundle Part Name)', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
                     ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
                     ['type' => 'btn_group', 'buttons' => [

@@ -78,7 +78,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 React.createElement("div", null, 
                     _(this.props.langs).map(function (lang, key) {
                         return (
-                            React.createElement("div", {key: that.props.id + lang.lang_code, className: "form-group"}, 
+                            React.createElement("div", {key: that.props.id + lang.lang_code, className: "form-group col-md-12"}, 
                                 React.createElement("div", {className: "col-md-3 control-label"}, 
                                     React.createElement("span", {className: "badge badge-default"}, lang.lang_code)
                                 ), 
@@ -117,8 +117,6 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
             };
         },
         componentWillMount: function () {
-            this.props.modalConfig = this.getModalConfig();
-
             this.setStoreData('data', this.state.data);
             this.setStoreData('locales', this.state.locales);
 
@@ -126,6 +124,9 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 data: this.props.data,
                 locales: this.props.locales
             });
+        },
+        componentDidMount: function () {
+            
         },
         shouldComponentUpdate: function (nextProps, nextState) {
             return nextState.data != this.state.data || nextState.locales != this.state.locales;
@@ -242,8 +243,12 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 $container.unwrap();
             }
 
-            if (valid && modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
-                window[modalConfig.onSaved](modal, this.state.data);
+            if (valid && modalConfig.onSaved) {
+                if (typeof modalConfig.onSaved === 'function') {
+                    modalConfig.onSaved(modal, this.state.data);
+                } else if (typeof window[modalConfig.onSaved] === 'function') {
+                    window[modalConfig.onSaved](modal, this.state.data);
+                }
 
                 // Update storage data
                 this.setStoreData('data', this.state.data);
@@ -317,7 +322,7 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
         warn: function (value) {
             console.warn(value);
         },
-        render: function () {
+        renderModal: function () {
             var inlineProps = this.getSelect2Config(),
                 locales = this.getLocales(),
                 langIds = _.pluck(this.state.data, 'lang_code'),
@@ -326,8 +331,10 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                 }).join(',') : Locale._('Multi Languages ...') : null;
 
             return (
-                React.createElement("div", {className: this.props.cClass || ''}, 
+                React.createElement("div", {style: this.props.containerStyles || {}, className: this.props.cClass || ''}, 
                     React.createElement(Components.Button, {type: "button", style: {marginBottom: '10px'}, 
+                                       "data-id": this.props.dataId || '', 
+                                       "data-name": this.props.dataName || '', 
                                        className: 'btn btn-xs multilang ' + (langLabel ? 'btn-info' : ''), 
                                        onClick: this.showModal}, 
                         !langLabel ? React.createElement("i", {className: "icon icon-globe"}) : '', " ", langLabel || Locale._('Translate')
@@ -360,6 +367,42 @@ define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2
                     )
                 )
             );
+        },
+        renderNode: function () {
+            var inlineProps = this.getSelect2Config(),
+                locales = this.getLocales();
+            
+            return (
+                React.createElement("div", {style: this.props.containerStyles || {}, className: this.props.cClass || ''}, 
+                    React.createElement("div", {className: "well"}, 
+                        React.createElement("table", null, 
+                            React.createElement("tbody", null, 
+                            React.createElement("tr", null, 
+                                React.createElement("td", null, 
+                                    React.createElement(FComSelect2, React.__spread({options: locales, onChange: this._handleSelect2Change, 
+                                                 defaultValue: []},  inlineProps))
+                                ), 
+                                React.createElement("td", null, 
+                                    React.createElement(Components.Button, {type: "button", className: "btn-sm btn-primary", 
+                                                       onClick: this._handleAddField}, 
+                                        Locale._('Add Locale')
+                                    )
+                                )
+                            )
+                            )
+                        )
+                    ), 
+                    React.createElement("div", {id: this.props.id + '-container', ref: "container"}, 
+                        React.createElement(LangFields, {id: this.props.id, 
+                                    langs: this.state.data || [], 
+                                    removeField: this.handleRemoveField, 
+                                    setLangVal: this.setLangVal})
+                    )
+                )
+            );
+        },
+        render: function () {
+            return !_.isEmpty(this.props.modalConfig) ? this.renderModal() : this.renderNode();
         }
     });
 

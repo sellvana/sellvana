@@ -15,7 +15,7 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         if (!$p2) {
             return $p1;
         }
-        return array_merge_recursive($p1, $p2);
+        return $this->BUtil->arrayMerge($p1, $p2);
     }
 
     /**
@@ -157,5 +157,15 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         $p1 = $p;
         $p1['field'] = ltrim($p1['js_toggle'], '!');
         return $this->getInputId($p1);
+    }
+
+    public function getSelect2ArgsText($p)
+    {
+        if (empty($p['select2'])) {
+            return '{}';
+        }
+        $args = $p['select2'];
+
+        return $this->BUtil->toJson($args);
     }
 }
