@@ -342,12 +342,12 @@ class FCom_Core_Main extends BClass
         }
 
         if ($config->get('install_status') === 'installed') {
-            $runLevels = [$area => 'REQUIRED'];
+            $runLevels = [$area => 'REQUESTED'];
         } else {
             $config->set('module_run_levels', []);
             $runLevels = [
                 'FCom_Install' => 'REQUIRED',
-                'FCom_Shell' => 'REQUESTED',
+                #'FCom_Shell' => 'REQUESTED',
                 'FCom_LibTwig' => 'REQUESTED',
                 'Sellvana_MarketClient' => 'REQUESTED', //TODO: move out to MarketClient module
             ];
