@@ -1847,7 +1847,7 @@ class BEvents extends BClass
             $insertCallable = $this->BUtil->extCallback($params['insert']);
             $inserted = false;
             foreach ($this->_events[$eventName]['observers'] as $i => $obs) {
-                if (!empty($insertCallable)) {
+                if (!empty($insertCallable) && is_callable($insertCallable)) {
                     $result = $insertCallable($obs, $eventName, $callback);
                     if ($result) {
                         $beforeAfter = $result === -1 ? $i : ($i + 1);

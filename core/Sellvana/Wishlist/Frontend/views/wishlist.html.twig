@@ -172,15 +172,14 @@
                 var wlId = $o.data('wishlist');
                 var pId  = $o.data('product');
 
-                $.ajax("{{ APP.href('wishlist/move') }}?product=" + pId + "&wishlist=" + wlId + '&id=' + id, {
-                    dataType: "json"
-                }).done(function(r) {
-                    if (r.success == true) {
-                        setInterval(function() {
-                            window.location.href = "{{ APP.href('wishlist') }}";
-                        }, 1000);
-                    }
-                });
+                $.post("{{ APP.href('wishlist/move') }}", { product: pId, wishlist: wlId, id: id, dataType: "json" })
+                    .done(function(r) {
+                        if (r.success == true) {
+                            setInterval(function() {
+                                window.location.href = "{{ APP.href('wishlist') }}";
+                            }, 1000);
+                        }
+                    });
             });
 
             $('#new-wishlist-form').validate({ rules: { title: "required" } });
