@@ -6,6 +6,11 @@ if (!defined('FULLERON_ROOT_DIR')) {
 
 require_once __DIR__ . '/buckyball/buckyball.php';
 
+/**
+ * Class FCom_Core_Main
+ *
+ * @property FCom_Core_Model_ExternalConfig $FCom_Core_Model_ExternalConfig
+ */
 class FCom_Core_Main extends BClass
 {
     protected $_modulesDirs = [];
@@ -646,5 +651,22 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
                 $model->mapDataFields();
             }
         }
+    }
+
+    public function onConfigAfterCoreImport()
+    {
+        $configModel = $this->FCom_Core_Model_ExternalConfig;
+        $importedConfig = $configModel->orm('ec')->find_many();
+        $websites = [];
+        foreach ($importedConfig as $item) {
+            //$this->BConfig->add()->
+            if ($item->get('site_id') === null) {
+                $this->BConfig->set($item->get('path'), $item->get('value'), false, true);
+            } else {
+            }
+        }
+        $this->BConfig->writeConfigFiles(['local']);
+        $tConfig = $configModel->table();
+        $this->BDb->run("TRUNCATE {$tConfig}");
     }
 }

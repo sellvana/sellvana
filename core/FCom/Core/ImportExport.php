@@ -83,6 +83,15 @@ class FCom_Core_ImportExport extends BClass
      */
     protected $_importCode;
 
+    /**
+     * Models that contain config data
+     * @var array
+     */
+    protected static $_configModels = [
+        'FCom_Core_Model_Config',
+        'FCom_Core_Model_ExternalConfig',
+    ];
+
     public function __construct(){
         $this->_currentObjectId = md5(spl_object_hash($this));
     }
@@ -329,10 +338,11 @@ class FCom_Core_ImportExport extends BClass
      *
      * @param string $fromFile
      * @param int $batch
+     * @param bool $allowConfig
      * @return bool
      * @throws BException
      */
-    public function importFile($fromFile = null, $batch = null)
+    public function importFile($fromFile = null, $batch = null, $allowConfig = false)
     {
         $fi = $this->_getReadHandle($fromFile, 'import');
 
@@ -365,13 +375,13 @@ class FCom_Core_ImportExport extends BClass
             if (!empty($lineData)) {
                 $batchData[] = $lineData;
                 if ($cnt % $bs == 0) {
-                    $this->import($batchData, $bs);
+                    $this->import($batchData, $bs, $allowConfig);
                     $batchData = [];
                 }
             }
         }
 
-        $this->import($batchData, $bs);
+        $this->import($batchData, $bs, $allowConfig);
 
         $this->BEvents->fire(self::$_origClass . "::afterImport");
 
@@ -389,7 +399,7 @@ class FCom_Core_ImportExport extends BClass
         return true;
     }
 
-    public function import($importData = array(), $batch = null)
+    public function import($importData = array(), $batch = null, $allowConfig = false)
     {
         $start = microtime(true);
 
@@ -417,6 +427,11 @@ class FCom_Core_ImportExport extends BClass
         }
 
         $ieConfig = $this->collectExportableModels();
+        foreach (array_keys($ieConfig) as $model) {
+            if (!$allowConfig && in_array($model, self::$_configModels)) {
+                unset($ieConfig[$model]);
+            }
+        }
         /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
         $ieHelperMod = $this->FCom_Core_Model_ImportExport_Model;
 

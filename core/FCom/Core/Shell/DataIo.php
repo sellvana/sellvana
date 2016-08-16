@@ -15,6 +15,7 @@ class FCom_Core_Shell_DataIo extends FCom_Core_Shell_Abstract
     const OPTION_QUIET   = 'q';
     const OPTION_MODEL   = 'm';
     const OPTION_ALL     = 'all';
+    const OPTION_ALLOW_CONFIG = 'allow-config';
 
     static protected $_actionName = 'data-io';
 
@@ -23,7 +24,8 @@ class FCom_Core_Shell_DataIo extends FCom_Core_Shell_Abstract
         'v'  => 'verbose',
         'q'  => 'quiet',
         'm?' => 'model',
-        'all'
+        'all',
+        'allow-config'
     ];
 
     protected $_importStarted = 0;
@@ -69,6 +71,8 @@ Options:
 
     {green*}-m {/}{cyan*}<model>{/}
     {green*}--model={/}{cyan*}<model>{/}   Model(s) to export({red}Only for export{/})
+    
+    {green*}--allow-config   Allow store config to be imported
 
   Overwrite control:
     {green*}    --all{/}         Export all models ({red}Only for export, ignore "--model" option{/})
@@ -213,7 +217,7 @@ EOT;
                     $this->println('{blue*}NOTICE:{/} Invalid import file. Will be skipped.');
                     continue;
                 }
-                $importer->importFile($file);
+                $importer->importFile($file, null, $this->getOption(self::OPTION_ALLOW_CONFIG));
 
                 $this->println(PHP_EOL . '{green*}END FILE: {/}{purple*}' . $file . '{/}');
             }
