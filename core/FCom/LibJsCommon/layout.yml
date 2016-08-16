@@ -2,7 +2,6 @@ common_js_libs:
     - view: head
         do:
             - [ requireJs, jquery.cookie, @FCom_LibJsCommon/js/jquery.cookie, { deps: [ jquery ] } ]
-            #- [ requireJs, jquery.resizableColumns, @FCom_LibJsCommon/js/jquery.resizableColumns.js, { deps: [ jquery ] } ]
             - [ requireJs, jquery.tablesorter, @FCom_LibJsCommon/js/jquery.tablesorter.min, { deps: [ jquery ] }]
             - [ requireJs, jquery.widgets, @FCom_LibJsCommon/js/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
             - [ requireJs, jquery.validate, @FCom_LibJsCommon/js/jquery.validate.min, { deps: [ jquery ] } ]
@@ -12,7 +11,6 @@ common_js_libs:
             - [ requireJs, jquery.zoom, @FCom_LibJsCommon/js/jquery.zoom, { deps: [ jquery ] } ]
             - [ requireJs, unique, @FCom_LibJsCommon/js/unique ]
             - [ requireJs, bootstrap, @FCom_LibJsCommon/js/bootstrap-3, { deps: [ jquery ] } ]
-#            - [ requireJs, bootstrap, @FCom_LibJsCommon/js/bootstrap-3.3.5/js/bootstrap, { deps: [ jquery ] } ]
 #            - [ requireJs, bootstrap, @FCom_LibJsCommon/js/bootstrap-3.min, { deps: [ jquery ] } ]
             - [ requireJs, fcom.password, @FCom_Core/js/fcom/fcom.password ]
             - [ requireJs, fcom.ipmode, @FCom_Core/js/fcom/fcom.ipmode ]
@@ -38,7 +36,6 @@ common_js_libs:
 
             #- [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
             #- [ requireModulePath, FCom_Core ]
-            #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]
             - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
             - [ css, @FCom_LibJsCommon/js/css/bootstrap-ladda.css ]
 
@@ -90,10 +87,6 @@ lib_select2:
             - [ requireJs, select2, @FCom_LibJsCommon/js/select2-3.5.4/select2, deps: [ jquery ] ]
             - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2.css ]
             - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2-bootstrap.css ]
-
-            #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
-            #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
-
 
 lib_select2-4.0:
     - view: head
