@@ -5,7 +5,8 @@ modules:
         translations: { en: en.php }
         description: "Enable multiple website management from the same instance"
         require: { module: { FCom_Core: 0.1.0 } }
-
+        observe:
+            - [ "FCom_Core_Main::onConfigAfterCoreImport:multisite", Sellvana_MultiSite_Main.onWebsiteConfigImport ]
         areas:
             FCom_Admin:
                 auto_use: [ bootstrap, layout, views ]

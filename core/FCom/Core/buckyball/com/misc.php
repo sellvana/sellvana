@@ -3904,7 +3904,8 @@ class BFile extends BClass
 
         $responseCode = substr($headers[0], 9, 3);
         if ($responseCode != 200) {
-            throw new BException('Unsupported response code: ' . $responseCode);
+            return $this;
+            //throw new BException('Unsupported response code: ' . $responseCode);
         }
 
         $memoryLimit = $this->BUtil->getMemoryLimit() - memory_get_usage();
