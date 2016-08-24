@@ -55,7 +55,7 @@ class Sellvana_RecentlyViewed_Model_History extends FCom_Core_Model_Abstract
             ->limit($cnt);
 
         if (!$custId) {
-            $orm->where(['h.cookie_token' => $token, 'h.customer_id' => null]);
+            $orm->where(['h.cookie_token' => (string)$token, 'h.customer_id' => null]);
         } else {
             $orm->where('h.cookie_token', $token);
         }
