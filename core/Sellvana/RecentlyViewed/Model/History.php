@@ -54,11 +54,10 @@ class Sellvana_RecentlyViewed_Model_History extends FCom_Core_Model_Abstract
             ->order_by_desc('h.update_at')
             ->limit($cnt);
 
-        if ($token) {
+        if (!$custId) {
+            $orm->where(['h.cookie_token' => $token, 'h.customer_id' => null]);
+        } else {
             $orm->where('h.cookie_token', $token);
-        }
-        if ($custId) {
-            $orm->where('h.customer_id', $custId);
         }
 
         $products = $orm->find_many();
