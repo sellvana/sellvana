@@ -16,18 +16,18 @@ class Sellvana_Promo_Main extends BClass
 
         $promos = $this->Sellvana_Promo_Model_Promo->findByCouponCodes([$couponCode]);
         if (!$promos) {
-            $result['error']['message'] = 'Coupon not found';
+            $args['result']['error']['message'] = 'Coupon not found';
             return;
         }
         $hlp = $this->Sellvana_Promo_Model_PromoCart;
         foreach ($promos as $promo) {
             if (!$hlp->validateConditions($promo, $cart)) {
-                $result['error']['message'] = "Coupon can't be applied to your cart";
+                $args['result']['error']['message'] = "Coupon can't be applied to your cart";
                 return;
             }
         }
-        $result['success'] = true;
-        unset($result['error']);
+        $args['result']['success'] = true;
+        unset($args['result']['error']);
     }
 
     public function onCartDiscountCalculate($args)
