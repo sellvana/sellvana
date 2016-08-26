@@ -20,7 +20,7 @@
           {% endif %}
           {{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}
           <a href="{{ APP.href("customer/address/edit") }}?id={{ address.get('id') }}">{{ "Edit" | _ }}</a>
-          <button type="submit"><span>{{ "Remove" | _ }}</span></button>
+          <button type="submit" class="f-address-remove"><span>{{ "Remove" | _ }}</span></button>
         </form>
       </div>
     {% endfor %}
@@ -32,6 +32,12 @@
   require(['jquery'], function($) {
     $( "#button" ).click(function() {
       $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+    });
+    $('.f-address-remove').click(function(ev) {
+      if (!confirm('{{ 'Are you sure you want to delete this address?'|_ }}')) {
+        return false;
+      }
+      return true;
     });
   });
 </script>
