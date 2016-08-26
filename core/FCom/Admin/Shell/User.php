@@ -6,7 +6,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
-class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
+class FCom_Admin_Shell_User extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 
@@ -73,7 +73,7 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
         $password = $this->getOption('p');
         if (!$password || $password === true) {
             $this->out('New user password: ');
-            $password = $this->FCom_Shell_Shell->stdin();
+            $password = $this->FCom_Core_Shell->stdin();
         }
 
         if (($role = $this->getOption('r'))) {
@@ -128,7 +128,7 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
         $password = $this->getOption('p');
         if ($password === true) {
             $this->out('Update password: ');
-            $password = $this->FCom_Shell_Shell->stdin();
+            $password = $this->FCom_Core_Shell->stdin();
         }
 
         $data = [];
@@ -202,7 +202,7 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
 
         if (!$this->getOption('y')) {
             $this->out('Please type YES to confirm deletion of the user (ID: {green*}' . $user->id() . '{/}): ');
-            $yes = $this->FCom_Shell_Shell->stdin();
+            $yes = $this->FCom_Core_Shell->stdin();
             if (strtoupper($yes) !== "YES") {
                 $this->println('User deletion canceled');
                 return;

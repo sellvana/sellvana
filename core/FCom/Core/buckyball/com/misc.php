@@ -3459,9 +3459,11 @@ class BDebug extends BClass
                     $shellOut .= '{red*}Called from: {/}' . $e['file'] . ':' . $e['line'];
                 }
 
-                /** @var FCom_Shell_Shell $shell */
-                $shell = FCom_Shell_Shell::i();
-                $shell->stdout($shell->colorize($shellOut));
+                if (class_exists('FCom_Core_Shell')) {
+                    /** @var FCom_Core_Shell $shell */
+                    $shell = FCom_Core_Shell::i();
+                    $shell->stdout($shell->colorize($shellOut));
+                }
             }
         }
 /*

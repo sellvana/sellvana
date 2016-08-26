@@ -5,7 +5,7 @@
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
-class FCom_Install_Shell_Install extends FCom_Shell_Action_Abstract
+class FCom_Install_Shell_Install extends FCom_Core_Shell_Abstract
 {
 
     static protected $_origClass = __CLASS__;
@@ -200,7 +200,7 @@ EOT;
         $options = $this->_getOptionFields();
 
         if ($this->getOption(self::OPTION_QUIET)) {
-            $this->FCom_Shell_Shell->setOutMode(FCom_Shell_Shell::OUT_MODE_QUIET);
+            $this->FCom_Core_Shell->setOutMode(FCom_Core_Shell::OUT_MODE_QUIET);
             $error = false;
             foreach ($this->_quietRequired as $item) {
                 if (!is_string($this->getOption($item))) {
@@ -311,7 +311,7 @@ EOT;
 
                 //$migrate->migrateModules(false);
 
-                //$this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+                //$this->out($this->FCom_Core_Shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1));
                 $this->println(PHP_EOL . '{green*}Installation configuration finished.{/}');
                 $this->println(
                     '{green*}Please run {/}{red*}`' . $this->getParam(self::PARAM_SELF)
@@ -384,7 +384,7 @@ EOT;
         $tryCount = 3;
         $iteration = 0;
         while (true) {
-            $shell = $this->FCom_Shell_Shell;
+            $shell = $this->FCom_Core_Shell;
 
             $defaultValue = null;
             $defaultValueStr = '';
@@ -397,7 +397,7 @@ EOT;
             }
             $this->out($question . $defaultValueStr . str_pad('', $offset));
             if ($offset) {
-                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+                $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_BACK, $offset));
             }
             $answer = $shell->stdin();
             $offset = strlen($answer);
@@ -431,7 +431,7 @@ EOT;
                 break;
             }
 
-            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1 + $errorOffset));
+            $this->out($shell->cursor(FCom_Core_Shell::CURSOR_CMD_UP, 1 + $errorOffset));
             $iteration++;
         }
         return $answer;

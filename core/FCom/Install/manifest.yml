@@ -14,7 +14,8 @@ modules:
         areas:
             FCom_Shell:
                 custom:
-                    actions: [ FCom_Install_Shell_Install ]
+                    actions:
+                        - FCom_Install_Shell_Install
 
         themes:
             FCom_Install:

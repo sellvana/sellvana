@@ -6,7 +6,7 @@
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  */
-class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Shell_Action_Abstract
+class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 

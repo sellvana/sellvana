@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class FCom_Shell_Shell_Abstract
+ * Class FCom_Core_Shell_Abstract
  *
- * @property FCom_Shell_Shell $FCom_Shell_Shell
+ * @property FCom_Core_Shell $FCom_Core_Shell
  */
-class FCom_Shell_Action_Help extends FCom_Shell_Action_Abstract
+class FCom_Core_Shell_Help extends FCom_Core_Shell_Abstract
 {
     static protected $_origClass = __CLASS__;
 
@@ -17,7 +17,7 @@ class FCom_Shell_Action_Help extends FCom_Shell_Action_Abstract
 
     protected function _run()
     {
-        $shellHlp = $this->FCom_Shell_Shell;
+        $shellHlp = $this->FCom_Core_Shell;
 
         $selfCmd = $shellHlp->getParam(1);
         $invalid = false;
@@ -45,7 +45,7 @@ class FCom_Shell_Action_Help extends FCom_Shell_Action_Abstract
             $actionHelps = [];
             $maxLen      = 0;
             $search = $this->getOption('s');
-            /** @var FCom_Shell_Action_Abstract $action */
+            /** @var FCom_Core_Shell_Abstract $action */
             foreach ($actions as $action) {
                 $shortHelp = $action->getShortHelp();
                 $name = $action->getActionName();

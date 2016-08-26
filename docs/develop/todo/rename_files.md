@@ -6,7 +6,7 @@ Potentially: wait until PHP 7.0 is common
 
 Below is the list of all Abstract and Interface files:
 
-    FCom_Shell_Action_Abstract
+    FCom_Core_Shell_Abstract
     FCom_Admin_View_Abstract
     FCom_Admin_Controller_Abstract
     FCom_ApiServer_Controller_Abstract

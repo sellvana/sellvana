@@ -14,9 +14,9 @@ if (PHP_SAPI !== 'cli') {
 
 FCom_Core_Main::i()->init('FCom_Shell');
 
-FCom_Shell_Shell::i()->run();
+FCom_Core_Shell::i()->run();
 
-echo FCom_Shell_Shell::i()->colorize(
+echo FCom_Core_Shell::i()->colorize(
     "\n{.black*}Total run time: {black_}" . sprintf('%2.5f', microtime(true) - $t) . "{.black*}, " .
     "Peak memory: {black_}" . BUtil::i()->convertFileSize(memory_get_peak_usage()) . "{.black*}.{/}\n"
 );
