@@ -54,6 +54,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
             $data['name'] = $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname');
         }
 
+        $rates = [];
         try {
             $rates = $this->getRates($data, $cart);
             if (!empty($rates['error'])) {

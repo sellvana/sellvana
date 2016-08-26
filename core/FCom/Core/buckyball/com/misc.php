@@ -4635,12 +4635,13 @@ class BValidate extends BClass
         $this->_validateRules($data);
 
         if ($this->_validateErrors && $formName) {
-            $this->BSession->set('validator-data:' . $formName, $data);
             foreach ($this->_validateErrors as $field => $errors) {
                 foreach ($errors as $error) {
                     $this->BSession->addMessage($error, 'error', 'validator-errors:' . $formName);
                 }
             }
+        } else {
+            $this->BSession->set('validator-data:' . $formName, $data);
         }
         return $this->_validateErrors ? false : true;
     }
