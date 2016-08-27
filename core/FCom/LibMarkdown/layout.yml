@@ -1,0 +1,5 @@
+lib_simplemde:
+    - view: head
+        do:
+            - [ requireJs, simplemde, @FCom_LibMarkdown/js/simplemde.min.js ]
+            - [ css, @FCom_LibMarkdown/js/simplemde.min.css ]
