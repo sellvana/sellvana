@@ -1232,12 +1232,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function onHeaderSearch($args)
     {
-        $r = $this->BRequest->get();
-        if (isset($r['q']) && $r['q'] != '') {
-            $value = '%' . $r['q'] . '%';
+        $q = $this->BRequest->get('q');
+        if (isset($q) && $q != '') {
+            $value = '%' . $q . '%';
             $result = $this->Sellvana_Catalog_Model_Product->orm('p')
                 ->where(['OR' => [
-                    ['p.id like ?', (string)$value],
+                    ['p.id like ?', (int)$value],
                     ['p.product_sku like ?', (string)$value],
                     ['p.url_key like ?', (string)$value],
                     ['p.product_name like ?', (string)$value],

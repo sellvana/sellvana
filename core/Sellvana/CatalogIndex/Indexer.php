@@ -67,7 +67,8 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
                         $docValueHlp->create($row)->save();
                     } else {
                         $v1 = explode('==>', $v, 2);
-                        $vVal = $this->BUtil->simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
+                        #$vVal = $this->BUtil->simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
+                        $vVal = trim($v1[0]);
                         $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
                         if (empty(static::$_filterValues[$fId][$vVal])) {
                             $fieldValue = $fieldValueHlp->loadWhere(['field_id' => (int)$fId, 'val' => (string)$vVal]);
