@@ -44,6 +44,7 @@ class Sellvana_ProductCompare_Model_History extends FCom_Core_Model_Abstract
         }
 
         $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
+            ->select('p.*')
             ->join('Sellvana_ProductCompare_Model_History', ['h.product_id', '=', 'p.id'], 'h')
             ->order_by_desc('h.update_at')
             ->limit($cnt);
