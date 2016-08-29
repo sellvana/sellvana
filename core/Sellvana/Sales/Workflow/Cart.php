@@ -280,7 +280,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                     $qtyCartMax = $this->BConfig->get('modules/Sellvana_Catalog/qty_cart_max');
                     if (!empty($qtyCartMax) && $totalQty > $qtyCartMax) {
                         $status = 'warning';
-                        $message = $this->BLocale->_("The quantity of each product in the shopping cart can not be greater than {$qtyCartMax}");
+                        $message = $this->BLocale->_("The quantity of each product in the shopping cart can not be greater than %s", $qtyCartMax);
                     } else {
                         if ($item->get('qty') !== $totalQty) {
                             $recalc = true;
