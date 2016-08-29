@@ -160,7 +160,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         parent::gridViewBefore($args);
         $this->view('admin/griddle')->set([
             'actions' => [
-                'new' => '',
             ],
         ]);
     }
