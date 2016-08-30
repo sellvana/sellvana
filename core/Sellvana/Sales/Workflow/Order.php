@@ -155,6 +155,31 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
      */
     public function action_adminMarksOrderAsShipped($args)
     {
-        $args['order']->shipAllShipments();
+        $order = $args['order'];
+        $shipments = $order->shipments();
+        if (!count($shipments)) {
+            $qtys = [];
+            $canShip = false;
+            foreach ($order->items() as $oItem) {
+                $qty = $oItem->getQtyCanShip();
+                if ($qty > 0) {
+                    $canShip = true;
+                }
+                $qtys[$oItem->id()] = $qty;
+            }
+            if ($canShip) {
+                $this->Sellvana_Sales_Main->workflowAction('adminCreatesShipment', [
+                    'order' => $order,
+                    'data' => [
+                        'carrier_code' => $order->get('shipping_method'),
+                        'carrier_desc' => $order->getShippingMethod()->getDescription(),
+                        'service_code' => $order->get('shipping_service'),
+                        'service_desc' => $order->getShippingServiceTitle(),
+                    ],
+                    'qtys' => $qtys,
+                ]);
+            }
+        }
+        $order->shipAllShipments();
     }
 }
