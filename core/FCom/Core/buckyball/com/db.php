@@ -2910,6 +2910,9 @@ class BModel extends Model
                 && preg_match('#^((|tiny|small|medium|big)int|dec|fixed|real|bit)#i', $field->get('Type'))
             ) {
                 $this->set($fName, null);
+                if (null !== $field->get('Default')) {
+                    $this->set($fName, $field->get('Default'));
+                }
             }
         }
         if ($callBeforeAfter) {
