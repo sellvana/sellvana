@@ -785,6 +785,20 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->save();
     }
 
+    public function getStateInfo()
+    {
+        $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($this->get('grand_total'), 'base')
+            . ' | ' . $this->_('Overall Status') . ': ' . $this->state()->overall()->getValueLabel()
+            . ' | ' . $this->_('Payment') . ': ' . $this->state()->payment()->getValueLabel()
+            . ' | ' . $this->_('Delivery') . ': ' . $this->state()->delivery()->getValueLabel();
+        $customState = $this->state()->custom()->getValueLabel();
+        if ($customState) {
+            $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
+        }
+
+        return $info;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

@@ -196,6 +196,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
         }
 
         $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $result['otherInfo'] = $order->getStateInfo();
         $this->BResponse->json($result);
     }
 
