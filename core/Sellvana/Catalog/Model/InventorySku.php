@@ -96,17 +96,21 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         $minQty = $this->get('qty_cart_min');
         if ($minQty && $qty < $minQty) {
             $qty = $minQty;
+            $this->BSession->addMessage($this->_('Some products quantities were recalculated because requested amount was smaller than allowed'), 'info', 'frontend');
         }
         $maxQty = $this->get('qty_cart_max');
         if ($maxQty && $qty > $maxQty) {
             $qty = $maxQty;
+            $this->BSession->addMessage($this->_('Some products quantities were recalculated because requested amount was larger than allowed'), 'info', 'frontend');
         }
         $incQty = $this->get('qty_cart_inc');
         if ($incQty > 1 && ($modulo = $qty % $incQty)) {
             $qty += $incQty - $modulo;
+            $this->BSession->addMessage($this->_('Some products quantities were recalculated because of quantity increment mismatch'), 'info', 'frontend');
         }
         if (!$this->canOrder($qty)) {
             $qty = $this->getQtyAvailable();
+            $this->BSession->addMessage($this->_('Some of the requested products are not available in the desired quantity'), 'info', 'frontend');
         }
         return $qty;
     }
