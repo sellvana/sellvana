@@ -229,6 +229,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                     $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('import');
                 }
             }
+            $allowConfig = $this->BRequest->get('allow_config');
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
@@ -247,7 +248,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
                     $this->BDebug->mode(BDebug::MODE_IMPORT);
 
-                    $importer->importFile($fileName);
+                    $importer->importFile($fileName, null, $allowConfig);
 
                     $error    = '';
                     $fileSize = $uploads['size'][$i];

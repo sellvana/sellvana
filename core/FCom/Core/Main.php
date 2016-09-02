@@ -657,14 +657,15 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
     {
         $configModel = $this->FCom_Core_Model_ExternalConfig;
         $importedConfig = $configModel->orm('ec')->find_many();
-        $websites = [];
+        $multisiteData = [];
         foreach ($importedConfig as $item) {
-            //$this->BConfig->add()->
             if ($item->get('site_id') === null) {
                 $this->BConfig->set($item->get('path'), $item->get('value'), false, true);
             } else {
+                $multisiteData[] = $item;
             }
         }
+        $this->BEvents->fire(__METHOD__ . ':multisite', ['data' => $multisiteData]);
         $this->BConfig->writeConfigFiles(['local']);
         $tConfig = $configModel->table();
         $this->BDb->run("TRUNCATE {$tConfig}");
