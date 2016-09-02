@@ -415,6 +415,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function checkOut()
     {
+        $dataToMerge = !empty($_SESSION['pushserver']) ? $_SESSION['pushserver'] : null;
+        $this->BSession->switchToNewSessionIfExists($dataToMerge);
+        
         $windows = $this->getData('windows');
         unset($windows[static::$_windowName]['connections'][static::$_connId]);
         if (empty($windows[static::$_windowName]['connections'])) {
@@ -525,7 +528,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      * @return bool
      * @throws BException
      */
-    public function isSubscribed($channel){
+    public function isSubscribed($channel)
+    {
         if (null === $channel) {
             $channel = $this->getChannel();
         }

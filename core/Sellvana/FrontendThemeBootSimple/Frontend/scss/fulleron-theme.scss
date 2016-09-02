@@ -525,13 +525,21 @@ a.btn-link {
 }
 
 .f-stock-notice {
-  margin: 10px 0;
-  font-size: 15px;
-  &.f-in-stock {
+  & > * {
+    margin: 10px 0;
+    font-size: 15px;
+  }
+  .f-in-stock {
+    display: none;
     color: #2ca00f;
   }
-  &.f-out-of-stock {
+  .f-out-of-stock {
+    display: block;
     color: #b21919;
+  }
+  &.-in-stock {
+    .f-in-stock { display: block; }
+    .f-out-of-stock { display: none; }
   }
 }
 
