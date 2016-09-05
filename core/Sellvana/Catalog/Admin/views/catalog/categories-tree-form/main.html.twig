@@ -8,6 +8,19 @@
 </div>
 
 {{ forms.input(fieldData, {field:'node_name', label:'Label'|_, required:1}) }}
+<div class="multilang-field row">
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+        {{ THIS.view('core/language-griddle').set('config', {
+            id: 'node_name_lang_' ~ m.get('id'),
+            data: m.getData('node_name_lang_fields'),
+            locales: LOCALE.parseAllowedLocalesToOptions(),
+            modalConfig: {
+                onSaved: 'saveNodeNameFieldLang'
+            }
+        }) | raw }}
+    </div>
+</div>
 
 {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_, required:1}) }}
 
@@ -23,8 +36,63 @@
 {{ forms.input(fieldData, {field:'page_title', label:'Page Title'|_ }) }}
 
 {{ forms.input(fieldData, {field:'meta_title', label:'Meta Title'|_ }) }}
+<div class="multilang-field row">
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+        {{ THIS.view('core/language-griddle').set('config', {
+            id: 'meta_title_lang_' ~ m.get('id'),
+            data: m.getData('meta_title_lang_fields'),
+            locales: LOCALE.parseAllowedLocalesToOptions(),
+            modalConfig: {
+                onSaved: 'saveMetaTitleFieldLang'
+            }
+        }) | raw }}
+    </div>
+</div>
 
 {{ forms.textarea(fieldData, {field:'meta_description', label:'Meta Description'|_, input_div_class:'col-md-10' }) }}
 
 {{ forms.textarea(fieldData, {field:'meta_keywords', label:'Meta Keywords'|_, input_div_class:'col-md-10' }) }}
 
+<input type='hidden' id='node_name_lang_fields' name='node_name_lang_fields'/>
+<input type='hidden' id='meta_title_lang_fields' name='meta_title_lang_fields'/>
+
+<script>
+    require(['underscore', 'jquery', 'jquery.validate', 'unique'], function(_, $) {
+        var $nameLangContainer = $('#node_name_lang_fields');
+        var $metaTitleContainer = $('#meta_title_lang_fields');
+
+        function initLangData() {
+            $nameLangContainer.val({{ m.getData('node_name_lang_fields')|json_encode|raw }});
+            $metaTitleContainer.val({{ m.getData('meta_title_lang_fields')|json_encode|raw }});
+        }
+
+        window.saveNodeNameFieldLang = function (modal) {
+            var modalNode = $(modal.getDOMNode());
+            _saveLangs(modalNode, $nameLangContainer);
+            modal.close();
+        };
+
+        window.saveMetaTitleFieldLang = function (modal) {
+            var modalNode = $(modal.getDOMNode());
+            _saveLangs(modalNode, $metaTitleContainer);
+            modal.close();
+        };
+
+        function _saveLangs(node, container, input_type) {
+            var hash = [];
+
+            _(node.find('.lang-field')).each(function(ele) {
+                hash.push({
+                    value: $(ele).val(),
+                    lang_code: $(ele).data('code'),
+                    input_type: input_type || 'text'
+                });
+            });
+
+            container.val(JSON.stringify(hash));
+        }
+
+        initLangData();
+    });
+</script>
