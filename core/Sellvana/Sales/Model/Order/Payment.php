@@ -17,6 +17,7 @@
  * @property int $online
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
  * @property Sellvana_Sales_Model_Order_Payment_State $Sellvana_Sales_Model_Order_Payment_State
  * @property Sellvana_Sales_Model_Order_Payment_Item $Sellvana_Sales_Model_Order_Payment_Item
@@ -603,8 +604,19 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function markAsPaid()
     {
         $this->state()->overall()->setPaid();
-        $this->add('amount_captured', $this->get('amount_due'));
+        $totalBalanceAmount = $this->get('amount_due');
+        $this->add('amount_captured', $totalBalanceAmount);
         $this->set('amount_due', 0);
+        foreach ($this->items() as $pItem) {
+            if ($totalBalanceAmount <= 0) {
+                break;
+            }
+            $oItem = $this->Sellvana_Sales_Model_Order_Item->load($pItem->get('order_item_id'));
+            $itemBalanceAmount = $oItem->getBalanceAmount();
+            $oItem->add('amount_paid', min($itemBalanceAmount, $totalBalanceAmount));
+            $totalBalanceAmount -= $itemBalanceAmount;
+            $oItem->save();
+        }
         $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
         $this->save();
     }

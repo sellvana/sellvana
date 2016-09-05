@@ -191,7 +191,7 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         if (!$amount) {
             $amount = $this->get('price');
         }
-        return $this->BLocale->currency($amount);
+        return $this->BLocale->currency($amount, $this->getCart()->get('store_currency_code'));
     }
 
     public function getRowTotalFormatted()
