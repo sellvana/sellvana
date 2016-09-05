@@ -7,7 +7,7 @@ modules:
         require: { module: { FCom_Core: 0.1.0 } }
 
         observe:
-            - [ "BSession::regenerateId", "FCom_PushServer_Main::onRegenerateSessionId" ]
+            - [ "BSession::regenerateId:after", "FCom_PushServer_Main::onRegenerateSessionId" ]
 
         areas:
             FCom_Admin:

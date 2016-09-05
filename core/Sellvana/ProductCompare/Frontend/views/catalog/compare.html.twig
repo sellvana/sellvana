@@ -56,20 +56,21 @@
 
                 {{ THIS.view('catalog/product/shopper-fields').set('product', p) | raw }}
 
-                <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
-
-                <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+                <div class="f-stock-notice {{ canOrder ? '-in-stock' }}" data-id="{{ p.id() }}">
+                    <p class="f-in-stock">{{ 'In Stock.'|_ }}</p>
+                    <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                </div>
 
                 <div class="form-group overflow-hidden">
                     <label for="qty" class="col-md-6 control-label">{{ 'Quantity:' |_ }}</label>
 
                     <div class="col-md-6">
-                        <input type="number" id="qty" name="qty" class="form-control" value="1"/>
+                        <input type="number" name="qty" class="form-control" value="1"/>
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}"
-                        id="prod-add-to-cart">
+                        name="prod-add-to-cart">
                     <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
                 <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
                    rel="nofollow">{{ "Add to Wishlist"|_ }}</a>

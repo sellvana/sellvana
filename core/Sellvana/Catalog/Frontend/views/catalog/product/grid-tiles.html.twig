@@ -60,6 +60,11 @@
                         <p>
                             <button type="submit" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
                         </p>
+
+                        <div class="f-stock-notice {{ p.canOrder() ? '-in-stock' }}" data-id="{{ p.id() }}">
+                            <!--<p class="f-in-stock">{{ 'In Stock.'|_ }}</p>-->
+                            <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                        </div>
                     </form>
                   {% if THIS.get('add_wishlist') %}
                     {{ THIS.view('wishlist/add-icon').set({p:p}) | raw }}
@@ -72,7 +77,7 @@
                             {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
                         {% endif %}
                     {% endif %}
-                    
+
                   {% if not THIS.get('simple_view') %}
                     {{ THIS.view('catalog/product/price').set('product', p) | raw }}
                   {% endif %}

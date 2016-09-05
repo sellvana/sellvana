@@ -74,9 +74,14 @@
             // handle current variant price and stock data
             $sku.html(node.product_sku);
             $price.html(node.variant_price);
+
             //console.log(node.variant_qty, node);
-            $('.f-stock-notice.f-in-stock').prop('hidden', node.variant_qty == 0);
-            $('.f-stock-notice.f-out-of-stock').prop('hidden', node.variant_qty > 0);
+            var $stockNotice = $('.f-stock-notice[data-id=' + node.product_id + ']');
+            if (node.variant_qty > 0) {
+                $stockNotice.addClass('-in-stock');
+            } else {
+                $stockNotice.removeClass('-in-stock');
+            }
             $addToCart.prop('disabled', !Number(node.variant_qty));
 
             // handle images
@@ -86,7 +91,10 @@
                         var $img = $(img);
                         $img.prop('hidden', node.img_ids.indexOf('' + $img.data('id')) === -1);
                     });
-                    $imgContainer.find('li:visible a').get(0).click();
+                    var img = $imgContainer.find('li:visible a').get(0);
+                    if (img) {
+                        img.click();
+                    }
                     $displayAll.prop('hidden', 0);
                 } else {
                     $imgContainer.children().prop('hidden', 0);

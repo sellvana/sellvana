@@ -65,8 +65,10 @@
 
                 {{ THIS.view('catalog/product/variants').set('product', m) | raw }}
 
-                <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
-                <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+                <div class="f-stock-notice {{ canOrder ? '-in-stock' }}">
+                    <p class="f-in-stock">{{ 'In Stock.'|_ }}</p>
+                    <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                </div>
 
                 <div class="f-prod-add-cart">
 

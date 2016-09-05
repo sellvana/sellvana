@@ -97,14 +97,15 @@
                         {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
                         {{ THIS.view('catalog/product/shopper-fields').set('product', prod) | raw }}
 
-                        <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>
-                            {{ 'In Stock.'|_ }}
-                            {% if inventory.getWarnCustomerQty() %}
-                                {{ '(Only %s left in stock)'|_(inventory.getWarnCustomerQty()) }}
-                            {% endif %}
-                        </p>
-
-                        <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+                        <div class="f-stock-notice {{ canOrder ? '-in-stock' }}" data-id="{{ prod.id() }}">
+                            <p class="f-in-stock">
+                                {{ 'In Stock.'|_ }}
+                                {% if inventory.getWarnCustomerQty() %}
+                                    {{ '(Only %s left in stock)'|_(inventory.getWarnCustomerQty()) }}
+                                {% endif %}
+                            </p>
+                            <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                        </div>
 
                         <div class="form-group row overflow-hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>

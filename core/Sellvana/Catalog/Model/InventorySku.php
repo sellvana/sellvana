@@ -63,16 +63,19 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 
     public function collectInventoryForProducts($products)
     {
-        $pIds = [];
+        $invSkus = [];
         foreach ($products as $p) {
-            $pIds[$p->id()] = $p->id();
+            if ($p->get('inventory_sku')) {
+                $invSkus[] = $p->get('inventory_sku');
+            }
         }
-        if (empty($pIds)) {
+        if (empty($invSkus)) {
             return [];
         }
-        $invModels = $this->orm()->where_in('id', $pIds)->find_many_assoc('id');
+        $invModels = $this->orm()->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
         foreach ($products as $p) {
-            $p->set('inventory_model', !empty($invModels[$p->id()]) ? $invModels[$p->id()] : false);
+            $invSku = $p->get('inventory_sku');
+            $p->set('inventory_model', !empty($invModels[$invSku]) ? $invModels[$invSku] : false);
         }
         return $invModels;
     }
