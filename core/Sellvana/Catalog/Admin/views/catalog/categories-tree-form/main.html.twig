@@ -13,7 +13,7 @@
     <div class="col-md-5">
         {{ THIS.view('core/language-griddle').set('config', {
             id: 'node_name_lang_' ~ m.get('id'),
-            data: m.getData('node_name_lang_fields'),
+            data: m.getData('category_name_lang_fields'),
             locales: LOCALE.parseAllowedLocalesToOptions(),
             modalConfig: {
                 onSaved: 'saveNodeNameFieldLang'
@@ -41,7 +41,7 @@
     <div class="col-md-5">
         {{ THIS.view('core/language-griddle').set('config', {
             id: 'meta_title_lang_' ~ m.get('id'),
-            data: m.getData('meta_title_lang_fields'),
+            data: m.getData('category_meta_title_lang_fields'),
             locales: LOCALE.parseAllowedLocalesToOptions(),
             modalConfig: {
                 onSaved: 'saveMetaTitleFieldLang'
@@ -63,8 +63,8 @@
         var $metaTitleContainer = $('#meta_title_lang_fields');
 
         function initLangData() {
-            $nameLangContainer.val({{ m.getData('node_name_lang_fields')|json_encode|raw }});
-            $metaTitleContainer.val({{ m.getData('meta_title_lang_fields')|json_encode|raw }});
+            $nameLangContainer.val({{ m.getData('category_name_lang_fields')|json_encode|raw }});
+            $metaTitleContainer.val({{ m.getData('category_meta_title_lang_fields')|json_encode|raw }});
         }
 
         window.saveNodeNameFieldLang = function (modal) {

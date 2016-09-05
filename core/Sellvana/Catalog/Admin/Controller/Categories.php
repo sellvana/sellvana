@@ -153,7 +153,7 @@ class Sellvana_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller
      * @param $data
      */
     private function _processCategoryLangFieldsPost($model, $data) {
-        $model->setData('node_name_lang_fields', $this->BUtil->dataGet($data, 'node_name_lang_fields'));
-        $model->setData('meta_title_lang_fields', $this->BUtil->dataGet($data, 'meta_title_lang_fields'));
+        $model->setData('category_name_lang_fields', $this->BUtil->dataGet($data, 'node_name_lang_fields'));
+        $model->setData('category_meta_title_lang_fields', $this->BUtil->dataGet($data, 'meta_title_lang_fields'));
     }
 }

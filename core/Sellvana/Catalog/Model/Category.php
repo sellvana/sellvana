@@ -46,6 +46,11 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         'unique_key' => 'url_path'
     ];
 
+    protected static $_dataFieldsMap = [
+        'category_name_lang_fields' => 'node_name_lang_fields',
+        'category_meta_title_lang_fields' => 'meta_title_lang_fields'
+    ];
+
     public function productsORM()
     {
         return $this->Sellvana_Catalog_Model_Product->orm('p')
