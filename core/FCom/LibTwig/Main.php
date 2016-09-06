@@ -113,7 +113,7 @@ class FCom_LibTwig_Main extends BClass
         return static::$_fileTwig->loadTemplate($filename)->render($args);
     }
 
-    public function renderer($view)
+    public function renderer(BView $view)
     {
         $viewName = $view->getParam('view_name');
 
@@ -121,7 +121,6 @@ class FCom_LibTwig_Main extends BClass
 
         $source = $view->getParam('source');
         $args = $view->getAllArgs();
-        //TODO: add BRequest and BLayout vars?
         $args['THIS'] = $view;
 
         if (!$source) {

@@ -2294,13 +2294,13 @@ class BSession extends BClass
 
     protected function _validateSession()
     {
+        $ip = $this->BRequest->ip();
+        $agent = $this->BRequest->userAgent();
         $refresh = false;
         if ($this->_idFromRequest && !isset($_SESSION['_ip'])) {
             $refresh = true;
         }
         if (!$refresh && !empty($this->_config['session_check_ip'])) {
-            $ip = $this->BRequest->ip();
-            $agent = $this->BRequest->userAgent();
             if (!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip
                 || !empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent
             ) {
