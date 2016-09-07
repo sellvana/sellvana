@@ -290,6 +290,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             ->_importDiscountDataFromCart()
             ->_setDefaultStates()
             ->save()
+            ->_updateProductQtys()
         ;
         return $this;
     }
@@ -446,6 +447,17 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $this->state()->setDefaultStates()->calcAllStates();
         return $this;
+    }
+
+    protected function _updateProductQtys()
+    {
+        foreach ($this->items() as $item) {
+            /** @var Sellvana_Catalog_Model_Product $product */
+            $product = $item->product();
+            $invModel = $product->getInventoryModel();
+            $invModel->add('qty_in_stock', -$item->get('qty_ordered'));
+            $invModel->save();
+        }
     }
 
     public function getTextDescription()
