@@ -9,6 +9,7 @@ customer_account_sidebar:
     - { include: base }
     - { hook: main, views: cart }
     - { hook: cart_upsell, views: cart/also-bought }
+    - { hook: cart_crosssell, views: cart/cross-sell }
     - { view: root, do: [[ addBodyClass, page-cart ]] }
     - view: head
         do:

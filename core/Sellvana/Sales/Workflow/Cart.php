@@ -282,7 +282,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                     $items[] = ['id' => $id, 'status' => 'updated', 'name' => $product ? $product->get('product_name') : ''];
                 } elseif ($totalQty <= 0 || empty($variants)) {
                     $recalc = true;
-                    $item->delete();
+                    $cart->removeItem($id);
                     unset($cartItems[$id]);
                     $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $product ? $product->get('product_name') : ''];
                 }

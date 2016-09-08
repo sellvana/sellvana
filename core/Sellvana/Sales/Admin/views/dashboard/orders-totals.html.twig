@@ -2,10 +2,11 @@
 
 <div class='row'>
     {% for order in orderTotal %}
+        {% set label = order.get('state_label') ?: '(No custom state)' %}
         <div class='col-sm-6'>
             <div class='box-content box-statistic'>
                 <h3 class='title text-error dashboard-order-total' data-id="{{ order.id }}">{{ order.order|_ }}</h3>
-                <small>{{ order.state_label|_ }}</small>
+                <small>{{ label }}</small>
                 <div class='text-error icon-inbox align-right'></div>
             </div>
         </div>

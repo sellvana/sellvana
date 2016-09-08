@@ -12,6 +12,7 @@
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_Model_Module $FCom_Core_Model_Module
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ * @property BCurrencyValue $BCurrencyValue
  *
  * common
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User

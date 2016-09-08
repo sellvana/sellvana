@@ -4,6 +4,7 @@
  * Class Sellvana_Sales_Workflow_Payment
  *
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
  * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
@@ -162,7 +163,12 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
                 $historyData
             );
         } else {
-            echo "<pre>"; var_dump($args); exit;
+            if (!empty($args['result'])) {
+                $message = 'Error: ' . $args['result']['error']['message'];
+            } else {
+                $message = $this->_('Unknown error. Please try again later.');
+            }
+            $this->BSession->addMessage($message, 'error', 'frontend');
         }
     }
 

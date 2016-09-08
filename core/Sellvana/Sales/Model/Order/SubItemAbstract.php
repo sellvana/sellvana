@@ -93,4 +93,18 @@ abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Mode
     {
         return $this->_doneField;
     }
+
+    /**
+     * @param $field
+     * @param null $currencyCode
+     * @return BCurrencyValue
+     */
+    public function getCurrencyValue($field, $currencyCode = null)
+    {
+        if (!$currencyCode) {
+            $currencyCode = $this->BConfig->get('modules/FCom_Core/base_currency', 'USD');
+        }
+
+        return $this->BCurrencyValue->fromModel($this, $field, $currencyCode);
+    }
 }

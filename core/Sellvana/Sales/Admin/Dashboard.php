@@ -77,10 +77,10 @@ class Sellvana_Sales_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
     public function getOrderTotal()
     {
         $orm = $this->Sellvana_Sales_Model_StateCustom->orm('s')
-            ->left_outer_join($this->{$this->_modelClass}->table(), ['o.state_custom', '=', 's.state_code'], 'o')
+            ->right_outer_join($this->{$this->_modelClass}->table(), ['o.state_custom', '=', 's.state_code'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
-            ->where('s.entity_type', 'order')
+            ->where_raw('s.entity_type = "order" OR s.entity_type IS NULL')
             ->select(['s.id', 's.state_label']);
 
         $this->_processFilters($orm);

@@ -102,7 +102,12 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         ), 
                         React.createElement("tbody", null, 
                             _.map(this.props.prices, function (price) {
-                                if (this.props.deleted && price.deleted && _.contains(this.props.deleted, parseInt(price.id))) {
+                                var id = price.id;
+                                if (id.indexOf('-') === -1) {
+                                    id = parseInt(id);
+                                }
+
+                                if (this.props.deleted && price.deleted && _.contains(this.props.deleted, id)) {
                                     return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", name: "prices[delete][]", value: price.id})
                                 }
 
