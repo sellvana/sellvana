@@ -976,6 +976,25 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return false;
     }
 
+    public function getCrossSellProducts()
+    {
+        $this->loadProducts();
+        $products = [];
+        foreach ($this->items() as $item) {
+            $productLinks = $item->getProduct()->getProductLinks(['cross_sell']);
+            foreach ($productLinks['cross_sell']['products'] as $product) {
+                $products[$product->id()] = $product;
+            }
+        }
+        shuffle($products);
+        $limit = $this->BConfig->get('modules/Sellvana_Sales/cross_sale_limit', 6);
+        if (count($products) > $limit) {
+            $products = array_splice($products, 0, $limit);
+        }
+
+        return $products;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

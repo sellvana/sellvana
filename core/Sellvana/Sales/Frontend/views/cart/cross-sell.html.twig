@@ -1,0 +1,19 @@
+{% set cnt = THIS.get('cnt') ?: 3 %}
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set products = cart.getCrossSellProducts() %}
+{% if cart.itemQty() and products %}
+<div class="f-widget f-widget-featured-prods">
+    <header class="f-widget-header">
+        <strong class="f-widget-title">You may also like these items</strong>
+    </header>
+    <div class="f-widget-content">
+      {{ THIS.view('catalog/product/grid-tiles').set({
+          lg_columns: cnt,
+          md_columns: cnt,
+          products: products,
+          simple_view: true,
+          list_name: 'You may also like these items',
+      }) | raw }}
+    </div>
+</div>
+{% endif %}
