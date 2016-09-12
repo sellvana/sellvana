@@ -1571,7 +1571,7 @@ class BCurrencyValue extends BClass
      */
     protected $_bindMode = self::BIND_NONE;
 
-    public function __construct($amountValue, $currencyCode)
+    public function __construct($amountValue = 0, $currencyCode = null)
     {
         $this->_amountValue  = $amountValue;
         $this->_currencyCode = $currencyCode;
@@ -1605,8 +1605,8 @@ class BCurrencyValue extends BClass
 
     /**
      * @param BModel $model
-     * @param $field
-     * @param $currencyCode
+     * @param string $field
+     * @param string $currencyCode
      * @param int $bind
      * @return $this
      */
@@ -1625,9 +1625,9 @@ class BCurrencyValue extends BClass
             return $this;
         }
         if ($this->_fromField[0] !== '/') {
-            $this->_fromModel->set($this->_fromField, $this->getValue());
+            $this->_fromModel->set($this->_fromField, $this->getAmount());
         } else {
-            $this->_fromModel->setData(trim($this->_fromField, '/'), $this->getValue());
+            $this->_fromModel->setData(trim($this->_fromField, '/'), $this->getAmount());
         }
         return $this;
     }
@@ -1652,9 +1652,9 @@ class BCurrencyValue extends BClass
         return $this->_currencyCode;
     }
 
-    protected function _validateCurrencyCode(BCurrencyValue $currencyValue)
+    protected function _validateCurrencyValue($currencyValue)
     {
-        if ($this->_currencyCode !== $currencyValue->getCurrencyCode()) {
+        if ($currencyValue instanceof BCurrencyValue && $this->_currencyCode !== $currencyValue->getCurrencyCode()) {
             throw new BException('Operand currency does not match');
         }
     }
@@ -1666,7 +1666,7 @@ class BCurrencyValue extends BClass
      */
     public function add(BCurrencyValue $currencyValue)
     {
-        $this->_validateCurrencyCode($currencyValue);
+        $this->_validateCurrencyValue($currencyValue);
         $this->_amountValue = bcadd($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
         $this->_updateModel();
         return $this;
@@ -1679,7 +1679,7 @@ class BCurrencyValue extends BClass
      */
     public function subtract(BCurrencyValue $currencyValue)
     {
-        $this->_validateCurrencyCode($currencyValue);
+        $this->_validateCurrencyValue($currencyValue);
         $this->_amountValue = bcsub($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
         $this->_updateModel();
         return $this;
@@ -1716,7 +1716,7 @@ class BCurrencyValue extends BClass
      */
     public function compare(BCurrencyValue $currencyValue)
     {
-        $this->_validateCurrencyCode($currencyValue);
+        $this->_validateCurrencyValue($currencyValue);
         return bccomp($this->getAmount() - $currencyValue->getAmount(), $this->_decimalScale);
     }
 

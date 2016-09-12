@@ -98,6 +98,11 @@
             {{ THIS.hook('cart_upsell') | raw }}
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-9">
+            {{ THIS.hook('cart_crosssell') | raw }}
+        </div>
+    </div>
 {% endif %}
 
 

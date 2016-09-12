@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
  * @property Sellvana_Sales_Model_Order_Cancel_Item $Sellvana_Sales_Model_Order_Cancel_Item
+ * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
  */
 class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
 {
@@ -119,6 +120,18 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         if (isset($data['state_overall'])) {
             foreach ($data['state_overall'] as $state => $_) {
                 $cancel->state()->overall()->invokeStateChange($state);
+
+                if ($state == Sellvana_Sales_Model_Order_Cancel_State_Overall::COMPLETE) {
+                    foreach ($cancel->items() as $item) {
+                        $oItemId = $item->get('order_item_id');
+                        $oItem = $this->Sellvana_Sales_Model_Order_Item->load($oItemId);
+                        /** @var Sellvana_Catalog_Model_Product $product */
+                        $product = $oItem->product();
+                        $invModel = $product->getInventoryModel();
+                        $invModel->add('qty_in_stock', $item->get('qty'));
+                        $invModel->save();
+                    }
+                }
             }
         }
         $cancel->save();

@@ -2095,18 +2095,30 @@ class BSession extends BClass
     protected $_sessionId;
 
     /**
+     * Flag for security measure
+     *
+     * @var boolean
+     */
+    protected $_idFromRequest;
+
+    /**
      * Whether PHP session is currently open
      *
-     * @var bool
+     * @var boolean
      */
     protected $_phpSessionOpen = false;
 
     /**
      * Whether any session variable was changed since last session save
      *
-     * @var bool
+     * @var boolean
      */
     protected $_dirty = false;
+
+    /**
+     * @var array
+     */
+    protected $_config;
 
     protected $_availableHandlers = [
         'default' => 'Default',
@@ -2140,46 +2152,103 @@ class BSession extends BClass
      *
      * @todo work around multiple cookies in header bug: https://bugs.php.net/bug.php?id=38104
      * @param string|null $id Optional session ID
-     * @param bool        $autoClose
-     * @param bool        $validate
      * @return $this
      */
-    public function open($id = null, $autoClose = false, $validate = true)
+    public function open($id = null)
     {
         if ($this->_isOpen) {
             return $this;
         }
 
-        $this->BEvents->fire(__METHOD__ . ':before', ['id' => $id, 'auto_close' => $autoClose, 'validate' => $validate]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['id' => $id]);
 
-        $config = $this->BConfig->get('cookie');
+        $this->_loadConfig();
 
-        if (!empty($config['session_disable'])) {
+        if (!empty($this->_config['session_disable'])) {
+            return $this;
+        }
+        if (headers_sent()) {
+            BDebug::warning("Headers already sent, can't start session");
             return $this;
         }
 
         $this->_isOpen = true;
 
-        $rememberMeTtl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
-        if ($this->BRequest->cookie('remember_me')) {
-            $ttl = $rememberMeTtl;
-        } else {
-            $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
+        $this->_setSessionPhpFlags();
+        $this->_setSessionName();
+        $this->_processSessionHandler();
+        $this->_setSessionId($id);
+        $this->_sessionStart();
+        $this->_phpSessionOpen = true;
+        $this->_validateSession();
+        $this->_sessionId = session_id();
+        $this->_initSessionData();
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['id' => $id]);
+
+        #BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+
+        return $this;
+    }
+
+    protected function _getRememberMeTtl()
+    {
+        static $rememberMeTtl;
+
+        if (!$rememberMeTtl) {
+            $rememberMeTtl = 86400 * (!empty($this->_config['remember_days']) ? $this->_config['remember_days'] : 30);
         }
-        ini_set('session.gc_maxlifetime', $rememberMeTtl);
+
+        return $rememberMeTtl;
+    }
+
+    protected function _getCookieTtl()
+    {
+        static $ttl;
+
+        if (!$ttl) {
+            $rememberMeTtl = $this->_getRememberMeTtl();
+            if ($this->BRequest->cookie('remember_me')) {
+                $ttl = $rememberMeTtl;
+            } else {
+                $ttl = !empty($this->_config['timeout']) ? $this->_config['timeout'] : 3600;
+            }
+        }
+
+        return $ttl;
+    }
+
+    protected function _loadConfig()
+    {
+        $this->_config = $this->BConfig->get('cookie');
+    }
+
+    protected function _setSessionPhpFlags()
+    {
+        ini_set('session.gc_maxlifetime', $this->_getRememberMeTtl());
         ini_set('session.gc_divisor', 100);
         ini_set('session.gc_probability', 1);
 
-        $domain = $this->BRequest->getCookieDomain();
-        $path = $this->BRequest->getCookiePath();
+        $useStrictMode = isset($this->_config['use_strict_mode']) ? $this->_config['use_strict_mode'] : 1;
+        ini_set('session.use_strict_mode', $useStrictMode);
 
-        session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (!empty($config['session_handler'])
-            && $config['session_handler'] !== 'default'
-            && !empty($this->_availableHandlers[$config['session_handler']])
+        $refererCheck = isset($this->_config['referer_check']) ? $this->_config['referer_check'] : 0;
+        ini_set('session.referer_check', $refererCheck);
+    }
+
+    protected function _setSessionName()
+    {
+        session_name(!empty($this->_config['name']) ? $this->_config['name'] : $this->_defaultSessionCookieName);
+    }
+
+    protected function _processSessionHandler()
+    {
+        if (!empty($this->_config['session_handler'])
+            && $this->_config['session_handler'] !== 'default'
+            && !empty($this->_availableHandlers[$this->_config['session_handler']])
         ) {
-            $class = $this->_availableHandlers[$config['session_handler']];
-            $this->{$class}->register($ttl);
+            $class = $this->_availableHandlers[$this->_config['session_handler']];
+            $this->{$class}->register($this->_getCookieTtl());
         } else {
             //session_set_cookie_params($ttl, $path, $domain);
             if (($dir = $this->BApp->storageRandomDir())) {
@@ -2188,58 +2257,78 @@ class BSession extends BClass
                 session_save_path($dir);
             }
         }
+    }
 
-        $useStrictMode = $this->BConfig->get('cookie/use_strict_mode', '1');
-        ini_set('session.use_strict_mode', $useStrictMode);
-
-        $refererCheck = $this->BConfig->get('cookie/referer_check');
-        ini_set('session.referer_check', $refererCheck);
-
+    protected function _setSessionId($id = null)
+    {
         if (!$id) {
             $id = $this->BRequest->get('SID');
             if (!$id && !empty($_COOKIE[session_name()])) {
                 $id = $_COOKIE[session_name()];
             }
+            $this->_idFromRequest = true;
         }
-        if (preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
+        if ($id && preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
             session_id($id);
-        } else {
-            $this->regenerateId();
         }
-        if (headers_sent()) {
-            BDebug::warning("Headers already sent, can't start session");
-        } else {
-            $https = $this->BRequest->https();
-            session_set_cookie_params($ttl, $path, $domain, $https, true);
-            session_start();
-            // update session cookie expiration to reflect current visit
-            // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
-            setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
-            $this->_phpSessionOpen = true;
-        }
-        $this->_sessionId = session_id();
+        return $id;
+    }
 
-        if (!empty($config['session_check_ip']) && $validate) {
-            $ip = $this->BRequest->ip();
-            if (empty($_SESSION['_ip'])) {
-                $_SESSION['_ip'] = $ip;
-            } elseif ($_SESSION['_ip'] !== $ip) {
-                $_SESSION = [];
-                session_destroy();
-                session_start();
-                //$this->BResponse->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
+    protected function _sessionStart($ttl = null)
+    {
+        if (null === $ttl) {
+            $ttl = $this->_getCookieTtl();
+        }
+        $path = $this->BRequest->getCookiePath();
+        $domain = $this->BRequest->getCookieDomain();
+        $https = $this->BRequest->https();
+
+        session_set_cookie_params($ttl, $path, $domain, $https, true);
+
+        session_start();
+
+        // update session cookie expiration to reflect current visit
+        // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
+        setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
+    }
+
+    protected function _validateSession()
+    {
+        $ip = $this->BRequest->ip();
+        $agent = $this->BRequest->userAgent();
+        $refresh = false;
+        if ($this->_idFromRequest && !isset($_SESSION['_ip'])) {
+            $refresh = true;
+        }
+        if (!$refresh && !empty($this->_config['session_check_ip'])) {
+            if (!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip
+                || !empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent
+            ) {
+                $refresh = true;
             }
         }
-
-        $namespace = !empty($config['session_namespace']) ? $config['session_namespace'] : 'default';
+        if (!$refresh && !empty($_SESSION['_expires']) && $_SESSION['_expires'] < time()) {
+            $refresh = true;
+        }
+        if ($refresh) {
+            $_SESSION = [];
+            session_destroy();
+            $this->_sessionStart();
+        }
+        if (empty($_SESSION['_ip'])) {
+            $_SESSION['_ip'] = $ip;
+        }
+        if (empty($_SESSION['_agent'])) {
+            $_SESSION['_agent'] = $agent;
+        }
+    }
+    protected function _initSessionData()
+    {
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
         if (empty($_SESSION[$namespace])) {
             $_SESSION[$namespace] = [];
         }
-        if ($autoClose) {
-            $this->data = $_SESSION[$namespace];
-        } else {
-            $this->data =& $_SESSION[$namespace];
-        }
+        $this->data =& $_SESSION[$namespace];
         $this->data['_'] = time();
 
         if (empty($this->data['current_language'])) {
@@ -2268,14 +2357,83 @@ class BSession extends BClass
         if (!empty($this->data['_timezone'])) {
             date_default_timezone_set($this->data['_timezone']);
         }
+    }
 
-        if ($autoClose) {
-            session_write_close();
-            $this->_phpSessionOpen = false;
-        }
-        BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+    /**
+     * Regenerate session ID
+     *
+     * @see http://php.net/manual/en/function.session-regenerate-id.php#87905
+     * @return $this
+     */
+    public function regenerateId()
+    {
+        $this->open();
+
+        $oldSessionId = session_id();
+
+        //@session_regenerate_id((bool)$this->BConfig->get('cookie/delete_old_session'));
+        @session_regenerate_id(false);
+
+        $newSessionId = session_id();
+
+        // close old and new session to allow other scripts to use them
+        session_write_close();
+
+        // start old session to save new session information (for long polling sleeper requests)
+        session_id($oldSessionId);
+        $this->_sessionStart();
+        $_SESSION['_new_session_id'] = $newSessionId;
+        $_SESSION['_expires'] = time() + 70; // expire old session in 70 seconds (give time for long polling return)
+        session_write_close();
+
+        // final start of new session
+        session_id($newSessionId);
+        $this->_sessionStart();
+
+        $this->_idFromRequest = false;
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['old_session_id' => $oldSessionId, 'session_id' => $newSessionId]);
+
+        //$this->BSession->set('_regenerate_id', 1);
+        //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
 
         return $this;
+    }
+
+    /**
+     * Used for long polling sleeper requests, when returning from browser
+     *
+     * @param array|null $dataToMerge
+     * @return $this
+     */
+    public function switchToNewSessionIfExists(array $dataToMerge = null)
+    {
+        if (!empty($_SESSION['_new_session_id'])) {
+            session_write_close();
+
+            session_id($_SESSION['_new_session_id']);
+            $this->_sessionStart();
+
+            if ($dataToMerge) {
+                $hlp = $this->BUtil;
+                foreach ($dataToMerge as $key => $data) {
+                    $_SESSION[$key] = !empty($_SESSION[$key]) ? $hlp->arrayMerge($_SESSION[$key], $data) : $data;
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get session ID
+     *
+     * @return string
+     */
+    public function sessionId()
+    {
+        $this->open();
+
+        return $this->_sessionId;
     }
 
     /**
@@ -2373,7 +2531,7 @@ class BSession extends BClass
             } else {
                 session_start();
             }
-            $namespace = $this->BConfig->get('cookie/session_namespace');
+            $namespace = $this->_config['session_namespace'];
             if (!$namespace) $namespace = 'default';
             $_SESSION[$namespace] = $this->data;
         }
@@ -2426,30 +2584,6 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         setcookie(session_name(), '', time() - 3600, $path, $domain, $https, true);
 #echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $path, $domain); exit;
         return $this;
-    }
-
-    public function regenerateId()
-    {
-        $this->open();
-
-        $oldSessionId = session_id();
-        @session_regenerate_id((bool)$this->BConfig->get('cookie/delete_old_session'));
-        $this->BEvents->fire(__METHOD__, ['old_session_id' => $oldSessionId, 'session_id' => session_id()]);
-        //$this->BSession->set('_regenerate_id', 1);
-        //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
-        return $this;
-    }
-
-    /**
-     * Get session ID
-     *
-     * @return string
-     */
-    public function sessionId()
-    {
-        $this->open();
-
-        return $this->_sessionId;
     }
 
     /**

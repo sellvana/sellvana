@@ -135,12 +135,14 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     public function markAsPaid($amount = null)
     {
         if ($amount === null) {
-            $amount = $this->getAmountCanPay();
+            $amount = $this->getBalanceAmount();
         } else {
-            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getAmountCanPay());
+            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getBalanceAmount());
         }
 
         $this->set('amount_in_payments', $amount);
+        $this->set('amount_paid', $amount);
+        $this->save(false);
     }
 
     public function __destruct()

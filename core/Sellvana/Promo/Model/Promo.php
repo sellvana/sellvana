@@ -222,6 +222,17 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         if (!$promos) {
             return [];
         }
+
+        $now = $this->BDb->now();
+        foreach ($promos as $key => $promo) {
+            if (!(
+                ($this->BUtil->isEmptyDate($promo->get('from_date')) || $promo->get('from_date') < $now)
+                && ($this->BUtil->isEmptyDate($promo->get('to_date')) || $promo->get('to_date') > $now)
+            )) {
+                unset($promos[$key]);
+            }
+        }
+
         return $promos;
     }
 

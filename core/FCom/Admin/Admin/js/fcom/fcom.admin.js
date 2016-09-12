@@ -1392,6 +1392,7 @@ define(fcomAdminDeps, function ($, Ladda) {
                         $('#' + btnId).remove();
                         $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
                         ajaxPassed = false;
+                        $(document).trigger('form:submit:success', [data]);
                     }
                 }
             }).fail(function(event, data) {

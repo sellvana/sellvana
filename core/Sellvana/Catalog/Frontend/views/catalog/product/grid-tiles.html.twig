@@ -52,28 +52,36 @@
                   </a>
                 </div>
                 <div class="caption">
+                    <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
+                        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                        <input type="hidden" name="id" value="{{ p.id() }}">
+                        <input type="hidden" name="action" value="add">
+                        <input type="hidden" name="qty" value="1">
+                        <p>
+                            <button type="submit" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
+                        </p>
+
+                        <div class="f-stock-notice {{ p.canOrder() ? '-in-stock' }}" data-id="{{ p.id() }}">
+                            <!--<p class="f-in-stock">{{ 'In Stock.'|_ }}</p>-->
+                            <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                        </div>
+                    </form>
                   {% if THIS.get('add_wishlist') %}
                     {{ THIS.view('wishlist/add-icon').set({p:p}) | raw }}
                   {% endif %}
                   <a href="{{ productUrl }}" class="f-prod-name js-ga-product-view-trigger">{{ productName }}</a>
+
+                    {% if not THIS.get('simple_view') %}
+                        <a href="{{ productUrl }}" class="btn btn-link btn-sm js-ga-product-view-trigger">{{ 'View Details'|_ }}</a>
+                        {% if THIS.get('add_compare') %}
+                            {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+                        {% endif %}
+                    {% endif %}
+
                   {% if not THIS.get('simple_view') %}
                     {{ THIS.view('catalog/product/price').set('product', p) | raw }}
                   {% endif %}
                   {#{ p.getShortDescription() }#}
-                  <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
-                    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="qty" value="1">
-                    <p>
-                      <button type="submit" name="id" value="{{ p.id() }}" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
-                      {% if not THIS.get('simple_view') %}
-                          <a href="{{ productUrl }}" class="btn btn-link btn-sm js-ga-product-view-trigger">{{ 'View Details'|_ }}</a>
-                          {% if THIS.get('add_compare') %}
-                              {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
-                          {% endif %}
-                      {% endif %}
-                    </p>
-                  </form>
                 </div>
               </div>
             </div>

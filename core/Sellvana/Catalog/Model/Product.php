@@ -976,18 +976,25 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param array
      * @return array
      */
-    public function getProductLinks()
+    public function getProductLinks($types = [])
     {
         $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['p.*', 'pl.link_type'])
             ->left_outer_join('Sellvana_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
-        $productLink = [
-            'related'=> ['title' => $this->_('Related Products'), 'products' => [] ],
-            'similar' => ['title' => $this->_('You may also like these items'), 'products' => [] ],
-            'cross_sell' => ['title' => $this->_('You may also like these items'), 'products' => [] ]
-        ];
+        $productLink = [];
+        if (empty($types) || in_array('related', $types)) {
+            $productLink['related'] = ['title' => $this->_('Related Products'), 'products' => [] ];
+        }
+        if (empty($types) || in_array('similar', $types)) {
+            $productLink['similar'] = ['title' => $this->_('You may also like these items'), 'products' => [] ];
+        }
+        if (empty($types) || in_array('cross_sell', $types)) {
+            $productLink['cross_sell'] = ['title' => $this->_('You may also like these items'), 'products' => [] ];
+        }
+
         foreach ($arrProduct as $product) {
             if (isset($productLink[$product->get('link_type')])) {
                 array_push($productLink[$product->get('link_type')]['products'], $product);

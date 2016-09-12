@@ -11,6 +11,8 @@
  */
 class Sellvana_MultiSite_Main extends BClass
 {
+    protected static $_siteCache = [];
+
     public function isFieldDataBelongsToThisSite($row)
     {
         if ($this->BRequest->area() !== 'FCom_Frontend') {
@@ -155,4 +157,19 @@ class Sellvana_MultiSite_Main extends BClass
         return $this->Sellvana_CatalogFields_Model_ProductFieldData;
     }
 
+    public function onWebsiteConfigImport($args)
+    {
+        $data = $args['data'];
+        foreach ($data as $item) {
+            $websiteId = $item->get('site_id');
+            if (!array_key_exists($websiteId, self::$_siteCache)) {
+                self::$_siteCache[$websiteId] = $this->Sellvana_MultiSite_Model_Site->load($websiteId);
+            }
+            $website = self::$_siteCache[$websiteId];
+            $website->setData('config/' . $item->get('path'), $item->get('value'));
+        }
+        foreach (self::$_siteCache as $website) {
+            $website->save();
+        }
+    }
 }

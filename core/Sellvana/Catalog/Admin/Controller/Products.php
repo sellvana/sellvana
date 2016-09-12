@@ -1273,11 +1273,13 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
         
         $this->_savePrices($model, $data['productPrice']);
+        $deletedIds = $this->BUtil->dataGet($data, 'prices.delete');
+        $deletedIds = $this->BUtil->arrayCleanInt($deletedIds);
         
         // Process delete product prices
-        if ($deletedIds = $this->BUtil->dataGet($data, 'prices.delete')) {
+        if (!empty($deletedIds)) {
             $this->Sellvana_Catalog_Model_ProductPrice->delete_many([
-                'id' => $this->BUtil->arrayCleanInt($deletedIds)
+                'id' => $deletedIds
             ]);
         }
     }

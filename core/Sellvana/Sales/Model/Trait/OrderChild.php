@@ -58,4 +58,18 @@ trait Sellvana_Sales_Model_Trait_OrderChild
         $history->save();
         return $this;
     }
+
+    /**
+     * @param $field
+     * @param null $currencyCode
+     * @return BCurrencyValue
+     */
+    public function getCurrencyValue($field, $currencyCode = null)
+    {
+        if (!$currencyCode) {
+            $currencyCode = $this->BConfig->get('modules/FCom_Core/base_currency', 'USD');
+        }
+
+        return $this->BCurrencyValue->fromModel($this, $field, $currencyCode);
+    }
 }

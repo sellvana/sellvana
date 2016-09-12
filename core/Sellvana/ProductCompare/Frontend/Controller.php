@@ -5,6 +5,7 @@
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
  * @property FCom_Core_Main FCom_Core_Main
  * @property Sellvana_ProductCompare_Model_SetItem Sellvana_ProductCompare_Model_SetItem
+ * @property Sellvana_Catalog_Model_InventorySku Sellvana_Catalog_Model_InventorySku
  */
 class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -24,7 +25,7 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
 
         if (!empty($arr)) {
             $this->Sellvana_Catalog_Model_Product->cachePreloadFrom($arr);
-            $products = $this->Sellvana_Catalog_Model_Product->cacheFetch();
+            $products = $this->Sellvana_Catalog_Model_Product->orm()->where_in('id', $arr)->find_many();
         }
         if (empty($products)) {
             if ($xhr) {
@@ -35,12 +36,14 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
                 return;
             }
         }
+        $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($products);
+
         if ($xhr) {
             $this->layout('/catalog/compare/xhr');
         } else {
             $this->layout('/catalog/compare');
         }
-        $layout->getView('catalog/compare')->set('products', array_values($products));
+        $layout->getView('catalog/compare')->set('products', $products);
         if (!$xhr) {
             $layout->getView('breadcrumbs')->set('crumbs', ['home',
                 ['label' => 'Compare ' . sizeof($products) . ' products', 'active' => true]

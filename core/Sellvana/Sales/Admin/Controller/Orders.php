@@ -201,18 +201,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ]
             ];
 
-            $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'), 'base')
-                . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
-                . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
-                . ' | ' . $this->_('Delivery') . ': ' . $m->state()->delivery()->getValueLabel();
-            $customState = $m->state()->custom()->getValueLabel();
-            if ($customState) {
-                $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
-            }
             /** @var BView $view */
             $view->set([
                 'actions' => $actions,
-                'other_info' => $info,
+                'other_info' => $m->getStateInfo(),
             ]);
         }
     }

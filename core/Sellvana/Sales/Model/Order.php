@@ -290,6 +290,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             ->_importDiscountDataFromCart()
             ->_setDefaultStates()
             ->save()
+            ->_updateProductQtys()
         ;
         return $this;
     }
@@ -446,6 +447,17 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $this->state()->setDefaultStates()->calcAllStates();
         return $this;
+    }
+
+    protected function _updateProductQtys()
+    {
+        foreach ($this->items() as $item) {
+            /** @var Sellvana_Catalog_Model_Product $product */
+            $product = $item->product();
+            $invModel = $product->getInventoryModel();
+            $invModel->add('qty_in_stock', -$item->get('qty_ordered'));
+            $invModel->save();
+        }
     }
 
     public function getTextDescription()
@@ -783,6 +795,20 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $due = $this->getData('store_currency/amount_due');
         $this->setData('store_currency/amount_due', $due - $amountInStoreCurrency);
         $this->save();
+    }
+
+    public function getStateInfo()
+    {
+        $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($this->get('grand_total'), 'base')
+            . ' | ' . $this->_('Overall Status') . ': ' . $this->state()->overall()->getValueLabel()
+            . ' | ' . $this->_('Payment') . ': ' . $this->state()->payment()->getValueLabel()
+            . ' | ' . $this->_('Delivery') . ': ' . $this->state()->delivery()->getValueLabel();
+        $customState = $this->state()->custom()->getValueLabel();
+        if ($customState) {
+            $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
+        }
+
+        return $info;
     }
 
     public function __destruct()
