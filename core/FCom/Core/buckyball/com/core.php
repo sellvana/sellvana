@@ -2225,6 +2225,9 @@ class BSession extends BClass
 
     protected function _setSessionPhpFlags()
     {
+        ini_set('session.use_cookies', 1);
+        ini_set('session.use_only_cookies', 1);
+
         ini_set('session.gc_maxlifetime', $this->_getRememberMeTtl());
         ini_set('session.gc_divisor', 100);
         ini_set('session.gc_probability', 1);
@@ -2262,11 +2265,10 @@ class BSession extends BClass
     protected function _setSessionId($id = null)
     {
         if (!$id) {
-            $id = $this->BRequest->get('SID');
-            if (!$id && !empty($_COOKIE[session_name()])) {
+            if (!empty($_COOKIE[session_name()])) {
                 $id = $_COOKIE[session_name()];
+                $this->_idFromRequest = true;
             }
-            $this->_idFromRequest = true;
         }
         if ($id && preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
             session_id($id);

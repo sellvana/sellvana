@@ -75,6 +75,8 @@ modules:
                 headers:
                     X-UA-Compatible: IE=edge
                     X-Frame-Options: SAMEORIGIN
+                    X-XSS-Protection: 1
+                    X-Content-Type-Options: nosniff
             cookie:
                 session_check_ip: 1
                 use_strict_mode: 1
