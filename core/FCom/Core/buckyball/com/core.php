@@ -2233,8 +2233,11 @@ class BSession extends BClass
         $useStrictMode = isset($this->_config['use_strict_mode']) ? $this->_config['use_strict_mode'] : 1;
         ini_set('session.use_strict_mode', $useStrictMode);
 
-        $refererCheck = isset($this->_config['referer_check']) ? $this->_config['referer_check'] : 0;
-        #ini_set('session.referer_check', $refererCheck);
+        ini_set('session.cookie_httponly', 1);
+
+        if ($this->BRequest->https()) {
+            ini_set('session.cookie_secure', 1);
+        }
     }
 
     protected function _setSessionName()
