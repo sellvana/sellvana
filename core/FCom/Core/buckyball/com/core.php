@@ -2533,8 +2533,7 @@ class BSession extends BClass
             } else {
                 session_start();
             }
-            $namespace = $this->_config['session_namespace'];
-            if (!$namespace) $namespace = 'default';
+            $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
             $_SESSION[$namespace] = $this->data;
         }
         // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
