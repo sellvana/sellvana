@@ -5,7 +5,7 @@
 </header>
 <ul class="row list-unstyled">
 {% for subCat in subCategories %}
-    {% set image_url = (subCat.get('image_url')) ? subCat.get('image_url'): 'media/image-not-found.jpg' %}
+    {% set image_url = subCat.get('image_url') ?: 'media/image-not-found.jpg' %}
     <li class="col-md-4 col-xs-6">
         <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}" class="subcat-img">
             <img src="{{ APP.instance('FCom_Core_Main').resizeUrl(image_url, {s:98}) }}"
