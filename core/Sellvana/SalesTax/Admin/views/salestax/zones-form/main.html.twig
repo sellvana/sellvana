@@ -11,10 +11,10 @@
 <fieldset name="main-product">
     <div class="f-section" id="zone-field-inputs">
         {{ forms.input(fieldData, {field:'title', required:1, label:'Title'|_}) }}
-        {{ forms.select(fieldData, {field: 'zone_type', required: 1, label:'Zone Type'|_, select2: 1, options: zoneTypes}) }}
-        {{ forms.select(fieldData, {field: 'country', label:'Country'|_, select2: 1,
+        {{ forms.select(fieldData, {field: 'zone_type', required: 1, label:'Zone Type'|_, select2: {}, options: zoneTypes}) }}
+        {{ forms.select(fieldData, {field: 'country', label:'Country'|_, select2: {},
             options: countries, form_group_class: 'zone-field'}) }}
-        {{ forms.select(fieldData, {id: 'region_select',field: 'region', label:'Region'|_, select2: 1, options: regions, form_group_class: 'zone-field'}) }}
+        {{ forms.select(fieldData, {id: 'region_select',field: 'region', label:'Region'|_, select2: {}, options: regions, form_group_class: 'zone-field'}) }}
         {{ forms.input(fieldData, {id: 'region_field', field: 'region', label:'Region'|_, form_group_class: 'zone-field', disabled: 1}) }}
         {{ forms.input(fieldData, {field: 'postcode_from', name: 'model[postcode]', id: 'postcode', label:'Postcode'|_, form_group_class: 'zone-field'}) }}
         {{ forms.input(fieldData, {field: 'postcode_from', label:'Postcode from'|_, form_group_class: 'zone-field'}) }}

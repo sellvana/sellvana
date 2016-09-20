@@ -10,7 +10,7 @@
 
 <fieldset name="main-product">
     <div class="f-section">
-        {{ forms.select(fieldData, {field:'tax_class_ids', label:'Tax Classes'|_, select2: true, multiple: true,
+        {{ forms.select(fieldData, {field:'tax_class_ids', label:'Tax Classes'|_, select2: {}, multiple: true,
                                     options: allTaxClasses, value:taxClassIds}) }}
     </div>
 </fieldset>
