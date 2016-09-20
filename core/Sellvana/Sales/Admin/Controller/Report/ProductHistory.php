@@ -18,6 +18,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
         $config = parent::gridConfig();
 
         $config['columns'] = [
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
             ['name' => 'period', 'index' => 'period', 'width' => 70],
             ['name' => 'product_sku', 'index' => 'product_sku'],
             ['name' => 'product_name', 'index' => 'product_name'],
@@ -31,7 +32,6 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
             ['name' => 'max_price', 'index' => 'max_price', 'cell' => 'currency'],
             ['name' => 'min_price', 'index' => 'min_price', 'cell' => 'currency'],
 
-            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
             ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
@@ -60,7 +60,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
             'avg_price' => 'Avg Sell Price',
             'max_price' => 'Max Sell Price',
             'min_price' => 'Min Sell Price',
-            'period_type' => 'Period',
+            'period_type' => 'Group by',
             'create_at' => 'Created',
         ];
     }

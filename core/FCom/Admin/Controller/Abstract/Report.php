@@ -112,6 +112,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
         $orm->group_by_expr($expr);
         $orm->select_expr($expr, 'period');
+        $orm->select_expr("'" . $val . "'", $filter['field']);
 
         return true;
     }
