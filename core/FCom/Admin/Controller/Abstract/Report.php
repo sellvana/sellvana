@@ -33,6 +33,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
         $this->_selectAllFields($config['orm']);
         foreach ($config['columns'] as &$column) {
+            $column['label'] = $column['name'];
             if (!empty($column['name']) && !empty($labels[$column['name']])) {
                 $column['label'] = $labels[$column['name']];
             }

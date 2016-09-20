@@ -20,7 +20,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
     protected $_systemFields = [
         'o_id', 'o_customer_id', 'o_cart_id', 'o_create_at', 'o_data_serialized', 'o_token', 'o_token_at', 'o_same_address',
         'c_id', 'c_default_shipping_id', 'c_default_billing_id', 'c_token', 'c_token_at', 'c_password_session_token',
-        'c_last_session_id', 'c_customer_group', 'c_password_hash'
+        'c_last_session_id', 'c_customer_group', 'c_password_hash', 'c_data_serialized', 'c_use_group_tax'
     ];
     protected $_visibleFields = ['o_unique_id', 'o_grand_total', 'o_customer_email', 'o_billing_firstname', 'o_billing_lastname'];
 

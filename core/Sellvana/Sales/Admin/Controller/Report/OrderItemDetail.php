@@ -22,7 +22,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
         'o_id', 'o_customer_id', 'o_cart_id', 'o_create_at', 'o_data_serialized', 'o_token', 'o_token_at', 'o_same_address',
         'oi_id', 'oi_order_id', 'oi_cart_item_id', 'oi_parent_item_id', 'oi_product_id', 'oi_inventory_id', 'oi_data_serialized',
         'c_id', 'c_default_shipping_id', 'c_default_billing_id', 'c_token', 'c_token_at', 'c_password_session_token',
-        'c_last_session_id', 'c_customer_group', 'c_password_hash'
+        'c_last_session_id', 'c_customer_group', 'c_password_hash', 'c_data_serialized', 'c_use_group_tax'
     ];
     protected $_visibleFields = ['o_unique_id', 'o_grand_total', 'o_customer_email', 'o_billing_firstname', 'o_billing_lastname', 'oi_product_sku', 'oi_product_name', 'oi_price', 'oi_qty_ordered', 'oi_row_total'];
 
@@ -128,10 +128,15 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
             'oi_show_separate' => 'Show Separately',
             'oi_qty_ordered' => 'Qty Ordered',
             'oi_qty_backordered' => 'Qty Backordered',
+            'oi_qty_in_cancels' => 'Qty in Cancels',
             'oi_qty_canceled' => 'Qty Canceled',
+            'oi_qty_in_shipments' => 'Qty in Shipments',
             'oi_qty_shipped' => 'Qty Shipped',
+            'oi_qty_in_returns' => 'Qty in Returns',
             'oi_qty_returned' => 'Qty Returned',
+            'oi_amount_in_refunds' => 'Amount in Refunds',
             'oi_amount_refunded' => 'Amount Refunded',
+            'oi_amount_in_payments' => 'Amount in Payments',
             'oi_amount_paid' => 'Amount Paid',
             'oi_state_overall' => 'State (Item)',
             'oi_state_delivery' => 'Delivery State (Item)',
