@@ -63,7 +63,7 @@
     <h5 class="f-prod-reviews-title">{{ "Most Helpful Customer Reviews"|_ }}</h5>
     {% for review in reviews.items.rows %}
         <article class="f-prod-review-post clearfix">
-            <small>{{ "%helpful$s of %total$s people found the following review helpful"|_({helpful: review.get('helpful'), total: review.get('helpful_voices')}) }}</small>
+            <small>{{ "%helpful$s of %total$s people found the following review helpful"|_({helpful: review.get('helpful'), total: max(review.get('helpful_voices'), review.get('helpful'))}) }}</small>
             <span class="glyphicon f-rating-stars f-xs-stars">
                 <span class="f-filled-stars" style="width:{{ (review.get('rating')/rate.max)*100 }}%;"></span>
                 <span class="f-empty-stars"></span>
