@@ -9,6 +9,6 @@
         {{ forms.boolean(fieldData, {field:'enable_notifications', label:'Enable Notifications'|_ }) }}
         {{ forms.input(fieldData, {field:'store_contact_email', label:'Store Contact Email'|_ }) }}
         {{ forms.input(fieldData, {field:'store_contact_name', label:'Store Contact Name'|_ }) }}
-        {{ forms.select(fieldData, {field:'notify_on_order_states', label:'Notify on Order States'|_, options: orderCustomStates, select2: true, multiple: true }) }}
+        {{ forms.select(fieldData, {field:'notify_on_order_states', label:'Notify on Order States'|_, options: orderCustomStates, select2: {}, multiple: true }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

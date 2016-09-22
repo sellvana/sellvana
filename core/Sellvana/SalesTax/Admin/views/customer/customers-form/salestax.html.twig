@@ -18,7 +18,7 @@
         {% if isGroupLoaded %}
             {{ forms.boolean(fieldData, { field:'use_group_tax', label:'Use Customer Group Classes'|_, value:useGroupTax }) }}
         {% endif %}
-        {{ forms.select(fieldData, {field:'tax_class_ids', label:'Tax Classes'|_, select2: true, multiple: true,
+        {{ forms.select(fieldData, {field:'tax_class_ids', label:'Tax Classes'|_, select2: {}, multiple: true,
             options: allTaxClasses, value:taxClassIds}) }}
     </div>
 </fieldset>
