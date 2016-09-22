@@ -27,7 +27,7 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
 
         $config['columns'] = [
             ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'period', 'index' => 'period', 'width' => 70],
+            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => 'All time'],
             ['name' => 'shipping_method', 'index' => 'o.shipping_method', 'options' => $methodOptions],
             ['name' => 'shipping_service', 'index' => 'o.shipping_service'],
             ['name' => 'order_count', 'index' => 'order_count'],

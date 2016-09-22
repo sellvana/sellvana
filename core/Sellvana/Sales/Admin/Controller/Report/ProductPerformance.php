@@ -17,8 +17,8 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'period', 'index' => 'period', 'width' => 70],
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true, 'default' => 'None'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => 'All time'],
             ['name' => 'product_sku', 'index' => 'product_sku', 'width' => 70],
             ['name' => 'product_name', 'index' => 'product_name'],
             ['name' => 'qty_sold', 'index' => 'qty_sold'],
