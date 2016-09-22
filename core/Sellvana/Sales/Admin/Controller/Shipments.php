@@ -104,6 +104,7 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
         }
 
         $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
+        $result['otherInfo'] = $order->getStateInfo();
         $this->BResponse->json($result);
     }
 
