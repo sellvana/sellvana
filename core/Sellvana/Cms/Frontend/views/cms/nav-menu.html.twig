@@ -2,5 +2,5 @@
 {% set navList = APP.instance('Sellvana_Cms_Model_Nav')->orm()->where('parent_id', rootId)->find_many() %}
 
 {% for nav in navList %}
-    <li><a href="{% nav.getUrl() %}">{% nav.get('node_name') %}</a></li>
+    <li><a href="{% nav.getUrl() %}">{% nav.getLangField('node_name') %}</a></li>
 {% endfor %}

@@ -229,4 +229,46 @@ class FCom_Core_Model_Abstract extends BModel
             $this->set($k, $this->getData($v));
         }
     }
+
+    /**
+     * Get language field in data_serialized base on current locale
+     *
+     * @param string $field
+     * @return string
+     */
+    public function getLangField($field)
+    {
+        $orgVal       = $this->get($field);
+        $langFieldKey = $field . "_lang_fields";
+        $mapFieldKey  = array_search($langFieldKey, $this->getDataFieldsMap());
+
+        if ($mapFieldKey !== false) {
+            $langFieldKey = $mapFieldKey;
+        }
+
+        $langData     = $this->getData($langFieldKey);
+        $curLangKey   = $this->BSession->get('current_locale');
+
+        if (!$langData || !$curLangKey) {
+            return $orgVal;
+        }
+
+        if (is_string($langData)) {
+            $langData = json_decode($langData);
+        }
+
+        if (is_array($langData) && count($langData)) {
+            foreach ($langData as $lang) {
+                if (isset($lang->lang_code) && $lang->lang_code == $curLangKey) {
+                    if (isset($lang->value) && $lang->value != '') {
+                        return $lang->value;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return $orgVal;
+    }
 }

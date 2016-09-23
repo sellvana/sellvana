@@ -114,17 +114,17 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
                 continue;
             }
 
-            $nodeName = $c->get('node_name');
+            $nodeName = $c->getLangField('node_name');
             if ($nodeName) {
                 $activeCatIds[] = $c->id();
                 $crumbs[] = ['label' => $nodeName, 'href' => $c->url()];
                 $head->addTitle($nodeName);
             }
         }
-        $crumbs[] = ['label' => $category->get('node_name'), 'active' => true];
+        $crumbs[] = ['label' => $category->getLangField('node_name'), 'active' => true];
         $category->set('is_active', 1);
 
-        $head->addTitle($category->get('node_name'));
+        $head->addTitle($category->getLangField('node_name'));
         $layout->getView('breadcrumbs')->set('crumbs', $crumbs);
         $layout->getView('catalog/search')->set('query', $q);
 

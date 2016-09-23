@@ -9,10 +9,10 @@
 
 <ul>
     {% for c in categories %}
-        <li><a href="{{ c.url() }}" title="{{ c.get('node_name') }}">{{ c.get('node_name') }}</a></li>
+        <li><a href="{{ c.url() }}" title="{{ c.getLangField('node_name') }}">{{ c.getLangField('node_name') }}</a></li>
     {% endfor %}
     {% for p in products %}
-        <li><a href="{{ p.url() }}">{{ p.get('product_name') }}</a></li>
+        <li><a href="{{ p.url() }}">{{ p.getLangField('product_name') }}</a></li>
     {% endfor %}
     {% for s in searches %}
         <li><a href="{{ s.get('target_url') }}">{{ s.get('title') }}</a></li>
