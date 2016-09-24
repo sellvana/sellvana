@@ -64,6 +64,7 @@ class FCom_Core_Main extends BClass
         }
 
         date_default_timezone_set('UTC');
+        #ini_set('curl.cainfo', __DIR__ . '/buckyball/ssl/cacert.pem');
 
         $config = $this->BConfig;
 

@@ -156,7 +156,9 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         }
         $p1 = $p;
         $p1['field'] = ltrim($p1['js_toggle'], '!');
-        return $this->getInputId($p1);
+        unset($p1['id']);
+        $inputId = $this->getInputId($p1);
+        return $inputId;
     }
 
     public function getSelect2ArgsText($p)
