@@ -11,7 +11,7 @@
                         <img src="{{ APP.instance('FCom_Core_Main').resizeUrl(cat.get('nav_callout_image_url'), {s: 18}) }}" />
                     {% endif %}
 
-                    {{ cat.get('node_name')|_ }}</a>
+                    {{ cat.getLangField('node_name')|_ }}</a>
 {% if cat.get('children') %}
                 <ul class="dropdown-menu">
 {% for cat1 in cat.get('children') %}
@@ -21,7 +21,7 @@
                                 <img src="{{ APP.instance('FCom_Core_Main').resizeUrl(cat1.get('nav_callout_image_url'), {s: 18}) }}" />
                             {% endif %}
 
-                            {{ cat1.get('node_name')|_ }}
+                            {{ cat1.getLangField('node_name')|_ }}
                         </a>
                     </li>
 {% endfor %}
