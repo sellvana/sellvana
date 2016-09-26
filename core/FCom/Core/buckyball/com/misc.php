@@ -3369,7 +3369,7 @@ class BDebug extends BClass
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
         $e['msg'] = (string)$e['msg'];
-        $e['ts'] = BDb::i()->now();
+        $e['ts'] = BDb::now();
         $e['t'] = microtime(true) - static::$_startTime;
         $e['d'] = null;
         $e['c'] = null;
