@@ -20,7 +20,7 @@
         {{ forms.boolean(fieldData, {field:'enabled', label:'Is Method Enabled?'|_ }) }}
         {#{{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}#}
         {{ forms.boolean(fieldData, {field:'all_services', label:'Enable All Services'}) }}
-        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services, js_toggle:'!all_services'}) }}
+        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:{}, options:services, js_toggle:'!all_services'}) }}
         {{ forms.input(fieldData, {field:'package_size', label:'Package Size (LxWxH)'|_ }) }}
     {{ forms.accordion_panel_end }}
 

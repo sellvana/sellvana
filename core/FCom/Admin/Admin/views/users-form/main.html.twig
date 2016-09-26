@@ -15,7 +15,7 @@
         <div class="f-section">
             {{ forms.select(fieldData, {field:'status', label:'Status'|_, options:hlp.fieldOptions('status') }) }}
             {{ forms.boolean(fieldData, {field:'is_superadmin', label:'Super Admin'|_}) }}
-            {{ forms.select(fieldData, {field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() }) }}
+            {{ forms.select(fieldData, {field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options(), add_empty: true }) }}
         </div>
 
         <div class="f-section">
