@@ -71,6 +71,7 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
         parent::gridOrmConfig($orm);
 
         $orm->select_expr('COUNT(o.id)', 'order_count')
+            ->select_expr('MIN(o.create_at)', 'create_at')
             ->select_expr('IFNULL(SUM(o.item_qty), 0)', 'item_count')
             ->select_expr('IFNULL(SUM(o.grand_total), 0)', 'total_amount')
             ->select_expr('IFNULL(SUM(o.amount_paid), 0)', 'total_received')
