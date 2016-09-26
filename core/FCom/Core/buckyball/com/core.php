@@ -708,7 +708,7 @@ class BConfig extends BClass
             case 'yml':
                 $config = $this->BYAML->load($filename);
                 break;
-            
+
             case 'toml':
                 $config = $this->Toml->parse(file_get_contents($filename));
                 break;
@@ -752,7 +752,7 @@ class BConfig extends BClass
             $node =& $this->_config;
         }
         #if ($this->shouldBeEncrypted($path)) {
-            //TODO: need encrypted values in config?
+        //TODO: need encrypted values in config?
         #}
         foreach (explode('/', $path) as $key) {
             if (!is_array($node)) {
@@ -2173,7 +2173,6 @@ class BSession extends BClass
         }
 
         $this->_isOpen = true;
-
         $this->_setSessionPhpFlags();
         $this->_setSessionName();
         $this->_processSessionHandler();
@@ -2183,7 +2182,6 @@ class BSession extends BClass
         $this->_validateSession();
         $this->_sessionId = session_id();
         $this->_initSessionData();
-
         $this->BEvents->fire(__METHOD__ . ':after', ['id' => $id]);
 
         #BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
@@ -2225,6 +2223,9 @@ class BSession extends BClass
 
     protected function _setSessionPhpFlags()
     {
+        ini_set('session.use_cookies', 1);
+        ini_set('session.use_only_cookies', 1);
+
         ini_set('session.gc_maxlifetime', $this->_getRememberMeTtl());
         ini_set('session.gc_divisor', 100);
         ini_set('session.gc_probability', 1);
@@ -2232,8 +2233,11 @@ class BSession extends BClass
         $useStrictMode = isset($this->_config['use_strict_mode']) ? $this->_config['use_strict_mode'] : 1;
         ini_set('session.use_strict_mode', $useStrictMode);
 
-        $refererCheck = isset($this->_config['referer_check']) ? $this->_config['referer_check'] : 0;
-        ini_set('session.referer_check', $refererCheck);
+        ini_set('session.cookie_httponly', 1);
+
+        if ($this->BRequest->https()) {
+            ini_set('session.cookie_secure', 1);
+        }
     }
 
     protected function _setSessionName()
@@ -2262,11 +2266,10 @@ class BSession extends BClass
     protected function _setSessionId($id = null)
     {
         if (!$id) {
-            $id = $this->BRequest->get('SID');
-            if (!$id && !empty($_COOKIE[session_name()])) {
+            if (!empty($_COOKIE[session_name()])) {
                 $id = $_COOKIE[session_name()];
+                $this->_idFromRequest = true;
             }
-            $this->_idFromRequest = true;
         }
         if ($id && preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
             session_id($id);
@@ -2279,6 +2282,7 @@ class BSession extends BClass
         if (null === $ttl) {
             $ttl = $this->_getCookieTtl();
         }
+
         $path = $this->BRequest->getCookiePath();
         $domain = $this->BRequest->getCookieDomain();
         $https = $this->BRequest->https();
@@ -2296,6 +2300,7 @@ class BSession extends BClass
     {
         $ip = $this->BRequest->ip();
         $agent = $this->BRequest->userAgent();
+
         $refresh = false;
         if ($this->_idFromRequest && !isset($_SESSION['_ip'])) {
             $refresh = true;
@@ -2315,15 +2320,19 @@ class BSession extends BClass
             session_destroy();
             $this->_sessionStart();
         }
+    }
+
+    protected function _initSessionData()
+    {
+        $ip = $this->BRequest->ip();
+        $agent = $this->BRequest->userAgent();
+
         if (empty($_SESSION['_ip'])) {
             $_SESSION['_ip'] = $ip;
         }
         if (empty($_SESSION['_agent'])) {
             $_SESSION['_agent'] = $agent;
         }
-    }
-    protected function _initSessionData()
-    {
         $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
         if (empty($_SESSION[$namespace])) {
             $_SESSION[$namespace] = [];
@@ -2531,8 +2540,7 @@ class BSession extends BClass
             } else {
                 session_start();
             }
-            $namespace = $this->_config['session_namespace'];
-            if (!$namespace) $namespace = 'default';
+            $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
             $_SESSION[$namespace] = $this->data;
         }
         // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
@@ -2540,13 +2548,13 @@ class BSession extends BClass
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
-/*
-        if ($this->get('_regenerate_id')) {
-            #session_regenerate_id(true);
-            session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
-            $this->set('_regenerate_id', 0);
-        }
-*/
+        /*
+                if ($this->get('_regenerate_id')) {
+                    #session_regenerate_id(true);
+                    session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+                    $this->set('_regenerate_id', 0);
+                }
+        */
         /*
 echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $sessionCookie = null;

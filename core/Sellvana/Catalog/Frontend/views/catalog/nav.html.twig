@@ -6,12 +6,24 @@
         <ul class="nav navbar-nav navbar-collapse collapse">
 {% for cat in categories %}
             <li class="dropdown {{ cat.id() in activeIds ? 'active' }}">
-                <a class="dropdown-toggle disabled"
-                    href="{{ cat.url() }}" data-toggle="dropdown">{{ cat.getLangField('node_name')|_ }}</a>
+                <a class="dropdown-toggle disabled" href="{{ cat.url() }}" data-toggle="dropdown">
+                    {% if cat.get('nav_callout_image_url') %}
+                        <img src="{{ APP.instance('FCom_Core_Main').resizeUrl(cat.get('nav_callout_image_url'), {s: 18}) }}" />
+                    {% endif %}
+
+                    {{ cat.get('node_name')|_ }}</a>
 {% if cat.get('children') %}
                 <ul class="dropdown-menu">
 {% for cat1 in cat.get('children') %}
-                    <li><a href="{{ cat1.url() }}">{{ cat1.getLangField('node_name')|_ }}</a></li>
+                    <li>
+                        <a href="{{ cat1.url() }}">
+                            {% if cat1.get('nav_callout_image_url') %}
+                                <img src="{{ APP.instance('FCom_Core_Main').resizeUrl(cat1.get('nav_callout_image_url'), {s: 18}) }}" />
+                            {% endif %}
+
+                            {{ cat1.get('node_name')|_ }}
+                        </a>
+                    </li>
 {% endfor %}
                 </ul>
 {% endif %}

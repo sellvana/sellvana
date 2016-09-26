@@ -52,13 +52,12 @@ Using custom id/name:
         {% set toggleId = view.jsVisibleToggleId(p) %}
         <script>
             require(['jquery'], function($) {
-                var {% if toggleId %}$toggle = $('#{{ toggleId }}'), {% endif %}$container = $('#{{ inputId }}-container');
+                var $toggle = $('#{{ toggleId }}');
+                var $container = $('#{{ inputId }}-container');
                 if ({{ conditions | raw }}) $container.show(); else $container.hide();
-                {% if toggleId %}
-                    $toggle.change(function(ev) {
-                        if ({{ conditions | raw }}) $container.show(); else $container.hide();
-                    });
-                {% endif %}
+                $toggle.change(function(ev) {
+                    if ({{ conditions | raw }}) $container.show(); else $container.hide();
+                });
             });
         </script>
     {% endif %}
@@ -67,26 +66,39 @@ Using custom id/name:
 {# ########## STRUCTURE MACROS ############ #}
 
 {% macro accordion_start(p) %}
-<div class="accordion accordion-blue panel-group" id="{{ p.id }}">
-    {% endmacro %}
 
-    {% macro accordion_end(p) %}
-</div>
+    <div class="accordion accordion-blue panel-group" id="{{ p.id }}">
+{% endmacro %}
+
+{% macro accordion_end(p) %}
+    </div>
 {% endmacro %}
 
 {% macro accordion_panel_start(p) %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <a class="accordion-toggle" href="#{{ p.id }}" data-toggle="collapse">{{ p.label }}</a>
-    </div>
-    <div class="panel-collapse accordion-body {{ p.in ? 'in' }}" id="{{ p.id }}">
-        <div class="panel-body">
-            {% endmacro %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#{{ p.id }}" data-toggle="collapse">{{ p.label }}</a>
+        </div>
+        <div class="panel-collapse accordion-body {{ p.in ? 'in' }}" id="{{ p.id }}">
+            <div class="panel-body">
+{% endmacro %}
 
-            {% macro accordion_panel_end(p) %}
+{% macro accordion_panel_end(p) %}
+            </div>
         </div>
     </div>
-</div>
+{% endmacro %}
+
+{% macro block_start(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% import _self as forms %}
+    {% set p = view.merge(p1, p2) %}
+    {{ forms.js_visible(p) }}
+    <div id="{{ view.getInputId(p) }}-container">
+{% endmacro %}
+
+{% macro block_end(p) %}
+    </div>
 {% endmacro %}
 
 {# ########## INPUT MACROS ############ #}

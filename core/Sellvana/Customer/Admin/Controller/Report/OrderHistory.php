@@ -25,6 +25,7 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
         }
 
         $config['columns'] = [
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
             ['name' => 'period', 'index' => 'period', 'width' => 70],
             ['name' => 'customer_id', 'index' => 'customer_id', 'options' => $customersOptions],
             ['name' => 'order_count', 'index' => 'order_count'],
@@ -34,7 +35,6 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
             ['name' => 'total_refunded', 'index' => 'total_refunded', 'cell' => 'currency'],
 
             ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
-            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -59,7 +59,7 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
             'total_received' => 'Total $Received',
             'total_refunded' => 'Total $Refunded',
             'create_at' => 'Created',
-            'period_type' => 'Period',
+            'period_type' => 'Group by',
         ];
     }
 

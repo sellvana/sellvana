@@ -9,7 +9,7 @@
 
 <div class="f-section" id="customorderstate-container">
     <fieldset class="adm-section-group">
-        {{ forms.select(fieldData, {field:'entity_type', label:'Entity Type'|_, options:m.fieldOptions('entity_type'), select2:true}) }}
+        {{ forms.select(fieldData, {field:'entity_type', label:'Entity Type'|_, options:m.fieldOptions('entity_type'), select2:{}}) }}
         {{ forms.input(fieldData, {field:'state_code', label:'Code'|_}) }}
         {{ forms.input(fieldData, {field:'state_label', label:'Label'|_}) }}
         {{ forms.input(fieldData, {field:'concrete_class', label:'Class'|_}) }}

@@ -1,0 +1,17 @@
+{% set cnt = THIS.get('cnt') ?: 3 %}
+{% set featured = APP.instance('Sellvana_Catalog_Model_Category').getFeaturedCategories(cnt) %}
+
+{% if featured %}
+    <article class="categories-block row">
+        {% for category in featured %}
+        <div class="col-md-4 text-center">
+            <a href="{{ category.url() }}">
+                <figure>
+                    <img src="{{ APP.instance('FCom_Core_Main').resizeUrl(category.get('featured_image_url'), {s:200}) }}" alt="{{ category.get('node_name') }}" />
+                </figure>
+                <p class="category-name">{{ category.get('node_name') }}</p>
+            </a>
+        </div>
+        {% endfor %}
+    </article>
+{% endif %}

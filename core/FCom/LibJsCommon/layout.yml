@@ -42,6 +42,8 @@ common_js_libs:
             - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
             - [ requireJs, ajaxify, @FCom_LibJsCommon/js/ajaxify.min, { deps: [ jquery ] } ]
 
+            - [ requireJs, store, @FCom_LibJsCommon/js/store ]
+
 lib_visualsearch:
     - view: head
         do:

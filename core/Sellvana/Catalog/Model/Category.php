@@ -218,11 +218,20 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     }
 
     /**
+     * @param int $cnt
+     * @param bool $random
      * @return $this[]
      */
-    public function getFeaturedCategories()
+    public function getFeaturedCategories($cnt, $random = true)
     {
-        return $this->orm()->where('is_featured', 1)->find_many();
+        $orm = $this->orm()->where('is_featured', 1);
+        if ($random) {
+            $orm->order_by_expr('RAND()');
+        }
+        if ($cnt) {
+            $orm->limit($cnt);
+        }
+        return $orm->find_many();
     }
 
     public function onAfterCreate()

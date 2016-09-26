@@ -193,6 +193,9 @@
                 data.error = true;
                 data.message = data.message || defErrorMsg;
             }
+            if (data.otherInfo) {
+                $('.page-header .entity-glimpse').html(data.otherInfo);
+            }
             if (data.tabs) {
                 _.each(data.tabs, function (tabHtml, i) {
                     $('#tab-' + i).html(tabHtml).data('loaded', !!tabHtml);

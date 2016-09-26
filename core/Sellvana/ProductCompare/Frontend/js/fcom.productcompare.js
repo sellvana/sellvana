@@ -132,7 +132,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
         }
 
         function reset() {
-            for (var i = 0; i < limit; i++) {
+            for (var i = (limit - 1); i >= 0; i--) {
                 if (!selected.length) {
                     break;
                 }
@@ -141,6 +141,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                     remove(selected[i].id, null, 'reset');
                 }
             }
+            selected = []; // sometimes not all items are removed in time because of the async XHR requests
         }
 
         function toggle(id) {

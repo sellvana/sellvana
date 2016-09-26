@@ -1281,7 +1281,7 @@ class BUtil extends BClass
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_CAINFO => dirname(__DIR__) . '/ssl/ca-bundle.crt',
+                CURLOPT_CAINFO => dirname(__DIR__) . '/ssl/cacert.pem',
                 CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
@@ -1380,7 +1380,7 @@ class BUtil extends BClass
             if (preg_match('#^(ssl|ftps|https):#', $url)) {
                 $streamOptions['ssl'] = [
                     'verify_peer' => true,
-                    'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
+                    'cafile' => dirname(__DIR__) . '/ssl/cacert.pem',
                     'verify_depth' => 5,
                 ];
             }
@@ -2551,7 +2551,10 @@ class BEmail extends BClass
 
         $origBody = $body;
 
-        $this->_formatAlternative($headers, $body);
+        $altBody = null;
+        $isHtml = !empty($headers['content-type']) && preg_match('#text/html#', $headers['content-type']);
+        $this->_formatAlternative($headers, $body, $altBody, $isHtml);
+
         $body = trim(preg_replace('#<!--.*?-->#', '', $body));//strip comments
 
         if (empty($headers['content-type'])) {
@@ -2573,6 +2576,8 @@ class BEmail extends BClass
             'to' => &$to,
             'subject' => &$subject,
             'orig_body' => &$origBody,
+            'alt_body' => &$altBody,
+            'is_html' => &$isHtml,
             'body' => &$body,
             'headers' => &$headers,
             'params' => &$params,
@@ -2624,7 +2629,7 @@ class BEmail extends BClass
      * @param $body
      * @return bool
      */
-    protected function _formatAlternative(&$headers, &$body)
+    protected function _formatAlternative(&$headers, &$body, &$altBody, &$isHtml)
     {
         if (!preg_match('#<!--=+-->#', $body)) {
             return $body;
@@ -2639,6 +2644,9 @@ class BEmail extends BClass
         $message = "--{$mimeBoundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n" . trim($parts[0]);
         $message .= "\r\n--{$mimeBoundary}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n" . trim($parts[1]);
         $message .= "\r\n--{$mimeBoundary}--";
+
+        $altBody = $parts[0];
+        $isHtml = true;
 
         $body = $message;
         return true;

@@ -71,10 +71,10 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
             ['name' => 'amount_due', 'label' => 'Due', 'cell' => 'currency'],
             ['name' => 'amount_captured', 'label' => 'Captured', 'cell' => 'currency'],
             ['name' => 'amount_refunded', 'label' => 'Refunded', 'cell' => 'currency'],
-            ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
-            ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
+            ['name' => 'state_overall', 'index' => 'p.state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
+            ['name' => 'state_custom', 'index' => 'p.state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
+            ['name' => 'create_at', 'index' => 'p.create_at', 'label' => 'Created', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'index' => 'p.update_at', 'label' => 'Updated', 'cell' => 'datetime'],
             ['name' => 'transactions', 'label' => 'Transactions'],
         ];
         $config['actions'] = [
