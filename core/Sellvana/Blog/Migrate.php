@@ -165,4 +165,21 @@ SET FOREIGN_KEY_CHECKS=1;
     {
         //$this->BDb->run("RENAME TABLE fcom_blog_category_post TO fcom_blog_post_category");
     }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tCategory = $this->Sellvana_Blog_Model_Category->table();
+        $tPost = $this->Sellvana_Blog_Model_Post->table();
+        $this->BDb->ddlTableDef($tPost, [
+            BDb::COLUMNS => [
+                'views' => 'INT(10) UNSIGNED NOT NULL DEFAULT 0',
+                'image' => 'varchar(255) DEFAULT NULL'
+            ]
+        ]);
+        $this->BDb->ddlTableDef($tCategory, [
+            BDb::COLUMNS => [
+                'default_post_image' => 'varchar(255) DEFAULT NULL'
+            ]
+        ]);
+    }
 }
