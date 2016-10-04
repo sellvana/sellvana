@@ -1,7 +1,8 @@
+{% set current = THIS.getCurrentNavItem() %}
 <aside class="f-col-sidebar col-sm-3">
   <ul class="list-group f-sidebar-nav">
   {% for key, item in THIS.getNavItems() %}
-    <li class="list-group-item {{ key==THIS.get('current') ? 'active' }}"><a href="{{ APP.href(item.href) }}">{{ item.label |_ }}</a></li>
+    <li class="list-group-item {{ key == current ? 'active' }}"><a href="{{ APP.href(item.href) }}">{{ item.label |_ }}</a></li>
   {% endfor %}
   </ul>
 </aside> <!-- /.f-col-sidebar -->
