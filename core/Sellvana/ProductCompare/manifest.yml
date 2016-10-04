@@ -15,7 +15,7 @@ modules:
             FCom_Admin:
                 auto_use: [ bootstrap ]
                 routing:
-                    - [ /prodcompare/?.action, Sellvana_ProductCompare_Admin_Controller.index ]
+                    - [ /prodcompare/?.action, Sellvana_ProductCompare_Admin_Controller ]
 
             FCom_Frontend:
                 routing:

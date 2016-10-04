@@ -1,0 +1,87 @@
+
+<header class="f-page-header">
+    <h1 class="f-page-title">{{ 'Compare' |_ }} <span class="compare-num-products">{{ THIS.get('products') | length }}</span> {{ 'products' |_ }}</h1>
+</header>
+
+<table class="table f-prod-listing-grid f-prod-compare-listing">
+    <tr>
+        <th>{{ 'Summary'|_ }}</th>
+        {% for i in 0..3 %}
+            <td class="item">
+                {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
+                    {% set pUrl = p.url() %}
+
+                    <a href="{{ APP.href('catalog/compare/remove?id=' ~ p.id()) }}" class="trigger-remove fa fa-times" {#onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)"#} title="{{ "Remove" |_ }}"></a>
+                    <p><a href="{{ pUrl }}"><img src="{{ p.thumbUrl(125) }}" class="product-img"/></a></p>
+                    <h3 class="product-name"><a href="{{ pUrl }}">{{ p.getName() }}</a></h3>
+                    <span class="manuf-name">{{ p.get('mfr_name') }}</span>
+                    <span class="sku">{{ "Part #: %s" | _(p.get('product_sku'))  }}</span>
+                    {% if p.get('avg_rating') %}
+                        <div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
+                        {{ '%s of 5' | _(p.get('avg_rating')) }}
+                    {% endif %}
+                    {% if p.get('num_reviews') %}
+                        (<a href="{{p.url(cat)}}#reviews">{{ '%s reviews' | _(p.get('num_reviews')) }}</a>)
+                    {% endif %}
+                    {{ THIS.view('catalog/product/price', {'product': p}) | raw }}
+
+                {% else %}
+                    &nbsp;
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
+    <tr>
+
+        <th>&nbsp;</th>
+        {% for i in 0..3 %}
+            <td class="item">
+                {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
+
+                    {% set inventory = p.getInventoryModel() %}
+                    {% set canOrder = p.canOrder() %}
+
+                    <div class="f-prod-select">
+
+                        {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
+
+                        <div class="f-prod-add-cart">
+
+                            {{ THIS.view('catalog/product/variants').set('product', p) | raw }}
+
+                            {{ THIS.view('catalog/product/shopper-fields').set('product', p) | raw }}
+
+                            <div class="f-stock-notice {{ canOrder ? '-in-stock' }}" data-id="{{ p.id() }}">
+                                <p class="f-in-stock">{{ 'In Stock.'|_ }}</p>
+                                <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                            </div>
+
+                            <div class="form-group overflow-hidden">
+                                <label for="qty" class="col-md-6 control-label">{{ 'Quantity:' |_ }}</label>
+
+                                <div class="col-md-6">
+                                    <input type="number" name="qty" class="form-control" value="1"/>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}"
+                                    name="prod-add-to-cart">
+                                <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
+                            <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
+                               rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
+
+                        </div>
+                    </div>
+                {% else %}
+                    &nbsp;
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
+</table>
+
+<script>
+    require(['jquery', 'jquery.rateit'], function($) {
+        $('.rateit').rateit();
+    })
+</script>
