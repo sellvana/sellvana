@@ -64,6 +64,11 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
         return $this->changeState(self::PARTIAL);
     }
 
+    public function isVirtual()
+    {
+        return $this->getValue() == self::VIRTUAL;
+    }
+
     public function isComplete()
     {
         return in_array($this->getValue(), [self::VIRTUAL, self::SHIPPED, self::DELIVERED]);

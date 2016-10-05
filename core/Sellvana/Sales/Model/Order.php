@@ -811,6 +811,46 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $info;
     }
 
+    public function getItemsForCustomer()
+    {
+        $itemGroups = [];
+        if (!empty($this->shipments())) {
+            foreach ($this->shipments() as $shipment) {
+                $itemsInShipment = [
+                    'label' => $this->_('Shipment') . ' #' . $shipment->id() . ' (' . $this->_($shipment->state()->overall()->getValue()) . ')',
+                    'items' => [],
+                ];
+                foreach ($shipment->items() as $sItem) {
+                    $itemsInShipment['items'][] = $sItem->orderItem();
+                }
+                $itemGroups[] = $itemsInShipment;
+            }
+        }
+
+        if (!empty($this->getShippableItems())) {
+            $itemGroups[] = [
+                'label' => $this->_('Pending items'),
+                'items' => $this->getShippableItems(),
+            ];
+        }
+
+        $virtualItems = [];
+        foreach ($this->items() as $item) {
+            if ($item->isVirtual()) {
+                $virtualItems[] = $item;
+            }
+        }
+
+        if (!empty($virtualItems)) {
+            $itemGroups[] = [
+                'label' => $this->_('Virtual items'),
+                'items' => $virtualItems
+            ];
+        }
+
+        return $itemGroups;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

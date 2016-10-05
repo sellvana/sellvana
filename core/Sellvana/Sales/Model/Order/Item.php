@@ -67,6 +67,11 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
             && $this->state()->delivery()->getValue() != Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
     }
 
+    public function isVirtual()
+    {
+        return $this->state()->delivery()->getValue() == Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
+    }
+
     public function getQtyCanPay()
     {
         return $this->get('qty_ordered') - $this->get('qty_in_cancels');
