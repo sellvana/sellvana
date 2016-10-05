@@ -708,10 +708,17 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'update_at', 'label' => 'Updated', 'hidden' => true, 'cell' => 'datetime'],
                 ['name' => 'from_admin', 'label' => 'Direction', 'options' => [0 => 'Received', 1 => 'Sent']],
                 ['name' => 'is_internal', 'label' => 'Visibility', 'options' => [0 => 'Public', 1 => 'Private']],
-                ['name' => 'comment_text', 'label' => 'Text'],
+                ['name' => 'comment_text', 'label' => 'Text', 'addable' => true, 'editable' => true, 'editor' => 'textarea', 'validation' => ['required' => true]],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add comment'],
+                //'add' => ['caption' => 'Add comment'],
+                'add-order-comment' => [
+                    'caption'  => 'Add comment',
+                    'type'     => 'button',
+                    'id'       => 'add-order-comment',
+                    'class'    => 'btn-primary',
+                    'callback' => 'showModalToAddComment',
+                ],
                 'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
@@ -722,6 +729,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_comments_register',
+            'callbacks' => [
+                'componentDidMount' => 'order_comments_register'
+            ]
         ];
 
         return ['config' => $config];

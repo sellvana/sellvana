@@ -14,7 +14,8 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
                 'row': {},
                 'id': 'modal-form',
                 'columnMetadata': [],
-                'hiddenId': ''
+                'hiddenId': '',
+                'wrapper': 'form'
             }
         },
         getInitialState: function () {
@@ -36,7 +37,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
         render: function () {
             var that = this;
             var gridId = this.props.id;
-            //console.log('row', this.props.row);
+            console.log('fcom.modalForm.row', this.props.row);
 
             var nodes = this.props.columnMetadata.map(function(column, index) {
                 if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
@@ -46,11 +47,22 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
             //add id
             nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: this.props.hiddenId ? this.props.hiddenId : this.props.row.id, key: nodes.length++}));
 
-            return (
-                React.createElement("form", {className: "form form-horizontal", id: gridId + '-modal-form', noValidate: true}, 
-                    nodes
+            if (this.props.wrapper == 'form') {
+                return (
+                    React.createElement("form", {className: "form form-horizontal", id: gridId + '-modal-form', noValidate: true}, 
+                        nodes
+                    )
                 )
-            )
+            } else {
+                var wrapper = this.props.wrapper;
+                return (
+                    React.createElement("wrapper", {className: this.props.wr}, 
+                        nodes
+                    )
+                )
+            }
+
+
         }
     });
 });

@@ -1,5 +1,70 @@
 {% set m = THIS.get('model') %}
 {% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').commentsGridConfig(m) %}
 
-{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComModalForm, Components) {
+        var orderCommentsGrid,isNewComment;
+
+        /**
+         * register grid to scope variable
+         * @param grid
+         */
+        window.order_comments_register = function (grid) {
+            console.log('order_comments_register');
+            orderCommentsGrid = grid;
+        };
+
+        /**
+         * show modal to add comment
+         */
+        window.showModalToAddComment = function () {
+            modalRender();
+        };
+
+        /**
+         * save order comment
+         * @returns {boolean}
+         */
+        window.saveOrderComment = function () {
+            console.log('saving comments');
+            return false;
+        };
+
+        /**
+         * render modal to display form of order comment
+         * @param row
+         */
+        function modalRender(row)
+        {
+            /*console.log('modalRender.row', row);
+            console.log('modalRender.orderCommentsGrid', orderCommentsGrid);*/
+            isNewComment = row === undefined;
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+
+            React.render(
+                    React.createElement(Components.Modal, {
+                                id: "addOrderCommentModal",
+                                show: true,
+                                title: "{{ 'Add comment'|_ }}",
+                                confirm: "{{ 'Save Changes'|_ }}",
+                                cancel: "{{ 'Cancel'|_ }}",
+                                onLoad: function (modal) {
+                                    var node = $(modal.getDOMNode());
+                                    node.find('.modal-dialog').css('width', '960px');
+                                },
+                                onConfirm: window.saveOrderComment
+                            },
+                            React.createElement(FComModalForm, {
+                                columnMetadata: orderCommentsGrid.props.columnMetadata,
+                                id: orderCommentsGrid.getConfig('id'),
+                                row: row,
+                                wrapper: 'div'
+                            })
+                    ),
+                    modalContainerEle);
+        }
+    });
+</script>
+
 {{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
