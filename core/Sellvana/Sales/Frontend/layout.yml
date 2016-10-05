@@ -22,21 +22,25 @@ customer_account_sidebar:
     - { include: base }
     - { hook: main, views: orders/list }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, orders ]] }
 
 /orders/view:
     - { include: base }
     - { hook: main, views: orders/view }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, orders ]] }
 
 /orders/cancel:
     - { include: base }
     - { hook: main, views: orders/cancel }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, orders ]] }
 
 /orders/return:
     - { include: base }
     - { hook: main, views: orders/return }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, orders ]] }
 
 /guest/create_account:
     - { include: base }

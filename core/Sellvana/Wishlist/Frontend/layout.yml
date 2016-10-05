@@ -15,6 +15,7 @@ customer_account_sidebar:
     - { include: lib_select2 }
     - { hook: main, views: wishlist }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, wishlist ]] }
 
 /wishlist/form:
     - { include: base }

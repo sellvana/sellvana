@@ -26,7 +26,7 @@
     {% endfor %}
     </div>
   </div>
-  {{ THIS.view('customer/account/sidebar').set('current', 'addresses') | raw }}
+  {{ THIS.view('customer/account/sidebar') | raw }}
 </div>
 <script>
   require(['jquery'], function($) {

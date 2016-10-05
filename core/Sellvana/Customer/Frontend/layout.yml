@@ -49,28 +49,34 @@ customer_account_sidebar:
     - { include: base }
     - { hook: main, views: customer/account/dashboard }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, dashboard ]] }
 
 /customer/account/edit:
     - { include: base }
     - { hook: main, views: customer/account/edit }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, edit ]] }
 
 /customer/account/editpassword:
     - { include: base }
     - { hook: main, views: customer/account/editpassword }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, edit ]] }
 
 /customer/address/edit:
     - { include: base }
     - { hook: main, views: customer/address/edit }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, addresses ]] }
 
 /customer/address/list:
     - { include: base }
     - { hook: main, views: customer/address/list }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, addresses ]] }
 
 /customer/address/choose:
     - { include: base }
     - { hook: main, views: customer/address/choose }
     - { include: customer_account_sidebar }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, addresses ]] }
