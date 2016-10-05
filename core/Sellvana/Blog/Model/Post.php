@@ -170,4 +170,21 @@ class Sellvana_Blog_Model_Post extends FCom_Core_Model_Abstract
         }
         return true;
     }
+
+    public function getImage()
+    {
+        $image = $this->get('image');
+        if (!$image) {
+            $categories = $this->getCategories();
+            foreach ($categories as $cat) {
+                if ($cat->get('default_post_image')) {
+                    return $cat->get('default_post_image');
+                }
+            }
+
+            return 'image-not-found.jpg';
+        }
+
+        return $this->get('image');
+    }
 }

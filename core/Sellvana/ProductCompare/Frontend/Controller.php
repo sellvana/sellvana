@@ -15,7 +15,6 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
     {
         $layout = $this->BLayout;
         $cookie = $this->BRequest->cookie(static::COMPARE_COOKIE_NAME);
-        $xhr = $this->BRequest->xhr();
         $set = $this->Sellvana_ProductCompare_Model_Set->sessionSet();
         if ($set) {
             $arr = $set->getCompareProductIds(); // if there is compare set for current user, get compared products from it
@@ -28,27 +27,19 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
             $products = $this->Sellvana_Catalog_Model_Product->orm()->where_in('id', $arr)->find_many();
         }
         if (empty($products)) {
-            if ($xhr) {
-                return;
-            } else {
-                $this->message('No products to compare');
-                $this->BResponse->redirect($this->FCom_Core_Main->lastNav());
-                return;
-            }
+            $this->message('No products to compare');
+            $this->BResponse->redirect($this->FCom_Core_Main->lastNav());
+            return;
         }
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($products);
 
-        if ($xhr) {
-            $this->layout('/catalog/compare/xhr');
-        } else {
-            $this->layout('/catalog/compare');
-        }
+        $this->layout('/catalog/compare');
+
         $layout->getView('catalog/compare')->set('products', $products);
-        if (!$xhr) {
-            $layout->getView('breadcrumbs')->set('crumbs', ['home',
-                ['label' => 'Compare ' . sizeof($products) . ' products', 'active' => true]
-            ]);
-        }
+
+        $layout->getView('breadcrumbs')->set('crumbs', ['home',
+            ['label' => 'Compare ' . sizeof($products) . ' products', 'active' => true]
+        ]);
     }
 
     public function action_index__POST()
@@ -117,6 +108,30 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
         }
 
         $this->BResponse->redirect('/catalog/compare');
+    }
+
+    public function action_xhr()
+    {
+        $layout = $this->BLayout;
+        $cookie = $this->BRequest->cookie(static::COMPARE_COOKIE_NAME);
+        $set = $this->Sellvana_ProductCompare_Model_Set->sessionSet();
+        if ($set) {
+            $arr = $set->getCompareProductIds(); // if there is compare set for current user, get compared products from it
+        } else if (!empty($cookie)) {
+            $arr = $this->BUtil->fromJson($cookie);
+        }
+
+        if (!empty($arr)) {
+            $this->Sellvana_Catalog_Model_Product->cachePreloadFrom($arr);
+            $products = $this->Sellvana_Catalog_Model_Product->orm()->where_in('id', $arr)->find_many();
+        }
+        if (empty($products)) {
+            return;
+        }
+        $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($products);
+
+        $this->layout('/catalog/compare/xhr');
+        $layout->getView('catalog/compare')->set('products', $products);
     }
 
     public function action_addxhr()

@@ -73,6 +73,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
         parent::gridOrmConfig($orm);
 
         $orm->join('Sellvana_Sales_Model_Order', 'oi.order_id = o.id', 'o')
+            ->select_expr('MIN(o.create_at)', 'create_at')
             ->select_expr('SUM(oi.qty_ordered)', 'qty_sold')
             ->select_expr('SUM(oi.row_total)', 'period_subtotal')
             ->select_expr('SUM(oi.row_discount)', 'period_discount')

@@ -12,7 +12,7 @@ base:
             - [ css, @Sellvana_ProductCompare/Frontend/css/sellvana.productcompare.css ]
 
 /catalog/compare/xhr:
-    - { root: catalog/compare }
+    - { root: catalog/compare/xhr-root }
 
 /:
     - { hook: homepage-additional, views: catalog/recently-compared }

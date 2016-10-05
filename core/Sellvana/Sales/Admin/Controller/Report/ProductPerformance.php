@@ -59,6 +59,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
         parent::gridOrmConfig($orm);
 
         $orm->join('Sellvana_Sales_Model_Order', 'oi.order_id = o.id', 'o')
+            ->select_expr('MIN(o.create_at)', 'create_at')
             ->select_expr('SUM(oi.qty_ordered)', 'qty_sold')
             ->select_expr('SUM(oi.row_total - oi.row_discount)', 'row_total_amount')
             ->group_by('oi.product_id');
