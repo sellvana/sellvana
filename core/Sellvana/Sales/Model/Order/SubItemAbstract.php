@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Sellvana_Sales_Model_Order_SubItemAbstract
+ *
+ * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
+ */
 abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Model_Abstract
 {
     /**
@@ -28,6 +33,8 @@ abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Mode
     protected $_doneStates = [];
 
     protected $_sumField = 'qty';
+
+    protected $_orderItems = [];
 
     public function getOrderItemsQtys(array $items = [])
     {
@@ -76,6 +83,19 @@ abstract class Sellvana_Sales_Model_Order_SubItemAbstract extends FCom_Core_Mode
         }
 
         return $result;
+    }
+
+    public function orderItem()
+    {
+        if (!$this->get('order_item_id')) {
+            return null;
+        }
+
+        if (!array_key_exists($this->id(), $this->_orderItems)) {
+            $this->_orderItems[$this->id()] = $this->Sellvana_Sales_Model_Order_Item->load($this->get('order_item_id'));
+        }
+
+        return $this->_orderItems[$this->id()];
     }
 
     /**
