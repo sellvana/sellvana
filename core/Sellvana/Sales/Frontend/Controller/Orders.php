@@ -72,7 +72,7 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         }
 
         $currentStatus = $this->BRequest->get('status');
-        if (!$currentStatus) {
+        if (!$currentStatus || !isset($counts[$currentStatus])) {
             $currentStatus = 'all';
         }
         $orm = $this->Sellvana_Sales_Model_Order->orm()->where('customer_id', $customerId)->order_by_desc('id');

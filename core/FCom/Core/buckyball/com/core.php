@@ -1809,8 +1809,6 @@ class BEvents extends BClass
     /**
      * Declare observers in bootstrap function
      *
-     * observe|watch|on|sub|subscribe ?
-     *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
      *          if starts with ^ will be processed as regular expression
      * @param mixed $callback
@@ -1944,8 +1942,6 @@ class BEvents extends BClass
 
     /**
      * Dispatch event observers
-     *
-     * dispatch|fire|notify|pub|publish ?
      *
      * @param string $eventName
      * @param array|object $args
