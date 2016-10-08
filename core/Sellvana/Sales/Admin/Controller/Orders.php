@@ -696,18 +696,20 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $config = [
             'id' => 'order_comments',
             'orm' => $orm,
-            'data_mode' => 'local',
+            'data_url' => $this->BApp->href('orders/comments_grid_data').'?order_id=' . $model->id(),
+            'edit_url' => $this->BApp->href('orders/comments_grid_data').'?order_id=' . $model->id(),
+            //'data_mode' => 'local',
             //'caption'      =>$caption,
             'columns' => [
                 ['type' => 'row_select'],
                 ['type' => 'btn_group', 'buttons' => [
-                    ['name' => 'edit'],
+                    ['name' => 'edit-custom', 'callback' => 'showModalToEditComment','cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "],
                 ]],
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
                 ['name' => 'update_at', 'label' => 'Updated', 'hidden' => true, 'cell' => 'datetime'],
-                ['name' => 'from_admin', 'label' => 'Direction', 'options' => [0 => 'Received', 1 => 'Sent']],
-                ['name' => 'is_internal', 'label' => 'Visibility', 'options' => [0 => 'Public', 1 => 'Private']],
+                ['name' => 'from_admin', 'label' => 'Direction', 'options' => [0 => 'Received', 1 => 'Sent'], 'editable' => true, 'editor' => 'select', 'addable' => true, ],
+                ['name' => 'is_internal', 'label' => 'Visibility', 'options' => [0 => 'Public', 1 => 'Private'], 'editable' => true, 'editor' => 'select', 'addable' => true, ],
                 ['name' => 'comment_text', 'label' => 'Text', 'addable' => true, 'editable' => true, 'editor' => 'textarea', 'validation' => ['required' => true]],
             ],
             'actions' => [
@@ -735,6 +737,75 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         ];
 
         return ['config' => $config];
+    }
+
+
+    public function action_comments_grid_data__POST()
+    {
+        //todo: should we create new controller for this process and re-use the gridDataPost???
+
+        $r = $this->BRequest;
+        $id = $r->post('id');
+        $hlp = $this->Sellvana_Sales_Model_Order_Comment;
+        $data = $r->post();
+
+        $data['order_id'] = $r->get('order_id');
+
+        /** @type BModel $hlp */
+        unset($data['id'], $data['oper']);
+
+        $args = ['data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp];
+
+        $this->BEvents->fire(static::$_origClass . '::comments_grid_data__POST::before', $args);
+
+        switch ($args['oper']) {
+            case 'add':
+                //fix Undefined variable: set
+                $model = $args['model'] = $hlp->create($data)->save();
+                $result = $model->as_array();
+                break;
+
+            case 'edit':
+                $model = $hlp->load($id);
+                if ($model) {
+                    $args['model'] = $model->set($data)->save();
+                    $result = $model->as_array();
+                } else {
+                    $result = ['error' => true];
+                }
+                break;
+
+            case 'del':
+                $model = $hlp->load($id);
+                if ($model) {
+                    $args['model'] = $model->delete();
+                    $result = ['success' => true];
+                } else {
+                    $result = ['error' => true];
+                }
+                break;
+        }
+
+        $args['result'] =& $result;
+
+        $this->BEvents->fire(static::$_origClass . '::comments_grid_data__POST::after', $args);
+
+        $this->BResponse->json($result);
+        die;
+    }
+
+    public function action_comments_grid_data()
+    {
+        /** @var FCom_Core_View_BackboneGrid $view */
+        $view = $this->view('core/backbonegrid');
+        $order = $this->Sellvana_Sales_Model_Order->load($this->BRequest->get('order_id'));
+        $view->set('grid', $this->commentsGridConfig($order));
+        $data = $view->generateOutputData();
+        $this->BResponse->json([
+            ['c' => $data['state']['c']],
+            $this->BDb->many_as_array($data['rows']),
+        ]);
+
     }
     
     public function historyGridConfig(Sellvana_Sales_Model_Order $model)
