@@ -121,6 +121,9 @@
                         if (files == 0) {
                             $mediaTypes.attr('disabled', false);
                         }
+                    }).bind('fileuploadstop, fileuploaddone', function() {
+                        //enable select#mediaTypes to allow user choose the Types again
+                        $mediaTypes.attr('disabled', false);
                     });
                     uploaderInitialized = true;
                 }
