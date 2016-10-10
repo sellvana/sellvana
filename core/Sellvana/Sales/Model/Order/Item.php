@@ -36,12 +36,15 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function setProduct($product)
+    public function setProduct(Sellvana_Catalog_Model_Product $product)
     {
         $this->_product = $product;
         return $this;
     }
 
+    /**
+     * @return Sellvana_Catalog_Model_Product
+     */
     public function product()
     {
         if (!$this->_product) {
