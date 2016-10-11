@@ -8,6 +8,5 @@
         {{ THIS.view('core/messages') | raw }}
         <label>{{ 'Available Balance:'|_ }}</label> {{ balance.get('amount') | currency }}
     </div>
+    {{ THIS.view('customer/account/sidebar') | raw }}
 </div>
-
-{{ THIS.view('customer/account/sidebar').set('current', 'storecredit') | raw }}

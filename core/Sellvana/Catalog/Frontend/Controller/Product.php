@@ -67,13 +67,13 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
                     continue;
                 }
 
-                if ($c->get('node_name')) {
-                    $crumbs[] = ['label' => $c->get('node_name'), 'href' => $c->url()];
-                    $head->addTitle($c->get('node_name'));
+                if ($c->getLangField('node_name')) {
+                    $crumbs[] = ['label' => $c->getLangField('node_name'), 'href' => $c->url()];
+                    $head->addTitle($c->getLangField('node_name'));
                 }
             }
-            $head->addTitle($category->get('node_name'));
-            $crumbs[] = ['label' => $category->get('node_name'), 'href' => $category->url()];
+            $head->addTitle($category->getLangField('node_name'));
+            $crumbs[] = ['label' => $category->getLangField('node_name'), 'href' => $category->url()];
         }
 
         $this->BApp->set('current_page_type', 'product');

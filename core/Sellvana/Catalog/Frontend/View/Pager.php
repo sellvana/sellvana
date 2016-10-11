@@ -34,7 +34,7 @@ class Sellvana_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
         // optimize page number urls by making simple str_replace
         if (!empty($params['p']) && sizeof($params) === 1) {
             if (!$pageUrl) {
-                $pageUrl = $this->BUtil->setUrlQuery($curUrl, ['page' => '-PAGE-']);
+                $pageUrl = $this->BUtil->setUrlQuery($curUrl, ['p' => '-PAGE-']);
             }
             $url = str_replace('-PAGE-', $params['p'], $pageUrl);
             return $url;

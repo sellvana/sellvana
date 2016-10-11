@@ -116,6 +116,9 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
                         case 'removed':
                             $this->message('Cart item has been removed');
                             break;
+                        case 'warning':
+                            $this->message($item['message'], 'warning');
+                            break;
                         case 'error':
                             $this->message($item['message'], 'error');
                             break;

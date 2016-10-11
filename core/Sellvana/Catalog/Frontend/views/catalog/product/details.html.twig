@@ -39,7 +39,11 @@
                                     {% endif %}
                                 {% endif %}
                             {% else %}
-                                <li><img data-id="{{ media.id() }}" class="f-prod-img img-responsive" src="{{ media.thumbUrl(458) }}{#{ img.imageUrl(1) }#}" alt="" itemprop="image"/></li>
+                                <li>
+                                    <img data-big-url="{{ media.imageUrl(1) }}"
+                                         data-id="{{ media.id() }}" class="f-prod-img img-responsive"
+                                         src="{{ media.thumbUrl(458) }}{#{ img.imageUrl(1) }#}" alt="" itemprop="image"/>
+                                </li>
                             {% endif %}
                         {% endfor %}
                     {% else %}
@@ -181,7 +185,14 @@
             manualControls: '#product-rslides-pager'
         });
 
-        $('#product-rslides li:not(".product-video-item")').addClass('zoom').zoom();
+        $('#product-rslides').find('li:not(".product-video-item")').each(function() {
+            var bigUrl = $(this).find('img.f-prod-img').attr('data-big-url');
+            if (bigUrl) {
+                $(this).addClass('zoom').zoom({
+                    url: bigUrl
+                });
+            }
+        });
 
         // Fix external video size
         var $externalVideoNode = $('.external_link').children('iframe');

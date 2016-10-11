@@ -1801,6 +1801,9 @@ class BUtil extends BClass
                 $attr = $v;
                 $v = !empty($attr['text']) ? $this->_($attr['text']) : '';
                 unset($attr['text']);
+            } elseif (is_numeric($v)) {
+                $v = $v . ' ';
+                $attr = [];
             } else {
                 $v = $this->_($v);
                 $attr = [];

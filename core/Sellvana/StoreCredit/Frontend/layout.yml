@@ -8,6 +8,7 @@ customer_account_sidebar:
     - { include: base }
     - { include: customer_account_sidebar }
     - { hook: main, views: "storecredit/account" }
+    - { view: customer/account/sidebar, do: [[ setCurrentNavItem, storecredit ]] }
 
 /checkout-simple/step2:
     - { hook: "checkout-simple/payment-methods:after", views: "storecredit/payment-form" }

@@ -19,14 +19,16 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                 if (($asc = $this->navNode->ascendants())) {
                     foreach ($asc as $a) {
                         if (!$a->node_name) continue;
-                        $crumbs[] = [
+
+                        $langNodeName = $a->getLangField('node_name');
+                        $crumbs[]     = [
                             'href' => $a->url_href ? $this->BApp->baseUrl() . trim('/' . $a->url_href, '/') : null,
-                            'title' => $a->node_name,
-                            'label' => $a->node_name,
+                            'title' => $langNodeName,
+                            'label' => $langNodeName,
                         ];
                     }
                 }
-                $crumbs[] = ['label' => $this->navNode->node_name, 'active' => true];
+                $crumbs[] = ['label' => $this->navNode->getLangField('node_name'), 'active' => true];
             }
             if (!empty($crumbs)) {
                 foreach ($crumbs as $i => &$c) {

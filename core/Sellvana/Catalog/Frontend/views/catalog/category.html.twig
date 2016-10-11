@@ -3,14 +3,14 @@
 
     {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
-      <span class="f-page-title">{{ category.get('node_name') }}</span>
+      <span class="f-page-title">{{ category.getLangField('node_name') }}</span>
       <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Filters'|_ }}</a>
     </header>
     <div class="row f-mb-slideout-menu">
       <!-- Category -->
       <div class="f-col-main {{ category.get('show_sidebar') ? 'col-sm-9' : 'col-sm-12' }}">
         <header class="f-page-header hidden-xs">
-          <h1 class="f-page-title">{{ category.get('node_name') }}</h1>
+          <h1 class="f-page-title">{{ category.getLangField('node_name') }}</h1>
         </header>
         {% for part, label in parts %}
           {% if part == 'sub_cat' and category.get('show_sub_cat') %}

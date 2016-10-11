@@ -1,8 +1,6 @@
-{% set xhr = REQUEST.xhr() %}
 
-{% if not xhr %}
-    <a href="{{ APP.instance('FCom_Core_Main').lastNav() }}">&lt;&lt; {{ "Back to results" |_ }}</a>
-{% endif %}
+<a href="{{ APP.instance('FCom_Core_Main').lastNav() }}">&lt;&lt; {{ "Back to results" |_ }}</a>
+
 
 <header class="f-page-header">
     <h1 class="f-page-title">{{ 'Compare' |_ }} <span class="compare-num-products">{{ THIS.get('products') | length }}</span> {{ 'products' |_ }}</h1>
@@ -85,16 +83,9 @@
   </tr>
 </table>
 
-{% if not xhr %}
-    <script>
-        require(['fcom.frontend'], function() {
-            {#var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});#}
-        })
-    </script>
-{% else %}
-    <script>
-        require(['jquery', 'jquery.rateit'], function($) {
-            $('.rateit').rateit();
-        })
-    </script>
-{% endif %}
+
+<script>
+    require(['fcom.frontend'], function() {
+        {#var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});#}
+    })
+</script>

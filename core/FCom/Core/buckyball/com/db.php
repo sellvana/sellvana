@@ -1384,6 +1384,11 @@ class BORM extends ORMWrapper
         return $array;
     }
 
+    public function collection()
+    {
+        return new BCollection($this->find_many());
+    }
+
     /**
      * Check whether the given field (or object itself) has been changed since this
      * object was saved.
@@ -3560,12 +3565,13 @@ class BModel extends Model
 }
 
 /**
- * Collection of models
+ * Collection of models or other values
  *
  * Should be (almost) drop in replacement for current straight arrays implementation
  */
 class BCollection extends ArrayIterator
 {
+/*
     protected $_orm;
     protected $_modelClass = 'BModel';
 
@@ -3620,6 +3626,9 @@ class BCollection extends ArrayIterator
     {
         return BDb::many_as_array($this);
     }
+    */
+
+
 }
 
 class BModelException extends BException

@@ -1399,17 +1399,17 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getName()
     {
-        return $this->get('product_name');
+        return $this->getLangField('product_name');
     }
 
     public function getDescription()
     {
-        return $this->get('description');
+        return $this->getLangField('description');
     }
 
     public function getShortDescription()
     {
-        return $this->get('short_description');
+        return $this->getLangField('short_description');
     }
 
     public function __destruct()

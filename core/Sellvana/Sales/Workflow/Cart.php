@@ -275,11 +275,20 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 }
                 $product = $item->getProduct();
                 if ($totalQty > 0) {
-                    if ($item->get('qty') !== $totalQty) {
-                        $recalc = true;
+                    $message = '';
+                    $status = 'updated';
+                    $qtyCartMax = $this->BConfig->get('modules/Sellvana_Catalog/qty_cart_max');
+                    if (!empty($qtyCartMax) && $totalQty > $qtyCartMax) {
+                        $status = 'warning';
+                        $message = $this->BLocale->_("The quantity of each product in the shopping cart can not be greater than %s", $qtyCartMax);
+                    } else {
+                        if ($item->get('qty') !== $totalQty) {
+                            $recalc = true;
+                        }
+                        $item->set('qty', $totalQty);
                     }
-                    $item->set('qty', $totalQty)->setData('variants', $variants)->save();
-                    $items[] = ['id' => $id, 'status' => 'updated', 'name' => $product ? $product->get('product_name') : ''];
+                    $item->setData('variants', $variants)->save();
+                    $items[] = ['id' => $id, 'status' => $status, 'name' => $product ? $product->get('product_name') : '', 'message' => $message];
                 } elseif ($totalQty <= 0 || empty($variants)) {
                     $recalc = true;
                     $cart->removeItem($id);
