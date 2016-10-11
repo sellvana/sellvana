@@ -229,6 +229,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             } else {
                 $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $result = ['status' => 'error', 'message' => $this->getErrorMessages()];
+                $args['validate_failed'] = true;
             }
 
             $this->formPostAfter($args);

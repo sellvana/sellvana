@@ -137,6 +137,12 @@
 
 </script>
 
+<script>
+    var uploadTr = '{{ 'Upload'|_ }}';
+    var errorTr = '{{ 'Error'|_ }}';
+    var cancelTr = '{{ 'Cancel'|_ }}';
+</script>
+
 {% verbatim %}
 <script id="template-upload" type="text/x-tmpl">
     {% for (var i=0, file; file=o.files[i]; i++) { %}

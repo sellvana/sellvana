@@ -24,14 +24,14 @@
         <ul>
         {% if category %}
             {% if parent and parent.get('node_name') %}
-                <li style="padding-left: 10px;"><a href="{{ parent.url() ~ '?' ~ rawGet }}">&lt; {{ parent.get('node_name') }}</a></li>
+                <li style="padding-left: 10px;"><a href="{{ parent.url() ~ '?' ~ rawGet }}">&lt; {{ parent.getLangField('node_name') }}</a></li>
             {% endif %}
 
-            <li class="cat-level-0"><b>{{ category.get('node_name') }}</b></li>
+            <li class="cat-level-0"><b>{{ category.getLangField('node_name') }}</b></li>
 
             {% for c in children %}
                 <li class="cat-level-1">
-                    <a href="{{ c.url() ~ '?' ~ rawGet }}">{{ c.get('node_name') }}</a>
+                    <a href="{{ c.url() ~ '?' ~ rawGet }}">{{ c.getLangField('node_name') }}</a>
                 </li>
             {% endfor %}
 
@@ -39,7 +39,7 @@
         {% if siblings %}
             {% for c in siblings %}
                 <li class="cat-level-0">
-                    <a href="{{ c.url() ~ '?' ~ rawGet }}">{{ c.get('node_name') }}</a>
+                    <a href="{{ c.url() ~ '?' ~ rawGet }}">{{ c.getLangField('node_name') }}</a>
                 </li>
             {% endfor %}
         {% endif %}
