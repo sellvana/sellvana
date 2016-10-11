@@ -12,9 +12,10 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 {
     public function action_index()
     {
-        $posts = $this->Sellvana_Blog_Model_Post->getPostsOrm()->find_many();
+        //$posts = $this->Sellvana_Blog_Model_Post->getPostsOrm()->find_many();
+        $postsOrm = $this->Sellvana_Blog_Model_Post->getPostsOrm();
+        $this->_paginate($postsOrm);
         $this->layout('/blog/index');
-        $this->view('blog/posts')->set('posts', $posts);
         $this->view('head')->rss($this->BApp->href('blog/feed.rss'));
     }
 
@@ -30,11 +31,10 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
         $this->layout('/blog/tag');
         $this->view('head')->rss($tag->getUrl() . '/feed.rss');
-        $posts = $this->Sellvana_Blog_Model_Post->getPostsOrm()
+        $postsOrm = $this->Sellvana_Blog_Model_Post->getPostsOrm()
             ->join('Sellvana_Blog_Model_PostTag', ['pt.post_id', '=', 'p.id'], 'pt')
-            ->where('pt.tag_id', $tag->id)
-            ->find_many();
-        $this->view('blog/posts')->set('posts', $posts);
+            ->where('pt.tag_id', $tag->id);
+        $this->_paginate($postsOrm);
         $this->view('head')->addTitle($tagName);
     }
 
@@ -50,11 +50,10 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
         $this->layout('/blog/category');
         $this->view('head')->rss($cat->getUrl() . '/feed.rss');
-        $posts = $this->Sellvana_Blog_Model_Post->getPostsOrm()
+        $postsOrm = $this->Sellvana_Blog_Model_Post->getPostsOrm()
             ->join('Sellvana_Blog_Model_PostCategory', ['pc.post_id', '=', 'p.id'], 'pc')
-            ->where('pc.category_id', $cat->id)
-            ->find_many();
-        $this->view('blog/posts')->set('posts', $posts);
+            ->where('pc.category_id', $cat->id);
+        $this->_paginate($postsOrm);
         $this->view('head')->addTitle($cat->name);
     }
 
@@ -69,10 +68,9 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
         }
         $this->layout('/blog/author');
-        $posts = $this->Sellvana_Blog_Model_Post->getPostsOrm()
-            ->where('p.author_user_id', $user->id)
-            ->find_many();
-        $this->view('blog/posts')->set('posts', $posts);
+        $postsOrm = $this->Sellvana_Blog_Model_Post->getPostsOrm()
+            ->where('p.author_user_id', $user->id);
+        $this->_paginate($postsOrm);
         $this->view('head')->rss($this->BApp->href('blog') . '/author/' . $userName . '/feed.rss');
         $this->view('head')->addTitle($user->firstname . ' ' . $user->lastname);
     }
@@ -95,7 +93,7 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $postsOrm->where_like('create_ym', $y . '%');
             $this->view('head')->addTitle($y);
         }
-        $this->view('blog/posts')->set('posts', $postsOrm->find_many());
+        $this->_paginate($postsOrm);
     }
 
     public function action_post()
@@ -177,5 +175,20 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
         echo $this->BUtil->toRss($data);
         exit;
+    }
+
+    /**
+     * @param $postsOrm BORM
+     * @return mixed
+     */
+    protected function _paginate($postsOrm)
+    {
+        /** @var Sellvana_Catalog_Frontend_View_Pager $pagerView */
+        $productsData = $postsOrm->paginate($this->BRequest->request(), [
+            'ps' => 5,
+        ]);
+        $posts = $productsData['rows'];
+        $this->view('catalog/product/pager')->set('state', $productsData['state']);
+        $this->view('blog/posts')->set('posts', $posts);
     }
 }
