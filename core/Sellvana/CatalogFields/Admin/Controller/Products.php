@@ -168,7 +168,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];
                 $f['display'] = 'eval';
-                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $vf->get('field_code').'\' class=\"select-value-field required\" style=\"width: 170px\" /></p>"';
+                $f['print'] = '"<div style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $vf->get('field_code').'\' class=\"select-value-field required\" style=\"width: 170px\" /></div>"';
                 $f['default'] = '';
                 $columns[] = $f;
             }
@@ -180,7 +180,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => '', 'attrs' => ['readOnly' => 'readOnly']];
         $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
-            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
+            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"variant-image\" style=\"width: 100%\"><option value></option></select>"' ];
         $columns[] = ['name' => 'variant_file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
         $columns[] = ['name' => 'field_values',  'hidden' => true, 'default' => ''];
