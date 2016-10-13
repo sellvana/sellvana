@@ -1353,7 +1353,7 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-
+/*
 $curlConstants = get_defined_constants(true)['curl'];
 $curlOptInfo = [];
 foreach ($curlConstants as $name => $key) {
@@ -1364,7 +1364,7 @@ foreach ($curlConstants as $name => $key) {
     }
 }
 echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
-
+*/
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
