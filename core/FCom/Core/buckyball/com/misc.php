@@ -1237,13 +1237,19 @@ class BUtil extends BClass
                     if (is_string($v) && $v[0] === '@') {
                         $filename     = substr($v, 1);
                         $fileContents = file_get_contents($filename);
+                        #$fileContents = base64_encode($fileContents);
+                        $fileContentsType = mime_content_type($filename);
                         $postContent .= "--{$boundary}\r\n" .
+                             "Content-Type: {$fileContentsType}\r\n" .
+                             "MIME-Version: 1.0\r\n" .
                              "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
-                             "Content-Type: application/zip\r\n" .
+                             #"Content-Transfer-Encoding: base64\r\n" .
                              "\r\n" .
                              "{$fileContents}\r\n";
                     } else {
                         $postContent .= "--{$boundary}\r\n" .
+                             "Content-Type: text/plain; charset=\"utf-8\"\r\n" .
+                             "MIME-Version: 1.0\r\n" .
                              "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
                              "\r\n" .
                              "{$v}\r\n";
@@ -1347,7 +1353,7 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-/*
+
 $curlConstants = get_defined_constants(true)['curl'];
 $curlOptInfo = [];
 foreach ($curlConstants as $name => $key) {
@@ -1358,7 +1364,7 @@ foreach ($curlConstants as $name => $key) {
     }
 }
 echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
-*/
+
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
