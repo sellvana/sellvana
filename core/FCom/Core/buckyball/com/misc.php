@@ -1281,7 +1281,7 @@ class BUtil extends BClass
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_CAINFO => dirname(__DIR__) . '/ssl/cacert.pem',
+                CURLOPT_CAINFO => $this->normalizePath(dirname(__DIR__) . '/ssl/cacert.pem'),
                 CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
@@ -1306,11 +1306,17 @@ class BUtil extends BClass
                 $curlOpt += [
                     CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_POST => 1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
                 ];
             } elseif ($method === 'PUT') {
                 $curlOpt += [
                     CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_PUT => 1,
+                    CURLOPT_CUSTOMREQUEST => 'PUT',
+                ];
+            } elseif ($method === 'DELETE') {
+                $curlOpt += [
+                    CURLOPT_CUSTOMREQUEST => 'DELETE',
                 ];
             }
 
@@ -1341,7 +1347,18 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-#var_dump(__METHOD__, $rawResponse);
+/*
+$curlConstants = get_defined_constants(true)['curl'];
+$curlOptInfo = [];
+foreach ($curlConstants as $name => $key) {
+    if (!empty($curlOpt[$key])) {
+        if (preg_match('#^CURLOPT#', $name)) {
+            $curlOptInfo[$name] = $curlOpt[$key];
+        }
+    }
+}
+echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
+*/
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
@@ -1388,7 +1405,7 @@ class BUtil extends BClass
                 $oldErrorReporting = error_reporting(0);
             }
             $response = file_get_contents($url, false, stream_context_create($streamOptions));
-#var_dump($response, $url, $streamOptions, $http_response_header); exit(__METHOD__);
+#var_dump($response, $url, $streamOptions, $http_response_header); #exit(__METHOD__);
             if (empty($options['debug'])) {
                 error_reporting($oldErrorReporting);
             }
