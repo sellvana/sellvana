@@ -1237,13 +1237,19 @@ class BUtil extends BClass
                     if (is_string($v) && $v[0] === '@') {
                         $filename     = substr($v, 1);
                         $fileContents = file_get_contents($filename);
+                        #$fileContents = base64_encode($fileContents);
+                        $fileContentsType = mime_content_type($filename);
                         $postContent .= "--{$boundary}\r\n" .
+                             "Content-Type: {$fileContentsType}\r\n" .
+                             "MIME-Version: 1.0\r\n" .
                              "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
-                             "Content-Type: application/zip\r\n" .
+                             #"Content-Transfer-Encoding: base64\r\n" .
                              "\r\n" .
                              "{$fileContents}\r\n";
                     } else {
                         $postContent .= "--{$boundary}\r\n" .
+                             "Content-Type: text/plain; charset=\"utf-8\"\r\n" .
+                             "MIME-Version: 1.0\r\n" .
                              "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
                              "\r\n" .
                              "{$v}\r\n";

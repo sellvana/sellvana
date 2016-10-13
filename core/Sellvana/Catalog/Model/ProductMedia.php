@@ -35,6 +35,14 @@ class Sellvana_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
         return $this->BApp->src($path);
     }
 
+    public function getImageFilepath()
+    {
+        $root = $this->BConfig->get('fs/root_dir');
+        $subfolder = $this->get('subfolder');
+        $path = $this->get('folder') . '/' . ($subfolder ? $subfolder . '/' : '') . $this->get('file_name');
+        return $root . '/' . $path;
+    }
+
     public function imageUrl($full = false)
     {
         static $default;
@@ -125,5 +133,16 @@ class Sellvana_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
             $p->setProductImages($images);
         }
         return $this;
+    }
+
+    public function getProductImages($productId)
+    {
+        return $this->orm('pm')
+            ->select('pm.*')
+            ->join('FCom_Core_Model_MediaLibrary', ['ml.id', '=', 'pm.file_id'], 'ml')
+            ->select(['ml.folder', 'ml.subfolder', 'ml.file_name'])
+            ->where('product_id', $productId)
+            ->where('media_type', 'I')
+            ->find_many_assoc('id');
     }
 }
