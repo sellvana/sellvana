@@ -1,0 +1,20 @@
+{% set m = APP.instance('FCom_Admin_Model_User').sessionUser() %}
+{% set locales = LOCALE.getAvailableLocaleCodes() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<div class="row">
+    <div class="col-lg-6">
+        <fieldset class="f-fieldset-group">
+            <div class="form-group">
+                <label for="locale" class="col-md-3 control-label">{{ 'Locale'|_ }}</label>
+                <div class="col-md-7">
+                    <select id="locale" name="model[locale]" class="form-control  required valid" style="" data-rule-required="true">
+                    {% for locale in locales %}
+                        <option value="{{ locale }}"{% if locale == m.get('locale') %} selected{% endif %}>{{ locale }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

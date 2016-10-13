@@ -55,7 +55,14 @@
               </div>
           </div>
           {% endif %}
-        <div class="form-group">
+          {{ THIS.hook('customer-register-form') | raw }}
+
+          {% set recaptcha = APP.instance('FCom_LibRecaptcha_Main') %}
+          {% if CONFIG.get('modules/Sellvana_Customer/recaptcha_register') and recaptcha.isAvailable() %}
+              {{ recaptcha.html() | raw }}
+          {% endif %}
+
+          <div class="form-group">
           <input type="submit" class="btn btn-primary btn-lg" value="{{ "Register" | _ }}"/>
           <a href="{{ APP.href() }}login" class="btn btn-link">&laquo; {{ 'Back to login'|_ }}</a>
           <span class="help-block f-required-notice">* {{ "Indicates Required Fields" | _ }}</span>

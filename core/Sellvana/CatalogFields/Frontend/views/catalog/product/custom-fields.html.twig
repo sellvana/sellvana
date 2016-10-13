@@ -1,0 +1,21 @@
+{% set prod = THIS.get('product') %}
+{% set customFields = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(prod) %}
+
+{% if customFields %}
+    <div class="f-tab-heading">
+        <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
+    </div>
+    {% for cf in customFields %}
+        <div class="form-group row" style="overflow: hidden">
+            <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
+            {% for field in cf.fields %}
+                {% if field.frontend_show == 1 %}
+                <div class="col-md-12">
+                    <label class="control-label field-label">{{ field.field_name ~": " |_ }}</label> <span class="field-value">{{ field.value|_|raw }}</span>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <hr/>
+{% endif %}

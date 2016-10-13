@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Users
@@ -8,15 +8,15 @@
 
 class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected static $_origClass = __CLASS__;
-    protected $_permission = 'system/users';
-    protected $_modelClass = 'FCom_Admin_Model_User';
-    protected $_gridHref = 'users';
-    protected $_gridTitle = 'Admin Users';
-    protected $_recordName = 'User';
-    protected $_mainTableAlias = 'au';
-    protected $_navPath = 'system/users';
-    protected $_formTitleField = 'username';
+    protected static $_origClass      = __CLASS__;
+    protected        $_permission     = 'system/users';
+    protected        $_modelClass     = 'FCom_Admin_Model_User';
+    protected        $_gridHref       = 'users';
+    protected        $_gridTitle      = 'Admin Users';
+    protected        $_recordName     = 'User';
+    protected        $_mainTableAlias = 'au';
+    protected        $_navPath        = 'system/users';
+    protected        $_formTitleField = 'username';
 
     public function gridConfig()
     {
@@ -33,13 +33,27 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'email', 'label' => 'Email', 'width' => 150],
             ['name' => 'firstname', 'label' => 'First Name', 'width' => 150],
             ['name' => 'lastname', 'label' => 'Last Name', 'width' => 150],
-            ['type' => 'input', 'name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,
-                'editor' => 'select', 'options' => $this->FCom_Admin_Model_User->fieldOptions('is_superadmin')],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select',
-                'editable' => true, 'multirow_edit' => true,
-                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')],
-            ['name' => 'create_at', 'label' => 'Created', 'width' => 100],
-            ['name' => 'update_at', 'label' => 'Updated', 'width' => 100],
+            [
+                'type' => 'input',
+                'name' => 'is_superadmin',
+                'label' => 'SuperAdmin',
+                'width' => 100,
+                'editable' => true,
+                'editor' => 'select',
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('is_superadmin')
+            ],
+            [
+                'type' => 'input',
+                'name' => 'status',
+                'label' => 'Status',
+                'width' => 100,
+                'editor' => 'select',
+                'editable' => true,
+                'multirow_edit' => true,
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')
+            ],
+            ['name' => 'create_at', 'label' => 'Created', 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'width' => 100, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => ['caption' => 'status'],
@@ -108,9 +122,16 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 80, 'hidden' => true],
             ['name' => 'username', 'label' => 'Username', 'index' => 'au.username', 'width' => 200],
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 200],
-            ['name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true,
-                'multirow_edit' => true, 'editor' => 'select',
-                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
+            [
+                'name' => 'user_status',
+                'label' => 'Status',
+                'index' => 'au.status',
+                'width' => 200,
+                'editable' => true,
+                'multirow_edit' => true,
+                'editor' => 'select',
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')
+            ]
         ];
         $config['config']['actions'] = [
             #'add' => ['caption' => 'Add user'],
@@ -126,7 +147,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['config']['filters'] = [
             ['field' => 'username', 'type' => 'text'],
             ['field' => 'email', 'type' => 'text'],
-            ['field' => 'status', 'type' => 'multiselect']
+            ['field' => 'user_status', 'type' => 'multiselect']
         ];
         $config['config']['data_mode'] = 'local';
         $config['config']['grid_before_create'] = 'rolesGridRegister';
@@ -154,9 +175,17 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true],
             ['name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250],
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100,
-                'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
-                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
+            [
+                'type' => 'input',
+                'name' => 'status',
+                'label' => 'Status',
+                'index' => 'au.status',
+                'width' => 100,
+                'editable' => true,
+                'multirow_edit' => true,
+                'editor' => 'select',
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')
+            ]
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add selected users']
@@ -171,10 +200,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             $config['orm'] = $this->FCom_Admin_Model_User->orm()->where('is_superadmin', 0);
         }
         $config['grid_before_create'] = 'userGridRegister';
-        $config['events'] = ['add'];
+        $config['events']             = ['add'];
 
         //add params to get only normal users
-        $config['data_url'] = $gridDataUrl = $this->BApp->href($this->_gridHref . '/grid_data').'?is_superadmin=0';
+        $config['data_url'] = $this->BApp->href($this->_gridHref . '/grid_data') . '?is_superadmin=0';
 
         return ['config' => $config];
     }

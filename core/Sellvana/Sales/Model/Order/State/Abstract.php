@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract_State_Concrete
 {
@@ -14,13 +14,13 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
         $model = $context->getModel();
 
         if ($this->getValue()) {
-            $comment = $this->BLocale->_('%s state was changed from %s to %s', [
+            $comment = $this->_('%s state was changed from %s to %s', [
                 $context->getStateLabel($this->_type),
                 $this->getValueLabel(),
                 $newState->getValueLabel(),
             ]);
         } else {
-            $comment = $this->BLocale->_('%s state was set to %s', [
+            $comment = $this->_('%s state was set to %s', [
                 $context->getStateLabel($this->_type),
                 $newState->getValueLabel(),
             ]);
@@ -28,6 +28,15 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
         $model->addHistoryEvent('state:' . $this->_type, $comment);
 
         return $newState;
+    }
+
+    public function invokeStateChange($value)
+    {
+        if (empty($this->_defaultMethods[$value])) {
+            throw new BException($this->_('Invalid state value: %s', $value));
+        }
+        $method = $this->_defaultMethods[$value];
+        return $this->{$method}();
     }
 
     public function getItemStateStatistics($stateType)

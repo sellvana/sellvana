@@ -1,16 +1,16 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
- * Class Sellvana_PaymentStripe_Main
+ * Class Sellvana_ProductCompare_Admin
  *
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
-class Sellvana_PaymentStripe_Main extends BClass
+class Sellvana_ProductCompare_Admin extends BClass
 {
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_ProductCompare' => BLocale::i()->_('Product Compare Settings'),
+            'settings/Sellvana_ProductCompare' => 'Product Compare Settings',
         ]);
     }
 }

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Core_Controller_Abstract
@@ -18,10 +18,13 @@ class FCom_Core_Controller_Abstract extends BActionController
     public function onBeforeDispatch()
     {
         if ($this->BRequest->csrf() && false == $this->isApiCall()) {
-            $this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+            $this->message('Session token expired, please try again', 'warning');
+            $this->BResponse->redirect(true);
+            return false;
+            #$this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
         }
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $root->body_class = $this->BRequest->path(0, 1);
         }
         return parent::onBeforeDispatch();

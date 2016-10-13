@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Wishlist_Migrate
@@ -11,7 +11,7 @@
 
 class Sellvana_Wishlist_Migrate extends BClass
 {
-    public function install__0_1_3()
+    public function install__0_5_1_0()
     {
         $tWishlist = $this->Sellvana_Wishlist_Model_Wishlist->table();
         $tWishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->table();
@@ -23,6 +23,8 @@ class Sellvana_Wishlist_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'customer_id' => 'int unsigned default null',
                 'cookie_token' => 'varchar(40) default null',
+                'title' => "varchar(255) null",
+                'is_default' => 'tinyint not null default 1',
                 'remote_ip' => 'varchar(50) default null',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime default null',
@@ -104,6 +106,31 @@ class Sellvana_Wishlist_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'wishlist' => ['wishlist_id', $tWishlist],
                 'product' => ['product_id', $tProduct],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $tWishlist = $this->Sellvana_Wishlist_Model_Wishlist->table();
+        $this->BDb->ddlTableDef($tWishlist, [
+            BDb::COLUMNS => [
+                'title' => "varchar(255) null",
+                'is_default' => 'tinyint not null default 1',
+            ],
+            BDb::KEYS => [
+                'IDX_default' => '(customer_id, is_default)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tWishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->table();
+        $this->BDb->ddlTableDef($tWishlistItem, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime not null',
+                'comment' => 'text',
             ],
         ]);
     }

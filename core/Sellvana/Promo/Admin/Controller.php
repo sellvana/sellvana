@@ -1,12 +1,10 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Promo_Admin_Controller
  *
  * @property Sellvana_Promo_Model_Promo       $Sellvana_Promo_Model_Promo
  * @property Sellvana_Promo_Model_PromoMedia  $Sellvana_Promo_Model_PromoMedia
- * @property Sellvana_Promo_Model_Product     $Sellvana_Promo_Model_Product
- * @property Sellvana_Promo_Model_Group       $Sellvana_Promo_Model_Group
  * @property Sellvana_Catalog_Model_Category  $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_Product   $Sellvana_Catalog_Model_Product
  * @property FCom_Admin_View_Grid         $FCom_Admin_View_Grid
@@ -48,15 +46,15 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             ['name' => 'internal_notes', 'label' => 'Admin Notes', 'width' => 250, 'hidden' => 1],
             ['name' => 'customer_label', 'label' => 'Customer Label', 'width' => 250, 'hidden' => 1],
             ['name' => 'customer_details', 'label' => 'Customer Details', 'width' => 250, 'hidden' => 1],
-            ['name' => 'from_date', 'label' => 'Start Date', 'formatter' => 'date'],
-            ['name' => 'to_date', 'label' => 'End Date', 'formatter' => 'date'],
+            ['name' => 'from_date', 'label' => 'Start Date', 'formatter' => 'date', 'cell' => 'date'],
+            ['name' => 'to_date', 'label' => 'End Date', 'formatter' => 'date', 'cell' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
                 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $hlp->fieldOptions('status')
             ],
             ['name' => 'details', 'label' => 'Details', 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date'],
-            ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date'],
+            ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date', 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -99,7 +97,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             // todo initiate promo with status 'incomplete'
             $args['view']->numCodes = 0;
         } else {
-            $m->set('numCodes', $this->getPromoCouponCodesCount($m->id()));
+            $m->set('numCodes', $this->_getPromoCouponCodesCount($m->id()));
             if ($m->get('coupon_type') == 1) {
                 // load coupon code for view display
                 $coupon = $this->Sellvana_Promo_Model_PromoCoupon->load($m->id(), 'promo_id');
@@ -130,7 +128,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             }
         }
 
-        if (!empty($args['data']['customer_group_ids']) && is_array($args['data']['customer_group_ids'])) {
+        if (isset($args['data']['customer_group_ids']) && is_array($args['data']['customer_group_ids'])) {
             $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
         }
 
@@ -144,7 +142,13 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 $args['model']->set("__multi_codes", $couponCodes);
 
             }
+            $couponCodesRemoved = isset($serializedData['coupons_removed'])? $serializedData['coupons_removed']: null;
+            if (isset($args['data']['coupon_type']) && $args['data']['coupon_type'] == 2 && $couponCodesRemoved) {
+                $args['model']->set("__multi_codes_removed", $couponCodesRemoved);
+
+            }
             unset($serializedData['coupons']);
+            unset($serializedData['coupons_removed']);
             $args['data']['data_serialized'] = $this->BUtil->toJson($serializedData);
         }
 
@@ -160,8 +164,8 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        $this->processCoupons($args['model']);
-        $this->processFrontendDisplay($args['model']);
+        $this->_processCoupons($args['model']);
+        $this->_processFrontendDisplay($args['model']);
         #$this->processGroupsPost($args['model'], $_POST);
         #$this->processMediaPost($args['model'], $_POST);
     }
@@ -184,7 +188,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 return;
             }
         }
-        $view = $this->couponGridView();
+        $view = $this->_couponGridView();
         $grid = $view->get('grid');
         $mainTableAlias = 'pc';
 
@@ -228,13 +232,17 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     /**
      * @return FCom_Core_View_BackboneGrid
      */
-    protected function couponGridView()
+    protected function _couponGridView($promoId = null)
     {
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
-        $config = [
+        $orm         = $this->Sellvana_Promo_Model_PromoCoupon->orm('pc');
+        if(null !== $promoId){
+            $orm->where('promo_id', $promoId);
+        }
+        $config      = [
             'id' => $this->getCouponGridId(),
             'data_mode' => 'local',
-            'data' => $this->BDb->many_as_array($this->Sellvana_Promo_Model_PromoCoupon->orm('pc')->find_many()),
+            'data' => $this->BDb->many_as_array($orm->find_many()),
             /*'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,*/
             'grid_url' => null,
@@ -242,9 +250,9 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             'columns' => [
                 ['type' => 'row_select', 'width'=>40],
                 ['name' => 'id', 'label' => 'ID', 'hidden' => true],
-                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
-                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40],
                 ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
+                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40]
             ],
             'actions' => [
                 'delete' => true,
@@ -253,7 +261,10 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 ['field' => 'code', 'type' => 'text'],
                 ['field' => 'total_used', 'type' => 'number-range'],
             ],
-            'grid_after_built' => 'couponsGridRegister'
+            // 'grid_after_built' => 'couponsGridRegister',
+            'callbacks' => [
+                'componentDidMount' => 'couponsGridRegister'
+            ]
         ];
         $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
         return $view;
@@ -262,14 +273,14 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     public function action_coupons_grid()
     {
         $r = $this->BRequest;
-        //$id = $r->get('id');
+        $id = $r->get('id');
         //if(!$id){
         //    $html = $this->_("Promotion id not found");
         //    $status = 'error';
         //    $this->BResponse->status(400, $html, false);
         //} else {
             $status = "success";
-            $html = $this->couponGridView()->render();
+            $html = $this->_couponGridView($id)->render();
         //}
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
@@ -343,9 +354,9 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 $fileSize = 0;
                 if (strpos($realPath, $path) !== 0) {
                     $error = $this->_("Weird file path." . $realPath . '|' . $path);
-                } else if ($uploads['error'][$i]) {
+                } elseif ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
-                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
@@ -400,7 +411,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         return $this->Sellvana_Promo_Model_PromoCoupon->origClass() . '_grid';
     }
 
-    protected function getPromoCouponCodesCount($id)
+    protected function _getPromoCouponCodesCount($id)
     {
         $couponOrm = $this->Sellvana_Promo_Model_PromoCoupon->orm('pc');
         $couponOrm->where('promo_id', $id);
@@ -411,7 +422,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
      * @param Sellvana_Promo_Model_Promo $model
      * @return $this|bool
      */
-    protected function processCoupons($model)
+    protected function _processCoupons($model)
     {
         $this->_processSingleCoupon($model);
         $this->_processMultiCoupons($model);
@@ -421,7 +432,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
      * @param Sellvana_Promo_Model_Promo $model
      * @throws BException
      */
-    protected function processFrontendDisplay($model)
+    protected function _processFrontendDisplay($model)
     {
         $data = $this->BRequest->post('display');
         if(!$data) {
@@ -502,6 +513,11 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
      */
     protected function _processMultiCoupons($model)
     {
+        $couponRemovedIds = $model->get('__multi_codes_removed');
+        if ($couponRemovedIds) {
+            $this->Sellvana_Promo_Model_PromoCoupon->delete_many(['id' => $couponRemovedIds]);
+        }
+
         $couponData = $model->get('__multi_codes');
         if (!$couponData) {
             return null;
@@ -511,6 +527,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         foreach ($couponData as $cd) {
             $codes[] = $cd['code'];
         }
+
         try {
             $created = $this->Sellvana_Promo_Model_PromoCoupon->createCouponCodes($codes, $model->id());
             $this->message($this->_("Created %d coupon codes.", $created));
@@ -617,7 +634,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 'id' => 'promo_attachments',
                 'caption' => 'Promotion Attachments',
                 'datatype' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->select('a.id')->select('a.file_name')->find_many()),
+                'data' => $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTACH)->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => [
                     ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],

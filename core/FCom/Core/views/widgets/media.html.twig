@@ -1,0 +1,15 @@
+{% set config = THIS.get('config') %}
+{#{{ dump(config) }}#}
+
+{% if config.src %}
+    <div class='container' id='media-{{ config.id }}'>
+        <img src="{{ config.src }}" alt="{{ config.alt|default(config.src) }}"
+                {% if config.width %}
+                    width="{{ config.width }}"
+                {% endif %}
+                {% if config.height %}
+                    height="{{ config.height }}"
+                {% endif %}
+                />
+    </div>
+{% endif %}

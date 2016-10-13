@@ -1,0 +1,12 @@
+{% set balance = THIS.get('balance') %}
+<div class="row f-mb-slideout-menu">
+    <div class="col-sm-9 f-col-main">
+        <header class="f-page-header">
+            <h1 class="f-page-title">{{ "Store Credit" | _ }}</h1>
+            <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Menu'|_ }}</a>
+        </header>
+        {{ THIS.view('core/messages') | raw }}
+        <label>{{ 'Available Balance:'|_ }}</label> {{ balance.get('amount') | currency }}
+    </div>
+    {{ THIS.view('customer/account/sidebar') | raw }}
+</div>

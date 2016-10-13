@@ -1,15 +1,13 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_PaymentOgone_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
-    function __construct()
-    {
-        $this->_name = 'Ogone';
-    }
+    protected $_code = 'ogone';
+    protected $_name = 'Ogone';
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('ogone/form');
+        return $this->BLayout->getView('ogone/form');
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)

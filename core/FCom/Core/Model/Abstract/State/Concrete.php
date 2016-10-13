@@ -1,7 +1,9 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
 {
+    const EMPTY_VALUE = '';
+
     /**
      * @var FCom_Core_Model_Abstract_State_Context
      */
@@ -47,11 +49,29 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
      */
     protected $_unsetValueNotificationTemplates = [];
 
+    /**
+     * @var array
+     */
+    protected $_defaultMethods = [];
+
+    /**
+     * @var array
+     */
+    protected $_defaultValueWorkflow = [];
+
+    /**
+     * FCom_Core_Model_Abstract_State_Concrete constructor.
+     *
+     * @param null $context
+     * @param null $type
+     * @param null $value
+     * @param null $options
+     */
     public function __construct($context = null, $type = null, $value = null, $options = null)
     {
         $this->_context = $context;
-        $this->_type = $type;
-        $this->_value = $value;
+        $this->_type    = $type;
+        $this->_value   = $value;
         $this->_options = $options;
 
         $this->_initialize();
@@ -69,6 +89,7 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
      *
      * @param string $value
      * @param bool $updateModelField
+     *
      * @return static New state object
      * @throws BException
      * @todo Implement required and not required state contexts
@@ -78,7 +99,7 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         if ($value === $this->getValue()) {
             return $this;
         }
-        
+
         $valueLabels = $this->getAllValueLabels();
         if ($value && empty($valueLabels[$value])) {
             throw new BException("Invalid state value '" . $value . "' for type '" . $this->_type . "'");
@@ -102,69 +123,138 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         }
         if (!empty($pool[$value])) {
             foreach ((array)$pool[$value] as $emailViewName) {
-                $view = $this->BLayout->view($emailViewName);
+                $view = $this->BLayout->getView($emailViewName);
                 if (!$view instanceof BViewEmpty) {
                     $view->set(['context' => $this->_context, 'type' => $this->_type, 'options' => $this->_options])
                         ->email();
                 }
             }
         }
+
         return $this;
     }
 
+    /**
+     * @return FCom_Core_Model_Abstract_State_Context|null
+     */
     public function getContext()
     {
         return $this->_context;
     }
 
+    /**
+     * @return FCom_Core_Model_Abstract|null
+     */
     public function getModel()
     {
         return $this->_context->getModel();
     }
 
+    /**
+     * @return string
+     */
     public function getState()
     {
         return $this->_context->getState($this->_type);
     }
 
+    /**
+     * @return string
+     */
     public function getDefaultValue()
     {
         return $this->_defaultValue;
     }
 
+    /**
+     * @return $this
+     * @throws BException
+     */
     public function setDefaultState()
     {
         $this->changeState($this->getDefaultValue());
+
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getValue()
     {
         return $this->_value;
     }
 
+    /**
+     * @return null|string
+     */
     public function getType()
     {
         return $this->_type;
     }
 
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
     public function is($value)
     {
         return $this->_value === $value;
     }
 
+    /**
+     * @param null $value
+     *
+     * @return string|null
+     */
     public function getValueLabel($value = null)
     {
         if (null === $value) {
             $value = $this->getValue();
         }
         $valueLabels = $this->getAllValueLabels();
+
         return !empty($valueLabels[$value]) ? $valueLabels[$value] : null;
     }
 
+    /**
+     * @return array
+     */
     public function getAllValueLabels()
     {
         return $this->_valueLabels;
+    }
+
+    public function getNextValues()
+    {
+        $value = $this->getValue();
+        if (empty($this->_defaultValueWorkflow)) {
+            return null;
+        }
+        if (!$value) {
+            $value = self::EMPTY_VALUE;
+        }
+        if (!isset($this->_defaultValueWorkflow[$value])) {
+            return false;
+        }
+        return $this->_defaultValueWorkflow[$value];
+    }
+
+    public function getNextValueLabels()
+    {
+        $allLabels = $this->getAllValueLabels();
+        $nextValues = $this->getNextValues();
+        if ($nextValues === null || $nextValues === true) {
+            return $allLabels;
+        } elseif ($nextValues === false) {
+            return [];
+        }
+        $nextLabels = [];
+        foreach ($nextValues as $value) {
+            $nextLabels[$value] = $allLabels[$value];
+        }
+        return $nextLabels;
     }
 
     public function __destruct()

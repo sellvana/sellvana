@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Cart_Total_Abstract
@@ -71,7 +71,7 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
      */
     public function getLabel()
     {
-        return $this->BLocale->_($this->_label);
+        return (string)$this->_($this->_label);
     }
 
     /**
@@ -107,7 +107,7 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
      */
     public function getValueFormatted()
     {
-        return $this->BLocale->currency($this->getStoreCurrencyValue());
+        return $this->BLocale->currency($this->getStoreCurrencyValue(), $this->_currency);
     }
 
     /**

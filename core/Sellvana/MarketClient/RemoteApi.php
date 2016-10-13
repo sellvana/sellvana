@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_MarketClient_RemoteApi
@@ -57,6 +57,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             'role' => !empty($data['role']) ? $data['role'] : null,
         ]);
         $response = $this->BUtil->remoteHttp('GET', $url);
+#var_dump($url, $response, $this->BUtil->lastRemoteHttpInfo()); exit;
         $result = $this->BUtil->fromJson($response);
         if (!empty($result['site_key'])) {
             $this->BConfig->set('modules/Sellvana_MarketClient/site_key', $result['site_key'], false, true);
@@ -94,6 +95,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         $response = $this->BUtil->remoteHttp("GET", $url);
 #var_dump($url, $response, $this->BUtil->lastRemoteHttpInfo(), microtime(1)-$t); exit;
         $remoteModResult = $this->BUtil->fromJson($response);
+        if (!$remoteModResult) {
+            $this->BCache->save(static::$_modulesVersionsCacheKey, [], 60);
+            return [];
+        }
         if (!empty($remoteModResult['error'])) {
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
             throw new BException($remoteModResult['message']);
@@ -269,17 +274,27 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     public function fetchUpdatesFeed()
     {
         $cacheKey = 'marketclient_updates_last_fetch_at';
-        if ($this->BCache->load($cacheKey)) {
-            return;
-        }
-        $this->BCache->save($cacheKey, $this->BDb->now(), 3600);
+        $ttlDays = $this->BConfig->get('modules/Sellvana_MarketClient/auto_check_days', 1);
 
-        $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('v1/market/site/updates', [
-            'site_key' => $siteKey,
-        ]);
+        $lastCheckAt = $this->BCache->load($cacheKey);
+        if ($lastCheckAt && is_numeric($lastCheckAt) && $lastCheckAt > (time() - $ttlDays * 86400)) {
+            return [];
+        }
+
+        $args = [
+            'site_key' => $this->BConfig->get('modules/Sellvana_MarketClient/site_key'),
+        ];
+        if ($lastCheckAt) {
+            $args['last_check'] = $lastCheckAt;
+        }
+
+        $url = $this->getUrl('v1/market/site/updates', $args);
         $response = $this->BUtil->remoteHttp('GET', $url);
         $result = $response ? $this->BUtil->fromJson($response) : [];
+
+        $lastCheckAt = time();
+        $this->BCache->save($cacheKey, $lastCheckAt);
+
         return $result;
     }
 }

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Promo_Model_Promo
@@ -35,7 +35,7 @@
  * @property Sellvana_Catalog_Model_InventorySku    $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_Category        $Sellvana_Catalog_Model_Category
  * @property Sellvana_Promo_Main                    $Sellvana_Promo_Main
- * @property Sellvana_CustomField_Main              $Sellvana_CustomField_Main
+ * @property Sellvana_CatalogFields_Main              $Sellvana_CatalogFields_Main
  */
 class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
@@ -83,6 +83,18 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
             "always" => "Apply Always",
             "all" => "All Conditions Have to Match",
             "any" => "Any Condition Has to Match",
+        ],
+        'conditions_options'  => [
+            "sku"         => "Products",
+            "category"    => "Categories",
+            "combination" => "Attribute Combination",
+            "total"       => "Cart Total",
+            "shipping"    => "Shipping Destination",
+        ],
+        'actions_options' => [
+            "discount" => "Discount",
+            "shipping" => "Shipping",
+            "free_product" => "Free Products",
         ]
     ];
 
@@ -140,6 +152,9 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
         $this->setDate('from_date', $this->get("from_date"));
         $this->setDate('to_date', $this->get("to_date"));
+        $this->set('limit_per_customer', (int)$this->get('limit_per_customer'));
+        $this->set('limit_per_promo', (int)$this->get('limit_per_promo'));
+        $this->set('limit_per_coupon', (int)$this->get('limit_per_coupon'));
 
         return true;
     }
@@ -207,6 +222,17 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         if (!$promos) {
             return [];
         }
+
+        $now = $this->BDb->now();
+        foreach ($promos as $key => $promo) {
+            if (!(
+                ($this->BUtil->isEmptyDate($promo->get('from_date')) || $promo->get('from_date') < $now)
+                && ($this->BUtil->isEmptyDate($promo->get('to_date')) || $promo->get('to_date') > $now)
+            )) {
+                unset($promos[$key]);
+            }
+        }
+
         return $promos;
     }
 
@@ -238,8 +264,8 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         $result = [];
         if (!$conditionRules || !$matchType || $matchType === 'always') {
             //TODO: optimize applying to all products in catalog when a lot of products
-            if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-                $this->Sellvana_CustomField_Main->disable();
+            if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+                $this->Sellvana_CatalogFields_Main->disable();
             }
             $products = $this->Sellvana_Catalog_Model_Product->orm('p')
                 ->clear_columns()
@@ -247,8 +273,8 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
                 ->select("('promo')", 'price_type')
                 ->find_many_assoc('product_id');
 
-            if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-                $this->Sellvana_CustomField_Main->disable(false);
+            if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+                $this->Sellvana_CatalogFields_Main->disable(false);
             }
             $result['products'] = $this->BDb->many_as_array($products);
             return $result;
@@ -307,34 +333,36 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         $ppsToCreate = [];
         $actions = $promo->getData('actions/rules/discount');
         $action = $actions[0];
-        $sortOrder = $promo->get('priority_order');
-        $fromDate = $promo->get('from_date');
-        $toDate = $promo->get('to_date');
+        if ($action) {
+            $sortOrder = $promo->get('priority_order');
+            $fromDate = $promo->get('from_date');
+            $toDate = $promo->get('to_date');
 
-        foreach ($data['products'] as $pId => $r) {
-            $r['qty'] = $sortOrder;
-            $r['amount'] = $action['value'];
-            $r['operation'] = $action['type'];
-            $r['valid_from'] = $fromDate;
-            $r['valid_to'] = $toDate;
-            if (empty($existing[$pId])) {
-                $r['product_id'] = $pId;
-                $r['promo_id'] = $promoId;
-                unset($r['data']);
-                $r['data_serialized'] = !empty($r['data']) ? $this->BUtil->toJson($r['data']) : '';
-                $ppsToCreate[] = $r;
-            } else {
-                $existing[$pId]->set($r);
-                if (!empty($r['data'])) {
-                    $existing[$pId]->setData($r['data']);
+            foreach ($data['products'] as $pId => $r) {
+                $r['qty'] = $sortOrder;
+                $r['amount'] = $action['value'];
+                $r['operation'] = $action['type'];
+                $r['valid_from'] = $fromDate;
+                $r['valid_to'] = $toDate;
+                if (empty($existing[$pId])) {
+                    $r['product_id'] = $pId;
+                    $r['promo_id'] = $promoId;
+                    unset($r['data']);
+                    $r['data_serialized'] = !empty($r['data']) ? $this->BUtil->toJson($r['data']) : '';
+                    $ppsToCreate[] = $r;
+                } else {
+                    $existing[$pId]->set($r);
+                    if (!empty($r['data'])) {
+                        $existing[$pId]->setData($r['data']);
+                    }
+                    $existing[$pId]->save();
                 }
-                $existing[$pId]->save();
             }
-        }
-        if ($ppsToCreate) {
-            //echo "<pre>"; var_dump($ppsToCreate); exit;
-            $priceHlp->create_many($ppsToCreate); #$this
-            //TODO: run onAfterCreate?
+            if ($ppsToCreate) {
+                //echo "<pre>"; var_dump($ppsToCreate); exit;
+                $priceHlp->create_many($ppsToCreate); #$this
+                //TODO: run onAfterCreate?
+            }
         }
         return $this;
     }
@@ -391,6 +419,42 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         if ($ppIdsToDelete) {
             $this->delete_many(['id' => $ppIdsToDelete]);
         }
+    }
+
+    public function conditionsOptions()
+    {
+        $options = $this->fieldOptions('conditions_options');
+        $promoType= $this->get('promo_type');
+
+        if($promoType == 'catalog'){
+            if (isset($options['total'])) {
+                $options['total'] = ['text' => $options['total'], 'disabled' => true];
+            }
+
+            if (isset($options['shipping'])) {
+                $options['shipping'] = ['text' => $options['shipping'], 'disabled' => true];
+            }
+        }
+
+        return $options;
+    }
+
+    public function actionOptions()
+    {
+        $options = $this->fieldOptions('actions_options');
+        $promoType= $this->get('promo_type');
+
+        if($promoType == 'catalog'){
+            // if promo type is catalog disable free_product and shipping action
+            if (isset($options['free_product'])) {
+                $options['free_product'] = ['text' => $options['free_product'], 'disabled' => true];
+            }
+            if (isset($options['shipping'])) {
+                $options['shipping'] = ['text' => $options['shipping'], 'disabled' => true];
+            }
+        }
+
+        return $options;
     }
 
     protected function _calcPromoProductsBySku(array $condition, array $context, array &$result)

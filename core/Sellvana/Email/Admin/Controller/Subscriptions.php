@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Email_Admin_Controller_Subscriptions
@@ -29,7 +29,7 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
                   'addable' => true, 'editable' => true, 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
                   'editable' => true, 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at'],
+            ['name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at', 'cell' => 'datetime'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
@@ -49,10 +49,12 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => [
-            'new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">'
-                . $this->BLocale->_('New Email Subscription') . '</button>'
-        ]]);
+
+        /** @var FCom_Admin_View_Grid $view */
+        $view = $args['page_view'];
+        $actions = (array)$view->get('actions');
+        unset($actions['new']);
+        $view->set('actions', $actions);
     }
 
     public function action_unique__POST()

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class FCom_Frontend_Main extends BClass
 {
@@ -7,7 +7,7 @@ class FCom_Frontend_Main extends BClass
     public function getLayout()
     {
         if (empty($this->_layout)) {
-#echo "<pre>"; print_r($this->BLayout->view('root')); echo "</pre>";
+#echo "<pre>"; print_r($this->BLayout->getView('root')); echo "</pre>";
             //TODO: permanent solution to Twig namespaces conflict between Frontend and Admin areas
             $this->BEvents->off('BLayout::addAllViewsDir', 'FCom_LibTwig_Main.onLayoutAddAllViews');
             $this->_layout = $this->BLayout->i(true);
@@ -29,7 +29,7 @@ class FCom_Frontend_Main extends BClass
             }
             $this->_layout->collectAllViewsFiles('FCom_Frontend');
         }
-#echo "<pre>"; print_r($this->BLayout->view('root')->param()); exit;
+#echo "<pre>"; print_r($this->BLayout->getView('root')->param()); exit;
         return $this->_layout;
     }
 
@@ -49,6 +49,11 @@ class FCom_Frontend_Main extends BClass
     public function href($url = '')
     {
         return $this->BApp->frontendHref($url);
+    }
+
+    public function onFetchLibrary($args)
+    {
+
     }
 }
 

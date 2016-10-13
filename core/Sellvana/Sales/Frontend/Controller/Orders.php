@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Frontend_Controller_Order
@@ -6,6 +6,9 @@
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
+ * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
+ * @property Sellvana_Sales_Model_Order_Return $Sellvana_Sales_Model_Order_Return
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller_Abstract
 {
@@ -69,7 +72,7 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         }
 
         $currentStatus = $this->BRequest->get('status');
-        if (!$currentStatus) {
+        if (!$currentStatus || !isset($counts[$currentStatus])) {
             $currentStatus = 'all';
         }
         $orm = $this->Sellvana_Sales_Model_Order->orm()->where('customer_id', $customerId)->order_by_desc('id');
@@ -117,6 +120,7 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
     {
         $order = $this->getOrder();
         if (!$order) {
+            $this->forward(false);
             return;
         }
 
@@ -135,6 +139,7 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
     {
         $order = $this->getOrder();
         if (!$order) {
+            $this->forward(false);
             return;
         }
 
@@ -143,4 +148,68 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         $this->BResponse->redirect('checkout');
     }
 
+    public function action_cancel()
+    {
+        $order = $this->getOrder();
+        if (!$order) {
+            $this->forward(false);
+            return;
+        }
+        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('orders')];
+        $crumbs[] = ['label' => 'Cancel Items', 'active' => true];
+        $this->layout('/orders/cancel');
+        $this->view('breadcrumbs')->crumbs = $crumbs;
+        $this->view('orders/cancel')->order = $order;
+    }
+
+    public function action_cancel__POST()
+    {
+        $order = $this->getOrder();
+        $cancel = $this->BRequest->post('cancel');
+        try {
+            $result = $this->Sellvana_Sales_Main->workflowAction('customerRequestsToCancelItems', [
+                'order' => $order,
+                'qtys' => $cancel,
+            ]);
+            if ($result['errors'])
+            $this->message('Items canceled successfully');
+            $this->BResponse->redirect('orders');
+        } catch (Exception $e) {
+            $this->message($e->getMessage(), 'error');
+            $this->BResponse->redirect(true);
+        }
+    }
+
+    public function action_return()
+    {
+        $order = $this->getOrder();
+        if (!$order) {
+            $this->forward(false);
+            return;
+        }
+        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('orders')];
+        $crumbs[] = ['label' => 'Return Items', 'active' => true];
+        $this->layout('/orders/return');
+        $this->view('breadcrumbs')->crumbs = $crumbs;
+        $this->view('orders/return')->order = $order;
+    }
+
+    public function action_return__POST()
+    {
+        $order = $this->getOrder();
+        $return = $this->BRequest->post('return');
+        try {
+            $this->Sellvana_Sales_Main->workflowAction('customerRequestsToReturnItems', [
+                'order' => $order,
+                'qtys' => $return,
+            ]);
+            $this->message('RMA has been requested successfully');
+            $this->BResponse->redirect('orders');
+        } catch (Exception $e) {
+            $this->message($e->getMessage(), 'error');
+            $this->BResponse->redirect(true);
+        }
+    }
 }

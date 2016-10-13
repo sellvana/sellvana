@@ -1,7 +1,7 @@
 modules:
     FCom_Core:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         before_bootstrap: { callback: "FCom_Core_Main::onBeforeBootstrap" }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
@@ -35,8 +35,36 @@ modules:
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Core_LayoutEditor.onFetchLibrary" ]
+            - [ "BORM::find_one:after", FCom_Core_Main.onFindOneAfter ]
+            - [ "BORM::find_many:after", FCom_Core_Main.onFindManyAfter ]
+            - [ "FCom_Core_ImportExport::import:afterModel:FCom_Core_Model_ExternalConfig", "FCom_Core_Main.onConfigAfterCoreImport" ]
+
+        areas:
+            FCom_Shell:
+                custom:
+                    actions:
+                        - FCom_Core_Shell_Cache
+                        - FCom_Core_Shell_Config
+                        - FCom_Core_Shell_DataIo
+                        - FCom_Core_Shell_Help
+                        - FCom_Core_Shell_Migrate
+                        - FCom_Core_Shell_Module
+                observe:
+                    - [ "FCom_Core_ImportExport::beforeImport", "FCom_Core_Shell_DataIo.onBeforeImport" ]
+                    - [ "FCom_Core_ImportExport::import:beforeModel", "FCom_Core_Shell_DataIo.onBeforeModel" ]
+                    - [ "FCom_Core_ImportExport::_importBatch:afterBatch", "FCom_Core_Shell_DataIo.onAfterBatch" ]
+
+            FCom_Install:
+                custom:
+                    actions:
+                        - FCom_Shell_Action_Help
 
         default_config:
+            core:
+                cache:
+                    memcache:
+                        host: localhost
+                        port: 11211
             db:
                 dbname: sellvana
                 username: root
@@ -47,8 +75,11 @@ modules:
                 headers:
                     X-UA-Compatible: IE=edge
                     X-Frame-Options: SAMEORIGIN
+                    X-XSS-Protection: 1
+                    X-Content-Type-Options: nosniff
             cookie:
                 session_check_ip: 1
+                use_strict_mode: 1
 
             modules:
                 FCom_Core:
@@ -66,5 +97,5 @@ modules:
                     base_currency: USD
                     default_currency: USD
                     import_export:
-                        batch_size: 10
-                        delete_after_import: 1
+                        batch_size: 1000
+                        delete_after_import: 0

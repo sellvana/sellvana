@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 abstract class FCom_Core_Model_Abstract_State_Custom extends FCom_Core_Model_Abstract
 {
@@ -43,12 +43,12 @@ abstract class FCom_Core_Model_Abstract_State_Custom extends FCom_Core_Model_Abs
 
     public function sendNotification($onUnset = false, $value = null)
     {
-        $pool = $unUnset ? $this->_unsetValueNotificationTemplates : $this->_setValueNotificationTemplates;
+        $pool = $onUnset ? $this->_unsetValueNotificationTemplates : $this->_setValueNotificationTemplates;
         if (null === $value) {
             $value = $this->_value;
         }
         if (!empty($pool[$value])) {
-            $this->BLayout->view($pool[$value])
+            $this->BLayout->getView($pool[$value])
                 ->set(['context' => $this->_context, 'type' => $this->_type, 'options' => $this->_options])
                 ->email();
         }

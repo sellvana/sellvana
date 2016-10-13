@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Frontend_View_Sidebar
@@ -9,6 +9,11 @@ class Sellvana_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
      * @var array
      */
     protected $_navItems = [];
+
+    /**
+     * @var string
+     */
+    protected $_currentNavItem;
 
     /**
      * @param $itemKey
@@ -46,5 +51,21 @@ class Sellvana_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
     public function getNavItems()
     {
         return $this->get('items');
+    }
+
+    /**
+     * @param string $itemKey
+     * @return $this
+     */
+    public function setCurrentNavItem($itemKey)
+    {
+        #var_dump($itemKey);
+        $this->_currentNavItem = $itemKey;
+        return $this;
+    }
+
+    public function getCurrentNavItem()
+    {
+        return $this->_currentNavItem;
     }
 }

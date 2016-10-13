@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Migrate
@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_5_1()
+    public function install__0_6_9_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -83,11 +83,13 @@ class Sellvana_Sales_Migrate extends BClass
                 'discount_amount' => "decimal(12,2) NOT NULL default 0",
                 'discount_percent' => 'decimal(5,2) not null default 0',
                 'grand_total' => "decimal(12,2) NOT NULL default 0",
+                'amount_paid' => "decimal(12,2) NOT NULL default 0",
+                'amount_due' => "decimal(12,2) NOT NULL default 0",
                 'cookie_token' => 'varchar(40) default null',
                 'customer_id' => "int unsigned default NULL",
                 'customer_email' => "varchar(100) NULL",
                 'shipping_method' => "VARCHAR(50)  NULL ",
-                'shipping_service' => "CHAR(2)  NULL",
+                'shipping_service' => 'varchar(50)',
                 'shipping_price' => "DECIMAL(10, 2) NULL ",
                 'shipping_discount' => 'decimal(12,2) not null default 0',
                 'shipping_free' => 'tinyint not null default 0',
@@ -161,11 +163,6 @@ class Sellvana_Sales_Migrate extends BClass
                 'row_discount' => "decimal(12,2) NOT NULL default 0",
                 'row_discount_percent' => 'decimal(5,2) not null default 0',
                 'auto_added' => 'tinyint not null default 0',
-
-                'promo_id_buy' => "VARCHAR(50) default NULL",
-                'promo_id_get' => "INT(10) UNSIGNED default NULL",
-                'promo_qty_used' => "decimal(12,2) DEFAULT NULL",
-                'promo_amt_used' => "decimal(12,2) DEFAULT NULL",
 
                 'parent_item_id' => 'int unsigned default null',
                 'shipping_size' => 'varchar(30)',
@@ -299,11 +296,18 @@ class Sellvana_Sales_Migrate extends BClass
 
                 'qty_ordered' => 'int not null',
                 'qty_backordered' => 'int not null default 0',
+
                 'qty_canceled' => 'int not null default 0',
                 'qty_shipped' => 'int not null default 0',
                 'qty_returned' => 'int not null default 0',
-                'qty_paid' => 'int not null default 0',
-                'qty_refunded' => 'int not null default 0',
+                'amount_paid' => 'decimal(12,2) not null default 0',
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+
+                'qty_in_cancels' => 'int not null default 0',
+                'qty_in_shipments' => 'int not null default 0',
+                'qty_in_returns' => 'int not null default 0',
+                'amount_in_payments' => 'decimal(12,2) not null default 0',
+                'amount_in_refunds' => 'decimal(12,2) not null default 0',
 
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
@@ -327,9 +331,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(20) not null default 'new'",
+                'state_carrier' => "varchar(20) not null default ''",
                 'state_custom' => "varchar(20) default null",
                 'carrier_code' => 'varchar(20)',
-                'service_code' => 'varchar(20)',
+                'service_code' => 'varchar(50)',
                 'carrier_desc' => 'varchar(50)',
                 'service_desc' => 'varchar(50)',
                 'carrier_price' => 'decimal(12,2)',
@@ -348,6 +353,7 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'IDX_state_overall' => '(state_overall)',
+                'IDX_state_carrier' => '(state_carrier)',
                 'IDX_state_custom' => '(state_custom)',
             ],
             BDb::CONSTRAINTS => [
@@ -361,6 +367,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_id' => 'int unsigned not null',
                 'shipment_id' => 'int unsigned not null',
                 'tracking_number' => 'varchar(50) default null',
+                'state_overall' => "varchar(20) not null default ''",
                 'carrier_status' => 'varchar(10) default null',
                 'data_serialized' => 'text',
             ],
@@ -396,7 +403,7 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderPayment, [
             BDb::COLUMNS => [
                 'id'               => 'int (10) unsigned not null auto_increment',
-                'order_id'         => 'int unsigned not null',
+                'order_id'         => 'int unsigned null',
                 'create_at'        => 'datetime not null',
                 'update_at'        => 'datetime null',
                 'payment_method'   => 'varchar(50) not null',
@@ -412,7 +419,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'transaction_type' => 'varchar(50)',
                 'transaction_fee'  => 'decimal(12,2)',
                 'online'           => 'BOOL',
+                'token'            => 'varchar(20) default null',
+                'token_at'         => 'datetime default null',
                 'state_overall'    => "varchar(20) not null default 'new'",
+                'state_processor'  => "varchar(20) not null default ''",
                 'state_custom'     => "varchar(20) default null",
             ],
             BDb::PRIMARY => '(id)',
@@ -426,7 +436,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'IDX_transaction_token' => '(transaction_token)',
             ],
             BDb::CONSTRAINTS => [
-                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
@@ -434,9 +444,10 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
-                'order_item_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned default null',
                 'payment_id' => 'int unsigned not null',
-                'qty' => 'int unsigned not null',
+                'amount' => 'decimal(12,2) not null default 0',
+                'amount_refunded' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -483,6 +494,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'rma_at' => 'datetime',
+                'received_at' => 'datetime',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -520,6 +535,9 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'refunded_at' => 'datetime',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -536,15 +554,17 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
-                'order_item_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned default null',
+                'payment_item_id' => 'int unsigned default null',
                 'refund_id' => 'int unsigned not null',
-                'qty' => 'int unsigned not null',
+                'amount' => 'decimal(12,2) not null default 0',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
+                'payment_item' => ['payment_item_id', $tOrderPaymentItem],
                 'refund' => ['refund_id', $tOrderRefund],
             ],
         ]);
@@ -556,6 +576,9 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'canceled_at' => 'datetime',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -792,11 +815,6 @@ class Sellvana_Sales_Migrate extends BClass
                 'price' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
                 'rowtotal' => "decimal(12,2) NULL",
 
-                'promo_id_buy' => "VARCHAR(50) NOT NULL",
-                'promo_id_get' => "INT(10) UNSIGNED NOT NULL",
-                'promo_qty_used' => "decimal(12,2) DEFAULT NULL",
-                'promo_amt_used' => "decimal(12,2) DEFAULT NULL",
-
                 'create_dt' => "DATETIME NOT NULL",
                 'update_dt' => "DATETIME NOT NULL",
             ],
@@ -1022,7 +1040,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             BDb::CONSTRAINTS => [
-                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
     }
@@ -1075,10 +1093,6 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($this->Sellvana_Sales_Model_Cart->table(), [
             BDb::COLUMNS => [
                 'coupon_code' => 'varchar(50) DEFAULT NULL',
-                'promo_id_buy' => 'VARCHAR(50) DEFAULT NULL',
-                'promo_id_get' => 'INT(10) UNSIGNED DEFAULT NULL',
-                'promo_qty_used' => 'decimal(12,2) DEFAULT NULL',
-                'promo_amt_used' => 'decimal(12,2) DEFAULT NULL',
             ],
         ]);
     }
@@ -2072,7 +2086,7 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_0_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1_0()
     {
         $tOrder = $this->Sellvana_Sales_Model_Order->table();
 
@@ -2088,13 +2102,272 @@ class Sellvana_Sales_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_service' => "varchar(50)  NULL",
+                'amount_paid' => "decimal(12,2) NOT NULL default 0",
+                'amount_due' => "decimal(12,2) NOT NULL default 0",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_2_0__0_5_3_0()
+    {
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'service_code' => "varchar(50)"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_5_3_0__0_5_4_0()
+    {
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'service_code' => "varchar(50)"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tOrderCancel = $this->Sellvana_Sales_Model_Order_Cancel->table();
+        $tOrderReturn = $this->Sellvana_Sales_Model_Order_Return->table();
+        $tOrderRefund = $this->Sellvana_Sales_Model_Order_Refund->table();
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'canceled_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturn, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'rma_at' => 'datetime',
+                'received_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'refunded_at' => 'datetime',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tCartItem = $this->Sellvana_Sales_Model_Cart_Item->table();
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::COLUMNS => [
+                'promo_id_buy' => "DROP",
+                'promo_id_get' => "DROP",
+                'promo_qty_used' => "DROP",
+                'promo_amt_used' => "DROP",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_2_0__0_6_3_0()
+    {
+        $this->upgrade__0_6_1_0__0_6_2_0();
+
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_service' => 'varchar(50)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_3_0__0_6_4_0()
+    {
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'order_id' => 'int unsigned null',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_4_0__0_6_5_0()
+    {
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'service_code' => "varchar(50)"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_6_5_0__0_6_6_0()
+    {
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentPackage = $this->Sellvana_Sales_Model_Order_Shipment_Package->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'state_carrier' => "varchar(20) not null default ''"
+            ],
+            BDb::KEYS => [
+                'IDX_state_carrier' => '(state_carrier)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipmentPackage, [
+            BDb::COLUMNS => [
+                'state_overall' => "varchar(20) not null default ''"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_6_6_0__0_6_7_0()
+    {
+        $hlpOrderItem = $this->Sellvana_Sales_Model_Order_Item;
+        $tOrderItem = $hlpOrderItem->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                /*
+                'qty_shipped' => 'RENAME qty_in_shipments int not null default 0',
+                'qty_canceled' => 'RENAME qty_in_cancels int not null default 0',
+                'qty_returned' => 'RENAME qty_in_returns int not null default 0',
+                'qty_paid' => 'RENAME qty_in_payments int not null default 0',
+                'qty_refunded' => 'RENAME qty_in_refunds int not null default 0',
+                 */
+                'qty_in_cancels' => 'int not null default 0',
+                'qty_in_shipments' => 'int not null default 0',
+                'qty_in_returns' => 'int not null default 0',
+                'qty_in_payments' => 'int not null default 0',
+                'qty_in_refunds' => 'int not null default 0',
+            ],
+        ]);
+
+        $hlpOrderItem->run_sql("UPDATE {$tOrderItem} SET qty_in_cancels=qty_canceled, qty_in_shipments=qty_shipped, 
+                                qty_in_returns=qty_returned, qty_in_payments=qty_paid, qty_in_refunds=qty_refunded");
+    }
+
+    public function upgrade__0_6_7_0__0_6_8_0()
+    {
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'state_processor' => "varchar(20) not null default 'pending'"
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_8_0__0_6_9_0()
+    {
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tOrderPaymentItem = $this->Sellvana_Sales_Model_Order_Payment_Item->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'amount_paid' => 'decimal(12,2) not null default 0',
+                'amount_in_payments' => 'decimal(12,2) not null default 0',
+                'qty_in_payments' => BDb::DROP,
+                'qty_paid' => BDb::DROP,
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'order_item_id' => 'int unsigned default null',
+                'amount' => 'decimal(12,2) not null default 0',
+                'qty' => BDb::DROP,
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_9_0__0_6_10_0()
+    {
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'token' => 'varchar(20) default null',
+                'token_at' => 'datetime default null',
+            ],
+        ]);
+    }
+
+
+    public function upgrade__0_6_10_0__0_6_11_0()
+    {
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tOrderRefundItem = $this->Sellvana_Sales_Model_Order_Refund_Item->table();
+        $tOrderPaymentItem = $this->Sellvana_Sales_Model_Order_Payment_Item->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+                'amount_in_refunds' => 'decimal(12,2) not null default 0',
+                'qty_in_refunds' => BDb::DROP,
+                'qty_refunded' => BDb::DROP,
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderRefundItem, [
+            BDb::COLUMNS => [
+                'order_item_id' => 'int unsigned default null',
+                'amount' => 'decimal(12,2) not null default 0',
+                'qty' => BDb::DROP,
+                'payment_item_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment_item' => ['payment_item_id', $tOrderPaymentItem],
+            ],
+        ]);
+        $tOrderPaymentTransaction = $this->Sellvana_Sales_Model_Order_Payment_Transaction->table();
+        $this->BDb->ddlTableDef($tOrderPaymentTransaction, [
+            BDb::COLUMNS => [
+                'amount_refunded' => 'decimal(12,2) not null default 0',
+                'amount_in_refunds' => 'decimal(12,2) not null default 0',
+                'qty_in_refunds' => BDb::DROP,
+                'qty_refunded' => BDb::DROP,
+            ],
+        ]);
+    }
 }
 
+/**
+ * Class Sellvana_Sales_Migrate_Model_Cart_Address
+ *
+ * This class is a stub to allow deletion of old table
+ */
 class Sellvana_Sales_Migrate_Model_Cart_Address extends BModel
 {
     protected static $_table = 'fcom_sales_cart_address';
 }
 
+/**
+ * Class Sellvana_Sales_Migrate_Model_Cart_Address
+ *
+ * This class is a stub to allow deletion of old table
+ */
 class Sellvana_Sales_Migrate_Model_Order_Address extends BModel
 {
     protected static $_table = 'fcom_sales_order_address';

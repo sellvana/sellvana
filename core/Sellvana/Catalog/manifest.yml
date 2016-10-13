@@ -1,18 +1,34 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.2.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
+        before: [ Sellvana_MultiSite ]
         categories: [ Catalog, Products ]
         translations: { en: en.php }
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
         observe:
-            - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Category", "Sellvana_Catalog_Model_Category.onImportAfterModel" ]
+            - [ "FCom_Core_ImportExport::_importBatch:afterBatch:Sellvana_Catalog_Model_Category", "Sellvana_Catalog_Model_Category.onImportAfterBatch" ]
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:
             modules/Sellvana_Catalog/allowed_locales: [ en_US ]
+            modules:
+                Sellvana_Catalog:
+                    weight_unit: lb
+                    length_unit: in
+                    enable_rollover: true
+                    rollover_effect: fade
+                    latest_new_limit: 25
+                    products_without_images_limit: 25
+                    searches_recent_terms_limit: 25
+                    searches_recent_top_limit: 25
+                    default_origin_country: US
+                FCom_Frontend:
+                    nav_top:
+                        type: root_selected
+                        root_category: 1
 
         areas:
             FCom_Admin:
@@ -23,12 +39,22 @@ modules:
                     - [ /catalog/products, Sellvana_Catalog_Admin_Controller_Products.index ]
                     - [ /catalog/products/.action, Sellvana_Catalog_Admin_Controller_Products ]
 
+                    - [ /catalog/products/quick-add/?.action, Sellvana_Catalog_Admin_Controller_ProductsAdd ]
+
                     - [ /catalog/products/import/.action, Sellvana_Catalog_Admin_Controller_ProductsImport ]
 
                     - [ /catalog/searchalias, Sellvana_Catalog_Admin_Controller_SearchAlias.index ]
                     - [ /catalog/searchalias/.action, Sellvana_Catalog_Admin_Controller_SearchAlias ]
 
                     - [ "/catalog/inventory/?.action", Sellvana_Catalog_Admin_Controller_Inventory ]
+
+                    - [ /catalog/report/inventory/search_terms/?.action, Sellvana_Catalog_Admin_Controller_Report_SearchTerms ]
+                    - [ /catalog/report/inventory/product_orders_history/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory ]
+                    - [ /catalog/report/inventory/low_inventory/?.action, Sellvana_Catalog_Admin_Controller_Report_LowInventory ]
+
+                    - [ /catalog/report/integrity/product_images/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductImages ]
+                    - [ /catalog/report/integrity/product_categories/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductCategories ]
+                    - [ /catalog/report/integrity/category_products/?.action, Sellvana_Catalog_Admin_Controller_Report_CategoryProducts ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, Sellvana_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, Sellvana_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
@@ -50,8 +76,12 @@ modules:
                         folder: media/product/images
                     product-attachments:
                         permission: catalog/product/attachements
-                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
+                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt,zip
                         folder: media/product/attachment
+                    product-videos:
+                        permission: catalog/product/videos
+                        filetype: mp4,ogg,webm
+                        folder: media/product/videos
                     category-images:
                         permission: catalog/category/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp

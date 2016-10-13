@@ -1,12 +1,28 @@
+<style type="text/css" media="screen">
+    .oembed_container {
+        padding: 20px 0;
+        text-align: center;
+        display: none;
+    }
+
+    .mejs-container {
+        margin: 0 auto;
+    }
+</style>
 {% set config = THIS.get('config') %}
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
 {% set uploadConfig = mediaLib.uploadConfig(config.type) %}
+{% if config.can_embed_video %}
+    {% set uploadConfig = uploadConfig | merge({ can_embed_video: config.can_embed_video }) %}
+{% endif %}
 {% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': uploadConfig.folder, 'config': config.config, 'mode': config.mode}) %}
+{% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
 
 {# need to processe config by class FCom_Core_View_BackboneGrid #}
 {% set mediaLibAttachConfigProcessed = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
 
 <div id="{{ config.id }}-media-modal-container"></div>
+<div id="{{ config.id }}-media-container"></div>
 
 <script type="text/javascript">
     /**
@@ -40,48 +56,78 @@
         return null;
     }
 
-    require(['underscore', 'react', 'griddle.fcomMediaLib'], function(_, React, FComMediaLib) {
+    require(['underscore', 'react', 'griddle.fcomMediaLib'], function (_, React, FComMediaLib) {
         var mediaGridId = '{{ config.id }}';
         var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigProcessed) | raw }};
         var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
         var modalConfig = getMediaModalConfig(mediaGridId);
+        var mainConfig = {{ UTIL.toJSON(config) | raw }};
+        var containerEle;
 
-        var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
-        mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);
+        if (typeof mainConfig.showModal !== 'undefined' && mainConfig.showModal === false) {
+            containerEle = document.getElementById(mediaGridId + '-media-container');
+        } else {
+            containerEle = document.getElementById(mediaGridId + '-media-modal-container');
+        }
+
+        mediaLibComponent{{ config.id }} = React.render(
+                React.createElement(
+                        FComMediaLib, {
+                            mediaConfig: mediaConfig,
+                            uploadConfig: uploadConfig,
+                            modalConfig: modalConfig,
+                            showModal: mainConfig.showModal
+                        }), containerEle);
         mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
 
         //re-scan image button
-        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-images').on('click', function() {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
-                if (response.status == 'success') {
-                    $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
-                    mediaLibGrid{{ config.id }}.refresh();
-                } else {
-                    $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                }
-            });
+        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-media').on('click', function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw }}&&type={{ config.type }}',
+                    {do: 'rescan'}, function (response) {
+                        if (response.status == 'success') {
+                            $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
+                            mediaLibGrid{{ config.id }}.refresh();
+                        } else {
+                            $.bootstrapGrowl("Error:<br>" + response.message, {
+                                type: 'danger',
+                                align: 'center',
+                                width: 'auto',
+                                delay: 5000
+                            });
+                        }
+                    });
         });
+
+        $(mediaLibComponent{{ config.id }}.getDOMNode())
+            .on('removedRows.griddle', function (e, rows) {
+                // Removed videos on main video tab grid
+            })
+            .on('addedRows.griddle', function (e, rows) {
+                // Added videos on main video tab grid
+                mediaLibGrid{{ config.id }}.addSelectedRows(rows);
+            });
     });
 
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
-        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
-        $('#{{config.id}}-media-upload').fileupload({
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element', 'jquery.vimeo'], function () {
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{ config.type ? config.type : "" }}';
+        var maxFileSize = parseInt({{ defaultFileSizeConfig }}) * 1024000;
+        var mediaGrid = mediaLibGrid{{ config.id }};
+
+        $('#{{ config.id }}-media-upload').fileupload({
             url: uploadUrl,
-            multiple: true
+            multiple: true,
+            maxFileSize: maxFileSize
             {% if config.mode and config.mode == 'thumbnail' %}
             , acceptFileTypes: /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
             {% elseif uploadConfig.filetype_regex %}
             , acceptFileTypes: {{ uploadConfig.filetype_regex }}
             {% endif %}
-        }).bind('fileuploadalways', function(e, data) {
-            //console.log('DEBUG: fileuploadalways.data', data);
-
-            var mediaGrid = mediaLibGrid{{ config.id }};
-
+        }).bind('fileuploadalways', function (e, data) {
+            // console.log('DEBUG: fileuploadalways.data', data);
             if (mediaGrid) {
                 //push data to media grid after upload
                 if ($.isArray(data.result.files)) {
-                    var rows = [], selectedRows =[];
+                    var rows = [], selectedRows = [];
                     data.result.files.forEach(function (obj) {
                         {% if config.multiSelAllowed %}
                         selectedRows.push(obj);
@@ -89,8 +135,8 @@
 
                         rows.push(obj);
 
-                        $('td.name span').each(function(i) {
-                            if($(this).html() === obj.file_name) {
+                        $('td.name span').each(function (i) {
+                            if ($(this).html() === obj.file_name) {
                                 $(this).parents('tr:first').remove();
                             }
                         });
@@ -101,6 +147,177 @@
                     }
                     mediaGrid.addRows(rows);
                 }
+            }
+        });
+
+        $(document).on('click', '.btn-preview', function (event) {
+            event.preventDefault();
+            var $container = $('.video-tab-container');
+            var $oembedContainer = $('.oembed_container');
+            var provider = $('input[name="provider"]:checked').val();
+
+            var url = $('#oembed_url').val();
+            if (url === '') {
+                $.bootstrapGrowl("{{ 'Error: Please enter video link.' | _ }}", {
+                    type: 'danger',
+                    align: 'center',
+                    width: 'auto',
+                    delay: 5000
+                });
+                return;
+            }
+
+            switch (provider) {
+                case 'youtube':
+                    // Default: https://www.youtube.com/watch?v=xxxxxxxxxxx
+                    // Short: https://youtu.be/xxxxxxxxxxx
+                    // Very short: http://y2u.be/xxxxxxxxxxx
+                    var match = url.match(new RegExp('^(https?://)?(www\.)?(youtube\.com|youtu\.be|y2u\.be)/?(watch\?v=[^&]+|[^&]+)', 'i'));
+                    if (!match) {
+                        $.bootstrapGrowl("{{ 'Error: Youtube link is invalid.' | _ }}", {
+                            type: 'danger',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 5000
+                        });
+                        return;
+                    }
+
+                    if (match && match[3] === 'y2u.be') {
+                        url = url.replace('y2u', 'youtu');
+                    }
+
+                    $oembedContainer.html('<video width="640" height="360" id="media-player" controls="controls" preload="true"><source src="' + url + '" type="video/youtube" /></video>').show();
+                    new MediaElementPlayer('video#media-player', {
+                        success: function (mediaElement, domObject) {
+                            playerPreview.load();
+                        }
+                    });
+                    break;
+                case 'vimeo':
+                    // Default: https://vimeo.com/.../.../xxxxxxxxx
+                    // Shorten: https://vimeo.com/xxxxxxxxx
+                    if (!url.match(new RegExp('^(https?://)?(www\.)?(vimeo\.com)/?([^&]+)', 'i'))) {
+                        $.bootstrapGrowl("{{ 'Error: Vimeo link is invalid.' | _ }}", {
+                            type: 'danger',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 5000
+                        });
+                        return;
+                    }
+
+                    if (!url.match(/https?:\/\/player\.vimeo\.com\/video\/\d{9}\?api=\d{1}&player_id=vimeo_player/)) {
+                        var id = url.slice(url.lastIndexOf('/') + 1);
+                        url = 'https://player.vimeo.com/video/' + id + '?api=1&player_id=vimeo_player';
+                    }
+
+                    $oembedContainer.empty().html('<iframe src="' + url + '" height="360" width="640" frameBorder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>').show();
+                    break;
+                default:
+                    $.post("{{ APP.href('/catalog/products/embed_video') }}", {url: url}, function (r) {
+                        if (r.error) {
+                            $.bootstrapGrowl("{{ 'Error: This video type has not been supported.' | _ }}", {
+                                type: 'danger',
+                                align: 'center',
+                                width: 'auto',
+                                delay: 5000
+                            });
+                            return;
+                        }
+
+                        $oembedContainer.empty().html(r).show();
+                    });
+                    break;
+            }
+        });
+
+        $(document).on('click', '.btn-embed', function (event) {
+            event.preventDefault();
+            var $container = $('.video-tab-container');
+            var $oembedContainer = $('.oembed_container');
+            var provider = $('input[name="provider"]:checked').val();
+
+            var url = $('.oembed_url').val();
+            if (!url) {
+                $.bootstrapGrowl("{{ 'Error: Please enter video link.' | _ }}", {
+                    type: 'danger',
+                    align: 'center',
+                    width: 'auto',
+                    delay: 5000
+                });
+                return;
+            }
+
+            switch (provider) {
+                case 'youtube':
+                    var match = url.match(new RegExp('^(https?://)?(www\.)?(youtube\.com|youtu\.be|y2u\.be)/?(watch\?v=[^&]+|[^&]+)', 'i'));
+
+                    if (!match) {
+                        $.bootstrapGrowl("{{ 'Error: Youtube link is invalid.' | _ }}", {
+                            type: 'danger',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 5000
+                        });
+                        return;
+                    }
+
+                    if (match && match[3] === 'y2u.be') {
+                        url = url.replace('y2u', 'youtu');
+                    }
+                    break;
+                case 'vimeo':
+                    if (!url.match(new RegExp('^(https?://)?(www\.)?(vimeo\.com)/?([^&]+)', 'i'))) {
+                        $.bootstrapGrowl("{{ 'Error: Vimeo link is invalid.' | _ }}", {
+                            type: 'danger',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 5000
+                        });
+                        return;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            var hash = {
+                oper: 'add',
+                url: url
+            };
+
+            $.post("{{ APP.href('/catalog/products/embed_video') }}", hash, function (r) {
+                if (!r.error) {
+                    $.bootstrapGrowl("{{ 'Success: Add library success.' | _ }}", {
+                        type: 'success',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 5000
+                    });
+                    mediaGrid.addRows([r]);
+                } else {
+                    $.bootstrapGrowl("{{ 'Error: Add library failure, please check your link.' | _ }}", {
+                        type: 'danger',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 5000
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-video-player', function (event) {
+            event.preventDefault();
+            var $td = $(this).parent().html($(this).data('html'));
+            var $video = $td.children('video.product-video-media');
+            if ($video.length) {
+                new MediaElementPlayer('video#' + $video.prop('id'), {
+                    pauseOtherPlayers: true,
+                    success: function (mediaElement, domObject) {
+                        mediaElement.load();
+                    }
+                });
             }
         });
     });

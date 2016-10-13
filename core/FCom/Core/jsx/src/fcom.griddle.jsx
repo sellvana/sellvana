@@ -6,22 +6,26 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
     /**
      * FCom Griddle Componnent
      */
-    var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
+    var FComGriddleComponent = React.createClass({
+        displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
                 "config": {},
                 "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable',
                 "callbacks": {}
-            }
+            };
         },
         componentWillMount: function () {
             this.initColumn();
+        },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return !_.isEqual(this.props.config, nextProps.config);
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
-            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden == true }), 'name');
+            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden === true; }), 'name');
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
@@ -42,7 +46,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             }
         },
         render: function () {
-            console.log('config', this.props.config);
+            console.log('griddle.config-' + this.props.config.id, this.props.config);
             var config = this.props.config;
 
             //prepare props base on data mode
@@ -328,11 +332,25 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         modalSaveMassChanges: function(modal) {
             //todo: combine this with FComGridBody::modalSaveChange()
             var that = this;
+            var gridId = this.props.getConfig('id');
             var url = this.props.getConfig('edit_url');
             var ids = _.pluck(this.props.getSelectedRows(), 'id');
             var hash = { oper: 'mass-edit', id: ids.join(',') };
             var isLocalMode = !this.props.hasExternalResults();
+            var formType = this.getMassEditFormType();
             var form = $(modal.getDOMNode()).find('form');
+
+            if (formType !== 'form'){
+                form = $(modal.getDOMNode()).find('#' + gridId + '-modal-mass-form');
+
+                var attrs = { };
+
+                $.each(form[0].attributes, function(idx, attr) {
+                    attrs[attr.nodeName] = attr.nodeValue;
+                });
+
+                form = $("<form/>", attrs).append(form.contents());
+            }
 
             form.find('textarea, input, select').each(function() {
                 var key = $(this).attr('id');
@@ -371,6 +389,17 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 //error
                 console.log('form validate fail');
                 return false;
+            }
+        },
+        getMassEditFormType: function(){
+            var massEditType = this.props.getConfig('mass_edit_type');
+            switch (massEditType){
+                case 'div':
+                    return 'div';
+                    break;
+                default:
+                    return 'form';
+                    break;
             }
         },
         doMassAction: function(event) { //top mass action
@@ -413,8 +442,15 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges}>
-                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} />
+                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" 
+                                          cancel="Close" 
+                                          onConfirm={this.modalSaveMassChanges} 
+                                          isLocalMode={isLocalMode} 
+                                          formType={this.getMassEditFormType()}>
+                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} 
+                                                   id={gridId} 
+                                                   isLocalMode={isLocalMode} 
+                                                   formType={this.getMassEditFormType()} />
                         </Components.Modal>,
                         modalEleContainer
                     );
@@ -504,11 +540,14 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         handleClick: function(event) {
             var that = this;
             var gridId = that.props.getConfig('id');
-            if ($(event.target).hasClass('_modal')) {
+            if ($(event.currentTarget).hasClass('_modal')) {
                 var modalEleContainer = document.getElementById(gridId + '-modal');
                 React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                 React.render(
-                    <Components.Modal show={true} title="Create Form" confirm="Save changes" cancel="Close" onConfirm={that.props.saveModalForm}>
+                    <Components.Modal show={true} title="Create Form" 
+                                      confirm="Save changes" 
+                                      cancel="Close" 
+                                      onConfirm={that.props.saveModalForm}>
                         <FComModalForm columnMetadata={that.props.columnMetadata} id={gridId} />
                     </Components.Modal>,
                     modalEleContainer
@@ -527,7 +566,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var gridId = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={gridId + '-quick-search'} onChange={this.quickSearch} />;
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" 
+                                     placeholder="Search within results" 
+                                     id={gridId + '-quick-search'} 
+                                     onChange={this.quickSearch} />;
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -538,30 +580,35 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var actionKey = gridId + '-fcom-settings-action-' + name;
                     var actionProps = {
                         key: gridId + '-fcom-settings-action-' + name,
-                        class: action.class
+                        className: action.class + ' ' + (action.addClass ? action.addClass : '')
                     };
                     switch (name) {
                         case 'refresh':
-                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
+                            node = <a href="#" {...actionProps}>{action.caption}</a>;
                             break;
                         case 'export':
-                            node = <button className={action.class} data-action='export' onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
+                            node = <button {...actionProps} data-action='export'
+                                                            onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         case 'link_to_page':
-                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
+                            node = <a href="#" {...actionProps}>{action.caption}</a>;
                             break;
                         case 'edit':
-                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button" key={actionKey}>{action.caption}</a>;
+                            actionProps.disabled = disabledClass;
+                            node = <button type="button" {...actionProps} data-action="mass-edit"
+                                           onClick={that.doMassAction} role="button">{action.caption}</button>;
                             break;
                         case 'delete':
-                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
+                            actionProps.disabled = disabledClass;
+                            node = <button type="button" {...actionProps} data-action="mass-delete"
+                                           onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         //todo: checking again new and add type
                         case 'add':
-                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
+                            node = <button {...actionProps} type="button">{action.caption}</button>;
                             break;
                         case 'new':
-                            node = <button className={action.class} onClick={that.handleClick} type="button" key={actionKey}>{action.caption}</button>;
+                            node = <button {...actionProps} onClick={that.handleClick} type="button">{action.caption}</button>;
                             break;
                         default:
                             if (action.type) {
@@ -569,12 +616,17 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                                     case 'button':
                                     default:
                                         //compatibility with old backbone grid
-                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} key={actionKey} id={action.id}
-                                            type="button" onClick={that.handleCustom.bind(null, action.callback)}>{action.caption}</button>;
+                                        
+                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} 
+                                                       key={actionKey} id={action.id} 
+                                                       type="button" 
+                                                       onClick={that.handleCustom.bind(null, action.callback)}>
+                                                    {action.caption}
+                                                </button>;
                                         break;
                                 }
                             } else if (action.html) {
-                                node = <span key={actionKey} dangerouslySetInnerHTML={{__html: action.html}}></span>;
+                                node = <span key={actionKey} dangerouslySetInnerHTML={{__html: action.html}} />;
                             }
 
                             break;
@@ -592,8 +644,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
 
-                if(colInfo.hidden){
-                    return null;
+                //not render options item element in case no LABEL
+                if (typeof colInfo == 'undefined' || colInfo.label == '') {
+                    return false;
                 }
 
                 return (
@@ -601,7 +654,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>
-                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                <input type="checkbox" defaultChecked={checked} data-id={column} 
+                                       data-name={column} 
+                                       className="showhide_column" 
+                                       onChange={that.toggleColumn} />
                                 {colInfo ?  colInfo.label : column}
                             </label>
                         </div>
@@ -701,27 +757,30 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var gridId = this.props.id;
             var oneField = this.state.oneField;
 
+            var formType = this.props.formType;
+
             var fieldDropdownDiv = null;
 
             if (!oneField) {
                 var fieldDropDownNodes = this.state.fields.map(function(column) {
                     if (!_.contains(that.state.shownFields, column.name)) {
-                        return React.createElement("option", {value: column.name}, column.label);
+                        return <option value={column.name}>{column.label}</option>;
                     }
                     return null;
                 });
-                fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
+                fieldDropDownNodes.unshift(<option value="" />);
 
                 fieldDropdownDiv = (
-                    React.createElement("div", { className: "well" },
-                        React.createElement("div", { className: "row" },
-                            React.createElement("div", { className: "col-sm-12" },
-                                React.createElement("select", { className: "select2 form-control", id: gridId + '-form-select', style: { width: '150px' } },
-                                    fieldDropDownNodes
-                                )
-                            )
-                        )
-                    )
+                    <div className="well">
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <select id={gridId + '-form-select'} style={{ width: '150px' }}
+                                        className="select2 form-control">
+                                    {fieldDropDownNodes}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 );
             }
 
@@ -733,7 +792,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             return (
                 React.createElement("div", null,
                     fieldDropdownDiv,
-                    React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'},
+                    React.createElement(formType, {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'},
                         formElements
                     )
                 )

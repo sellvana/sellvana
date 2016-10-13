@@ -1,8 +1,17 @@
 modules:
     FCom_AdminChat:
-        version: 0.5.0.0
-        channel: alpha
-        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.2 } }
+        version: 0.6.0.0
+        channel: beta
+        custom:
+            status:
+                dev: 70
+                todo:
+                    - multi user chat
+                    - attach chat session to customer / order / etc
+                    - send files
+                    - search / export history
+
+        require: { module: { FCom_Core: 0.5.0.0, FCom_PushServer: 0.5.0.0 } }
 
         areas:
             FCom_Admin:
@@ -13,9 +22,3 @@ modules:
 
             FCom_PushServer:
                 auto_use: [ bootstrap ]
-
-        #todo:
-            # multi user chat
-            # attach chat session to customer / order / etc
-            # send files
-            # search / export history

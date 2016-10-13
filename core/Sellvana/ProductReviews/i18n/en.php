@@ -22,8 +22,14 @@
 'on' => '',
 'Edit this review' => '',
 'Read all %s customer reviews' => '',
-'We will check and approve your review in 24 hours.' => '',
+'We will check and approve your review promptly.' => '',
 'No reviews. Become first person review this products.' => '',
 'Review the Product' => '',
 'Customer Reviews' => '',
-'Write your own review' => ''];
+'Write your own review' => '',
+'%stars$s star(s)' => [
+    '#' => 'stars',
+    '*' => '%stars$s stars',
+    '1' => '1 star',
+]
+];

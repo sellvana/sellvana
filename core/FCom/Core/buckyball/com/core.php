@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Copyright 2014 Boris Gurvich
@@ -75,6 +75,7 @@
  * @property BDebug $BDebug
  * @property BLoginThrottle $BLoginThrottle
  * @property BYAML $BYAML
+ * @property Toml $Toml
  * @property BValidate $BValidate
  * @property BValidateViewHelper $BValidateViewHelper
  * @property Bcrypt $Bcrypt
@@ -187,7 +188,7 @@ class BClass
 
     public function getGlobalDependencyInstance($name, $diConfig)
     {
-        if (!ctype_upper($name[0])) {
+        if ($name[0] < 'A' || $name[0] > 'Z') {
             return false;
         }
         if (isset(static::$_diGlobal[$name])) {
@@ -210,6 +211,23 @@ class BClass
             static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
         }
         return static::$_diGlobal[$class];
+    }
+
+    /**
+     * @param $string
+     * @param array|string $params
+     * @param null $module
+     * @return false|string
+     * @throws BException
+     */
+    public function _($string, $params = [], $module = null)
+    {
+        /** @var BLocale $locale */
+        static $locale;
+        if (!$locale) {
+            $locale = $this->BLocale;
+        }
+        return $locale->translate($string, $params, $module);
     }
 }
 
@@ -259,7 +277,7 @@ class BApp extends BClass
                 break;
 
             default:
-                BDebug::error($this->BLocale->_('Unknown feature: %s', $feature));
+                BDebug::error($this->_('Unknown feature: %s', $feature));
         }
         static::$_compat[$feature] = $compat;
         return $compat;
@@ -366,7 +384,7 @@ class BApp extends BClass
      */
     public function t($string, $args = [])
     {
-        return $this->BLocale->_($string, $args);
+        return $this->_($string, $args);
     }
 
     /**
@@ -646,6 +664,12 @@ class BConfig extends BClass
         return $this;
     }
 
+    public function addDefault(array $config)
+    {
+        $this->_config = $this->BUtil->arrayMerge($config, $this->_config);
+        return $this;
+    }
+
     /**
      * Add configuration from file
      *
@@ -656,7 +680,7 @@ class BConfig extends BClass
         if (preg_match('#^@([^/]+)(.*)#', $filename, $m)) {
             $module = $this->BModuleRegistry->module($m[1]);
             if (!$module) {
-                BDebug::error($this->BLocale->_('Invalid module name: %s', $m[1]));
+                BDebug::error($this->_('Invalid module name: %s', $m[1]));
             }
             $filename = $module->root_dir . $m[2];
         }
@@ -670,7 +694,7 @@ class BConfig extends BClass
             $filename = $configDir . '/' . $filename;
         }
         if (!is_readable($filename)) {
-            BDebug::error($this->BLocale->_('Invalid configuration file name: %s', $filename));
+            BDebug::error($this->_('Invalid configuration file name: %s', $filename));
         }
 
         switch ($ext) {
@@ -685,12 +709,16 @@ class BConfig extends BClass
                 $config = $this->BYAML->load($filename);
                 break;
 
+            case 'toml':
+                $config = $this->Toml->parse(file_get_contents($filename));
+                break;
+
             case 'json':
                 $config = $this->BUtil->fromJson(file_get_contents($filename));
                 break;
         }
         if (!is_array($config)) {
-            BDebug::error($this->BLocale->_('Invalid configuration contents: %s', $filename));
+            BDebug::error($this->_('Invalid configuration contents: %s', $filename));
         }
         $this->add($config, $toSave);
         return $this;
@@ -723,10 +751,13 @@ class BConfig extends BClass
         } else {
             $node =& $this->_config;
         }
-        if ($this->shouldBeEncrypted($path)) {
-
-        }
+        #if ($this->shouldBeEncrypted($path)) {
+        //TODO: need encrypted values in config?
+        #}
         foreach (explode('/', $path) as $key) {
+            if (!is_array($node)) {
+                $node = [];
+            }
             $node =& $node[$key];
         }
         if ($merge) {
@@ -814,7 +845,7 @@ class BConfig extends BClass
     {
         //TODO: make more flexible, to account for other (custom) file names
         if (null === $files) {
-            $files = ['core', 'db', 'local'];
+            $files = ['core', 'db', 'local', 'codecept'];
         }
         if (is_string($files)) {
             $files = explode(',', strtolower($files));
@@ -847,6 +878,39 @@ class BConfig extends BClass
                 'db,install_status,module_run_levels,recovery,mode_by_ip,cache,core',
                 true);
             $this->writeFile('local.php', $local);
+        }
+        if (in_array('codecept', $files)) {
+            $codecept = [
+                'codecept_sites' => [
+                    'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/codeception.yml'
+                ],
+                'codecept_executable' => FULLERON_ROOT_DIR . '/codecept.phar',
+                'codecept_executable_url' => 'http://codeception.com/codecept.phar',
+                'php_executable' => '',
+                'codecept_tests' => [
+                    'acceptance' => false,
+                    'functional' => false,
+                    'unit' => true
+                ],
+                'codecept_ignore' => [
+                    'WebGuy.php',
+                    'TestGuy.php',
+                    'CodeGuy.php',
+                    '_bootstrap.php',
+                    '.DS_Store'
+                ],
+                'codecept_bootstrap' => [
+                    FULLERON_ROOT_DIR . '/core/FCom/Test/bootstrap.php',
+                    FULLERON_ROOT_DIR . '/core/FCom/Test/Core/Db.php'
+                ],
+                'codecept_test_db' => [
+                    'host' => '127.0.0.1',
+                    'dbname' => 'dbname',
+                    'username' => 'user',
+                    'password' => 'pass'
+                ]
+            ];
+            $this->writeFile('codecept.php', $codecept);
         }
         return $this;
     }
@@ -1131,10 +1195,10 @@ class BClassRegistry extends BClass
     public function augmentProperty($class, $property, $op, $type, $callback)
     {
         if ($op !== 'set' && $op !== 'get') {
-            BDebug::error($this->BLocale->_('Invalid property augmentation operator: %s', $op));
+            BDebug::error($this->_('Invalid property augmentation operator: %s', $op));
         }
         if ($type !== 'override' && $type !== 'before' && $type !== 'after') {
-            BDebug::error($this->BLocale->_('Invalid property augmentation type: %s', $type));
+            BDebug::error($this->_('Invalid property augmentation type: %s', $type));
         }
         $entry = [
             'module_name' => $this->BModuleRegistry->currentModuleName(),
@@ -1703,10 +1767,12 @@ class BEvents extends BClass
      */
     protected $_events = [];
 
+    protected $_regexObservers = [];
+
     /**
      * Shortcut to help with IDE autocompletion
      *
-     * @param bool  $new
+     * @param bool $new
      * @param array $args
      * @return BEvents
      */
@@ -1732,7 +1798,7 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $eventName = strtolower($eventName);
+        $eventName                 = strtolower($eventName);
         $this->_events[$eventName] = [
             'observers' => [],
             'args' => $args,
@@ -1743,15 +1809,14 @@ class BEvents extends BClass
     /**
      * Declare observers in bootstrap function
      *
-     * observe|watch|on|sub|subscribe ?
-     *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed        $callback
+     *          if starts with ^ will be processed as regular expression
+     * @param mixed $callback
      * @param array|object $args
-     * @param null         $alias
+     * @param array $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
      * @return BEvents
      */
-    public function on($eventName, $callback = null, $args = [], $alias = null)
+    public function on($eventName, $callback = null, $args = [], $params = null)
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1759,17 +1824,63 @@ class BEvents extends BClass
             }
             return $this;
         }
-        if (null === $alias && is_string($callback)) {
-            $alias = $callback;
+        if (is_string($params)) {
+            $params = ['alias' => $params];
         }
-        $observer = ['callback' => $callback, 'args' => $args, 'alias' => $alias];
+        if (strpos($eventName, '^') === 0 || !empty($params['regex'])) {
+            return $this->onRegex($eventName, $callback, $args, $params);
+        }
+        if (empty($params['alias']) && is_string($callback)) {
+            $params['alias'] = $callback;
+        }
+        $observer = ['callback' => $callback, 'args' => $args, 'alias' => $params['alias']];
         if (($moduleName = $this->BModuleRegistry->currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
         //TODO: create named observers
         $eventName = strtolower($eventName);
-        $this->_events[$eventName]['observers'][] = $observer;
+        if (empty($params['insert'])) {
+            $this->_events[$eventName]['observers'][] = $observer;
+        } else {
+            $insertCallable = $this->BUtil->extCallback($params['insert']);
+            $inserted = false;
+            foreach ($this->_events[$eventName]['observers'] as $i => $obs) {
+                if (!empty($insertCallable) && is_callable($insertCallable)) {
+                    $result = $insertCallable($obs, $eventName, $callback);
+                    if ($result) {
+                        $beforeAfter = $result === -1 ? $i : ($i + 1);
+                        array_splice($this->_events[$eventName]['observers'], $beforeAfter, 0, [$observer]);
+                        $inserted = true;
+                        break;
+                    }
+                }
+            }
+            if (!$inserted) {
+                $this->_events[$eventName]['observers'][] = $observer;
+            }
+        }
         BDebug::debug('SUBSCRIBE ' . $eventName, 1);
+        return $this;
+    }
+
+    /**
+     * @param $eventPattern can start with ^ or a regex delimiter for full pattern
+     * @param $callback
+     * @param array $args
+     * @param null $params
+     * @return $this
+     */
+    public function onRegex($eventPattern, $callback, $args = [], $params = null)
+    {
+        if (strpos($eventPattern, '^') === 0) {
+            $eventPattern = '#' . $eventPattern . '#';
+        }
+        $this->_regexObservers[] = [
+            'event_pattern' => $eventPattern,
+            'callback' => $callback,
+            'args' => $args,
+            'params' => $params,
+        ];
         return $this;
     }
 
@@ -1777,12 +1888,12 @@ class BEvents extends BClass
      * Run callback on event only once, and remove automatically
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed        $callback
+     * @param mixed $callback
      * @param array|object $args
-     * @param null         $alias
+     * @param array $params
      * @return BEvents
      */
-    public function once($eventName, $callback = null, $args = [], $alias = null)
+    public function once($eventName, $callback = null, $args = [], $params = [])
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1790,11 +1901,11 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $this->on($eventName, $callback, $args, $alias);
+        $this->on($eventName, $callback, $args, $params);
         $lastId = sizeof($this->_events[$eventName]['observers']);
-        $this->on($eventName, function() use ($eventName, $lastId) {
+        $this->on($eventName, function () use ($eventName, $lastId) {
             $this->BEvents
-                ->off($eventName, $lastId-1) // remove the observer
+                ->off($eventName, $lastId - 1)// remove the observer
                 ->off($eventName, $lastId) // remove the remover
             ;
         });
@@ -1805,7 +1916,7 @@ class BEvents extends BClass
      * Disable all observers for an event or a specific observer
      *
      * @param string $eventName
-     * @param null   $alias
+     * @param null $alias
      * @return BEvents
      */
     public function off($eventName, $alias = null)
@@ -1832,20 +1943,30 @@ class BEvents extends BClass
     /**
      * Dispatch event observers
      *
-     * dispatch|fire|notify|pub|publish ?
-     *
      * @param string $eventName
      * @param array|object $args
      * @return array Collection of results from observers
      */
     public function fire($eventName, $args = [])
     {
-        $eventName = strtolower($eventName);
-        $profileStart = BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
-        $result = [];
+        if (!empty($this->_regexObservers)) {
+            foreach ($this->_regexObservers as $i => &$reObs) {
+                foreach ($this->_events as $eventName => $event) {
+                    if (empty($reObs['events_tested'][$eventName]) && preg_match($reObs['event_pattern'], $eventName)) {
+                        $this->on($eventName, $reObs['callback'], $reObs['args'], $reObs['params']);
+                    }
+                    $reObs['events_tested'][$eventName] = 1;
+                }
+            }
+            unset($reObs);
+        }
+        $eventName    = strtolower($eventName);
+        $result       = [];
         if (empty($this->_events[$eventName])) {
             return $result;
         }
+        $profileStart =
+            BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
         $observers =& $this->_events[$eventName]['observers'];
         // sort order observers
         do {
@@ -1854,8 +1975,8 @@ class BEvents extends BClass
                 if (!empty($observer['args']['position']) && empty($observer['ordered'])) {
                     unset($observers[$i]);
                     $observer['ordered'] = true;
-                    $observers = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
-                    $dirty = true;
+                    $observers           = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
+                    $dirty               = true;
                     break;
                 }
             }
@@ -1891,9 +2012,11 @@ class BEvents extends BClass
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
                         if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
-                            echo "<pre>"; BDebug::cleanBacktrace(); echo "</pre>";
+                            echo "<pre>";
+                            BDebug::cleanBacktrace();
+                            echo "</pre>";
                         }
-                        $cb = [$r[0]::i(), $r[1]];
+                        $cb                   = [$r[0]::i(), $r[1]];
                         $observer['callback'] = $cb;
                         // remember for next call, don't want to use &$observer
                         $observers[$i]['callback'] = $cb;
@@ -1925,8 +2048,14 @@ class BEvents extends BClass
             if (preg_match($eventRegexp, $eventName)) {
                 $results += (array)$this->fire($eventName, $args);
             }
+
         }
         return $results;
+    }
+
+    public function observers($eventName)
+    {
+        return !empty($this->_events[$eventName]) ? $this->_events[$eventName] : [];
     }
 
     public function debug()
@@ -1962,21 +2091,34 @@ class BSession extends BClass
     protected $_sessionId;
 
     /**
+     * Flag for security measure
+     *
+     * @var boolean
+     */
+    protected $_idFromRequest;
+
+    /**
      * Whether PHP session is currently open
      *
-     * @var bool
+     * @var boolean
      */
     protected $_phpSessionOpen = false;
 
     /**
      * Whether any session variable was changed since last session save
      *
-     * @var bool
+     * @var boolean
      */
     protected $_dirty = false;
 
+    /**
+     * @var array
+     */
+    protected $_config;
+
     protected $_availableHandlers = [
-        '' => 'Default',
+        'default' => 'Default',
+        'memcached' => 'BSession_Memcached',
     ];
 
     protected $_defaultSessionCookieName = 'fulleron';
@@ -2006,93 +2148,192 @@ class BSession extends BClass
      *
      * @todo work around multiple cookies in header bug: https://bugs.php.net/bug.php?id=38104
      * @param string|null $id Optional session ID
-     * @param bool        $autoClose
-     * @param bool        $validate
      * @return $this
      */
-    public function open($id = null, $autoClose = false, $validate = true)
+    public function open($id = null)
     {
         if ($this->_isOpen) {
             return $this;
         }
 
-        $this->BEvents->fire(__METHOD__ . ':before', ['id' => $id, 'auto_close' => $autoClose, 'validate' => $validate]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['id' => $id]);
 
-        $config = $this->BConfig->get('cookie');
+        $this->_loadConfig();
 
-        if (!empty($config['session_disable'])) {
+        if (!empty($this->_config['session_disable'])) {
+            return $this;
+        }
+        if (headers_sent()) {
+            BDebug::warning("Headers already sent, can't start session");
             return $this;
         }
 
         $this->_isOpen = true;
-
-        $rememberMeTtl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
-        if ($this->BRequest->cookie('remember_me')) {
-            $ttl = $rememberMeTtl;
-        } else {
-            $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
-        }
-
-        $domain = $this->BRequest->getCookieDomain();
-        $path = $this->BRequest->getCookiePath();
-
-        if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
-            $class = $this->_availableHandlers[$config['session_handler']];
-            $class::i()->register($ttl);
-        }
-        //session_set_cookie_params($ttl, $path, $domain);
-        session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (($dir = $this->BApp->storageRandomDir())) {
-            $dir .= '/session';
-            $this->BUtil->ensureDir($dir);
-            session_save_path($dir);
-        }
-        #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
-        if (!$id) {
-            $id = $this->BRequest->get('SID');
-            if (!$id && !empty($_COOKIE[session_name()])) {
-                $id = $_COOKIE[session_name()];
-            }
-        }
-        if (preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
-            session_id($id);
-        } else {
-            $this->regenerateId();
-        }
-        if (headers_sent()) {
-            BDebug::warning("Headers already sent, can't start session");
-        } else {
-            $https = $this->BRequest->https();
-            session_set_cookie_params($ttl, $path, $domain, $https, true);
-            session_start();
-            // update session cookie expiration to reflect current visit
-            // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
-            setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
-            $this->_phpSessionOpen = true;
-        }
+        $this->_setSessionPhpFlags();
+        $this->_setSessionName();
+        $this->_processSessionHandler();
+        $this->_setSessionId($id);
+        $this->_sessionStart();
+        $this->_phpSessionOpen = true;
+        $this->_validateSession();
         $this->_sessionId = session_id();
+        $this->_initSessionData();
+        $this->BEvents->fire(__METHOD__ . ':after', ['id' => $id]);
 
-        if (!empty($config['session_check_ip']) && $validate) {
-            $ip = $this->BRequest->ip();
-            if (empty($_SESSION['_ip'])) {
-                $_SESSION['_ip'] = $ip;
-            } elseif ($_SESSION['_ip'] !== $ip) {
-                $_SESSION = [];
-                session_destroy();
-                session_start();
-                //$this->BResponse->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
+        #BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+
+        return $this;
+    }
+
+    protected function _getRememberMeTtl()
+    {
+        static $rememberMeTtl;
+
+        if (!$rememberMeTtl) {
+            $rememberMeTtl = 86400 * (!empty($this->_config['remember_days']) ? $this->_config['remember_days'] : 30);
+        }
+
+        return $rememberMeTtl;
+    }
+
+    protected function _getCookieTtl()
+    {
+        static $ttl;
+
+        if (!$ttl) {
+            $rememberMeTtl = $this->_getRememberMeTtl();
+            if ($this->BRequest->cookie('remember_me')) {
+                $ttl = $rememberMeTtl;
+            } else {
+                $ttl = !empty($this->_config['timeout']) ? $this->_config['timeout'] : 3600;
             }
         }
 
-        $namespace = !empty($config['session_namespace']) ? $config['session_namespace'] : 'default';
+        return $ttl;
+    }
+
+    protected function _loadConfig()
+    {
+        $this->_config = $this->BConfig->get('cookie');
+    }
+
+    protected function _setSessionPhpFlags()
+    {
+        ini_set('session.use_cookies', 1);
+        ini_set('session.use_only_cookies', 1);
+
+        ini_set('session.gc_maxlifetime', $this->_getRememberMeTtl());
+        ini_set('session.gc_divisor', 100);
+        ini_set('session.gc_probability', 1);
+
+        $useStrictMode = isset($this->_config['use_strict_mode']) ? $this->_config['use_strict_mode'] : 1;
+        ini_set('session.use_strict_mode', $useStrictMode);
+
+        ini_set('session.cookie_httponly', 1);
+
+        if ($this->BRequest->https()) {
+            ini_set('session.cookie_secure', 1);
+        }
+    }
+
+    protected function _setSessionName()
+    {
+        session_name(!empty($this->_config['name']) ? $this->_config['name'] : $this->_defaultSessionCookieName);
+    }
+
+    protected function _processSessionHandler()
+    {
+        if (!empty($this->_config['session_handler'])
+            && $this->_config['session_handler'] !== 'default'
+            && !empty($this->_availableHandlers[$this->_config['session_handler']])
+        ) {
+            $class = $this->_availableHandlers[$this->_config['session_handler']];
+            $this->{$class}->register($this->_getCookieTtl());
+        } else {
+            //session_set_cookie_params($ttl, $path, $domain);
+            if (($dir = $this->BApp->storageRandomDir())) {
+                $dir .= '/session';
+                $this->BUtil->ensureDir($dir);
+                session_save_path($dir);
+            }
+        }
+    }
+
+    protected function _setSessionId($id = null)
+    {
+        if (!$id) {
+            if (!empty($_COOKIE[session_name()])) {
+                $id = $_COOKIE[session_name()];
+                $this->_idFromRequest = true;
+            }
+        }
+        if ($id && preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
+            session_id($id);
+        }
+        return $id;
+    }
+
+    protected function _sessionStart($ttl = null)
+    {
+        if (null === $ttl) {
+            $ttl = $this->_getCookieTtl();
+        }
+
+        $path = $this->BRequest->getCookiePath();
+        $domain = $this->BRequest->getCookieDomain();
+        $https = $this->BRequest->https();
+
+        session_set_cookie_params($ttl, $path, $domain, $https, true);
+
+        session_start();
+
+        // update session cookie expiration to reflect current visit
+        // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
+        setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
+    }
+
+    protected function _validateSession()
+    {
+        $ip = $this->BRequest->ip();
+        $agent = $this->BRequest->userAgent();
+
+        $refresh = false;
+        if ($this->_idFromRequest && !isset($_SESSION['_ip'])) {
+            $refresh = true;
+        }
+        if (!$refresh && !empty($this->_config['session_check_ip'])) {
+            if (!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip
+                || !empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent
+            ) {
+                $refresh = true;
+            }
+        }
+        if (!$refresh && !empty($_SESSION['_expires']) && $_SESSION['_expires'] < time()) {
+            $refresh = true;
+        }
+        if ($refresh) {
+            $_SESSION = [];
+            session_destroy();
+            $this->_sessionStart();
+        }
+    }
+
+    protected function _initSessionData()
+    {
+        $ip = $this->BRequest->ip();
+        $agent = $this->BRequest->userAgent();
+
+        if (empty($_SESSION['_ip'])) {
+            $_SESSION['_ip'] = $ip;
+        }
+        if (empty($_SESSION['_agent'])) {
+            $_SESSION['_agent'] = $agent;
+        }
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
         if (empty($_SESSION[$namespace])) {
             $_SESSION[$namespace] = [];
         }
-        if ($autoClose) {
-            $this->data = $_SESSION[$namespace];
-        } else {
-            $this->data =& $_SESSION[$namespace];
-        }
+        $this->data =& $_SESSION[$namespace];
         $this->data['_'] = time();
 
         if (empty($this->data['current_language'])) {
@@ -2121,14 +2362,83 @@ class BSession extends BClass
         if (!empty($this->data['_timezone'])) {
             date_default_timezone_set($this->data['_timezone']);
         }
+    }
 
-        if ($autoClose) {
-            session_write_close();
-            $this->_phpSessionOpen = false;
-        }
-        BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+    /**
+     * Regenerate session ID
+     *
+     * @see http://php.net/manual/en/function.session-regenerate-id.php#87905
+     * @return $this
+     */
+    public function regenerateId()
+    {
+        $this->open();
+
+        $oldSessionId = session_id();
+
+        //@session_regenerate_id((bool)$this->BConfig->get('cookie/delete_old_session'));
+        @session_regenerate_id(false);
+
+        $newSessionId = session_id();
+
+        // close old and new session to allow other scripts to use them
+        session_write_close();
+
+        // start old session to save new session information (for long polling sleeper requests)
+        session_id($oldSessionId);
+        $this->_sessionStart();
+        $_SESSION['_new_session_id'] = $newSessionId;
+        $_SESSION['_expires'] = time() + 70; // expire old session in 70 seconds (give time for long polling return)
+        session_write_close();
+
+        // final start of new session
+        session_id($newSessionId);
+        $this->_sessionStart();
+
+        $this->_idFromRequest = false;
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['old_session_id' => $oldSessionId, 'session_id' => $newSessionId]);
+
+        //$this->BSession->set('_regenerate_id', 1);
+        //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
 
         return $this;
+    }
+
+    /**
+     * Used for long polling sleeper requests, when returning from browser
+     *
+     * @param array|null $dataToMerge
+     * @return $this
+     */
+    public function switchToNewSessionIfExists(array $dataToMerge = null)
+    {
+        if (!empty($_SESSION['_new_session_id'])) {
+            session_write_close();
+
+            session_id($_SESSION['_new_session_id']);
+            $this->_sessionStart();
+
+            if ($dataToMerge) {
+                $hlp = $this->BUtil;
+                foreach ($dataToMerge as $key => $data) {
+                    $_SESSION[$key] = !empty($_SESSION[$key]) ? $hlp->arrayMerge($_SESSION[$key], $data) : $data;
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get session ID
+     *
+     * @return string
+     */
+    public function sessionId()
+    {
+        $this->open();
+
+        return $this->_sessionId;
     }
 
     /**
@@ -2226,8 +2536,7 @@ class BSession extends BClass
             } else {
                 session_start();
             }
-            $namespace = $this->BConfig->get('cookie/session_namespace');
-            if (!$namespace) $namespace = 'default';
+            $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
             $_SESSION[$namespace] = $this->data;
         }
         // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
@@ -2235,13 +2544,13 @@ class BSession extends BClass
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
-/*
-        if ($this->get('_regenerate_id')) {
-            #session_regenerate_id(true);
-            session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
-            $this->set('_regenerate_id', 0);
-        }
-*/
+        /*
+                if ($this->get('_regenerate_id')) {
+                    #session_regenerate_id(true);
+                    session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+                    $this->set('_regenerate_id', 0);
+                }
+        */
         /*
 echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $sessionCookie = null;
@@ -2281,30 +2590,6 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         return $this;
     }
 
-    public function regenerateId()
-    {
-        $this->open();
-
-        $oldSessionId = session_id();
-        @session_regenerate_id(true);
-        $this->BEvents->fire(__METHOD__, ['old_session_id' => $oldSessionId, 'session_id' => session_id()]);
-        //$this->BSession->set('_regenerate_id', 1);
-        //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
-        return $this;
-    }
-
-    /**
-     * Get session ID
-     *
-     * @return string
-     */
-    public function sessionId()
-    {
-        $this->open();
-
-        return $this->_sessionId;
-    }
-
     /**
      * Add session message
      *
@@ -2320,15 +2605,25 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $this->setDirty();
         $message = ['type' => $type];
         if (is_array($msg) && !empty($msg[0])) {
-            $message['msgs'] = $msg;
+            $msgs = [];
+            foreach ($msg as $m) {
+                if (is_string($m) || is_object($m) && method_exists($m, '__toString')) {
+                    $msgs[] = (string)$m;
+                } elseif (is_array($m)) {
+                    $m['title'] = !empty($m['title']) ? (string)$m['title'] : null;
+                    $m['msg'] = !empty($m['msg']) ? (string)$m['msg'] : null;
+                    $msgs[] = $m;
+                }
+            }
+            $message['msgs'] = $msgs;
         } else {
-            $message['msg'] = $msg;
+            $message['msg'] = (string)$msg;
         }
         if (isset($options['title'])) {
-            $message['title'] = $options['title'];
+            $message['title'] = (string)$options['title'];
         }
         if (isset($options['icon'])) {
-            $message['icon'] = $options['icon'];
+            $message['icon'] = (string)$options['icon'];
         }
         if (null === $tag) {
             $tag = '_';
@@ -2396,6 +2691,25 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     public function __destruct()
     {
         //$this->close();
+    }
+}
+
+class BSession_Memcached extends BClass
+{
+    public function register($ttl = null)
+    {
+        $savePath = $this->BConfig->get('cookie/session_savepath');
+        if (!$savePath) {
+            $savePath = 'localhost:11211';
+        }
+
+        if (class_exists('Memcache', false)) {
+            ini_set('session.save_handler', 'memcache');
+            ini_set('session.save_path', $savePath);
+        } elseif (class_exists('Memcached', false)) {
+            ini_set('session.save_handler', 'memcached');
+            ini_set('session.save_path', $savePath);
+        }
     }
 }
 

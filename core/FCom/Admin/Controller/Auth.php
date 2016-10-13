@@ -1,9 +1,11 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Auth
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Admin_Model_UserG2FA $FCom_Admin_Model_UserG2FA
+ * @property FCom_LibRecaptcha_Main $FCom_LibRecaptcha_Main
  */
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
@@ -13,9 +15,22 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         return true;
     }
 
+    public function action_login()
+    {
+        $this->BResponse->redirect('');
+    }
+
     public function action_login__POST()
     {
         try {
+            if ($this->BConfig->get('modules/FCom_Admin/recaptcha_login')
+                && !$this->FCom_LibRecaptcha_Main->check()
+            ) {
+                $this->message('Invalid or missing reCaptcha response', 'error');
+                $this->BResponse->redirect('login');
+                return;
+            }
+
             $r = $this->BRequest->post('login');
             if (empty($r['username']) || empty($r['password'])) {
                 throw new Exception($this->_('Username and password cannot be blank.'));
@@ -25,17 +40,39 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             if (!$user) {
                 throw new Exception($this->_('Invalid user name or password.'));
             }
-            $user->login();
+
             if (!empty($r['remember_me'])) {
                 $days = $this->BConfig->get('cookie/remember_days');
                 $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
             }
 
+            if ($user->get('g2fa_status') == 9) {
+                $token = $this->BRequest->cookie('g2fa_token');
+                $rec = $this->FCom_Admin_Model_UserG2FA->verifyToken($user->id(), $token);
+                if (!$rec) {
+                    $this->BSession->set('g2fa_user_id', $user->id());
+                    $this->BResponse->redirect('g2fa/login');
+                    return;
+                }
+            }
+
+            $user->login();
+
             $url = $this->BSession->get('admin_login_orig_url');
+            $result = 'success';
         } catch (Exception $e) {
             $this->BDebug->logException($e);
-            $this->message($e->getMessage(), 'error');
+            if (!$this->BRequest->xhr()) {
+                $this->message($e->getMessage(), 'error');
+            }
+            $result = 'error';
         }
+
+        if ($this->BRequest->xhr()) {
+            $this->BResponse->json(['result' => $result]);
+            return;
+        }
+
         $this->BResponse->redirect(!empty($url) ? $url : $this->BApp->href());
     }
 
@@ -46,6 +83,14 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 
     public function action_password_recover__POST()
     {
+        if ($this->BConfig->get('modules/FCom_Admin/recaptcha_password_recover')
+            && !$this->FCom_LibRecaptcha_Main->check()
+        ) {
+            $this->message('Invalid or missing reCaptcha response', 'error');
+            $this->BResponse->redirect('password/recover');
+            return;
+        }
+
         $form = $this->BRequest->request('model');
         if (empty($form) || empty($form['email'])) {
             $this->message('Invalid or empty email', 'error');
@@ -64,12 +109,12 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
                 $user->recoverPassword();
                 sleep(1); // equalize time for success and failure
             } else {
-                if ($this->BDebug->is('DEBUG') && !$hlp->orm()->find_one()) {
-                    $hlp->create(['username' => 'admin', 'email' => $form['email'], 'is_superadmin' => 1])
-                        ->save()->recoverPassword();
-                } else {
+//                if ($this->BDebug->is('DEBUG') && !$hlp->orm()->find_one()) {
+//                    $hlp->create(['username' => 'admin', 'email' => $form['email'], 'is_superadmin' => 1])
+//                        ->save()->recoverPassword();
+//                } else {
                     $this->BLoginThrottle->failure(1);
-                }
+//                }
             }
         } else {
             sleep(1); // equalize time for success and failure

@@ -1,0 +1,22 @@
+{% set u = THIS.get('user') %}
+{% set resetUrl = APP.href('g2fa/reset?token=' ~ u.get('g2fa_token')) %}
+
+<!--{ To: "{{ u.get('firstname') ~ ' ' ~ u.get('lastname') }}" <{{ u.get('email') }}> }-->
+<!--{ From: "{{ CONFIG.get('modules/FCom_Core/site_title') }}" <{{ CONFIG.get('modules/FCom_Core/admin_email') }}> }-->
+<!--{ Subject: {{ 'Google 2FA reset instructions'|_ }} }-->
+
+Hello {{ u.get('firstname') ?: u.get('username') }},
+
+Please go to this URL to reset your 2FA:
+
+{{ resetUrl }}
+
+<!--======-->
+
+{{ THIS.view('email/html-header') | raw }}
+
+<p>Hello {{ u.get('firstname') ?: u.get('username') }},</p>
+
+<p>Please click here to <a href="{{ resetUrl }}">reset your 2FA</a></p>
+
+{{ THIS.view('email/html-footer') | raw }}

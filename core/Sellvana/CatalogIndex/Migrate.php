@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogIndex_Migrate
@@ -11,14 +11,14 @@
  * @property Sellvana_CatalogIndex_Model_FieldValue $Sellvana_CatalogIndex_Model_FieldValue
  * @property Sellvana_CatalogIndex_Model_Term $Sellvana_CatalogIndex_Model_Term
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CustomField_Model_Field $Sellvana_CustomField_Model_Field
+ * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  */
 
 class Sellvana_CatalogIndex_Migrate extends BClass
 {
-    public function install__0_2_0()
+    public function install__0_5_0_0()
     {
-        $tCustField = $this->Sellvana_CustomField_Model_Field->table();
+        $tCustField = $this->Sellvana_CatalogFields_Model_Field->table();
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
 
         $tTerm = $this->Sellvana_CatalogIndex_Model_Term->table();
@@ -44,7 +44,7 @@ class Sellvana_CatalogIndex_Migrate extends BClass
                 'field_name' => 'varchar(50) not null',
                 'field_label' => 'varchar(50) not null',
                 'field_type' => "enum('int','decimal','varchar','text','category') not null",
-                'weight' => 'int unsigned not null',
+                'weight' => 'int unsigned not null default 0',
                 'fcom_field_id' => 'int(10) unsigned default null',
                 'source_type' => "enum('field','method','callback') not null default 'field'",
                 'source_callback' => 'varchar(255) null',
@@ -121,13 +121,15 @@ class Sellvana_CatalogIndex_Migrate extends BClass
         $this->BDb->ddlTableDef($tDocValue, [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
-                'doc_id' => 'int(10) unsigned NOT NULL',
-                'field_id' => 'int(10) unsigned NOT NULL',
-                'value_id' => 'int(10) unsigned NOT NULL',
+                'doc_id' => 'int unsigned NOT NULL',
+                'field_id' => 'int unsigned NOT NULL',
+                'value_id' => 'int unsigned default null',
+                'value_decimal' => 'decimal(12,2) default null',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'UNQ_doc_field_value' => 'UNIQUE (`doc_id`,`field_id`,`value_id`)',
+                'IDX_value_decimal' => '(value_decimal)',
             ],
             BDb::CONSTRAINTS => [
                 'doc' => ['doc_id', $tDoc],
@@ -207,7 +209,7 @@ VALUES
 (6,'color','Color','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,2,NULL,'none','none',NULL,NULL),
 (7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,3,NULL,'none','none',NULL,NULL),
 (8,'price_range','Price Range','varchar',0,NULL,'callback','Sellvana_CatalogIndex_Model_Field::indexPriceRange','inclusive',0,1,0,4,NULL,'none','none',NULL,NULL),
-(9,'price','Price','decimal',0,NULL,'field',NULL,'none',0,0,0,4,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
+(9,'price','Price','decimal',0,NULL,'field',NULL,'none',0,0,0,4,'catalog/category/_filter_price','none','both','Price (Min-Max) || Price (Max-Min)',NULL)
         ");
     }
 
@@ -306,5 +308,130 @@ VALUES
         if ($priceField) {
             $priceField->set(['filter_type' => 'range', 'filter_custom_view' => 'catalog/category/_filter_price'])->save();
         }
+    }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        //SEE: http://www.artfulsoftware.com/infotree/qrytip.php?id=552
+        $functions = [
+            'levenshtein' => <<<EOT
+CREATE FUNCTION levenshtein( s1 VARCHAR(255), s2 VARCHAR(255) )
+  RETURNS INT
+  DETERMINISTIC
+  BEGIN
+    DECLARE s1_len, s2_len, i, j, c, c_temp, cost INT;
+    DECLARE s1_char CHAR;
+    -- max strlen=255
+    DECLARE cv0, cv1 VARBINARY(256);
+    SET s1_len = CHAR_LENGTH(s1), s2_len = CHAR_LENGTH(s2), cv1 = 0x00, j = 1, i = 1, c = 0;
+    IF s1 = s2 THEN
+      RETURN 0;
+    ELSEIF s1_len = 0 THEN
+      RETURN s2_len;
+    ELSEIF s2_len = 0 THEN
+      RETURN s1_len;
+    ELSE
+      WHILE j <= s2_len DO
+        SET cv1 = CONCAT(cv1, UNHEX(HEX(j))), j = j + 1;
+      END WHILE;
+      WHILE i <= s1_len DO
+        SET s1_char = SUBSTRING(s1, i, 1), c = i, cv0 = UNHEX(HEX(i)), j = 1;
+        WHILE j <= s2_len DO
+          SET c = c + 1;
+          IF s1_char = SUBSTRING(s2, j, 1) THEN
+            SET cost = 0; ELSE SET cost = 1;
+          END IF;
+          SET c_temp = CONV(HEX(SUBSTRING(cv1, j, 1)), 16, 10) + cost;
+          IF c > c_temp THEN SET c = c_temp; END IF;
+            SET c_temp = CONV(HEX(SUBSTRING(cv1, j+1, 1)), 16, 10) + 1;
+            IF c > c_temp THEN
+              SET c = c_temp;
+            END IF;
+            SET cv0 = CONCAT(cv0, UNHEX(HEX(c))), j = j + 1;
+        END WHILE;
+        SET cv1 = cv0, i = i + 1;
+      END WHILE;
+    END IF;
+    RETURN c;
+  END;
+EOT
+        , 'levenshtein_ratio' => <<<EOT
+CREATE FUNCTION levenshtein_ratio( s1 VARCHAR(255), s2 VARCHAR(255) )
+  RETURNS INT
+  DETERMINISTIC
+  BEGIN
+    DECLARE s1_len, s2_len, max_len INT;
+    SET s1_len = LENGTH(s1), s2_len = LENGTH(s2);
+    IF s1_len > s2_len THEN
+      SET max_len = s1_len;
+    ELSE
+      SET max_len = s2_len;
+    END IF;
+    RETURN ROUND((1 - LEVENSHTEIN(s1, s2) / max_len) * 100);
+  END;
+EOT
+        ];
+
+        $this->BDb->connect();
+        $orm = BORM::i();
+        $dbName = $orm->get_config('dbname');
+        $functionsExist = $orm->raw_query("SHOW FUNCTION STATUS LIKE 'levenshtein%'")
+            ->find_many_assoc('Name');
+        foreach ($functions as $name => $func) {
+            try {
+                if (!empty($functionsExist[$name]) && $functionsExist[$name]->get('Db') === $dbName) {
+                    $orm->raw_query("DROP FUNCTION {$name}")->execute();
+                }
+                $orm->raw_query($func)->execute();
+            } catch (Exception $e) {
+                if (!preg_match('/FUNCTION .* already exists/i', $e->getMessage())) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $fieldHlp = $this->Sellvana_CatalogIndex_Model_Field;
+        $relevanceField = $fieldHlp->load('relevance', 'field_name');
+        if (!$relevanceField) {
+            $relevanceField = $fieldHlp->create();
+        }
+        $relevanceField->set([
+            'field_name' => 'relevance',
+            'field_label' => 'Relevance',
+            'field_type' => 'int',
+            'source_type' => 'callback',
+            'source_callback' => 'Sellvana_CatalogIndex_Model_Field::relevance',
+            'sort_type' => 'asc',
+            'weight' => 0,
+        ])->save();
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $this->Sellvana_CatalogIndex_Model_Field->load('color', 'field_name')
+            ->set('filter_custom_view', 'catalog/category/_filter_swatches')->save();
+    }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tDocSort = $this->Sellvana_CatalogIndex_Model_DocSort->table();
+        $this->BDb->ddlTableDef($tDocSort, [
+            BDb::COLUMNS => [
+                'value' => 'RENAME sort_value varchar(255)',
+            ],
+        ]);
+
+        $fHlp = $this->Sellvana_CatalogIndex_Model_Field;
+        $this->BDb->ddlTableDef($fHlp->table(), [
+            BDb::COLUMNS => [
+                'sort_method' => "varchar(10) default 'na' after sort_type",
+                'sort_callback' => 'text after sort_method',
+            ],
+        ]);
+        $fHlp->update_many(['sort_method' => 'text']);
+        $fHlp->update_many(['sort_method' => 'decimal'], ['field_name' => ['price', 'avg_rating']]);
     }
 }

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Frontend_Controller_Address
@@ -75,10 +75,10 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
         $crumbs[] = array('label'=>'View Addresses', 'href'=>$this->BApp->href('customer/address'));
         $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $layout->view('customer/address/edit')->countries = $this->FCom_Geo_Model_Country->options($countriesList);
-        $layout->view('customer/address/edit')->address = $address;
-        $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
-        $layout->view('customer/address/edit')->default_billing = $defaultBilling;*/
+        $layout->getView('customer/address/edit')->countries = $this->FCom_Geo_Model_Country->options($countriesList);
+        $layout->getView('customer/address/edit')->address = $address;
+        $layout->getView('customer/address/edit')->default_shipping = $defaultShipping;
+        $layout->getView('customer/address/edit')->default_billing = $defaultBilling;*/
 
         //$this->view('geo/embed')->set('countries', $countriesList);
         $varSet = [
@@ -197,5 +197,49 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
                 'addresses' => $addresses,
             ]
         );
+    }
+
+    public function action_delete__POST()
+    {
+        $id = $this->BRequest->get('id');
+        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $addresses = $customer->getAddresses();
+
+        $found = false;
+        $firstAddress = false;
+        $changeBillingAddress = false;
+        $changeShippingAddress = false;
+
+        /** @var Sellvana_Customer_Model_Address $addr */
+        foreach ($addresses as $addr) {
+            if ($addr->get('id') == $id) {
+                $found = true;
+                $changeBillingAddress = ($customer->getDefaultBillingAddress()->get('id') === $addr->get('id'));
+                $changeShippingAddress = ($customer->getDefaultShippingAddress()->get('id') === $addr->get('id'));
+                $addr->delete();
+                if (!$changeBillingAddress && !$changeShippingAddress) {
+                    break;
+                }
+            } elseif (!$firstAddress) {
+                $firstAddress = $addr;
+            }
+
+            if ($found && $firstAddress) {
+                if ($changeBillingAddress) {
+                    $customer->setDefaultAddress($firstAddress, 'billing');
+                }
+                if ($changeShippingAddress) {
+                    $customer->setDefaultAddress($firstAddress, 'shipping');
+                }
+                $customer->save();
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->message('You can\'t delete an address which doesn\'t belong to you', 'error');
+        }
+
+        $this->BResponse->redirect($this->BApp->href('customer/address'));
     }
 }

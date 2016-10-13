@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -82,7 +82,7 @@ class BRequest extends BClass
     /**
      * Returns area of the current request
      *
-     * @var string
+     * @return string
      */
     public function area()
     {
@@ -97,6 +97,7 @@ class BRequest extends BClass
      */
     public function setArea($area)
     {
+        //TODO: $this->_area = preg_replace('#^fcom_#', '', strtolower($area));
         $this->_area = $area;
         return $this;
     }
@@ -213,6 +214,50 @@ class BRequest extends BClass
     public function scheme()
     {
         return $this->https() ? 'https' : 'http';
+    }
+
+    /**
+     * Get all mime types accepted by client browser, or return the preferred type
+     *
+     * @param array|string|null $supportedTypes
+     * @return array|null
+     */
+    public function acceptTypes($supportedTypes = null)
+    {
+        if (empty($_SERVER['HTTP_ACCEPT'])) {
+            return [];
+        }
+        static $acceptTypes = null;
+        if (null === $acceptTypes) {
+            $accept = [];
+            $acceptTypes = [];
+            foreach (preg_split('#\s*,\s*#', $_SERVER['HTTP_ACCEPT']) as $i => $part) {
+                if (preg_match("#^(\S+)\s*;\s*(?:q|level)=([0-9\.]+)#i", $part, $m)) {
+                    $accept[] = ['pos' => $i, 'type' => $m[1], 'q' => (double)$m[2]];
+                } else {
+                    $accept[] = ['pos' => $i, 'type' => $part, 'q' => 1];
+                }
+            }
+            usort($accept, function ($a, $b) {
+                return ($a['q'] === $b['q']) ? ($a['pos'] - $b['pos']) : ($b['q'] - $a['q']);
+            });
+            foreach ($accept as $a) {
+                $acceptTypes[$a['type']] = $a['type'];
+            }
+        }
+        if (null === $supportedTypes) {
+            return $acceptTypes;
+        }
+        $supportedTypes = (array)$supportedTypes;
+        foreach ($acceptTypes as $type) {
+            if (in_array($type, $supportedTypes)) {
+                return $type;
+            }
+        }
+        if (!empty($acceptTypes['*/*'])) {
+            return $supportedTypes[0];
+        }
+        return false;
     }
 
     /**
@@ -341,13 +386,13 @@ class BRequest extends BClass
     protected static $_webRootCache = [];
 
     /**
-    * Web root path for current application
-    *
-    * If request is /folder1/folder2/index.php, return /folder1/folder2/
-    *
-    * @param $parent if required a parent of current web root, specify depth
-    * @return string
-    */
+     * Web root path for current application
+     *
+     * If request is /folder1/folder2/index.php, return /folder1/folder2/
+     *
+     * @param $parent if required a parent of current web root, specify depth
+     * @return string
+     */
     public function webRoot($parentDepth = 0)
     {
         if (isset(static::$_webRootCache[$parentDepth])) {
@@ -428,19 +473,28 @@ class BRequest extends BClass
         static $path;
 
         if (null === $path) {
-    #echo "<pre>"; print_r($_SERVER); exit;
             $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
-                (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/');
-                /*
-                    (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
-                        (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
-                    )
-                );*/
+                (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : null);
+            /*
+                (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
+                    (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
+                )
+            );*/
 
+            if (null === $path && !empty($_SERVER['REQUEST_URI'])) {
+                $path = preg_replace('#[?].*$#', '', $_SERVER['REQUEST_URI']);
+                $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+
+                if ($scriptDir && $scriptDir !== '/') {
+                    $rootPathRe = '#' . preg_quote(dirname($_SERVER['SCRIPT_NAME']), '#') . '#';
+                    $path = preg_replace($rootPathRe, '', $path);
+                }
+            }
             // nginx rewrite fix
             $basename = basename($this->scriptName());
-            $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
-
+            if ($basename && ($basename !== '/' || $basename[0] !== '/')) {
+                $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
+            }
             $re = '#^/(([a-z]{2})(_[A-Z]{2})?)(/.*|$)#';
             if ($this->BConfig->get('web/language_in_url') && preg_match($re, $path, $match)) {
                 static::$_language = $match[2];
@@ -509,12 +563,12 @@ class BRequest extends BClass
     }
 
     /**
-    * Request raw POST text
-    *
-    * @param bool $json Receive request as JSON
-    * @param bool $asObject Return as object vs array
-    * @return object|array|string
-    */
+     * Request raw POST text
+     *
+     * @param bool $json Receive request as JSON
+     * @param bool $asObject Return as object vs array
+     * @return object|array|string
+     */
     public function rawPost()
     {
         $post = file_get_contents('php://input');
@@ -657,8 +711,7 @@ class BRequest extends BClass
                         $result[$key] = ['error' => 'invalid_type', 'tp' => 1, 'type' => $type, 'name' => $name];
                         continue;
                     }
-                    $this->BUtil->ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir . '/' . $name);
+                    $this->BUtil->moveUploadedFileSafely($tmpName, $targetDir . '/' . $name, ['@media_dir', '@random_dir']);
                     $result[$key] = ['name' => $name, 'tp' => 2, 'type' => $type, 'target' => $targetDir . '/' . $name];
                 } else {
                     $message = !empty($uploadErrors[$error]) ? $uploadErrors[$error] : null;
@@ -675,8 +728,7 @@ class BRequest extends BClass
                     $result[] = ['error' => 'invalid_type', 'tp' => 4, 'type' => $type, 'pattern' => $typesRegex,
                         'source' => $source, 'name' => $name];
                 } else {
-                    $this->BUtil->ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir . '/' . $name);
+                    $this->BUtil->moveUploadedFileSafely($tmpName, $targetDir . '/' . $name, ['@media_dir', '@random_dir']);
                     $result[] = ['name' => $name, 'type' => $type, 'target' => $targetDir . '/' . $name];
                 }
             } else {
@@ -921,8 +973,8 @@ class BRequest extends BClass
     *
     * Syntax: $this->BRequest->sanitize($post, array(
     *   'var1' => 'alnum', // return only alphanumeric components, default null
-    *   'var2' => array('trim|ucwords', 'default'), // trim and capitalize, default 'default'
-    *   'var3' => array('regex:/[^0-9.]/', '0'), // remove anything not number or .
+    *   'var2' => ['trim|ucwords', 'default'], // trim and capitalize, default 'default'
+    *   'var3' => ['regex:/[^0-9.]/', '0'], // remove anything not number or .
     * ));
     *
     * @todo replace with filter_var_array
@@ -1093,6 +1145,11 @@ class BRequest extends BClass
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param $forUrlPath
+     * @param null $curPath
+     */
     public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
     {
         $allowedTags = $this->getAllowedTags();
@@ -1101,7 +1158,9 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
-                if (!mb_check_encoding($v)) {
+                if ($v === 'PLACEHOLDER~TO~REMOVE') {
+                    unset($data[$k]);
+                } elseif (!mb_check_encoding($v)) {
                     $v = null;
                 } elseif (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
@@ -1382,6 +1441,14 @@ class BResponse extends BClass
 
         if (!file_exists($source)) {
             $this->status(404, 'File not found', 'File not found');
+            $this->shutdown(__METHOD__);
+            return;
+        }
+
+        if (!$this->BUtil->isPathWithinRoot($source)) {
+            $this->status(403, 'Invalid file location', 'Invalid file location');
+            $this->shutdown(__METHOD__);
+            return;
         }
 
         if (!$fileName) {
@@ -1518,12 +1585,6 @@ class BResponse extends BClass
         $this->output();
     }
 
-    /**
-    * Redirect browser to another URL
-    *
-    * @param string $url URL to redirect
-    * @param int $status Default 302 (temporary), another possible value 301 (permanent)
-    */
     public function redirect($url, $status = 302)
     {
         $this->BSession->close();
@@ -1659,6 +1720,8 @@ class BResponse extends BClass
     {
         if (!$tags) {
             $tags = $this->BRequest->getAllowedTags();
+        } elseif ($tags[0] === '+') {
+            $tags = $this->BRequest->getAllowedTags() . substr($tags, 1);
         }
         $html = strip_tags($html, $tags);
 
@@ -1747,11 +1810,11 @@ class BRouting extends BClass
     }
 
     /**
-    * Change route part (usually 1st)
-    *
-    * @param string $partValue
-    * @param mixed $options
-    */
+     * Change route part (usually 1st)
+     *
+     * @param string $partValue
+     * @param mixed $options
+     */
     public function changeRoute($from, $opt)
     {
         if (!is_array($opt)) {
@@ -2030,6 +2093,12 @@ class BRouting extends BClass
         return $this->processRoutePath($args['target'], $args);
     }
 
+    /**
+     * @param $from
+     * @param $to
+     * @param array $args
+     * @return $this
+     */
     public function redirect($from, $to, $args = [])
     {
         $args['target'] = $to;
@@ -2089,7 +2158,7 @@ class BRouting extends BClass
 
         if ($attempts >= 100) {
             echo "<pre>"; print_r($route); echo "</pre>";
-            $this->BDebug->error($this->BLocale->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
+            $this->BDebug->error($this->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
         }
     }
 
@@ -2171,7 +2240,7 @@ class BRouteNode extends BClass
                 $part = '';
                 if ($k0 === '?') {
                     $k = substr($k, 1);
-                    $k0 = $k[0];
+                    $k0 = !empty($k[0]) ? $k[0] : '';
                     $part = '?';
                 }
                 if ($k0 === ':') { // optional param
@@ -2239,12 +2308,12 @@ class BRouteNode extends BClass
     }
 
     /**
-    * Add an observer to the route node
-    *
-    * @param mixed $callback
-    * @param array $args
-    * @param boolean $multiple whether to allow multiple observers for the route
-    */
+     * Add an observer to the route node
+     *
+     * @param mixed $callback
+     * @param array $args
+     * @param boolean $multiple whether to allow multiple observers for the route
+     */
     public function observe($callback, $args = null, $multiple = true)
     {
         $observer = new BRouteObserver([
@@ -2308,7 +2377,7 @@ class BRouteNode extends BClass
             }
         }
         if ($attempts >= 100) {
-            $this->BDebug->error($this->BLocale->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
+            $this->BDebug->error($this->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
         }
         return false;
     }
@@ -2451,7 +2520,7 @@ class BActionController extends BClass
     */
     public function view($viewname)
     {
-        return $this->BLayout->view($viewname);
+        return $this->BLayout->getView($viewname);
     }
 
     /**
@@ -2707,7 +2776,7 @@ class BActionController extends BClass
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
         $view->useMetaData();
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $root->addBodyClass('page-' . $page);
         }
 
@@ -2733,6 +2802,6 @@ class BActionController extends BClass
         if (empty($module)) {
             $module = $this->BModuleRegistry->currentModuleName();
         }
-        return $this->BLocale->_($string, $params, $module);
+        return parent::_($string, $params, $module);
     }
 }

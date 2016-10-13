@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Controller_Abstract
 {
@@ -27,6 +27,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_formTitle;# = 'Record';
     protected $_formTitleField = 'id';
     protected $_formNoNewRecord = false;
+
+    protected $_messages = [];
 
 
     public function __construct()
@@ -79,7 +81,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $modelClass = $this->_modelClass;
         $config = [
             'id' => static::$_origClass,
-            'orm' => $modelClass ? $this->{$modelClass}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*') : null,
+            'orm' => $modelClass ? $this->gridOrm() : null,
             #'orm' => $modelClass,
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
@@ -89,6 +91,14 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         ];
         $config = array_merge($config, $this->_gridConfig);
         return $config;
+    }
+
+    public function gridOrm($alias = null)
+    {
+        if (!$alias) {
+            $alias = $this->_mainTableAlias;
+        }
+        return $this->{$this->_modelClass}->orm($alias)->select($alias . '.*');
     }
 
     /**
@@ -108,6 +118,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     protected function _processConfig($config)
     {
+        foreach ($config['columns'] as &$col) {
+            if (!empty($col['multirow_edit']) && empty($col['editor']) && !empty($col['options'])) {
+                $col['editor'] = 'select';
+            }
+        }
+        unset($col);
         return $config;
     }
 
@@ -248,6 +264,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $id = $this->BRequest->param('id', true);
         if ($id && !($model = $this->{$class}->load($id))) {
             /*$this->BDebug->error('Invalid ID: '.$id);*/
+            // Redirect if item does not exist
+            $this->BResponse->redirect($this->BApp->href($this->_gridHref));
             $this->message('This item does not exist', 'error');
         }
         if (empty($model)) {
@@ -272,7 +290,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $nav->setNav($this->_navPath);
         }
 
-        $this->BLayout->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
+        $this->BLayout->getView('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_form');
         }
@@ -285,6 +303,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         /** @var FCom_Core_Model_Abstract $m */
         $m = $args['model'];
+        $id = $m ? (method_exists($m, 'id') ? $m->id() : $m->get('id')) : null;
         $actions = [];
 
         $actions['back'] = [
@@ -295,11 +314,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'onclick' => "location.href='{$this->BApp->href($this->_gridHref)}'",
             ],
             [
-                ['span', null, $this->BLocale->_('Back to list')],
-            ]
+                ['span', null, $this->_('Back to list')],
+            ], 10
         ];
 
-        if ($m->id()) {
+        if ($id) {
             $actions['delete'] = [
                 'button',
                 [
@@ -310,29 +329,42 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     'onclick' => 'return confirm(\'Are you sure?\')',
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Delete')],
-                ]
+                    ['span', null, $this->_('Delete')],
+                ], 20
             ];
         }
+
         $actions['save'] = [
             'button',
             [
-                'class' => ['btn', 'btn-primary'],
+                'class' => ['btn', 'btn-primary', 'ladda-button'],
                 'onclick' => 'return adminForm.saveAll(this)',
+                'data-style' => 'expand-left',
             ],
             [
-                ['span', null, $this->BLocale->_('Save')],
-            ]
+                ['span', null, $this->_('Save')],
+            ], 30
         ];
 
-        $id = $m ? (method_exists($m, 'id') ? $m->id() : $m->get('id')) : null;
+        $actions['save_and_continue'] = [
+            'button',
+            [
+                'class' => ['btn', 'btn-primary', 'ladda-button'],
+                'onclick' => 'return adminForm.saveAll(this, true)',
+                'data-style' => 'expand-left',
+            ],
+            [
+                ['span', null, $this->_('Save And Continue')],
+            ], 1000
+        ];
+
         if ($id) {
             $titleFieldValue = is_string($this->_formTitleField) && preg_match('#^[a-z0-9_]+$#i', $this->_formTitleField)
                 ? $m->get($this->_formTitleField)
                 : $this->BUtil->call($this->_formTitleField, $m);
-            $this->_formTitle = $this->BLocale->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
+            $this->_formTitle = $this->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
         } else {
-            $this->_formTitle = $this->BLocale->_('Create New %s', [$this->_recordName]);
+            $this->_formTitle = $this->_('Create New %s', [$this->_recordName]);
         }
 
         $args['view']->set([
@@ -350,6 +382,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $args = [];
         $formId = $this->formId();
         $redirectUrl = $this->BApp->href($this->_gridHref);
+        $model = null;
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
@@ -378,6 +411,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
                 if ($validated) {
                     $model->save();
+                    $result = ['status' => 'success'];
                     $this->message('Changes have been saved');
                     if ($r->post('do') === 'save_and_continue') {
                         $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
@@ -385,6 +419,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                     $args['validate_failed'] = true;
+                    $result = ['status' => 'error'];
                     $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
                 }
 
@@ -399,9 +434,32 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $traceMsg = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $traceMsg);
             $this->message($e->getMessage() . ': ' . $traceMsg, 'error');
             $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
+            $result = ['status' => 'error'];
         }
+
         if ($r->xhr()) {
-            $this->forward('form', null, ['id' => $id]);
+            $result['messages'] = [];
+            foreach ($this->BSession->messages('_,admin,validator-errors:' . $formId) as $message) {
+                $result['messages'][] = [
+                    'text' => is_array($message['msg']) ? $message['msg']['error'] : $message['msg'],
+                    'type' => $result['status'],
+                ];
+            }
+            $result['redirect'] = false;
+            /*if (!$id && $r->post('do') === 'save_and_continue' && $model) {
+                $result['redirect'] = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
+            } else*/
+            if ($r->post('do') !== 'save_and_continue' && $result['status'] === 'success') {
+                $result['redirect'] = $this->BApp->href($this->_gridHref);
+            } elseif (!is_null($model)) {
+                $result['id'] = $model->id();
+                $viewArgs = ['model' => $model, 'view' => new FCom_Admin_View_Form()];
+                $this->formViewBefore($viewArgs);
+                $result['buttons'] = $viewArgs['view']->getActionsHtml();
+                $result['title'] = $viewArgs['view']->get('title');
+            }
+            $this->BResponse->json($result);
+            //$this->forward('form', null, ['id' => $id]);
         } else {
             $this->BResponse->redirect($redirectUrl);
         }
@@ -451,5 +509,23 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             }
             $this->message($msg, 'error');
         }
+    }
+
+    /**
+     * @param $msg
+     * @param string $type
+     * @param string $tag
+     * @param array $options
+     * @return $this
+     */
+    public function message($msg, $type = 'success', $tag = 'admin', $options = [])
+    {
+        if (is_array($msg)) {
+            array_walk($msg, [$this->BLocale, 'translate']);
+        } else {
+            $msg = $this->_($msg);
+        }
+        $this->BSession->addMessage($msg, $type, $tag, $options);
+        return $this;
     }
 }

@@ -1,0 +1,24 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.customerfields, "@Sellvana_CustomerFields/Admin/js/fcom.customerfields" ]
+    - view: admin/nav
+        do:
+            - [ addNav, customer/fields, { label: Customer Fields, href: /customerfields/fields } ]
+
+customer_form_tabs:
+    - view: admin/form
+        do:
+            - [ addTab, fields, { label: Additional Info, pos: 82, view: customerfields/customers/fields-tab, async: true } ]
+            - [ addTab, fields-backbone, { label: Backbone Additional Info, pos: 84, view: customerfields/customers/fields-tab-backbone, async: true } ]
+
+/customerfields/fields:
+    - { include: base }
+    - { hook: main, views: customerfields/fields }
+    - { view: admin/nav, do: [[ setNav, customer/fields ]] }
+
+
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_CustomerFields, { label: Customer Fields, group: customers, async: true, permission: settings/Sellvana_CustomerFields } ]

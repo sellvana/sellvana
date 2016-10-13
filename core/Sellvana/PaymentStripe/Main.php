@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_PaymentStripe_Main
@@ -6,7 +6,7 @@
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
-class Sellvana_ProductCompare_Admin extends BClass
+class Sellvana_PaymentStripe_Main extends BClass
 {
     public function bootstrap()
     {
@@ -15,7 +15,7 @@ class Sellvana_ProductCompare_Admin extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_PaymentStripe' => BLocale::i()->_('Payment Stripe Settings'),
+            'settings/Sellvana_PaymentStripe' => 'Payment Stripe Settings',
         ]);
     }
 }

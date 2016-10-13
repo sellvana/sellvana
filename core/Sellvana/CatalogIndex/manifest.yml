@@ -1,8 +1,8 @@
 modules:
     Sellvana_CatalogIndex:
-        version: 0.5.0.0
-        channel: alpha
-        require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CustomField: 0.1.4 } }
+        version: 0.6.2.0
+        channel: beta
+        require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CatalogFields: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
         auto_use: [ bootstrap, views, layout ]
         observe:
@@ -10,7 +10,13 @@ modules:
             - [ "Sellvana_Catalog_Model_Product::import:before", "Sellvana_CatalogIndex_Main::onProductBeforeImport" ]
             - [ "Sellvana_Catalog_Model_Product::import:after", "Sellvana_CatalogIndex_Main::onProductAfterImport" ]
             - [ "Sellvana_Catalog_Model_Category::onAfterSave:products", "Sellvana_CatalogIndex_Main::onCategoryAfterSave" ]
-            - [ "Sellvana_CustomField_Model_Field::onAfterSave", "Sellvana_CatalogIndex_Main::onCustomFieldAfterSave" ]
+            - [ "FCom_Core_Model_TreeAbstract::refreshDescendants:before", "Sellvana_CatalogIndex_Main::onBeforeRefreshDescendants" ]
+            - [ "FCom_Core_Model_TreeAbstract::refreshDescendants:after", "Sellvana_CatalogIndex_Main::onAfterRefreshDescendants" ]
+            - [ "Sellvana_CatalogFields_Model_Field::onAfterSave", "Sellvana_CatalogIndex_Main::onCustomFieldAfterSave" ]
+            - [ "FCom_Core_ImportExport::import:beforeModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductBeforeImport" ]
+            - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductAfterCoreImport" ]
+            - [ "FCom_Core_ImportExport::afterImport", "Sellvana_CatalogIndex_Main::onAfterCoreImport" ]
+            - [ "FCom_Admin_Model_Activity::collectActivityItems", Sellvana_CatalogIndex_Main.onCollectActivityItems ]
         default_config:
             modules/Sellvana_CatalogIndex/show_root_categories: 1
             modules/Sellvana_CatalogIndex/show_sibling_categories: 1
@@ -21,8 +27,14 @@ modules:
                     - [ /catalogindex/?.action, Sellvana_CatalogIndex_Admin_Controller ]
                     - [ /catalogindex/fields, Sellvana_CatalogIndex_Admin_Controller_Fields.index ]
                     - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
+                observe:
+                    - [ "Sellvana_Catalog_Admin_Controller_ProductsAdd::action_index__POST:after", "Sellvana_CatalogIndex_Main.onProductsQuickAdd" ]
 
             FCom_Frontend:
                 observe:
                     - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_data", Sellvana_CatalogIndex_Frontend.onCategoryProductsData ]
                     - [ "Sellvana_Catalog_Frontend_Controller_Search::action_index:products_data", Sellvana_CatalogIndex_Frontend.onSearchProductsData ]
+
+            FCom_Shell:
+                custom:
+                    actions: [ Sellvana_CatalogIndex_Shell_Reindex, Sellvana_CatalogIndex_Shell_Populate ]

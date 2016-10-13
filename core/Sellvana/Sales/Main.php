@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Main
@@ -15,20 +15,19 @@ class Sellvana_Sales_Main extends BClass
 
     public function bootstrap()
     {
-        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'sales' => $locale->_('Sales'),
-            'sales/orders' => $locale->_('Orders'),
-            'sales/order_status' => $locale->_('Order Status'),
-            'sales/order_custom_state' => $locale->_('Order Custom State'),
-            'sales/carts' => $locale->_('Carts'),
-            'sales/reports' => $locale->_('Reports'),
-            'settings/Sellvana_Sales' => $locale->_('Sales Settings'),
-            'settings/Sellvana_SalesShipping' => $locale->_('Sales Shipping Settings'),
-            'settings/Sellvana_SalesPaymentMethods' => $locale->_('Sales Payment Methods Settings'),
+            'sales' => 'Sales',
+            'sales/orders' => 'Orders',
+            'sales/order_status' => 'Order Status',
+            'sales/order_custom_state' => 'Order Custom State',
+            'sales/carts' => 'Carts',
+            'sales/reports' => 'Reports',
+            'settings/Sellvana_Sales' => 'Sales Settings',
+            'settings/Sellvana_SalesShipping' => 'Sales Shipping Settings',
+            'settings/Sellvana_SalesPaymentMethods' => 'Sales Payment Methods Settings',
         ]);
 
-        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
+        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal', 'AmountDue'] as $total) {
             $this->Sellvana_Sales_Model_Cart->registerTotalRowHandler('Sellvana_Sales_Model_Cart_Total_' . $total);
         }
 
@@ -172,7 +171,11 @@ class Sellvana_Sales_Main extends BClass
     public function getAllSelectedShippingServices()
     {
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
-        $estimates = $cart->getData('shipping_estimates');
+        if ($cart) {
+            $estimates = $cart->getData('shipping_rates');
+        } else {
+            $estimates = [];
+        }
 
         $services = [];
         foreach ($this->getShippingMethods() as $mKey => $method) {
@@ -180,7 +183,7 @@ class Sellvana_Sales_Main extends BClass
                 continue;
             }
             foreach ($method->getServicesSelected() as $sKey => $sLabel) {
-                $services[$mKey]['services'][$sKey]['value'] = $mKey . ':' . $sKey;
+                $services[$mKey]['services'][$sKey]['value'] = $sKey;
                 $services[$mKey]['services'][$sKey]['label'] = $sLabel;
                 if ($estimates && !empty($estimates[$mKey][$sKey])) {
                     $services[$mKey]['services'][$sKey]['estimate'] = $estimates[$mKey][$sKey];
@@ -202,7 +205,7 @@ class Sellvana_Sales_Main extends BClass
     /**
      * @param array $args
      */
-    public function checkDefaultShippingPayment($args)
+    public function onCollectActivityItems($args)
     {
         if (!$this->getShippingMethods()) {
             $args['items'][] = [
@@ -222,28 +225,6 @@ class Sellvana_Sales_Main extends BClass
                 'code' => "sales_missing_payment",
             ];
         }
-    }
-
-    /**
-     * @param array $args
-     */
-    public function onGetDashboardWidgets($args)
-    {
-        $view = $args['view'];
-        $view->addWidget('orders-list', [
-            'title' => 'Recent Orders',
-            'icon' => 'inbox',
-            'view' => 'order/dashboard/orders-list',
-            'async' => true,
-        ]);
-        $view->addWidget('orders-totals', [
-            'title' => 'Order Totals',
-            'icon' => 'inbox',
-            'view' => 'order/dashboard/orders-totals',
-            'cols' => 4,
-            'async' => true,
-            'filter' => true
-        ]);
     }
 
     public function workflowAction($actionName, $args = [])

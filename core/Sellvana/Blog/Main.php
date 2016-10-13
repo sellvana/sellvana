@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Blog_Main
@@ -10,8 +10,8 @@ class Sellvana_Blog_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_Blog' => BLocale::i()->_('Blog Settings'),
-            'blog' => BLocale::i()->_('Blog'),
+            'settings/Sellvana_Blog' => 'Blog Settings',
+            'blog' => 'Blog',
         ]);
     }
 }

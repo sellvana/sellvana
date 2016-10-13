@@ -102,24 +102,26 @@
         <div id="testbed"></div>
         <script type="text/javascript">
             require(['jquery', 'moment', 'daterangepicker', 'bootstrap'], function ($) {
+                var s, e;
                 {% if fromDate %}
-                    var s = '{{ fromDate }}';
+                    s = '{{ fromDate }}';
                 {% else %}
                     var startDate = new Date();
-                    var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+                    s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
                 {% endif %}
 
                 {% if toDate %}
-                    var e = '{{ toDate }}';
+                    e = '{{ toDate }}';
                 {% else %}
-                    var e = s;
+                    e = s;
                 {% endif %}
 
                 $('#model-date_range').daterangepicker(
                     {
                         format: 'YYYY-MM-DD',
                         startDate: s,
-                        endDate: e
+                        endDate: e,
+                        opens: "left"
                     }
                 );
                 var $help = $('.help-icon');
@@ -158,12 +160,7 @@
                 <label for="model-conditions_type" class="sr-only">{{ "Condition type"|_ }}</label>
                 <select id="model-conditions_type" class="form-control to-select2">
                     <option value="-1">{{ "Add Condition Type..."|_ }}</option>
-                    <option value="sku">{{ "Products"|_ }}</option>
-                    <option value="category">{{ "Categories"|_ }}</option>
-                    <option value="combination">{{ "Attribute Combination"|_ }}</option>
-                    <option value="total" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">{{ "Cart Total"|_ }}</option>
-                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
-                        {{ "Shipping Destination"|_ }}</option>
+                    {{ UTIL.optionsHtml(m.conditionsOptions())|raw }}
                 </select>
             </div>
         </div>
@@ -182,11 +179,7 @@
             <div class="col-md-5">
                 <select id="model-actions" class="form-control to-select2">
                     <option value="-1">{{"Add Promo Action..."|_}}</option>
-                    <option value="discount">{{"Discount"|_}}</option>
-                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }}
-                            class="cart-only">{{"Shipping"|_}}</option>
-                    <option value="free_product" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
-                        {{"Free Products"|_}}</option>
+                    {{ UTIL.optionsHtml(m.actionOptions())|raw }}
                 </select>
             </div>
         </div>
@@ -197,7 +190,7 @@
         </div>
         {% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
-            require(['react', 'fcom.promo'], function (React, Promo) {
+            require(['react', 'fcom.rulesWidget'], function (React, RulesWidget) {
                 $('select.to-select2').select2();
                 var promo_type_id = '{{ elView.getInputId({'field':'promo_type'}) }}';
                 var coupon_type_id = '{{ elView.getInputId({'field':'coupon_type'}) }}';
@@ -249,7 +242,7 @@
                     single_coupon_name: "{{ elView.getInputName({'field':'single_coupon_code'}) }}",
                     single_coupon_code: "{{ validator.fieldValue("single_coupon_code") }}",
                     promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
-                    showCouponsUrl: "{{ APP.href('promo/coupons/view')}}", // "/admin/promo/coupons/view?id=1",
+                    showCouponsUrl: "{{ APP.href('promo/coupons/view/?id=') ~ m.id()}}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate')}}", // "/admin/promo/coupons/generate?id=1",
                     importCouponsUrl: "{{ APP.href('promo/coupons/import')}}", // "/admin/promo/coupons/import?id=1",
                     valueUpc: '{{validator.fieldValue("limit_per_customer")}}',
@@ -260,9 +253,10 @@
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
                     buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}',
+                    numCodes: {{ numCodes | default(0) }},
                     base_fields: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('price_relation_options'))|raw }}
                 };
-                Promo.init(options);
+                RulesWidget.init(options);
             });
         </script>
     </div>

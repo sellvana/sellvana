@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Model_Role
@@ -25,6 +25,10 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['role_name'],
+    ];
+
+    protected static $_fieldOptions = [
+        'status' => ['all' => 'All', 'none' => "None"],
     ];
 
     /**
@@ -56,9 +60,10 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
             }
             return $this;
         }
-        if (is_string($params)) {
+        if (is_string($params) || is_object($params) && method_exists($params, '__toString')) {
             $params = ['title' => $params];
         }
+        $params['title'] = $this->_($params['title']);
         if (empty($params['module_name'])) {
             $params['module_name'] = $this->BModuleRegistry->currentModuleName();
         }

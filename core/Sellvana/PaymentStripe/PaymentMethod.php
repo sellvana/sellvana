@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_PaymentStripe_PaymentMethod
@@ -7,7 +7,7 @@
  */
 class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
-    static protected $_methodKey = 'stripe';
+    protected $_code = 'stripe';
 
     protected $_name = 'Stripe';
 
@@ -29,6 +29,11 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         'refund_online'   => 1,
         'recurring'       => 1,
     ];
+
+    /**
+     * @var bool
+     */
+    protected $_manualStateManagement = false;
 
     protected function _initialize()
     {
@@ -54,6 +59,12 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         return $this->getConfig('test') ? $this->getConfig('test_public_key') : $this->getConfig('live_public_key');
     }
 
+    public function isAllDataPresent($data)
+    {
+        return parent::isAllDataPresent($data) && !empty($data['stripe']['token']);
+    }
+
+
     /**
      * @return mixed
      * @throws Exception
@@ -63,10 +74,10 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         $data = [
             'form_prefix' => $this->getCheckoutFormPrefix(),
             'public_key' => $this->getPublicKey(),
-            'amount' => $this->Sellvana_Sales_Model_Cart->sessionCart()->get('subtotal'),
+            'amount' => $this->Sellvana_Sales_Model_Cart->sessionCart()->get('amount_due'),
             'description' => null,//'You will have opportunity to change address and shipping method on the next step',
         ];
-        return $this->BLayout->view('stripe/form')->set($data);
+        return $this->BLayout->getView('stripe/form')->set($data);
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)
@@ -100,17 +111,14 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
 
             $result['success'] = true;
         } catch (Stripe_CardError $e) {
-            echo "<pre>";
-            var_dump($e);
-            exit;
             $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result, true);
         } catch (Stripe_InvalidRequestError $e) {
-            echo "<pre>";
-            var_dump($e);
-            exit;
             $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result, true);
         } catch (Exception $e) {
-echo "<pre>"; var_dump($e); exit;
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result, true);
         }
 
         return $result;
@@ -132,6 +140,39 @@ echo "<pre>"; var_dump($e); exit;
         }
         return !$key ? $this->_config : (!empty($this->_config[$key]) ? $this->_config[$key] : null);
     }
+
+    public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+        $this->_initialize();
+        $this->_transaction = $transaction;
+        $result = [];
+
+        $payment = $transaction->payment();
+        try {
+            $parentTransaction = $payment->findTransaction(Sellvana_Sales_Model_Order_Payment_Transaction::SALE, 'completed');
+            $charge = Stripe_Charge::retrieve($parentTransaction->get('transaction_id'));
+            $refund = $charge->refund([
+                'amount' => round($transaction->get('amount') * 100),
+                'currency' => $transaction->payment()->order()->get('order_currency'),
+            ]);
+            $transaction
+                ->set('transaction_id', $refund->id)
+                ->setData('result', $refund->__toArray(true));
+
+            $result['success'] = true;
+        } catch (Stripe_CardError $e) {
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result);
+        } catch (Stripe_InvalidRequestError $e) {
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result);
+        } catch (Exception $e) {
+            $result['error']['message'] = $e->getMessage();
+            $this->_setErrorStatus($result);
+        }
+        return $result;
+    }
+
 
     /*
     protected function _call($method, $objectId = null, array $data = [])

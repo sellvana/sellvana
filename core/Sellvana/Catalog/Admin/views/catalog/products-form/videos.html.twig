@@ -1,0 +1,238 @@
+{% set m = THIS.get('model') %}
+{% set prodVideosConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productVideosGridConfig(m) %}
+
+{% set type = 'videos' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    mode: 'videos',
+    type: 'product-videos',
+    title: 'Videos'|_,
+    folder: 'media/product/videos',
+    config: {actions: {delete: {caption : 'Remove'|_}}},
+    can_embed_video: true
+} %}
+
+{% set attachmentsConfig = {
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-videos',
+    medialibConfig: medialibConfig,
+    gridConfig: prodVideosConfig
+} %}
+{% set combineType = targetType ~ type %}
+{{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
+        var productVideosGrid = {{ combineType }}Grid, 
+            productVideosNode,
+            videoExt       = '', 
+            videoName      = '', 
+            editedRow      = {},
+            isExternalLink = false;
+
+        if (productVideosGrid) {
+            $(productVideosGrid.getDOMNode())
+                .on('removedRows.griddle', function (e, rows) {
+                    // Removed videos on main video tab grid
+                }).on('addedRows.griddle', function (e, rows) {
+                    // Added videos on main video tab grid
+                });
+        }
+
+        /**
+         * Get file extension
+         * @param  {String} str
+         * @return {String}
+         */
+        function _getFileExtension(str) {
+            if (str.match(/mp[34]|webm|ogg/)) {
+                return str.slice(str.lastIndexOf('.') + 1);
+            }
+            return '';
+        }
+
+        /**
+         * Check if file name has no supported suffix
+         * 
+         * @param  {String} value 
+         * @param  {Object} elem
+         * @return {Boolean}
+         */
+        function validateVideoName (value, elem) {
+            if (isExternalLink === false && !value.match(/\w+\.(mp[34]|ogg|webm)$/)) {
+                $(elem).focus();
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Check if file extension is changed
+         * 
+         * @param  {String} value 
+         * @param  {Object} elem
+         * @return {Boolean}
+         */
+        function validateVideoExtension(value, elem) {
+            if (isExternalLink === false && _getFileExtension(value) !== videoExt) {
+                $(elem).focus();
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Capitalize first letter
+         * 
+         * @param  {string} string 
+         * @return {string}
+         */
+        function _capitalizeFirstLetter(string) {
+            return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function _refreshGrid(data) {
+            _(data).each(function(val, i) {
+                if (editedRow[i] != undefined && editedRow[i] != val) {
+                    $('#product_videos-' + i + '-' + data['id']).val(val);
+                    editedRow[i] = val;
+                }
+            });
+
+            productVideosGrid.updateRows([editedRow]);
+        }
+
+        window.savePreviewModal = function(modal) {
+            var $form         = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
+                id            = $form.find('#id').val(),
+                url           = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
+                hash          = { oper: id ? 'edit' : 'add'},
+                isNameChanged = false;
+
+            $form.find('textarea, input, select').each(function() {
+                var key = $(this).attr('id');
+                var val = $(this).val();
+                if (key == 'file_name' && val !== videoName) {
+                    isNameChanged = true;
+                }
+                hash[key] = productVideosGrid.html2text(val);
+            });
+
+            if ($form.valid()) {
+                if (isNameChanged) {
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: hash
+                    }).done(function(r) {
+                        if (r.error) {
+                            $.bootstrapGrowl("{{ 'Error: Save file error due to system error, please try again.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 3000 });
+                            return;
+                        }
+                        _refreshGrid(hash);
+                        modal.close();
+                    });
+                } else {
+                    _refreshGrid(hash);
+                    modal.close();
+                }
+            }
+        };
+
+        window.showModalToPreviewVideo = function(row) {
+            editedRow      = row;
+            isExternalLink = false;
+            videoName      = row.file_name;
+            var videoNode;
+
+            if (!row.file_size) {
+                isExternalLink = true;
+                var data = typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
+                var provider = data !== undefined ? data.provider_name.toLowerCase() : '';
+                switch(provider) {
+                    case 'youtube':
+                        $html = $(data.html);
+                        videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                                React.DOM.source({ src: $html.prop('src'),  type: "video/youtube"  })
+                            );
+                        break;
+                    case 'vimeo':
+                        videoNode = React.DOM.div({ dangerouslySetInnerHTML: {__html: data.html} });
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                videoExt = _getFileExtension(row.file_name);
+                videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                        React.DOM.source({ src: row.source,  type: "video/" + videoExt  })
+                    );
+            }
+
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "previewProductVideo",
+                        show: true,
+                        title: "{{ 'Video Details' |_ }}",
+                        confirm: "{{ 'Save changes' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
+                        onLoad: function(modal) {
+                            productVideosNode = $(modal.getDOMNode());
+                            productVideosNode.find('.modal-dialog').css('width', '960px');
+                        },
+                        onConfirm: window.savePreviewModal
+                    },
+                    React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
+                        React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
+                            videoNode
+                        ),
+                        React.DOM.div({ id: "video-infos", className: 'col-sm-5', style: { background: '#F3F3F3' } },
+                            React.DOM.div({ id: 'video-details' },
+                                React.DOM.h3(null, "{{ 'Video Details' | _ }}"),
+                                React.DOM.div({ className: 'file-name' }, 
+                                    React.DOM.strong(null, "{{ 'File name: ' | _ }}"),
+                                    React.DOM.span(null, row.file_name)
+                                ),
+                                React.DOM.div({ className: 'file-type' }, 
+                                    React.DOM.strong(null, "{{ 'File type: ' | _ }}"),
+                                    React.DOM.span(null, videoExt ? 'video/'+videoExt : "{{ 'External Video' |_ }}")
+                                ),
+                                React.DOM.div({ className: 'folder' }, 
+                                    React.DOM.strong(null, "{{ 'Folder: ' | _ }}"),
+                                    React.DOM.span(null, !isExternalLink ? row.folder : "")
+                                ),
+                                React.DOM.div({ className: 'file-size' }, 
+                                    React.DOM.strong(null, "{{ 'File size: ' | _ }}"),
+                                    React.DOM.span(null, row.file_size ? Math.ceil(row.file_size/1024000) + "{{ ' MB' |_ }}" : "")
+                                ),
+                                React.DOM.div({ className: 'create-at' }, 
+                                    React.DOM.strong(null, (isExternalLink ? "{{ 'Embed on: ' | _ }}" : "{{ 'Upload on: ' | _ }}")),
+                                    React.DOM.span(null, row.create_at)
+                                )
+                            ),
+                            React.DOM.hr(),
+                            React.createElement(FComModalForm, { columnMetadata: productVideosGrid.getConfig('columns'), id: productVideosGrid.getConfig('id'), row: row, hiddenId: row.file_id }),
+                            React.DOM.hr()
+                        )
+                    )
+                ), modalContainerEle
+            );
+            
+            $('video,audio').mediaelementplayer({
+                features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
+            });
+
+            $.validator.addMethod('validateVideoName', validateVideoName, '{{ "Incorrect name or must contains supported extension suffix." | _ }}');
+            $.validator.addMethod('validateVideoExtension', validateVideoExtension, '{{ "File extention must be " | _ }}' + videoExt);
+            $.validator.addClassRules('valid-video-name', {
+                validateVideoName: true,
+                validateVideoExtension: true
+            });
+        }
+    });
+</script>

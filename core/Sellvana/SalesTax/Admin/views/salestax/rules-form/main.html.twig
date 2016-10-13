@@ -22,13 +22,13 @@
         {{ forms.input(fieldData, {field:'sort_order', label:'Sort Order'|_, type: 'number'}) }}
 
         {{ forms.boolean(fieldData, {field:'match_all_product_classes', id:'match_all_product_classes', label:'Match All Product Classes'}) }}
-        {{ forms.select(fieldData, {id: 'product_classes',field: 'product_classes', label:'Product Classes'|_, multiple:1, disabled: 1, select2: 1, options: productClasses, value: currentProductClasses}) }}
+        {{ forms.select(fieldData, {id: 'product_classes',field: 'product_classes', label:'Product Classes'|_, multiple:1, disabled: 1, select2: {}, options: productClasses, value: currentProductClasses}) }}
 
         {{ forms.boolean(fieldData, {field:'match_all_customer_classes', id:'match_all_customer_classes', label:'Match All Customer Classes'}) }}
-        {{ forms.select(fieldData, {id: 'customer_classes',field: 'customer_classes', label:'Customer Classes'|_, multiple: 1, disabled: 1, select2: 1, options: customerClasses, value: currentCustomerClasses}) }}
+        {{ forms.select(fieldData, {id: 'customer_classes',field: 'customer_classes', label:'Customer Classes'|_, multiple: 1, disabled: 1, select2: {}, options: customerClasses, value: currentCustomerClasses}) }}
 
         {{ forms.boolean(fieldData, {field:'match_all_zones', id:'match_all_zones', label:'Match All Zones'}) }}
-        {{ forms.select(fieldData, {id: 'zones',field: 'zones', label:'Tax Zones'|_, multiple: 1, disabled: 1, select2: 1, options: zones, value: currentZones}) }}
+        {{ forms.select(fieldData, {id: 'zones',field: 'zones', label:'Tax Zones'|_, multiple: 1, disabled: 1, select2: {}, options: zones, value: currentZones}) }}
 
         {{ forms.boolean(fieldData, {field:'apply_to_shipping', label:'Apply To Shipping'}) }}
     </div>

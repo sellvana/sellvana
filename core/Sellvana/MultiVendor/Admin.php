@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_MultiVendor_Admin
@@ -13,8 +13,8 @@ class Sellvana_MultiVendor_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'multi_vendor'          => BLocale::i()->_('Multi Vendor'),
-            'settings/multi_vendor' => BLocale::i()->_('Multi Vendor Settings'),
+            'multi_vendor'          => 'Multi Vendor',
+            'settings/multi_vendor' => 'Multi Vendor Settings',
         ]);
     }
 
@@ -26,6 +26,7 @@ class Sellvana_MultiVendor_Admin extends BClass
         }
         $product = $args['model'];
 
+
         $hlp = $this->Sellvana_MultiVendor_Model_VendorProduct;
         $vp = $hlp->load($product->id(), 'product_id');
         if ($vp) {
@@ -35,8 +36,8 @@ class Sellvana_MultiVendor_Admin extends BClass
                 $vp->delete();
             }
         } elseif (!empty($vpData['vendor_id'])) {
-            $vp['product_id'] = $product->id();
-            $hlp->create($vp)->save();
+            $vpData['product_id'] = $product->id();
+            $hlp->create($vpData)->save();
         }
     }
 }

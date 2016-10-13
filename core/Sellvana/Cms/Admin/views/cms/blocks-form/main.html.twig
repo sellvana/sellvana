@@ -10,7 +10,7 @@
         {{ forms.input(fieldData, {field:'handle', label:'Handle'|_, required: 1}) }}
         {{ forms.input(fieldData, {field:'description', label:'Description'|_}) }}
         {{ forms.select(fieldData, {field:'renderer', label:'Content Format'|_, options: LAYOUT.getAllRenderers(true)}) }}
-        {{ forms.textarea(fieldData, {field:'content', label:'Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
+        {{ forms.wysiwyg(fieldData, {field:'content', label:'Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
     </div>
 </fieldset>
 
@@ -19,11 +19,17 @@ require(['jquery', 'ckeditor', 'fcom.admin'], function($) {
     var renderers = {{ UTIL.toJson(LAYOUT.getAllRenderers()) | raw }};
     function updateEditor() {
         switch (renderers[$('#model-renderer').val()].editor) {
-            case 'text': adminForm.wysiwygDestroy('model-content'); break;
-            case 'html': adminForm.wysiwygCreate('model-content'); break;
+            case 'text':
+                if (typeof adminForm != 'undefined')
+                    adminForm.wysiwygDestroy('model-content');
+                break;
+            case 'html':
+                if (typeof adminForm != 'undefined')
+                    adminForm.wysiwygCreate('model-content');
+                break;
         }
     }
     $('#model-renderer').change(updateEditor);
     updateEditor();
-})
+});
 </script>

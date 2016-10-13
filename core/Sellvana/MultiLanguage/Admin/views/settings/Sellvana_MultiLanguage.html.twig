@@ -2,6 +2,7 @@
 {% set fieldData = { model: c, settings_module:'Sellvana_MultiLanguage' } %}
 {% set backOrders = prod.backOrders() %}
 {% set locales = LOCALE.getAvailableLocaleCodes() %}
+{% set enabledLocales = CONFIG.get('modules/Sellvana_MultiLanguage/allowed_locales') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "Multi Language Settings"|_}}</h2>
@@ -16,5 +17,21 @@
                 'locale': 'Full Locale (en_US)',
             }
         }) }}{# 'name': 'Language name (english)', TODO:implement #}
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Locale Setup'|_, id:'settings-Sellvana_MultiLanguage-group2'}) }}
+        {% for locale in enabledLocales %}
+            {% set fieldName = 'setup_string_' ~ locale %}
+            {{ forms.textarea(fieldData, {label: locale, field: fieldName,
+                value: validator.fieldValue(fieldName),label_class: labelClass,
+                help_icon: 1, help_text: locale }) }}
+            <div class="form-group">
+                <label class="control-label col-md-2">Default values for {{ locale }}</label>
+                <ul class="list-unstyled col-md-5">
+                    {% for type,format in LOCALE.getLocaleDefaultFormats(locale) %}
+                        <li><strong>{{ type }}:</strong>"{{ format }}"</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

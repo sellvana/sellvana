@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_PushServer_Main
@@ -46,17 +46,18 @@ class FCom_PushServer_Main extends BCLass
     public function layoutInit()
     {
         /** @var FCom_Core_View_Head $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
         /** @var FCom_Core_View_Text $script */
-        $script = $this->BLayout->view('head_script');
+        $script = $this->BLayout->getView('head_script');
 
-        //if ($this->FCom_Admin_Model_User->isLoggedIn()) {
+        $onlyAdmin = $this->BConfig->get('modules/FCom_PushServer/only_admin');
+        if (!$onlyAdmin || $this->BRequest->area() === 'FCom_Admin' && $this->FCom_Admin_Model_User->isLoggedIn()) {
             $text = "
 FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
 ";
             $head->js_raw('pushserver_init', $text);
             $script->addText('FCom_PushServer:init', $text);
-        //}
+        }
     }
 
     /**
@@ -66,6 +67,7 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
     {
         $userId = $this->FCom_Admin_Model_User->sessionUserId();
         $this->FCom_PushServer_Model_Client->delete_many(['admin_user_id' => $userId]);
+        //TODO: Implement deleting records older than X days
         //TODO: implement roster (online/offline) notifications
     }
 

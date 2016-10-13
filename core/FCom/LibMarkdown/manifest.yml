@@ -1,5 +1,6 @@
 modules:
     FCom_LibMarkdown:
-        version: 0.5.0.0
-        channel: alpha
-        auto_use: [ bootstrap ]
+        version: 0.6.0.0
+        channel: beta
+        auto_use: [ bootstrap, layout ]
+        load_after: [ FCom_LibTwig ]

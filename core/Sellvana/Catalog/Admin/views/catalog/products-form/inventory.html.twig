@@ -3,6 +3,8 @@
 {% set validator = THIS.get('validator') %}
 {% set prodFieldData = { model:m, label_class:'col-md-4' } %}
 {% set invFieldData = { model:inv, id_prefix: 'inventory', name_prefix: 'inventory', label_class:'col-md-4' } %}
+{% set countries = APP.instance('BLocale').getAvailableCountries() %}
+{% set defCountry = CONFIG.get('modules/Sellvana_Catalog/default_origin_country') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
@@ -19,6 +21,7 @@
         {{ forms.input(invFieldData,    { field: 'qty_warn_customer', label: 'Minimal Qty to warn customer on frontend'|_, type: 'number'}) }}
         {{ forms.input(invFieldData,    { field: 'qty_notify_admin', label: 'Minimal Qty to notify admin'|_, type: 'number' }) }}
         {{ forms.input(invFieldData,    { field: 'qty_cart_min', label: 'Minimal Qty in Cart'|_, type: 'number' }) }}
+        {{ forms.input(invFieldData,    { field: 'qty_cart_max', label: 'Maximum Qty in Cart'|_, type: 'number' }) }}
         {{ forms.input(invFieldData,    { field: 'qty_cart_inc', label: 'Qty in Cart Increment'|_, type: 'number' }) }}
         {{ forms.input(invFieldData,    { field: 'qty_buffer', label: 'Buffer Qty In Stock'|_, type: 'number' }) }}
         <hr>
@@ -26,5 +29,8 @@
         {{ forms.input(invFieldData,    { field: 'net_weight', label: 'Net Weight'|_ }) }}
         {{ forms.input(invFieldData,    { field: 'shipping_weight', label: 'Shipping Weight'|_ }) }}
         {{ forms.input(invFieldData,    { field: 'shipping_size', label: 'Shipping Size (WxDxH)'|_ }) }}
+
+        {{ forms.input(invFieldData,    { field: 'hs_tariff_number', label: 'Harmonized Tariff Number'|_ }) }}
+        {{ forms.select(invFieldData,   { field: 'origin_country', label: 'Country of Origin'|_, options: countries, default: defCountry }) }}
     </div>
 </fieldset>

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Cms_Migrate
@@ -285,6 +285,37 @@ class Sellvana_Cms_Migrate extends BClass
                 'layout_update' => BDb::DROP,
                 'data_serialized' => 'text default null',
             ],
+        ]);
+    }
+
+    public function upgrade__0_5_0_0__0_5_0_1()
+    {
+        $tBlock = $this->Sellvana_Cms_Model_Block->table();
+        $this->BDb->ddlTableDef($tBlock, [
+            BDb::COLUMNS => [
+                'form_notify_admin'        => 'BOOLEAN NULL DEFAULT 0',
+                'form_notify_admin_user'   => 'INT(10) UNSIGNED NULL DEFAULT NULL',
+                'form_notify_customer'     => 'BOOLEAN NULL DEFAULT 0',
+                'form_notify_customer_tpl' => 'VARCHAR(100) NULL DEFAULT NULL',
+                'form_user_email_field'    => 'VARCHAR(20) NULL DEFAULT NULL',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_0_1__0_5_0_2()
+    {
+        $tFormData = $this->Sellvana_Cms_Model_FormData->table();
+        $tBlock = $this->Sellvana_Cms_Model_Block->table();
+
+        $this->BDb->ddlTableDef($tFormData, [
+            BDb::COLUMNS => [
+                'form_id' => 'DROP',
+                'block_id' => 'int(10) unsigned NOT NULL'
+            ],
+            BDb::CONSTRAINTS => [
+                'form' => 'DROP',
+                'block'=> ['block_id', $tBlock]
+            ]
         ]);
     }
 }

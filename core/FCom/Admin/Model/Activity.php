@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * class FCom_Admin_Model_Activity
@@ -6,6 +6,7 @@
  * @property int $id
  * @property string $status new|recent|archived
  * @property string $type workflow|alert
+ * @property string $feed local|remote
  * @property string $event_code (order:new:123)
  * @property string $permissions (orders, customers, modules)
  * @property int $action_user_id
@@ -39,6 +40,10 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         'type' => [
             'workflow' => 'Workflow',
             'alert' => 'Alert',
+        ],
+        'feed' => [
+            'local' => 'Local',
+            'remote' => 'Remote',
         ],
     ];
 
@@ -201,6 +206,22 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
             $this->set('status', 'archive')->save();
         }
         */
+        return $this;
+    }
+
+    public function collectActivityItems()
+    {
+        $items = [];
+        $this->BEvents->fire(__METHOD__, ['items' => &$items]);
+        $this->addActivityItems($items);
+        return $this;
+    }
+
+    public function fetchRemoteActivityItems()
+    {
+        $items = [];
+        $this->BEvents->fire(__METHOD__, ['items' => &$items]);
+        $this->addActivityItems($items);
         return $this;
     }
 

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class FCom_LibTwig_Main extends BClass
 {
@@ -32,13 +32,13 @@ class FCom_LibTwig_Main extends BClass
 
         $config = $this->BConfig;
 
-        static::$_cacheDir = $config->get('fs/cache_dir') . '/twig';
+        static::$_cacheDir = $this->BApp->storageRandomDir() . '/twig';
         $this->BUtil->ensureDir(static::$_cacheDir);
         $cacheConfig = $this->BConfig->get('core/cache/twig');
         $useCache = !$cacheConfig && $this->BDebug->is(['DEBUG', 'DEVELOPMENT']) || $cacheConfig === 'enable';
         $options = [
             'cache' => $useCache ? static::$_cacheDir : false,
-            'debug' => false, #$config->get('modules/FCom_LibTwig/debug'),
+            'debug' => $this->BDebug->is(['DEBUG']), #$config->get('modules/FCom_LibTwig/debug'),
             'auto_reload' => true, #$useCache ? false : true, #$config->get('modules/FCom_LibTwig/auto_reload'),
             'optimizations' => -1,
         ];
@@ -55,13 +55,15 @@ class FCom_LibTwig_Main extends BClass
         }
 
         foreach ([
-            '_' => [$this->BLocale, '_'],
+            '_' => [$this->BLocale, 'translate'],
             'currency' => [$this->BLocale, 'currency'],
+            'locdate' => [$this->BLocale, 'datetimeDbToLocal'],
             'safehtml' => [$this->BResponse, 'safeHtml'],
             'min' => 'min',
             'max' => 'max',
             'floor' => 'floor',
             'debug' => function($v) { echo "<pre>"; print_r($v); echo "</pre>"; },
+            'replace1' => function($v, $from, $to) { return str_replace($from, $to, $v); },
         ] as $filterName => $filterCallback) {
             $filter = new Twig_SimpleFilter($filterName, $filterCallback);
             static::$_fileTwig->addFilter($filter);
@@ -106,7 +108,12 @@ class FCom_LibTwig_Main extends BClass
         static::$_fileLoader->prependPath($path, $namespace);
     }
 
-    public function renderer($view)
+    public function renderFile($filename, $args)
+    {
+        return static::$_fileTwig->loadTemplate($filename)->render($args);
+    }
+
+    public function renderer(BView $view)
     {
         $viewName = $view->getParam('view_name');
 
@@ -114,7 +121,6 @@ class FCom_LibTwig_Main extends BClass
 
         $source = $view->getParam('source');
         $args = $view->getAllArgs();
-        //TODO: add BRequest and BLayout vars?
         $args['THIS'] = $view;
 
         if (!$source) {

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -326,7 +326,7 @@ class BDb
                 exit;
             }
             $row = $r->$method();
-            if (null !== $fields) $row = BUtil::arrayMask($row, $fields, $maskInverse);
+            if (null !== $fields) $row = BUtil::i()->arrayMask($row, $fields, $maskInverse);
             $res[$i] = $row;
         }
         return $res;
@@ -814,8 +814,9 @@ EOT
         if (static::ddlTableExists($fullTableName, $connectionName)) {
             $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
             static::ddlClearCache(null, $connectionName);
+            return $result;
         }
-        return $result;
+        return false;
     }
 
     /**
@@ -831,6 +832,9 @@ EOT
         $isObject = is_object($data);
         $result = [];
         foreach ($data as $k => $v) {
+            if (is_array($v) || is_object($v)) {
+                continue;
+            }
             $fieldInfo = BDb::ddlFieldInfo($table, $k, $connectionName);
             if ($fieldInfo) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];
@@ -1015,7 +1019,8 @@ class BORM extends ORMWrapper
             $password = static::$_config['password'];
             $driver_options = static::$_config['driver_options'];
             if (empty($driver_options[PDO::MYSQL_ATTR_INIT_COMMAND])) { //ADDED
-                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
+                $sqlMode = BDebug::i()->is(['DEBUG', 'DEVELOPMENT']) ? 'STRICT_TRANS_TABLES' : 'TRADITIONAL';
+                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8, SESSION sql_mode = {$sqlMode}";
             }
             if (empty($driver_options[PDO::ATTR_TIMEOUT])) {
                 $driver_options[PDO::ATTR_TIMEOUT] = 5;
@@ -1207,11 +1212,12 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Return select sql statement built from the ORM object
-    * Extended with argument for options skipping of values calculation
-    *
-    * @return string
-    */
+     * Return select sql statement built from the ORM object
+     * Extended with argument for options skipping of values calculation
+     *
+     * @param bool $calculate_values
+     * @return string
+     */
     public function as_sql($calculate_values = true)
     {
         return $this->_build_select($calculate_values);
@@ -1319,8 +1325,10 @@ class BORM extends ORMWrapper
     public function find_one($id = null)
     {
         $class = $this->_origClass();
+        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         BEvents::i()->fire($class . '::find_one:orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         $result = parent::find_one($id);
+        BEvents::i()->fire(__METHOD__ . ':after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         BEvents::i()->fire($class . '::find_one:after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         return $result;
     }
@@ -1333,9 +1341,11 @@ class BORM extends ORMWrapper
     public function find_many()
     {
         $class = $this->_origClass();
+        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $this, 'class' => $class]);
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
-        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'class' => $class]);
+        BEvents::i()->fire(__METHOD__ . ':after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
+        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         return $result;
     }
 
@@ -1372,6 +1382,11 @@ class BORM extends ORMWrapper
             }
         }
         return $array;
+    }
+
+    public function collection()
+    {
+        return new BCollection($this->find_many());
     }
 
     /**
@@ -1493,8 +1508,11 @@ class BORM extends ORMWrapper
      * @param null $table_alias
      * @return $this
      */
-    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
-        if (!isset(self::$_classTableMap[$table])) {
+    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null)
+    {
+        if ($table instanceof BModel) {
+            self::$_classTableMap[$table] = $table->table();
+        } elseif (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
                 self::$_classTableMap[$table] = $class::table();
@@ -1526,6 +1544,33 @@ class BORM extends ORMWrapper
 
         // ADDED: avoid duplicate joins of the same table and alias
         $this->_join_sources["{$join_operator} {$table} ON {$constraint}"] = "{$join_operator} {$table} ON {$constraint}";
+        return $this;
+    }
+
+    /**
+     * Add a RAW JOIN source to the query
+     *
+     * @param $table
+     * @param $constraint
+     * @param $table_alias
+     * @param array $parameters
+     * @return $this
+     */
+    public function raw_join($table, $constraint, $table_alias, $parameters = array()) {
+        // Add table alias if present
+        if (!is_null($table_alias)) {
+            $table_alias = $this->_quote_identifier($table_alias);
+            $table .= " {$table_alias}";
+        }
+        $this->_values = array_merge($this->_values, $parameters);
+        // Build the constraint
+        if (is_array($constraint)) {
+            list($first_column, $operator, $second_column) = $constraint;
+            $first_column = $this->_quote_identifier($first_column);
+            $second_column = $this->_quote_identifier($second_column);
+            $constraint = "{$first_column} {$operator} {$second_column}";
+        }
+        $this->_join_sources[] = "{$table} ON {$constraint}";
         return $this;
     }
 
@@ -1667,6 +1712,17 @@ class BORM extends ORMWrapper
     {
         BDb::connect($this->_writeConnectionName);
         return parent::delete();
+    }
+
+    /**
+     * Add an unquoted expression to the list of columns to GROUP BY
+     *
+     * @param $expr
+     * @return $this
+     */
+    public function group_by_expr($expr) {
+        $this->_group_by[] = $expr;
+        return $this;
     }
 
     /**
@@ -1863,7 +1919,10 @@ class BORM extends ORMWrapper
 
         $values = [];
         foreach ($this->_where_conditions as $condition) {
-            $values[] = $condition[static::WHERE_VALUES][0];
+            // WHERE condition doesn't always have a value (e.g. WHERE x IS NULL)
+            if (isset($condition[static::WHERE_VALUES][0])) {
+                $values[] = $condition[static::WHERE_VALUES][0];
+            }
         }
 
         return $values;
@@ -2141,6 +2200,7 @@ class BORM extends ORMWrapper
  * @property BDebug $BDebug
  * @property BLoginThrottle $BLoginThrottle
  * @property BYAML $BYAML
+ * @property Toml $Toml
  * @property BValidate $BValidate
  * @property BValidateViewHelper $BValidateViewHelper
  * @property Bcrypt $Bcrypt
@@ -2325,7 +2385,7 @@ class BModel extends Model
     *
     * @return BPDO
     */
-    public static function readDb()
+    public static function connectToReadDb()
     {
         if (null === static::$_readConnectionName) {
             $readConnection = BConfig::i()->get('db/read_connection');
@@ -2339,7 +2399,7 @@ class BModel extends Model
     *
     * @return BPDO
     */
-    public static function writeDb()
+    public static function connectToWriteDb()
     {
         if (null === static::$_writeConnectionName) {
             $writeConnectionName = BConfig::i()->get('db/write_connection');
@@ -2354,16 +2414,17 @@ class BModel extends Model
     * Use XXX::i()->orm($alias) instead
     *
     * @param string|null $class_name optional
+    * @param string|null $context
     * @return BORM
     */
-    public static function factory($class_name = null)
+    public static function factory($class_name = null, $context = null)
     {
         if (null === $class_name) { // ADDED
             $class_name = get_called_class();
         }
         $class_name = BClassRegistry::className($class_name); // ADDED
 
-        static::readDb();
+        static::connectToReadDb();
         $table_name = static::_get_table_name($class_name);
         $orm = BORM::for_table($table_name); // CHANGED
         $orm->set_class_name($class_name);
@@ -2372,6 +2433,7 @@ class BModel extends Model
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
+        $orm->set('_context', $context); // ADDED
         $orm->table_alias('_main');
         return $orm;
     }
@@ -2380,11 +2442,12 @@ class BModel extends Model
     * Alias for self::factory() with shortcut for table alias
     *
     * @param string $alias table alias
+    * @param string $context
     * @return BORM
     */
-    public static function orm($alias = null)
+    public static function orm($alias = null, $context = null)
     {
-        $orm = static::factory();
+        $orm = static::factory(null, $context);
         static::_findOrm($orm);
         if ($alias) {
             $orm->table_alias($alias);
@@ -2845,6 +2908,18 @@ class BModel extends Model
     */
     public function save($callBeforeAfter = true, $replace = false)
     {
+        $fields = $this->BDb->ddlFieldInfo($this->table());
+        foreach ($fields as $fName => $field) {
+            $value = $this->get($fName);
+            if ($value !== null && !is_numeric($value)
+                && preg_match('#^((|tiny|small|medium|big)int|dec|fixed|real|bit)#i', $field->get('Type'))
+            ) {
+                $this->set($fName, null);
+                if (null !== $field->get('Default')) {
+                    $this->set($fName, $field->get('Default'));
+                }
+            }
+        }
         if ($callBeforeAfter) {
             try {
                 if (!$this->onBeforeSave()) {
@@ -2857,14 +2932,14 @@ class BModel extends Model
 
         $this->_newRecord = !$this->get(static::_get_id_column_name(get_called_class()));
 
-        static::writeDb();
+        static::connectToWriteDb();
         parent::save($replace);
 
         if ($callBeforeAfter) {
             $this->onAfterSave();
         }
 
-        if (static::$_cacheAuto) {
+        if (static::$_cacheAuto && !$this->BDebug->is(BDebug::MODE_IMPORT)) {
             $this->cacheStore();
         }
         return $this;
@@ -2931,7 +3006,7 @@ class BModel extends Model
             }
         }
 
-        static::writeDb();
+        static::connectToWriteDb();
         parent::delete();
 
         $this->onAfterDelete();
@@ -2957,7 +3032,7 @@ class BModel extends Model
     */
     public static function run_sql($sql, $params = [])
     {
-        return static::writeDb()->prepare($sql)->execute((array)$params);
+        return static::connectToWriteDb()->prepare($sql)->execute((array)$params);
     }
 
     /**
@@ -2997,7 +3072,7 @@ class BModel extends Model
 
     public static function create_many(array $data, array $defaults = [], array $options = [])
     {
-        static::writeDb();
+        static::connectToWriteDb();
         $fields = [];
         foreach ($data as $r) {
             foreach ($r as $f => $v) {
@@ -3039,7 +3114,7 @@ class BModel extends Model
      */
     public static function update_many(array $data, $where = null, $p = [])
     {
-        static::writeDb();
+        static::connectToWriteDb();
         $update = [];
         $params = [];
         foreach ($data as $k => $v) {
@@ -3080,7 +3155,7 @@ class BModel extends Model
      */
     public static function update_many_by_id(array $data, $idField = null, $updateField = null)
     {
-        static::writeDb();
+        static::connectToWriteDb();
         if (null === $idField) {
             $idField = static::_get_id_column_name(get_called_class());
         }
@@ -3135,7 +3210,7 @@ class BModel extends Model
     */
     public static function delete_many($where, $params = [])
     {
-        static::writeDb();
+        static::connectToWriteDb();
         BEvents::i()->fire(static::origClass() . '::delete_many:before', [
             'where' => &$where,
             'params' => &$params,
@@ -3278,7 +3353,7 @@ class BModel extends Model
     {
         $collection = $this->get($var);
         if (!$collection) {
-            $collection = $this-> {$var};
+            $collection = $this->{$var};
             if (!$collection) return null;
         }
         foreach ($collection as $k => $v) {
@@ -3470,15 +3545,33 @@ class BModel extends Model
         }
         return $this;
     }
+
+    /**
+     * @param $string
+     * @param array|string $params
+     * @param null $module
+     * @return false|string
+     * @throws BException
+     */
+    public function _($string, $params = [], $module = null)
+    {
+        /** @var BLocale $locale */
+        static $locale;
+        if (!$locale) {
+            $locale = $this->BLocale;
+        }
+        return $locale->translate($string, $params, $module);
+    }
 }
 
 /**
- * Collection of models
+ * Collection of models or other values
  *
  * Should be (almost) drop in replacement for current straight arrays implementation
  */
 class BCollection extends ArrayIterator
 {
+/*
     protected $_orm;
     protected $_modelClass = 'BModel';
 
@@ -3533,6 +3626,9 @@ class BCollection extends ArrayIterator
     {
         return BDb::many_as_array($this);
     }
+    */
+
+
 }
 
 class BModelException extends BException

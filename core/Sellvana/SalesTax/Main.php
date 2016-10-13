@@ -1,10 +1,11 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_SalesTax_Main
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_SalesTax_Model_CustomerTax $Sellvana_SalesTax_Model_CustomerTax
+ * @property Sellvana_SalesTax_Model_CustomerGroupTax $Sellvana_SalesTax_Model_CustomerGroupTax
  * @property Sellvana_SalesTax_Model_ProductTax $Sellvana_SalesTax_Model_ProductTax
  * @property Sellvana_SalesTax_Model_Rule $Sellvana_SalesTax_Model_Rule
  * @property Sellvana_SalesTax_Model_RuleCustomerClass $Sellvana_SalesTax_Model_RuleCustomerClass
@@ -17,26 +18,26 @@ class Sellvana_SalesTax_Main extends BClass
 {
     public function bootstrap()
     {
-        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'sales/tax'                  => $locale->_('Sales Tax'),
-            'sales/tax/zones'            => $locale->_('Sales Tax Zones'),
-            'sales/tax/rules'            => $locale->_('Sales Tax Rules'),
-            'sales/tax/product_classes'  => $locale->_('Sales Tax Product Classes'),
-            'sales/tax/customer_classes' => $locale->_('Sales Tax Customer Classes'),
-            'settings/Sellvana_SalesTax' => $locale->_('Sales Tax Settings'),
+            'sales/tax' => 'Sales Tax',
+            'sales/tax/zones' => 'Sales Tax Zones',
+            'sales/tax/rules' => 'Sales Tax Rules',
+            'sales/tax/product_classes' => 'Sales Tax Product Classes',
+            'sales/tax/customer_classes' => 'Sales Tax Customer Classes',
+            'settings/Sellvana_SalesTax' => 'Sales Tax Settings',
         ]);
     }
+
     public function onCartTaxCalculate($args)
     {
         /** @var Sellvana_Sales_Model_Cart $cart */
-        $cart = $args['cart'];
-        $result =& $args['result'];
+        $cart       = $args['cart'];
+        $result     =& $args['result'];
         $customerId = !empty($args['customer']) ? $args['customer']->id() : $cart->get('customer_id');
 
         $result['tax_amount'] = 0;
-        $result['items'] = [];
-        $result['details'] = [];
+        $result['items']      = [];
+        $result['details']    = [];
 
         $zones = $this->_collectCartZones($cart);
         if (!$zones) {
@@ -78,7 +79,7 @@ class Sellvana_SalesTax_Main extends BClass
             }
         }
 
-        $region = $cart->get('shipping_region');
+        $region   = $cart->get('shipping_region');
         $postcode = $cart->get('shipping_postcode');
 
         $orWhere = [
@@ -87,14 +88,17 @@ class Sellvana_SalesTax_Main extends BClass
 
         if ($postcode) {
             $orWhere[] = ['AND', 'zone_type' => 'postcode', 'postcode_from' => $postcode];
-            $orWhere[] = ['AND', 'zone_type' => 'postrange', ['postcode_from <= ?', $postcode], ['postcode_to >= ?', $postcode]];
+            $orWhere[] =
+                ['AND', 'zone_type' => 'postrange', ['postcode_from <= ?', $postcode], ['postcode_to >= ?', $postcode]];
         }
         if ($region) {
-            $orWhere[] = ['AND', 'zone_type' => 'region', 'region' => $region, 'postcode_from' => null, 'postcode_to' => null];
+            $orWhere[] =
+                ['AND', 'zone_type' => 'region', 'region' => $region, 'postcode_from' => null, 'postcode_to' => null];
         }
         $ruleZones = $this->Sellvana_SalesTax_Model_Zone->orm('z')
             ->where('country', $country)->where_complex($orWhere, true)
-            ->join('Sellvana_SalesTax_Model_RuleZone', ['rz.zone_id', '=', 'z.id'], 'rz')
+            ->join('Sellvana_SalesTax_Model_RuleZone', ['rz.zone_id', '=',
+                'z.id'], 'rz')
             ->select('z.*')->select('rz.rule_id')
             ->find_many();
 
@@ -112,7 +116,7 @@ class Sellvana_SalesTax_Main extends BClass
         if (!$custClassIds) {
             // otherwise use configuration for default guest tax class
             $defCustClassId = $this->BConfig->get('modules/Sellvana_SalesTax/default_guest_class_id');
-            $custClassIds = [$defCustClassId];
+            $custClassIds   = [$defCustClassId];
         }
 
         $custClassRules = $this->Sellvana_SalesTax_Model_RuleCustomerClass->orm()
@@ -146,8 +150,8 @@ class Sellvana_SalesTax_Main extends BClass
             $assigned = false;
             foreach ($prodTaxClasses as $pt) {
                 if ($item->get('product_id') === $pt->get('product_id')) {
-                    $assigned = true;
-                    $prodClassId = $pt->get('product_class_id');
+                    $assigned                                    = true;
+                    $prodClassId                                 = $pt->get('product_class_id');
                     $itemsByProdClass[$prodClassId][$item->id()] = $item;
                 }
             }
@@ -262,39 +266,41 @@ class Sellvana_SalesTax_Main extends BClass
                 continue;
             }
             $prevCompPriority = null;
-            $taxableAmount = $item->get('row_total');
+            $taxableAmount    = $item->get('row_total');
             foreach ($rulesPerItem[$itemId] as $compoundPriority => $itemRules) {
                 $compoundAmount = 0;
                 foreach ($itemRules as $rId => $rule) {
                     if ($rule->get('fpt_amount')) {
                         $itemRuleAmount = $rule->get('fpt_amount');
+                        $rate = null;
                     } else {
-                        $rate = (float)($rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent'));
+                        $rate                =
+                            (float)($rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent'));
                         $ratesByRule[$rId][] = $rate;
-                        $itemRuleAmount = ceil($taxableAmount * $rate) / 100;
+                        $itemRuleAmount      = ceil($taxableAmount * $rate) / 100;
                     }
                     if (empty($result['details']['rules'][$rId])) {
                         $result['details']['rules'][$rId] = ['amount' => 0];
                     }
                     $result['details']['rules'][$rId]['amount'] += $itemRuleAmount;
-                    $result['items'][$itemId]['details']['rules'][$rId] = ['rate' => $rate, 'amount' => $itemRuleAmount];
+                    $result['items'][$itemId]['details']['rules'][$rId] =
+                        ['rate' => $rate, 'amount' => $itemRuleAmount];
                     $compoundAmount += $itemRuleAmount;
                 }
                 $taxableAmount += $compoundAmount;
             }
-            $rowTaxAmount = $taxableAmount - $item->get('row_total');
+            $rowTaxAmount                        = $taxableAmount - $item->get('row_total');
             $result['items'][$itemId]['row_tax'] = $rowTaxAmount;
             $result['tax_amount'] += $rowTaxAmount;
         }
 
         foreach ($ratesByRule as $rId => $rates) {
-            $result['details']['rules'][$rId]['title'] = $rules[$rId]->get('title');
+            $result['details']['rules'][$rId]['title']    = $rules[$rId]->get('title');
             $result['details']['rules'][$rId]['avg_rate'] = array_sum($rates) / sizeof($rates);
         }
 
         return $result;
     }
-
     public function onProductAfterSave($args)
     {
         $model = $args['model'];
@@ -302,6 +308,35 @@ class Sellvana_SalesTax_Main extends BClass
         $hlp = $this->Sellvana_SalesTax_Model_ProductTax;
         $existingTaxIds = $hlp->orm()->where('product_id', $pId)->find_many_assoc('product_class_id', 'id');
         $newTaxIds = $model->get('tax_class_ids');
+
+        if ($existingTaxIds) {
+            $deleteIds = [];
+            foreach ($existingTaxIds as $tcId => $tId) {
+                if (null !== $newTaxIds && !in_array($tcId, $newTaxIds)) {
+                    $deleteIds[] = $tId;
+                }
+            }
+            if ($deleteIds) {
+                $hlp->delete_many(['id' => $deleteIds]);
+            }
+        }
+
+        if (null !== $newTaxIds) {
+            foreach ($newTaxIds as $tcId) {
+                if (empty($existingTaxIds[$tcId])) {
+                    $hlp->create(['product_id' => $pId, 'product_class_id' => $tcId])->save();
+                }
+            }
+        }
+    }
+
+    public function onCustomerAfterSave($args)
+    {
+        $model = $args['model'];
+        $cId = $model->id();
+        $hlp = $this->Sellvana_SalesTax_Model_CustomerTax;
+        $existingTaxIds = $hlp->orm()->where('customer_id', $cId)->find_many_assoc('customer_class_id', 'id');
+        $newTaxIds = $model->get('tax_class_ids') ?: [];
 
         if ($existingTaxIds) {
             $deleteIds = [];
@@ -318,7 +353,36 @@ class Sellvana_SalesTax_Main extends BClass
         if ($newTaxIds) {
             foreach ($newTaxIds as $tcId) {
                 if (empty($existingTaxIds[$tcId])) {
-                    $hlp->create(['product_id' => $pId, 'product_class_id' => $tcId])->save();
+                    $hlp->create(['customer_id' => $cId, 'customer_class_id' => $tcId])->save();
+                }
+            }
+        }
+    }
+
+    public function onCustomerGroupAfterSave($args)
+    {
+        $model = $args['model'];
+        $cId = $model->id();
+                $hlp = $this->Sellvana_SalesTax_Model_CustomerGroupTax;
+        $existingTaxIds = $hlp->orm()->where('customer_group_id', $cId)->find_many_assoc('customer_class_id', 'id');
+        $newTaxIds = $model->get('tax_class_ids') ?: [];
+
+        if ($existingTaxIds) {
+            $deleteIds = [];
+            foreach ($existingTaxIds as $tcId => $tId) {
+                if (!in_array($tcId, $newTaxIds)) {
+                    $deleteIds[] = $tId;
+                }
+            }
+            if ($deleteIds) {
+                $hlp->delete_many(['id' => $deleteIds]);
+            }
+        }
+
+        if ($newTaxIds) {
+            foreach ($newTaxIds as $tcId) {
+                if (empty($existingTaxIds[$tcId])) {
+                    $hlp->create(['customer_group_id' => $cId, 'customer_class_id' => $tcId])->save();
                 }
             }
         }

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_StateCustom
@@ -30,7 +30,8 @@ class Sellvana_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
 
     public function optionsByType($type = null)
     {
-        if (empty(static::$_optionsByType)) {
+        if (!isset(static::$_optionsByType)) {
+            static::$_optionsByType = [];
             $states = $this->orm()->order_by_asc('state_label')->find_many();
             foreach ($states as $state) {
                 static::$_optionsByType[$state->entity_type][$state->state_code] = $state->state_label;

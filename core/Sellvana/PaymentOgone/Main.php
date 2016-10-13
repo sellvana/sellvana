@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_PaymentOgone_Main
@@ -17,7 +17,7 @@ class Sellvana_PaymentOgone_Main extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_PaymentOgone' => BLocale::i()->_('Payment Ogone Settings'),
+            'settings/Sellvana_PaymentOgone' => 'Payment Ogone Settings',
         ]);
     }
 }

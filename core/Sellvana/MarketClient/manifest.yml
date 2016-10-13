@@ -1,7 +1,7 @@
 modules:
     Sellvana_MarketClient:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Fulleron Extension Market Client"
 
@@ -16,12 +16,11 @@ modules:
                 observe:
                     - [ "FCom_Admin_Controller_Modules::gridViewBefore", Sellvana_MarketClient_Admin.onModulesGridViewBefore ]
                     - [ "FCom_Admin_Controller_Modules::gridView", Sellvana_MarketClient_Admin.onModulesGridView ]
-                    - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_MarketClient_Main.onGetHeaderNotifications ]
 
 
             FCom_Cron:
                 crontab:
-                    #- [ * * * * *, Sellvana_MarketClient_Cron.collectModules ]
+                    - [ "* * * * *", Sellvana_MarketClient_Cron.collectMarketUpdates ]
 
             FCom_Install:
                 auto_use: [ layout, views ]
@@ -30,3 +29,9 @@ modules:
                     - [ "/marketclient/download/?.action", Sellvana_MarketClient_Controller_Download ]
                 observe:
                     - [ "FCom_Install_Controller::action_step3__POST:after", Sellvana_MarketClient_Main.onInstallStep3Post ]
+
+      default_config:
+          modules:
+              Sellvana_MarketClient:
+                  auto_check_enable: 1
+                  auto_check_days: 1

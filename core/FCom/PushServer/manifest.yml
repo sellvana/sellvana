@@ -1,13 +1,13 @@
 modules:
     FCom_PushServer:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         description: XHR Push Server implementation for long polling real-time communication C2C and S2C
 
         require: { module: { FCom_Core: 0.1.0 } }
 
         observe:
-            - [ "BSession::regenerateId", "FCom_PushServer_Main::onRegenerateSessionId" ]
+            - [ "BSession::regenerateId:after", "FCom_PushServer_Main::onRegenerateSessionId" ]
 
         areas:
             FCom_Admin:
@@ -23,5 +23,11 @@ modules:
                 routing:
                     - [ /, FCom_PushServer_Controller.index ]
 
+            FCom_Shell:
+                custom:
+                    actions:
+                        - FCom_PushServer_Shell_Debug
+
         default_config:
             modules/FCom_PushServer/delay_sec: 1
+            modules/FCom_PushServer/only_admin: true

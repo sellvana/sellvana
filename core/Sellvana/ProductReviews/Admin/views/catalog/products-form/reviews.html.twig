@@ -1,60 +1,113 @@
 <!--{ label: Product Reviews }-->
 <!--{ pos: 70 }-->
 <!--{ model_new_hide: true }-->
+<!--{ async: true }-->
+
+<style type="text/css">
+    div.rateit div.rateit-selected
+    {
+        background: url({{ APP.src('@FCom_LibJsCommon/js/images/rateit/star.gif') }}) left -32px;
+    }
+</style>
 
 {% set m = THIS.get('model') %}
 {% set ctrl = APP.instance('Sellvana_ProductReviews_Admin_Controller') %}
 {% set gridConfig = ctrl.gridConfig(m) %}
 
 <script>
-require(["jquery", "underscore", "jquery.validate"], function($, _) {
-    var btnApprove = $('#prod-reviews-approve');
-    var btnDeny = $('#prod-reviews-deny');
-    var selectedRows = [];
-    var prodReviewGrid;
-    window.products_reviews_register = function(grid) {
-        prodReviewGrid = grid;
-        grid.getGridSkeleton().Views.GridView.prototype.afterSelectionChanged = function() {
-            if (prodReviewGrid.getSelectedRows().length > 0) {
-                btnApprove.removeClass('disabled');
-                btnDeny.removeClass('disabled');
-            } else {
-                btnApprove.addClass('disabled');
-                btnDeny.addClass('disabled');
-            }
-        }
-        grid.build();
-    }
-    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
-        adminForm.createSwitchButton();
-        adminForm.wysiwygInit();
+    require(["jquery", "underscore", 'react', 'fcom.components', 'griddle.fcomModalForm', 'fcom.locale', "jquery.validate", "fcom.admin", "bootstrap"], function ($, _, React, Components, FComModalForm, Locale) {
+        var prodReviewGrid = null, prodReviewNode = null;
+        var prodReviewModalNode = null, prodModalForm = null;
 
-        btnApprove.on('click', function() {
+        window.prodReviewsRegister = function (grid) {
+            prodReviewGrid = grid;
+            prodReviewNode = $(prodReviewGrid.getDOMNode());
+        };
+
+        window.showModalToEditReview = function (row) {
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                    React.createElement(Components.Modal, {
+                                id: "editProReviewModal",
+                                show: true,
+                                title: "{{ 'Edit Form' |_ }}",
+                                confirm: "{{ 'Save changes' |_ }}",
+                                cancel: "{{ 'Close' |_ }}",
+                                onLoad: function (modal) {
+                                    prodReviewModalNode = $(modal.getDOMNode());
+                                    prodModalForm = prodReviewModalNode.find('#{{ gridConfig.id }}-modal-form');
+                                    prodReviewModalNode.find('.modal-dialog').css('width', '600px')
+                                },
+                                onConfirm: window.saveReviewModal
+                            },
+                            React.DOM.div({className: "row f-grid-wrapper", style: {margin: '0 auto'}},
+                                    React.createElement(FComModalForm, {
+                                        columnMetadata: prodReviewGrid.getConfig('columns'),
+                                        id: prodReviewGrid.getConfig('id'),
+                                        row: row
+                                    })
+                            )
+                    ), modalContainerEle
+            );
+
+        };
+
+        window.saveReviewModal = function (modal) {
+            if (!prodModalForm.valid()) return false;
+
+            var hash = {
+                oper: 'edit'
+            };
+
+            _(prodReviewModalNode.find('input, select, textarea')).each(function (ele) {
+                hash[$(ele).attr('name')] = $(ele).val();
+            });
+
+            $.post(prodReviewGrid.getConfig('edit_url'), hash, function (r) {
+                if (r) {
+                    prodReviewGrid.updateRows([r]);
+
+                    $.bootstrapGrowl("{{ 'Successfully saved.' | _ }}", {type: 'success', align: 'center', width: 'auto'});
+                }
+            });
+
+            modal.close();
+        };
+
+        window.approveReviews = function (grid) {
             updateStatus(1);
-        });
+        };
 
-        btnDeny.on('click', function() {
+        window.denyReviews = function (grid) {
             updateStatus(0);
-        });
+        };
 
-        function updateStatus(approve)
-        {
-            var selectedRows = prodReviewGrid.getRows().toJSON();
-            for (var index = 0; index < selectedRows.length; index++) {
-                var row = prodReviewGrid.getRows().findWhere({id:selectedRows[index].id});
-                row.set('approved', approve);
-                row.save();
-                row.trigger('render');
-                //todo: implement update multi rows
-            }
-            $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+        function updateStatus(approve) {
+            approve = approve.toString();
+            var editedRows = [];
+            _(prodReviewGrid.getSelectedRows()).each(function (row, index) {
+                if (row.approved != approve) {
+                    row.approved = approve;
+
+                    var hash = row;
+                    hash['oper'] = 'edit';
+
+                    $.post(prodReviewGrid.getConfig('edit_url'), hash, function (r) {
+                        if (r) editedRows.push(r);
+                    });
+                }
+            });
+
+            prodReviewGrid.updateRows(editedRows);
+            prodReviewGrid.clearSelectedRows();
+            $.bootstrapGrowl("{{ 'Successfully saved.' | _ }}", {type: 'success', align: 'center', width: 'auto'});
+
         }
 
     });
-});
 </script>
 
-{#{{ THIS.view('core/backbonegrid').set('grid', {config: gridConfig }) | raw }}#}
 {{ THIS.view('core/griddle').set('grid', {config: gridConfig }) | raw }}
 
 

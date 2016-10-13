@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 {
@@ -13,12 +13,13 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         ['qty_warn_customer', '@integer'],
         ['qty_notify_admin', '@integer'],
         ['qty_cart_min', '@integer'],
+        ['qty_cart_max', '@integer'],
         ['qty_cart_inc', '@integer'],
         ['qty_buffer', '@integer'],
     ];
 
     static protected $_fieldOptions = [
-        'manage_inventory' => [1 => 'YES', 0 => 'no'],
+        'manage_inventory' => [1 => 'YES', 0 => 'no', -1 => 'Default'],
         'allow_backorder' => [1 => 'YES', 0 => 'no', ],
         'pack_separate' => [1 => 'YES', 0 => 'no', ],
     ];
@@ -27,6 +28,8 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         "title" => "N/A",
         'qty_in_stock' => 0,
         'qty_buffer' => 0,
+        'qty_cart_inc' => 1,
+        'pack_separate' => 0,
     ];
 
     protected static $_importExportProfile = [
@@ -41,23 +44,38 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
             return false;
         }
 
+        if (!$this->get('inventory_sku')) {
+            return false;
+        }
+
         $this->set('qty_buffer', 0, 'IFNULL');
+
+        if (null === $this->get('pack_separate')) {
+            $this->set('pack_separate', 0);
+        }
+
+        if (null === $this->get('origin_country')) {
+            $this->set('origin_country', $this->BConfig->get('modules/Sellvana_Catalog/default_origin_country'));
+        }
 
         return true;
     }
 
     public function collectInventoryForProducts($products)
     {
-        $pIds = [];
+        $invSkus = [];
         foreach ($products as $p) {
-            $pIds[$p->id()] = $p->id();
+            if ($p->get('inventory_sku')) {
+                $invSkus[] = $p->get('inventory_sku');
+            }
         }
-        if (empty($pIds)) {
+        if (empty($invSkus)) {
             return [];
         }
-        $invModels = $this->orm()->where_in('id', $pIds)->find_many_assoc('id');
+        $invModels = $this->orm()->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
         foreach ($products as $p) {
-            $p->set('inventory_model', !empty($invModels[$p->id()]) ? $invModels[$p->id()] : false);
+            $invSku = $p->get('inventory_sku');
+            $p->set('inventory_model', !empty($invModels[$invSku]) ? $invModels[$invSku] : false);
         }
         return $invModels;
     }
@@ -81,17 +99,29 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         $minQty = $this->get('qty_cart_min');
         if ($minQty && $qty < $minQty) {
             $qty = $minQty;
+            $this->BSession->addMessage($this->_('Some products quantities were recalculated because requested amount was smaller than allowed'), 'info', 'frontend');
+        }
+        $maxQty = $this->get('qty_cart_max');
+        if ($maxQty && $qty > $maxQty) {
+            $qty = $maxQty;
+            $this->BSession->addMessage($this->_('Some products quantities were recalculated because requested amount was larger than allowed'), 'info', 'frontend');
         }
         $incQty = $this->get('qty_cart_inc');
         if ($incQty > 1 && ($modulo = $qty % $incQty)) {
             $qty += $incQty - $modulo;
+            $this->BSession->addMessage($this->_('Some products quantities were recalculated because of quantity increment mismatch'), 'info', 'frontend');
         }
         if (!$this->canOrder($qty)) {
             $qty = $this->getQtyAvailable();
+            $this->BSession->addMessage($this->_('Some of the requested products are not available in the desired quantity'), 'info', 'frontend');
         }
         return $qty;
     }
 
+    /**
+     * @deprecated use $product's manage_inventory
+     * @return array|null
+     */
     public function getManageInventory()
     {
         return $this->get('manage_inventory');
@@ -109,7 +139,14 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 
     public function canOrder($qty = 1)
     {
-        return !$this->getManageInventory() || $this->getAllowBackorder() || $this->getQtyAvailable() >= $qty;
+        return $this->getAllowBackorder() || $this->getQtyAvailable() >= $qty;
+    }
+
+    public function getWarnCustomerQty()
+    {
+        $qtyWarn = $this->get('qty_warn_customer');
+        $qtyAvail = $this->getQtyAvailable();
+        return ($qtyWarn && ($qtyAvail < $qtyWarn)) ? $qtyAvail : false;
     }
 
     public function reserveUnits($qty)

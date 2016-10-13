@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Order_Cancel
@@ -8,6 +8,7 @@
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
  * @property Sellvana_Sales_Model_Order_Cancel_State $Sellvana_Sales_Model_Order_Cancel_State
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
+ * @property Sellvana_Sales_Model_Order_Cancel_Item $Sellvana_Sales_Model_Order_Cancel_Item
  */
 
 class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
@@ -20,6 +21,11 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
     protected $_state;
 
     /**
+     * @var Sellvana_Sales_Model_Order_Cancel_Item[]
+     */
+    protected $_items;
+
+    /**
      * @return Sellvana_Sales_Model_Order_Cancel_State
      */
     public function state()
@@ -30,47 +36,88 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function cancelOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    /**
+     * Return the cancel items
+     *
+     * @param boolean $assoc
+     * @return Sellvana_Sales_Model_Order_Cancel_Item[]
+     */
+    public function items($assoc = true)
     {
-        if (!preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_SET_ORDER)) {
-            return $this;
+        if (!$this->_items) {
+            $this->_items = $this->Sellvana_Sales_Model_Order_Cancel_Item->orm('oci')
+                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'oci.order_item_id'], 'oi')
+                ->select('oci.*')->select(['oi.product_id', 'product_sku', 'inventory_id',
+                    'inventory_sku', 'product_name'])
+                ->where('cancel_id', $this->id())->find_many_assoc();
         }
-        $qtys = [];
-        foreach ($matches as $m) {
-            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-        }
-        $skus = array_keys($qtys);
+        return $assoc ? $this->_items : array_values($this->_items);
+    }
+
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $qtys = null)
+    {
+        $this->order($order);
+        $this->state()->overall()->setDefaultState();
+        $this->state()->custom()->setDefaultState();
+        $this->save();
+
         $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
+        if ($qtys === null) {
+            $qtys = [];
+            foreach ($items as $item) {
+                $qtys[$item->id()] = true;
             }
         }
-        if (!$items) {
-            return [
-                'error' => ['message' => 'No valid SKUs found'],
-            ];
-        }
 
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanCancel() : $qtys[$sku];
-            $item->set('qty_to_cancel', $qty);
+        foreach ($qtys as $itemId => $qty) {
+            if (empty($items[$itemId])) {
+                throw new BException($this->_('Invalid item id: %s', $itemId));
+            }
+            /** @var Sellvana_Sales_Model_Order_Item $item */
+            $item = $items[$itemId];
+            $qtyCanCancel = $item->getQtyCanCancel();
+            if ($qty === true) {
+                $qty = $qtyCanCancel;
+            } elseif ($qty <= 0 || $qty > $qtyCanCancel) {
+                throw new BException($this->_('Invalid quantity to cancel for %s: %s', [$item->get('product_sku'), $qty]));
+            }
+            $this->Sellvana_Sales_Model_Order_Cancel_Item->create([
+                'order_id' => $order->id(),
+                'cancel_id' => $this->id(),
+                'order_item_id' => $item->id(),
+                'qty' => $qty,
+            ])->save();
         }
-
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminCancelsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
 
         return $this;
     }
 
-    public function cancelItem($item)
+    public function register($done = false)
     {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $cancelItems = $this->items();
 
+        foreach ($cancelItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add($done ? 'qty_canceled' : 'qty_in_cancels', $cItem->get('qty'));
+        }
+
+        return $this;
+    }
+
+    public function unregister($done = false)
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $cancelItems = $this->items();
+
+        foreach ($cancelItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add($done ? 'qty_canceled' : 'qty_in_cancels', -$cItem->get('qty'));
+        }
+
+        return $this;
     }
 
     public function __destruct()

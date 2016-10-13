@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 abstract class FCom_Core_Model_Abstract_State_Context extends BClass
 {
@@ -37,35 +37,68 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
      */
     static protected $_stateValues = [];
 
+    /**
+     * FCom_Core_Model_Abstract_State_Context constructor.
+     *
+     * @param null $model
+     */
     public function __construct($model = null)
     {
         $this->_model = $model;
     }
 
+    /**
+     * @param $model
+     *
+     * @return object
+     */
     public function factory($model)
     {
         return $this->BClassRegistry->instance(get_class($this), [$model]);
     }
 
+    /**
+     * @param string $stateValue
+     *
+     * @return null|string
+     */
     public function getStateLabel($stateValue)
     {
         return !empty($this->_stateLabels[$stateValue]) ? $this->_stateLabels[$stateValue] : null;
     }
 
+    /**
+     * @return FCom_Core_Model_Abstract|null
+     */
     public function getModel()
     {
         return $this->_model;
     }
 
+    /**
+     * @param string $type
+     * @param string $value
+     * @param array $options
+     *
+     * @return $this
+     */
     public function addStateValue($type, $value, $options = [])
     {
         if (empty($options['class'])) {
             $options['class'] = static::$_defaultStateClasses[$type];
         }
         static::$_stateValues[$type][$value] = $options;
+
         return $this;
     }
 
+    /**
+     * @param string $type
+     * @param null $value
+     *
+     * @return FCom_Core_Model_Abstract_State_Concrete|object
+     * @throws BException
+     */
     protected function _getStateObject($type, $value = null)
     {
         if (null === $value) {
@@ -76,9 +109,9 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
         }
         if (!empty(static::$_stateValues[$type][$value])) {
             $options = static::$_stateValues[$type][$value];
-            $class = $options['class'];
+            $class   = $options['class'];
         } elseif (!empty(static::$_defaultStateClasses[$type])) {
-            $class = static::$_defaultStateClasses[$type];
+            $class   = static::$_defaultStateClasses[$type];
             $options = ['class' => $class];
         } else {
             throw new BException('Invalid state type: ' . $type);
@@ -90,29 +123,60 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
         }
 
         $this->_stateObjects[$type] = $concreteState;
+
         return $concreteState;
     }
 
+    /**
+     * Get state field base on specific type
+     *
+     * @param string $type
+     *
+     * @return string
+     */
     protected function _getModelStateField($type)
     {
         return 'state_' . $type;
     }
 
+    /**
+     * Get state value base on specific type
+     *
+     * @param string $type
+     *
+     * @return string
+     */
     protected function _getModelStateValue($type)
     {
         return $this->_model->get($this->_getModelStateField($type));
     }
 
+    /**
+     * Get state value base on specific type
+     *
+     * @param string $type
+     *
+     * @return string
+     */
     public function getState($type)
     {
         $stateField = $this->_getModelStateField($type);
+
         return $this->_model->get($stateField);
     }
 
+    /**
+     * @param string $type
+     * @param string $value
+     * @param bool $updateModelField
+     *
+     * @return FCom_Core_Model_Abstract_State_Concrete
+     * @throws BException
+     */
     public function changeState($type, $value, $updateModelField = true)
     {
-        $stateField = $this->_getModelStateField($type);
-        $oldValue = $this->_model->get($stateField);
+        $stateField                 = $this->_getModelStateField($type);
+        $oldValue                   = $this->_model->get($stateField);
         $this->_stateObjects[$type] = $this->_getStateObject($type, $value);
         if ($updateModelField) {
             $this->_model->set($stateField, $value);

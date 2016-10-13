@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -55,6 +55,8 @@ class BModuleRegistry extends BClass
     * @var array
     */
     protected $_currentModuleStack = [];
+
+    protected $_bootstrapFinished = false;
 
     public function __construct()
     {
@@ -273,8 +275,8 @@ class BModuleRegistry extends BClass
     public function scan($source, $validateManifests = false)
     {
         // if $source does not end with .json, assume it is a folder
-        if (!preg_match('/\.(json|yml|php)$/', $source)) {
-            $source .= '/manifest.{json,yml,php}';
+        if (!preg_match('/\.(json|yml|php|toml)$/', $source)) {
+            $source .= '/manifest.{json,yml,php,toml}';
         }
         $source = str_replace('\\', '/', $source);
         $manifests = glob($source, GLOB_BRACE);
@@ -301,16 +303,19 @@ class BModuleRegistry extends BClass
                     $useCache = true;#!$this->BDebug->is(['DEBUG', 'DEVELOPMENT', 'INSTALLATION']);
                     $manifest = $this->BYAML->load($file, $useCache);
                     break;
+                case 'toml':
+                    $manifest = $this->Toml->parse(file_get_contents($file));
+                    break;
                 case 'json':
                     $json = file_get_contents($file);
                     $manifest = $this->BUtil->fromJson($json);
 
                     break;
                 default:
-                    throw new BException($this->BLocale->_("Unknown manifest file format: %s", $file));
+                    throw new BException($this->_("Unknown manifest file format: %s", $file));
             }
             if (empty($manifest['modules']) && empty($manifest['include'])) {
-                throw new BException($this->BLocale->_("Invalid or empty manifest file: %s", $file));
+                throw new BException($this->_("Invalid or empty manifest file: %s", $file));
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName => $params) {
@@ -627,11 +632,17 @@ class BModuleRegistry extends BClass
             $this->popModule();
         }
 
+        $this->_bootstrapFinished = true;
         $this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
 
         $this->BEvents->fire('BModuleRegistry::bootstrap:after');
 
         return $this;
+    }
+
+    public function isBootstrapFinished()
+    {
+        return $this->_bootstrapFinished;
     }
 }
 
@@ -879,7 +890,7 @@ if ($args['name']==="Sellvana_Referrals") {
         if (empty($params['update'])) {
             $rootDir = $this->root_dir;
             $file = $this->bootstrap['file'];
-            BDebug::debug($this->BLocale->_('Module is already registered: %s (%s)', [$this->name, $rootDir . '/' . $file]));
+            BDebug::debug($this->_('Module is already registered: %s (%s)', [$this->name, $rootDir . '/' . $file]));
             return $this;
         }
         unset($params['update']);
@@ -992,12 +1003,19 @@ if ($args['name']==="Sellvana_Referrals") {
         $area = $this->BRequest->area();
         $areaDir = str_replace('FCom_', '', $area);
         if (isset($auto['all']) || isset($auto['bootstrap'])) { // TODO: check for is_callable() ?
+            if (!isset($this->bootstrap)) {
+                $this->bootstrap = [];
+            }
+            /*
+            if (method_exists($this->name, 'bootstrap')) {
+                $this->bootstrap[] = ['callback' => $this->name . '::bootstrap'];
+            }
+            */
+            if (method_exists($this->name . '_Main', 'bootstrap')) {
+                $this->bootstrap[] = ['callback' => $this->name . '_Main::bootstrap'];
+            }
             if (method_exists($this->name . '_' . $areaDir, 'bootstrap')) {
-                $this->bootstrap = ['callback' => $this->name . '_' . $areaDir . '::bootstrap'];
-            } elseif (method_exists($this->name . '_Main', 'bootstrap')) {
-                $this->bootstrap = ['callback' => $this->name . '_Main::bootstrap'];
-            } elseif (method_exists($this->name, 'bootstrap')) {
-                $this->bootstrap = ['callback' => $this->name . '::bootstrap'];
+                $this->bootstrap[] = ['callback' => $this->name . '_' . $areaDir . '::bootstrap'];
             }
         }
         $this->BLayout->addModuleViewsDirsAndLayouts($this, $area);
@@ -1226,15 +1244,6 @@ if (!isset($o[0]) || !isset($o[1])) {
         return $this;
     }
 
-    public function _($string, $args = [])
-    {
-        $tr = dgettext($this->name, $string);
-        if ($args) {
-            $tr = $this->BUtil->sprintfn($tr, $args);
-        }
-        return $tr;
-    }
-
     public function set($key, $value = null)
     {
         if (is_array($key)) {
@@ -1257,11 +1266,13 @@ if (!isset($o[0]) || !isset($o[1])) {
             $config = $this->default_config;
             foreach ($config as $path => $value) {
                 if (strpos($path, '/') !== false) {
-                    $cfgHlp->set($path, $value);
+                    if ($cfgHlp->get($path) === null) {
+                        $cfgHlp->set($path, $value);
+                    }
                     unset($config[$path]);
                 }
             }
-            $cfgHlp->add($config);
+            $cfgHlp->addDefault($config);
         }
         $this->_processThemes();
         return $this;
@@ -1289,11 +1300,11 @@ if (!isset($o[0]) || !isset($o[1])) {
             require_once ($includeFile);
         }
         if (!empty($bb['callback'])) {
-            $start = BDebug::debug($this->BLocale->_('Start BEFORE bootstrap for %s', [$this->name]));
+            $start = BDebug::debug($this->_('Start BEFORE bootstrap for %s', [$this->name]));
             $this->BUtil->call($bb['callback']);
             #$mod->run_status = BModule::LOADED;
             BDebug::profile($start);
-            BDebug::debug($this->BLocale->_('End BEFORE bootstrap for %s', [$this->name]));
+            BDebug::debug($this->_('End BEFORE bootstrap for %s', [$this->name]));
         }
 
         return $this;
@@ -1320,17 +1331,22 @@ if (!isset($o[0]) || !isset($o[1])) {
         $this->BEvents->fire('BModule::bootstrap:before', ['module' => $this]);
 
         if (!empty($this->bootstrap)) {
-            if (!empty($this->bootstrap['file'])) {
-                $includeFile = $this->BUtil->normalizePath($this->root_dir . '/' . $this->bootstrap['file']);
-                BDebug::debug('MODULE.BOOTSTRAP ' . $includeFile);
-                require_once ($includeFile);
+            if (empty($this->bootstrap[0])) {
+                $this->bootstrap = [$this->bootstrap];
             }
-            if (!empty($this->bootstrap['callback'])) {
-                $start = BDebug::debug($this->BLocale->_('Start bootstrap for %s', [$this->name]));
-                $this->BUtil->call($this->bootstrap['callback']);
-                #$mod->run_status = BModule::LOADED;
-                BDebug::profile($start);
-                BDebug::debug($this->BLocale->_('End bootstrap for %s', [$this->name]));
+            foreach ($this->bootstrap as $bootstrap) {
+                if (!empty($bootstrap['file'])) {
+                    $includeFile = $this->BUtil->normalizePath($this->root_dir . '/' . $bootstrap['file']);
+                    BDebug::debug('MODULE.BOOTSTRAP ' . $includeFile);
+                    require_once($includeFile);
+                }
+                if (!empty($bootstrap['callback'])) {
+                    $start = BDebug::debug($this->_('Start bootstrap for %s', [$this->name]));
+                    $this->BUtil->call($bootstrap['callback']);
+                    #$mod->run_status = BModule::LOADED;
+                    BDebug::profile($start);
+                    BDebug::debug($this->_('End bootstrap for %s', [$this->name]));
+                }
             }
         }
 
@@ -1375,6 +1391,11 @@ class BMigrate extends BClass
     protected static $_breakFlag;
 
     /**
+     * @var array
+     */
+    protected static $_migrationData;
+
+    /**
     * Shortcut to help with IDE autocompletion
     *
     * @return BMigrate
@@ -1399,13 +1420,15 @@ class BMigrate extends BClass
             }
             if ($mod->version && $mod->migrate) {
                 $connName = $mod->db_connection_name ? $mod->db_connection_name : 'DEFAULT';
-                $migration[$connName][$modName] = [
+                $mod = [
                     'code_version' => $mod->version,
                     'script' => $mod->migrate,
                     'run_status' => $mod->run_status,
                     'module_name' => $modName,
                     'connection_name' => $connName,
                 ];
+                $migration[$connName][$modName] = $mod;
+                static::$_migrationData[$modName] = $mod;
             }
         }
         return $migration;
@@ -1456,13 +1479,15 @@ class BMigrate extends BClass
     }
 
     /**
-    * Run declared migration scripts to install or upgrade module DB scheme
-    *
-    * @param mixed $limitModules
-    *   - false: migrate ALL declared modules (including disabled)
-    *   - true: migrate only enabled modules in current request
-    *   - array or comma separated string: migrate only specified modules
-    */
+     * Run declared migration scripts to install or upgrade module DB scheme
+     *
+     * @param mixed $limitModules
+     *   - false: migrate ALL declared modules (including disabled)
+     *   - true: migrate only enabled modules in current request
+     *   - array or comma separated string: migrate only specified modules
+     * @param boolean $force
+     * @param string $redirectUrl
+     */
     public function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
         if (!$force) {
@@ -1554,9 +1579,14 @@ class BMigrate extends BClass
             $this->BConfig->writeConfigFiles('core');
         }
 
-        $this->BResponse->startLongResponse();
+        if (PHP_SAPI !== 'cli') {
+            $this->BResponse->startLongResponse();
+        }
+
+        $this->BDebug->mode(BDebug::MODE_INSTALLATION);
+
         $view = $this->BView;
-        echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
+        $this->println('<html><body><h1>Migrating modules DB structure...</h1><pre>');
         $i = 0;
         $error = false;
         try {
@@ -1570,16 +1600,16 @@ class BMigrate extends BClass
                         continue;
                     }
 
-                    echo '<br>[' . (++$i) . '/' . $num . '] ';
+                    $this->println('<br>[' . (++$i) . '/' . $num . '] ');
                     $action = null;
                     if (empty($mod['schema_version'])) {
-                        echo 'Installing <strong>' . $view->q($modName . ': ' . $mod['code_version']) . '</strong> ... ';
+                        $this->println('Installing <strong>' . $view->q($modName . ': ' . $mod['code_version']) . '</strong> ... ');
                         $action = 'install_upgrade';
                     } elseif (version_compare($mod['schema_version'], $mod['code_version'], '<')) {
-                        echo 'Upgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $this->println('Upgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ');
                         $action = 'install_upgrade';
                     } elseif (version_compare($mod['schema_version'], $mod['code_version'], '>')) {
-                        echo 'Downgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $this->println('Downgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ');
                         $action = 'downgrade';
                     }
                     if (empty($action)) {
@@ -1659,30 +1689,43 @@ class BMigrate extends BClass
                     break;
                 }
             }
-            echo "\n\n" . $e->getMessage();
+            $this->println("\n\n" . $e->getMessage());
             if (!static::$_lastQuery) {
                 static::$_lastQuery = BORM::get_last_query();
             }
             if (static::$_lastQuery) {
-                echo "\n\nQUERY: " . static::$_lastQuery;
+                $this->println("\n\nQUERY: " . static::$_lastQuery);
             }
-            echo "\n\nLOCATION: " . $traceStep['file'] . ':' . $traceStep['line'];
+            $this->println("\n\nLOCATION: " . $traceStep['file'] . ':' . $traceStep['line']);
             $error = true;
         }
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
         $url = null !== $redirectUrl ? $redirectUrl : $this->BRequest->currentUrl();
-        echo '</pre>';
+        $this->println('</pre>');
         if (!$error) {
-            echo '<script>location.href="' . $url . '";</script>';
-            echo '<p>ALL DONE. <a href="' . $url . '">Click here to continue</a></p>';
+            $this->println('<script>location.href="' . $url . '";</script>');
+            $this->println('<p>ALL DONE. <a href="' . $url . '">Click here to continue</a></p>');
         } else {
-            echo '<p>There was an error, please check the output or log file and try again.</p>';
-            echo '<p><a href="' . $url . '">Click here to continue</a></p>';
+            $this->println('<p>There was an error, please check the output or log file and try again.</p>');
+            $this->println('<p><a href="' . $url . '">Click here to continue</a></p>');
         }
-        echo '</body></html>';
-        exit;
+        $this->println('</body></html>');
+        if (PHP_SAPI !== 'cli') {
+            exit;
+        }
+    }
+
+    /**
+     * @param $string
+     */
+    public function println($string)
+    {
+        if (PHP_SAPI !== 'cli')
+        {
+            echo $string;
+        }
     }
 
     protected function _runInstallUpgradeClassMethods($modName, $class)
@@ -1796,9 +1839,10 @@ class BMigrate extends BClass
             return true;
         }
 
-        echo '*' . $version . '; ';
+        $this->println('*' . $version . '; ');
 
 BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
+
         // creating module before running install, so the module configuration values can be created within script
         $module = $this->BDbModule->load($mod['module_name'], 'module_name');
         if (!$module) {
@@ -1811,6 +1855,10 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // call install migration script
         try {
+            if (!$this->_processMigrationDependencies('before', $mod, $version)) {
+                return false;
+            }
+
             if (is_callable($callback)) {
                 $result = $this->BUtil->call($callback);
             } elseif (is_file($callback)) {
@@ -1819,11 +1867,17 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
                 $this->BDb->run($callback);
                 $result = null;
             }
+
             if (false === $result) {
                 static::$_lastQuery = BORM::get_last_query();
                 $module->delete();
                 return false;
             }
+
+            if (!$this->_processMigrationDependencies('after', $mod, $version)) {
+                return false;
+            }
+
             $module->set(['last_status' => 'INSTALLED'])->save();
             $mod['schema_version'] = $version;
         } catch (Exception $e) {
@@ -1856,7 +1910,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // if schema doesn't exist, throw exception
         if (empty($mod['schema_version'])) {
-            throw new BException($this->BLocale->_("Can't upgrade, module schema doesn't exist yet: %s", $this->BModuleRegistry->currentModuleName()));
+            throw new BException($this->_("Can't upgrade, module schema doesn't exist yet: %s", $this->BModuleRegistry->currentModuleName()));
         }
         $schemaVersion = $mod['schema_version'];
 
@@ -1872,7 +1926,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         if (version_compare($schemaVersion, $fromVersion, '>')) {
             return true;
         }
-        echo '^' . $toVersion . '; ';
+        $this->println('^' . $toVersion . '; ');
 
         if (!$module) {
             $module = $this->BDbModule->load($mod['module_name'], 'module_name');
@@ -1883,6 +1937,10 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         ])->save();
         // call upgrade migration script
         try {
+            if (!$this->_processMigrationDependencies('before', $mod, $toVersion)) {
+                return false;
+            }
+
             if (is_callable($callback)) {
                 $result = $this->BUtil->call($callback);
             } elseif (is_file($callback)) {
@@ -1891,9 +1949,15 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
                 $this->BDb->run($callback);
                 $result = null;
             }
+
             if (false === $result) {
                 return false;
             }
+
+            if (!$this->_processMigrationDependencies('after', $mod, $toVersion)) {
+                return false;
+            }
+
             // update module schema version to new one
             $mod['schema_version'] = $toVersion;
             $module->set([
@@ -1930,7 +1994,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // if schema doesn't exist, throw exception
         if (empty($mod['schema_version'])) {
-            throw new BException($this->BLocale->_("Can't downgrade, module schema doesn't exist: %s", $this->BModuleRegistry->currentModuleName()));
+            throw new BException($this->_("Can't downgrade, module schema doesn't exist: %s", $this->BModuleRegistry->currentModuleName()));
         }
         $schemaVersion = $mod['schema_version'];
 
@@ -1946,7 +2010,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         if (version_compare($schemaVersion, $fromVersion, '<')) {
             return true;
         }
-        echo 'v' . $toVersion . '; ';
+        $this->println('v' . $toVersion . '; ');
 
         if (!$module) {
             $module = $this->BDbModule->load($mod['module_name'], 'module_name');
@@ -2014,6 +2078,56 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // delete module schema version from db, related configuration entries will be deleted
         $this->BDbModule->load($mod['module_name'], 'module_name')->delete();
+        return true;
+    }
+
+    /**
+     * @param string $when before|after
+     * @param array $mod
+     * @param string $version
+     * @return boolean
+     */
+    protected function _processMigrationDependencies($when, $mod, $version)
+    {
+        $modName = $mod['module_name'];
+        foreach (static::$_migrationData as $iterModName => $iterMod) {
+            if ($iterMod['run_status'] !== BModule::LOADED) {
+                continue;
+            }
+            $class = "{$iterModName}_Migrate";
+            $singleton = $this->{$class};
+            $method = "{$when}__{$modName}__" . str_replace('.', '_', $version);
+            if (method_exists($singleton, $method)) {
+                $this->println("+{$iterModName}:{$when}; ");
+                $result = call_user_func([$singleton, $method], $mod, $version);
+                if (false === $result) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public function isModuleVersion($moduleName, $version)
+    {
+        if (!$this->BModuleRegistry->isLoaded($moduleName)) {
+            return false;
+        }
+        $module = $this->BDbModule->load($moduleName);
+        if (!$module) {
+            return false;
+        }
+        $modVer = $module->get('schema_version');
+        if (preg_match('#^(.*)~(.*)$#', $version, $m)) {
+            if (!empty($m[1]) && version_compare($modVer, $m[1], '<')) {
+                return false;
+            }
+            if (!empty($m[2]) && version_compare($modVer, $m[2], '>')) {
+                return false;
+            }
+        } elseif (version_compare($modVer, $version, '!=')) {
+            return false;
+        }
         return true;
     }
 }

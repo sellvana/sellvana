@@ -1,0 +1,9 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.adminlivefeed, "@Sellvana_AdminLiveFeed/Admin/js/fcom.adminlivefeed" ]
+            - [ requireRun, fcom.adminlivefeed]
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_AdminLiveFeed, { label: Recent Activity, group: pushserver, async: true, permission: settings/Sellvana_AdminLiveFeed } ]

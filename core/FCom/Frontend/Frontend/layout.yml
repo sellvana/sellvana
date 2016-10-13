@@ -33,6 +33,7 @@ base:
     - { include: common_js_libs }
     - { include: lib_select2 }
     - { include: lib_file_upload }
+    - { include: lib_media_player }
 
     - { callback: FCom_Core_Main.defaultThemeCustomLayout }
     - { callback: FCom_Frontend_Frontend.layout }

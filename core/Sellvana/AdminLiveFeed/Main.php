@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_AdminLiveFeed_Main
@@ -10,15 +10,25 @@
  */
 class Sellvana_AdminLiveFeed_Main extends BCLass
 {
+    /**
+     * @var bool
+     */
+    protected $_disabled = false;
 
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_AdminLiveFeed' => BLocale::i()->_('Admin Live Feed Settings'),
+            'settings/Sellvana_AdminLiveFeed' => 'Admin Live Feed Settings',
         ]);
     }
 
-    public function onGetHeaderNotifications()
+    public function disable($flag = true)
+    {
+        $this->_disabled = $flag;
+        return $this;
+    }
+
+    public function onCollectActivityItems()
     {
         if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
             $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('activities_feed');
@@ -27,13 +37,16 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onProductAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                     'href' => 'catalog/products/form?id=' . $model->id(),
-                    'content' => $this->BLocale->_(
+                    'content' => $this->_(
                         'New %s of products have been added to catalog',
                         '#' . $model->id()
                     ),
@@ -44,24 +57,30 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onPrefAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Email_Model_Pref $model */
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_newsletter')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'content' => $model->email . ' ' . $this->BLocale->_('has subscribed to newsletter'),
+                'content' => $model->email . ' ' . $this->_('has subscribed to newsletter'),
             ]);
         }
     }
 
     public function onCustomerAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Customer_Model_Customer $model */
         $model = $args['model'];
         if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_customer')) {
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                     'href' => 'customers/form/?id=' . $model->id(),
-                    'content' => $this->BLocale->_(
+                    'content' => $this->_(
                         '%s created an account.',
                         $model->firstname . ' ' . $model->lastname . '(' . $model->email . ')'
                     ),
@@ -72,6 +91,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onReviewsAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_ProductReviews_Model_Review $model */
         $model = $args['model'];
         $pCustomerId = $model->customer_id;
@@ -79,7 +101,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_product_reviews')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                 'href' => 'prodreviews/form/?id=' . $model->id(),
-                'content' => $this->BLocale->_(
+                'content' => $this->_(
                     '%s has review the product %s',
                     [$customer->firstname . ' ' . $customer->lastname, '#' . $model->id()]
                 ),
@@ -89,6 +111,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onOrderPlaced($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         if (!$this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_sales')) {
             return;
         }
@@ -101,7 +126,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $order = $newState->getContext()->getModel();
         $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
             'href' => 'orders/form/?id=' . $order->id(),
-            'content' => $this->BLocale->_(
+            'content' => $this->_(
                 'Order #%s has been placed by %s',
                 [$order->get('unique_id'), $order->fullName('billing')]
             ),
@@ -110,20 +135,26 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onSearch($args)
     {
-        if ( $this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
+        if ($this->_disabled) {
+            return;
+        }
+        if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'content' => $this->BLocale->_('The term %s has been searched', $args['query']),
+                'content' => $this->_('The term %s has been searched', $args['query']),
             ]);
         }
     }
 
     public function onWishlistAfterAdd($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_wishlist')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'content' => $this->BLocale->_('Item %s has been added to a wishlist', $model->product_name),
+                'content' => $this->_('Item %s has been added to a wishlist', $model->product_name),
             ]);
         }
     }

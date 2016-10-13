@@ -1,0 +1,14 @@
+{% set c = THIS.get('model') %}
+{% set services = APP.instance('Sellvana_ShippingPlain_ShippingMethod').getServices() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "ShippingUPS Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_ShippingUps'}) }}
+    {% set fieldData = { model: c, settings_module:'Sellvana_ShippingPlain' } %}
+    {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-Sellvana_ShippingPlain-group0' }) }}
+        {{ forms.boolean(fieldData, {field:'enabled', label:'Is Method Enabled?'|_ }) }}
+        {#{{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}#}
+        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:{}, options:services}) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Cart_Total_Discount
@@ -72,6 +72,7 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
 
         $cart->setData('discount_details', !empty($result['details']) ? $result['details'] : []);
 
+        $cart->setData('store_currency/' . $this->_cartField, $this->_cart->convertToStoreCurrency($this->_value));
         $cart->set($this->_cartField, $this->_value);
 
         if ($this->_value) {
@@ -86,7 +87,7 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
     public function getLabelFormatted()
     {
         $label = parent::getLabelFormatted();
-        $view = $this->BLayout->view('cart/total/discount');
+        $view = $this->BLayout->getView('cart/total/discount');
         if (!$view) {
             return $label;
         }

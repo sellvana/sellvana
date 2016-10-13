@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_PushServer_Model_Client
@@ -175,6 +175,13 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }*/
     }
 
+    public function setClientData($windowName, $connId)
+    {
+        static::$_windowName = $windowName;
+        static::$_connId = $connId;
+        return $this;
+    }
+
     /**
      * @param $request
      * @return $this
@@ -267,7 +274,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 
-        if($newWindows){
+        if ($newWindows) {
             foreach ($newWindows as $windowName => $window) { // some cleanup
                 if (empty($window['connections'])) {
                     unset($newWindows[$windowName]);
@@ -280,8 +287,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
         $newWindows[static::$_windowName]['connections'][static::$_connId] = 1; // set new connection
 
-        $this->setData('windows', $newWindows)->save(); // save new state
-
+        $this->setData('windows', $newWindows);
+#print_r($this->getData());
+        $this->save(); // save new state
         if (!$oldWindows) { // is this first connection for the client
             $this->subscribe();
             $this->set('status', 'online')->save(); // set as connected
@@ -384,7 +392,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                     $this->BDebug->log("{$logId} SYNC EMPTY: " . print_r($connections, 1));
                 }
 
-                $messages[] = ['channel' => 'client', 'signal' => 'noop'];
+                //TODO: figure out in which cases this is needed
+                #$messages[] = ['channel' => 'client', 'signal' => 'noop'];
             }
         }
         // foreach ($connections as $connId => $conn) {
@@ -406,6 +415,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function checkOut()
     {
+        $dataToMerge = !empty($_SESSION['pushserver']) ? $_SESSION['pushserver'] : null;
+        $this->BSession->switchToNewSessionIfExists($dataToMerge);
+        
         $windows = $this->getData('windows');
         unset($windows[static::$_windowName]['connections'][static::$_connId]);
         if (empty($windows[static::$_windowName]['connections'])) {
@@ -506,8 +518,33 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             unset($sessData['pushserver']['channels'][$channel->channel_name]);
             unset($sessData['pushserver']['subscribed'][$channel->channel_name]);
         }
-
         return $this;
+    }
+
+    /**
+     * Check if the client is subscribed to a channel, ignore session data.
+     *
+     * @param $channel
+     * @return bool
+     * @throws BException
+     */
+    public function isSubscribed($channel)
+    {
+        if (null === $channel) {
+            $channel = $this->getChannel();
+        }
+        $isSessionClient = $this->session_id === $this->BSession->sessionId();
+        if (!is_object($channel)) {
+            $channel = $this->FCom_PushServer_Model_Channel->getChannel($channel, true, $isSessionClient);
+        }
+        $hlp = $this->FCom_PushServer_Model_Subscriber;
+        $data = ['client_id' => $this->id(), 'channel_id' => $channel->id()];
+        $subscriber = $hlp->loadWhere($data);
+        if (!$subscriber) {
+            $this->unsubscribe($channel);
+            return false;
+        }
+        return true;
     }
 
     /**

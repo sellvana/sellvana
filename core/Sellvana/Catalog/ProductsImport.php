@@ -1,12 +1,11 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_ProductsImport
- * @property Sellvana_CustomField_Model_Field $Sellvana_CustomField_Model_Field
  */
 class Sellvana_Catalog_ProductsImport extends BImport
 {
-    protected $fields = [
+    protected $_fields = [
         'product.product_sku' => ['pattern' => 'sku'],
         'product.product_name' => ['pattern' => 'product.*name|name'],
         'product.short_description' => ['pattern' => 'short.*description'],
@@ -34,31 +33,13 @@ class Sellvana_Catalog_ProductsImport extends BImport
         'product.update_at' => ['updated']
     ];
 
-    protected $dir = 'products';
-    protected $model = 'Sellvana_Catalog_Model_Product';
+    protected $_dir = 'products';
+    protected $_model = 'Sellvana_Catalog_Model_Product';
 
-    protected $allowedFileTypes = ['txt', 'csv'];
+    protected $_allowedFileTypes = ['txt', 'csv'];
 
     public function updateFieldsDueToInfo($info = null)
     {
-        $cfFields = $this->Sellvana_CustomField_Model_Field->getListAssoc();
-        $cfKeys = array_keys($cfFields);
-//        $dataKeys = $info['first_row'];
-        //$cfIntersection = array_intersect($cfKeys, $dataKeys);
-        foreach ($cfKeys as $key) {
-            if (!isset($this->fields['product.' . $key])) {
-                $this->fields['product.' . $key] = ['pattern' => $key];
-            }
-        }
-        /*
-        if ($dataKeys) {
-            foreach ($dataKeys as $f) {
-                if (!isset($this->fields['product.'.$f])) {
-                    $this->fields['product.'.$f] = array('pattern' => $f);
-                }
-            }
-        }
-         *
-         */
+        $this->BEvents->fire(__METHOD__, ['info' => $info, 'object' => $this]);
     }
 }

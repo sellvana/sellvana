@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Order_State_Abstract
 {
@@ -24,6 +24,15 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
     ];
 
     protected $_defaultValue = self::PENDING;
+
+    protected $_defaultValueWorkflow = [
+        self::VIRTUAL => [],
+        self::PENDING => [self::PACKED, self::SHIPPED, self::PARTIAL],
+        self::PACKED => [self::SHIPPED, self::PARTIAL],
+        self::SHIPPED => [self::DELIVERED],
+        self::DELIVERED => [],
+        self::PARTIAL => [self::SHIPPED, self::DELIVERED],
+    ];
 
     public function setVirtual()
     {
@@ -53,6 +62,11 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
     public function setPartial()
     {
         return $this->changeState(self::PARTIAL);
+    }
+
+    public function isVirtual()
+    {
+        return $this->getValue() == self::VIRTUAL;
     }
 
     public function isComplete()

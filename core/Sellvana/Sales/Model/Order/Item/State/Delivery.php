@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Model_Order_State_Abstract
 {
@@ -17,6 +17,15 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
         self::DELIVERED => 'Delivered',
         self::PARTIAL => 'Partial',
     ];
+    
+    protected $_defaultMethods = [
+        self::VIRTUAL => 'setVirtual',
+        self::PENDING => 'setPending',
+        self::PACKED => 'setPacked',
+        self::SHIPPED => 'setShipped',
+        self::DELIVERED => 'setDelivered',
+        self::PARTIAL => 'setPartial',
+    ];
 
     protected $_setValueNotificationTemplates =[
         self::SHIPPED => 'email/sales/order-item-state-delivery-shipped',
@@ -24,6 +33,15 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
     ];
 
     protected $_defaultValue = self::PENDING;
+
+    protected $_defaultValueWorkflow = [
+        self::VIRTUAL => [],
+        self::PENDING => [self::PACKED, self::SHIPPED],
+        self::PACKED => [self::SHIPPED, self::PARTIAL],
+        self::PARTIAL => [self::SHIPPED],
+        self::SHIPPED => [self::DELIVERED],
+        self::DELIVERED => [],
+    ];
 
     public function setVirtual()
     {

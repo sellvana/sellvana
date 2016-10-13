@@ -1,4 +1,5 @@
 {% set order = THIS.get('context').getModel() %}
+{% set orderCurrency = order.get('store_currency_code') %}
 {% set linkParams = 'id=' ~ order.get('unique_id') ~ '&token=' ~ order.get('token') %}
 
 <!--{ Content-Type: text/html; charset=UTF-8 }-->
@@ -6,14 +7,84 @@
 <!--{ To: "{{ order.get('billing_firstname') ~ ' ' ~ order.get('billing_lastname') }}" <{{ order.get('customer_email') }}> }-->
 <!--{ Subject: {{ 'Your order %s' | _(order.get('unique_id')) }} }-->
 
-Hello, {{ order.get('billing_firstname') }}.
+{{ 'Hello %s,'|_(order.get('billing_firstname')) }}
 
-<p>Thank you for your order!</p>
+<p>{{ 'Thank you for your order!'|_ }}</p>
+
+<hr>
+<table>
+    <tr>
+        <th>{{ 'Product name'|_ }}</th>
+        <th>{{ 'Quantity'|_ }}</th>
+        <th>{{ 'Total Price'|_ }}</th>
+    </tr>
+{% for item in order.items() %}
+    <tr>
+        <td>{{ THIS.view('orders/item').set('item', item) | raw }}</td>
+        <td>{{ 'x %s'|_(item.get('qty_ordered')) }}</td>
+        <td>{{ item.getData('store_currency/row_total') | currency(orderCurrency) }}</td>
+    </tr>
+{% endfor %}
+</table>
+<hr>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>{{ "Shipping Address" |_ }}</th>
+            <th>{{ "Billing Address" |_ }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ order.addressAsHtml('shipping') | raw }}</td>
+            <td>{{ order.addressAsHtml('billing') | raw }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<hr>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>{{ "Shipping method" | _ }}</th>
+            <th>{{ "Payment method" | _ }}</th>
+        </tr>
+        </thead>
+        <tr>
+            <td>{{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})</td>
+            <td>{{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})</td>
+        </tr>
+    </table>
+</div>
+<hr>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>{{ "Subtotal" | _ }}</th>
+            <th>{{ "Grand Total" | _ }}</th>
+            <th>{{ "Amount Paid" | _ }}</th>
+            <th>{{ "Balance Due" | _ }}</th>
+        </tr>
+        </thead>
+        <tr>
+            <td>{{ order.getData('store_currency/subtotal') | currency(orderCurrency) }} </td>
+            <td>{{ order.getData('store_currency/grand_total') | currency(orderCurrency) }} </td>
+            <td>{{ order.getData('store_currency/amount_paid') | currency(orderCurrency) }} </td>
+            <td>{{ order.getData('store_currency/amount_due') | currency(orderCurrency) }} </td>
+        </tr>
+    </table>
+</div>
 
 {% if not order.get('customer_id') %}
     {% if order.accountExistsForGuestEmail() %}
-        <p><a href="{{ APP.href('guest/add_to_account?' ~ linkParams) }}">Click here to add this order to your account</a></p>
+        <p><a href="{{ APP.href('guest/add_to_account?' ~ linkParams) }}">{{ 'Click here to add this order to your account'|_ }}</a></p>
     {% else %}
-        <p><a href="{{ APP.href('guest/create_account?' ~ linkParams) }}">Click here to create account from your order</a></p>
+        <p><a href="{{ APP.href('guest/create_account?' ~ linkParams) }}">{{ 'Click here to create account from your order'|_ }}</a></p>
     {% endif %}
 {% endif %}

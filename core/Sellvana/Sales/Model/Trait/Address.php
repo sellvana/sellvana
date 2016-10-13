@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Trait_Address
@@ -39,7 +39,7 @@ trait Sellvana_Sales_Model_Trait_Address
 
     public function addressAsHtml($atype)
     {
-        return $this->BLayout->view('sales/address-card')->set(['model' => $this, 'atype' => $atype])->render();
+        return $this->BLayout->getView('sales/address-card')->set(['model' => $this, 'atype' => $atype])->render();
     }
 
     public function addressAsArray($atype)
@@ -47,6 +47,7 @@ trait Sellvana_Sales_Model_Trait_Address
         $country = $this->get($atype . '_country');
         $arr = [
             'atype'     => $atype,
+            'email'     => $this->get('customer_email'),
             'company'   => $this->get($atype . '_company'),
             'attn'      => $this->get($atype . '_attn'),
             'firstname' => $this->get($atype . '_firstname'),

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_RecentlyViewed_Model_History
@@ -6,6 +6,7 @@
  * DI
  * @property Sellvana_Customer_Model_Customer Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_RecentlyViewed_Model_History extends FCom_Core_Model_Abstract
 {
@@ -48,18 +49,19 @@ class Sellvana_RecentlyViewed_Model_History extends FCom_Core_Model_Abstract
         }
 
         $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
+            ->select('p.*')
             ->join('Sellvana_RecentlyViewed_Model_History', ['h.product_id', '=', 'p.id'], 'h')
             ->order_by_desc('h.update_at')
             ->limit($cnt);
 
-        if ($token) {
+        if (!$custId) {
+            $orm->where(['h.cookie_token' => (string)$token, 'h.customer_id' => null]);
+        } else {
             $orm->where('h.cookie_token', $token);
         }
-        if ($custId) {
-            $orm->where('h.customer_id', $custId);
-        }
 
-        $result = $orm->find_many();
-        return $result;
+        $products = $orm->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
     }
 }

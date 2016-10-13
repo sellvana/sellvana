@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_Return_State extends FCom_Core_Model_Abstract_State_Context
 {
@@ -18,13 +18,13 @@ class Sellvana_Sales_Model_Order_Return_State extends FCom_Core_Model_Abstract_S
     protected $_model;
 
     /**
-     * Default classes for each type of payment state
+     * Default classes for each type of return state
      *
      * @var array
      */
     static protected $_defaultStateClasses = [
-        self::OVERALL => 'Sellvana_Sales_Model_Order_Payment_State_Overall',
-        self::CUSTOM => 'Sellvana_Sales_Model_Order_Payment_State_Custom',
+        self::OVERALL => 'Sellvana_Sales_Model_Order_Return_State_Overall',
+        self::CUSTOM => 'Sellvana_Sales_Model_Order_Return_State_Custom',
     ];
 
     /**

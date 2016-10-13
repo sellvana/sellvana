@@ -7,13 +7,15 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
 	/**
      * form content for modal
      */
-    var FComModalForm = React.createClass({
+    return React.createClass({
         mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
                 'row': {},
                 'id': 'modal-form',
-                'columnMetadata': []
+                'columnMetadata': [],
+                'hiddenId': '',
+                'wrapper': 'form'
             }
         },
         getInitialState: function () {
@@ -35,23 +37,33 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
         render: function () {
             var that = this;
             var gridId = this.props.id;
-            //console.log('row', this.props.row);
+            //console.log('fcom.modalForm.row', this.props.row);
 
-            var nodes = this.props.columnMetadata.map(function(column) {
+            var nodes = this.props.columnMetadata.map(function(column, index) {
                 if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-                return <Components.ModalElement column={column} value={that.props.row[column.name]} />
+                return <Components.ModalElement column={column} value={that.props.row[column.name] || column.default_value || ''} key={index} />
             });
 
             //add id
-            nodes.push(<input type="hidden" name="id" id="id" value={this.props.row.id} />);
+            nodes.push(<input type="hidden" name="id" id="id" value={this.props.hiddenId ? this.props.hiddenId : this.props.row.id} key={nodes.length++} />);
 
-            return (
-                <form className="form form-horizontal validate-form" id={gridId + '-modal-form'}>
-                    {nodes}
-                </form>
-            )
+            if (this.props.wrapper == 'form') {
+                return (
+                    <form className="form form-horizontal" id={gridId + '-modal-form'} noValidate>
+                        {nodes}
+                    </form>
+                )
+            } else {
+                //this case is using form modal form inside the form, so we need to usethe #fcom_appened_form
+                var wrapper = this.props.wrapper;
+                return (
+                    <{wrapper} className="tmp_wrapper">
+                        {nodes}
+                    </{wrapper}>
+                )
+            }
+
+
         }
     });
-
-	return FComModalForm;
 });

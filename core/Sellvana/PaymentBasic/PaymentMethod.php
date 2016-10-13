@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_PaymentBasic_PaymentMethod
@@ -6,7 +6,7 @@
 class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
     protected $_name = 'Check / Money Order';
-    static protected $_methodKey = 'check_mo';
+    protected $_code = 'check_mo';
 
     protected $_capabilities = [
         'pay'             => 1,
@@ -19,7 +19,7 @@ class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('check_mo/form');
+        return $this->BLayout->getView('check_mo/form');
     }
 
     /**

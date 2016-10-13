@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Templates
@@ -41,9 +41,9 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $data = [];
         foreach ($layout->getAllViews() as $view) {
             $row = [
-                'id' => md5(uniqid('templates_')),
-                'view_name' => $view->param('view_name'),
-                'file_ext' => $view->param('file_ext'),
+                'id'          => md5(uniqid('templates_')),
+                'view_name'   => $view->param('view_name'),
+                'file_ext'    => $view->param('file_ext'),
                 'module_name' => $view->param('module_name'),
             ];
             $data[] = $row;
@@ -51,13 +51,18 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $config['data'] = $data;
         $config['data_mode'] = 'local';
         $config['filters'] = [
-            ['field' => 'name', 'type' => 'text'],
+            ['field' => 'view_name', 'type' => 'text'],
+            ['field' => 'file_ext', 'type' => 'text'],
+            ['field' => 'module_name', 'type' => 'text']
         ];
         $config['actions'] = [
             'delete' => ['caption' => 'Remove/Revert'],
         ];
         $config['events'] = ['delete', 'mass-delete'];
         $config['grid_before_create'] = 'template_grid';
+        $config['callbacks'] = [
+            'componentDidMount' => 'template_grid'
+        ];
         //$config['state'] =array(5,6,7,8);
         return $config;
     }
@@ -67,14 +72,15 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $tplViewName = $this->BRequest->get('id');
         $this->layout($this->_formLayoutName);
         $areaLayout = $this->FCom_Frontend_Main->getLayout();
+        $tplContents = '';
         if ($tplViewName) {
             $tplView = $areaLayout->getView($tplViewName);
-            $tplViewFile = $tplView->getTemplateFileName();
-            $tplContents = file_get_contents($tplViewFile);
-        } else {
-            $tplViewName = '';
-            $tplViewName = '';
-            $tplContents = '';
+            if (!($tplView instanceof BViewEmpty)) {
+                $tplViewFile = $tplView->getTemplateFileName();
+                $tplContents = file_get_contents($tplViewFile);
+            } else {
+                $tplViewName = '';
+            }
         }
         $model = new BData([
             'id' => $tplViewName,
@@ -89,7 +95,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $actions = $view->get('actions');
         $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" '
             . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
-            .  $this->BLocale->_('Remove/Revert') . '</span></button>';
+            .  $this->_('Remove/Revert') . '</span></button>';
         $view->set('actions', $actions);
 
         $view->set('tab_view_prefix', $this->_formViewPrefix);
@@ -132,7 +138,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
                     throw new BException("The view doesn't use template file");
                 }
                 if (file_exists($targetFile)) {
-                    unlink($targetFile);
+                    $this->BUtil->deleteFileSafely($targetFile, $targetDir);
                     $this->message('Template file was reverted or removed');
                 } else {
                     $this->message('Template file is already reverted to original', 'warning');
@@ -140,9 +146,8 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
                 $this->BResponse->redirect('templates');
                 return;
             }
-
-            $this->BUtil->ensureDir(dirname($targetFile));
-            file_put_contents($targetFile, $model['view_contents']);
+            
+            $this->BUtil->writeFileSafely($targetFile, $model['view_contents'], $targetDir);
             $this->message('Updated template file has been saved in custom module');
             $this->BResponse->redirect('templates');
         } catch (Exception $e) {

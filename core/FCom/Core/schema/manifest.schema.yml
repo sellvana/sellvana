@@ -221,5 +221,8 @@ $area/security/request_fields_whitelist/*:
     key_pattern: "^/.*$"
 
 $area/security/request_fields_whitelist/*/*:
-    type: str
+    type: map
     key_pattern: "^(GET|POST|REQUEST|COOKIE)/.*$"
+
+$area/security/request_fields_whitelist/*/*/*:
+    type: str

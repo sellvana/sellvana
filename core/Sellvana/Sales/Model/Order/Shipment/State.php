@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract_State_Context
 {
@@ -57,4 +57,9 @@ class Sellvana_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract
         return $this->_getStateObject(self::CUSTOM);
     }
 
+    public function calcAllStates()
+    {
+        $this->overall()->calcState();
+        $this->carrier()->calcState();
+    }
 }

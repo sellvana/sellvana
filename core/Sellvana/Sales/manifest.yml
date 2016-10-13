@@ -1,8 +1,8 @@
 modules:
     Sellvana_Sales:
-        version: 0.5.1.0
-        channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
+        version: 0.6.11.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
@@ -13,6 +13,10 @@ modules:
                     default_shipping_method: plain
                     order_number: "0000000"
                     cart_cookie_token_ttl_days: 30
+                    orders_late_limit: 25
+                    cross_sale_limit: 6
+                Sellvana_Sales_Shipping:
+                    package_size: 5x5x5
 
         areas:
             FCom_Admin:
@@ -21,11 +25,28 @@ modules:
                     - [ /carts/?.action, Sellvana_Sales_Admin_Controller_Carts ]
                     - [ /orders/?.action, Sellvana_Sales_Admin_Controller_Orders ]
                     - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
+                    - [ /shipments/?.action, Sellvana_Sales_Admin_Controller_Shipments ]
+                    - [ /cancels/?.action, Sellvana_Sales_Admin_Controller_Cancels ]
+                    - [ /returns/?.action, Sellvana_Sales_Admin_Controller_Returns ]
+                    - [ /refunds/?.action, Sellvana_Sales_Admin_Controller_Refunds ]
                     - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
+
+                    - [ /sales/report/product_performance/?.action, Sellvana_Sales_Admin_Controller_Report_ProductPerformance ]
+                    - [ /sales/report/customer_groups/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerGroup ]
+                    - [ /sales/report/abandoned_carts/?.action, Sellvana_Sales_Admin_Controller_Report_AbandonedCarts ]
+                    - [ /sales/report/payment_method/?.action, Sellvana_Sales_Admin_Controller_Report_PaymentMethod ]
+                    - [ /sales/report/country/?.action, Sellvana_Sales_Admin_Controller_Report_Country ]
+                    - [ /sales/report/state/?.action, Sellvana_Sales_Admin_Controller_Report_State ]
+                    - [ /sales/report/hour/?.action, Sellvana_Sales_Admin_Controller_Report_Hour ]
+                    - [ /sales/report/day/?.action, Sellvana_Sales_Admin_Controller_Report_Day ]
+                    - [ /sales/report/order_detail/?.action, Sellvana_Sales_Admin_Controller_Report_OrderDetail ]
+                    - [ /sales/report/order_item_detail/?.action, Sellvana_Sales_Admin_Controller_Report_OrderItemDetail ]
+                    - [ /sales/report/shipping_method/?.action, Sellvana_Sales_Admin_Controller_Report_ShippingMethod ]
+                    - [ /sales/report/customer_performance/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerPerformance ]
+                    - [ /sales/report/product_history/?.action, Sellvana_Sales_Admin_Controller_Report_ProductHistory ]
                 observe:
-                    - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
+                    - [ "FCom_Admin_Model_Activity::collectActivityItems", Sellvana_Sales_Main.onCollectActivityItems]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_Sales_Admin_Controller_Orders.onSaveAdminSettings ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", Sellvana_Sales_Admin_Controller_Orders.onHeaderSearch  ]
 
@@ -39,6 +60,7 @@ modules:
                 routing:
                     - [ "/cart/?.action", Sellvana_Sales_Frontend_Controller_Cart ]
                     - [ /orders/?.action, Sellvana_Sales_Frontend_Controller_Orders ]
+                    - [ /payments/?.action, Sellvana_Sales_Frontend_Controller_Payments ]
                     - [ /guest/?.action, Sellvana_Sales_Frontend_Controller_Guest ]
 
                 observe:
@@ -49,3 +71,4 @@ modules:
             FCom_Cron:
                 crontab:
                     - [ "* * * * *", Sellvana_Sales_Cron::runEveryMinute ]
+                    - [ "0 0 * * *", Sellvana_Sales_Cron::runDaily ]

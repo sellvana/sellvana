@@ -1,8 +1,8 @@
 modules:
     Sellvana_MultiLanguage:
-        version: 0.5.0.0
-        channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_CatalogIndex: 0.1.0, Sellvana_CustomField: 0.1.0 } }
+        version: 0.6.0.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, Sellvana_CatalogIndex: 0.1.0, Sellvana_CatalogFields: 0.1.0 } }
         translations: { en: en.php }
         auto_use: [ bootstrap ]
 
@@ -22,3 +22,8 @@ modules:
                 routing:
                     - [ /translations, Sellvana_MultiLanguage_Admin_Controller_Translations.index ]
                     - [ /translations/.action, Sellvana_MultiLanguage_Admin_Controller_Translations ]
+                observe:
+                    - [ "BActionController::onBeforeDispatch", Sellvana_MultiLanguage_Admin.userLocale ]
+
+        default_config:
+            modules/Sellvana_MultiLanguage/allowed_locales: [ en_US, fr_FR, de_DE, it_IT ]

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Created by pp
@@ -7,8 +7,8 @@
 
 class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
 {
-    protected static $gatewayUrl = "https://secure.authorize.net/gateway/transact.dll";
-    protected static $testGatewayUrl = "https://test.authorize.net/gateway/transact.dll";
+    protected static $_gatewayUrl = "https://secure.authorize.net/gateway/transact.dll";
+    protected static $_testGatewayUrl = "https://test.authorize.net/gateway/transact.dll";
 
     public static $ccTransactions = [
         "AUTH_CAPTURE",
@@ -19,7 +19,7 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
         "VOID" // void payment
     ];
 
-    protected static $reqFields = [
+    protected static $_reqFields = [
         "x_login",
         "x_tran_key",
         "x_type",
@@ -32,16 +32,16 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
         "x_delim_char", // single character
     ];
 
-    protected static $reqFieldsCapture = [
+    protected static $_reqFieldsCapture = [
         "x_auth_code", // Required only for CAPTURE_ONLY transactions;Format: 6 characters
     ];
 
-    protected static $reqFieldsAuthPrior = [
+    protected static $_reqFieldsAuthPrior = [
         "x_trans_id", // Required only for CREDIT, PRIOR_ AUTH_ CAPTURE, and VOID transactions
         "x_split_tender_id",
     ];
 
-    protected static $otherFields = [
+    protected static $_otherFields = [
         "x_allow_partial_auth",
         "x_prepaid_balance_on_card",
         "x_prepaid_requested_amount",
@@ -106,8 +106,8 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
     public function paymentActions()
     {
         return [
-            "AUTH_ONLY"         => $this->BLocale->_("Authorize Only"),
-            "AUTH_CAPTURE" => $this->BLocale->_("Authorize and Capture")
+            "AUTH_ONLY"         => $this->_("Authorize Only"),
+            "AUTH_CAPTURE" => $this->_("Authorize and Capture")
         ];
     }
 /*
@@ -122,11 +122,11 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => $this->BLocale->_("Other")
+            "OT" => $this->_("Other")
         ];
     }
 
-    protected static $responseFormat = [
+    protected static $_responseFormat = [
         1 => "Response Code",
         2 => "Response Subcode",
         3 => "Response Reason Code",
@@ -203,7 +203,10 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
      */
     public function gatewayUrl($config)
     {
-        $url = static::$gatewayUrl;
+        $url = static::$_gatewayUrl;
+        if (!$config) {
+            $config = $this->BConfig;
+        }
         if ($config->get('modules/Sellvana_PaymentAuthorizeNet/cgi_url')) {
             $url = $config->get('modules/Sellvana_PaymentAuthorizeNet/cgi_url');
         }

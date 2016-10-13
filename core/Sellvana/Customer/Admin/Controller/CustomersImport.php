@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Admin_Controller_CustomersImport
@@ -47,7 +47,7 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
         $this->BResponse->redirect('customers/import/status');
     }
 
-    public function action_start()
+    public function action_start__POST()
     {
         $this->Sellvana_Customer_Import->run();
         $this->BResponse->redirect('customers/import/status');
@@ -62,7 +62,7 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
     public function action_status()
     {
         $s = $this->BRequest->request('start');
-        $view = $this->BLayout->view('customer/import/status')->set(['start' => $s]);
+        $view = $this->BLayout->getView('customer/import/status')->set(['start' => $s]);
         $this->BResponse->set($view->render());
     }
 }

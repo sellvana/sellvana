@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Cron_Main
@@ -61,6 +61,9 @@ class FCom_Cron_Main extends BClass
         } elseif (null !== $handles && !is_array($handles)) {
             throw new Exception('Invalid argument: ' . print_r($handles, 1));
         }
+        // bootstrap all modules
+        $this->BModuleRegistry->bootstrap();
+        
         // fetch configuration
         $c = $this->BConfig->get('modules/FCom_Cron');
         $leewayMins = !empty($c['leeway_mins']) ? $c['leeway_mins'] * 1 : 5;
@@ -73,8 +76,8 @@ class FCom_Cron_Main extends BClass
         $time = strtotime($this->BDb->now());
         $timeout = $time - $timeoutSecs;
         foreach ($dbTasks as $h => $task) {
-            $task->last_start_time = strtotime($task->last_start_at);
-            if ($task->status === 'running' && $task->last_start_time < $timeout) {
+            $task->set('last_start_time', strtotime($task->get('last_start_at')));
+            if ($task->get('status') === 'running' && $task->get('last_start_time') < $timeout) {
                 $task->set('status', 'timeout')->save();
             }
         }
@@ -91,11 +94,11 @@ class FCom_Cron_Main extends BClass
                 // check whether to skip already existing tasks
                 if (!$force && !empty($dbTasks[$h])) {
                 // skip pending and already running tasks
-                    if (in_array($dbTasks[$h]->status, ['pending', 'running'])) {
+                    if (in_array($dbTasks[$h]->get('status'), ['pending', 'running'])) {
                         continue;
                     }
                     // skip tasks that started within last minute if not specified $force flag
-                    if ($dbTasks[$h]->last_start_time > $thresholdTime) {
+                    if ($dbTasks[$h]->get('last_start_time') > $thresholdTime) {
     #echo $dbTasks[$h]->last_start_time.', '.$thresholdTime.', '.date('Y-m-d H:i:s', $dbTasks[$h]->last_start_time).', '.date('Y-m-d H:i:s', $thresholdTime).'<hr>';
                         continue;
                     }
@@ -133,7 +136,7 @@ class FCom_Cron_Main extends BClass
                 'last_start_at' => $this->BDb->now(),
                 'last_finish_at' => null,
             ])->save();
-            $task = $this->_tasks[$dbTask->handle];
+            $task = $this->_tasks[$dbTask->get('handle')];
 
             try {
                 // run task callback
@@ -223,10 +226,14 @@ class FCom_Cron_Main extends BClass
             'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12,
             'sun' => 0, 'mon' => 1, 'tue' => 2, 'wed' => 3, 'thu' => 4, 'fri' => 5, 'sat' => 6,
         ];
-        if (is_numeric($val)) return $val;
+        if (is_numeric($val)) {
+            return $val;
+        }
         if (is_string($val)) {
             $val = strtolower(substr($val, 0, 3));
-            if (isset($convert[$val])) return $convert[$val];
+            if (isset($convert[$val])) {
+                return $convert[$val];
+            }
         }
         return false;
     }

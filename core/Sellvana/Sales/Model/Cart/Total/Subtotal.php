@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Cart_Total_Subtotal
@@ -7,6 +7,7 @@
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_ShopperFields_Frontend $Sellvana_ShopperFields_Frontend
  */
 class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
@@ -28,6 +29,13 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
         $storeCurrency = $this->_cart->get('store_currency_code');
         if (!$storeCurrency) {
             $storeCurrency = $this->_cart->setStoreCurrency()->get('store_currency_code');
+        }
+        $currencyRate = 1;
+        if ($storeCurrency != $baseCurrency) {
+            $currencyRate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
+            if (!$currencyRate) {
+                $currencyRate = 1;
+            }
         }
 
         foreach ($this->_cart->items() as $item) {
@@ -55,19 +63,22 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                 $itemPrice = $product->variantPrice($itemPrice, $item->get('variant'));
             }
 
-            if ($item->get('shopper_fields')) {
-                foreach ($item->get('shopper_fields') as $f => $fData) {
-                    $itemPrice = $this->priceFunction($itemPrice, $fData);
+            if ($item->getData('shopper_fields') && $this->BModuleRegistry->isLoaded('Sellvana_ShopperFields')) {
+                $frontendFields = $this->Sellvana_ShopperFields_Frontend->getProductFrontendFields($product);
+#var_dump(__METHOD__, $item->getData('shopper_fields'), $frontendFields); exit;
+                foreach ($item->getData('shopper_fields') as $f => $fData) {
+                    $field = $frontendFields[$f];
+                    if (!empty($field['options'][$fData['val']])) {
+                        $option = $field['options'][$fData['val']];
+                        if (!empty($option['price'])) {
+                            $itemPrice += $option['price'] * $fData['qty'];
+                        }
+                    }
                 }
             }
 
             $storeCurrencyPrice = $itemPrice;
-            if ($storeCurrency != $baseCurrency) {
-                $rate      = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
-                if ($rate) {
-                    $itemPrice = $storeCurrencyPrice / $rate;
-                }
-            }
+            $itemPrice = $storeCurrencyPrice / $currencyRate;
 
             $itemNum++;
             $itemQty += $item->get('qty');
@@ -78,12 +89,13 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             $subtotal += $rowTotal;
 
             if ($storeCurrency != $baseCurrency) {
-                $storeCurrencySubtotal = $item->calcRowTotal(true);
+                $storeCurrencyRowtotal = $item->calcRowTotal(true);
             } else {
-                $storeCurrencySubtotal = $subtotal;
+                $storeCurrencyRowtotal = $rowTotal;
             }
+            $storeCurrencySubtotal += $storeCurrencyRowtotal;
 
-            $item->set('row_total', $rowTotal)->setData('store_currency/row_total', $storeCurrencySubtotal);
+            $item->set('row_total', $rowTotal)->setData('store_currency/row_total', $storeCurrencyRowtotal);
         }
 
         $this->_value = $subtotal;

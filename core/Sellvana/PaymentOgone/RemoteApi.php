@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_PaymentOgone_RemoteApi
@@ -256,7 +256,7 @@ class Sellvana_PaymentOgone_RemoteApi extends BClass
             $order->changeStatus($update);
         }
         if ($comment) {
-            $order->addComment($this->BLocale->_($comment));
+            $order->addComment($this->_($comment));
         }
         if ($notifyCustomer) {
             $order->notifyCustomer('ORDER_RECEIVED');

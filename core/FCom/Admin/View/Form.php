@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_View_Form
@@ -10,8 +10,18 @@ class FCom_Admin_View_Form extends FCom_Admin_View_Abstract
         if (!$this->get('actions')) {
             return '';
         }
-        $htmlArr = [];
+
+        $actions = [];
+        $defaultOrder = 100;
         foreach ($this->get('actions') as $action) {
+            $order = isset($action[3]) ? $action[3] : $defaultOrder;
+            $actions[$order] = $action;
+            $defaultOrder += 10;
+        }
+        ksort($actions);
+
+        $htmlArr = [];
+        foreach ($actions as $action) {
             if (is_string($action)) {
                 $htmlArr[] = $action;
             } elseif (is_array($action)) {

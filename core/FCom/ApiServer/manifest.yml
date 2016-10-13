@@ -1,8 +1,8 @@
 modules:
     FCom_ApiServer:
-        version: 0.5.0.0
-        channel: alpha
-        require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0 } }
+        version: 0.6.0.0
+        channel: beta
+        require: { module: { FCom_Core: 0.5.0.0, FCom_LibTwig: 0.5.0.0 } }
         description: "API Server area"
         auto_use: [ bootstrap ]
 

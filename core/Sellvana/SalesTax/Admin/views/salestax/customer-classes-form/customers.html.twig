@@ -40,7 +40,7 @@
             mainGrid = grid;
             var modalContainerEle = document.getElementById('{{ customerTaxConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
-            React.renderComponent(
+            React.render(
                     React.createElement(Components.Modal, {
                                 className: "taxProductModal",
                                 show: true,
@@ -57,7 +57,7 @@
                     ), modalContainerEle);
             var custmerAttachConfigCompiled = {{ UTIL.toJson(custmerAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('taxProductList');
-            var instanceAttachGrid = React.renderComponent(
+            var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, {config: custmerAttachConfigCompiled}),
                     attachGridContainerEle
             );
@@ -87,7 +87,7 @@
                 });
                 modal.close();
             } else {
-                alert('please choose at least one product');
+                alert('please choose at least one customer');
             }
         };
 

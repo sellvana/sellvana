@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_ProductsImport
@@ -51,7 +51,6 @@ class Sellvana_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Contro
     {
         $this->Sellvana_Catalog_ProductsImport->run();
         $this->BResponse->redirect('catalog/products/import/status');
-        exit;
     }
 
     public function action_stop__POST()
@@ -63,7 +62,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Contro
     public function action_status()
     {
         $s = $this->BRequest->request('start');
-        $view = $this->BLayout->view('catalog/products/import/status')->set(['start' => $s]);
+        $view = $this->BLayout->getView('catalog/products/import/status')->set(['start' => $s]);
         $this->BResponse->set($view->render());
     }
 }

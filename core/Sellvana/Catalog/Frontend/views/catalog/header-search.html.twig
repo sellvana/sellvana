@@ -1,68 +1,305 @@
+<style type="text/css">
+    .product-preview-modal {
+        position: relative;
+        background: #fff;
+        border: 4px solid #fff;
+    }
+    .product-preview-modal:after, .product-preview-modal:before {
+        right: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        top: 60px;
+        border-color: rgba(248, 248, 248, 0);
+        border-right-color: #fff;
+    }
+
+    .product-preview-modal:after {
+        border-width: 15px;
+        margin-top: -15px;
+    }
+    .product-preview-modal:before {
+        border-width: 22px;
+        margin-top: -22px;
+    }
+
+    .product-search-img {
+        width: 20%;
+        display: inline-block;
+    }
+
+    .typeahead-product-info {
+        display: block;
+        font-size: 0.9em;
+    }
+
+    .short-desc {
+        display: inline;
+        color: #595959;
+        font-size: 0.6em;
+    }
+
+    .typeahead-header, .typeahead-footer {
+        padding: 5px 10px;
+    }
+
+    .typeahead-footer a {
+        font-size: 1em;
+        padding: 10px 0;
+        display: block;
+    }
+
+    .typeahead-footer a:hover {
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        background: #4B65B1;
+        color: #fff;
+    }
+
+    .typeahead-footer a:hover .search-text {
+        color: #fff;
+    }
+
+    .search-text {
+        font-size: 0.9em;
+        text-transform: uppercase;
+    }
+
+    .search-product-item-img {
+        width: 40px;
+    }
+
+    .tt-menu {
+        width: 422px;
+        margin: 40px 0;
+        padding: 8px 0;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        -webkit-border-radius: 8px;
+        -moz-border-radius: 8px;
+        border-radius: 8px;
+        -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    }
+
+    .tt-suggestion {
+        padding: 3px 20px;
+        font-size: 18px;
+        line-height: 24px;
+        position: relative;
+    }
+
+    .tt-suggestion a {
+        display: block;
+        width: 100%;
+        height: 40px;
+        color: #66757F;
+        line-height: 15px;
+        font-size: 0.8em;
+    }
+
+    .tt-suggestion a img {
+        margin-right: 15px;
+        float: left;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+    .btn-search-preview {
+        display: block;
+        float: right;
+        font-size: 1em;
+        line-height: 40px;
+        width: 30px;
+        text-align: center;
+    }
+
+    .tt-cursor {
+        background: #4B65B1;
+    }
+
+    .tt-suggestion.tt-cursor {
+        background: #4B65B1;
+    }
+
+    .tt-suggestion.tt-cursor a, 
+    .tt-suggestion.tt-cursor .tt-highlight,
+    .tt-suggestion.tt-cursor .short-desc em {
+        color: #fff;
+    }
+
+    .tt-highlight {
+        color: #4B65B1;
+    }
+    
+    .empty-message {
+        padding-left: 12px;
+    }
+
+    .product-preview-modal {
+        position: absolute;
+        width: 500px;
+        background: #fff;
+        padding: 12px;
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+        left: 445px;
+        top: -40px;
+        -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    }
+
+    .product-preview-modal .product-preview-left {
+        width: 30%;
+        display: block;
+        margin-right: 15px;
+        float: left;
+    }
+
+    .product-preview-modal .product-preview-left img {
+        vertical-align: inherit !important;
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+    }
+
+    .product-preview-modal .product-preview-right {
+        width: 60%;
+        display: block;
+        line-height: 30px;
+        float: left;
+    }
+
+    p.product-preview-desc {
+        margin-top: 15px;
+    }
+
+    .base-price {
+        color: #999;
+        text-decoration: line-through;
+    }
+
+    .product-preview-modal .product-preview-right p {
+        font-size: 0.7em;
+        line-height: 15px;
+    }
+
+    .product-preview-modal .product-preview-right h4 {
+        color: #fff;
+        font-size: 1em;
+        margin-bottom: 10px;
+        color: #4B65B1;
+        font-weight: bold;
+        padding-top: 0;
+    }
+</style>
 <form class="navbar-form f-header-search-form {{ THIS.get('for_mobile') ? 'visible-xs' : 'hidden-xs' }}" role="search" action="{{ APP.href('catalog/search') }}">
-  <input type="text" class="form-control" autocomplete="off" placeholder="{{ 'Search the store'|_ }}" name="q" value="{{ THIS.get('query') }}">
-  <button type="submit" class="btn btn-default {{ THIS.get('for_mobile') ? 'btn-sm' }}"><span class="glyphicon glyphicon-search"></span></button>
+    <input type="text" class="form-control typeahead" placeholder="{{ 'Search the store'|_ }}" name="q">
+    <button type="submit" class="btn btn-default {{ THIS.get('for_mobile') ? 'btn-sm' }}"><span class="glyphicon glyphicon-search"></span></button>
 </form>
+
 {% if not THIS.get('for_mobile') %}
   <script type="text/javascript">
-    require(['jquery', /*'bloodhound', */'typeahead'], function($/*, Bloodhound*/) {
-        var $input = $('.f-header-search-form input[name=q]');
+    require(['jquery', 'underscore', 'bloodhound', 'typeahead'], function($, _, Bloodhound) {
+        var $input = $('.typeahead');
         var url = '{{ APP.href('catalog/search/autocomplete') }}';
-        /*
+        
         var engine = new Bloodhound({
             queryTokenizer: Bloodhound.tokenizers.whitespace,
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
-            local: ["(A)labama","Alaska","Arizona","Arkansas","Arkansas2","Barkansas"]
-            //remote: {
-            //    url: url
-            //}
-        });
-        engine.initialize();
-        $input.typeahead({source: engine.ttAdapter()});
-        */
-        var queryCache = {};
-        /*$input.typeahead({
-            //source: ['A', 'B', 'C']
-            source: function(query, sync, async) {
-                console.log(query, sync, async);
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('val'),
+            sufficient: 20,
+            identify: function(datum) {
+                return datum.id;
+            },
+            /*local: $.map(products, function(item) {
+                return { val: item.product_name };
+            }),*/
+            prefetch: {
+                url: url,
+                filter: function(products) {
+                    return $.map(products, function(item) {
+                        return { val: item };
+                    });
+                }
+            },
+            remote: {
+                url: url + "?q=%QUERY",
+                filter: function(products) {
+                    return products;
+                },
+                wildcard: "%QUERY"
             }
-        });*/
-        /*
-        $input.keyup(function(ev) {
-            var q = $(this).val();
-            if (queryCache[q]) {
-                $input.typeahead({source:queryCache[q]});
-            } else {
-                $.get(url, {q: q}, function (data) {
-                    $input.typeahead({source:data});
-                    queryCache[q] = data;
-                });
+        });
+
+        engine.initialize();
+
+        $input.typeahead(null, {
+            name: 'products',
+            displayKey: 'val',
+            limit: 5,
+            minLength: 3,
+            source: engine.ttAdapter(),
+            templates: {
+                suggestion: function (data) {
+                    var curLocale = "{{ LOCALE.getCurrentLocale() }}".replace('_', '-');
+                    var basePriceLabel = data.price.base ? data.price.base.label : "{{ 'Price' | _ }}";
+                    var basePrice = data.price.base && data.price.base.value !== 0 ? data.price.base.value.toLocaleString(curLocale, { style: 'currency', currency: '{{ LOCALE.getCurrencyCode() }}' }) : "{{ 'No Price' | _ }}";
+
+                    var salePriceLabel = data.price.sale ? data.price.sale.label : "{{ 'Sale' | _ }}";
+                    var salePrice = data.price.sale ? data.price.sale.value.toLocaleString(curLocale, { style: 'currency', currency: '{{ LOCALE.getCurrencyCode() }}' }) : '';
+
+                    var savePriceLabel = data.price.save ? data.price.save.label : "{{ 'You Save' | _ }}";
+                    var savePrice = data.price.save ? data.price.save.formatted : '';
+                    return '<div class="tt-suggestion tt-selectable"><a href="{{ APP.frontendHref() }}'+data.url_key+'" class="search-product-item"><img class="search-product-item-img" src="'+data.thumb_url+'" title="'+data.product_name+'" /><span class="typeahead-product-info"><strong>' + data.product_name + '</strong><i onmouseover="window.showPreviewProduct(this)" onmouseout="window.hidePreviewProduct(this)" class="btn-search-preview fa fa-search text-right"></i></span><span class="short-desc"><em>'+readMore(data.short_description)+'</em></span></a><div class="product-preview-modal" style="display: none;"><div class="preview-body"><div class="product-preview-left"><img src="'+data.thumb_url+'"/></div><div class="product-preview-right"><h4 class="preview-header-title">'+data.product_name+'</h4><p class="product-preview-price">'+basePriceLabel+': <span class="'+(typeof basePrice === 'string' ? 'text-danger' : 'base-price')+'">'+basePrice+'</span></p><p class="product-preview-sale">'+salePriceLabel+': <span class="text-danger">'+salePrice+'</span></p><p>'+savePriceLabel+': <span class="text-danger">'+savePrice+'</span></p><p class="product-preview-desc">'+data.description.replace(/<[^>]*>?/g, '')+'</p></div></div></div></div>';
+                },
+                empty: '<div class="empty-message">{{ "No matches." | _ }}</div>',
+                pending: "<div class='waiting' style='text-align: center;'><img width='30px' src='{{ APP.src('@FCom_Admin/Admin/img/waiting.gif') }}'></div>",
+                header: function (data) {
+                    return '<div class="typeahead-header text-muted text-center">{{ "Searched for" | _ }} <strong>' + data.query + '</strong></div>';
+                },
+                footer: function(data) {
+                    return '<div class="typeahead-footer text-mute text-center"><a href="{{ APP.href('catalog/search') }}?q='+encodeURIComponent(data.query)+'" class="btn-load-more">{{ "Search all products with" | _ }} <strong class="search-text text-primary">'+data.query+'</strong></a></div>';
+                }
             }
         })
-        */
-
-        //$input.typeahead({source:function(q) { return ['abc','def','gth'] }, autoSelect: true});
-        /*
-        console.log(2);
-        $input.change(function() {
-            console.log(3);
-            var current = $input.typeahead("getActive");
-            if (current) {
-                console.log(4, current);
-                // Some item from your model is active!
-                if (current.name == $input.val()) {
-                    console.log(5);
-                    // This means the exact match is found. Use toLowerCase() if you want case insensitive match.
-                } else {
-                    console.log(6);
-                    // This means it is only a partial match, you can either add a new item
-                    // or take the active if you don't want new items
-                }
-            } else {
-                console.log(7);
-                // Nothing is active so it is a new value (or maybe empty value)
-            }
+        .on('typeahead:selected', function($e, product) {
+            document.location = "{{ APP.href('/') }}" + encodeURIComponent(product.url_key);
+        })
+        .on('typeahead:cursorchange', function($e, product) {
+            if (product) $input.val(product.product_name);
         });
-        */
+
+        window.showPreviewProduct = function(target) {
+            var $container = $(target).parents('.tt-suggestion');
+            $container.find('.product-preview-modal').fadeIn('200');
+        };
+        window.hidePreviewProduct = function(target) {
+            var $container = $(target).parents('.tt-suggestion');
+            $container.find('.product-preview-modal').fadeOut('100');
+        };
+
+        function readMore (content, showChar) {
+            if (!showChar) showChar = 100; // How many characters are shown by default
+            var ellipsesText = "...";
+
+            if(content.length > showChar) {
+
+                var c = content.substr(0, showChar);
+
+                return c + '<span>' + ellipsesText + '&nbsp;</span>';
+            }
+            return content;
+        }
     });
   </script>
 {% endif %}

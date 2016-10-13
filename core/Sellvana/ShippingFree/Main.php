@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_ShippingFree_Main
@@ -15,7 +15,7 @@ class Sellvana_ShippingFree_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_ShippingFree' => BLocale::i()->_('Shipping Free Settings'),
+            'settings/Sellvana_ShippingFree' => 'Shipping Free Settings',
         ]);
         return;
 

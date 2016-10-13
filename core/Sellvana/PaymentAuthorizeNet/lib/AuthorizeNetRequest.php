@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Sends requests to the Authorize.Net gateways.
@@ -91,7 +91,7 @@ abstract class AuthorizeNetRequest
         curl_setopt($curl_request, CURLOPT_TIMEOUT, 45);
         curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl_request, CURLOPT_SSL_VERIFYHOST, 2);
-        if (static::VERIFY_PEER) {
+        if ($this->VERIFY_PEER) {
             curl_setopt($curl_request, CURLOPT_CAINFO, dirname(dirname(__FILE__)) . '/lib/ssl/cert.pem');
         } else {
             curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, false);

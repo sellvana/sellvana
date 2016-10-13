@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Checkout_Frontend_Controller_Checkout
@@ -8,6 +8,7 @@
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  */
 
 class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Controller_Abstract
@@ -126,8 +127,17 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
         $this->_cart->calculateTotals()->saveAllDetails();
 
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        if ($customer && !$customer->getDefaultShippingAddress()) {
-            $customer->addAddress($this->_cart->addressAsArray('shipping'), true);
+        if ($customer) {
+            $address = false;
+            if (!$customer->getDefaultShippingAddress()) {
+                $address = $customer->addAddress($this->_cart->addressAsArray('shipping'), true);
+            } elseif(isset($post['save'])) {
+                $address = $customer->addAddress($this->_cart->addressAsArray('shipping'), false);
+            }
+
+            if ($address) {
+                $this->BSession->set('shipping_address_id', $address->get('id'));
+            }
         }
 
         $this->BResponse->redirect('checkout');
@@ -136,28 +146,55 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
     public function action_step2()
     {
         $this->layout('/checkout-simple/step2');
+        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $addresses = ($customer) ? $customer->getAddresses() : [];
+        $this->view('checkout-simple/step2')->addresses = $addresses;
+        $this->view('checkout-simple/partial/address-book')->customer = $customer;
     }
 
     public function action_step2__POST()
     {
         $post = $this->BRequest->post();
         $result = [];
-        $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-        if (!empty($post['same_address'])) {
-            $this->Sellvana_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
-        }
-        $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
-        $this->Sellvana_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
-        $this->Sellvana_Sales_Main->workflowAction('customerPlacesOrder', $args);
+        if (!empty($post['save'])) {
 
-        if (!empty($result['redirect_to'])) {
-            $href = $result['redirect_to'];
-        } elseif (!empty($result['success'])) {
-            $href = 'checkout/success';
-        } else {
-            $href = 'checkout';
         }
-        $this->BResponse->redirect($href);
+        $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
+
+        try {
+            if (empty($post['same_address'])) {
+                $this->Sellvana_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
+                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+                if ($customer && !empty($post['save'])) {
+                    $address = $customer->addAddress($this->_cart->addressAsArray('billing'), false);
+                    $this->BSession->set('shipping_address_id', $address->get('id'));
+                }
+            }
+            $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
+            $this->Sellvana_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+            $this->Sellvana_Sales_Main->workflowAction('customerPlacesOrder', $args);
+
+            if (!empty($result['redirect_to'])) {
+                $href = $result['redirect_to'];
+            } elseif (!empty($result['success'])) {
+                $href = 'checkout/success';
+            } else {
+                $href = 'checkout';
+            }
+
+            if (!empty($result['post_params']) && !empty($result['redirect_to'])) {
+                $this->layout('/checkout-simple/redirect');
+                $view = $this->view('checkout-simple/redirect');
+                $view->set('hiddenFields', $result['post_params']);
+                $view->set('postUrl', $result['redirect_to']);
+            } else {
+                $this->BResponse->redirect($href);
+            }
+        } catch (Exception $e) {
+            $href = 'checkout';
+            $this->message($e->getMessage(), 'error');
+            $this->BResponse->redirect($href);
+        }
     }
 
     public function action_success()
@@ -168,6 +205,10 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             return;
         }
         $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+        if (!$order) {
+            $this->BResponse->redirect('');
+            return;
+        }
         $custHlp = $this->Sellvana_Customer_Model_Customer;
         $this->view('checkout-simple/success')->set([
             'order' => $order,
@@ -175,6 +216,60 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             'sess_customer' => $custHlp->sessionUser(),
         ]);
         $this->layout('/checkout-simple/success');
+    }
+
+    public function action_changeAddress()
+    {
+        $token = $this->BRequest->get('token');
+        if (!$this->BSession->validateCsrfToken($token)) {
+            $this->message('Incorrect token', 'error');
+            $this->BResponse->redirect('checkout');
+            return;
+        }
+        $type = $this->BRequest->get('type');
+        $addressId = (int)$this->BRequest->get('id');
+
+        if ($type && $addressId) {
+            if (!in_array($type, ['shipping', 'billing'])) {
+                $this->message('Incorrect address type', 'error');
+                $this->BResponse->redirect('checkout');
+                return;
+            }
+
+            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+            $addresses = $customer->getAddresses();
+
+            $address = false;
+            foreach ($addresses as $addr) {
+                if ($addr->get('id') == $addressId) {
+                    $address = $addr;
+                    break;
+                }
+            }
+
+            if (!$address) {
+                $this->message('You can\'t choose an address which doesn\'t belong to you', 'error');
+                $this->BResponse->redirect('checkout');
+                return;
+            }
+
+            $post = ['address_id' => $addressId, $type => []];
+            if (($type == 'shipping' && $addressId == $this->BSession->get('billing_address_id')) ||
+                ($type == 'billing'  && $addressId == $this->BSession->get('shipping_address_id'))) {
+                $post['same_address'] = 1;
+            }
+            $fields = $this->Sellvana_Customer_Model_Address->getFields();
+            foreach ($fields as $field) {
+                $post[$type][$field] = $address->get($field);
+            }
+
+            $result = [];
+            $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
+            $this->Sellvana_Sales_Main->workflowAction('customerUpdates' . ucfirst($type) . 'Address', $args);
+            $this->_cart->calculateTotals()->saveAllDetails();
+        }
+
+        $this->BResponse->redirect('checkout');
     }
 
     public function action_xhr_shipping_address__POST()

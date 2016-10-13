@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_MarketClient_Main
@@ -11,10 +11,10 @@ class Sellvana_MarketClient_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_MarketClient' => BLocale::i()->_('Market Client Settings'),
-            'market_client' => BLocale::i()->_('Market Client'),
-            'market_client/install' => BLocale::i()->_('Market Client Install'),
-            'market_client/publish' => BLocale::i()->_('Market Client Publish'),
+            'settings/Sellvana_MarketClient' => 'Market Client Settings',
+            'market_client' => 'Market Client',
+            'market_client/install' => 'Market Client Install',
+            'market_client/publish' => 'Market Client Publish',
         ]);
 
     }
@@ -92,7 +92,7 @@ class Sellvana_MarketClient_Main extends BClass
             $this->progress([
                 'cur' => $i,
                 'modules' => [
-                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
+                    $modName => $this->_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -112,10 +112,22 @@ class Sellvana_MarketClient_Main extends BClass
 
             $this->progress([
                 'modules' => [
-                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
+                    $modName => $this->_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
                 ],
             ]);
 
+            /**
+             * TODO: implement the following process:
+             * 1. Unpack files from module package into tmp folder
+             * 2. Validate CRC for unpacked files
+             * 2a. If there's a problem, abort and error
+             * 3. Backup existing module files
+             * 4. Copy new files from tmp folder into dlc module location, overwriting old files
+             * 5. Check that files in dlc module location matching files in tmp folder
+             * 5a. If there's a problem, restore files from backup, abort and error
+             * 6. Delete old files from dlc module location that are not in the new package
+             * 7. Clear cache and run migrations
+             */
             if (!$this->BUtil->zipExtract($filename, $targetDir)) {
                 $this->progress([
                     'errors' => [
@@ -131,7 +143,7 @@ class Sellvana_MarketClient_Main extends BClass
             }
             $this->progress([
                 'modules' => [
-                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
+                    $modName => $this->_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
                 ],
             ]);
         }
@@ -151,19 +163,6 @@ class Sellvana_MarketClient_Main extends BClass
     {
         $this->progress(['status' => 'STOP']);
         return $this;
-    }
-
-    public function onGetHeaderNotifications($args)
-    {
-        $updates = $this->Sellvana_MarketClient_RemoteApi->fetchUpdatesFeed();
-
-        if (!empty($updates['items'])) {
-            foreach ($updates['items'] as $item) {
-                //TODO: make sure correct structure
-                $item['feed'] = 'remote';
-                $args['items'][] = $item;
-            }
-        }
     }
 
     public function onInstallStep3Post($args)

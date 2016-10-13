@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Blog_Admin_Controller_Post
@@ -46,8 +46,8 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
             ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
             ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
             ['name' => 'create_ym', 'label' => 'Create ym' , 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'date'],
-            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'date'],
+            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -113,7 +113,10 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
                 ['field' => 'title', 'type' => 'text'],
                 ['field' => 'status', 'type' => 'multiselect'],
             ],
-            'grid_before_create' => 'postAllGridRegister'
+            'grid_before_create' => 'postAllGridRegister',
+            'callbacks' => [
+                'componentDidMount' => 'postAllGridRegister'
+            ]
         ];
 
         return ['config' => $config];
@@ -146,7 +149,14 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
                 ['name' => 'status', 'label' => 'Status'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add Posts'],
+//                'add' => ['caption' => 'Add Posts'],
+                'add-posts' => [
+                    'caption'  => 'Add Posts',
+                    'type'     => 'button',
+                    'id'       => 'add-posts-from-grid',
+                    'class'    => 'btn-primary',
+                    'callback' => 'showModalToAddPosts'
+                ],
                 'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
@@ -154,6 +164,9 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
                 ['field' => 'status', 'type' => 'multiselect'],
             ],
             'grid_before_create' => $related ? 'postGridRegister' : 'postNotRelatedGridRegister',
+            'callbacks' => [
+                'componentDidMount' => $related ? 'postGridRegister' : 'postNotRelatedGridRegister'
+            ]
             //'events' => ['init', 'add', 'mass-delete']
         ];
 

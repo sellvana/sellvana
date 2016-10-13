@@ -1,9 +1,24 @@
 modules:
     FCom_Admin:
-        version: 0.5.0.0
-        channel: alpha
-        description: Base Admin functionality
-        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0, FCom_LibScssPhp: 0.1.0 } }
+        version: 0.6.3.0
+        channel: beta
+        description: Admin Panel base functionality and platform
+        custom:
+            status:
+                dev: 90
+                todo:
+                    - AJAX Save and Save and continue
+
+        require:
+            module:
+                FCom_Core: 0.5.0.0
+                FCom_LibJsCommon: 0.5.0.0
+                FCom_LibTwig: 0.5.0.0
+                FCom_Frontend: 0.5.0.0
+                FCom_LibScssPhp: 0.5.0.0
+                FCom_LibJsCkeditor: 0.5.0.0
+                FCom_LibGoogle2FA: 0.5.0.0
+                FCom_LibRecaptcha: 0.5.0.0
 
         translations:
             de: de.php
@@ -20,6 +35,7 @@ modules:
                     - [ admin/nav, { view_class: FCom_Admin_View_Nav } ]
                     - [ admin/grid, { view_class: FCom_Admin_View_Grid } ]
                     - [ admin/griddle, { view_class: FCom_Admin_View_Grid } ]
+                    - [ admin/report, { view_class: FCom_Admin_View_Grid } ]
                     - [ admin/form, { view_class: FCom_Admin_View_Form } ]
                     - [ core/form-elements, { view_class: FCom_Core_View_FormElements } ]
                     #- [ jqgrid, { view_class: FCom_Admin_View_JqGrid } ]
@@ -29,6 +45,7 @@ modules:
                 routing:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
                     - [ /, FCom_Admin_Controller.index ]
+                    #- [ /login, FCom_Admin_Controller.login ]
                     - [ /*view, FCom_Admin_Controller.static ]
                     - [ /blank, FCom_Admin_Controller.blank ]
 
@@ -58,11 +75,9 @@ modules:
 
                     - [ "/media/grid/:do", FCom_Admin_Controller_MediaLibrary.grid_data ]
 
-                    - [ /settings, FCom_Admin_Controller_Settings.index ]
+                    - [ "/settings/?.action", FCom_Admin_Controller_Settings ]
 
                     - [ "/modules/?.action" , FCom_Admin_Controller_Modules ]
-
-                    - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
                     - [ /media_library, FCom_Admin_Controller_MediaLibrary.index ]
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
@@ -70,9 +85,10 @@ modules:
 
                     - [ /switch_locale, FCom_Admin_Controller.switch_locale ]
 
+                    - [ "/g2fa/?.action", FCom_Admin_Controller_Google2FA ]
+
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", "FCom_Admin_Admin.onGetDashboardWidgets" ]
 
                 security:
                     request_fields_whitelist:
@@ -93,11 +109,19 @@ modules:
                         permission: upload/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp
                         folder: media/images
+
+            FCom_Shell:
+                custom:
+                    actions:
+                        - FCom_Admin_Shell_User
+
         default_config:
             modules:
                 FCom_Admin:
                     theme: FCom_Admin_DefaultTheme
                     default_locale: en_US
+                    default_dashboard_widget_limit: 25
+                    enable_debug_in_js: 0
 
         themes:
             FCom_Admin_DefaultTheme:

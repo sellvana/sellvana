@@ -1,16 +1,39 @@
 <!--{ label: Form Fields }-->
 <!--{ pos: 30 }-->
-
+<style>
+    #frontend-field-grid-modal-form .select2-container .select2-choice,
+    #frontend-field-grid-modal-form .select2-container .select2-choice {
+        height: 28px;
+        width: 348px;
+        font-size: 1em;
+    }
+</style>
 {% set blockCtrl = APP.instance('Sellvana_Cms_Admin_Controller_Blocks') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
 {% set grid = blockCtrl.formFieldGrid(model) %}
+{% set adminUsers = blockCtrl.getAdminUsers() %}
+{% set templates = blockCtrl.getEmailTemplates() %}
 <fieldset class="form-horizontal">
     <div class="f-section">
         <div class="form-group">
             {% set emailOptions = blockCtrl.getEmailOptions() %}
 
-            {{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
-            {{ forms.select(fieldData, {field:'form_email', label:'Send form data to'|_, select2: true, options:emailOptions}) }}
+            {{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2: {}}) }}
+            {{ forms.select(fieldData, {field:'form_email', label:'Send form data to'|_, select2: {}, options:emailOptions}) }}
             {{ forms.input(fieldData, {field:'form_custom_email', label:'Custom email'|_, attr:'disabled', input_class:"email"}) }}
+
+            {% if adminUsers %}
+                {{ forms.boolean(fieldData, {field: 'form_notify_admin', label: 'Send notification to admin'|_, select2: {}}) }}
+                {{ forms.select(fieldData, {field: 'form_notify_admin_user', label: 'Admin users to notify'|_, multiple: false, options: adminUsers, select2: {}}) }}
+            {% endif %}
+
+            {{ forms.boolean(fieldData, {field: 'form_notify_customer', label: 'Send confirmation to customer'|_, select2: {}}) }}
+            {% if templates %}
+                {{ forms.select(fieldData, {field: 'form_notify_customer_tpl', label: 'Email template'|_, options: templates, select2: {}}) }}
+            {% endif %}
+            {{ forms.input(fieldData, {field: 'form_user_email_field', label: 'Form Email Field'|_}) }}
+
             <script type="text/javascript">
                 require(['jquery', 'select2'], function ($) {
                     $(function () {
@@ -41,16 +64,14 @@
 </fieldset>
 
 <script>
-    require(['react', 'underscore', 'jquery', 'fcom.components', 'select2'], function (React, _, $, Components) {
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomSelect2'], function (React, _, $, Components, FComSelect2) {
         var formFieldsGrid, formFieldsNode, formFieldsModalNode;
-        var inputName = 'input[data-col="name"]';
-        var inputOption = 'input[data-col="options"]';
-        var selectFieldType = 'select[data-col="input_type"]';
+        var FieldsComponent;
 
         window.formFieldGridRegister = function(grid) {
             formFieldsGrid = grid;
             formFieldsNode = $(formFieldsGrid.getDOMNode());
-        }
+        };
 
         $('#default-form').submit(function (ev) {
             var rows = formFieldsGrid.getRows();
@@ -66,17 +87,14 @@
             $("#block_form_fields_data").val(JSON.stringify(res));
         });
 
-        /**
-         * Add form fields
-         */
-        window.addFormField = function(modal) {
+        function collectFields() {
             var fields = formFieldsModalNode.find('select,input,textarea'),
                 form = formFieldsModalNode.find('form'),
-                addBtn = formFieldsModalNode.find('button.save'),
                 options = {},
                 addRows = {};
 
             var mainFields = {
+                id: 1,
                 name: 1,
                 label: 1,
                 input_type: 1,
@@ -85,7 +103,7 @@
             };
 
             var rows = formFieldsGrid.getRows();
-            if($.isEmptyObject(addRows) == true) {
+            if ($.isEmptyObject(addRows) == true) {
                 addRows['id'] = 0;
             }
 
@@ -119,885 +137,574 @@
                     addRows['_new'] = true;
                     addRows['id'] = id + 1;
                 }
+            }
+            return addRows;
+        }
+        /**
+         * Add form fields
+         */
+        window.addFormField = function(modal) {
+            var addRows = collectFields();
 
+            if (addRows.id && addRows.id !== 0) {
                 formFieldsGrid.addRows([addRows]);
                 modal.close();
             }
-        }
+        };
 
-        var formColumns = [
-            {
-                'name': 'input_type', 'label': 'Field Type', 'labelClass': 'col-sm-3', 'width': 200, 'editor': 'select', 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true},
-                options: {
-                    '': '-- Select field type --',
-                    'text': 'Single Line Text',
-                    'textarea': 'Paragraph Text',
-                    'wysiwyg': 'Rich Text',
-                    'number': 'Number',
-                    'email': 'Email Address',
-                    'url': 'Website/URL',
-                    'image': 'Image URL',
-                    'file': 'File Upload',
-                    'date': 'Date',
-                    'tel': 'Phone Number',
-                    'hidden': 'Hidden Field',
-                    'time': 'Time',
-                    'password': 'Password',
-                    'checkbox': 'Checkbox',
-                    'radio': 'Radio',
-                    'select': 'Dropdown',
-                    'select-multi': 'select-multi'
-                }
-            },
-            {'name': 'position', 'label': 'Position', 'labelClass': 'col-sm-5', 'cssClass': 'col-sm-7', 'hidden': true, 'addable': true, 'editable': true, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
+        window.updateFormField = function(modal) {
+            var updateRows = collectFields();
 
-            {'name': 'name', 'label': 'Field Name', 'labelClass': 'col-sm-3', 'width': 200, 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true}},
+            if (updateRows.id && updateRows.id !== 0) {
+                formFieldsGrid.updateRows([updateRows]);
+                modal.close();
+            }
+        };
 
-            {'name': 'required', 'label': 'Required', 'labelClass': 'col-sm-5', 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'width': 150,'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
-
-            {'name': 'field_id', 'label': 'Field Id', 'labelClass': 'col-sm-3', 'addable': true, 'editable': true, 'hidden': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true}},
-
-            {'name': 'readonly', 'label': 'Read Only', 'labelClass': 'col-sm-5', 'hidden': true, 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
-
-            {'addable': true, 'editable': true, 'editor': 'clearfix', 'formGroupClass': 'clearfix', 'style': {clear: 'both'}},
-
-            {'name': 'label', 'label': 'Field Label', 'labelClass': 'col-sm-2', 'width': 200, 'addable': true, 'editable': true, 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group ', 'validation': {'required': true}},
-
-            {'name': 'css_class', 'label': 'CSS Classes', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group '},
-
-            {'name': 'field_default_value', 'label': 'Default Value', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'editor': 'textarea', 'cols': 20, 'rows': 5, 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group '},
-
-            {'name': 'field_placeholder', 'label': 'Placeholder', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'cssClass': ' col-sm-9', 'formGroupClass': 'form-group managed textarea-field text-field url-field tel-field email-field password-field', 'managable': ['textarea', 'text', 'url', 'tel', 'email', 'password']},
-
-            {'formGroupClass': 'form-group managed number-field date-field time-field text-field url-field tel-field email-field password-field textarea-field select-field select-multi-field', addable: true, 'editable': true, 'hidden': true, 'managable': ['textarea'], 'child': [
-                    {'name': 'maxlength', 'label': 'Max Length', 'labelClass': 'col-sm-2', cssClass: 'digits nonegative col-sm-3'}
-                ]
-            },
-
-            {'formGroupClass': 'form-group managed number-field date-field time-field text-field url-field tel-field email-field password-field textarea-field select-field select-multi-field', 'addable': true, 'editable': true, 'hidden': true, 'managable': ['number', 'date', 'select', 'text', 'url', 'tel', 'email', 'password', 'select-multi', 'time'], 
-                'child': [
-                    {'name': 'size', 'label': 'Size', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3'}
-                ]
-            },
-
-            {'formGroupClass': 'form-group managed textarea-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['textarea'],
-                'child': [
-                    {'name': 'rows', 'label': 'Rows', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3'},
-                    {'name': 'cols', 'label': 'Cols', 'labelClass': 'col-sm-3', 'cssClass': 'digits nonegative col-sm-3'}
-                ]
-            },
-
-            {'name': 'options', 'label': 'Add/Remove options', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed select-field select-multi-field radio-field checkbox-field', 'cssClass': 'col-sm-9', 'addable': true, 'editable': true, 'managable': ['select', 'select-multi', 'radio']},
-
-            {'name': 'checked', 'label': 'Default checked', 'labelClass': 'col-sm-2', 'cssClass': 'col-sm-2', 'formGroupClass': 'form-group managed checkbox-field radio-field', 'addable': true, 'editable': true, 'editor': 'select', 'managable': ['checkbox', 'radio'], 
-                'options': {
-                    '0': 'No', '1': 'Yes'
-                }
-            },
-
-            {'name': 'formaction', 'label': 'Form action', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed image-field submit-field', 'cssClass': 'col-sm-9', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['image', 'submit'], 'cssClass': 'col-sm-9'},
-
-            {'name': 'formnovalidate', 'label': 'No form validate', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['submit'], 'cssClass': 'col-sm-2', 'editor': 'select', 'formGroupClass': 'form-group managed submit-field', 
-                'options': {
-                    '0': 'No', '1': 'Yes'
-                }
-            },
-
-            {'name': 'src', 'label': 'Src', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['image'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group managed image-field'},
-
-            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'managable': ['image'], 'editable': true, 
-                'child': [
-                    {'name': 'height', 'label': 'Height', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3', 'formGroupClass': ''},
-                    {'name': 'width', 'label': 'Width', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3', 'formGroupClass': ''}
-                ]
-            },
-
-            {'formGroupClass': 'form-group managed number-field date-field time-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['number', 'date', 'time'], 
-                'child': [
-                    {'name': 'min', 'label': 'Min value', 'labelClass': 'col-sm-6', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'},
-                    {'name': 'max', 'label': 'Max value', 'labelClass': 'col-sm-5', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'},
-                    {'name': 'step', 'label': 'Step', 'labelClass': 'col-sm-3', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'}
-                ]
-            },
-
-            {'name': 'multiple', 'label': 'Multiple', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed email-field file-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['email', 'file'], 'cssClass': 'col-sm-2', 'editor': 'select', 
-                'options': {
-                    '0': 'No', '1': 'Yes'
-                }
-            },
-
-            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'email', 'url', 'tel', 'password'], 
-                'child': [
-                    {'name': 'pattern', 'label': 'Pattern', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-4', 'formGroupClass': ''},
-                    {'name': 'autocomplete', 'label': 'Autocomplete', 'labelClass': 'col-sm-3', 'cssClass': 'col-sm-2', 'formGroupClass': '', 'editor': 'select', 
-                        'options': {
-                            '0': 'No', '1': 'Yes'
+        var setValidateForm = function (selector) {
+            if (selector == null) {
+                selector = $(".validate-form");
+            }
+            if ($().validate) {
+                return selector.each(function (i, elem) {
+                    return $(elem).validate({
+                        errorElement: "span",
+                        errorClass: "help-block has-error",
+                        errorPlacement: function (e, t) {
+                            return t.parents(".controls").first().append(e);
+                        },
+                        highlight: function (e) {
+                            $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                            return $(e).closest('span.help-block').css('display', 'block');
+                        },
+                        success: function (e) {
+                            e.closest(".form-group").removeClass("has-error");
+                            return e.closest("span.help-block").css('display', 'none');
                         }
-                    }
-                ]
-            },
+                    });
+                });
+            }
+        };
 
-            {'name': 'validation', 'label': 'Validation', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'textarea', 'wysiwyg', 'number', 'email', 'url', 'image', 'file', 'date', 'tel', 'time', 'password'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group validation -rte-field -hidden-field -select-field -select-multi-field -radio-field -checkbox-field'},
-        ];
-        var FormFieldModalForm = React.createClass({
-            displayName: "FormFieldModalForm",
-            getInitialState: function(){
-                return { inputType: '' };
-            },
+        var ActionSelect = React.createClass({
             getDefaultProps: function () {
                 return {
-                    'row': {},
-                    'id': 'modal-form',
-                    'columnMetadata': []
+                    options: [
+                        {id: 'text', text: "{{ 'Single Line Text'|_ }}"},
+                        {id: 'textarea', text: "{{ 'Paragraph Text'|_ }}"},
+                        {id: 'wysiwyg', text: "{{ 'Rich Text'|_ }}"},
+                        {id: 'number', text: "{{ 'Number'|_ }}"},
+                        {id: 'email', text: "{{ 'Email Address'|_ }}"},
+                        {id: 'url', text: "{{ 'Website/URL'|_ }}"},
+                        {id: 'image', text: "{{ 'Image URL'|_ }}"},
+                        {id: 'file', text: "{{ 'File Upload'|_ }}"},
+                        {id: 'date', text: "{{ 'Date'|_ }}"},
+                        {id: 'tel', text: "{{ 'Phone Number'|_ }}"},
+                        {id: 'hidden', text: "{{ 'Hidden Field'|_ }}"},
+                        {id: 'time', text: "{{ 'Time'|_ }}"},
+                        {id: 'password', text: "{{ 'Password'|_ }}"},
+                        {id: 'checkbox', text: "{{ 'Checkbox'|_ }}"},
+                        {id: 'radio', text: "{{ 'Radio'|_ }}"},
+                        {id: 'select', text: "{{ 'Dropdown'|_ }}"},
+                        {id: 'select-multi', text: "{{ 'Select Multi'|_ }}"}
+                    ]
+                };
+            },
+            getInitialState: function () {
+                return {
+                    value: this.props.value
                 }
             },
-            componentDidMount: function() {
-                
+            handleChange: function (e, callback, selection) {
+                FieldsComponent.setProps({ inputType: selection.id });
             },
-            setInputType: function(e) {
-                this.removeErrorEles();
-                this.setState({inputType: e.target.value});
-            },
-            removeFormFields: function(cols, fields) {
-                _.each(cols, function(col, i) {
-                    _.each(fields, function(field, index) {
-                        if (field === col.name) cols.splice(i, 1);
-                    });
-                });
-            },
-            removeErrorEles: function() {
-                formFieldsModalNode.find('label.error').each(function() {
-                    $(this).remove();
-                });
+            getConfig: function () {
+                return {
+                    id: guid(),
+                    name: this.props.name,
+                    className: '',
+                    placeholder: "{{ '-- Select field type --' |_ }}",
+                    multiple: false,
+                    options: this.props.options,
+                    onChange: this.handleChange,
+                    defaultValue: [this.state.value]
+                };
             },
             render: function () {
-                var that = this;
-                var gridId = this.props.id;
-                var columns = this.props.columnMetadata;
-                var renderColumns = [];
-                var inputType = this.state.inputType;
-
-                if (inputType !== '') {
-                    _.each(columns, function(col, index) {
-                        var bool = _.findWhere(col.managable, inputType);
-                        if (typeof bool !== 'undefined' || !col.managable) renderColumns.push(col);
-                    });
-                } else {
-                    _.each(columns, function(col, index) {
-                        if (!col.managable) renderColumns.push(col);
-                    });
-                }
-
-                switch(inputType) {
-                    case 'file':
-                    case 'image':
-                        this.removeFormFields(renderColumns, ['field_default_value']);
-                        break;
-                    case 'hidden':
-                        this.removeFormFields(renderColumns, [
-                                'position', 'required', 'readonly'
-                            ]);
-                        break;
-                    case 'select-multi':
-                    case 'password':
-                        this.removeFormFields(renderColumns, ['required']);
-                        break;
-                }
-
-                var nodes = renderColumns.map(function(column) {
-                    if((that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-                    if (column.name === 'input_type') {
-                        return React.createElement(formFieldsModalElement, {column: column, value: that.props.row[column.name], setInputTypeHandle: that.setInputType})
-                    }
-                    return React.createElement(formFieldsModalElement, {column: column, value: that.props.row[column.name]})
-                });
-
-                return (
-                    React.createElement("div", {className: " field-element-wrapper"}, nodes)
-                )
+                return React.createElement(FComSelect2, this.getConfig());
             }
         });
-
-        var formFieldsModalElement = React.createClass({
-            displayName: "formFieldsModalElement",
-            mixins: [FCom.Mixin, FCom.FormMixin],
-            getDefaultProps: function() {
+        
+        var FieldsForm = React.createClass({
+            getDefaultProps: function () {
                 return {
-                    'value': '', //default value
-                    'column': {}, //column info and option,
-                    'removeFieldDisplay': false, //remove field button for mass-edit
-                    'removeFieldHandle': null,
-                    'setInputTypeHandle': null
+                    row: {},
+                    managable: {
+                        text: ['field_placeholder', 'maxlength', 'size'],
+                        textarea: ['field_placeholder', 'maxlength', 'size', 'rows', 'cols'],
+                        number: ['maxlength', 'size', 'min', 'max', 'step'],
+                        email: ['field_placeholder', 'maxlength', 'size', 'multiple'],
+                        url: ['field_placeholder', 'maxlength', 'size'],
+                        image: ['formaction', 'src', 'height', 'width', 'pattern', 'autocomplete'],
+                        file: ['multiple'],
+                        date: ['maxlength', 'size', 'min', 'max', 'step'],
+                        tel: ['field_placeholder', 'maxlength', 'size'],
+                        time: ['maxlength', 'size', 'min', 'max', 'step'],
+                        password: ['field_placeholder', 'maxlength', 'size', 'validation'],
+                        checkbox: ['options', 'checked', 'validation'],
+                        radio: ['maxlength', 'options', 'checked', 'validation'],
+                        select: ['maxlength', 'size', 'options', 'validation'],
+                        'select-multi': ['maxlength', 'size', 'options', 'validation']
+                    }
+                };
+            },
+            getInitialState: function () {
+                return {
+                    inputType: ''
+                };
+            },
+            componentWillReceiveProps: function (nextProps) {
+                this.setState({ inputType: nextProps.inputType });
+            },
+            componentDidMount: function () {
+                if (this.props.row['input_type'] !== '')
+                    this.setState({ inputType: this.props.row['input_type'] });
+            },
+            getValue: function (input) {
+                var row = this.props.row;
+
+                if (_.isEmpty(row)) return '';
+
+                if (row[input]) return row[input];
+                else {
+                    options = typeof row.options == 'string' ? JSON.parse(row.options) : row.options;
+                    return options[input];
                 }
             },
-            componentDidMount: function() {
-                //console.log(this.props.callback);
-            },
-            renderCustomNode: function(columns) {
-                var that = this;
-                var inputs = columns.map(function(column, index) {
-                    return (
-                        React.createElement("div", {className: column.formGroupClass, style: column.style}, 
-                            that.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass}, that.renderNode(column))
-                        )
-                    );
-                });
+            isRendered: function (input) {
+                if (!this.state.inputType) return false;
 
-                return inputs;
+                if (_.isArray(input))
+                    return _.contains(this.props.managable[this.state.inputType], input[0]);
+                return _.contains(this.props.managable[this.state.inputType], input);
             },
-            renderLabel: function(column) {
-                var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
-                return (
-                    React.createElement("div", {className: "control-label " + column.labelClass}, 
-                        React.createElement("label", {htmlFor: column.name}, 
-                            column.label, iconRequired
+            render: function () {
+                return React.DOM.div(null,
+                    React.DOM.input({ type: 'hidden', id: 'id', name: 'id', defaultValue: this.getValue('id') }),
+                    React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group col-sm-8' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: 'col-sm-3',
+                                required: true,
+                                input_id: 'input_type' }, "{{ 'Field Type'|_ }}"
+                            ),
+                            React.DOM.div({ className: 'controls col-sm-8' },
+                                    React.createElement(ActionSelect, {
+                                        id: 'input_type',
+                                        name: 'input_type',
+                                        value: this.getValue('input_type')
+                                    })
+                            )
+                        ),
+                        React.DOM.div({ className: 'form-group col-sm-4' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: 'col-sm-5',
+                                required: true,
+                                input_id: 'position' }, "{{ 'Position'|_ }}"
+                            ),
+                            React.DOM.div({ className: 'controls col-sm-7' },
+                                React.createElement(Components.ControlInput, { value: this.getValue('position'), id: 'position', name: 'position', validation: { required: true } })
+                            )
                         )
-                    )
+                    ),
+                    React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group col-sm-8' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: 'col-sm-3',
+                                required: true, input_id: 'name' }, "{{ 'Field Name'|_ }}"
+                            ),
+                            React.DOM.div({ className: 'controls col-sm-8' },
+                                React.createElement(Components.ControlInput, { value: this.getValue('name'), id: 'name', name: 'name', validation: { required: true } })
+                            )
+                        ),
+                        React.DOM.div({ className: 'form-group col-sm-4' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: 'col-sm-5',
+                                input_id: 'required' }, "{{ 'Required'|_ }}"
+                            ),
+                            React.DOM.div({ className: 'controls col-sm-7' },
+                                React.createElement(Components.ControlInput, {
+                                    type: 'select',
+                                    value: this.getValue('required'),
+                                    id: 'required',
+                                    name: 'required',
+                                    validation: { required: true },
+                                    options: {
+                                        0: 'No',
+                                        1: 'Yes'
+                                    }
+                                })
+                            )
+                        )
+                    ),
+                    React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group col-sm-8' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: 'col-sm-3',
+                                required: true, input_id: 'field_id' }, "{{ 'Field Id'|_ }}"
+                            ),
+                            React.DOM.div({ className: 'controls col-sm-8' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('field_id'),
+                                    id: 'field_id',
+                                    name: 'field_id',
+                                    validation: { required: true } })
+                            )
+                        ),
+                        React.DOM.div({ className: 'form-group col-sm-4' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: 'col-sm-5',
+                                input_id: 'readonly' }, "{{ 'Read Only'|_ }}"
+                            ),
+                            React.DOM.div({ className: 'controls col-sm-7' },
+                                React.createElement(Components.ControlInput, {
+                                    type: 'select',
+                                    value: this.getValue('readonly'),
+                                    id: 'readonly',
+                                    name: 'readonly',
+                                    validation: { required: true },
+                                    options: {
+                                        0: 'No',
+                                        1: 'Yes'
+                                    }
+                                })
+                            )
+                        )
+                    ),
+                    React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { required: true, input_id: 'label' }, "{{ 'Field Label'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('label'),
+                                    id: 'label',
+                                    name: 'label',
+                                    validation: { required: true }
+                                })
+                            )
+                        )
+                    ),
+                    React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'css_class' }, "{{ 'CSS Classes'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('css_class'),
+                                    id: 'css_class',
+                                    name: 'css_class'
+                                })
+                            )
+                        )
+                    ),
+                    React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'field_default_value' }, "{{ 'Default Value'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    type: 'textarea',
+                                    value: this.getValue('field_default_value'),
+                                    id: 'field_default_value',
+                                    name: 'field_default_value'
+                                })
+                            )
+                        )
+                    ),
+                    this.isRendered('field_placeholder') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'field_placeholder' }, "{{ 'Placeholder'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('field_placeholder'),
+                                    id: 'field_placeholder',
+                                    name: 'field_placeholder'
+                                })
+                            )
+                        )
+                    ): null,
+                    this.isRendered('maxlength') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'maxlength' }, "{{ 'Max Length'|_ }}"),
+                            React.DOM.div({ className: 'controls digits nonegative col-sm-3' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('maxlength'),
+                                    id: 'maxlength',
+                                    name: 'maxlength'
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('size') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'size' }, "{{ 'Size'|_ }}"),
+                            React.DOM.div({ className: 'controls digits nonegative col-sm-3' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('size'),
+                                    id: 'size',
+                                    name: 'size'
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered(['rows', 'cols']) ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.DOM.div(null,
+                                React.createElement(Components.ControlLabel, { input_id: 'rows' }, "{{ 'Rows'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-3' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('rows'),
+                                        id: 'rows',
+                                        name: 'rows'
+                                    })
+                                )
+                            ),
+                            React.DOM.div(null,
+                                React.createElement(Components.ControlLabel, { input_id: 'cols' }, "{{ 'Cols'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-3' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('cols'),
+                                        id: 'cols',
+                                        name: 'cols'
+                                    })
+                                )
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('options') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'options' }, "{{ 'Add/Remove options'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('options'),
+                                    id: 'options',
+                                    name: 'options'
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('checked') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'checked' }, "{{ 'Default checked'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-2' },
+                                React.createElement(Components.ControlInput, {
+                                    type: 'select',
+                                    value: this.getValue('checked'),
+                                    id: 'checked',
+                                    name: 'checked',
+                                    options: {
+                                        0: 'No',
+                                        1: 'Yes'
+                                    }
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('formaction') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'formaction' }, "{{ 'Form action'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('formaction'),
+                                    id: 'formaction',
+                                    name: 'formaction'
+                                })
+                            )
+                        )
+                    ): null,
+                    this.isRendered('formnovalidate') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'formnovalidate' }, "{{ 'No form validate'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-2' },
+                                React.createElement(Components.ControlInput, {
+                                    type: 'select',
+                                    value: this.getValue('formnovalidate'),
+                                    id: 'formnovalidate',
+                                    name: 'formnovalidate',
+                                    options: {
+                                        0: 'No',
+                                        1: 'Yes'
+                                    }
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('src') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'src' }, "{{ 'Src'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-9' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('src'),
+                                    id: 'src',
+                                    name: 'src'
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered(['height', 'width']) ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.DOM.div(null,
+                                React.createElement(Components.ControlLabel, { input_id: 'height' }, "{{ 'Height'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-3' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('height'),
+                                        id: 'height',
+                                        name: 'height'
+                                    })
+                                )
+                            ),
+                            React.DOM.div(null,
+                                React.createElement(Components.ControlLabel, { input_id: 'width' }, "{{ 'Width'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-3' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('width'),
+                                        id: 'width',
+                                        name: 'width'
+                                    })
+                                )
+                            )
+                        )
+                    ) : null,
+                    this.isRendered(['min', 'max', 'step']) ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.DOM.div({ className: 'col-sm-4' },
+                                React.createElement(Components.ControlLabel, { label_class: 'col-sm-6', input_id: 'min' }, "{{ 'Min value'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-6' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('min'),
+                                        id: 'min',
+                                        name: 'min'
+                                    })
+                                )
+                            ),
+                            React.DOM.div({ className: 'col-sm-4' },
+                                React.createElement(Components.ControlLabel, { label_class: 'col-sm-6', input_id: 'max' }, "{{ 'Max value'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-6' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('max'),
+                                        id: 'max',
+                                        name: 'max'
+                                    })
+                                )
+                            ),
+                            React.DOM.div({ className: 'col-sm-4' },
+                                React.createElement(Components.ControlLabel, { label_class: 'col-sm-3', input_id: 'step' }, "{{ 'Step'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-6' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('step'),
+                                        id: 'step',
+                                        name: 'step'
+                                    })
+                                )
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('multiple') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'multiple' }, "{{ 'Multiple'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-2' },
+                                React.createElement(Components.ControlInput, {
+                                    type: 'select',
+                                    value: this.getValue('multiple'),
+                                    id: 'multiple',
+                                    name: 'multiple',
+                                    options: {
+                                        0: 'No',
+                                        1: 'Yes'
+                                    }
+                                })
+                            )
+                        )
+                    ) : null,
+                    this.isRendered(['pattern', 'autocomplete']) ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.DOM.div(null,
+                                React.createElement(Components.ControlLabel, { input_id: 'pattern' }, "{{ 'Pattern'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-4' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('pattern'),
+                                        id: 'pattern',
+                                        name: 'pattern'
+                                    })
+                                )
+                            ),
+                            React.DOM.div(null,
+                                React.createElement(Components.ControlLabel, { input_id: 'autocomplete', className: 'col-sm-3' }, "{{ 'Autocomplete'|_ }}"),
+                                React.DOM.div({ className: 'controls digits nonegative col-sm-2' },
+                                    React.createElement(Components.ControlInput, {
+                                        value: this.getValue('autocomplete'),
+                                        id: 'autocomplete',
+                                        name: 'autocomplete'
+                                    })
+                                )
+                            )
+                        )
+                    ) : null,
+                    this.isRendered('validation') ? React.DOM.div({ className: 'row' },
+                        React.DOM.div({ className: 'form-group' },
+                            React.createElement(Components.ControlLabel, { input_id: 'validation' }, "{{ 'Validation'|_ }}"),
+                            React.DOM.div({ className: 'controls col-sm-2' },
+                                React.createElement(Components.ControlInput, {
+                                    value: this.getValue('validation'),
+                                    id: 'validation',
+                                    name: 'validation'
+                                })
+                            )
+                        )
+                    ): null
                 );
-            },
-            renderNode: function(column) {
-                var that = this;
-                var validationRules = that.validationRules(column.validation);
-                switch (column.editor) {
-                    case 'select':
-                        var options = [];
-                        _.forEach(column.options, function(text, value) {
-                            options.push(React.createElement("option", {value: value}, text));
-                        });
-                        if (typeof this.props.setInputTypeHandle !== 'undefined') {
-                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: '', onChange: that.props.setInputTypeHandle},  validationRules), options);
-                        } else {
-                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules), options);
-                        }
-                        break;
-                    case 'textarea':
-                        return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: ''},  validationRules));
-                        break;
-                    default:
-                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
-                        break;
-                }   
-            },
-            render: function() {
-                var that = this;
-                var column = this.props.column;
-
-                if (column.editor == 'clearfix') {
-                    return React.createElement('div', {className: 'clearfix', style: column.style});
-                }
-
-                if (typeof column.child !== 'undefined') {
-                    return (
-                        React.createElement("div", {className: column.formGroupClass, style: column.style, id: column.name}, this.renderCustomNode(column.child))
-                    );
-                }
-
-                return (
-                    React.createElement("div", {className: column.formGroupClass, style: column.style, id: column.name}, 
-                        this.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass, style: column.style}, this.renderNode(column))
-                    )
-                )
-
             }
         });
 
         window.showModalToAddFormField = function(grid) {
             formFieldsGrid = grid;
-            var modalContainerEle = document.getElementById('{{ grid.config.id }}-modal');
+            renderModal();
+        };
+
+        window.showModalToEditFormField = function(row) {
+            renderModal(row);
+        };
+
+        function renderModal(row) {
+            var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(
                 React.createElement(Components.Modal, {
-                            className: "formFieldsModal",
-                            show: true,
-                            title: 'Add Field',
-                            confirm: 'Add',
-                            cancel: 'Close',
-                            onLoad: function(modal) {
-                                formFieldsModalNode = $(modal.getDOMNode());
-                                formFieldsModalNode.find('.modal-dialog').css('width', '900px');
-                            },
-                            onConfirm: window.addFormField
+                        className: "formFieldsModal",
+                        show: true,
+                        title: "{{ 'Fields Form'|_ }}",
+                        confirm: row ? "{{ 'Update Field'|_ }}" : "{{ 'Add Field'|_ }}",
+                        cancel: "{{ 'Cancel'|_ }}",
+                        onLoad: function(modal) {
+                            formFieldsModalNode = $(modal.getDOMNode());
+                            formFieldsModalNode.find('.modal-dialog').css('width', '900px');
                         },
-                        React.createElement('div', {className: 'f-grid-wrapper', id: formFieldsGrid.getConfig('id')+'-wrap'})
-                ), modalContainerEle);
-
-            var modalWrapEle = $('#{{ grid.config.id }}-wrap');
-            modalWrapEle.append('<form id="{{ grid.config.id }}-modal-form" class="form form-horizontal validate-form"></form>');
-            var modalFormEle = document.getElementById('{{ grid.config.id }}-modal-form');
-            React.unmountComponentAtNode(modalFormEle);
-            React.render(
-                React.createElement(FormFieldModalForm, {columnMetadata: formColumns, id: formFieldsGrid.getConfig('id')}), modalFormEle
+                        onConfirm: row ? window.updateFormField : window.addFormField
+                    },
+                    React.createElement('div', {className: 'f-grid-wrapper', id: formFieldsGrid.getConfig('id')+'-wrap'},
+                        React.DOM.form({ id: "{{ grid.config.id }}-modal-form", className: 'form form-horizontal validate-form' },
+                            React.DOM.div({ id: 'field-element-wrapper' })
+                        )
+                    )
+                ), modalContainerEle
             );
+
+            var formContainer = document.getElementById('field-element-wrapper');
+            React.unmountComponentAtNode(formContainer);
+            FieldsComponent = React.render(
+                React.createElement(FieldsForm, { row: row }), formContainer
+            );
+
+            var modalFormEle = document.getElementById('{{ grid.config.id }}-modal-form');
+            setValidateForm($(modalFormEle));
         }
     });
 </script>
-
-{#<div class="f-section">
-<script type="text/javascript">
-    require(['backbone', 'underscore', 'jquery'], function (Backbone, _, $) {
-
-        var $fcomAppendForm = $('#fcom_append_form');
-        if ($fcomAppendForm.length > 0) {
-            $fcomAppendForm.html('');
-            $fcomAppendForm.append('<form id="{{ grid.config.id }}-new-form" class="form form-horizontal validate-form"/>');
-            var html = $("#{{ grid.config.id }}-custom-modal").html();
-
-            $("#{{ grid.config.id }}-custom-modal").remove();
-            $('form#{{ grid.config.id }}-new-form').append(html);
-
-            var setValidateForm = function (selector) {
-                if (selector == null) {
-                    selector = $(".validate-form");
-                }
-                if (jQuery().validate) {
-                    return selector.each(function (i, elem) {
-                        return $(elem).validate({
-                            errorElement: "span",
-                            errorClass: "help-block has-error",
-                            errorPlacement: function (e, t) {
-                                return t.parents(".controls").first().append(e);
-                            },
-                            highlight: function (e) {
-                                $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
-                                return $(e).closest('span.help-block').css('display', 'block');
-                            },
-                            success: function (e) {
-                                e.closest(".form-group").removeClass("has-error");
-                                return e.closest("span.help-block").css('display', 'none');
-                            }
-                        });
-                    });
-                }
-            };
-            setValidateForm($('#{{ grid.config.id }}-new-form'));
-        }
-
-        var mainGrid;
-        var inputName = 'input[data-col="name"]';
-        var inputOption = 'input[data-col="options"]';
-        var selectFieldType = 'select[data-col="input_type"]';
-        var $modal;
-        window.formFieldGridRegister = function (grid) {
-            mainGrid = grid;
-            mainGrid.build();
-            $modal = $('#{{grid.config.id}}-custom-form');
-            var mainFields = {
-                name: 1,
-                label: 1,
-                input_type: 1,
-                required: 1,
-                position: 1
-            };
-
-            if ($modal[0]) {
-
-                $("#options").select2({ // enable comma separated list of values with select2
-                    tags: [],
-                    tokenSeparators: [',']
-                });
-
-                $("#css_class").select2({ // enable comma separated list of values with select2
-                    tags: [],
-                    tokenSeparators: [',', ' ', '\t', '\n']
-                });
-
-                var $selects = $modal.find('select');
-                $selects.select2();
-                var $fields = $modal.find('select,input,textarea');
-                var $addBtn = $modal.find('button.save');
-                var $id = $modal.find("#id");
-                var rowTpl = mainGrid.getGridSkeleton().Models.Row;
-                $addBtn.click(function (e) {
-                    if (!$('#{{ grid.config.id }}-new-form').valid()) {
-                        return;
-                    }
-                    var temp;
-                    var rows = mainGrid.getRows();
-                    if(parseInt($id.val()) != 0) {
-                        temp = rows.get($id.val());
-                    }
-
-                    if(!temp) {
-                        temp = new rowTpl;
-                        temp.set('id', 0);
-                    }
-
-                    var options = {};
-                    $fields.each(function (i, o) {
-                        var $el = $(o);
-                        var disabled = $el.prop('disabled');
-                        if (!disabled) {
-                            var fieldName = $el.prop('name');
-                            var fieldType = $el.prop('type');
-                            var fieldValue = $el.val();
-                            if ((fieldType == 'checkbox' || fieldType == 'radio') && !$el.prop('checked')) {
-                                return;
-                            }
-                            if (mainFields[fieldName]) {
-                                temp.set(fieldName, fieldValue);
-                            } else if (fieldName != '') {
-                                options[fieldName] = fieldValue;
-                            }
-//                                console.log(temp);
-                        }
-                    });
-                    if ($.isEmptyObject(options) == false) {
-                        temp.set('options', JSON.stringify(options));
-                    }
-                    if (temp.get('id') == 0) {
-                        var rowsSize = rows.size();
-                        var id = 1;
-                        if (rowsSize != 0) {
-                            // some rows in collection
-                            var last = rows.at(rowsSize - 1);
-                            id = last.get('id') - 0; // make sure it is number
-                        }
-                        temp.set('_new', true);
-                        temp.set('id', id + 1);
-                    }
-                    rows.add(temp);
-
-                    $modal.modal('hide');
-                    e.preventDefault();
-                });
-                $(mainGrid.getGridSkeleton().AddButton).click(function () {
-                    $modal.modal('show');
-                });
-            }
-            var $btn = $(".btn-edit");
-            $btn.click(function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                editField(this);
-                return false;
-            });
-        };
-        $('#cms-blocks-form').submit(function (ev) {
-            var rows = mainGrid.getRows().toJSON();
-
-            var res = [];
-            for (var i in rows) {
-                if (rows[i].position.length == 0) {
-                    rows[i].position = 0;
-                }
-                res.push(_.pick(rows[i], 'id', 'name', 'label', 'input_type', 'required', 'options', 'position'));
-            }
-
-            $("#block_form_fields_data").val(JSON.stringify(res));
-        });
-
-        function checkUnique(value, elem, params) {
-            var error = true;
-            if (typeof (elem) !== 'undefined') {
-                var parent = $(elem).parents('tr');
-                var val = parent.find(inputName).val();
-                mainGrid.getRows().each(function (data) {
-                    if (parent.attr('id') != data.get('id') && val == data.get('name')) {
-                        error = false;
-                    }
-                });
-            }
-
-            return error;
-        }
-
-
-        function editField(btn) {
-            var $btn = $(btn);
-            var $tr = $btn.closest('tr');
-            var id = $tr.attr('id');
-            var row = mainGrid.getRows().get(id);
-            var pairs = row.pairs();
-            $(pairs).each(function(inx, pair){
-                var f = pair[0];
-                var val = pair[1];
-
-                if(!f || $.trim(f) === "" || f == 0){
-                    return;
-                }
-                var isSelect2 = false;
-                if (f == 'options') { // if data field name is options, parse the json and populate fields.
-                    var options = $.parseJSON(val);
-                    for (var field in options) {
-                        if (!field || $.trim(field) === "" || field == 0) {
-                            continue;
-                        }
-                        $field = $modal.find("#" + field);
-                        val = options[field];
-                        isSelect2 = false;
-                        if ($field.length > 0) {
-                            $field.val(val);
-                            isSelect2 = $field.hasClass("select2-offscreen");
-                            if (isSelect2) { // if field is select2 control, use select2 api to set value
-                                if (field == "options") {
-                                    $field.select2({ // enable comma separated list of values with select2
-                                        tags: val.split(","),
-                                        tokenSeparators: [',']
-                                    });
-                                } else if(field == "css_class") {
-                                    $field.select2({ // enable comma separated list of values with select2
-                                        tags: val.split(/[,\s]+/),
-                                        tokenSeparators: [',', ' ', '\t', '\n']
-                                    });
-                                } else {
-                                    $field.select2("val", val);
-                                }
-                            }
-                        }
-                    }
-                } else { // else set fields values
-                    var $field = $modal.find("#" + f);
-
-                    if ($field.length > 0) {
-                        $field.val(val);
-                        isSelect2 = $field.hasClass("select2-offscreen");
-                        if (isSelect2) {
-                            $field.select2("val", val).trigger("change");
-                        }
-                    }
-                }
-            });
-
-            $modal.modal('show');
-            var $typeField = $modal.find('#input_type'); // trigger change event in order correct fields to show
-            $typeField.trigger('change');
-            return false;
-        }
-
-        $.validator.addMethod('checkUnique', checkUnique, '{{ "Field Name are already taken place."|_ }}');
-
-        $.validator.addClassRules("requiredOptions", {
-            required: function (value, elem, params) {
-                var error = true;
-                if (typeof (elem) !== 'undefined') {
-                    var parent = $(elem).parents('tr');
-                    if (parent.find(selectFieldType).val() == 'select' && value.trim().length == 0) {
-                        error = false;
-                    }
-                }
-                return error;
-            }
-        });
-
-        $.validator.addClassRules("unique", {
-            required: true,
-            checkUnique: true
-        });
-
-        $.validator.addClassRules("nonegative", {
-            min: 0
-        });
-
-        $.validator.addMethod('pattern', function(value, element, regexpr) {
-            var valid = regexpr.test(value);
-            return valid;
-        }, "{{ "Only letters, digits, _ and - are allowed." }}");
-
-        $.validator.addClassRules("alnum", {
-            pattern: /^[a-zA-Z0-9_-]+$/
-        });
-
-    });
-</script>
-
-<div class="form-group">
-    {% set emailOptions = blockCtrl.getEmailOptions() %}
-
-    {{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
-    {{ forms.select(fieldData, {field:'form_email', label:'Send form data to'|_, select2: true, options:emailOptions}) }}
-    {{ forms.input(fieldData, {field:'form_custom_email', label:'Custom email'|_, attr:'disabled', input_class:"email"}) }}
-    <script type="text/javascript">
-        require(['jquery', 'select2'], function ($) {
-            $(function () {
-                var $formCustomEmail = $('#model-form_custom_email');
-                var $formEmail = $("#model-form_email");
-                if($formEmail.val() == 'other') {
-                    $formCustomEmail.prop('disabled', false);
-                }
-                $formEmail.on("change", function (e) {
-                    var val = $(this).val();
-                    if (val == 'other') {
-                        $formCustomEmail.prop('disabled', false);
-                    } else {
-                        $formCustomEmail.prop('disabled', true);
-                    }
-                });
-            })
-        });
-    </script>
-    <input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
-</div> #}
-{#<div class='' id='frontend-field-grid-modal' tabindex='-1'>#}
-{# <div id="{{grid.config.id}}-custom-modal">
-    <div class='modal fade in' id='{{grid.config.id}}-custom-form' tabindex='-1'>
-    <div class='modal-dialog'>
-    <div class='modal-content'>
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">{{ "Add field"|_ }}</h4>
-    </div>
-    <div class='modal-body'>
-        <input type="hidden" name="id" value="0" id="id"/>
-        <div class=" field-element-wrapper">
-            <div class="form-group">
-                <label for="input_type" class="col-sm-3 control-label required">{{ "Field Type"|_ }}</label>
-                <div class="controls col-sm-5">
-                    <select name="input_type" class="form-control required" id="input_type">
-                        <option value="" selected>{{ "-- Select field type --"|_ }}</option>
-                        <option value="text">{{ "Single Line Text"|_ }}</option>
-                        <option value="textarea">{{ "Paragraph Text" }}</option>
-                        <option value="wysiwyg">{{ "Rich Text"|_ }}</option>
-                        <option value="number">{{ "Number"|_ }}</option>
-                        <option value="email">{{ "Email Address"|_ }}</option>
-                        <option value="url">{{ "Website/URL"|_ }}</option>
-                        <option value="image">{{ "Image URL"|_ }}</option>
-                        <option value="file">{{ "File Upload"|_ }}</option>
-                        <option value="date">{{ "Date"|_ }}</option>
-                        <option value="tel">{{ "Phone Number"|_ }}</option>
-                        <option value="hidden">{{ "Hidden Field"|_ }}</option>
-                        <option value="time">{{ "Time"|_ }}</option>
-                        <option value="password">{{ "Password"|_ }}</option>
-                        <option value="checkbox">{{ "Checkbox"|_ }}</option>
-                        <option value="radio">{{ "Radio"|_ }}</option>
-                        <option value="select">{{ "Dropdown"|_ }}</option>
-                        <option value="select-multi">{{ "Multi select"|_ }}</option>
-                    </select>
-                </div>
-
-                <div class="-hidden-field">
-                    <label class="control-label col-sm-2" for="position">{{ "Position"|_ }}</label>
-                    <div class="controls col-sm-2"><input type="text" name="position" id="position" class="form-control digits nonegative"/></div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="field_id" class="control-label required col-sm-3">{{ "Field Id" }}</label>
-                <div class="controls col-sm-5"><input type="text" id="field_id" name="field_id" class="form-control required alnum"></div>
-
-                <div class=" -hidden-field -select-field -select-multi-field -password-field ">
-                    <label class="control-label col-sm-2" for="readonly">{{ "Read Only"|_ }}</label>
-                    <div class="controls col-sm-2">
-                        <select id="readonly" name="readonly" class="form-control">
-                            <option value="0">{{ "no"|_ }}</option>
-                            <option value="1">{{ "YES"|_ }}</option>
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-            <div class="form-group">
-                <label for="name" class="control-label col-sm-3 required">{{ "Field name"|_ }}</label>
-                <div class="controls col-sm-5"><input type="text" name="name" id="name" class="form-control required alnum" value=""/></div>
-
-                <div class=" -hidden-field">
-                    <label class="control-label col-sm-2" for="required">{{ "Required"|_ }}</label>
-                    <div class="controls col-sm-2">
-                        <select id="required" name="required" class="form-control">
-                            <option value="0">{{ "no"|_ }}</option>
-                            <option value="1">{{ "YES"|_ }}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group -hidden-field">
-                <label class="control-label col-sm-3 required" for="label">{{ "Field Label"|_ }}</label>
-                <div class="controls col-sm-9"><input type="text" name="label" id="label" class="form-control required" value=""/>
-                </div>
-            </div>
-
-            <div class="form-group -hidden-field">
-
-                <label class="control-label col-sm-3" for="css_class">{{ "CSS classes"|_ }}</label>
-                <div class="controls col-sm-9">
-                    <input type="text" name="css_class" id="css_class" class="form-control" value="">
-                    <p class="help-block">{{ "Comma or space separated list of classes"|_ }}</p>
-                </div>
-            </div>
-
-            <div class="form-group -select-multi-field -image-field -file-field">
-                <label class="control-label col-sm-3"
-                       for="field_default_value">{{ "Default Value"|_ }}</label>
-                <div class="controls col-sm-9"><textarea name="field_default_value"
-                                                id="field_default_value" class="form-control text"></textarea></div>
-            </div>
-            <div class="form-group managed textarea-field text-field url-field tel-field email-field password-field">
-                <label class="control-label col-sm-3"
-                       for="field_placeholder">{{ "Placeholder"|_ }}</label>
-                <div class="controls col-sm-9"><input type="text" name="field_placeholder"
-                                             id="field_placeholder" class="form-control" value=""/></div>
-            </div>
-            <div class="form-group managed number-field date-field time-field text-field url-field
-                                                    tel-field email-field password-field textarea-field select-field select-multi-field">
-                <div class="managed textarea-field">
-                    <label class="control-label col-sm-3" for="maxlength">{{ "Max length"|_ }}</label>
-                    <div class="controls col-sm-3">
-                        <input type="text" name="maxlength" value="" class="form-control digits nonegative" id="maxlength">
-                    </div>
-                </div>
-                <div class="managed number-field date-field time-field text-field url-field
-                                                        tel-field email-field password-field select-field select-multi-field">
-                    <label class="control-label col-sm-3" for="size">{{ "Size"|_ }}</label>
-                    <div class="controls col-sm-3">
-                        <input type="text" name="size" id="size" value="" class="form-control digits nonegative">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group managed textarea-field">
-                <label class="control-label col-sm-3" for="rows">{{ "Rows"|_ }}</label>
-
-                <div class="controls col-sm-3">
-                    <input type="text" name="rows" value="" class="form-control digits nonegative" id="rows">
-                </div>
-                <label class="control-label col-sm-3" for="cols">{{ "Cols"|_ }}</label>
-
-                <div class="controls col-sm-3">
-                    <input type="text" name="cols" id="cols" value="" class="form-control digits nonegative">
-                </div>
-            </div>
-
-            <div class="form-group managed select-field select-multi-field radio-field checkbox-field" id="options-group">
-                <label class="control-label col-sm-3" for="options">{{ "Add/Remove options"|_ }}</label>
-
-                <div class="controls col-sm-9">
-                    <input type="hidden" name="options" id="options" class="form-control"/>
-                    <p class="help-block">{{ "Comma separated list of values"|_ }}</p>
-                </div>
-            </div>
-
-            <div class="form-group managed checkbox-field radio-field">
-                <label class="control-label col-sm-3" for="checked">{{ "Default checked"|_ }}</label>
-
-                <div class="controls col-sm-2 checkbox">
-                    <select id="checked" name="checked" class="form-control valid">
-                        <option value="0">{{ "no"|_ }}</option>
-                        <option value="1">{{ "YES"|_ }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group managed image-field submit-field">
-                <label class="control-label col-sm-3" for="formaction">{{ "Form action"|_ }}</label>
-                <div class="controls col-sm-9"><input type="text" name="formaction" id="formaction" class="form-control" value=""/></div>
-            </div>
-
-            <div class="form-group managed submit-field">
-                <label class="control-label col-sm-3" for="formnovalidate">{{ "No form validate"|_ }}</label>
-
-                <div class="controls col-sm-2">
-                    <select id="formnovalidate" name="formnovalidate" class="form-control valid">
-                        <option value="0">{{ "no"|_ }}</option>
-                        <option value="1">{{ "YES"|_ }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group managed image-field">
-                <label class="control-label col-sm-3" for="src">{{ "Src"|_ }}</label>
-                <div class="controls col-sm-9"><input type="text" name="src" id="src" class="form-control" value=""/></div>
-            </div>
-
-            <div class="form-group managed image-field">
-                <label class="control-label col-sm-3" for="height">{{ "Height"|_ }}</label>
-                <div class="controls col-sm-3"><input type="text" name="height" id="height" class="form-control digits nonegative" value=""/></div>
-
-                <label class="control-label col-sm-3" for="width">{{ "Width"|_ }}</label>
-                <div class="controls col-sm-3"><input type="text" name="width" id="width" class="form-control digits nonegative" value=""/></div>
-            </div>
-
-            <div class="form-group managed number-field date-field time-field">
-                <label class="control-label col-sm-3" for="min">{{ "Min value"|_ }}</label>
-                <div class="controls col-sm-2"><input type="text" name="min" id="min" class="form-control digits nonegative" value=""/></div>
-
-                <label class="control-label col-sm-2" for="max">{{ "Max value"|_ }}</label>
-                <div class="controls col-sm-2"><input type="text" name="max" id="max" class="form-control digits nonegative" value=""/></div>
-
-                <label class="control-label col-sm-1" for="step">{{ "Step"|_ }}</label>
-                <div class="controls col-sm-2"><input type="text" name="step" id="step" class="form-control digits nonegative" value=""/></div>
-            </div>
-
-            <div class="form-group managed email-field file-field">
-                <label class="control-label col-sm-3" for="multiple">{{ "Multiple"|_ }}</label>
-
-                <div class="controls col-sm-2">
-                    <select id="multiple" name="multiple" class="form-control valid">
-                        <option value="0">{{ "no"|_ }}</option>
-                        <option value="1">{{ "YES"|_ }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group managed text-field url-field tel-field email-field password-field">
-                <label class="control-label col-sm-3" for="pattern">{{ "Pattern"|_ }}</label>
-
-                <div class="controls col-sm-5"><input type="text" name="pattern" id="pattern" class="form-control" value=""/></div>
-                <label class="control-label col-sm-2" for="autocomplete">{{ "Autocomplete"|_ }}</label>
-
-                <div class="controls col-sm-2">
-                    <select id="autocomplete" name="autocomplete" class="form-control valid">
-                        <option value="0">{{ "no"|_ }}</option>
-                        <option value="1">{{ "YES"|_ }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group validation -rte-field -hidden-field -select-field -select-multi-field
-                                -radio-field -checkbox-field">
-                <label class="control-label col-sm-3" for="validation">{{ "Validation"|_ }}</label>
-
-                <div class="controls col-sm-9">
-                    <input type="text" name="validation" id="validation" value="" class="form-control">
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <div class='modal-footer'>
-        <button class='btn btn-primary save'  type='button'>{{ "Add Field"|_ }}</button>
-        <button class='btn btn-default f-grid-modal-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
-    </div>
-    </div>
-    <script type="text/javascript">
-        require(['jquery', 'select2'], function ($) {
-            var $inputType = $("#input_type");
-            var lastFieldType;
-            $(".managed").hide();
-
-            function toggleFields($selector) {
-                var opt = $selector.val();
-                if (lastFieldType != undefined) {
-                    var $lastField = $(".-" + lastFieldType + '-field');
-                    $lastField.show();
-                    $lastField.find("input, select, textarea").prop('disabled', false);
-                }
-                var $managed = $(".managed");
-                $managed.hide();
-                $managed.find("input, select, textarea").prop('disabled', true);
-                if (opt != '-') {
-                    var $enable = $("." + opt + '-field');
-                    $enable.show();
-                    var $inputs = $enable.find("input, select, textarea");
-                    $inputs.prop('disabled', false);
-                    var $disable = $(".-" + opt + '-field');
-                    $disable.hide();
-                    $disable.find("input, select, textarea").prop('disabled', true);
-                    lastFieldType = opt;
-                }
-            }
-
-            toggleFields($inputType);
-            $inputType.change(function (e) {
-                e.stopPropagation();
-                toggleFields($inputType);
-            });
-        });
-    </script>
-    </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-sm-10">
-        {{ THIS.view('core/backbonegrid').set('grid', blockCtrl.formFieldGrid(model))| raw }}
-    </div>
-</div>
-</div>
-</fieldset> #}

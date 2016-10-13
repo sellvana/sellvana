@@ -8,12 +8,12 @@
 {% set similarLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'similar') %}
 {% set crossLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'cross_sell') %}
 
-<input type='hidden' name='grid[linked_products_similar][add]' id='similar_ids_add' />
-<input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
-<input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
-<input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
-<input type='hidden' name='grid[linked_products_cross_sell][add]' id='cross_sell_ids_add'/>
-<input type='hidden' name='grid[linked_products_cross_sell][del]' id='cross_sell_ids_remove'/>
+<input type='hidden' name='linked_products_similar[add]' id='similar_ids_add' />
+<input type='hidden' name='linked_products_similar[del]' id='similar_ids_remove'/>
+<input type='hidden' name='linked_products_related[add]' id='related_ids_add'/>
+<input type='hidden' name='linked_products_related[del]' id='related_ids_remove'/>
+<input type='hidden' name='linked_products_cross_sell[add]' id='cross_sell_ids_add'/>
+<input type='hidden' name='linked_products_cross_sell[del]' id='cross_sell_ids_remove'/>
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
@@ -37,19 +37,20 @@
 
         /**
          * callback function for top action to show modal to add products
-         * @param that
+         * @param grid
          */
         window.showModalToAddProduct = function(grid) {
             mainGrid = grid;
+            var modalContainerEle;
             switch(mainGrid.getConfig('id')) {
                 case 'linked_products_related':
-                    var modalContainerEle = document.getElementById('{{ relatedLinkedProdConfig.config.id }}-modal');
+                    modalContainerEle = document.getElementById('{{ relatedLinkedProdConfig.config.id }}-modal');
                     break;
                 case 'linked_products_similar':
-                    var modalContainerEle = document.getElementById('{{ similarLinkedProdConfig.config.id }}-modal');
+                    modalContainerEle = document.getElementById('{{ similarLinkedProdConfig.config.id }}-modal');
                     break;
                 case 'linked_products_cross_sell':
-                    var modalContainerEle = document.getElementById('{{ crossLinkedProdConfig.config.id }}-modal');
+                    modalContainerEle = document.getElementById('{{ crossLinkedProdConfig.config.id }}-modal');
                     break;
             }
             
@@ -58,20 +59,20 @@
                     React.createElement(Components.Modal, {
                                 className: "productModal",
                                 show: true,
-                                title: 'Products List',
-                                confirm: 'Add',
-                                cancel: 'Close',
+                                title: "{{ 'Products List' |_ }}",
+                                confirm: "{{ 'Add' |_ }}",
+                                cancel: "{{ 'Close' |_ }}",
                                 onLoad: function(modal) {
                                     var relatedNode = $(modal.getDOMNode());
                                     relatedNode.find('.modal-dialog').css('width', '900px');
                                 },
                                 onConfirm: window.addSelectedProduct
                             },
-                            React.createElement('div', {className: 'f-grid-wrapper', id: mainGrid.getConfig('id')+'_tab'})
+                            React.DOM.div({className: 'f-grid-wrapper', id: mainGrid.getConfig('id')+'_tab'})
                     ), modalContainerEle);
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById(mainGrid.getConfig('id')+'_tab');
-            var instanceAttachGrid = React.renderComponent(
+            var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
                     attachGridContainerEle
             );
@@ -101,7 +102,7 @@
                 });
                 modal.close();
             } else {
-                alert('please choose at least one product');
+                $.bootstrapGrowl("{{ 'Please choose at least one product.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 5000 });
             }
         };
 

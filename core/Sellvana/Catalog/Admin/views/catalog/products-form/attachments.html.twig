@@ -1,13 +1,12 @@
 {% set m = THIS.get('model') %}
-{#{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}#}
-{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfigForGriddle(m) %}
+{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
 
 {% set type = 'attachments' %}
 {% set targetType = 'product' %}
 {% set medialibConfig = {
     id: 'all_' ~ type,
     type: 'product-attachments',
-    config: {actions: {delete: {caption : 'Remove'}}}
+    config: {actions: {delete: {caption : 'Remove'|_}}}
 } %}
 
 {% set attachmentsConfig = {

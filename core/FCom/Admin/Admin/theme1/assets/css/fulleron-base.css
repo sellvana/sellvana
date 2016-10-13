@@ -1344,6 +1344,7 @@ fieldset[disabled] .btn {
   width:100%;
   overflow:auto;
   overflow-y:hidden;
+  padding-bottom: 20px;
   }
 .responsive-table table td {
   position:relative;

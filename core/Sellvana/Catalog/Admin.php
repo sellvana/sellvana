@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Admin
@@ -51,18 +51,19 @@ class Sellvana_Catalog_Admin extends BClass
             ->allowFolder('media/category/images')
             ->allowFolder('media/product/images')
             ->allowFolder('media/product/attachment')
+            ->allowFolder('media/product/videos')
             ->allowFolder('storage/import/products')
             ->allowFolder('{random}/import/products')
         ;
 
-        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_Catalog' => $locale->_('Catalog Settings'),
-            'catalog' => $locale->_('Catalog'),
-            'catalog/products' => $locale->_('Manage Products'),
-            'catalog/categories' => $locale->_('Manage Categories'),
-            'catalog/families' => $locale->_('Manage Families'),
-            'catalog/stocks' => $locale->_('Manage Stocks'),
+            'settings/Sellvana_Catalog' => 'Catalog Settings',
+            'catalog' => 'Catalog',
+            'catalog/products' => 'Manage Products',
+            'catalog/products-quick-add' => 'Quick Add Products',
+            'catalog/categories' => 'Manage Categories',
+            'catalog/families' => 'Manage Families',
+            'catalog/stocks' => 'Manage Stocks',
         ]);
     }
 

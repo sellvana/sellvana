@@ -1,13 +1,13 @@
 modules:
     Sellvana_AdminLiveFeed:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         description: Admin Live Feed
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.4 } }
         auto_use: [ layout, views ]
 
         observe:
-            - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_AdminLiveFeed_Main.onGetHeaderNotifications ]
+            - [ "FCom_Admin_Model_Activity::collectActivityItems", Sellvana_AdminLiveFeed_Main.onCollectActivityItems ]
 
             - [ "Sellvana_Catalog_Model_Product::onAfterSave", "Sellvana_AdminLiveFeed_Main.onProductAfterSave" ]
             - [ "Sellvana_Email_Model_Pref::onAfterSave", "Sellvana_AdminLiveFeed_Main.onPrefAfterSave" ]

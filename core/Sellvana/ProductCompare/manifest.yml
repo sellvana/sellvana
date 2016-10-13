@@ -1,7 +1,7 @@
 modules:
     Sellvana_ProductCompare:
-        version: 0.5.1.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Catalog: 0.1.0, Sellvana_Customer: 0.1.3 } }
         translations: { en: en.php }
         description: "Product comparison"
@@ -15,7 +15,7 @@ modules:
             FCom_Admin:
                 auto_use: [ bootstrap ]
                 routing:
-                    - [ /prodcompare/?.action, Sellvana_ProductCompare_Admin_Controller.index ]
+                    - [ /prodcompare/?.action, Sellvana_ProductCompare_Admin_Controller ]
 
             FCom_Frontend:
                 routing:

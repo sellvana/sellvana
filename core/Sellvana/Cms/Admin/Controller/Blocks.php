@@ -1,12 +1,14 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Cms_Admin_Controller_Blocks
  *
  * @property Sellvana_Cms_Model_BlockHistory $Sellvana_Cms_Model_BlockHistory
+ * @property Sellvana_Cms_Model_FormData     $Sellvana_Cms_Model_FormData
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
  */
 class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -38,7 +40,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'meta_title', 'label' => 'Meta Title', 'hidden' => true],
             ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
             ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
-            ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true],
+            ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -76,7 +78,13 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'required', 'label' => 'Required', 'width' => 150,],
             ['name' => 'position', 'label' => 'Position', 'width' => 200,],
             ['name' => 'options', 'label' => 'Options', 'width' => 200, 'hidden' => true],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], ['name' => 'edit']]]
+            ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], [
+                'name'     => 'edit-field',
+                'title'    => 'Edit',
+                'type'     => 'button',
+                'cssClass' => 'btn-edit',
+                'icon'     => 'icon icon-pencil',
+                'callback' => 'showModalToEditFormField']]]
         ];
 
         $config['filters'] = [
@@ -84,7 +92,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['field' => 'label', 'type' => 'text'],
             ['field' => 'input_type', 'type' => 'text']
         ];
-        
+
         $config['actions'] = [
             //'add' => ['caption' => 'Add Fields'],
             'add-form-field' => [
@@ -99,7 +107,50 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config['callbacks'] = [
             'componentDidMount' => 'formFieldGridRegister'
         ];
-        $config['grid_before_create'] = 'formFieldGridRegister';
+//        $config['grid_before_create'] = 'formFieldGridRegister';
+        //$config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
+        //$config['edit_url_required'] = true;
+
+        return ['config' => $config];
+    }
+
+    /**
+     * @param $model Sellvana_Catalog_Model_Product
+     * @return array
+     */
+    public function formDataGrid($model)
+    {
+        $orm = $this->Sellvana_Cms_Model_FormData->orm('fd')->select('fd' . '.*')->where('block_id', $model->id());
+        $config              = parent::gridConfig();
+        $config['orm']       = $orm;
+        $config['id']        = 'form-data-grid';
+        $config['caption']   = 'Form Data Grid';
+        $config['columns']   = [
+            ['type' => 'row_select'],
+            ['name' => 'id', 'label' => 'ID', 'width' => 30],
+            ['name' => 'create_at', 'label' => 'Submitted On', 'width' => 200, 'cell' => 'datetime'],
+            ['name' => 'customer_id', 'label' => 'Customer ID', 'width' => 50,],
+            ['name' => 'post_status', 'label' => 'Post Status', 'width' => 200,],
+            ['name' => 'email', 'label' => 'Email', 'width' => 250,],
+            [
+                'type'    => 'btn_group',
+                'buttons' => [
+                    [
+                        'name'     => 'details',
+                        'title'    => 'Details',
+                        'type'     => 'button',
+                        'cssClass' => 'btn-details',
+                        'icon'     => 'icon-pencil',
+                        'callback' => 'showModalDetailsFormField'
+                    ]
+                ]
+            ]
+        ];
+
+        $config['callbacks']          = [
+            'componentDidMount' => 'formDataGridRegister'
+        ];
+//        $config['grid_before_create'] = 'formDataGridRegister';
         //$config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
         //$config['edit_url_required'] = true;
 
@@ -118,7 +169,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
                     'ts' => ['label' => 'TimeStamp', 'formatter' => 'date'],
                     'version' => ['label' => 'Version'],
                     'user_id' => ['type' => 'input', 'label' => 'User', 'editor' => 'select',
-                        'options' => $this->FCom_Admin_Model_User->options()],
+                        'options' => $this->getAdminUsers()],
                     'username' => ['Label' => 'User Name', 'hidden' => true],
                     'comments' => ['labl' => 'Comments'],
                 ],
@@ -141,6 +192,27 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         ];
 
         return $emailOptions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminUsers()
+    {
+        $options = $this->FCom_Admin_Model_User->options();
+        return $options;
+    }
+
+    public function getEmailTemplates()
+    {
+        $templates = $this->FCom_Frontend_Main->getLayout()->findViewsRegex('#^email/#');
+        $options   = [];
+        if ($templates) {
+            foreach ($templates as $t) {
+                $options[$t->getParam('view_name')] = $t->twigName();
+            }
+        }
+        return $options;
     }
 
     public function action_history_grid_data()
@@ -166,5 +238,21 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         parent::formPostBefore($args);
 
         $args['model']->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
+        $adminUsers = isset($args['data']['form_notify_admin_user'])? $args['data']['form_notify_admin_user']: null;
+
+        if ($adminUsers && is_array($adminUsers)) {
+            $args['model']->set('form_notify_admin_user', join(',', $adminUsers));
+        }
     }
+
+    public function formViewBefore($args)
+    {
+        parent::formViewBefore($args);
+        $adminUsers = $args['model']->get('form_notify_admin_user');
+        if ($adminUsers) {
+            $adminUsers = !is_array($adminUsers) ? explode(',', $adminUsers) : $adminUsers;
+            $args['model']->set('form_notify_admin_user', $adminUsers);
+        }
+    }
+
 }

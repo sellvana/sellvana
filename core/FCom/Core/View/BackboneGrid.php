@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Core_View_BackboneGrid
@@ -6,6 +6,7 @@
  * @property array $grid
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * todo: rename class FCom_Core_View_BackboneGrid
  */
 class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 {
@@ -392,22 +393,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                 switch ($k) {
                     case 'refresh':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Refresh');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Refresh');
                         $class   = 'js-change-url grid-refresh btn';
                         $html    = $this->BUtil->tagHtml('a', ['href' => '#', 'class' => $class], $caption);
                         break;
                     case 'export':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Export');
                         $class   = 'grid-export btn';
                         $html    = $this->BUtil->tagHtml('button', ['type' => 'button', 'class' => $class], $caption);
                         break;
                     case 'link_to_page':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Export');
                         $class   = 'grid-export btn';
                         $html    = $this->BUtil->tagHtml('a', ['href' => $action['href'], 'class' => $class], $caption);
                         break;
                     case 'edit':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Edit');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Edit');
                         $class   = 'btn grid-mass-edit mass-action btn-success';
                         $html    = $this->BUtil->tagHtml('a',
                             ['class' => $class .' disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid['config']['id'] . '-mass-edit', 'role' => 'button'],
@@ -415,17 +416,17 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         );
                         break;
                     case 'delete':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Delete');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Delete');
                         $class   = 'btn grid-mass-delete mass-action btn-danger' . ((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : '');
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class . ' disabled', 'type' => 'button'], $caption);
                         break;
                     case 'add': //todo: confirm with Boris merge this action with 'new'
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
                         $class   = 'btn grid-add btn-primary';
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
                     case 'new':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
                         $class   = 'btn grid-new btn-primary' . (isset($action['modal']) && $action['modal'] ? ' _modal' : '');
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
@@ -433,7 +434,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         $action = static::$_defaultActions[$k];
                 }
             } elseif (!isset($action['html']) || !$action['html']) {
-                $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
                 $class = isset($action['class']) ? 'btn ' . $action['class'] : 'btn';
                 $html = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button', 'id' => isset($action['id']) ? $action['id'] : ''], $caption);
             }
@@ -564,7 +565,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->_processFiltersConfig();
         $this->_processActionsConfig();
         $this->_processPersonalization();
-
         $grid = $this->grid;
         $this->BEvents->fire(__METHOD__ . ':after', ['grid' => &$grid]);
         $grid['_processed'] = true;
@@ -615,7 +615,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $params = ["p", "ps", "s", "sd"/*,"q"*/];
 
             foreach ($params as $p) {
-                $persState[$p] = isset($persState[$p]) ? $persState[$p]
+                $persState[$p] = (isset($persState[$p])  && $persState[$p] != null) ? $persState[$p]
                     : ((isset($config['state']) && isset($config['state'][$p])) ? $config['state'][$p] : null);
             }
 
@@ -638,9 +638,16 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $persFilters = !empty($persState['filters']) ? $persState['filters'] : [];
             $persState = $this->BUtil->arrayMask($persState, 's,sd,p,ps,q');
 
-            $this->_processGridFilters($config, $persFilters, $orm);
+            $this->processGridFilters($config, $persFilters, $orm);
 
-            $config['state'] = $persState;
+            //apply state from config[state] in case personalize[state] null
+            $params = ["p", "ps", "s", "sd"/*,"q"*/];
+            foreach ($params as $p) {
+                $persState[$p] = (isset($persState[$p]) && $persState[$p] != null) ? $persState[$p]
+                    :  ((isset($config['state']) && isset($config['state'][$p])) ? $config['state'][$p] : null);
+            }
+
+            $grid['result']['state'] = $persState;
             $grid['request'] = (empty($grid['request']))? $persState: $grid['request'];
             try {
                 $grid['result'] = $orm->paginate($grid['request'], [
@@ -668,7 +675,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         unset($column);
 
-        $this->grid = $grid;
+        $this->grid = $this->BUtil->arrayWalkToString($grid);
         return $grid;
     }
 
@@ -677,10 +684,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
      */
     public function getPageRowsData()
     {
-
         $grid = $this->get('grid');
         $state = isset($grid['result']['state']) ? $grid['result']['state'] : [];
         $rows = isset($grid['result']['rows']) ? $grid['result']['rows'] : [];
+
+        if (!empty($grid['config']['page_models_callback'])) {
+            $callback = $this->BUtil->extCallback($grid['config']['page_models_callback']);
+            call_user_func($callback, $rows);
+        }
+
         //var_dump($state);
         $gridId = $grid['config']['id'];
 //        $persState = !empty($grid['config']['state']) ? $grid['config']['state'] : array(); // overridden right after this section
@@ -713,6 +725,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
             }
             */
+            foreach ($grid['config']['columns'] as $col) {
+                if (empty($col['cell']) || empty($col['name']) || empty($r[$col['name']])) {
+                    continue;
+                }
+
+                $field = $col['name'];
+                $r[$field] = $this->_formatValue($r[$field], $col['cell']);
+            }
             $data[] = $r;
         }
 
@@ -767,14 +787,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
 
                 if (!empty($col['cell'])) {
-                    switch ($col['cell']) {
-                        case 'number':
-                            $value = floatval($value);
-                            break;
-                        case 'integer':
-                            $value = intval($value);
-                            break;
-                    }
+                    $value = $this->_formatValue($value, $col['cell'], $export);
                 }
 
                 if ($oldValue !== $value) {
@@ -783,6 +796,51 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
         }
         return $data;
+    }
+
+    /**
+     * @param string $value
+     * @param string $type
+     * @param bool|false $export
+     * @return float|int|string
+     */
+    protected function _formatValue($value, $type, $export = false)
+    {
+        switch ($type) {
+            case 'number':
+                $value = floatval($value);
+                break;
+            case 'integer':
+                $value = intval($value);
+                break;
+            case 'currency':
+                if (!$export) {
+                    $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
+                    if ($currency) {
+                        $value = $this->BLocale->currency($value, $currency);
+                    } else {
+                        $value = $this->BLocale->currency($value);
+                    }
+                }
+                break;
+            case 'date':
+                if (!$export) {
+                    $value = $this->BLocale->datetimeDbToLocal($value);
+                }
+                break;
+            case 'datetime':
+                if (!$export) {
+                    $value = $this->BLocale->datetimeDbToLocal($value, BLocale::FORMAT_SHORT_DATETIME);
+                }
+                break;
+            case 'datetime_full':
+                if (!$export) {
+                    $value = $this->BLocale->datetimeDbToLocal($value, BLocale::FORMAT_FULL_DATETIME);
+                }
+                break;
+        }
+
+        return $value;
     }
 
     /**
@@ -831,7 +889,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
 
         if (!empty($filters)) {
-            $this->_processGridFilters($config, $filters, $orm);
+            $this->processGridFilters($config, $filters, $orm);
         }
         if (null !== $method) {
             //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
@@ -959,7 +1017,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
      * @param array $filters
      * @param BORM $orm
      */
-    protected function _processGridFilters(&$config, $filters, $orm)
+    public function processGridFilters(&$config, $filters, $orm)
     {
         $configFilterFields = [];
         if (!empty($config['filters'])) {
@@ -997,18 +1055,31 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 || empty($f['type'])
                 || !isset($f['val'])
                 || $f['val'] === ''
-                || (empty($f['val']) && $f['val'] !== 0)
+                || (empty($f['val']) && $f['val'] !== 0 && $f['val'] !== '0')
                 || empty($configFilterFields[$fId])
             ) {
                 continue;
             }
 
-            switch ($f['type']) {
+            $stop = false;
+            if (!empty($f['callback'])) {
+                $gridId = $this->grid['config']['id'];
+                $stop = $this->{$gridId}->{$f['callback']}($f, $filters[$fId]['val'], $orm);
+            }
+            if (!$stop) {
+                $this->_defaultFilterCallback($f, $orm);
+            }
+        }
+    }
+
+    protected function _defaultFilterCallback($f, $orm)
+    {
+        switch ($f['type']) {
             case 'text':
-                $val = $filters[$fId];
-                if (!empty($filters[$fId])) {
-                    $val = $filters[$fId]['val'];
-                    switch ($filters[$fId]['op']) {
+                $val = $f;
+                if (!empty($f)) {
+                    $val = $f['val'];
+                    switch ($f['op']) {
                         case 'start'://start with
                             $val = $val . '%';
                             $op = 'like';
@@ -1033,11 +1104,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
                 break;
 
-            case 'date-range': case 'number-range':
-                $val = $filters[$fId]['val'];
+            case 'date-range':
+            case 'number-range':
+                $val = $f['val'];
                 $temp = explode('~', $val);
-                if (!empty($filters[$fId])) {
-                    switch ($filters[$fId]['op']) {
+                if (!empty($f)) {
+                    switch ($f['op']) {
                         case 'between':
                             $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
                             if (isset($temp[1])) {
@@ -1068,16 +1140,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 break;
 
             case 'select':
-                $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+                $this->_processGridFiltersOne($f, 'equal', $f['val'], $orm);
                 break;
 
             case 'multiselect':
-                if (!is_array($filters[$fId]['val'])) {
-                    $vals = explode(',', $filters[$fId]['val']);
+                if (!is_array($f['val'])) {
+                    $vals = explode(',', $f['val']);
                 }
                 $this->_processGridFiltersOne($f, 'in', $vals, $orm);
                 break;
-            }
         }
     }
 

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
@@ -13,6 +13,8 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
         CANCEL_REQUESTED = 'cancel_req',
         CANCELED = 'canceled',
         ARCHIVED = 'archived';
+
+    protected static $_origClass = __CLASS__;
 
     protected $_valueLabels = [
         self::PENDING => 'Pending',
@@ -41,6 +43,20 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
     ];
 
     protected $_defaultValue = self::PENDING;
+
+    protected $_defaultValueWorkflow = [
+        self::PENDING => [self::PLACED],
+        self::PLACED => [self::REVIEW, self::PROCESSING, self::BACKORDERED],
+        self::REVIEW => [self::FRAUD, self::LEGIT],
+        self::FRAUD => [self::CANCELED, self::ARCHIVED],
+        self::LEGIT => [self::PROCESSING],
+        self::PROCESSING => [self::BACKORDERED, self::COMPLETE, self::CANCEL_REQUESTED],
+        self::BACKORDERED => [self::PROCESSING, self::COMPLETE],
+        self::COMPLETE => [self::ARCHIVED],
+        self::CANCEL_REQUESTED => [self::CANCELED],
+        self::CANCELED => [self::ARCHIVED],
+        self::ARCHIVED => [],
+    ];
 
     public function setPending()
     {
@@ -124,7 +140,7 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
             return $this;
         }
 
-        if ($model->get('qty_shipped') || $model->get('qty_paid')) {
+        if ($model->get('qty_shipped') || $model->get('amount_paid')) {
             $this->setProcessing();
             return $this;
         }

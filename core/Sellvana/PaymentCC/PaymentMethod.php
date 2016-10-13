@@ -1,12 +1,12 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_PaymentCC_PaymentMethod
  */
 class Sellvana_PaymentCC_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
-    protected $_name = 'Credit Cart';
-    static protected $_methodKey = 'cc';
+    protected $_name = 'Credit Card';
+    protected $_code = 'cc';
 
     protected $_capabilities = [
         'pay'             => 1,
@@ -19,7 +19,7 @@ class Sellvana_PaymentCC_PaymentMethod extends Sellvana_Sales_Method_Payment_Abs
      */
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('credit_card/form');
+        return $this->BLayout->getView('credit_card/form');
     }
 
     /**

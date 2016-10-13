@@ -1,10 +1,111 @@
 <!--{ label: History }-->
 <!--{ pos: 90 }-->
+{% set grid = APP.instance('Sellvana_Cms_Admin_Controller_Blocks').formDataGrid(model) %}
 
 <fieldset>
     <div class="form-group">
         <div class="col-md-12">
             {# THIS.view('jqgrid').set('config', APP.instance('Sellvana_Cms_Admin_Controller_Blocks').historyGridConfig(THIS.get('model')))|raw #}
+            {{ THIS.view('core/griddle').set('grid', grid) | raw }}
         </div>
     </div>
 </fieldset>
+<script type="text/javascript">
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'select2'], function (React, _, $, Components) {
+        var formDataGrid, formDataNode, formDataModalNode;
+
+        window.formDataGridRegister = function (grid) {
+            formDataGrid = grid;
+            formDataNode = $(formDataGrid.getDOMNode());
+        };
+
+        var FormFieldModal = React.createClass({
+            displayName: "FormDataModal",
+            getDefaultProps: function () {
+                return {
+                    'row': {},
+                    'id': 'modal-form-data'
+                }
+            },
+            render: function () {
+//                var that = this;
+//                var gridId = this.props.id;
+//                var columns = this.props.columnMetadata;
+                var rowData = this.props.row;
+                var key = 1;
+
+                var rows = rowData.map(function (value, field) {
+                    var k = column.name + (key++);
+                    if (_.isNaN(k)) {
+                        k = key;
+                    }
+
+                    return (
+                            React.createElement('tr', {key: k}, [
+                                React.createElement('td', {key: k + '-field'}, field),
+                                React.createElement('td', {key: k + '-value'}, value)
+                            ])
+                    )
+
+                });
+
+                return (
+                        React.createElement("table", {className: " field-element-wrapper"}, rows)
+                )
+            }
+        });
+
+        window.showModalDetailsFormField = function (row) {
+            var grid = formDataGrid;
+            var modalContainerEle = document.getElementById('{{ grid.config.id }}-modal');
+            var data = {};
+            _.extend(data, row);
+            if (row.options) {
+                var options;
+                if (typeof row.options == 'string') {
+                    try {
+                        options = JSON.parse(row.options)
+                    } catch (e) {
+                        console.log("row.options not valid JSON string", row.options);
+                    }
+                } else {
+                    options = row.options;
+                }
+
+                if (typeof options == 'object') {
+                    _.extend(data, options);
+                }
+            }
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                    React.createElement(Components.Modal, {
+                                className: "formDataModal",
+                                show: true,
+                                title: 'Data Details',
+                                confirm: 'OK',
+                                cancel: 'Close',
+                                onLoad: function (modal) {
+                                    formDataModalNode = $(modal.getDOMNode());
+                                    formDataModalNode.find('.modal-dialog').css('width', '900px');
+                                }
+                            },
+                            React.createElement('div', {
+                                className: 'f-grid-wrapper',
+                                id: grid.getConfig('id') + '-wrap'
+                            })
+                    ), modalContainerEle);
+
+            var modalWrapEle = $('#{{ grid.config.id }}-wrap');
+            modalWrapEle.append('<div id="{{ grid.config.id }}-modal-form" class="form-data-modal"></div>');
+            var modalFormEle = document.getElementById('{{ grid.config.id }}-modal-form');
+            React.unmountComponentAtNode(modalFormEle);
+            React.render(
+                    React.createElement(FormFieldModal, {
+                        id: grid.getConfig('id'),
+                        row: data
+                    }), modalFormEle
+            );
+        }
+
+    });
+</script>

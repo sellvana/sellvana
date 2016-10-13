@@ -1,23 +1,23 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { model:SESSION.get('w'), id_prefix:'db', name_prefix:'w[db]', get_prefix:'db', label_class:'col-lg-4', input_div_class:'col-lg-7' } %}
-
-<form method="post" action="{{APP.href('install/step1')}}" class="form-horizontal">
+<form method="post" action="{{ APP.href('install/step1') }}" class="form-horizontal">
     <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
     <div class="panel-heading">
         <h1 class="panel-title">{{ 'Step 1 of 3: Database Connection' |_ }}</h1>
     </div>
 
-    {{ forms.input(fieldData, {field:'host', label:'Host'|_, required:1}) }}
-    {{ forms.input(fieldData, {field:'port', label:'Port'|_, required:1}) }}
-    {{ forms.input(fieldData, {field:'dbname', label:'Database'|_, required:1}) }}
-    {{ forms.input(fieldData, {field:'username', label:'Username'|_, required:1}) }}
+    {{ forms.input(fieldData, {field:'host', label:'Host'|_, required:1, attr: { pattern: '([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*', title:'A valid host name'} }) }}
+    {{ forms.input(fieldData, {field:'port', label:'Port'|_, required:1, type:'number'}) }}
+    {{ forms.input(fieldData, {field:'dbname', label:'Database'|_, required:1, attr: { pattern: '[a-zA-Z0-9_]+', title:'A valid DB name (alphanumeric and underscores only)'|_ } }) }}
+    {{ forms.input(fieldData, {field:'username', label:'Username'|_, required:1, attr: { pattern: '[a-zA-Z0-9_]+', title:'A valid DB username (alphanumeric and underscores only)'|_ } }) }}
     {{ forms.input(fieldData, {field:'password', type:'password', label:'Password'|_, placeholder:'*****', value:''}) }}
-    {{ forms.input(fieldData, {field:'table_prefix', label:'Table prefix'|_}) }}
+    {{ forms.input(fieldData, {field:'table_prefix', label:'Table prefix'|_, attr: { pattern: '[a-zA-Z0-9_]+', title:'A valid DB table prefix (alphanumeric and underscores only)'|_ } }) }}
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item clearfix">
-            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{APP.href('install/index')}}">&laquo; {{ 'Back' |_ }}</a>-->
-            <button type="submit" class="btn btn-primary pull-right" name="do" value="next">{{ 'Continue' |_ }}</button>
+            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{ APP.href('install/index') }}">&laquo; {{ 'Back' |_ }}</a>-->
+            <button type="submit" class="btn btn-primary pull-right ladda-button" data-style="expand-left" name="do"
+                    value="next">{{ 'Continue' |_ }}</button>
         </li>
     </ul>
 </form>

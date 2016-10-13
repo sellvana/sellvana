@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Frontend_Controller_Product
@@ -32,9 +32,9 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         $this->BEvents->fire(__METHOD__ . ':product', ['product' => &$product]);
         $this->BApp->set('current_product', $product);
 
-        $viewName = 'catalog/product/details';
-        $layout->view($viewName)->set('product', $product);
-        $head = $layout->view('head');
+        $viewName = $product->get('custom_details_view') ?: 'catalog/product/details';
+        $layout->getView($viewName)->set('product', $product);
+        $head = $layout->getView('head');
 
         $categoryPath = $this->BRequest->param('category');
         
@@ -54,16 +54,26 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
 
             $this->BApp->set('current_category', $category);
 
-            $layout->view($viewName)->set('category', $category);
+            $layout->getView($viewName)->set('category', $category);
             $head->canonical($product->url());
+            $rootCategoryId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
+            $hide = (bool)$rootCategoryId;
             foreach ($category->ascendants() as $c) {
-                if ($c->get('node_name')) {
-                    $crumbs[] = ['label' => $c->get('node_name'), 'href' => $c->url()];
-                    $head->addTitle($c->get('node_name'));
+                if ($hide) { // hide ascendants of the root category
+                    if ($c->id() == $rootCategoryId) {
+                        $hide = false;
+                    }
+
+                    continue;
+                }
+
+                if ($c->getLangField('node_name')) {
+                    $crumbs[] = ['label' => $c->getLangField('node_name'), 'href' => $c->url()];
+                    $head->addTitle($c->getLangField('node_name'));
                 }
             }
-            $head->addTitle($category->get('node_name'));
-            $crumbs[] = ['label' => $category->get('node_name'), 'href' => $category->url()];
+            $head->addTitle($category->getLangField('node_name'));
+            $crumbs[] = ['label' => $category->getLangField('node_name'), 'href' => $category->url()];
         }
 
         $this->BApp->set('current_page_type', 'product');
@@ -71,18 +81,19 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         $head->addTitle($product->getName());
         $crumbs[] = ['label' => $product->getName(), 'active' => true];
 
-        $layout->view('breadcrumbs')->set('crumbs', $crumbs);
+        $layout->getView('breadcrumbs')->set('crumbs', $crumbs);
 
         $user = false;
         if ($this->BApp->m('Sellvana_Customer')) {
             $user = $this->Sellvana_Customer_Model_Customer->sessionUser();
         }
-        $layout->view($viewName)->set('user', $user);
+        $layout->getView($viewName)->set('user', $user);
 
         $layoutData = $product->getData('layout');
         if ($layoutData) {
             $context = ['type' => 'product', 'main_view' => $viewName];
             $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
+#echo "<pre>"; var_dump(__METHOD__, $layoutUpdate); echo "</pre>";
             if ($layoutUpdate) {
                 $this->BLayout->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
             }

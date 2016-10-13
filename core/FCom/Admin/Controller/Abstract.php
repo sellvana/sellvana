@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Abstract
@@ -46,7 +46,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = $this->BRequest;
         if ($r->xhr()) {
             $this->BSession->set('admin_login_orig_url', $r->referrer());
-            $this->BResponse->json(['error' => 'login']);
+            $loginForm = $this->BLayout->getView('login')->render();
+            $this->BResponse->json([
+                'error' => 'login',
+                'form' => $this->BLayout->getView('login/modal_form')->set('loginForm', $loginForm)->render()
+            ]);
         } else {
             $this->BSession->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
@@ -74,7 +78,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         if (!parent::onBeforeDispatch()) return false;
 
-        $this->view('head')->addTitle($this->BLocale->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
+        $this->view('head')->addTitle($this->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
 
         return true;
     }
@@ -107,9 +111,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'admin', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, [$this->BLocale, '_']);
+            array_walk($msg, [$this->BLocale, 'translate']);
         } else {
-            $msg = $this->BLocale->_($msg);
+            $msg = $this->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
@@ -147,7 +151,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $tab['async'] = false;
                 }
                 if (!empty($tab['view'])) {
-                    $tabView = $layout->view($tab['view']);
+                    $tabView = $layout->getView($tab['view']);
                     if ($tabView) {
                         $tabView->set([
                             'model' => $model,
@@ -233,12 +237,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             if (!empty($params['disabled'])) {
                 continue;
             }
-            if (!empty($params['model_new_hide'])) {
+            /*if (!empty($params['model_new_hide'])) {
                 $model = $formView->get('model');
                 if (!$model || !$model->id()) {
                     continue;
                 }
-            }
+            }*/
             $formView->addTab($id, $params);
         }
         return $this;
@@ -267,11 +271,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         if ($outTabs) {
             $layout = $this->BLayout;
             $tabs = $view->tabs;
+            $this->BLayout->applyLayout('settings-tabs');
             foreach ($tabs as $k => $tab) {
                 if ($outTabs !== 'ALL' && !in_array($k, $outTabs)) {
                     continue;
                 }
-                $view = $layout->view($tab['view']);
+                $view = $layout->getView($tab['view']);
                 if (!$view) {
                     $this->BDebug->error('MISSING VIEW: ' . $tabs[$k]['view']);
                     continue;
@@ -307,37 +312,51 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         switch ($args['oper']) {
         case 'add':
             //fix Undefined variable: set
-            $set = $args['model'] = $hlp->create($data)->save();
-            $result = $set->as_array();
+            $model = $args['model'] = $hlp->create($data)->save();
+            $result = $model->as_array();
             break;
 
         case 'edit':
-            //fix Undefined variable: set
-            $set = $args['model'] = $hlp->load($id)->set($data)->save();
-            $result = $set->as_array();
+            $model = $hlp->load($id);
+            if ($model) {
+                $args['model'] = $model->set($data)->save();
+                $result = $model->as_array();
+            } else {
+                $result = ['error' => true];
+            }
             break;
 
         case 'del':
-            $args['model'] = $hlp->load($id)->delete();
-            $result = ['success' => true];
+            $model = $hlp->load($id);
+            if ($model) {
+                $args['model'] = $model->delete();
+                $result = ['success' => true];
+            } else {
+                $result = ['error' => true];
+            }
             break;
 
         case 'mass-delete':
-            $args['ids'] = explode(",", $id);
+            $args['ids'] = $this->BUtil->arrayCleanInt($id);
             foreach ($args['ids'] as $id) {
-                $hlp->load($id)->delete();
+                $model = $hlp->load($id);
+                if ($model) {
+                    $model->delete();
+                }
             }
             $result = ['success' => true];
             break;
 
         case 'mass-edit':
-            $args['ids'] = explode(',', $id);
+            $args['ids'] = $this->BUtil->arrayCleanInt($id);
             foreach ($args['ids'] as $id) {
-                if (isset($data['_new'])) {
-                    unset($data['_new']);
+                $model = $hlp->load($id);
+                unset($data['_new']);
+                //if (isset($data['_new'])) {
+                if (!$model) {
                     $args['models'][] = $hlp->create($data)->save();
                 } else {
-                    $args['models'][] = $hlp->load($id)->set($data)->save();
+                    $args['models'][] = $model->set($data)->save();
                 }
             }
             $result = ['success' => true];

@@ -1,0 +1,24 @@
+{% set products = APP.instance('Sellvana_Catalog_Admin_Dashboard').getProductsWithoutImages() %}
+
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "SKU"|_ }}</th>
+            <th>{{ "Name"|_ }}</th>
+        </tr>
+        </thead>
+        {% if products is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.get('product_sku') }}</td>
+                    <td>{{ product.get('product_name') }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>

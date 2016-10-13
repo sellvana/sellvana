@@ -1,33 +1,28 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 namespace EasyPost;
 
+defined('BUCKYBALL_ROOT_DIR') || die();
+
 class Rate extends Resource
 {
-    public static function constructFrom($values, $class = null, $apiKey = null)
-    {
-        $class = get_class();
-
-        return self::constructFrom($values, $class, $apiKey);
-    }
-
     public static function retrieve($id, $apiKey = null)
     {
-        $class = get_class();
-
-        return self::_retrieve($class, $id, $apiKey);
+        return self::_retrieve(get_class(), $id, $apiKey);
     }
 
     public static function all($params = null, $apiKey = null)
     {
-        $class = get_class();
+        return self::_all(get_class(), $params, $apiKey);
+    }
 
-        return self::_all($class, $params, $apiKey);
+    public function save()
+    {
+        return self::_save(get_class());
     }
 
     public static function create($params = null, $apiKey = null)
     {
-        $class = get_class();
         if (!isset($params['rate']) || !is_array($params['rate'])) {
             $clone = $params;
             unset($params);
@@ -39,13 +34,6 @@ class Rate extends Resource
             $params['rate']['shipment'] = $clone['rate'];
         }
 
-        return self::_create($class, $params, $apiKey);
-    }
-
-    public function save()
-    {
-        $class = get_class();
-
-        return self::_save($class);
+        return self::_create(get_class(), $params, $apiKey);
     }
 }

@@ -1,10 +1,18 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Facility to handle l10n and i18n
 */
 class BLocale extends BClass
 {
+    const FORMAT_SHORT_DATE      = 'date_short';
+    const FORMAT_SHORT_DATETIME  = 'datetime_short';
+    const FORMAT_FULL_DATETIME   = 'datetime_full';
+    const FORMAT_CURRENCY        = 'currency';
+
+    const DECIMAL_SEPARATOR      = 'decimal_sep';
+    const GROUP_SEPARATOR        = 'group_sep';
+
     static protected $_domainPrefix = 'fulleron/';
     static protected $_domainStack = [];
 
@@ -56,6 +64,38 @@ class BLocale extends BClass
     protected static $_customTranslators = [];
 
     /**
+     * Default locale settings
+     *
+     * @var array
+     */
+    protected $_defaultFormats = [
+        self::FORMAT_SHORT_DATE     => 'MMM d, y',
+        self::FORMAT_SHORT_DATETIME => "MMM d, y h:mm:ss a",
+        self::FORMAT_FULL_DATETIME  => "EEEE, MMMM d, y 'at' h:mm:ss a",
+        self::FORMAT_CURRENCY       => '¤#,##0.00',
+    ];
+
+    /**
+     * Current locale settings
+     *
+     * @var array
+     */
+    static protected $_localeSettings = [];
+
+    /**
+     * Locale aware date formatters
+     *
+     * @var IntlDateFormatter[]|NumberFormatter[]
+     */
+    static protected $_formatters = [
+        self::FORMAT_SHORT_DATE     => false,
+        self::FORMAT_SHORT_DATETIME => false,
+        self::FORMAT_FULL_DATETIME  => false,
+        self::FORMAT_CURRENCY       => false
+    ];
+
+
+    /**
      * Shortcut to help with IDE autocompletion
      *
      * @param bool  $new
@@ -76,6 +116,8 @@ class BLocale extends BClass
         date_default_timezone_set($this->_defaultTz);
         setlocale(LC_ALL, $this->_defaultLocale);
         $this->_tzCache['UTC'] = new DateTimeZone('UTC');
+        $this->_initFormatters($this->_defaultLocale);
+        self::$_localeSettings = $this->getLocaleDefaultFormats($this->_defaultLocale);
     }
 
     public function transliterate($str, $filler = '-')
@@ -98,7 +140,7 @@ class BLocale extends BClass
     public function getAvailableLocaleCodes()
     {
         static $codes = [
-            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', ' ar_EG', 'ar_IN',
+            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', 'ar_EG', 'ar_IN',
             'ar_IQ', 'ar_JO', 'ar_KW', 'ar_LB', 'ar_LY', 'ar_MA', 'ar_OM', ' ar_QA', 'ar_SA', 'ar_SD', 'ar_SY',
             'ar_TN', 'ar_YE', 'az_AZ', 'as_IN', 'ast_ES', ' be_BY', 'bem_ZM', 'ber_DZ', 'ber_MA', 'bg_BG',
             'bho_IN', 'bn_BD', 'bn_IN', 'bo_CN', ' bo_IN', 'br_FR', 'brx_IN', 'bs_BA', 'byn_ER', 'ca_AD',
@@ -353,7 +395,7 @@ class BLocale extends BClass
         return $result;
     }
 
-    public function getAvailableCountries($format = 'name', $limitCountries = null)
+    public function getAvailableCountries($format = 'name', $limitCountries = null, $showEmpty = false)
     {
         static $countries = [
             ['AD', 'Andorra', 'AND', '20'],
@@ -635,6 +677,9 @@ class BLocale extends BClass
             default:
                 throw new BException('Invalid label type');
         }
+        if ($showEmpty) {
+            $result = ['' => ''] + $result;
+        }
         return $result;
     }
 
@@ -807,6 +852,32 @@ class BLocale extends BClass
                 $locale = $this->_defaultLocale;
             }
         }
+        $localeSetup = $this->BConfig->get('modules/Sellvana_MultiLanguage/setup_string_' . $locale, "");
+        $localeSetup = explode("\n", $localeSetup);
+        $this->_initFormatters($locale);
+        self::$_localeSettings = $this->getLocaleDefaultFormats($locale);
+        foreach ($localeSetup as $setupString) {
+            if (!trim($setupString)) {
+                continue;
+            }
+            list($setting, $value) = explode(':', $setupString, 2) + [null];
+            if (!array_key_exists($setting, self::$_localeSettings)) {
+                continue;
+            }
+            $value = str_replace('"', '', trim($value));
+            self::$_localeSettings[$setting] = $value;
+            if (!empty(self::$_formatters[$setting])) {
+                self::$_formatters[$setting]->setPattern($value);
+            } elseif (in_array($setting, [self::DECIMAL_SEPARATOR, self::DECIMAL_SEPARATOR])) {
+                if ($setting == self::DECIMAL_SEPARATOR) {
+                    $symbol = NumberFormatter::MONETARY_SEPARATOR_SYMBOL;
+                } else {
+                    $symbol = NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL;
+                }
+                self::$_formatters[self::FORMAT_CURRENCY]->setSymbol($symbol, $value);
+            }
+        }
+
         $this->_currentLocale = $locale;
         list($lang) = explode('_', $locale, 2);
         $this->BSession->set('current_language', $lang)->set('current_locale', $locale);
@@ -852,7 +923,7 @@ class BLocale extends BClass
                     case 'csv':
                         $fp = fopen($data, 'r');
                         while (($r = fgetcsv($fp, 2084))) {
-                            static::addTranslation($r, $module);
+                            static::_addTranslation($r, $module);
                         }
                         fclose($fp);
                         break;
@@ -862,7 +933,7 @@ class BLocale extends BClass
                         $translations = $this->BUtil->fromJson($content);
                         if (is_array($translations)) {
                             foreach ($translations as $word => $tr) {
-                                static::addTranslation([$word, $tr], $module);
+                                static::_addTranslation([$word, $tr], $module);
                             }
                         }
                         break;
@@ -870,7 +941,7 @@ class BLocale extends BClass
                     case 'php':
                         $translations = include $data;
                         foreach ($translations as $word => $tr) {
-                            static::addTranslation([$word, $tr], $module);
+                            static::_addTranslation([$word, $tr], $module);
                         }
                         break;
 
@@ -903,7 +974,7 @@ class BLocale extends BClass
             }
         } elseif (is_array($data)) {
             foreach ($data as $r) {
-                static::addTranslation($r, $module);
+                static::_addTranslation($r, $module);
             }
         }
     }
@@ -947,7 +1018,7 @@ class BLocale extends BClass
         return $this;
     }
 
-    protected function addTranslation($r, $module = null)
+    protected function _addTranslation($r, $module = null)
     {
         if (empty($r[1])) {
             #BDebug::debug('Empty translation for "'.$r[0].'"');
@@ -990,8 +1061,18 @@ class BLocale extends BClass
         return $this;
     }
 
-    public function _($string, $params = [], $module = null)
+    public function translate($string, $params = [], $module = null)
     {
+/*
+        if ($string instanceof BTranslated) {
+            return $string;
+        }
+        return new BTranslated($string, $params, $module);
+    }
+
+    public function translateToString($string, $params, $module)
+    {
+*/
         if (empty(static::$_tr[$string])) { // if no translation at all
             $tr = null;
             foreach (static::$_customTranslators as $translator) {
@@ -1016,6 +1097,54 @@ class BLocale extends BClass
             }
         }
 
+        if (is_array($tr) && !empty($tr['#'])) {
+            $choices = $tr;
+            $defaultString = '';
+            $tr = null;
+            $value = null;
+            foreach ($choices as $condition => $string) {
+                if ($condition === '#') {
+                    if (!isset($params[$string])) {
+                        throw new BException('Parameter is not set: ' . $string);
+                    }
+                    if (!is_int($params[$string])) {
+                        throw new BException('Invalid qualifier parameter: ' . $params[$string]);
+                    }
+                    $value = $params[$string];
+                    continue;
+                }
+                if (null === $value) {
+                    throw new BException('Condition parameter should be specified first');
+                }
+                if ($condition === '*') { // if star, this is default
+                    $defaultString = $string;
+                    continue;
+                }
+                if (!preg_match('/^(\*)?([0-9]+)?(\.\.)?([0-9]+)?$/', $condition, $m) || ($m[2] === '' && $m[4] === '')) {
+                    throw new BException('Invalid condition: ' . $condition);
+                }
+                $condValue = empty($m[1]) ? $value : ($value % 10); // if starts with star, modulo 10
+                $valid = true;
+                if (!empty($m[3])) { // range
+                    if ($m[2] !== '' && $condValue < (int)$m[2]) { // lower bound breached
+                        $valid = false;
+                    }
+                    if (isset($m[4]) && $condValue > (int)$m[4]) { // upper bound breached
+                        $valid = false;
+                    }
+                } elseif ($condValue !== (int)$m[2]) { // single number doesn't match
+                    $valid = false;
+                }
+                if ($valid) {
+                    $tr = $string;
+                    break;
+                }
+            }
+            if (null === $tr) {
+                $tr = $defaultString;
+            }
+        }
+
         return $this->BUtil->sprintfn($tr, $params);
     }
 
@@ -1025,16 +1154,16 @@ class BLocale extends BClass
         if (is_array($sources)) {
             foreach ($sources as $string) {
                 if (is_string($string)) {
-                    $results[$string] = static::_($string);
+                    $results[$string] = static::translate($string);
                 } else if (is_array($string) && !empty($string)) {
                     $str = (string) $string[0];
                     $params = isset($string[1]) ? (array) $string[1] : [];
                     $module = isset($string[2]) ? (string) $string[2] : null;
-                    $results[$str] = static::_($str, $params, $module);
+                    $results[$str] = static::translate($str, $params, $module);
                 }
             }
         } else {
-            $results[(string) $sources] = static::_((string) $sources);
+            $results[(string) $sources] = static::translate((string) $sources);
         }
 
         return $this->BUtil->toJson($results);
@@ -1130,7 +1259,7 @@ class BLocale extends BClass
     /**
     * Get timezone offset in seconds
     *
-    * @param stirng|null $tz If null, return server timezone offset
+    * @param string|null $tz If null, return server timezone offset
     * @return int
     */
     public function tzOffset($tz = null)
@@ -1183,15 +1312,48 @@ class BLocale extends BClass
     }
 
     /**
+     * Parse default allowed languages to select2 options
+     *
+     * @param bool $griddle
+     * @param array $locales
+     * @return array
+     */
+    public function parseAllowedLocalesToOptions($griddle = false, $locales = [])
+    {
+        if (empty($locales)) {
+            $locales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
+            if (empty($locales)) {
+                return [];
+            }
+        }
+
+        $result = [];
+
+        foreach ($locales as $locale) {
+            $griddle ? $result[$locale] = $locale : $result[] = ['id' => $locale, 'text' => $locale];
+        }
+
+        return $result;
+    }
+
+    /**
     * Convert DB datetime (GMT) to local
     *
     * @param string $value
-    * @param bool $full Full format or short
+    * @param string $format
     * @return string
     */
-    public function datetimeDbToLocal($value, $full = false)
+    public function datetimeDbToLocal($value, $format = self::FORMAT_SHORT_DATE)
     {
-        return strftime($full ? '%c' : '%x', strtotime($value) + $this->tzOffset());
+        $value = strtotime($value) + $this->tzOffset();
+
+        if (empty(self::$_formatters[$format])) {
+            return $value;
+        }
+
+        $formatter = self::$_formatters[$format];
+
+        return $formatter->format($value);
     }
 
     public function getTranslations()
@@ -1227,19 +1389,41 @@ class BLocale extends BClass
         return static::$_currencyCode;
     }
 
-    public function getSymbol($currency)
+    public function getAvailableCurrencies()
     {
-        return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+        $currencies = str_replace(' ', '', $this->BConfig->get('modules/Sellvana_MultiCurrency/available_currencies'));
+        return explode(',', $currencies);
     }
 
-    public function currency($value, $currency = null, $decimals = 2)
+    public function getSymbol($currency)
     {
+        $value = !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+        $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency]);
+        return $value;
+    }
+
+    public function currency($value, $currency = null)
+    {
+        $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
+        if ($currency == 'base') {
+            $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        }
+
         if ($currency) {
-            $symbol = $this->getSymbol($currency);
+            $symbol = $this->getSymbol($currency) ?: $currency;
         } else {
             $symbol = static::$_currencySymbol;
+            $currency = self::$_currencyCode;
         }
-        return sprintf('%s%s', $symbol, number_format($value, $decimals));
+
+        if ($symbol) {
+            //$formatter->setPattern(str_replace('¤', "'" . $symbol . "'", $formatter->getPattern()));
+        }
+
+        $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency, 'formatter' => &$formatter]);
+        $value = $formatter->formatCurrency($value, $currency);
+
+        return $value;
     }
 
     public function roundCurrency($value, $decimals = 2)
@@ -1247,5 +1431,338 @@ class BLocale extends BClass
         //TODO: currency specific number of digits
         $precision = pow(10, $decimals);
         return round($value * $precision) / $precision;
+    }
+
+    /**
+     * Selects locale default settings from intl package
+     *
+     * @param $locale
+     * @return array
+     */
+    public function getLocaleDefaultFormats($locale)
+    {
+        if (!$this->_isLocaleAvailableInIntl($locale)) {
+            return $this->_defaultFormats;
+        }
+
+        $formatters = ($locale == $this->_currentLocale) ? self::$_formatters : $this->_createFormatters($locale);
+        $settings = [];
+        foreach ($formatters as $format => $formatter) {
+            $settings[$format] = $formatter->getPattern();
+        }
+        $currencyFormatter = $formatters[self::FORMAT_CURRENCY];
+        $settings[self::DECIMAL_SEPARATOR] = $currencyFormatter->getSymbol(NumberFormatter::MONETARY_SEPARATOR_SYMBOL);
+        $settings[self::GROUP_SEPARATOR] = $currencyFormatter->getSymbol(NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL);
+        return $settings;
+    }
+
+    public function getCurrentLocaleSettings()
+    {
+        return self::$_localeSettings;
+    }
+
+    /**
+     * Checks if locale is available in intl package
+     *
+     * @param $locale
+     * @return bool
+     */
+    protected function _isLocaleAvailableInIntl($locale)
+    {
+        if (!class_exists('ResourceBundle')) {
+            return false;
+        }
+
+        $availableLocales = ResourceBundle::getLocales('');
+
+        return in_array($locale, $availableLocales);
+    }
+
+    /**
+     * Creates date and currency formatters for selected locale
+     *
+     * @param $locale
+     */
+    protected function _initFormatters($locale)
+    {
+        if (!$this->_isLocaleAvailableInIntl($locale)) {
+            $locale = $this->_defaultLocale;
+        }
+
+        self::$_formatters = $this->_createFormatters($locale);
+    }
+
+    /**
+     * Create formatters for locale
+     *
+     * @param $locale
+     * @return array
+     */
+    protected function _createFormatters($locale)
+    {
+        if (!class_exists('IntlDateFormatter')) {
+            return [];
+        }
+        $formatters = [];
+        $formatters[self::FORMAT_SHORT_DATE] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::NONE
+        );
+        $formatters[self::FORMAT_SHORT_DATETIME] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::MEDIUM
+        );
+        $formatters[self::FORMAT_FULL_DATETIME] = new IntlDateFormatter(
+            $locale,
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::MEDIUM
+        );
+        // NumberFormatter::CURRENCY ignores fractional digit limit
+        $formatters[self::FORMAT_CURRENCY] = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+
+        return $formatters;
+    }
+}
+
+/**
+ * Class BCurrencyValue
+ *
+ * The purpose of this class is to create and hold currency specific values, use bcmath calculations,
+ * and to make sure that operations are performed only between values of the same currency (bindMode)
+ *
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
+ */
+class BCurrencyValue extends BClass
+{
+    const BIND_NONE = 0;
+    const BIND_MODEL = 1;
+    const BIND_VALUE = 2; // Not implemented
+    const BIND_BOTH = 3; // Not implemented
+
+    /**
+     * @var string
+     */
+    protected $_currencyCode;
+
+    /**
+     * @var float
+     */
+    protected $_amountValue;
+
+    /**
+     * @var int
+     */
+    protected $_decimalScale = 2;
+
+    /**
+     * @var BModel
+     */
+    protected $_fromModel = null;
+
+    /**
+     * @var string
+     */
+    protected $_fromField = null;
+
+    /**
+     * @var int
+     */
+    protected $_bindMode = self::BIND_NONE;
+
+    public function __construct($amountValue = 0, $currencyCode = null)
+    {
+        $this->_amountValue  = $amountValue;
+        $this->_currencyCode = $currencyCode;
+        //$this->_decimalScale = 2; // retrieve from currencies db
+    }
+
+    /**
+     * @param float $amountValue
+     * @param string $currencyCode
+     * @return $this
+     */
+    public function create($amountValue, $currencyCode)
+    {
+        $class = get_class($this);
+        return new $class($amountValue, $currencyCode);
+    }
+
+    /**
+     * @param BModel $model
+     * @param string $field
+     * @param int $bindMode
+     * @return $this
+     */
+    public function setModelField(BModel $model, $field, $bindMode)
+    {
+        $this->_fromModel = $model;
+        $this->_fromField = $field;
+        $this->_bindMode = $bindMode;
+        return $this;
+    }
+
+    /**
+     * @param BModel $model
+     * @param string $field
+     * @param string $currencyCode
+     * @param int $bind
+     * @return $this
+     */
+    public function fromModel(BModel $model, $field, $currencyCode, $bind = self::BIND_NONE)
+    {
+        $amount = $field[0] !== '/' ? $model->get($field) : $model->getData(trim($field, '/'));
+        return $this->create($amount, $currencyCode)->setModelField($model, $field, $bind);
+    }
+
+    protected function _updateModel()
+    {
+        if ($this->_bindMode !== self::BIND_MODEL && $this->_bindMode !== self::BIND_BOTH) {
+            return $this;
+        }
+        if (!$this->_fromModel || !$this->_fromField) {
+            return $this;
+        }
+        if ($this->_fromField[0] !== '/') {
+            $this->_fromModel->set($this->_fromField, $this->getAmount());
+        } else {
+            $this->_fromModel->setData(trim($this->_fromField, '/'), $this->getAmount());
+        }
+        return $this;
+    }
+
+    /**
+     * @param boolean $raw
+     * @return float
+     */
+    public function getAmount($raw = false)
+    {
+        if ($raw) {
+            return $this->_amountValue;
+        }
+        return bcadd($this->_amountValue, 0, $this->_decimalScale);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrencyCode()
+    {
+        return $this->_currencyCode;
+    }
+
+    protected function _validateCurrencyValue($currencyValue)
+    {
+        if ($currencyValue instanceof BCurrencyValue && $this->_currencyCode !== $currencyValue->getCurrencyCode()) {
+            throw new BException('Operand currency does not match');
+        }
+    }
+
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return $this
+     * @throws BException
+     */
+    public function add(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyValue($currencyValue);
+        $this->_amountValue = bcadd($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return $this
+     * @throws BException
+     */
+    public function subtract(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyValue($currencyValue);
+        $this->_amountValue = bcsub($this->getAmount(), $currencyValue->getAmount(), $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+
+    /**
+     * @param int|float $operand
+     * @return $this
+     * @throws BException
+     */
+    public function multiply($operand)
+    {
+        $this->_amountValue = bcmul($this->getAmount(), $operand, $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+
+    /**
+     * @param int|float $operand
+     * @return $this
+     * @throws BException
+     */
+    public function divide($operand)
+    {
+        $this->_amountValue = bcdiv($this->getAmount(), $operand, $this->_decimalScale);
+        $this->_updateModel();
+        return $this;
+    }
+
+    /**
+     * @param BCurrencyValue $currencyValue
+     * @return int
+     * @throws BException
+     */
+    public function compare(BCurrencyValue $currencyValue)
+    {
+        $this->_validateCurrencyValue($currencyValue);
+        return bccomp($this->getAmount() - $currencyValue->getAmount(), $this->_decimalScale);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormatted()
+    {
+        return $this->BLocale->currency($this->getAmount(), $this->getCurrencyCode());
+    }
+
+    /**
+     * Depends on Sellvana_MultiCurrency_Main - refactor
+     *
+     * @param $newCurrencyCode
+     * @return static
+     */
+    public function getConverted($newCurrencyCode)
+    {
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate($this->getCurrencyCode(), $newCurrencyCode);
+        $newAmount = $this->getAmount() * $rate;
+        return new static($newAmount, $newCurrencyCode);
+    }
+}
+
+class BTranslated extends BClass
+{
+    /** @var BLocale */
+    protected static $_locale;
+
+    protected $_string;
+    protected $_params = [];
+    protected $_module = null;
+
+    public function __construct($string, $params, $module)
+    {
+        $this->_string = $string;
+        $this->_params = $params;
+        $this->_module = $module;
+    }
+
+    public function __toString()
+    {
+        if (!static::$_locale) {
+            static::$_locale = $this->BLocale;
+        }
+        return (string)static::$_locale->translateToString($this->_string, $this->_params, $this->_module);
     }
 }

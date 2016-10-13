@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_ProductCompare_Model_Set
@@ -62,7 +62,7 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
                 }
                 if (empty($set)) {
                     if ($createAnonymousIfNeeded) {
-                        $cookieToken = $this->BUtil->randomString(32);
+                        $cookieToken = $this->BUtil->randomString(40, BUtil::CHARPOOL_ALNUMCAP);
                         $set = $this->create(['cookie_token' => (string)$cookieToken])->save();
                         $ttl = $this->BConfig->get('modules/Sellvana_ProductCompare/cookie_token_ttl_days') * 86400;
                         $this->BResponse->cookie('compare', $cookieToken, $ttl);

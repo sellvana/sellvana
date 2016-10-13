@@ -1,8 +1,6 @@
 {% set order = THIS.get('order') %}
 {% set orderItems = order.items() %}
-
-{% import THIS.view('core/form-elements').twigName() as forms %}
-{% set mergeFieldData = { id_prefix:'merge', name_prefix:'merge' } %}
+{% set orderCurrency = order.get('store_currency_code') %}
 
 {% set sessCustomer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
 {% if not sessCustomer %}
@@ -12,9 +10,16 @@
 <div class="row f-mb-slideout-menu">
     <div class="col-sm-9 f-col-main">
         <header class="f-page-header">
-            <h1 class="f-page-title">{{ "Orders" | _ }} #{{ order.get('unique_id') }} <span class="badge">{{ order.state().overall().getValueLabel()|_ }}</span></h1>
+            <h1 class="f-page-title">{{ "Order #%s" | _(order.get('unique_id')) }} <span class="badge">{{ order.state().overall().getValueLabel()|_ }}</span></h1>
             <div class="pull-right">
                 <form method="post" action="{{ APP.href('orders/repeat?id=' ~ order.get('unique_id')) }}">
+                    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                    {% if order.getCancelableItems() %}
+                        <a href="{{ APP.href('orders/cancel?id=' ~ order.get('unique_id')) }}" class="btn btn-default">{{ 'Cancel Items'|_ }}</a>
+                    {% endif %}
+                    {% if order.getReturnableItems() %}
+                        <a href="{{ APP.href('orders/return?id=' ~ order.get('unique_id')) }}" class="btn btn-default">{{ 'Return Items'|_ }}</a>
+                    {% endif %}
                     <button type="submit" class="btn btn-primary">{{ 'Repeat Order'|_ }}</button>
                 </form>
             </div>
@@ -22,16 +27,19 @@
                class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Menu'|_ }}</a>
         </header>
 
+        {{ THIS.view('core/messages') | raw }}
+
         {% if orderItems %}
             <h4>{{ "Order items" | _ }}</h4>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>{{ 'ID'|_ }}</th>
                         <th>{{ "Info" | _ }}</th>
-                        <th>{{ "Qty" | _ }}</th>
+                        <th>{{ "Qty Ordered" | _ }}</th>
                         <th>{{ "Total" | _ }}</th>
+                        <th>{{ "Notes" | _ }}</th>
                     </tr>
                     </thead>
                     {% for item in orderItems %}
@@ -39,7 +47,21 @@
                             <td>{{ item.get('id') }}</td>
                             <td>{{ THIS.view('orders/item').set('item', item) | raw }} </td>
                             <td>{{ item.get('qty_ordered') }} </td>
-                            <td>{{ item.get('row_total') | currency }} </td>
+                            <td>{{ item.getData('store_currency/row_total') | currency(orderCurrency) }} </td>
+                            <td>
+                                {% if item.get('qty_shipped') %}
+                                    <p>{{ 'Shipped: %s' | _(item.get('qty_shipped')) }}</p>
+                                {% endif %}
+                                {% if item.get('qty_canceled') %}
+                                    <p>{{ 'Canceled: %s' | _(item.get('qty_canceled')) }}</p>
+                                {% endif %}
+                                {% if item.get('qty_returned') %}
+                                    <p>{{ 'Returned: %s' | _(item.get('qty_returned')) }}</p>
+                                {% endif %}
+                                {% if item.get('amount_refunded') %}
+                                    <p>{{ 'Refunded: %s' | _(item.get('amount_refunded') | currency) }}</p>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -74,8 +96,13 @@
                 </tr>
                 </thead>
                 <tr>
-                    <td>{{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})</td>
-                    <td>{{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})</td>
+                    <td>
+                        {{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})
+                        <br>{{ order.getShippingServiceTitle() }}
+                    </td>
+                    <td>
+                        {{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})
+                    </td>
                 </tr>
             </table>
         </div>
@@ -86,13 +113,15 @@
                 <tr>
                     <th>{{ "Subtotal" | _ }}</th>
                     <th>{{ "Grand Total" | _ }}</th>
+                    <th>{{ "Amount Paid" | _ }}</th>
                     <th>{{ "Balance Due" | _ }}</th>
                 </tr>
                 </thead>
                 <tr>
-                    <td>{{ order.get('subtotal') | currency }} </td>
-                    <td>{{ order.get('grand_total') | currency }} </td>
-                    <td>{{ order.get('amount_due') | currency }} </td>
+                    <td>{{ order.getData('store_currency/subtotal') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/grand_total') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/amount_paid') | currency(orderCurrency) }} </td>
+                    <td>{{ order.getData('store_currency/amount_due') | currency(orderCurrency) }} </td>
                 </tr>
             </table>
         </div>
@@ -118,7 +147,7 @@
         <!-- END: Merging order into account -->
 
     </div>
-    {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
+    {{ THIS.view('customer/account/sidebar') | raw }}
 </div>
 
 <script>

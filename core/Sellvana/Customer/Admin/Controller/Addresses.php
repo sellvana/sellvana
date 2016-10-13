@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Admin_Controller_Addresses
@@ -13,6 +13,37 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
     protected $_recordName = 'Address';
     protected $_mainTableAlias = 'a';
 
+    public function gridConfig() {
+        $config = parent::gridConfig();
+
+        $config['columns'] = [
+            ['name' => 'id', 'index' => 'a.id'],
+            ['name' => 'firstname', 'index' => 'a.firstname'],
+            ['name' => 'lastname', 'index' => 'a.lastname'],
+            ['name' => 'company', 'index' => 'a.company'],
+            ['name' => 'street1', 'index' => 'a.street1'],
+            ['name' => 'street2', 'index' => 'a.street2'],
+            ['name' => 'street3', 'index' => 'a.street3'],
+            ['name' => 'country', 'index' => 'a.country'],
+            ['name' => 'region', 'index' => 'a.region'],
+            ['name' => 'city', 'index' => 'a.city'],
+            ['name' => 'postcode', 'index' => 'a.postcode'],
+            ['name' => 'phone', 'index' => 'a.phone'],
+            ['name' => 'fax', 'index' => 'a.fax'],
+            ['name' => 'email', 'index' => 'a.email']
+        ];
+
+        $config['filters'] = [
+            ['field' => 'country', 'type' => 'multiselect'],
+            ['field' => 'company', 'type' => 'text'],
+            ['field' => 'postcode', 'type' => 'text'],
+            ['field' => 'street1', 'type' => 'text'],
+            ['field' => 'email', 'type' => 'text']
+        ];
+
+        return $config;
+    }
+
     /**
      * config get all addresses of customer
      * @param $customer Sellvana_Customer_Model_Customer
@@ -25,6 +56,7 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115, 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditAddress', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true],
             ['name' => 'customer_id', 'label' => 'Customer ID', 'index' => 'a.customer_id', 'hidden' => true,
                 'form_hidden_label' => true, 'addable' => true, 'editable' => true,
@@ -65,12 +97,17 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
             ],
             ['name' => 'is_default_shipping', 'label' => 'Is Default Shipping', 'display' => 'eval',
                 'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_shipping_id]\' "+(rc.row["is_default_shipping"] == 1 ? checked=\'checked\' : \'\')+" />"'
-            ],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
-                'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
+            ]
         ];
         $config['actions'] = [
-            'new'    => ['caption' => 'Add New Address', 'modal' => true],
+            // 'new'    => ['caption' => 'Add New Address', 'modal' => true],
+            'add-address' => [
+                'caption'  => 'Add New Address',
+                'type'     => 'button',
+                'id'       => 'add-address-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddAddress'
+            ],
             'delete' => true
         ];
         $config['filters'] = [
@@ -78,15 +115,25 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
             ['field' => 'company', 'type' => 'text'],
             ['field' => 'postcode', 'type' => 'text'],
             ['field' => 'street1', 'type' => 'text'],
-            ['field' => 'email', 'type' => 'text'],
-            '_quick' => ['expr' => 'street1 like ? or company like ? or city like ? or country like ?', 'args' => ['%?%', '%?%', '%?%', '%?%']]
+            ['field' => 'email', 'type' => 'text']
         ];
 
         $config['orm'] = $this->Sellvana_Customer_Model_Address->orm($this->_mainTableAlias)
             ->select($this->_mainTableAlias . '.*')->where('customer_id', $customer->id);
-        $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
-        $config['grid_before_create'] = 'customer_address_grid';
+        $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
+        // $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
+        // $config['grid_before_create'] = 'customer_address_grid';
+        $config['callbacks'] = [
+            'componentDidMount' => 'addressGridRegister'
+        ];
         return ['config' => $config];
+    }
+
+    public function gridOrmConfig($orm) {
+        parent::gridOrmConfig($orm);
+        if ($this->BRequest->get('customer_id')) {
+            $orm->where('customer_id', $this->BRequest->get('customer_id'));
+        }
     }
 
     public function action_get_state__POST()

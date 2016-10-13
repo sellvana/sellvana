@@ -3,7 +3,8 @@
 
 <div class="f-widget f-widget-prods-compare">
     <form method="post" action="{{ APP.href('catalog/compare') }}">
-        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+        {# Duplicate CSRF input #}
+        {#<input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>#}
         <strong class="f-widget-title">{{ 'Compare up to 4 products'|_ }}</strong>
         <ul class="f-widget-content">
             {% for i in 0..3 %}
@@ -18,7 +19,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
-      <a href="{{ APP.href('catalog/compare') }}" class="btn btn-default btn-sm compare-trigger" rel="#compare-overlay" value="compare"><span>{{ "Compare" |_ }}</span></a>
+      <a href="{{ APP.href('catalog/compare') }}" class="btn btn-default btn-sm compare-trigger" rel="#compare-overlay"><span>{{ "Compare" |_ }}</span></a>
       <button name="submit" type="submit" class="btn btn-default btn-sm reset-btn" value="reset">{{ 'Reset' |_ }}</button>
     </form>
 </div>
@@ -29,7 +30,8 @@
 require(['jquery', 'fcom.productcompare'], function($) {
     var compare = {{ compareJson | default('[]') | raw }};
     $(function() { // let all checkboxes to load first
-        $('.block-compare').data('compare', new FCom.CompareBlock({
+        // Class name `block-compare` do not available
+        $(document).data('compare', new FCom.CompareBlock({
             thumbContainer: '.f-widget-prods-compare',
             checkbox: '.btn-compare',
             img: '.f-prod-img',
@@ -37,8 +39,8 @@ require(['jquery', 'fcom.productcompare'], function($) {
             url_add: '{{ APP.href('catalog/compare/addxhr') }}',
             url_remove: '{{ APP.href('catalog/compare/rmxhr') }}'
         }));
-/*
-        $("#compare-trigger").overlay({
+
+        /*$("#compare-trigger").overlay({
             mask: { color:'#000', loadSpeed:0, opacity:0.3 },
             effect:'default',
             speed:0,

@@ -1,10 +1,11 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Admin_Controller_Customers
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_Wishlist_Model_Wishlist $Sellvana_Wishlist_Model_Wishlist
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Admin_Main $FCom_Admin_Main
  */
@@ -20,6 +21,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
     protected $_formTitleField = 'Sellvana_Customer_Admin_Controller_Customers.formTitleField';
+    protected $_formLayoutName = '/customers/form';
 
     public function gridConfig()
     {
@@ -29,7 +31,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
-                    'title' => $this->BLocale->_('Log in as customer'), 'target' => 'AdminCustomer'],
+                    'title' => $this->_('Log in as customer'), 'target' => 'AdminCustomer'],
                 ['name' => 'delete'],
             ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'c.id'],
@@ -48,9 +50,9 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode', 'hidden' => true],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select', 'hidden' => true,
                     'options' => $this->BLocale->getAvailableCountries()],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at'],
+            ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at', 'cell' => 'datetime'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
-            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true],
+            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'export' => true,
@@ -80,6 +82,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             $this->gridOrmConfig($config['orm']);
         }
         $config['grid_before_create'] = 'customerGridRegister';
+        $config['callbacks'] = ['componentDidMount' => 'customerGridRegister'];
         return $config;
     }
 
@@ -110,18 +113,18 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
                 'a',
                 [
                     'class' => ['btn', 'btn-default'],
-                    'title' => $this->BLocale->_('Redirect to frontend and create order'),
+                    'title' => $this->_('Redirect to frontend and create order'),
                     'href' => $this->BApp->href('customers/start_session?id=' . $m->id()),
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Log in as Customer')],
+                    ['span', null, $this->_('Log in as Customer')],
                 ]
             ];
         }
         if ($m->id()) {
             $saleStatistics = $m->saleStatistics();
-            $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'])
-                . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg']);
+            $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'], 'base')
+                . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg'], 'base');
         } else {
             $info = '';
         }
@@ -176,60 +179,27 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             if (!empty($data['default_billing_id'])) {
                 $address = $hlp->load($data['default_billing_id']);
                 /** @type Sellvana_Customer_Model_Address $address */
-                if ($address->customer_id == $customer->id) {
+                if ($address->is_default_billing == 0 && $address->customer_id == $customer->id) {
                     $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
                     $address->set('is_default_billing', 1)->save();
                 }
             }
             if (!empty($data['default_shipping_id'])) {
-                $address = $hlp->load($data['default_billing_id']);
+                $address = $hlp->load($data['default_shipping_id']);
                 /** @type Sellvana_Customer_Model_Address $address */
-                if ($address->customer_id == $customer->id) {
+                if ($address->is_default_shipping == 0 && $address->customer_id == $customer->id) {
                     $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
                     $address->set('is_default_shipping', 1)->save();
                 }
             }
+
+            if (!empty($data['is_default'])) {
+                $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
+                foreach ($wishlists as $wishlist) {
+                    $wishlist->set('is_default', $wishlist->id() == $data['is_default'])->save();
+                }
+            }
         }
-    }
-
-    /**
-     * get config for grid: customers of group
-     * @param $group Sellvana_CustomerGroups_Model_Group
-     * @return array
-     */
-    public function getGroupCustomersConfig($group)
-    {
-        $class = $this->_modelClass;
-        $orm = $class::i()->orm('c')
-            ->select(['c.id', 'c.firstname', 'c.lastname', 'c.email'])
-            ->join('Sellvana_CustomerGroups_Model_Group', ['c.customer_group', '=', 'cg.id'], 'cg')
-            ->where('c.customer_group', $group ? $group->id : 0);
-
-        $config = parent::gridConfig();
-
-        // TODO for empty local grid, it throws exception
-        unset($config['orm']);
-        $config['data'] = $orm->find_many();
-        $config['id'] = 'group_customers_grid_' . $group->id;
-        $config['columns'] = [
-            ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200],
-        ];
-        $config['actions'] = [
-            'add' => ['caption' => 'Add customer'],
-        ];
-        $config['filters'] = [
-            ['field' => 'firstname', 'type' => 'text'],
-            ['field' => 'lastname', 'type' => 'text'],
-            ['field' => 'email', 'type' => 'text'],
-        ];
-        $config['data_mode'] = 'local';
-
-
-        return ['config' => $config];
     }
 
     /**
@@ -281,15 +251,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         }
 
         $this->BResponse->redirect($redirectUrl);
-    }
-
-    public function getCustomerRecent()
-    {
-        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - 7 * 86400);
-        $result = $this->Sellvana_Customer_Model_Customer->orm()
-            ->where_gte('create_at', $recent)
-            ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])->find_many();
-        return $result;
     }
 
     public function onHeaderSearch($args)

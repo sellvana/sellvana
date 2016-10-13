@@ -1,4 +1,5 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
 {% set type = THIS.get('address_type') %}
 {% set validator = THIS.validator(type ~ '-form', cart) %}
 
@@ -44,7 +45,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_country' %}
             <label for="{{ field }}" class="control-label required">{{ "Country" |_ }}</label>
-            {% set countries = THIS.get('countries') %}
+            {% set countries = APP.instance('BLocale').getAvailableCountries() %}
             {% set defC = validator.fieldValue(field) %}
             <select required class="geo-country required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[country]" id="{{ field }}">
                 <option value="">{{ "Select an option" |_ }}</option>
@@ -59,7 +60,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_region' %}
             <label for="{{ field }}" class="control-label required">{{ "Region" |_ }}</label>
-            <select required class="geo-region required {{ validator.fieldClass(field) }} form-control" style="display: none" name="{{ type }}[region]" id="{{ field }}">
+            <select class="geo-region required {{ validator.fieldClass(field) }} form-control" style="display: none" name="{{ type }}[region]" id="{{ field }}">
                 <option value="">{{ "Select an option" |_ }}</option>
             </select>
             <input type="text" class="geo-region required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[region]" id="{{ field }}" value="{{ validator.fieldValue(field) }}"/>
@@ -81,6 +82,16 @@
             {{ validator.errorHtml(field, field) | raw }}
         </div>
     </div>
+
+    {% if customer %}
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = 'save' %}
+            <input type="checkbox" name="{{ field }}" id="{{ field }}">
+            <label for="{{ field }}" class="control-label">{{ "Save to address book"|_ }}</label>
+        </div>
+    </div>
+    {% endif %}
 </fieldset>
 
 <script>
@@ -88,6 +99,6 @@
         $(function() {
             $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue(type ~ '_country') }}', region:'{{ validator.fieldValue(type ~ '_region') }}'});
             $('#{{ type }}-form').validate();
-        })
+        });
     })
 </script>

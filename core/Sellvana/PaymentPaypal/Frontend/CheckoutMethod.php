@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_PaymentPaypal_Frontend_CheckoutMethod extends Sellvana_Sales_Method_Checkout_Abstract
 {

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Checkout_Frontend_Controller_Cart
@@ -24,19 +24,19 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
         $layout = $this->BLayout;
 
         $this->layout('/cart');
-        $layout->view('cart')->set('redirectLogin', false);
+        $layout->getView('cart')->set('redirectLogin', false);
         if ($this->BApp->m('Sellvana_Customer') && $this->Sellvana_Customer_Model_Customer->isLoggedIn() == false) {
-            $layout->view('cart')->set('redirectLogin', true);
+            $layout->getView('cart')->set('redirectLogin', true);
         }
 
-        $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
+        $layout->getView('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
-        $shippingEstimate = $cart->getData('shipping_estimate');
-        $layout->view('cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
+        $shippingEstimate = $cart->getData('shipping_rates');
+        $layout->getView('cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
     }
 
     public function action_add__POST()
@@ -45,7 +45,7 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
         $post = $this->BRequest->post();
         $result = [];
 
-        // Sellvana_Sales_Workflow_Cart -> Sellvana_CustomField_Frontend -> Sellvana_Sales_Model_Cart
+        // Sellvana_Sales_Workflow_Cart -> Sellvana_CatalogFields_Frontend -> Sellvana_Sales_Model_Cart
         $this->Sellvana_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
 
         $item = $result['items'][0];
@@ -87,7 +87,7 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
                             . htmlspecialchars($p->product_name)
                             . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
                             . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
-                        'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
+                        'minicart_html' => $this->BLayout->getView('checkout/cart/block')->render(),
                         'cnt' => $cart->itemQty(),
                         'subtotal' => $cart->subtotal,
                     ];
@@ -115,6 +115,9 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
                             break;
                         case 'removed':
                             $this->message('Cart item has been removed');
+                            break;
+                        case 'warning':
+                            $this->message($item['message'], 'warning');
                             break;
                         case 'error':
                             $this->message($item['message'], 'error');

@@ -25,10 +25,10 @@
         {{ forms.select(fieldData,  {field:'currency', label:'Accepted Currency'|_, options: currencies }) }}
         {{ forms.boolean(fieldData, {field:'email_customer', label:'Email Customer'|_ }) }}
         {{ forms.input(fieldData,   {field:'merchant_email', label:'Merchant\'s Email'|_, attr: 'data-rule-number="true"' }) }}
-        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, options: cardTypes, attr: 'multiple="multiple"'}) }}
+        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, multiple: true, options: cardTypes, attr: 'multiple="multiple"'}) }}
         {{ forms.boolean(fieldData, {field:'useccv', label:'Credit Card Verification'|_ }) }}
         {{ forms.select(fieldData,  {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} }) }}
-        {{ forms.select(fieldData,  {field:'specific_country', label:'Payment from Specific Countries'|_, options: countries, attr: 'multiple="multiple"'}) }}
+        {{ forms.select(fieldData,  {field:'specific_country', label:'Payment from Specific Countries'|_, multiple: true, options: countries, attr: 'multiple="multiple"'}) }}
         {{ forms.boolean(fieldData, {field:'allow_partial_authorization', label:'Allow Partial Authorization'|_ }) }}
     {{ forms.accordion_panel_end }}
 
@@ -47,10 +47,34 @@
         {{ forms.boolean(fieldData, {field:'debug', label:'Debug'|_ }) }}
         {{ forms.boolean(fieldData, {field:'email_customer', label:'Email Customer'|_ }) }}
         {{ forms.input(fieldData,   {field:'merchant_email', label:'Merchant\'s Email'|_ }) }}
-        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, attr: ' multiple="multiple"', options: cardTypes }) }}
+        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, multiple: true, attr: ' multiple="multiple"', options: cardTypes }) }}
         {{ forms.boolean(fieldData, {field:'useccv', label:'Credit Card Verification'|_ }) }}
         {{ forms.select(fieldData,  {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} }) }}
-        {{ forms.select(fieldData,  {field:'specificcountry', label:'Payment from Specific Countries'|_, attr: 'multiple="multiple"', options: countries }) }}
+        {{ forms.select(fieldData,  {field:'specificcountry', label:'Payment from Specific Countries'|_, multiple: true, attr: 'multiple="multiple"', options: countries }) }}
+        {{ forms.input(fieldData,   {field:'min_order_total', label:'Minimum Order Total'|_ }) }}
+        {{ forms.input(fieldData,   {field:'max_order_total', label:'Maximum Order Total'|_ }) }}
+        {{ forms.input(fieldData,   {field:'sort_order', label:'Sort Order'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
+    {% set fieldData = { model: c, id_prefix: 'authorizenet_sim', name_prefix: 'config[modules][Sellvana_PaymentAuthorizeNet][sim]', get_prefix:'modules/Sellvana_PaymentAuthorizeNet/sim' } %}
+    {{ forms.accordion_panel_start({label:'Authorize.net Server Integration Method API'|_, id:'settings-Sellvana_PaymentAuthorizeNet-group2'}) }}
+        {{ forms.boolean(fieldData, {field:'active', label:'Enabled'|_ }) }}
+        {{ forms.input(fieldData,   {field:'title', label:'Title'|_ }) }}
+        {{ forms.input(fieldData,   {field:'login', label:'API Login ID'|_, type: "password" }) }}
+        {{ forms.input(fieldData,   {field:'trans_key', label:'Transaction Key'|_, type: "password" }) }}
+        {{ forms.input(fieldData,   {field:'trans_md5', label:'Merchant MD5'|_, type: "password" }) }}
+        {{ forms.select(fieldData,  {field:'payment_action', label:'Payment Action'|_, options: paymentActions }) }}
+        {{ forms.select(fieldData,  {field:'order_status', label:'New Order Status'|_, options: orderStatuses }) }}
+        {{ forms.boolean(fieldData, {field:'test', label:'Test Mode'|_ }) }}
+        {{ forms.input(fieldData,   {field:'cgi_url', label:'Gateway URL'|_, value: gatewayUrl }) }}
+        {{ forms.select(fieldData,  {field:'currency', label:'Accepted Currency'|_, options: currencies }) }}
+        {{ forms.boolean(fieldData, {field:'debug', label:'Debug'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'email_customer', label:'Email Customer'|_ }) }}
+        {{ forms.input(fieldData,   {field:'merchant_email', label:'Merchant\'s Email'|_ }) }}
+        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, multiple: true, attr: ' multiple="multiple"', options: cardTypes }) }}
+        {{ forms.boolean(fieldData, {field:'useccv', label:'Credit Card Verification'|_ }) }}
+        {{ forms.select(fieldData,  {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} }) }}
+        {{ forms.select(fieldData,  {field:'specificcountry', label:'Payment from Specific Countries'|_, multiple: true, attr: 'multiple="multiple"', options: countries }) }}
         {{ forms.input(fieldData,   {field:'min_order_total', label:'Minimum Order Total'|_ }) }}
         {{ forms.input(fieldData,   {field:'max_order_total', label:'Maximum Order Total'|_ }) }}
         {{ forms.input(fieldData,   {field:'sort_order', label:'Sort Order'|_ }) }}

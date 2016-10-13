@@ -1,20 +1,20 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Core_Migrate
  *
- * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
  * @property FCom_Core_Model_ImportExport_Model $FCom_Core_Model_ImportExport_Model
  * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
  * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ * @property FCom_Core_Model_ExternalConfig $FCom_Core_Model_ExternalConfig
  */
 
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_2_0()
+    public function install__0_5_0_0()
     {
         $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
         if (!$this->BDb->ddlTableExists($tMediaLibrary)) {
@@ -47,7 +47,7 @@ class FCom_Core_Migrate extends BClass
         ]);
         $this->BConfig->set('cookie/session_check_ip', 1, false, true);
         $this->BConfig->writeConfigFiles();
-        $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_ImportExport_Id->table(), [
             BDb::COLUMNS => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
@@ -57,6 +57,7 @@ class FCom_Core_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
+            BDb::PRIMARY => '(id)',
         ]);
 
         $this->BDb->run("DROP TABLE IF EXISTS fcom_import_info");
@@ -114,9 +115,9 @@ class FCom_Core_Migrate extends BClass
                 ],
             ]
         );
-        if (!$this->BConfig->get('cache/default_backend')) {
+        if (!$this->BConfig->get('core/cache/default_backend')) {
             $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
-            $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
+            $this->BConfig->set('core/cache/default_backend', $this->_defaultBackend, false, true);
             $this->BConfig->writeConfigFiles('core');
         }
     }
@@ -160,7 +161,7 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         //Source, model, import id, local id
-        $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_ImportExport_Id->table(), [
             BDb::COLUMNS => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
@@ -230,9 +231,9 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
-        if (!$this->BConfig->get('cache/default_backend')) {
+        if (!$this->BConfig->get('core/cache/default_backend')) {
             $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
-            $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
+            $this->BConfig->set('core/cache/default_backend', $this->_defaultBackend, false, true);
             $this->BConfig->writeConfigFiles('core');
         }
     }
@@ -292,5 +293,26 @@ UPDATE {$tModule} SET module_name=CASE module_name
         @$this->BUtil->ensureDir($cacheDir);
 
         $this->BMigrate->stopMigration();
+    }
+
+    public function upgrade__0_5_0_0__0_5_0_1()
+    {
+        $tableExternalConfig = $this->FCom_Core_Model_ExternalConfig->table();
+
+        $tableDef = [
+            BDb::COLUMNS => [
+                'id'                => 'int(10) unsigned not null auto_increment',
+                'source_type'       => 'varchar(50) not null',
+                'path'              => 'varchar(255) not null',
+                'value'             => 'text not null',
+                'site_id'           => 'int(11) unsigned default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS    => [
+                'UNQ_external_config' => 'UNIQUE (source_type, path, site_id)',
+            ],
+        ];
+
+        $this->BDb->ddlTableDef($tableExternalConfig, $tableDef);
     }
 }

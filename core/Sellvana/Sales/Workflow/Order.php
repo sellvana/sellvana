@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Workflow_Order
@@ -6,6 +6,7 @@
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
 {
@@ -15,6 +16,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
     {
         /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['result']['order'];
+        $order->generateToken();
         $order->state()->overall()->setPlaced();
         $order->addHistoryEvent('placed', 'Order was placed by a customer');
 
@@ -23,9 +25,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
             $order->addHistoryEvent('auto_review', 'Order was sent for review as per default policy');
         }
 
-        $order->generateToken()->save();
-
-        $this->Sellvana_Sales_Model_Order_Shipment->createShipmentFromOrder($order);
+        $order->save();
     }
 
     /**
@@ -140,5 +140,46 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $label = $newState->getValueLabel();
         $args['order']->addHistoryEvent('custom_state', 'Admin user has changed custom order state to "' . $label . '"');
         $args['order']->save();
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order[] $args
+     */
+    public function action_adminMarksOrderAsPaid($args)
+    {
+        $args['order']->markAsPaid();
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order[] $args
+     */
+    public function action_adminMarksOrderAsShipped($args)
+    {
+        $order = $args['order'];
+        $shipments = $order->shipments();
+        if (!count($shipments)) {
+            $qtys = [];
+            $canShip = false;
+            foreach ($order->items() as $oItem) {
+                $qty = $oItem->getQtyCanShip();
+                if ($qty > 0) {
+                    $canShip = true;
+                }
+                $qtys[$oItem->id()] = $qty;
+            }
+            if ($canShip) {
+                $this->Sellvana_Sales_Main->workflowAction('adminCreatesShipment', [
+                    'order' => $order,
+                    'data' => [
+                        'carrier_code' => $order->get('shipping_method'),
+                        'carrier_desc' => $order->getShippingMethod()->getDescription(),
+                        'service_code' => $order->get('shipping_service'),
+                        'service_desc' => $order->getShippingServiceTitle(),
+                    ],
+                    'qtys' => $qtys,
+                ]);
+            }
+        }
+        $order->shipAllShipments();
     }
 }

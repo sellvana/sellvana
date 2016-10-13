@@ -1,11 +1,11 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Model class for table "fcom_product".
  *
  * The followings are the available columns in table 'fcom_product':
  *
-*@property string  $id
+ * @property string  $id
  * @property string  $product_sku
  * @property string  $product_name
  * @property string  $short_description
@@ -41,9 +41,6 @@
  * @property Sellvana_Catalog_Model_ProductPrice     $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Customer_Model_Customer        $Sellvana_Customer_Model_Customer
  * @property Sellvana_CustomerGroups_Model_Group     $Sellvana_CustomerGroups_Model_Group
- * @property Sellvana_CustomField_Model_Field        $Sellvana_CustomField_Model_Field
- * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
- * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
  * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
  * @property Sellvana_MultiSite_Frontend             $Sellvana_MultiSite_Frontend
  * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
@@ -65,6 +62,26 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'vendor_disc' => 'Supplier Discontinued',
             'mfr_disc' => 'MFR Discontinued',
         ],
+        'rollover_effects' => [
+            'fade' => 'Fade',
+            'clip' => 'Clip',
+            'blind' => 'Blinds',
+            'drop' => 'Drop',
+            'fold' => 'Fold',
+            'highlight' => 'Highlight',
+            'puff' => 'Puff',
+            'pulsate' => 'Pulsate',
+            'slide' => 'Slide'
+        ],
+        'grid_tile_type' => [
+            'D' => 'Default',
+            'C' => 'Cms Block',
+            'V' => 'Custom View',
+        ],
+    ];
+
+    protected static $_fieldDefaults = [
+        'base_price' => 0,
     ];
 
     protected static $_validationRules = [
@@ -93,13 +110,22 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ],
-        'unique_key' => 'product_sku'
+        'unique_key' => 'product_sku',
+        'custom_data' => true,
+    ];
+
+    protected static $_dataFieldsMap = [
+        'product_name_lang_fields' => 'name_lang_fields',
+        'short_description_lang_fields' => 'short_desc_lang_fields',
+        'description_lang_fields' => 'desc_lang_fields',
     ];
 
     protected $_importErrors = null;
     protected $_dataImport = [];
 
     protected $_priceModels;
+
+    protected $_images;
 
     protected static $_urlPrefix;
 
@@ -116,7 +142,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->BLocale->_('The SKU number entered is already in use. Please enter a valid SKU number.');
+            return $this->_('The SKU number entered is already in use. Please enter a valid SKU number.');
         }
         return true;
     }
@@ -134,7 +160,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->BLocale->_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->_('The URL Key entered is already in use. Please enter a valid URL Key.');
         }
         return true;
     }
@@ -175,13 +201,28 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->BApp->frontendHref($prefix . ($category ? $category->get('url_path') . '/' : '') . $this->get('url_key'));
     }
 
-    public function imageUrl($full = false)
+    public function imageUrl($full = false, $imgType = 'default')
     {
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
-        $thumbUrl = $this->get('thumb_url');
+        //$url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();// what is the point in this? Image resources are always in same path
+        $url = '';
+        //$thumbUrl = $this->get('thumb_url');
+        //if ($thumbUrl) {
+        //    return $url . $media . '/' . $thumbUrl;
+        //}
+        switch ($imgType) {
+            case 'thumb':
+                $thumbUrl = $this->getThumbPath();
+                break;
+            case 'rollover':
+                $thumbUrl = $this->getRolloverPath();
+                break;
+            default :
+                $thumbUrl = $this->getDefaultImagePath();
+                break;
+        }
         if ($thumbUrl) {
             return $url . $media . '/' . $thumbUrl;
         }
@@ -199,9 +240,25 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $default;
     }
 
+    public function defaultImgUrl($w, $h = null, $full = false)
+    {
+        $imgUrl = $this->imageUrl(false, 'default');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
+    }
+
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'thumb');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
+    }
+
+    public function rolloverUrl($w, $h = null, $full = false)
+    {
+        $imgUrl = $this->imageUrl(false, 'rollover');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function onBeforeSave()
@@ -209,34 +266,35 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         //todo: check out for unique url_key before save
-        if (!$this->get('url_key')) $this->generateUrlKey();
+        if (!$this->get('url_key')) {
+            $this->generateUrlKey();
+        }
 
-        // Cleanup possible bad input
-        //if ($this->get('sale_price') === '') {
-        //    $this->set('sale_price', null);
-        //}
-        //if ($this->get('cost') === '') {
-        //    $this->set('cost', null);
-        //}
-        //if ($this->get('msrp') === '') {
-        //    $this->set('msrp', null);
-        //}
-        //if ($this->get('map') === '') {
-        //    $this->set('map', null);
-        //}
-        //if ($this->get('markup') === '') {
-        //    $this->set('markup', null);
-        //}
+        if (!$this->get('description')) {
+            $this->set('description', $this->get('short_description'));
+        }
+
+        switch ($this->get('grid_tile_type')) {
+            case 'D':
+                $this->set([
+                    'custom_grid_view' => null,
+                    'custom_list_view' => null,
+                ]);
+                break;
+
+            case 'C':
+                $this->set([
+                    'custom_grid_view' => 'catalog/product/cms-tile',
+                    'custom_list_view' => 'catalog/product/cms-tile',
+                ]);
+                break;
+
+            case 'V':
+                //TODO: any changes necessary?
+                break;
+        }
 
         return true;
-    }
-
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $thumbPath = $this->FCom_Core_Main->resizeUrl($this->imageUrl(), ['s' => 48]);
-        $this->set('thumb_path', $thumbPath);
-
     }
 
     public function onAfterSave()
@@ -255,7 +313,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $saveAgain = true;
         }
         if ($saveAgain) {
-            $this->save();
+            $this->save(false);
         }
         $this->Sellvana_Catalog_Model_ProductPrice->parseAndSaveDefaultPrices($this);
 
@@ -403,29 +461,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         return $categories;
     }
-/*
-    public function customFields($product)
-    {
-        return $this->Sellvana_CustomField_Model_ProductField->productFields($product);
-    }
-*/
-
-    /**
-     * @return array
-     */
-    public function customFieldsShowOnFrontend()
-    {
-        $result = [];
-        $fields = $this->Sellvana_CustomField_Model_ProductField->productFields($this);
-        if ($fields) {
-            foreach ($fields as $f) {
-                if ($f->get('frontend_show')) {
-                    $result[] = $f;
-                }
-            }
-        }
-        return $result;
-    }
 
     /**
      * @param string $q
@@ -464,16 +499,27 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param $type
-     * @return ORM
+     * @return BORM
      */
     public function mediaORM($type)
     {
-        return $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
-            ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
-            //->select(array('pa.manuf_vendor_id'))
-            ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
-            ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'])
-            ->order_by_asc('position');
+        $orm = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
+                    ->where('pa.product_id', $this->id)
+                    ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
+                    ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label', 'pa.media_type', 'a.data_serialized']);
+
+        if (is_array($type)) {
+            list($I, $V) = $type;
+            // $orm->where_raw("pa.media_type = '$I' OR (pa.media_type = '$V' AND pa.is_default = 1)")
+            $orm->where_raw("(pa.media_type = '$I' OR pa.media_type = '$V')")
+                ->order_by_desc('pa.media_type')
+                ->order_by_asc('position');
+        } else {
+            $orm->where('pa.media_type', $type)
+                ->order_by_asc('position');
+        }
+
+        return $orm;
     }
 
     /**
@@ -483,6 +529,31 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function media($type)
     {
         return $this->mediaORM($type)->find_many_assoc();
+    }
+
+    /**
+     * @param bool|false $isVideoIncluded
+     */
+    public function gallery($isVideoIncluded = false)
+    {
+        $type = 'I';
+        if ($isVideoIncluded) {
+            $type = ['I', 'V'];
+        }
+
+        $mediaItems = $this->mediaORM($type)
+            ->where(["pa.in_gallery" => 1])
+            ->find_many_assoc();
+
+        // Remove default width and height for responsive
+        foreach ($mediaItems as $k => $media) {
+            $html = $media->getData('html');
+            if ($html) {
+                $mediaItems[$k]->setData('html', preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '', $html));
+            }
+        }
+
+        return $mediaItems;
     }
 
     /**
@@ -566,8 +637,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $result = [];
         //$result['status'] = '';
 
-        $customFieldsOptions = $this->Sellvana_CustomField_Model_FieldOption->getListAssoc();
-
         //HANDLE IMPORT
         static $cfIntersection = '';
         $customFields = [];
@@ -600,43 +669,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
 
-
             //HANDLE CUSTOM FIELDS
-            if ($config['import']['custom_fields']['import']) {
-                //find intersection of custom fields with data fields
-                    $cfFields = $this->Sellvana_CustomField_Model_Field->getListAssoc();
-                    $cfKeys = array_keys($cfFields);
-                    $dataKeys = array_keys($d);
-                    $cfIntersection = array_intersect($cfKeys, $dataKeys);
-
-                    if ($cfIntersection) {
-                        //get custom fields values from data
-                        foreach ($cfIntersection as $cfk) {
-                            $field = $cfFields[$cfk];
-                            $dataValue = $d[$cfk];
-                            if ($config['import']['custom_fields']['create_missing_options']) {
-                                //create missing custom field options
-                                if (!empty($customFieldsOptions[$field->id()])) {
-                                    if (!in_array($dataValue, $customFieldsOptions[$field->id()])) {
-                                        try {
-                                            $this->Sellvana_CustomField_Model_FieldOption->orm()
-                                                    ->create(['field_id' => $field->id(), 'label' => $dataValue])
-                                                    ->save();
-                                        } catch (Exception $e) {
-                                            $errors[] = $e->getMessage();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
+            $this->BEvents->fire(__METHOD__ . ':row', ['config' => $config, 'data' => $d]);
 
             //HANDLE PRODUCT
             $p = false;
-            if ('create_or_update' == $config['import']['actions'] ||
-                    'update' == $config['import']['actions']
-                    ) {
+            if ('create_or_update' == $config['import']['actions'] || 'update' == $config['import']['actions']) {
                 if (isset($d['product_sku'])) {
                     $p = $this->orm()->where("product_sku", $d['product_sku'])->find_one();
                 }
@@ -790,39 +828,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         //HANDLE CUSTOM FIELDS to product relations
-        if ($config['import']['custom_fields']['import']
-            && !empty($cfIntersection) && !empty($productIds) && !empty($cfFields)) {
-            //get custom fields values from data
-            $fieldIds = [];
-            foreach ($cfIntersection as $cfk) {
-                $field = $cfFields[$cfk];
-                $fieldIds[] = $field->id();
-            }
-
-            //get or create product custom field
-            $customsResult = $this->Sellvana_CustomField_Model_ProductField->orm()->where_in("product_id", $productIds)->find_many();
-            foreach ($customsResult as $cus) {
-                $customsResult[$cus->product_id] = $cus;
-            }
-            $productCustomFields = [];
-            foreach ($productIds as $pId) {
-                if (!empty($customFields[$pId])) {
-                    $productCustomFields = $customFields[$pId];
-                }
-                $productCustomFields['_add_field_ids'] = implode(",", $fieldIds);
-                $productCustomFields['product_id'] = $pId;
-                if (!empty($customsResult[$pId])) {
-                    $custom = $customsResult[$pId];
-                } else {
-                    $custom = $this->Sellvana_CustomField_Model_ProductField->create();
-                }
-                $custom->set($productCustomFields);
-                $custom->save();
-                unset($custom);
-            }
-            unset($customFields);
-            unset($customsResult);
-        }
+        $this->BEvents->fire(__METHOD__ . ':after_loop', ['config' => $config, 'data' => $d]);
 
         if (!empty($relatedProducts)) {
             $relatedResult = $this->_importRelatedProducts($relatedProducts);
@@ -888,72 +894,107 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param bool|int $limit
+     * @param bool $incAvgRating
+     * @param bool|int $filterByRating
+     * @return array
+     */
+    public function reviews($limit = false, $incAvgRating = true, $filterByRating = false)
+    {
+        $numReviews = 0;
+        $pageData = [];
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            $ratings = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.rating')->select_expr('COUNT(pr.id)', 'count')
+                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->group_by('pr.rating')->find_many();
+
+            $stats = $this->getRatingStats($ratings, $incAvgRating);
+            $numReviews = $stats['num_reviews'];
+            $avgRating = $stats['avg_rating'];
+            $ratingByStars = $stats['rating_by_stars'];
+
+            $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
+                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->order_by_expr('(pr.helpful / pr.helpful_voices) DESC');
+
+            if ((int)$filterByRating) {
+                $reviews->where('rating', (int)$filterByRating);
+            }
+
+            if ((int)$limit) {
+                $reviews->limit($limit);
+            }
+
+            $reviews = $reviews->order_by_expr('pr.create_at DESC');
+
+            $pageData = $reviews->paginate($this->BRequest->get(), [
+                'ps' => 3,
+            ]);
+        }
+
+        return [
+            'items' => $pageData,
+            'ratings' => isset($ratingByStars) ? $ratingByStars : [],
+            'avgRating' => isset($avgRating) ? $avgRating : [],
+            'numReviews' => $numReviews,
+        ];
+    }
+
+    /**
+     * @param array $ratings
      * @param bool $incAvgRating
      * @return array
      */
-    public function reviews($incAvgRating = true)
+    public function getRatingStats($ratings = [], $incAvgRating = true)
     {
-        if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
-            $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
-                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
-                ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
-
-            if ($incAvgRating) {
-                $avgRating = $this->calcAverageRating($reviews);
-            }
-        } else {
-            $reviews = [];
+        $avgRating = false;
+        $numReviews = 0;
+        $reviewConfig = $this->Sellvana_ProductReviews_Model_Review->config();
+        $ratingByStars = [];
+        for ($i = $reviewConfig['max']; $i >= $reviewConfig['min']; $i -= $reviewConfig['step']) {
+            $ratingByStars[$i] = 0;
         }
+
+        if (!empty($ratings)) {
+            foreach ($ratings as $review) {
+                $avgRating += $review->rating * $review->count;
+                $numReviews += $review->count;
+                $ratingByStars[$review->rating] = $review->count;
+            }
+
+            $avgRating = trim(number_format($avgRating / $numReviews, 2), '0.');
+        }
+
         return [
-            'items' => $reviews,
-            'avgRating' => isset($avgRating) ? $avgRating : [],
-            'numReviews' => count($reviews),
+            'num_reviews' => $numReviews,
+            'avg_rating' => $avgRating,
+            'rating_by_stars' => $ratingByStars
         ];
     }
 
     /**
-     * @param array $reviews
+     * @param array
      * @return array
      */
-    public function calcAverageRating($reviews = [])
+    public function getProductLinks($types = [])
     {
-        $rs = [
-            'rating' => 0,
-            'rating1' => 0,
-            'rating2' => 0,
-            'rating3' => 0,
-        ];
-        if (!empty($reviews)) {
-            $numReviews = count($reviews);
-            foreach ($reviews as $review) {
-                $rs['rating'] += $review->rating;
-                $rs['rating1'] += $review->rating1;
-                $rs['rating2'] += $review->rating2;
-                $rs['rating3'] += $review->rating3;
-            }
-
-            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
-            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
-            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
-            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
-        }
-
-        return $rs;
-    }
-
-    /**
-     * @return array
-     */
-    public function getProductLinks()
-    {
-        $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select('pl.link_type')
+        $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['p.*', 'pl.link_type'])
             ->left_outer_join('Sellvana_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
-        $productLink = [
-            'related'=> ['title' => $this->BLocale->_('Related Products'), 'products' => [] ],
-            'similar' => ['title' => $this->BLocale->_('You may also like these items'), 'products' => [] ],
-            'cross_sell' => ['title' => $this->BLocale->_('You may also like these items'), 'products' => [] ]
-        ];
+        $productLink = [];
+        if (empty($types) || in_array('related', $types)) {
+            $productLink['related'] = ['title' => $this->_('Related Products'), 'products' => [] ];
+        }
+        if (empty($types) || in_array('similar', $types)) {
+            $productLink['similar'] = ['title' => $this->_('You may also like these items'), 'products' => [] ];
+        }
+        if (empty($types) || in_array('cross_sell', $types)) {
+            $productLink['cross_sell'] = ['title' => $this->_('You may also like these items'), 'products' => [] ];
+        }
+
         foreach ($arrProduct as $product) {
             if (isset($productLink[$product->get('link_type')])) {
                 array_push($productLink[$product->get('link_type')]['products'], $product);
@@ -1140,9 +1181,18 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function backOrders()
     {
         return [
-            "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
-            "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
+            "NOT_BACK_ORDERS"         => $this->_("No Back Orders"),
+            "ALLOW_QUANTITY_BELOW" => $this->_("Allow Quantity Below 0")
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolloverEffects()
+    {
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        return $this->fieldOptions('rollover_effects');
     }
 
     /**
@@ -1151,11 +1201,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getInventoryModel()
     {
+        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
+        if (!$this->get('manage_inventory')) {
+            $invModel = $invHlp->create();
+            $this->set('inventory_model', $invModel);
+            return $invModel;
+        }
         $invModel = $this->get('inventory_model');
         if ($invModel !== null) {
             return $invModel;
         }
-        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
         // get inventory SKU from inventory SKU or product SKU if not specified
         $invSku = $this->get('inventory_sku');
         if (null === $invSku || '' === $invSku) {
@@ -1165,7 +1220,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $this->set('inventory_model', $invModel);
                 return $invModel;
             }
-            $this->set('inventory_sku', $invSku);
+            $this->set('inventory_sku', $invSku)->save();
         }
         // find inventory model
         $invModel = $invHlp->load($invSku, 'inventory_sku');
@@ -1189,105 +1244,38 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param string $type
-     * @param array|boolean $context
+     * @param array $context
      * @param bool $useDefault
      * @return Sellvana_Catalog_Model_ProductPrice
      */
-    public function getPriceModelByType($type, $context = null, $useDefault = true)
+    public function getPriceModelByType($type, $context = [], $useDefault = true)
     {
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
         if (!isset($this->_priceModels)) {
-            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this], true);
+            $priceHlp->collectProductsPrices([$this]);
         }
-        if (false === $this->_priceModels || empty($this->_priceModels[0][$type])) {
-            return null;
-        }
-
-        $prices = $this->_priceModels[0][$type];
-
-        if (!$context) {
-            return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
-        }
-
-        static $siteId = null, $customerGroupId = false, $currencyCode = false;
-        if (null === $siteId) {
-            $modHlp = $this->BModuleRegistry;
-            $siteId = false;
-            if ($modHlp->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
-                $siteId = $site ? $site->id() : false;
-            }
-            if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
-                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-                $customerGroupId = $customer ? $customer->get('customer_group_id')
-                    : $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
-            }
-            if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
-                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
-                $currencyCode = $currency ?: false;
-            }
-        }
-
-        if (true === $context) {
-            $context = [
-                'site_id' => true,
-                'customer_group_id' => true,
-                'currency_code' => true,
-            ];
-        }
-
-        $s = !empty($context['site_id']) ? (true !== $context['site_id'] ? $context['site_id'] : $siteId) : '*';
-        $g = !empty($context['customer_group_id']) ? (true !== $context['customer_group_id'] ? $context['customer_group_id'] : $customerGroupId) : '*';
-        $c = !empty($context['currency_code']) ? (true !== $context['currency_code'] ? $context['currency_code'] : $currencyCode) : '*';
-
-        if (isset($prices["{$s}:{$g}:{$c}"])) {
-            return $prices["{$s}:{$g}:{$c}"];
-        }
-        if (!$useDefault) {
-            return null;
-        }
-        if ($s !== '*' && isset($prices["*:{$g}:{$c}"])) {
-            return $prices["*:{$g}:{$c}"];
-        }
-        if ($g !== '*' && isset($prices["{$s}:*:{$c}"])) {
-            return $prices["{$s}:*:{$c}"];
-        }
-        if ($c !== '*' && isset($prices["{$s}:{$g}:*"])) {
-            return $prices["{$s}:{$g}:*"];
-        }
-        if ($s !== '*' && $g !== '*' && isset($prices["*:*:{$c}"])) {
-            return $prices["*:*:{$c}"];
-        }
-        if ($s !== '*' && $c !== '*' && isset($prices["*:{$g}:*"])) {
-            return $prices["*:{$g}:*"];
-        }
-        if ($g !== '*' && $c !== '*' && isset($prices["*:*:{$c}"])) {
-            return $prices["*:*:{$c}"];
-        }
-        return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+        return $priceHlp->getPriceModelByType($this->_priceModels, $type, $context, $useDefault);
     }
 
     /**
      * Get final price of product in catalog
      *
-     * @param boolean|array $context
+     * @param array $context
      * @return mixed
-     *
-     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
-    public function getCatalogPrice($context = true)
+    public function getCatalogPrice($context = [])
     {
-        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+        if (!empty($context['currency_code']) && $context['currency_code'] !== '*') {
             $currency = $context['currency_code'];
         } else {
             $currency = null;
         }
-        $priceModel = $this->getPriceModelByType('base', $context);
-        $price = $priceModel ? $priceModel->getPrice(null, $currency) : 0;
 
-        $salePriceModel = $this->getPriceModelByType('sale', $context);
-        if ($salePriceModel && $salePriceModel->isValid()) {
-            $price = min($price, $salePriceModel->getPrice(null, $currency));
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        if (!isset($this->_priceModels)) {
+            $priceHlp->collectProductsPrices([$this]);
         }
+        $price = $priceHlp->getCatalogPrice($this->_priceModels, $context);
 
         $this->BEvents->fire(__METHOD__, [
             'product' => $this,
@@ -1309,11 +1297,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
          * - pos: 0,1,2,3
          */
         $prices = [];
-        $context = true;
+        $context = [];
 
-        $basePriceModel = $this->getPriceModelByType('base', $context);
-        $mapPriceModel = $this->getPriceModelByType('map', $context);
-        $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        if (!isset($this->_priceModels)) {
+            $priceHlp->collectProductsPrices([$this]);
+        }
+        $basePriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'base', $context);
+        $mapPriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'map', $context);
+        $msrpPriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'msrp', $context);
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();
@@ -1322,7 +1314,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($mapPriceModel) {
             $mapPrice = $mapPriceModel->getPrice();
             if ($mapPrice > $finalPrice) {
-                $finalText = $this->BLocale->_('Add to cart');
+                $finalText = $this->_('Add to cart');
             }
         }
 
@@ -1363,7 +1355,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $prices;
     }
 
-    public function getAllTierPrices($context = true)
+    public function getAllTierPrices($context = [])
     {
         return $this->getPriceModelByType('tier', $context);
     }
@@ -1375,7 +1367,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array|boolean $context
      * @return null|float
      */
-    public function getTierPrice($qty, $context = true)
+    public function getTierPrice($qty, $context = [])
     {
         /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
         $tierPrices = $this->getPriceModelByType('tier', $context);
@@ -1405,39 +1397,72 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $itemPrice;
     }
 
-    public function _getLanguageValue($staticField, $dataField)
-    {
-        $langValuesJson = $this->getData($dataField);
-        if ($langValuesJson) {
-            $langValues = $this->BUtil->fromJson($langValuesJson);
-            $curLocale = str_replace('_', '-', $this->BLocale->getCurrentLocale());
-            foreach ($langValues as $lv) {
-                if ($lv['lang_code'] === $curLocale) {
-                    return $lv['value'];
-                }
-            }
-        }
-        return $this->get($staticField);
-    }
-
     public function getName()
     {
-        return $this->_getLanguageValue('product_name', 'name_lang_fields');
+        return $this->getLangField('product_name');
     }
 
     public function getDescription()
     {
-        return $this->_getLanguageValue('description', 'desc_lang_fields');
+        return $this->getLangField('description');
     }
 
     public function getShortDescription()
     {
-        return $this->_getLanguageValue('short_description', 'short_desc_lang_fields');
+        return $this->getLangField('short_description');
     }
 
     public function __destruct()
     {
         parent::__destruct();
         unset($this->_priceModels);
+    }
+
+    public function setProductImages($images)
+    {
+        if (empty($this->_images)) {
+            $this->_images = $images;
+        } else {
+            $this->_images = array_merge($this->_images, $images);
+        }
+        return $this;
+    }
+
+    public function getThumbPath()
+    {
+        if (!isset($this->_images['thumb'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['thumb']*/);
+        }
+        return $this->_images['thumb'];
+    }
+
+    public function getRolloverPath()
+    {
+        if (!isset($this->_images['rollover'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['rollover']*/);
+        }
+        return $this->_images['rollover'];
+    }
+
+    public function getDefaultImagePath()
+    {
+        if (!isset($this->_images['default'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
+        }
+        return $this->_images['default'];
+    }
+
+    public function canOrder($qty = 1)
+    {
+        return !$this->get('manage_inventory') || $this->getInventoryModel()->canOrder($qty);
+    }
+
+    public function getGridTileTypeOptions()
+    {
+        $options = $this->fieldOptions('grid_tile_type');
+        if (!$this->BModuleRegistry->isLoaded('Sellvana_Cms')) {
+            unset($options['C']);
+        }
+        return $options;
     }
 }

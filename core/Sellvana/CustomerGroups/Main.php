@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CustomerGroups_Main
@@ -9,7 +9,7 @@ class Sellvana_CustomerGroups_Main extends BClass
 {
     public function onCustomerBeforeSave($args)
     {
-        $defCustGroup = $this->BConfig->get('modules/Sellvana_CustomerGroups/default_group_id');
-        $args['model']->set('customer_group', $defCustGroup);
+//        $defCustGroup = $this->BConfig->get('modules/Sellvana_CustomerGroups/default_group_id');
+//        $args['model']->set('customer_group', $defCustGroup);
     }
 }

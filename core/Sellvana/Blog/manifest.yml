@@ -1,7 +1,7 @@
 modules:
     Sellvana_Blog:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.1.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Cms: 0.1.0 } }
         auto_use: [ bootstrap, layout, views ]
 
@@ -24,6 +24,11 @@ modules:
                 routing:
                     - [ "/blog/post/?.action", Sellvana_Blog_Admin_Controller_Post ]
                     - [ "/blog/category/?.action", Sellvana_Blog_Admin_Controller_Category ]
+                uploads:
+                    blog-post-images:
+                        permission: blog
+                        filetype: jpeg,jpg,tiff,gif,png,bmp
+                        folder: media/blog/images
                 security:
                     request_fields_whitelist:
                         /blog/post/form:

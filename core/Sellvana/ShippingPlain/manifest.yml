@@ -1,7 +1,7 @@
 modules:
     Sellvana_ShippingPlain:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Sales: 0.1.10 } }
         category: [ Shipping ]
         title: Shipping Plain module
@@ -11,7 +11,11 @@ modules:
 
         auto_use: [ bootstrap ]
 
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+
         default_config:
-            modules:
-                Sellvana_ShippingPlain:
-                    conditionally_free_services: ['01', '02']
+            modules/Sellvana_ShippingPlain/enabled: 1
+            modules/Sellvana_ShippingPlain/conditionally_free_services: ['_02']
+            modules/Sellvana_ShippingPlain/services: ['_01', '_02']

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_ProductReviews_Model_Review
@@ -7,9 +7,6 @@
  * @property int $product_id
  * @property int $customer_id
  * @property int $rating
- * @property int $rating1
- * @property int $rating2
- * @property int $rating3
  * @property int $approved
  * @property int $helpful
  * @property int $helpful_voices
@@ -31,6 +28,11 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
        'min' => 0,
        'step' => 1,
     ];
+
+    protected static $_fieldDefaults = [
+        'verified_purchase' => 0,
+    ];
+
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['product_id', 'customer_id', 'create_at'],
@@ -49,9 +51,6 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
         /*array('helpful_voices', '@string', null, array('max' => 11)),
         array('rating', '@integer'),
-        array('rating1', '@integer'),
-        array('rating2', '@integer'),
-        array('rating3', '@integer'),
         array('approved', '@integer'),
         array('helpful', '@integer'),
         array('offensive', '@integer'),
@@ -60,15 +59,15 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     public function notify()
     {
-        $this->BLayout->view('email/prodreview-new-admin')->email();
-        $this->BLayout->view('email/prodreview-new-customer')->email();
+        $this->BLayout->getView('email/prodreview-new-admin')->email();
+        $this->BLayout->getView('email/prodreview-new-customer')->email();
         return $this;
     }
 
     public function confirm()
     {
         $this->set('approved', 1)->save();
-        $this->BLayout->view('email/prodreview-confirm-customer')->email();
+        $this->BLayout->getView('email/prodreview-confirm-customer')->email();
         return $this;
     }
 
@@ -80,27 +79,29 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         $pId = $this->get('product_id');
         if ($pId) { //make sure we have related product id
             $rating = $this->orm()->where('product_id', $pId)
-                           ->where('approved', 1)
-                           ->select('(avg(rating))', 'avg')
-                            #->select('(avg(rating1))', 'avg1')
-                            #->select('(avg(rating2))', 'avg2')
-                            #->select('(avg(rating3))', 'avg3')
-                           ->select('(count(1))', 'num')
-                           ->find_one();
+                ->where('approved', 1)
+                ->select('(avg(rating))', 'avg_rating')
+                ->select('(count(1))', 'num_reviews')
+                ->select('(count(rating))', 'num_upvotes')
+                ->find_one();
 
-            $this->Sellvana_Catalog_Model_Product->load($pId)
-                                             ->set('avg_rating', $rating->get('avg'))
-                                             ->set('num_reviews', $rating->get('num'))
-                                             ->save();
+            $this->Sellvana_Catalog_Model_Product->load($pId)->set($rating->as_array())->save();
         }
 
         return $this;
     }
 
-    public function helpful($mark)
+    public function helpful($mark, $add = false)
     {
+        if ($mark === 0) {
+            $mark = -1;
+        }
         $this->add('helpful', $mark);
-        $this->add('helpful_voices');
+
+        if ($add) {
+            $this->add('helpful_voices');
+        }
+
         $this->save();
         return $this;
     }
@@ -115,12 +116,30 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         $data = [];
         foreach ($products as $p) {
             $m = $p->avg_rating;
-            if     ($m >= 4) $v = '4 ==> 4 Stars & Up';
+            if ($m == 5) $v = '5 ==> 5 Stars Only';
+            elseif ($m >= 4) $v = '4 ==> 4 Stars & Up';
             elseif ($m >= 3) $v = '3 ==> 3 Stars & Up';
             elseif ($m >= 2) $v = '2 ==> 2 Stars & Up';
             elseif ($m >= 1) $v = '1 ==> 1 Star & Up';
             else $v = '';
             $data[$p->id()] = $v;
+        }
+        return $data;
+    }
+
+    public function indexAvgRatingLaplace($products, $field)
+    {
+        /** @see http://planspace.org/2014/08/17/how-to-sort-by-average-rating/ */
+
+        $data = [];
+        $a = 1;
+        $b = 2;
+        foreach ($products as $p) {
+            $upvotes = $p->get('num_upvotes');
+            $reviews = $p->get('num_reviews') * 5;
+            if ($upvotes && $reviews) {
+                $data[$p->id()] = ($upvotes + $a) / ($reviews + $b);
+            }
         }
         return $data;
     }

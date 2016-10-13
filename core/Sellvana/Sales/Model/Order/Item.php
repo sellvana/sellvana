@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Order_Item
@@ -36,12 +36,15 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function setProduct($product)
+    public function setProduct(Sellvana_Catalog_Model_Product $product)
     {
         $this->_product = $product;
         return $this;
     }
 
+    /**
+     * @return Sellvana_Catalog_Model_Product
+     */
     public function product()
     {
         if (!$this->_product) {
@@ -63,39 +66,91 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function isShippable()
     {
-        return $this->get('shipping_weight') > 0;
+        return $this->get('shipping_weight') > 0
+            && $this->state()->delivery()->getValue() != Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
+    }
+
+    public function isVirtual()
+    {
+        return $this->state()->delivery()->getValue() == Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
     }
 
     public function getQtyCanPay()
     {
-        return $this->get('qty_ordered') - $this->get('qty_paid') - $this->get('qty_canceled');
+        return $this->get('qty_ordered') - $this->get('qty_in_cancels');
     }
 
     public function getQtyCanBackorder()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') - $this->get('qty_in_cancels')
                 - $this->get('qty_backordered');
     }
 
     public function getQtyCanShip()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') - $this->get('qty_in_cancels')
                 - $this->get('qty_backordered');
     }
 
     public function getQtyCanCancel()
     {
-        return $this->get('qty_ordered') - $this->get('qty_shipped') -  $this->get('qty_canceled');
+        return $this->get('qty_ordered') - $this->get('qty_in_shipments') -  $this->get('qty_in_cancels');
     }
 
     public function getQtyCanReturn()
     {
-        return $this->get('qty_shipped') - $this->get('qty_returned');
+        return $this->get('qty_shipped') - $this->get('qty_in_returns');
     }
 
-    public function getQtyCanRefund()
+    /**
+     * Get amount available to create a new refund
+     *
+     * @return float
+     */
+    public function getAmountCanRefund()
     {
-        return $this->get('qty_paid') - $this->get('qty_refunded');
+        return $this->get('amount_paid') - $this->get('amount_in_refunds');
+    }
+
+    /**
+     * Get amount available to complete a refund
+     *
+     * @return float
+     */
+    public function getRefundableAmount()
+    {
+        return $this->get('amount_paid') - $this->get('amount_refunded');
+    }
+
+    public function getCalcPrice()
+    {
+        return ($this->get('row_total') - $this->get('row_discount')) / $this->get('qty_ordered');
+    }
+
+    public function getAmountCanPay()
+    {
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
+    }
+
+    public function getBalanceAmount()
+    {
+        return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_paid');
+    }
+
+    /**
+     * @param float|null $amount
+     */
+    public function markAsPaid($amount = null)
+    {
+        if ($amount === null) {
+            $amount = $this->getBalanceAmount();
+        } else {
+            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getBalanceAmount());
+        }
+
+        $this->set('amount_in_payments', $amount);
+        $this->set('amount_paid', $amount);
+        $this->save(false);
     }
 
     public function __destruct()

@@ -13,3 +13,14 @@
         {% endfor %}
     </ul>
 {% endif %}
+{% if not product.canOrder(item.qty) %}
+    {% set qtyAvail = product.getInventoryModel().getQtyAvailable() %}
+    <div class="f-stock-notice">
+    {% if qtyAvail %}
+        <p class="f-out-of-stock">{{ 'Maximum available quantity: %s'|_(qtyAvail) }}</p>
+    {% else %}
+        <p class="f-out-of-stock">{{ 'This item is currently unavailable'|_ }}</p>
+    {% endif %}
+    </div>
+    <input type="hidden" name="unavailable" value="1">
+{% endif %}

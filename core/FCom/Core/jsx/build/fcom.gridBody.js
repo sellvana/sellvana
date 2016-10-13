@@ -17,15 +17,19 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 "originalData": [],
                 "columnMetadata": [],
                 "className": ""
-            }
+            };
         },
         doRowAction: function(callback, event) {
+            // Remove focus for prevent re-render modal when keypress
+            event.currentTarget.blur();
+            
             /*if (this.props.getConfig('data_mode') == 'local') {
                 return this.doRowLocalAction(event);
             }*/
             var that = this;
-            var action = event.target.dataset.action;
-            var rowId = event.target.dataset.row;
+            var action = event.currentTarget.dataset.action;
+            var rowId = event.currentTarget.dataset.row;
+            var folder = event.currentTarget.dataset.folder;
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
             var isLocalMode = !this.props.hasExternalResults();
@@ -43,7 +47,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
             switch (action) {
                 case 'edit':
-                    //console.log('render modal');
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
@@ -65,9 +68,16 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                         if (isLocalMode) {
                             this.props.removeRows([row]);
                         } else {
-
+                            var oper = 'del';
                             if (editUrl.length > 0 && rowId) {
-                                $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                if (folder) {
+                                    oper = 'mass-delete';
+                                    if (!editUrl.match("\\b"+"folder"+"\\b")) {
+                                        editUrl += '?folder=' + encodeURIComponent(folder);
+                                    }
+                                }
+                                
+                                $.post(editUrl, {id: rowId, oper: oper}, function() {
                                     that.props.removeSelectedRows([row]);
                                     that.props.refresh();
                                 });
@@ -77,7 +87,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     break;
                 default:
                     if (typeof window[callback] === 'function') {
-                        return window[callback](row);
+                        return window[callback](row, event);
                     } else {
                         console.log('Do row custom action');
                     }
@@ -94,11 +104,20 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             /*console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
             console.log('FComGridBody.columns', this.props.columns);*/
 
-            var title = React.createElement(FComGridTitle, {columns: this.props.columns, changeSort: this.props.changeSort, sortColumn: this.props.sortColumn, getConfig: this.props.getConfig, 
-                sortAscending: this.props.sortAscending, columnMetadata: this.props.columnMetadata, data: this.props.data, 
-                originalData: this.props.originalData, setHeaderSelection: this.props.setHeaderSelection, getHeaderSelection: this.props.getHeaderSelection, 
-                addSelectedRows: this.props.addSelectedRows, getSelectedRows: this.props.getSelectedRows, clearSelectedRows: this.props.clearSelectedRows, 
-                removeSelectedRows: this.props.removeSelectedRows, saveLocalState: this.saveLocalState, 
+            var title = React.createElement(FComGridTitle, {columns: this.props.columns, changeSort: this.props.changeSort, 
+                                       sortColumn: this.props.sortColumn, 
+                                       getConfig: this.props.getConfig, 
+                                       sortAscending: this.props.sortAscending, 
+                                       columnMetadata: this.props.columnMetadata, 
+                                       data: this.props.data, 
+                                       originalData: this.props.originalData, 
+                                       setHeaderSelection: this.props.setHeaderSelection, 
+                                       getHeaderSelection: this.props.getHeaderSelection, 
+                                       addSelectedRows: this.props.addSelectedRows, 
+                                       getSelectedRows: this.props.getSelectedRows, 
+                                       clearSelectedRows: this.props.clearSelectedRows, 
+                                       removeSelectedRows: this.props.removeSelectedRows, 
+                                       saveLocalState: this.saveLocalState, 
                 ref: 'gridTitle'}
             );
 
@@ -131,9 +150,16 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     });
                 }
 
-                return React.createElement(FComRow, {ref: 'row'+row.id, row: row, key: 'row-' + row.id, index: index, columns: that.props.columns, columnMetadata: that.props.columnMetadata, defaultValues: defaultValues, 
-                    getConfig: that.props.getConfig, doRowAction: that.doRowAction, removeSelectedRows: that.props.removeSelectedRows, 
-                    addSelectedRows: that.props.addSelectedRows, getSelectedRows: that.props.getSelectedRows});
+                return React.createElement(FComRow, {ref: 'row'+row.id, row: row, key: 'row-' + row.id, 
+                                index: index, columns: that.props.columns, 
+                                columnMetadata: that.props.columnMetadata, 
+                                defaultValues: defaultValues, 
+                                getConfig: that.props.getConfig, 
+                                doRowAction: that.doRowAction, 
+                                removeSelectedRows: that.props.removeSelectedRows, 
+                                addSelectedRows: that.props.addSelectedRows, 
+                                getSelectedRows: that.props.getSelectedRows, 
+                                refresh: that.props.refresh});
             });
 
             return (
@@ -190,7 +216,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             var personalizeUrl = this.props.getConfig('personalize_url');
 
             //resize and callback to personalize
-            $(this.getDOMNode()).find("th").resizable({
+            $(this.getDOMNode()).find("th[data-id!='0']").resizable({
                 handles: 'e',
                 minWidth: 20,
                 stop: function (ev, ui) {
@@ -227,7 +253,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
                 //checkbox
                 if (col == '0') {
-
                     var selectionButtonText = (
                         React.createElement("button", {"data-toggle": "dropdown", type: "button", className: "btn btn-default btn-sm dropdown-toggle"}, 
                             React.createElement("span", {className: "icon-placeholder"}, 
@@ -265,7 +290,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     });
 
                     return (
-                        React.createElement("th", {className: columnClass, "data-id": "0", key: col}, 
+                        React.createElement("th", {style: { width: '80px'}, "data-id": "0", key: col}, 
                             React.createElement("div", {className: "dropdown f-grid-display-type"}, 
                                 selectionButtonText, 
                                 React.createElement("ul", {className: "dropdown-menu js-sel"}, headerSelectionNodes)

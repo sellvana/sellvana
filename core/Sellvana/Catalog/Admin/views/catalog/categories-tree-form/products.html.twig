@@ -37,25 +37,26 @@
             mainGrid = grid;
             var modalContainerEle = document.getElementById('{{ catProductConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
-            React.renderComponent(
-                    React.createElement(Components.Modal, {
-                                id: "addProductModal",
-                                show: true,
-                                title: 'Products List',
-                                confirm: 'Add',
-                                cancel: 'Close',
-                                onLoad: function(modal) {
-                                    var node = $(modal.getDOMNode());
-                                    node.find('.modal-dialog').css('width', '900px');
-                                },
-                                onConfirm: window.addSelectedProduct
-                            },
-                            React.createElement('div', {className: 'f-grid-wrapper', id: 'allProductList'})
-                    ), modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "addProductModal",
+                        show: true,
+                        title: "{{ 'Products List' |_ }}",
+                        confirm: "{{ 'Add' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
+                        onLoad: function(modal) {
+                            var node = $(modal.getDOMNode());
+                            node.find('.modal-dialog').css('width', '900px');
+                        },
+                        onConfirm: window.addSelectedProduct
+                    },
+                    React.DOM.div({className: 'f-grid-wrapper', id: 'allProductList'})
+                ), modalContainerEle);
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('allProductList');
-            var instanceAttachGrid = React.renderComponent(
-                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
+            React.unmountComponentAtNode(attachGridContainerEle);
+            var instanceAttachGrid = React.render(
+                React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
                     attachGridContainerEle
             );
 
@@ -84,7 +85,7 @@
                 });
                 modal.close();
             } else {
-                alert('please choose at least one product');
+                $.bootstrapGrowl("{{ 'Please choose at least one product.'|_ }}", { type: 'warning', align: 'center', width: 'auto', delay: 3000 });
             }
         };
 
@@ -95,35 +96,43 @@
         window.setCatProdMainGrid = function(grid) {
             mainGrid = grid;
             var addedIds = [], removedIds = [],
-                    originIds = _.pluck(grid.getRows(), 'id'),
-                    productIdsAddEle = $('#product_ids_add'),
-                    productIdsRemoveEle = $('#product_ids_remove');
+                originIds = _.pluck(grid.getRows(), 'id'),
+                productIdsAddEle = $('#product_ids_add'),
+                productIdsRemoveEle = $('#product_ids_remove');
 
             $(mainGrid.getDOMNode())
-                    .on('removedRows.griddle', function (e, removedRows, grid) {
-                        removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
-                        var diffRemoveIds = _.difference(originIds, removedIds);
-                        productIdsRemoveEle.val(diffRemoveIds.join(','));
+                .on('removedRows.griddle', function (e, removedRows, grid) {
+                    removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                    var diffRemoveIds = _.difference(originIds, removedIds);
+                    productIdsRemoveEle.val(diffRemoveIds.join(','));
 
-                        var arrCurrentAddedIds = productIdsAddEle.val().split(',');
-                        if (!_.isEmpty(arrCurrentAddedIds)) {
-                            var temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
-                            productIdsAddEle.val(temp.join(','));
-                        }
-                    })
-                    .on('addedRows.griddle', function(e, addedRows, grid) {
-                        addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
-                        var diffAddIds = _.difference(addedIds, originIds);
-                        productIdsAddEle.val(diffAddIds.join(','));
+                    var arrCurrentAddedIds = productIdsAddEle.val().split(',');
+                    if (!_.isEmpty(arrCurrentAddedIds)) {
+                        var temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                        productIdsAddEle.val(temp.join(','));
+                    }
+                })
+                .on('addedRows.griddle', function(e, addedRows, grid) {
+                    addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                    var diffAddIds = _.difference(addedIds, originIds);
+                    productIdsAddEle.val(diffAddIds.join(','));
 
-                        var arrCurrentRemovedIds = productIdsRemoveEle.val().split(',');
-                        if (!_.isEmpty(arrCurrentRemovedIds)) {
-                            var temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
-                            productIdsRemoveEle.val(temp.join(','));
-                        }
-                    });
+                    var arrCurrentRemovedIds = productIdsRemoveEle.val().split(',');
+                    if (!_.isEmpty(arrCurrentRemovedIds)) {
+                        var temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                        productIdsRemoveEle.val(temp.join(','));
+                    }
+                });
         }
+
+        $('#' + mainGridId).on('change', '.js-sort_order', function(ev) {
+            var $dataField = $('#category_products_sort_order'), $input = $(ev.target);
+            var fData = JSON.parse($dataField.val()), pId = $input.attr('id').replace(mainGridId + '-sort_order-', '');
+            fData[pId] = $input.val();
+            $dataField.val(JSON.stringify(fData));
+        });
     });
 </script>
 
 {{ THIS.view('core/griddle').set('grid', catProductConfig) | raw }}
+<input type="hidden" id="category_products_sort_order" name="category_products_sort_order" value="{}">

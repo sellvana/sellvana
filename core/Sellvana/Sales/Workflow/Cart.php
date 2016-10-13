@@ -36,7 +36,9 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             $cart->set([
                 'customer_id' => $customer->id(),
                 'customer_email' => $customer->get('email'),
-            ])->importAddressesFromCustomer($customer)->calculateTotals();
+            ]);
+            $cart->importAddressesFromCustomer($customer);
+            $cart->calculateTotals();
         }
 
         $cart->save();
@@ -146,14 +148,21 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 $item = ['id' => $reqItem, 'qty' => 1];
                 $ids[] = $item['id'];
             } elseif ($reqItem instanceof Sellvana_Catalog_Model_Product) {
-                $item = ['id' => $reqItem->getId(), 'qty' => 1, 'product' => $reqItem];
+                $item = ['id' => $reqItem->id(), 'qty' => 1, 'product' => $reqItem];
+            } else {
+                $this->BDebug->log('Invalid reqItem: ' . print_r($reqItem, 1));
+                continue;
             }
             $itemsData[] = $item;
         }
 
         // retrieve product records
         /** @var Sellvana_Catalog_Model_Product[] $products */
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $ids)->find_many_assoc();
+        if ($ids) {
+            $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $ids)->find_many_assoc();
+        } else {
+            $products = [];
+        }
         foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
                 continue;
@@ -164,17 +173,19 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 continue;
             }
             $p = $item['product'] = $products[$item['id']];
+            $costModel = $p->getPriceModelByType('cost');
+            // Basic details and signature, can be adjusted in :calcDetails event
             $item['details'] = [
                 'qty' => $item['qty'],
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
                 'inventory_sku' => $p->get('inventory_sku'),
+                'cost' => $costModel ? $costModel->getPrice() : null,
                 #'manage_inventory' => $p->get('manage_inventory'),
-            ];
-
-            $item['details']['signature'] = [
-                'product_sku' => $p->get('product_sku'),
-                'inventory_sku' => $p->get('inventory_sku'),
+                'signature' => [
+                    'product_sku' => $p->get('product_sku'),
+                    'inventory_sku' => $p->get('inventory_sku'),
+                ],
             ];
 
         }
@@ -209,7 +220,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
 
     /**
      * @todo normalize API
-     * @todo move "variants" code to Sellvana_CustomFields module
+     * @todo move "variants" code to Sellvana_CatalogFields module
      */
     public function action_customerUpdatesCart($args)
     {
@@ -264,14 +275,23 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 }
                 $product = $item->getProduct();
                 if ($totalQty > 0) {
-                    if ($item->get('qty') !== $totalQty) {
-                        $recalc = true;
+                    $message = '';
+                    $status = 'updated';
+                    $qtyCartMax = $this->BConfig->get('modules/Sellvana_Catalog/qty_cart_max');
+                    if (!empty($qtyCartMax) && $totalQty > $qtyCartMax) {
+                        $status = 'warning';
+                        $message = $this->BLocale->_("The quantity of each product in the shopping cart can not be greater than %s", $qtyCartMax);
+                    } else {
+                        if ($item->get('qty') !== $totalQty) {
+                            $recalc = true;
+                        }
+                        $item->set('qty', $totalQty);
                     }
-                    $item->set('qty', $totalQty)->setData('variants', $variants)->save();
-                    $items[] = ['id' => $id, 'status' => 'updated', 'name' => $product ? $product->get('product_name') : ''];
+                    $item->setData('variants', $variants)->save();
+                    $items[] = ['id' => $id, 'status' => $status, 'name' => $product ? $product->get('product_name') : '', 'message' => $message];
                 } elseif ($totalQty <= 0 || empty($variants)) {
                     $recalc = true;
-                    $item->delete();
+                    $cart->removeItem($id);
                     unset($cartItems[$id]);
                     $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $product ? $product->get('product_name') : ''];
                 }
@@ -365,6 +385,6 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $cart = $this->_getCart($args);
         $cart->state()->overall()->setAbandoned();
         $cart->save();
-        $this->BLayout->view('email/sales/cart-state-abandoned.html.twig')->email();
+        $this->BLayout->getView('email/sales/cart-state-abandoned.html.twig')->email();
     }
 }

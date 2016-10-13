@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Main
@@ -77,5 +77,14 @@ class Sellvana_Catalog_Main extends BClass
                 }
             ])
         ;
+    }
+
+    public function getNavTopTypeOptions()
+    {
+        return [
+            'root_only' => 'Root Categories',
+            'selected' => 'Categories Selected for Nav',
+            'root_selected' => 'Root and Selected Categories',
+        ];
     }
 }

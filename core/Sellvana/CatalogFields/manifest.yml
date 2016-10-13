@@ -1,0 +1,44 @@
+modules:
+    Sellvana_CatalogFields:
+        version: 0.6.2.0
+        channel: beta
+        require: { module: { Sellvana_Catalog: 0.6.0.0 } }
+        translations: { en: en.php }
+        before: [ Sellvana_MultiSite ]
+        after: [ Sellvana_Customer ]
+        description: "Base custom fields implementation, currently for catalog only"
+        auto_use: [ bootstrap ]
+        observe:
+            - [ "Sellvana_Catalog_Model_Product::onAfterLoad", Sellvana_CatalogFields_Main.onProductAfterLoad ]
+            - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CatalogFields_Main.onProductAfterSave ]
+            - [ "Sellvana_CatalogFields_Model_ProductVariant::find_one:after", Sellvana_CatalogFields_Main.onProductVariantFindAfter ]
+            - [ "Sellvana_CatalogFields_Model_ProductVariant::find_many:after", Sellvana_CatalogFields_Main.onProductVariantFindAfter ]
+            - [ "Sellvana_Catalog_Model_Product::import:row", Sellvana_CatalogFields_Main.onProductImportRow ]
+            - [ "Sellvana_Catalog_Model_Product::import:after_loop", Sellvana_CatalogFields_Main.onProductImportAfterLoop ]
+            - [ "Sellvana_Catalog_Model_ProductsImport::updateFieldsDueToInfo", Sellvana_CatalogFields_Main.onUpdateFieldsDueToInfo ]
+            - [ "Sellvana_Catalog_Model_Product::find_many:after", Sellvana_CatalogFields_Main.onFindManyAfter ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+                routing:
+                    - [ /catalogfields/fieldsets, Sellvana_CatalogFields_Admin_Controller_FieldSets.fieldsets ]
+                    - [ /catalogfields/fields, Sellvana_CatalogFields_Admin_Controller_FieldSets.fields ]
+                    - [ /catalogfields/fieldsets/.action, Sellvana_CatalogFields_Admin_Controller_FieldSets ]
+                    - [ /catalogfields/fields/.action, Sellvana_CatalogFields_Admin_Controller_FieldSets ]
+                    - [ /catalogfields/products/.action, Sellvana_CatalogFields_Admin_Controller_Products ]
+                observe:
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::gridColumns", Sellvana_CatalogFields_Admin.onProductGridColumns ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formViewBefore", Sellvana_CatalogFields_Admin.onProductsFormViewBefore ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formPostBefore", Sellvana_CatalogFields_Admin.onProductFormPostBefore ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", Sellvana_CatalogFields_Admin.onProductFormPostAfterValidate ]
+                security:
+                    request_fields_whitelist:
+                        /catalog/products/form:
+                            POST/custom_fields: "+"
+
+            FCom_Frontend:
+                auto_use: [ views ]
+                observe:
+                    - [ "BLayout::hook:custom-fields-filters", Sellvana_CatalogFields_Main.hookCustomFieldFilters ]
+                    - [ "Sellvana_Sales_Workflow_Cart::action_customerAddsItemsToCart:calcDetails", Sellvana_CatalogFields_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]

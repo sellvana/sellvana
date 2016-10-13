@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Model class for table 'fcom_customer'
@@ -61,8 +61,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     ];
 
     protected static $_sessionUser;
-    protected $defaultShipping = null;
-    protected $defaultBilling = null;
+    protected $_defaultShipping = null;
+    protected $_defaultBilling = null;
 
     private static $lastImportedCustomer = 0;
 
@@ -156,7 +156,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'password_hash' => $this->BUtil->fullSaltedHash($password),
             'password_session_token' => $token,
         ]);
-        if ($this->id() === $this->sessionUserId()) {
+
+        if ($this->id() === $this->sessionUserId() && $this->BRequest->area() != 'FCom_Admin') {
             $this->BSession->set('admin_user_password_token', $token);
         }
         return $this;
@@ -169,7 +170,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function recoverPassword()
     {
         $this->set(['token' => $this->BUtil->randomString(20), 'token_at' => $this->BDb->now()])->save();
-        $this->BLayout->view('email/customer-password-recover')->set('customer', $this)->email();
+        $this->BLayout->getView('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
     }
 
@@ -201,19 +202,18 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function validateCustomerStatus()
     {
         $result = ['allow_login' => false];
-        $locale = $this->BLocale;
         switch ($this->get('status')) {
             case 'active':
                 $result['allow_login'] = true;
                 break;
             case 'review':
-                $result['error']['message'] = $locale->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
+                $result['error']['message'] = $this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
                 break;
             case 'disabled':
-                $result['error']['message'] = $locale->_('Your account is disabled. Please contact us for more details.');
+                $result['error']['message'] = $this->_('Your account is disabled. Please contact us for more details.');
                 break;
             default:
-                $result['error']['message'] = $locale->_('Your account status has a problem. Please contact us for more details.');
+                $result['error']['message'] = $this->_('Your account status has a problem. Please contact us for more details.');
                 break;
         }
         return $result;
@@ -228,7 +228,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
-        $this->BLayout->view('email/customer-password-reset')->set('customer', $this)->email();
+        $this->BLayout->getView('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }
 
@@ -308,8 +308,11 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function as_array(array $objHashes = [])
     {
-        $data = parent::as_array();
-        unset($data['password_hash']);
+        $data = parent::as_array($objHashes);
+        if (array_key_exists('password_hash', $data))
+        {
+            $data['password_hash'] = null;
+        }
         return $data;
     }
 
@@ -494,8 +497,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $r['status'] = 'active';
         }
         $customer = $this->create($r)->save();
-        $this->BLayout->view('email/new-customer')->set('customer', $customer)->email();
-        $this->BLayout->view('email/new-customer-admin')->set('customer', $customer)->email();
+        $this->BLayout->getView('email/new-customer')->set('customer', $customer)->email();
+        $this->BLayout->getView('email/new-customer-admin')->set('customer', $customer)->email();
         return $customer;
     }
 
@@ -553,7 +556,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_billing || $this->default_billing_id === $addr->id()) {
+            if ($this->default_billing_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -561,13 +564,13 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return nul|Sellvana_Customer_Model_Address
+     * @return null|Sellvana_Customer_Model_Address
      */
     public function getDefaultShippingAddress()
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_shipping || $this->default_shipping_id === $addr->id()) {
+            if ($this->default_shipping_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -682,9 +685,16 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = $this->orm()->where('email', $data[$args['field']]);
+
+        $isNew = isset($data['is_new']) ? (bool)$data['is_new'] : true;
+        $emailChanged = isset($data['old_email']) ? ($data['old_email'] != $data[$args['field']]) : true;
+        if (!$isNew && !$emailChanged) {
+            return true;
+        }
+
+        $orm = $this->orm('c')->where('c.email', $data[$args['field']]);
         if (!empty($data['id'])) {
-            $orm->where_not_equal('id', $data['id']);
+            $orm->where_not_equal('c.id', $data['id']);
         }
         if ($orm->find_one()) {
             return false;

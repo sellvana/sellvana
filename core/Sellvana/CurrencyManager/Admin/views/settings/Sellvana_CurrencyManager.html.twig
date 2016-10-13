@@ -1,0 +1,41 @@
+<!--{ permission: settings/Sellvana_CurrencyManager }-->
+
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_CurrencyManager' } %}
+{% set currencyManager = APP.instance('Sellvana_CurrencyManager_Model_Manager') %}
+{% set views = currencyManager.getAllViews() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "Currency Manager Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_CurrencyManager'}) }}
+    {{ forms.accordion_panel_start({label:'Frontend specific options'|_, id:'settings-Sellvana_CurrencyManager-group1', in:1}) }}
+        {{ forms.boolean(fieldData, {field:'enabled_on_frontend', label:'Enabled for Frontend'|_ }) }}
+        {{ forms.select(fieldData, {field:'disabled_in_views', label:'Disabled for views'|_ , multiple:true, select2:{}, options:views }) }}
+    {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Admin specific options'|_, id:'settings-Sellvana_CurrencyManager-group2', in:0}) }}
+        {{ forms.boolean(fieldData, {field:'enabled_on_admin', label:'Enabled for Admin'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Global currency options'|_, id:'settings-Sellvana_CurrencyManager-group3', in:1}) }}
+        {{ forms.input(fieldData, {field:'precision', label:'Display Precision'|_, help_block_text: 'Number of decimal digits (e.g. 0, 1, 2). Default: 0. Examples: 4 => 12.3811, 3 => 12.381, 2 => 12.38, 1 => 12.4, 0 => 12, -1 => 10'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'cut_zero_decimals', label:'Cut Zero Decimals'|_, help_block_text: 'Unlike Display Precision, this setting discards only zeroes. Example: 99.99 => 99.99, 99.00 => 99'|_ }) }}
+        {{ forms.input(fieldData, {field:'replace_zero_decimals_with', label:'Replace Zero Decimals with'|_, help_block_text: 'Used only if Cut Zero Decimals = Yes, default ",-"'|_ }) }}
+        {{ forms.select(fieldData, {field:'symbol_position', label:'Symbol Position'|_, options:currencyManager.getAvailableSymbolPositions() }) }}
+        {{ forms.select(fieldData, {field:'symbol_type', label:'Symbol Type'|_, options:currencyManager.getAvailableSymbolTypes() }) }}
+        {{ forms.boolean(fieldData, {field:'symbol_space', label:'Space between Symbol and Value'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
+    {% for currency in LOCALE.getAvailableCurrencies() %}
+    {{ forms.accordion_panel_start({label: currency ~ ' - currency specific options'|_, id:'settings-Sellvana_CurrencyManager-group' ~ currency, in:0}) }}
+        {{ forms.input(fieldData, {field:'precision_' ~ currency, label:'Display Precision'|_ }) }}
+        {{ forms.select(fieldData, {field:'cut_zero_decimals_' ~ currency, label:'Cut Zero Decimals'|_, options: { '': '', 0: 'no'|_, 1: 'YES'|_} }) }}
+        {{ forms.input(fieldData, {field:'replace_zero_decimals_with_' ~ currency, label:'Replace Zero Decimals with'|_ }) }}
+        {{ forms.select(fieldData, {field:'symbol_position_' ~ currency, label:'Symbol Position'|_, options:currencyManager.getAvailableSymbolPositions(true) }) }}
+        {{ forms.select(fieldData, {field:'symbol_type_' ~ currency, label:'Symbol Type'|_, options:currencyManager.getAvailableSymbolTypes(true) }) }}
+        {{ forms.select(fieldData, {field:'symbol_space_' ~ currency, label:'Space between Symbol and Value'|_, options: { '': '', 0: 'no'|_, 1: 'YES'|_} }) }}
+        {{ forms.input(fieldData, {field:'replace_symbol_with_' ~ currency, label:'Replace Symbol with'|_ }) }}
+    {{ forms.accordion_panel_end }}
+    {% endfor %}
+
+{{ forms.accordion_end }}

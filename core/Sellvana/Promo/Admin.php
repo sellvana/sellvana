@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Promo_Admin
@@ -12,7 +12,7 @@ class Sellvana_Promo_Admin extends BClass
     {
         $this->FCom_Admin_Controller_MediaLibrary->allowFolder('media/promo');
         $this->FCom_Admin_Model_Role->createPermission([
-            'promo' => BLocale::i()->_('Promotions'),
+            'promo' => 'Promotions',
         ]);
     }
 }

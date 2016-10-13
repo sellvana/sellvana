@@ -9,6 +9,9 @@
                 {{  'Menu'|_ }}
             </a>
         </header>
+
+        {{ THIS.view('core/messages') | raw }}
+
         {% if counts.all %}
             <ul class="nav nav-tabs">
                 <li role="presentation" {{ status == 'all' ? 'class="active"' }}><a href="{{ APP.href('orders') }}">{{ 'Orders'|_ }} <span class="badge">{{ counts.all }}</span></a></li>
@@ -28,6 +31,7 @@
                 </tr>
               </thead>
                 {% for order in orders  %}
+                    {% set orderCurrency = order.get('store_currency_code') %}
                     <tr>
                         <td>
                             <a href="{{ APP.href('orders/view') }}?id={{ order.get('unique_id') }}">
@@ -37,14 +41,14 @@
                         <td>{{ order.state().overall().getValueLabel()|_ }} </td>
                         <td>{{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})</td>
                         <td>{{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})</td>
-                        <td class="text-right">{{ order.get('grand_total') | currency }} </td>
-                        <td class="text-right">{{ order.get('amount_due') | currency  }} </td>
+                        <td class="text-right">{{ order.getData('store_currency/grand_total') | currency(orderCurrency) }} </td>
+                        <td class="text-right">{{ order.getData('store_currency/amount_due') | currency(orderCurrency)  }} </td>
                     </tr>
                 {% endfor %}
             </table>
         {% endif %}
     </div>
-    {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
+    {{ THIS.view('customer/account/sidebar') | raw }}
 </div>
 
 <script>

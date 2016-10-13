@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_State_Comment extends Sellvana_Sales_Model_Order_State_Abstract
 {
@@ -31,6 +31,16 @@ class Sellvana_Sales_Model_Order_State_Comment extends Sellvana_Sales_Model_Orde
     ];
 
     protected $_defaultValue = self::NONE;
+
+    protected $_defaultValueWorkflow = [
+        self::NONE => [self::RECEIVED],
+        self::RECEIVED => [self::PROCESSING, self::DELEGATED],
+        self::PROCESSING => [self::CLOSED],
+        self::DELEGATED => [self::CLOSED],
+        self::SENT => [self::CLOSED],
+        self::CLOSED => [],
+        self::AUTO_CLOSED => [],
+    ];
 
     public function setNone()
     {

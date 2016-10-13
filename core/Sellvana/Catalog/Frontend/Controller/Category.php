@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Frontend_Controller_Category
@@ -11,6 +11,7 @@
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 
 class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Controller_Abstract
@@ -33,22 +34,33 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
             $this->forward(false);
             return $this;
         }
-
         $this->BApp->set('current_page_type', 'category');
+        $this->BApp->set('current_category', $category);
 
         $this->layout('/catalog/category');
         $layout = $this->BLayout;
 
         /** @var Sellvana_Catalog_Frontend_View_Pager $pagerView */
-        $pagerView = $layout->view('catalog/product/pager');
+        $pagerView = $layout->getView('catalog/product/pager');
 
         $q = $this->BRequest->get('q');
         if (is_array($q)) {
             $q = join(' ', $q);
         }
         if ($q !== '' && !is_null($q)) {
-            $q = $this->Sellvana_Catalog_Model_SearchAlias->processSearchQuery($q);
+            $alias = $this->Sellvana_Catalog_Model_SearchAlias->fetchSearchAlias($q);
+            $targetUrl = $alias->get('target_url');
+            if ($alias->get('alias_type') === Sellvana_Catalog_Model_SearchAlias::TYPE_FULL && $targetUrl) {
+                if (!$this->BUtil->isUrlFull($targetUrl)) {
+                    $targetUrl = $this->BApp->href($targetUrl);
+                }
+                $this->BResponse->redirect($targetUrl);
+                return;
+            } else {
+                $q = $alias->get('target_term');
+            }
         }
+        $this->BApp->set('current_query', $q);
 
         $productsData = null;
         $this->BEvents->fire(__METHOD__ . ':products_data', [
@@ -60,51 +72,65 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
         if (!$productsData) {
             $filter = $this->BRequest->get('f');
             $productsOrm = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q, $filter, $category);
-            $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsOrm]);
 
-            $productsData = $productsOrm->paginate($this->BRequest->get(), [
+            $request = $this->BRequest->request();
+            if (empty($request['sc']) && !empty($request['sort'])) {
+                $request['sc'] = $request['sort'];
+            }
+
+            $this->BEvents->fire(__METHOD__ . ':products_orm', ['orm' => $productsOrm, 'request' => &$request]);
+
+            $productsData = $productsOrm->paginate($request, [
                 'ps' => $pagerView->default_page_size,
                 'sc' => $pagerView->default_sort,
                 'page_size_options' => $pagerView->page_size_options,
                 'sort_options' => $pagerView->sort_options,
             ]);
-            $layout->view('catalog/product/pager')->set(['query' => $q, 'filters' => $filter]);
+            $layout->getView('catalog/product/pager')->set(['query' => $q, 'filters' => $filter]);
         }
 
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($productsData['rows']);
         $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($productsData['rows']);
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
 
         $this->BEvents->fire(__METHOD__ . ':products_data_after', ['data' => &$productsData]);
 
-        $this->BApp
-            ->set('current_category', $category)
-            ->set('current_query', $q)
-            ->set('products_data', $productsData);
+        $this->BApp->set('products_data', $productsData);
 
         $this->FCom_Core_Main->lastNav(true);
 
         /** @var FCom_Core_View_Head $head */
-        $head = $layout->view('head');
+        $head = $layout->getView('head');
         $crumbs = ['home'];
         $activeCatIds = [$category->id()];
+        $rootCategoryId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
+        $hide = (bool)$rootCategoryId;
         foreach ($category->ascendants() as $c) {
-            $nodeName = $c->get('node_name');
+            if ($hide) { // hide ascendants of the root category
+                if ($c->id() == $rootCategoryId) {
+                    $hide = false;
+                }
+
+                continue;
+            }
+
+            $nodeName = $c->getLangField('node_name');
             if ($nodeName) {
                 $activeCatIds[] = $c->id();
                 $crumbs[] = ['label' => $nodeName, 'href' => $c->url()];
                 $head->addTitle($nodeName);
             }
         }
-        $crumbs[] = ['label' => $category->get('node_name'), 'active' => true];
+        $crumbs[] = ['label' => $category->getLangField('node_name'), 'active' => true];
         $category->set('is_active', 1);
 
-        $head->addTitle($category->get('node_name'));
-        $layout->view('breadcrumbs')->set('crumbs', $crumbs);
-        $layout->view('catalog/search')->set('query', $q);
+        $head->addTitle($category->getLangField('node_name'));
+        $layout->getView('breadcrumbs')->set('crumbs', $crumbs);
+        $layout->getView('catalog/search')->set('query', $q);
 
         $rowsViewName = 'catalog/product/' . $pagerView->getViewAs();
         $layout->hookView('main_products', $rowsViewName);
-        $rowsView = $layout->view($rowsViewName);
+        $rowsView = $layout->getView($rowsViewName);
         $rowsView->set([
             'category' => $category,
             'products_data' => $productsData,
@@ -113,7 +139,7 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
         $pagerView->set('state', $productsData['state'])
             ->setCanonicalPrevNext();
 
-        $layout->view('catalog/nav')->set([
+        $layout->getView('catalog/nav')->set([
             'category' => $category,
             'active_ids' => $activeCatIds,
             'home_url' => $this->BConfig->get('modules/Sellvana_Catalog/url_prefix'),

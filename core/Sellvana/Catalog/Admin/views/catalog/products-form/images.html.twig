@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
+{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 
 {% set type = 'images' %}
 {% set targetType = 'product' %}
@@ -7,9 +7,9 @@
     id: 'all_' ~ type,
     mode: 'images',
     type: 'product-images',
-    title: 'Images',
+    title: 'Images'|_,
     folder: 'media/product/images',
-    config: {actions: {delete: {caption : 'Remove'}}}
+    config: {actions: {delete: {caption : 'Remove'|_}}}
 } %}
 
 {% set attachmentsConfig = {
@@ -58,11 +58,12 @@
         var productImagesGrid = {{ combineType }}Grid;
         if (productImagesGrid) {
             $(productImagesGrid.getDOMNode())
-                    .on('removedRows.griddle', function (e, rows) {
-                        updateImageInVariantList(rows, true);
-                    }).on('addedRows.griddle', function (e, rows) {
-                        updateImageInVariantList(rows);
-                    });
+                .on('removedRows.griddle', function (e, removedRows) {
+                    updateImageInVariantList(removedRows, true);
+                })
+                .on('addedRows.griddle', function (e, addedRows) {
+                    updateImageInVariantList(addedRows);
+                });
         }
     });
 
@@ -89,6 +90,7 @@
                     file_size: row.file_size,
                     label: row.label,
                     position: row.position,
+                    in_gallery: row.in_galery,
                     subfolder: row.subfolder,
                     id: guid()
                 });
@@ -157,86 +159,108 @@
             });
         }
     };*/
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp',
+        'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];
-        $('#quick-add-images')
-                .fileupload({
-                    url: uploadUrl,
-                    multiple: true,
-                    autoUpload: true,
-                    dropZone: $('.fileinput-button')
-                })
-                .bind('fileuploadalways', function (e, data) {
-                    var mediaGrid = mediaLibGrid{{ medialibConfig.id }};
-                    var combineGrid = {{ combineType }}Grid;
-                    var success = false;
-                    if ($.isArray(data.result.files) && mediaGrid) {
-                        var addRows = [];
-                        var combineAddRows = [];
-                        var current = FCom.Mixin.dateTimeNow();
+        $('#quick-add-images').fileupload({
+            url: uploadUrl,
+            multiple: true,
+            autoUpload: true,
+            dropZone: $('#dropzone')
+        })
+        .bind('fileuploadalways', function (e, data) {
+            var mediaGrid = mediaLibGrid{{ medialibConfig.id }};
+            var combineGrid = {{ combineType }}Grid;
+            var success = false;
+            if ($.isArray(data.result.files) && mediaGrid) {
+                var addRows = [];
+                var combineAddRows = [];
+                var NoI = combineGrid.getRows().length || false;
+                var current = FCom.Mixin.dateTimeNow();
 
-                        //collect data to push to grid
-                        data.result.files.forEach(function (obj) {
-                            if (!obj.error) {
-                                addRows.push(obj);
+                //collect data to push to grid
+                data.result.files.forEach(function (obj, i) {
+                    if (!obj.error) {
+                        addRows.push(obj);
 
-                                //check combine grid already had this image
-                                if (combineGrid && !_.findWhere(combineGrid.getRows(), { file_id: obj.id })) {
-                                    var combineRow = $.extend({}, obj, {
-                                        _new: true,
-                                        id: guid(),
-                                        file_id: obj.id,
-                                        update_at: current,
-                                        create_at: current,
-                                        //temporary value before implement edit inline
-                                        position: 0,
-                                        label: FCom.Mixin.removeSpecialChars(obj.file_name)
-                                    });
-                                    combineAddRows.push(combineRow);
-                                }
-                            }
-                            else {
-                                file_error.push(obj.file_name);
-                            }
-                        });
-
-                        //add to media grid
-                        if (addRows.length) {
-                            success = true;
-                            mediaGrid.addRows(addRows);
-                        }
-
-                        //add to combine grid
-                        if (combineAddRows.length) {
-                            combineGrid.addRows(combineAddRows);
-                        }
-
-                        if (success) {
-                            $.bootstrapGrowl("Successfully uploaded.", { type: 'success', align: 'center', width: 'auto' });
+                        //check combine grid already had this image
+                        if (combineGrid && !_.findWhere(combineGrid.getRows(), {file_id: obj.id})) {
+                            var combineRow = $.extend({}, obj, {
+                                _new: true,
+                                id: guid(),
+                                file_id: obj.id,
+                                update_at: current,
+                                create_at: current,
+                                //temporary value before implement edit inline
+                                position: !NoI ? 1 : NoI + 1,
+                                is_thumb: !NoI && i == 0 ? 1 : 0,
+                                is_default: !NoI && i == 0 ? 1 : 0,
+                                is_rollover: !NoI && i == 0 ? 1 : 0,
+                                in_gallery: 1,
+                                label: FCom.Mixin.removeSpecialChars(obj.file_name)
+                            });
+                            combineAddRows.push(combineRow);
                         }
                     }
-                })
-                .bind('fileuploadstop', function (e, data) {
-                    if (file_error.join(',') != '') {
-                        alert('Illegal file extension: ' + file_error.join(','));
-                        file_error = [];
+                    else {
+                        file_error.push(obj.file_name);
                     }
                 });
 
-        $(document)
-                .bind('dragover', function (e) {
-                    //console.log('drag');
-                    var span = $('.fileinput-button').find('span');
-                    if (!span.attr('data-text')) {
-                        span.attr('data-text', span.html());
-                    }
-                    span.html('Drop images to here');
-                })
-                .bind('drop dragleave', function (e) {
-                    //console.log('drop');
-                    var span = $('.fileinput-button').find('span');
-                    span.html(span.attr('data-text'));
-                });
+                //add to media grid
+                if (addRows.length) {
+                    success = true;
+                    mediaGrid.addRows(addRows);
+                }
+
+                //add to combine grid
+                if (combineAddRows.length) {
+                    combineGrid.addRows(combineAddRows);
+                }
+
+                if (success) {
+                    $.bootstrapGrowl("{{ 'Successfully uploaded.' |_ }}", {
+                        type: 'success',
+                        align: 'center',
+                        width: 'auto'
+                    });
+                }
+            }
+        })
+        .bind('fileuploadstop', function (e, data) {
+            if (file_error.join(',') != '') {
+                alert("{{ 'Illegal file extension: ' |_ }}" + file_error.join(','));
+                file_error = [];
+            }
+        });
+
+        $(document).bind('dragover', function (e) {
+            var $dropZone = $('#dropzone'),
+                $span = $dropZone.find('span');
+
+            var found = false,
+                node = e.target;
+
+            do {
+                if (node === $dropZone[0]) {
+                    found = true;
+                    break;
+                }
+                node = node.parentNode;
+            } while (node != null);
+
+            if (found) {
+                $span.html("{{ 'Drop images to here' |_ }}");
+            } else {
+                if (!$span.attr('data-text')) {
+                    $span.attr('data-text', $span.html());
+                }
+            }
+        })
+        .bind('drop dragleave', function (e) {
+            var $span = $('#dropzone').find('span');
+            $span.html($span.attr('data-text'));
+        });
     });
 </script>

@@ -17,14 +17,17 @@
         <input type="hidden" name="rid" value="{{ pr.id() }}" id="id-preview">
 
         <h1 class="f-prod-name">{{ prod.getName() }}</h1>
-        <!--
-        <div class="f-prod-avg-rating">
-          <div class="glyphicon f-rating-stars f-lg-stars">
-            <span class="f-filled-stars" style="width:0%;"></span>
-            <span class="f-empty-stars"></span>
-          </div>
-        </div>
-        -->
+
+        <fieldset class="rating">
+            {#<legend>{{ 'Your rating:'|_ }}</legend>#}
+            {% set ratingValue = pr ? pr.get('rating') : (validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : 0) %}
+            {% for i in 5..1 %}
+                <input type="radio" id="rating-star{{ i }}" name="review[rating]" value="{{ i }}" {{ i == ratingValue ? 'checked' }}/>
+                <label for="rating-star{{ i }}" title="{{ '%s star(s)'|_(i) }}">{{ '%s star(s)'|_(i) }}</label>
+            {% endfor %}
+        </fieldset>
+        <div class="clearfix"></div>
+        {#
         <input class="validate[required]" type="range" id="prodreview-rating" name="review[rating]" min="{{ min }}" max="{{ max }}"
             {% if pr %}
                 value="{{ pr.get('rating')}}"
@@ -32,8 +35,8 @@
                 value="{{ validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : min }}"
             {% endif %}
            step="{{ step }}" />
-
         <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
+        #}
         <div class="form-group">
             <label for="review-title">{{ 'Review Title'|_ }}</label>
             <div class="controls">

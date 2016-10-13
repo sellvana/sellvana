@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Order_Refund
@@ -6,6 +6,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
  * @property Sellvana_Sales_Model_Order_Refund_State $Sellvana_Sales_Model_Order_Refund_State
+ * @property Sellvana_Sales_Model_Order_Refund_Item $Sellvana_Sales_Model_Order_Refund_Item
  */
 
 class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
@@ -15,10 +16,18 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_order_refund';
     protected static $_origClass = __CLASS__;
 
+    /**
+     * @var Sellvana_Sales_Model_Order_Refund_State
+     */
     protected $_state;
 
     /**
-     * @return Sellvana_Sales_Model_Order_Refund_State
+     * @var Sellvana_Sales_Model_Order_Return_Item[]
+     */
+    protected $_items;
+
+    /**
+     * @refund Sellvana_Sales_Model_Order_Refund_State
      */
     public function state()
     {
@@ -28,40 +37,118 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function refundOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    /**
+     * Return the return items
+     *
+     * @param boolean $assoc
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
+    public function items($assoc = true)
     {
-        if (!preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_SET_ORDER)) {
-            return $this;
+        if (!$this->_items) {
+            $this->_items = $this->Sellvana_Sales_Model_Order_Refund_Item->orm('ori')
+                ->join('Sellvana_Sales_Model_Order_Item', ['oi.id', '=', 'ori.order_item_id'], 'oi')
+                ->select('ori.*')->select(['oi.product_id', 'product_sku', 'inventory_id',
+                    'inventory_sku', 'product_name'])
+                ->where('refund_id', $this->id())->find_many_assoc();
         }
-        $qtys = [];
-        foreach ($matches as $m) {
-            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
-        }
-        $skus = array_keys($qtys);
+        return $assoc ? $this->_items : array_values($this->_items);
+    }
+
+    public function importFromOrder(Sellvana_Sales_Model_Order $order, array $amounts = [])
+    {
+        $this->order($order);
+        $this->set('amount', array_sum($amounts));
+        $this->state()->overall()->setDefaultState();
+        $this->state()->custom()->setDefaultState();
+        $this->save();
+
         $items = $order->items();
-        foreach ($items as $i => $item) {
-            if (!in_array($item->get('product_sku'), $skus)) {
-                unset($items[$i]);
+        if ($amounts === null) {
+            $amounts = [];
+            foreach ($items as $item) {
+                $amounts[$item->id()] = true;
             }
         }
-        if (!$items) {
-            return [
-                'error' => ['message' => 'No valid SKUs found'],
-            ];
+
+        foreach ($amounts as $itemId => $amount) {
+            if (empty($items[$itemId])) {
+                throw new BException($this->_('Invalid item id: %s', $itemId));
+            }
+            /** @var Sellvana_Sales_Model_Order_Item $item */
+            $item = $items[$itemId];
+            $amountCanRefund = $item->getAmountCanRefund();
+            if ($amount === true) {
+                $amount = $amountCanRefund;
+            } elseif ($amount <= 0 || $amount > $amountCanRefund) {
+                throw new BException($this->_('Invalid amount to refund for %s: %s', [$item->get('product_sku'), $amount]));
+            }
+            $this->Sellvana_Sales_Model_Order_Refund_Item->create([
+                'order_id' => $order->id(),
+                'refund_id' => $this->id(),
+                'order_item_id' => $item->id(),
+                'amount' => $amount,
+            ])->save();
         }
 
-        foreach ($items as $item) {
-            $sku = $item->get('product_sku');
-            $qty = $qtys[$sku] === true ? $item->getQtyCanRefund() : $qtys[$sku];
-            $item->set('qty_to_refund', $qty);
+        return $this;
+    }
+
+    public function importItemsFromPayment(Sellvana_Sales_Model_Order_Payment $payment)
+    {
+        $amount = $this->get('amount');
+        $oItems = $payment->order()->items();
+        foreach ($payment->items() as $oItemId => $pItem) {
+            if ($pItem->get('amount') <= $pItem->get('amount_refunded')) {
+                continue;
+            }
+
+            $refundableAmount = $pItem->get('amount') - $pItem->get('amount_refunded');
+            $toRefund = min($amount, $refundableAmount);
+            $this->Sellvana_Sales_Model_Order_Refund_Item->create([
+                'refund_id' => $this->id(),
+                'order_id' => $payment->order()->id(),
+                'order_item_id' => $oItemId,
+                'amount' => $toRefund,
+                'payment_item_id' => $pItem->id(),
+            ])->save();
+            $pItem->add('amount_refunded', $toRefund);
+            $pItem->save();
+            $oItems[$oItemId]->add('amount_refunded', $toRefund)->save();
+            $amount -= $toRefund;
+
+            if ($amount <= 0) {
+                break;
+            }
         }
 
-        $result = [];
-        $this->Sellvana_Sales_Main->workflowAction('adminRefundsOrderItems', [
-            'order' => $order,
-            'items' => $items,
-            'result' => &$result,
-        ]);
+        return $this;
+    }
+    
+    public function register($done = false)
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $refundItems = $this->items();
+
+        foreach ($refundItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add($done ? 'amount_refunded' : 'amount_in_refunds', $cItem->get('amount'));
+        }
+
+        return $this;
+    }
+
+    public function unregister($done = false)
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $refundItems = $this->items();
+
+        foreach ($refundItems as $cItem) {
+            $oItem = $orderItems[$cItem->get('order_item_id')];
+            $oItem->add($done ? 'amount_refunded' : 'amount_in_refunds', -$cItem->get('amount'));
+        }
 
         return $this;
     }

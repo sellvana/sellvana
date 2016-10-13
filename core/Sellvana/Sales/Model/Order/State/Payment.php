@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Order_State_Abstract
 {
@@ -8,7 +8,9 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         PARTIAL_PAID = 'partial_paid',
         PAID = 'paid',
         OUTSTANDING = 'outstanding',
-        VOID = 'void';
+        VOID = 'void',
+        REFUNDED = 'refunded',
+        PARTIAL_REFUNDED = 'partial_refunded';
 
     protected $_valueLabels = [
         self::FREE => 'Free',
@@ -18,6 +20,19 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         self::PAID => 'Paid',
         self::OUTSTANDING => 'Outstanding',
         self::VOID => 'Void',
+        self::REFUNDED => 'Refunded',
+        self::PARTIAL_REFUNDED => 'Partial Refunded',
+    ];
+
+    protected $_defaultValueWorkflow = [
+        self::FREE => [],
+        self::UNPAID => [self::PROCESSING, self::PAID, self::PARTIAL_PAID, self::OUTSTANDING],
+        self::PROCESSING => [self::PAID, self::PARTIAL_PAID, self::OUTSTANDING, self::VOID],
+        self::PARTIAL_PAID => [self::PAID, self::OUTSTANDING, self::PARTIAL_REFUNDED],
+        self::OUTSTANDING => [self::PAID, self::PARTIAL_PAID, self::VOID],
+        self::VOID => [],
+        self::PAID => [self::REFUNDED, self::PARTIAL_REFUNDED],
+        self::PARTIAL_REFUNDED => [self::REFUNDED]
     ];
 
     public function getDefaultValue()
@@ -60,6 +75,16 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
     public function setVoid()
     {
         return $this->changeState(self::VOID);
+    }
+
+    public function setPartialRefunded()
+    {
+        return $this->changeState(self::PARTIAL_REFUNDED);
+    }
+
+    public function setRefunded()
+    {
+        return $this->changeState(self::REFUNDED);
     }
 
     public function isComplete()

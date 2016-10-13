@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Method_Shipping_Abstract
@@ -13,6 +13,12 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     protected $_configPath;
     protected $_config;
     protected $_lastError;
+    protected $_trackingUpdate = false;
+
+    public function getCode()
+    {
+        return $this->_code;
+    }
 
     public function getName()
     {
@@ -55,7 +61,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         if (!empty($services[$serviceKey])) {
             return $services[$serviceKey];
         }
-        return false;
+        return $serviceKey;
     }
 
     public function getServices()
@@ -72,12 +78,15 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     {
         $allServices = $this->getServices();
         $enabled = $this->getConfig('services');
-        if (!$enabled) {
+        if ($this->getConfig('all_services') || !$enabled) {
             return $allServices;
         }
         $services = [];
         foreach ($enabled as $svc) {
-            $services[$svc] = $allServices[$svc];
+            if ($svc[0] !== '_') {
+                $svc = '_' . $svc;
+            }
+            $services[$svc] = (!empty($allServices[$svc])) ? $allServices[$svc] : $svc;
         }
         return $services;
     }
@@ -93,9 +102,16 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         $cartRates = [];
         foreach ($packages as $package) {
             $package['services'] = array_keys($ratedServices);
-            $packageRates = $this->fetchPackageRates($package);
-            if (!empty($packageRates['error'])) {
-                return $packageRates; // if for any package there's an error, return immediately
+            $packageRatesResult = $this->fetchPackageRates($package);
+            if (!empty($packageRatesResult['error'])) {
+                return $packageRatesResult; // if for any package there's an error, return immediately
+            }
+            $packageRates = [];
+            foreach ($packageRatesResult['rates'] as $code => $rate) {
+                if ($code[0] !== '_') {
+                    $code = '_' . $code;
+                }
+                $packageRates['rates'][$code] = $rate;
             }
             foreach ($ratedServices as $code => $label) {
                 if (empty($packageRates['rates'][$code])) {
@@ -108,6 +124,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                         'price' => 0,
                         'weight' => 0,
                         'max_days' => 0,
+                        'exact_time' => null,
                     ];
                 }
                 $packageRate = $packageRates['rates'][$code];
@@ -117,6 +134,9 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                 $cartRates[$code]['price'] += $packageRates['rates'][$code]['price'];
                 if (!empty($packageRates['rates'][$code]['max_days'])) {
                     $cartRates[$code]['max_days'] = max($cartRates[$code]['max_days'], $packageRates['rates'][$code]['max_days']);
+                }
+                if (!empty($packageRates['rates'][$code]['exact_time'])) {
+                    $cartRates[$code]['exact_time'] = $packageRates['rates'][$code]['exact_time'];
                 }
             }
         }
@@ -128,21 +148,15 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         return $cartRates;
     }
 
-    public function calcCartPackages($cart)
+    /**
+     * @param Sellvana_Sales_Model_Cart $cart
+     * @return array
+     */
+    public function calcCartPackages(Sellvana_Sales_Model_Cart $cart)
     {
-        $maxPkgWeight = $this->getConfig('max_package_weight', 1000);
-
         $packages = [];
         $pkgIdx = 0;
-        $pkgTpl = [
-            'customer_context' => $cart->id(),
-            'to_street1' => $cart->get('shipping_street1'),
-            'to_street2' => $cart->get('shipping_street2'),
-            'to_city' => $cart->get('shipping_city'),
-            'to_region' => $cart->get('shipping_region'),
-            'to_postcode' => $cart->get('shipping_postcode'),
-            'to_country' => $cart->get('shipping_country'),
-        ];
+        $pkgTpl = $this->_getPackageTemplate($cart);
 
         foreach ($cart->items() as $item) {
             $qty = $item->get('qty');
@@ -151,6 +165,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                     $pkg = array_merge($pkgTpl, [
                         'qty' => 1,
                         'weight' => $item->get('shipping_weight'),
+                        'total' => ($item->get('row_total') + $item->get('row_tax')) / $qty,
                         'items' => [$item->id() => 1],
                     ]);
                     $packages[$pkgIdx] = $pkg;
@@ -158,18 +173,57 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                 }
                 continue;
             }
-            $rowWeight = $qty * $item->get('shipping_weight');
-            if (!empty($packages[$pkgIdx]) && ($packages[$pkgIdx]['weight'] + $rowWeight) > $maxPkgWeight) {
-                $pkgIdx++;
-            }
+
+            $rowWeight = $rowTotal = 0;
+            $packageQty = 0;
             if (empty($packages[$pkgIdx])) {
-                $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'items' => []]);
+                $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'total' => 0, 'items' => []]);
             }
-            $packages[$pkgIdx]['items'][$item->id()] = $qty;
-            $packages[$pkgIdx]['qty'] += $qty;
-            $packages[$pkgIdx]['weight'] += $rowWeight;
+            for ($i = 0; $i < $qty; $i++) {
+                if (!empty($packages[$pkgIdx]) && !$this->_itemCanBeAddedToPackage($packages[$pkgIdx], $item, $packageQty+1)) {
+                    if ($packageQty > 0) {
+                        $packages[$pkgIdx]['items'][$item->id()] = $packageQty;
+                        $packages[$pkgIdx]['qty'] += $packageQty;
+                        $packages[$pkgIdx]['weight'] += $rowWeight;
+                        $packages[$pkgIdx]['total'] += $rowTotal;
+                    }
+
+                    $pkgIdx++;
+                    $rowWeight = $rowTotal = 0;
+                    $packageQty = 0;
+
+                    if (empty($packages[$pkgIdx])) {
+                        $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'total' => 0, 'items' => []]);
+                    }
+                }
+
+                $packageQty++;
+                $rowWeight += $item->get('shipping_weight');
+                $rowTotal += ($item->get('row_total') + $item->get('row_tax')) / $qty;
+            }
+
+            if ($packageQty > 0) {
+                $packages[$pkgIdx]['items'][$item->id()] = $packageQty;
+                $packages[$pkgIdx]['qty'] += $packageQty;
+                $packages[$pkgIdx]['weight'] += $rowWeight;
+                $packages[$pkgIdx]['total'] += $rowTotal;
+            }
         }
+
         return $packages;
+    }
+
+    /**
+     * @param array $package
+     * @param Sellvana_Sales_Model_Cart_Item $item
+     * @param int $qty
+     * @return bool
+     */
+    protected function _itemCanBeAddedToPackage($package, $item, $qty)
+    {
+        $maxPkgWeight = $this->getConfig('max_package_weight', 1000);
+        $rowWeight = $qty * $item->get('shipping_weight');
+        return (($package['weight'] + $rowWeight) <= $maxPkgWeight);
     }
 
     public function fetchPackageRates($package)
@@ -177,18 +231,59 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         return $this->_fetchRates($package);
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Cart $cart
+     * @return array
+     */
+    protected function _getPackageTemplate(Sellvana_Sales_Model_Cart $cart)
+    {
+        return [
+            'customer_context' => $cart->id(),
+            'to_street1' => $cart->get('shipping_street1'),
+            'to_street2' => $cart->get('shipping_street2'),
+            'to_city' => $cart->get('shipping_city'),
+            'to_region' => $cart->get('shipping_region'),
+            'to_postcode' => $cart->get('shipping_postcode'),
+            'to_country' => $cart->get('shipping_country'),
+            'to_phone' => $cart->get('shipping_phone'),
+            'to_email' => $cart->get('customer_email'),
+            'to_name' => $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname'),
+        ];
+    }
+
     protected function _applyDefaultPackageConfig($data)
     {
         $config = $this->BConfig->get('modules/Sellvana_Sales');
 
-        if (empty($data['from_country'])) {
-            $data['from_country'] =  !empty($config['store_country']) ? $config['store_country'] : null;
+        if (empty($data['to_country'])) {
+            $data['to_country'] = !empty($config['store_country']) ? $config['store_country'] : null;
+        }
+        if (empty($data['from_name'])) {
+            $data['from_name'] =  !empty($config['store_name']) ? $config['store_name'] : null;
+        }
+        if (empty($data['from_email'])) {
+            $data['from_email'] =  !empty($config['store_email']) ? $config['store_email'] : null;
+        }
+        if (empty($data['from_city'])) {
+            $data['from_city'] =  !empty($config['store_city']) ? $config['store_city'] : null;
+        }
+        if (empty($data['from_region'])) {
+            $data['from_region'] =  !empty($config['store_region']) ? $config['store_region'] : null;
         }
         if (empty($data['from_postcode'])) {
             $data['from_postcode'] = !empty($config['store_postcode']) ? $config['store_postcode'] : null;
         }
-        if (empty($data['to_country'])) {
-            $data['to_country'] = !empty($config['store_country']) ? $config['store_country'] : null;
+        if (empty($data['from_country'])) {
+            $data['from_country'] =  !empty($config['store_country']) ? $config['store_country'] : null;
+        }
+        if (empty($data['from_street1'])) {
+            $data['from_street1'] =  !empty($config['store_street1']) ? $config['store_street1'] : null;
+        }
+        if (empty($data['from_street2'])) {
+            $data['from_street2'] =  !empty($config['store_street2']) ? $config['store_street2'] : null;
+        }
+        if (empty($data['from_phone'])) {
+            $data['from_phone'] =  !empty($config['store_phone']) ? $config['store_phone'] : null;
         }
 
         if (empty($data['customer_context'])) {
@@ -199,14 +294,20 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
             $data['services'] = array_keys($this->getServicesSelected());
         }
 
+        if (empty($data['package_size'])) {
+            $data['package_size'] = $this->BConfig->get('modules/Sellvana_Sales_Shipping/package_size');
+        }
+        if (!empty($data['package_size'])) {
+            $sizeArr = explode('x', $data['package_size']);
+        }
         if (empty($data['length'])) {
-            $data['length'] = 10;
+            $data['length'] = !empty($sizeArr[0]) ? $sizeArr[0] : 5;
         }
         if (empty($data['width'])) {
-            $data['width'] = 10;
+            $data['width'] = !empty($sizeArr[1]) ? $sizeArr[1] : 5;
         }
         if (empty($data['height'])) {
-            $data['height'] = 10;
+            $data['height'] = !empty($sizeArr[2]) ? $sizeArr[2] : 5;
         }
 
         if (!isset($data['residential'])) {
@@ -241,4 +342,43 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         return ['error' => true, 'message' => 'Not implemented'];
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment_Package $package
+     * @return bool
+     */
+    public function getPackageLabel(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canTrackingUpdate()
+    {
+        return $this->_trackingUpdate;
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment_Package[] $args
+     *  - shipment_id => package
+     *
+     * @return array
+     *  - success
+     *  - error
+     *  - message
+     */
+    public function fetchTrackingUpdates($args)
+    {
+        return ['error' => true, 'message' => 'Not implemented'];
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment_Package $package
+     * @return bool|string
+     */
+    public function getTrackingUrl(Sellvana_Sales_Model_Order_Shipment_Package $package)
+    {
+        return false;
+    }
 }

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Install_Controller
@@ -12,7 +12,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
     public function onBeforeDispatch()
     {
-        if (!parent::onBeforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) {
+            return false;
+        }
 
         $method = $this->BRequest->method();
         switch ($method) {
@@ -33,9 +35,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'install', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, [$this->BLocale, '_']);
+            array_walk($msg, [$this->BLocale, 'translate']);
         } else {
-            $msg = $this->BLocale->_($msg);
+            $msg = $this->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
@@ -46,7 +48,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         $this->BLayout->applyLayout('/');
 
         $errors = $this->BDebug->getCollectedErrors();
-        $this->BLayout->view('index')->errors = $errors;
+        $this->BLayout->getView('index')->errors = $errors;
     }
 
     public function action_index__POST()

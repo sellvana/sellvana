@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CustomerAssist_PushServer_Customer
@@ -17,7 +17,7 @@ class Sellvana_CustomerAssist_PushServer_Customer extends FCom_PushServer_Servic
 
         $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
             'href' => $this->BApp->adminHref('customer_assist/help_me?session_id=' . $sessionId),
-            'content' => $this->BLocale->_('Customer has requested assistance: %s', [$sessionId]),
+            'content' => $this->_('Customer has requested assistance: %s', [$sessionId]),
         ]);
     }
 }

@@ -1,26 +1,26 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
-* Copyright 2014 Boris Gurvich
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* @package BuckyBall
-* @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@sellvana.com>
-* @copyright (c) 2010-2014 Boris Gurvich
-* @license http://www.apache.org/licenses/LICENSE-2.0.html
-*/
+ * Copyright 2014 Boris Gurvich
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package BuckyBall
+ * @link http://github.com/unirgy/buckyball
+ * @author Boris Gurvich <boris@sellvana.com>
+ * @copyright (c) 2010-2014 Boris Gurvich
+ * @license http://www.apache.org/licenses/LICENSE-2.0.html
+ */
 
 class BCache extends BClass
 {
@@ -29,10 +29,10 @@ class BCache extends BClass
     protected $_defaultBackend;
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BCache
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @return BCache
+     */
     static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
@@ -43,7 +43,7 @@ class BCache extends BClass
         foreach (['File', 'Shmop', 'Apc', 'Memcache', 'Db'] as $type) {
             $this->addBackend($type, 'BCache_Backend_' . $type);
         }
-        $this->_defaultBackend = $this->BConfig->get('cache/default_backend', 'file');
+        $this->_defaultBackend = $this->BConfig->get('core/cache/default_backend', 'file');
     }
 
     public function addBackend($type, $backend)
@@ -71,9 +71,18 @@ class BCache extends BClass
         return $this;
     }
 
-    public function getAllbackends()
+    public function getAllBackends()
     {
         return $this->_backends;
+    }
+    
+    public function getAllBackendsAsOptions()
+    {
+        $options = [];
+        foreach ($this->getAllBackends() as $type => $backend) {
+            $options[$type] = $type;
+        }
+        return $options;
     }
 
     public function getFastestAvailableBackend()
@@ -106,9 +115,10 @@ class BCache extends BClass
             if (empty($info['available'])) {
                 throw new BException('Cache backend is not available: ' . $type);
             }
-            $config = (array)$this->BConfig->get('cache/' . $type);
+            $config = (array)$this->BConfig->get('core/cache/' . $type);
             $backend->init($config);
             $this->_backendStatus[$type] = true;
+            $this->BDebug->debug('Default cache backend initialized: ' . $type);
         }
         return $this->_backends[$type];
     }
@@ -203,7 +213,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     {
         $md5 = md5($key);
         return $this->_config['dir'] . '/' . substr($md5, 0, 2) . '/'
-            . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.' . $this->_config['file_type'];
+        . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.' . $this->_config['file_type'];
     }
 
     public function load($key)
@@ -281,13 +291,13 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     }
 
     /**
-    * Load many items found by pattern
-    *
-    * @todo implement regexp pattern
-    *
-    * @param mixed $pattern
-    * @return array
-    */
+     * Load many items found by pattern
+     *
+     * @todo implement regexp pattern
+     *
+     * @param mixed $pattern
+     * @return array
+     */
     public function loadMany($pattern)
     {
         $files = glob($this->_config['dir'] . '/*/*' . $this->BUtil->simplifyString($pattern) . '*');
@@ -479,19 +489,39 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
     {
         return true;
     }
+
+    public function deleteAll()
+    {
+        $items = new APCIterator('user');
+        $prefix = $this->_config['prefix'];
+        foreach ($items as $item) {
+            apc_delete($item['key']);
+        }
+        return true;
+    }
 }
 
 class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 {
+    protected $_type;
     protected $_config;
     protected $_conn;
+    protected $_flags;
 
     public function info()
     {
-        return ['available' => false];
+        #return ['available' => false];
 
         //TODO: explicit configuration
-        return ['available' => class_exists('Memcache', false) && $this->init(), 'rank' => 10];
+        if (class_exists('Memcache', false)) {
+            $this->_type = 'Memcache';
+        } elseif (class_exists('Memcached', false)) {
+            $this->_type = 'Memcached';
+        } else {
+            return ['available' => false];
+        }
+
+        return ['available' => $this->_type && $this->init($this->_config), 'rank' => 10];
     }
 
     public function init($config = [])
@@ -509,9 +539,16 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
             $config['port'] = 11211;
         }
         $this->_config = $config;
-        $this->_flags = !empty($config['compress']) ? MEMCACHE_COMPRESSED : 0;
-        $this->_conn = new Memcache;
-        return @$this->_conn->pconnect($config['host'], $config['port']);
+        #$this->_flags = !empty($config['compress']) ? MEMCACHE_COMPRESSED : 0;
+        switch ($this->_type) {
+            case 'Memcache':
+                $this->_conn = new Memcache;
+                return @$this->_conn->pconnect($config['host'], $config['port']);
+
+            case 'Memcached':
+                $this->_conn = new Memcached('sellvana');
+                return $this->_conn->addServer($config['host'], $config['port']);
+        }
     }
 
     public function load($key)
@@ -521,9 +558,15 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function save($key, $data, $ttl = null)
     {
-        $flag = !empty($this->_config['compress']) ? MEMCACHE_COMPRESSED : 0;
-        $ttl1 = is_null($ttl) ? 0 : time() + $ttl;
-        return $this->_conn->set($this->_config['prefix'] . $key, $data, $flag, $ttl1);
+        switch ($this->_type) {
+            case 'Memcache':
+                $flag = 0;#!empty($this->_config['compress']) ? MEMCACHE_COMPRESSED : 0;
+                $ttl1 = is_null($ttl) ? 0 : time() + $ttl;
+                return $this->_conn->set($this->_config['prefix'] . $key, $data, $flag, $ttl1);
+
+            case 'Memcached':
+                return $this->_conn->set($this->_config['prefix'] . $key, $data, $ttl);
+        }
     }
 
     public function delete($key)
@@ -543,7 +586,13 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function gc()
     {
-        return false; // not implemented
+        return true; // not needed, ttl handled internally
+    }
+
+    public function deleteAll()
+    {
+        $this->_conn->flush();
+        return true;
     }
 }
 
@@ -612,6 +661,11 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
         return true;
     }
 
+    public function deleteAll()
+    {
+        return false; // not implemented
+    }
+
     public function migrate()
     {
         $t = BCache_Backend_Db_Model_Cache::table();
@@ -651,38 +705,42 @@ class BCache_Backend_Shmop extends BClass implements BCache_Backend_Interface
 
     public function init($config = [])
     {
-
+        return false; // not implemented
     }
 
     public function load($key)
     {
-
+        return false; // not implemented
     }
 
     public function save($key, $data, $ttl = null)
     {
-
+        return false; // not implemented
     }
-
 
     public function delete($key)
     {
-
+        return false; // not implemented
     }
 
     public function loadMany($pattern)
     {
-
+        return false; // not implemented
     }
 
     public function deleteMany($pattern)
     {
-
+        return false; // not implemented
     }
 
     public function gc()
     {
+        return false; // not implemented
+    }
 
+    public function deleteAll()
+    {
+        return false; // not implemented
     }
 }
 

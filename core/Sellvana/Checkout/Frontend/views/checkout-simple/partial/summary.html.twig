@@ -1,4 +1,6 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set cartCurrencyCode = cart.get('store_currency_code') %}
+{% set baseCurrencyCode = CONFIG.get('modules/FCom_Core/base_currency') %}
 {% set totals = cart.getTotals() %}
 
 <h4>{{ 'Totals'|_ }}</h4>
@@ -15,8 +17,20 @@
     </div>
 {% endfor %}
 
+{% if cartCurrencyCode != baseCurrencyCode %}
+<div class="row">
+    <div class="col-md-8 title">
+        {{ 'You will be charged for'|_ }}
+    </div>
+    <div class="col-md-4">{{ cart.get('grand_total') | currency('base') }}</div>
+</div>
+{% endif %}
+
 <h4>{{ "Order Items" |_ }}</h4>
 
 {% for item in cart.items() %}
-    {{ THIS.view('checkout-simple/partial/summary-item').set({'item': item, 'product': p}) | raw }}
+    {% if (item.get('qty') > 0) %}
+        {{ THIS.view('checkout-simple/partial/summary-item').set({'item': item, 'product': p}) | raw }}
+    {% endif %}
 {% endfor %}
+

@@ -4,46 +4,72 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set hlp = APP.instance('FCom_Admin_Model_Role') %}
+{% set rolesHlp = APP.instance('FCom_Admin_Controller_Roles') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset>
-  <div class="f-section">
-    {{ forms.input({field:'role_name', validator:validator, required:1, label:'Role Name'|_})}}
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-permissions">{{ 'Permissions'|_ }}</label>
-        <div class="col-md-5">
-            <div id="permissions"></div>
+    <div class="f-section">
+        {{ forms.input({field:'role_name', validator:validator, required:1, label:'Role Name'|_}) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-permissions">{{ 'Permissions'|_ }}</label>
+
+            <div class="col-md-6">
+                <div id="permissions-grid">
+                    {{ THIS.view('core/griddle').set('grid', rolesHlp.gridPermissionsConfig(m))|raw }}
+                </div>
+            </div>
         </div>
     </div>
-  </div>
 </fieldset>
 
 
 <script>
-    require(['jquery', 'jstree'], function ($) {
+    require(['jquery', 'jstree', 'underscore'], function ($, jt, _) {
         $(function () {
             $('#roles-form').validate();
 
             $('#permissions').jstree({
                 plugins: ['themes', 'json_data', 'ui', 'hotkeys', 'checkbox', 'search'],
-                json_data: {
+                core: {
                     data: {{ UTIL.toJson(m.getAllPermissionsTree())|raw }}
                 },
                 checkbox: {
                     override_ui: true,
                     real_checkboxes: true,
-                    real_checkboxes_names: function (n)
-                    {
+                    real_checkboxes_names: function (n) {
                         return ['model[permissions][' + n.attr('path') + ']', 1]
                     }
                 },
-                search: { case_insensitive: true }
+                search: {case_insensitive: true}
             }).bind('loaded.jstree', function (event, data) {
-                        var checked = {{ UTIL.toJson(m.getPermissionIds())|raw }};
-                        for (var id in checked) {
-                            data.inst.check_node('#' + id);
-                        }
+                var checked = {{ UTIL.toJson(m.getPermissionIds())|raw }};
+                for (var id in checked) {
+                    data.instance.check_node('#' + id);
+                }
             });
-        })
+        });
+
+        /**
+         * callback function after permissions grid mounted
+         * @param grid
+         * @param trigger
+         */
+        window.permissionsGridMounted = function (grid, trigger) {
+            var permissionsGrid = grid;
+
+            if (trigger == 'componentDidMount') {
+                $(permissionsGrid.getDOMNode()).on('updatedRows.griddle', function (e, rows, data) {
+                    updateStatusSelect(permissionsGrid, rows);
+                });
+            }
+        };
+
+        var updateStatusSelect = function (grid, rows) {
+            _.each(rows, function (module) {
+                var id = grid.getConfig('id') + '-status-' + module.id;
+
+                $(grid.getDOMNode()).find("#" + id).val(module.status);
+            });
+        }
     })
 </script>

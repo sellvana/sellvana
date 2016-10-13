@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_MarketClient_Admin
@@ -10,11 +10,10 @@ class Sellvana_MarketClient_Admin extends BClass
 {
     public function bootstrap()
     {
-        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'market_client' => $locale->_('Market Client'),
-            'market_client/public' => $locale->_('Public'),
-            'market_client/remote' => $locale->_('Remote'),
+            'market_client' => 'Market Client',
+            'market_client/public' => 'Public',
+            'market_client/remote' => 'Remote',
         ]);
     }
 
@@ -26,7 +25,7 @@ class Sellvana_MarketClient_Admin extends BClass
         $view = $args['page_view'];
         $actions = (array)$view->get('actions');
         $actions += [
-            'check_updates' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \'' . $this->BApp->href('marketclient/site/check_updates?install=true') . '\').submit()"><span>' . $this->BLocale->_('Check For Updates') . '</span></button>',
+            'check_updates' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \'' . $this->BApp->href('marketclient/site/check_updates?install=true') . '\').submit()"><span>' . $this->_('Check For Updates') . '</span></button>',
         ];
         $view->set('actions', $actions);
     }

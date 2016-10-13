@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -70,7 +70,9 @@ class BUtil extends BClass
     *
     * @var string
     */
-    protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
+    const CHARPOOL_DEFAULT = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMCAP = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMLOW = '1234567890abcdefghijklmnopqrstuvwxyz';
 
     /**
     * Shortcut to help with IDE auto-completion
@@ -112,8 +114,7 @@ class BUtil extends BClass
      */
     public function fromJson($json, $asObject = false)
     {
-        $obj = json_decode($json);
-        return $asObject ? $obj : static::objectToArray($obj);
+        return json_decode($json, !$asObject);
     }
 
     /**
@@ -253,10 +254,15 @@ class BUtil extends BClass
     public function objectToArray($d)
     {
         if (is_object($d)) {
-            $d = get_object_vars($d);
+            #$d = get_object_vars($d); // bug on HHVM and PHP7 (https://3v4l.org/bbleq)
+            $r = [];
+            foreach ($r as $k => $v) {
+                $r[$k] = $v;
+            }
+            $d = $r;
         }
         if (is_array($d)) {
-            return array_map([$this->BUtil, 'objectToArray'], $d);
+            return array_map([$this, 'objectToArray'], $d);
         }
         return $d;
     }
@@ -270,7 +276,7 @@ class BUtil extends BClass
     public function arrayToObject($d)
     {
         if (is_array($d)) {
-            return (object) array_map([$this->BUtil, 'arrayToObject'], $d);
+            return (object) array_map([$this, 'arrayToObject'], $d);
         }
         return $d;
     }
@@ -283,14 +289,16 @@ class BUtil extends BClass
      * @param array|string $mapFields
      * @return array
      */
-    public function arraySeqToMap($array, $idField, $mapFields = null)
+    public function arraySeqToMap($array, $idField = 'id', $mapFields = null)
     {
         $map = [];
         foreach ($array as $k => $row) {
             if (is_array($mapFields)) {
-                $outRow = $this->BUtil->arrayMask($row, $mapFields);
+                $outRow = $this->arrayMask($row, $mapFields);
             } elseif (is_string($mapFields)) {
                 $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
+            } else {
+                $outRow = !empty($row[$idField]) ? $row[$idField] : null;
             }
             if (!is_numeric($k)) {
                 $map[$k] = $outRow;
@@ -299,6 +307,25 @@ class BUtil extends BClass
             }
         }
         return $map;
+    }
+
+    public function arrayMapToSeq($array, $keyField = 'id', $valueField = 'text')
+    {
+        $seq = [];
+        foreach ($array as $k => $v) {
+            $seq[] = [$keyField => $k, $valueField => $v];
+        }
+        return $seq;
+    }
+
+    public function arrayWalkToString($array)
+    {
+        array_walk_recursive($array, function(&$node) {
+            if (is_object($node) && method_exists($node, '__toString')) {
+                $node = (string)$node;
+            }
+        });
+        return $array;
     }
 
     /**
@@ -528,6 +555,9 @@ class BUtil extends BClass
 
     public function arrayCleanEmpty($arr)
     {
+        if (is_string($arr)) {
+            $arr = explode(',', $arr);
+        }
         foreach ($arr as $k => $v) {
             if (is_array($v)) {
                 $arr[$k] = $this->arrayCleanEmpty($v);
@@ -732,9 +762,11 @@ class BUtil extends BClass
         $isObject = is_object(current($source));
         foreach ($source as $k => $item) {
             if ($isObject) {
-                $key = null === $keyField ? $k : $item->$keyField;
-                $label = $labelField[0] === '.' ? $item-> {substr($labelField, 1)}() : $item->labelField;
-                $options[$key] = $label;
+                $key = null === $keyField ? $k : $item->get($keyField);
+                $label = $labelField[0] === '.' ? $item->{substr($labelField, 1)}() : $item->get($labelField);
+                if (null !== $label) {
+                    $options[$key] = $label;
+                }
             } else {
                 $key = null === $keyField ? $k : $item[$keyField];
                 $options[$key] = $item[$labelField];
@@ -761,6 +793,144 @@ class BUtil extends BClass
             }
         }
         return $assocArray;
+    }
+
+    /**
+     * Explode the "value" and "key" arguments passed to "pluck".
+     *
+     * @param  string|array $value
+     * @param  string|array|null $key
+     * @return array
+     */
+    protected function _parsePluckParams($value, $key)
+    {
+        $value = is_string($value) ? preg_split('#[./]#', $value) : $value;
+
+        $key = is_null($key) || is_array($key) ? $key : preg_split('#[./]#', $key);
+
+        return [$value, $key];
+    }
+
+    /**
+     * Pluck an array of values from an array.
+     *
+     * @param  array $array
+     * @param  string|array $value
+     * @param  string|array|null $key
+     * @return array|null
+     */
+    public function arrayPluck($array, $value, $key = null)
+    {
+        if (!is_array($array)) {
+            return null;
+        }
+
+        $results = [];
+
+        list($value, $key) = static::_parsePluckParams($value, $key);
+
+        foreach ($array as $item) {
+            $itemValue = static::dataGet($item, $value);
+            if (is_null($key)) {
+                $results[] = $itemValue;
+            } else {
+                $itemKey           = static::dataGet($item, $key);
+                $results[$itemKey] = $itemValue;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param       $input
+     * @param       $offset
+     * @param       $length
+     * @param array $replacement
+     * @return array
+     */
+    public function arraySpliceAssoc($input, $offset, $length, $replacement = [])
+    {
+        $replacement = (array)$replacement;
+        $keyIndices = array_flip(array_keys($input));
+        if (isset($input[$offset]) && is_string($offset)) {
+            $offset = $keyIndices[$offset];
+        }
+        if (isset($input[$length]) && is_string($length)) {
+            $length = $keyIndices[$length] - $offset;
+        }
+
+        return array_slice($input, 0, $offset, TRUE)
+            + $replacement
+            + array_slice($input, $offset + $length, NULL, TRUE);
+    }
+
+    /**
+     * @param array  $array
+     * @param string $label
+     * @param string $key
+     * @return array
+     */
+    public function arrayAddEmptyOption(array $array, $label = '', $key = '')
+    {
+        return $this->arraySpliceAssoc($array, 0, 0, [$key => $label]);
+    }
+
+    /**
+     * Get an item from an array|object using "dot" or "slash" notation.
+     *
+     * @param  mixed $target
+     * @param  string|array $key
+     * @param  mixed $default
+     * @return mixed
+     */
+    public function dataGet($target, $key, $default = null)
+    {
+        if (is_null($key)) {
+            return $target;
+        }
+
+        $key = is_array($key) ? $key : preg_split('#[./]#', $key);
+
+        while (($segment = array_shift($key)) !== null) {
+            if (is_array($target)) {
+                if (!array_key_exists($segment, $target)) {
+                    return static::maybeCallback($default);
+                }
+
+                $target = $target[$segment];
+            } elseif (is_object($target)) {
+                if ($target instanceof Model) {
+                    $target = $target->get($segment);
+                } else {
+                    if (!isset($target->{$segment})) {
+                        return static::maybeCallback($default);
+                    }
+
+                    $target = $target->{$segment};
+                }
+            } else {
+                return static::maybeCallback($default);
+            }
+        }
+
+        return $target;
+    }
+
+    /**
+     * Convert xml object to array
+     *
+     * @param $xmlObject
+     * @param array $out
+     * @return array
+     */
+    public function arrayFromXml($xmlObject, $out = [])
+    {
+        foreach ((array)$xmlObject as $index => $node) {
+            $out[$index] = is_object($node) ? $this->arrayFromXml($node) : $node;
+        }
+
+        return $out;
     }
 
     /**
@@ -833,11 +1003,8 @@ class BUtil extends BClass
      * @param string $chars allowed characters to be used
      * @return string
      */
-    public function randomString($strLen = 8, $chars = null)
+    public function randomString($strLen = 8, $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool;
-        }
         $charsLen = strlen($chars)-1;
         $str = '';
         mt_srand();
@@ -874,11 +1041,8 @@ class BUtil extends BClass
      * @param null $chars
      * @return string
      */
-    public function nextStringValue($string = '', $chars = null)
+    public function nextStringValue($string = '', $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool; // avoid leading 0
-        }
         $pos = strlen($string);
         $lastChar = substr($chars, -1);
         while (--$pos >= -1) {
@@ -1035,7 +1199,7 @@ class BUtil extends BClass
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
-        $useCurl = isset($options['curl']) ? $options['curl'] : false;
+        $useCurl = isset($options['curl']) ? $options['curl'] : true;
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
         }
@@ -1049,27 +1213,66 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
-        $found = false;
-        foreach ($headers as $h) {
-            if (stripos($h, 'expect:') === 0) {
-                $found = true;
-                break;
+        $multipart = false;
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                if (is_string($v) && !empty($v[0]) && $v[0] === '@') {
+                    $multipart = true;
+                    break;
+                }
             }
         }
-        if (!$found) {
-            $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
-        }
-        $found = false;
-        foreach ($headers as $h) {
-            if (stripos($h, 'referer:') === 0) {
-                $found = true;
-                break;
+        $contentType = null;
+        $postContent = null;
+        if ($method === 'POST' || $method === 'PUT') {
+            if (!$multipart) {
+                $contentType = 'application/x-www-form-urlencoded';
+                $postContent = is_array($data) ? http_build_query($data) : $data;
+            } else {
+                $boundary = '--------------------------' . microtime(true);
+                $contentType = 'multipart/form-data; boundary=' . $boundary;
+                $postContent = '';
+                //TODO: implement recursive forms
+                foreach ($data as $k => $v) {
+                    if (is_string($v) && $v[0] === '@') {
+                        $filename     = substr($v, 1);
+                        $fileContents = file_get_contents($filename);
+                        $postContent .= "--{$boundary}\r\n" .
+                             "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
+                             "Content-Type: application/zip\r\n" .
+                             "\r\n" .
+                             "{$fileContents}\r\n";
+                    } else {
+                        $postContent .= "--{$boundary}\r\n" .
+                             "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
+                             "\r\n" .
+                             "{$v}\r\n";
+                    }
+                }
+                $postContent .= "--{$boundary}--\r\n";
             }
         }
-        if (!$found) {
-            $headers += ['Referer: ' . $this->BRequest->currentUrl()];
+
+        foreach ([
+            'Expect' => '', //Fixes the HTTP/1.1 417 Expectation Failed
+            'Referer' => $this->BRequest->currentUrl(),
+            'Accept' => '*/*',
+            'Content-Type' => $contentType,
+            'Content-Length' => $postContent ? strlen($postContent) : null,
+        ] as $header => $value) {
+            $found = false;
+            foreach ($headers as $h) {
+                if (stripos($h, $header . ':') === 0) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found && $value !== null) {
+                $headers[] = $header . ': ' . $value;
+            }
         }
-        
+
+
         if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
@@ -1078,7 +1281,7 @@ class BUtil extends BClass
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_CAINFO => dirname(__DIR__) . '/ssl/ca-bundle.crt',
+                CURLOPT_CAINFO => $this->normalizePath(dirname(__DIR__) . '/ssl/cacert.pem'),
                 CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
@@ -1092,29 +1295,28 @@ class BUtil extends BClass
             }
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = $this->BApp->storageRandomDir() . '/cache';
-                $this->BUtil->ensureDir($cookieDir);
+                $this->ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
                 $curlOpt += [
                     CURLOPT_COOKIEJAR => $cookie,
                 ];
             }
 
-            if (is_array($data)) {
-                foreach ($data as $k => $v) {
-                    if (is_string($v) && $v[0] === '@') {
-                        $data[$k] = new CURLFile(substr($v, 1));
-                    }
-                }
-            }
             if ($method === 'POST') {
                 $curlOpt += [
-                    CURLOPT_POSTFIELDS => $data,
+                    CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_POST => 1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
                 ];
             } elseif ($method === 'PUT') {
                 $curlOpt += [
-                    CURLOPT_POSTFIELDS => $data,
+                    CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_PUT => 1,
+                    CURLOPT_CUSTOMREQUEST => 'PUT',
+                ];
+            } elseif ($method === 'DELETE') {
+                $curlOpt += [
+                    CURLOPT_CUSTOMREQUEST => 'DELETE',
                 ];
             }
 
@@ -1145,9 +1347,21 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
+/*
+$curlConstants = get_defined_constants(true)['curl'];
+$curlOptInfo = [];
+foreach ($curlConstants as $name => $key) {
+    if (!empty($curlOpt[$key])) {
+        if (preg_match('#^CURLOPT#', $name)) {
+            $curlOptInfo[$name] = $curlOpt[$key];
+        }
+    }
+}
+echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
+*/
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
-#echo "<xmp>"; var_dump($rawResponse, static::$_lastRemoteHttpInfo); echo "</xmp>";
+#echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
             $respHeaders = explode("\r\n", $headers);
             if (curl_errno($ch) != 0) {
                 static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
@@ -1156,7 +1370,7 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
-                'protocol_version' => '1.1',
+                'protocol_version' => '1.0',
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => [
@@ -1171,61 +1385,27 @@ class BUtil extends BClass
                 $streamOptions['http']['proxy'] = $options['proxy'];
             }
             if ($method === 'POST' || $method === 'PUT') {
-                $multipart = false;
-                if (is_array($data)) {
-                    foreach ($data as $k => $v) {
-                        if (is_string($v) && $v[0] === '@') {
-                            $multipart = true;
-                            break;
-                        }
-                    }
-                }
-                if (!$multipart) {
-                    $contentType = 'application/x-www-form-urlencoded';
-                    $streamOptions['http']['content'] = is_array($data) ? http_build_query($data) : $data;
-                } else {
-                    $boundary = '--------------------------' . microtime(true);
-                    $contentType = 'multipart/form-data; boundary=' . $boundary;
-                    $streamOptions['http']['content'] = '';
-                    //TODO: implement recursive forms
-                    foreach ($data as $k => $v) {
-                        if (is_string($v) && $v[0] === '@') {
-                            $filename = substr($v, 1);
-                            $fileContents = file_get_contents($filename);
-                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
-                                "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
-                                "Content-Type: application/zip\r\n" .
-                                "\r\n" .
-                                "{$fileContents}\r\n";
-                        } else {
-                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
-                                "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
-                                "\r\n" .
-                                "{$v}\r\n";
-                        }
-                    }
-                    $streamOptions['http']['content'] .= "--{$boundary}--\r\n";
-                }
-                $streamOptions['http']['header'][] = "Content-Type: {$contentType}";
-                    //."Content-Length: ".strlen($request)."\r\n";
+                $streamOptions['http']['content'] = $postContent;
+                $streamOptions['http']['header'][] = "Content-Type: {$contentType}"
+                    . "\r\nContent-Length: " . strlen($postContent) . "\r\n";
 
-                if (!empty($options['auth'])) {
-                    $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
-                }
+            }
+            if (!empty($options['auth'])) {
+                $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+            }
 
-                if (preg_match('#^(ssl|ftps|https):#', $url)) {
-                    $streamOptions['ssl'] = [
-                        'verify_peer' => true,
-                        'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
-                        'verify_depth' => 5,
-                    ];
-                }
+            if (preg_match('#^(ssl|ftps|https):#', $url)) {
+                $streamOptions['ssl'] = [
+                    'verify_peer' => true,
+                    'cafile' => dirname(__DIR__) . '/ssl/cacert.pem',
+                    'verify_depth' => 5,
+                ];
             }
             if (empty($options['debug'])) {
                 $oldErrorReporting = error_reporting(0);
             }
             $response = file_get_contents($url, false, stream_context_create($streamOptions));
-#var_dump($response, $url, $streamOptions, $http_response_header); exit(__METHOD__);
+#var_dump($response, $url, $streamOptions, $http_response_header); #exit(__METHOD__);
             if (empty($options['debug'])) {
                 error_reporting($oldErrorReporting);
             }
@@ -1233,17 +1413,23 @@ class BUtil extends BClass
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
         }
         foreach ($respHeaders as $i => $line) {
-            if ($i) {
+            if ($i && strpos($line, ':')) {
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m);
-                static::$_lastRemoteHttpInfo['headers']['http'] = [
-                    'full' => $m[0],
-                    'protocol' => $m[1],
-                    'code' => $m[2],
-                    'status' => $m[3],
-                ];
+                if (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
+                    static::$_lastRemoteHttpInfo['headers']['http'] = [
+                        'unparsed' => $line,
+                        'full' => $m[0],
+                        'protocol' => $m[1],
+                        'code' => $m[2],
+                        'status' => $m[3],
+                    ];
+                } else {
+                    static::$_lastRemoteHttpInfo['headers']['http'] = [
+                        'unparsed' => $line,
+                    ];
+                }
             }
         }
 /*
@@ -1277,7 +1463,7 @@ class BUtil extends BClass
      */
     public function normalizePath($path)
     {
-        $path = str_replace('\\', '/', $path);
+        $path = str_replace(['\\', "\0"], ['/', ''], $path);
         if (strpos($path, '/..') !== false) {
             $a = explode('/', $path);
             $b = [];
@@ -1344,6 +1530,92 @@ class BUtil extends BClass
     {
         return !empty($path) && ($path[0] === '/' || $path[0] === '\\') // starting with / or \
             || !empty($path[1]) && $path[1] === ':'; // windows drive letter C:
+    }
+
+    /**
+     * @param string $path
+     * @param array|string $root
+     * @param boolean $isPathNormalized
+     * @return bool
+     */
+    public function isPathWithinRoot($path, $root = null, $isPathNormalized = false)
+    {
+        $path = $this->normalizePath($path);
+
+        if (is_array($root)) {
+            foreach ($root as $r) {
+                if ($this->isPathWithinRoot($path, $r, true)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        $fs = $this->BConfig->get('fs');
+
+        if (!$root) {
+            $root = $fs['root_dir'];
+        } elseif ($root === '@random_dir') {
+            $root = $this->BApp->storageRandomDir();
+        } elseif ($root[0] === '@') {
+            $root = preg_replace_callback('#^@([a-z_]+)($|/.*)#', function($m) {
+                return $this->BConfig->get('fs/' . $m[1]) . $m[2];
+            }, $root);
+        }
+
+        $this->ensureDir($root);
+        $root = $this->normalizePath(realpath($root));
+        if (!$path || !$root || substr($path, 0, strlen($root)) !== $root) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function moveUploadedFileSafely($from, $to, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!$this->isPathWithinRoot($to, $root)) {
+            return false;
+        }
+        $this->ensureDir(dirname($to));
+        return @move_uploaded_file($from, $to);
+    }
+
+    public function readFileSafely($file, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!file_exists($file)) {
+            return false;
+        }
+        if (!$this->isPathWithinRoot($file, $root)) {
+            return false;
+        }
+        return @file_get_contents($file);
+    }
+
+    public function writeFileSafely($file, $content, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!$this->isPathWithinRoot($file, $root)) {
+            return false;
+        }
+        $this->ensureDir(dirname($file));
+        return @file_put_contents($file, $content);
+    }
+
+    public function moveFileSafely($from, $to, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!$this->isPathWithinRoot($to, $root)) {
+            return false;
+        }
+        $this->ensureDir(dirname($to));
+        return @rename($from, $to);
+    }
+
+    public function deleteFileSafely($file, $root = ['@media_dir', '@random_dir'])
+    {
+        if (!file_exists($file) || !$this->isPathWithinRoot($file, $root)) {
+            return false;
+        }
+        return @unlink($file);
     }
 
     /**
@@ -1535,25 +1807,27 @@ class BUtil extends BClass
         if (!$options) {
             return '';
         }
-        $locale = $this->BLocale;
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
                 $label = trim(substr($k, 1));
-                $htmlArr[] = $this->BUtil->tagHtml('optgroup', ['label' => $label], static::optionsHtml($v, $default));
+                $htmlArr[] = $this->tagHtml('optgroup', ['label' => $label], static::optionsHtml($v, $default));
                 continue;
             }
             if (is_array($v)) {
                 $attr = $v;
-                $v = !empty($attr['text']) ? $locale->_($attr['text']) : '';
+                $v = !empty($attr['text']) ? $this->_($attr['text']) : '';
                 unset($attr['text']);
+            } elseif (is_numeric($v)) {
+                $v = $v . ' ';
+                $attr = [];
             } else {
-                $v = $locale->_($v);
+                $v = $this->_($v);
                 $attr = [];
             }
             $attr['value'] = $k;
             $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
-            $htmlArr[] = $this->BUtil->tagHtml('option', $attr, $v);
+            $htmlArr[] = $this->tagHtml('option', $attr, $v);
         }
 
         return join("\n", $htmlArr);
@@ -1585,6 +1859,11 @@ class BUtil extends BClass
         return preg_replace('#[0 :-]#', '', (string)$date) === '';
     }
 
+    public function isValidDate($date)
+    {
+        return preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $date);
+    }
+
     /**
      * Get gravatar image src by email
      *
@@ -1605,9 +1884,20 @@ class BUtil extends BClass
             . ($params ? '?' . http_build_query($params) : '');
     }
 
+    public function isCallable($cb)
+    {
+        if (is_callable($cb)) {
+            return true;
+        }
+        if (is_string($cb) && preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $cb)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param $callback
-     * @return array
+     * @return callable
      */
     public function extCallback($callback)
     {
@@ -1618,16 +1908,15 @@ class BUtil extends BClass
                 $callback = $callbackMapCache[$callback];
             } else {
                 $origCallback = $callback;
-                if (strpos($callback, '::') !== false) {
-                    list($class, $method) = explode('::', $callback);
-                    $reflMethod = new ReflectionMethod($class, $method);
-                    if ($reflMethod->isStatic()) {
-                        $class = null; // proceed with usual callback
+                if (preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $callback, $m)) {
+                    $class = $m[1];
+                    $method = $m[3];
+                    if ($m[2] === '::') {
+                        $reflMethod = new ReflectionMethod($class, $method);
+                        if ($reflMethod->isStatic()) {
+                            $class = null; // proceed with usual callback
+                        }
                     }
-                } elseif (strpos($callback, '.') !== false) {
-                    list($class, $method) = explode('.', $callback);
-                } elseif (strpos($callback, '->')) {
-                    list($class, $method) = explode('->', $callback);
                 }
                 if (!empty($class)) {
                     $instance = BClassRegistry::instance($class, [], true);
@@ -1653,6 +1942,33 @@ class BUtil extends BClass
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    /**
+     * If callback, call and get result, otherwise pass through
+     *
+     * Do not apply on user data for security concerns
+     *
+     * @param mixed $data
+     * @param string $cacheKey
+     * @return mixed
+     */
+    public function maybeCallback($data, $cacheKey = null)
+    {
+        static $cache = [];
+
+        if ($cacheKey && !empty($cache[$cacheKey])) {
+            return $this->call($cache[$cacheKey]);
+        }
+        if ($this->isCallable($data)) {
+            $callback = $this->extCallback($data);
+            if ($cacheKey) {
+                $cache[$cacheKey] = $callback;
+            }
+            $result = $callback($data);
+            return $result;
+        }
+        return $data;
     }
 
     /**
@@ -1797,6 +2113,16 @@ class BUtil extends BClass
     }
 
     /**
+     * Helper for Twig templates
+     *
+     * @return float
+     */
+    public function microtime()
+    {
+        return microtime(true);
+    }
+
+    /**
      * Simplify string to allowed characters only
      *
      * @param string $str input string
@@ -1818,11 +2144,16 @@ class BUtil extends BClass
     * DANGEROUS
     *
     * @param string $dir
+    * @param string|array $root
+    * @param boolean $first
     */
-    public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $first = true)
+    public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $root = ['@media_dir', '@random_dir'], $first = true)
     {
         if ($first) {
             $dir = realpath($dir);
+            if (!$this->isPathWithinRoot($dir, $root)) {
+                return false;
+            }
         }
         if (!$dir || !file_exists($dir)) {
             return true;
@@ -1834,9 +2165,9 @@ class BUtil extends BClass
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, $root, false)) {
                 chmod($dir . "/" . $item, 0777);
-                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, $root, false)) {
                     return false;
                 }
             }
@@ -1925,7 +2256,7 @@ class BUtil extends BClass
         if (!$res) {
             throw new BException("Can't open zip archive for reading: " . $filename);
         }
-        $this->BUtil->ensureDir($targetDir);
+        $this->ensureDir($targetDir);
         $res = $zip->extractTo($targetDir);
         $zip->close();
         if (!$res) {
@@ -1946,7 +2277,7 @@ class BUtil extends BClass
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
         }
-        $files = $this->BUtil->globRecursive($sourceDir);
+        $files = $this->globRecursive($sourceDir);
         if (!$files) {
             throw new BException('Invalid or empty source dir');
         }
@@ -1975,7 +2306,7 @@ class BUtil extends BClass
      */
     public function getMemoryLimit()
     {
-        preg_match('#^([0-9]+)([GMK]?)$#', ini_get('memory_limit'), $val);
+        preg_match('#^([0-9]+)([GMK]?)$#', strtoupper(ini_get('memory_limit')), $val);
         $mult = ['G' => 1073741824, 'M' => 1048576, 'K' => 1024];
         return $val[1] * (!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
     }
@@ -2067,11 +2398,47 @@ class BUtil extends BClass
     }
 
     /**
+     * Given a file name, remove any file extension from the string.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function removeFileExtension($string)
+    {
+        return preg_replace("/\\.[^.\\s]{3,4}$/", "", $string);
+    }
+
+    /**
+     * Take a camel cased string and turn it into a word separated sentence.
+     * e.g. 'ThisIsASentence' would turn into 'This Is A Sentence'
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function camelToSentence($string)
+    {
+        return trim(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $string));
+    }
+
+    /**
      * Alias of version_compare for use in Twig templates
      */
     public function versionCompare($v1, $v2, $op = null)
     {
         return version_compare($v1, $v2, $op);
+    }
+
+    /**
+     * Converts bytes into human readable file size.
+     *
+     * @param $size
+     * @return string
+     */
+    public function convertFileSize($size)
+    {
+        $unit = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
+        $exponent = (int)floor(log($size, 1024));
+        return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
     }
 }
 
@@ -2152,10 +2519,10 @@ class BEmail extends BClass
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return bool|mixed
      */
-    public function send($data)
+    public function send(array $data)
     {
         static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|list-unsubscribe|x-.*)$/';
 
@@ -2204,22 +2571,33 @@ class BEmail extends BClass
 
         $origBody = $body;
 
-        $this->_formatAlternative($headers, $body);
+        $altBody = null;
+        $isHtml = !empty($headers['content-type']) && preg_match('#text/html#', $headers['content-type']);
+        $this->_formatAlternative($headers, $body, $altBody, $isHtml);
+
         $body = trim(preg_replace('#<!--.*?-->#', '', $body));//strip comments
+
+        if (empty($headers['content-type'])) {
+            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
+        }
 
         if ($files) {
             // $body and $headers will be updated
             $this->_addAttachments($files, $headers, $body);
         }
 
-        if (empty($headers['content-type'])) {
-            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
+        if (!empty($headers['bcc'])) { // workaround some weird bug in php send()
+            $bcc = $headers['bcc'];
+            unset($headers['bcc']);
+            $headers['bcc'] = $bcc;
         }
 
         $emailData = [
             'to' => &$to,
             'subject' => &$subject,
             'orig_body' => &$origBody,
+            'alt_body' => &$altBody,
+            'is_html' => &$isHtml,
             'body' => &$body,
             'headers' => &$headers,
             'params' => &$params,
@@ -2271,7 +2649,7 @@ class BEmail extends BClass
      * @param $body
      * @return bool
      */
-    protected function _formatAlternative(&$headers, &$body)
+    protected function _formatAlternative(&$headers, &$body, &$altBody, &$isHtml)
     {
         if (!preg_match('#<!--=+-->#', $body)) {
             return $body;
@@ -2286,6 +2664,9 @@ class BEmail extends BClass
         $message = "--{$mimeBoundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n" . trim($parts[0]);
         $message .= "\r\n--{$mimeBoundary}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n" . trim($parts[1]);
         $message .= "\r\n--{$mimeBoundary}--";
+
+        $altBody = $parts[0];
+        $isHtml = true;
 
         $body = $message;
         return true;
@@ -2305,7 +2686,7 @@ class BEmail extends BClass
         $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
 
         //headers and message for text
-        $message = "--{$mimeBoundary}\r\n{$mailheaders['content-type']}\r\n\r\n{$body}\r\n\r\n";
+        $message = "--{$mimeBoundary}\r\n{$headers['content-type']}\r\n\r\n{$body}\r\n\r\n";
 
         // headers for attachment
         $headers['mime-version'] = "MIME-Version: 1.0";
@@ -2319,7 +2700,7 @@ class BEmail extends BClass
                 $message .= "--{$mimeBoundary}\r\n" .
                     "Content-Type: application/octet-stream; name=\"{$name}\"\r\n" .
                     "Content-Description: {$name}\r\n" .
-                    "Content-Disposition: attachment; filename=\"{$name}\"; size=" . filesize($files[$i]) . ";\r\n" .
+                    "Content-Disposition: attachment; filename=\"{$name}\"; size=" . filesize($file) . ";\r\n" .
                     "Content-Transfer-Encoding: base64\r\n\r\n{$data}\r\n\r\n";
             }
         }
@@ -2330,13 +2711,18 @@ class BEmail extends BClass
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return bool
      */
-    public function defaultHandler($data)
+    public function defaultHandler(array $data)
     {
-        return mail($data['to'], $data['subject'], $data['body'],
-            join("\r\n", $data['headers']), join(' ', $data['params']));
+        return mail(
+            $data['to'],
+            $data['subject'],
+            $data['body'],
+            join("\r\n", $data['headers']),
+            join(' ', $data['params'])
+        );
     }
 }
 
@@ -2548,30 +2934,6 @@ class BErrorException extends Exception
 */
 class BDebug extends BClass
 {
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const EMERGENCY = 0,
         ALERT       = 1,
         CRITICAL    = 2,
@@ -2595,27 +2957,6 @@ class BDebug extends BClass
         self::DEBUG     => 'DEBUG',
     ];
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MEMORY  = 0,
         FILE      = 1,
         SYSLOG    = 2,
@@ -2624,30 +2965,6 @@ class BDebug extends BClass
         EXCEPTION = 16,
         STOP      = 4096;
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MODE_DEBUG      = 'DEBUG',
         MODE_DEVELOPMENT  = 'DEVELOPMENT',
         MODE_STAGING      = 'STAGING',
@@ -2655,7 +2972,8 @@ class BDebug extends BClass
         MODE_MIGRATION    = 'MIGRATION',
         MODE_INSTALLATION = 'INSTALLATION',
         MODE_RECOVERY     = 'RECOVERY',
-        MODE_DISABLED     = 'DISABLED'
+        MODE_DISABLED     = 'DISABLED',
+        MODE_IMPORT       = 'IMPORT'
     ;
 
     /**
@@ -2749,6 +3067,15 @@ class BDebug extends BClass
             self::EXCEPTION => false,
             self::STOP      => false,
         ],
+        self::MODE_IMPORT => [
+            self::MEMORY    => false,//self::DEBUG,
+            self::SYSLOG    => false,
+            self::FILE      => false,//self::WARNING,
+            self::EMAIL     => false, //self::CRITICAL,
+            self::OUTPUT    => false,//self::NOTICE,
+            self::EXCEPTION => false,//self::ERROR,
+            self::STOP      => false,//self::CRITICAL,
+        ],
     ];
 
     /**
@@ -2822,6 +3149,8 @@ class BDebug extends BClass
      * @var array
      */
     static protected $_errorHandlerLog = [];
+
+    static protected $_disableAllLogging = false;
 
     /**
     * Constructor, remember script start time for delta timestamps
@@ -2959,6 +3288,7 @@ class BDebug extends BClass
     {
         $this->BUtil->ensureDir($dir);
         static::$_logDir = $dir;
+        return $this;
     }
 
     /**
@@ -2969,12 +3299,16 @@ class BDebug extends BClass
     public function log($msg, $file = 'debug.log', $backtrace = false)
     {
         $file = static::$_logDir . '/' . $file;
-        error_log($msg . "\n", 3, $file);
+        if (!is_scalar($msg)) {
+            $msg = print_r($msg, 1);
+        }
+        error_log(date('c') . ' ' . $msg . "\n", 3, $file);
         if ($backtrace) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             error_log(ob_get_clean(), 3, $file);
         }
+        return $this;
     }
 
     /**
@@ -2982,7 +3316,8 @@ class BDebug extends BClass
      */
     public function logException($e)
     {
-        static::log(print_r($e, 1), 'exceptions.log');
+        $this->log(print_r($e, 1), 'exceptions.log');
+        return $this;
     }
 
     /**
@@ -3030,11 +3365,14 @@ class BDebug extends BClass
      */
     static public function trigger($level, $msg, $stackPop = 0, $backtrace = false)
     {
-        if ($level !== static::DEBUG) {
-            static::$_collectedErrors[$level][] = $msg;
+        if (static::$_disableAllLogging) {
+            return null;
         }
-        if (is_scalar($msg)) {
-            $e = ['msg' => $msg];
+//        if ($level !== static::DEBUG) {
+//            static::$_collectedErrors[$level][] = $msg;
+//        }
+        if (is_scalar($msg) || is_object($msg) && method_exists($msg, '__toString')) {
+            $e = ['msg' => (string)$msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
             $bt = $msg->getTrace();
             $msgStr = $msg->getMessage();
@@ -3058,18 +3396,36 @@ class BDebug extends BClass
         //$o = $bt[$stackPop]['object'];
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
-        $e['ts'] = BDb::i()->now();
+        $e['msg'] = (string)$e['msg'];
+        $e['ts'] = BDb::now();
         $e['t'] = microtime(true) - static::$_startTime;
         $e['d'] = null;
         $e['c'] = null;
         $e['mem'] = memory_get_usage();
 
         if ($backtrace || !empty(static::$_verboseBacktrace[$e['msg']])) {
+            if (PHP_SAPI === 'cli') {
+                $e['msg'] = '{white*}' . $e['msg'] . '{/}';
+                $e['msg'] .= PHP_EOL . PHP_EOL . '{cyan*}Backtrace:{/}';
+                $fileIndex = 0;
+            }
             foreach ($bt as $t) {
-                if (!empty($t['file'])) {
-                    $e['msg'] .= "\n" . $t['file'] . ':' . $t['line'];
-                } elseif (!empty($t['class'])) {
-                    $e['msg'] .= "\n" . $t['class'] . $t['type'] . $t['function'];
+                if (PHP_SAPI !== 'cli') {
+                    if (!empty($t['file'])) {
+                        $e['msg'] .= "\n" . $t['file'] . ':' . $t['line'];
+                    } elseif (!empty($t['class'])) {
+                        $e['msg'] .= "\n" . $t['class'] . $t['type'] . $t['function'];
+                    }
+                } else {
+                    $index = '{white}#' . $fileIndex . '{/}';
+                    if (!empty($t['file'])) {
+                        $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
+                                . $t['file'] . '{/}:{white}' . $t['line'] . '{/}';
+                    } elseif (!empty($t['class'])) {
+                        $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
+                                . $t['class'] . $t['type'] . $t['function'] . '{/}';
+                    }
+                    $fileIndex++;
                 }
             }
         }
@@ -3121,9 +3477,22 @@ class BDebug extends BClass
 
         $l = static::$_level[static::OUTPUT];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            echo static::cleanBacktrace($message);
-            echo '</xmp>';
+            if (PHP_SAPI !== 'cli') {
+                echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
+                echo static::cleanBacktrace(print_r($message, 1));
+                echo '</xmp>';
+            } else {
+                $shellOut = PHP_EOL . '{red*}' . $e['level'] . ':{/} ' . $e['msg'] . PHP_EOL;
+                if (isset($e['file'])) {
+                    $shellOut .= '{red*}Called from: {/}' . $e['file'] . ':' . $e['line'];
+                }
+
+                if (class_exists('FCom_Core_Shell')) {
+                    /** @var FCom_Core_Shell $shell */
+                    $shell = FCom_Core_Shell::i();
+                    $shell->stdout($shell->colorize($shellOut));
+                }
+            }
         }
 /*
         $l = static::$_level[static::EXCEPTION];
@@ -3137,7 +3506,9 @@ class BDebug extends BClass
 */
         $l = static::$_level[static::STOP];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            static::i()->dumpLog();
+            if (PHP_SAPI !== 'cli') {
+                static::i()->dumpLog();
+            }
             die;
         }
 
@@ -3162,7 +3533,7 @@ class BDebug extends BClass
         if ($textBefore) {
             echo htmlspecialchars($textBefore) . "\n";
         }
-        debug_print_backtrace();
+        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $output = ob_get_clean();
         $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
         return $output;
@@ -3313,7 +3684,7 @@ class BDebug extends BClass
         }
 ?></tbody></table></div><script>
 
-        if (typeof require !== 'undefined') {
+        if (typeof require !== 'undefined' && require.defined("jquery.tablesorter")) {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })
@@ -3362,6 +3733,15 @@ class BDebug extends BClass
     {
         static::dumpLog();
         //$args['content'] = str_replace('</body>', static::dumpLog(true).'</body>', $args['content']);
+    }
+
+    public function disableAllLogging()
+    {
+        static::$_disableAllLogging = true;
+        //$this->mode('PRODUCTION'); //For example in MODE_IMPORT also need disable all logging.
+        BORM::configure('logging', 0);
+        $this->BConfig->set('db/logging', 0);
+        return $this;
     }
 }
 
@@ -3483,6 +3863,241 @@ class BFtpClient extends BClass
             ftp_chdir($conn, '..');
         }
         return $errors;
+    }
+}
+
+/**
+ * Class BFile
+ */
+class BFile extends BClass
+{
+    const STATUS_REMOTE_FILE = 'remote',
+          STATUS_LOCAL_FILE  = 'local';
+
+    protected $_tpmDir;
+    protected $_currentTmpDir;
+
+    protected $_currentStatus;
+    protected $_previousStatus;
+
+    protected $_fileInfo;
+
+    protected $_fileContent;
+
+    /**
+     * Is necessary to keep the contents of file in the object or not
+     * @var bool
+     */
+    public $keepContent = false;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->_tpmDir = $this->BApp->storageRandomDir() . DIRECTORY_SEPARATOR . 'tmp';
+    }
+
+    /**
+     * @param $path
+     * @return BFile|void
+     * @throws BException
+     */
+    public function load($path)
+    {
+        if (!is_string($path)) {
+            throw new BException('Support only string path of file');
+        }
+        /** @var BFile $file */
+        $file = self::i(true);
+        if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
+            return $file->_loadRemoteFile($path);
+        } else {
+            return $file->_loadLocalFile($path);
+        }
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     * @throws BException
+     */
+    private function _loadRemoteFile($url)
+    {
+        $headers = get_headers($url, 1);
+        if (false === $headers) {
+            throw new BException('Can\'t get headers of url:' . $url);
+        }
+
+        $responseCode = substr($headers[0], 9, 3);
+        if ($responseCode != 200) {
+            return $this;
+            //throw new BException('Unsupported response code: ' . $responseCode);
+        }
+
+        $memoryLimit = $this->BUtil->getMemoryLimit() - memory_get_usage();
+        if ($memoryLimit <= ($headers['Content-Length'])) {
+            throw new BException('Can\'t get file. It\'s to big. URL:' . $url);
+        }
+
+        $file = $this->BUtil->remoteHttp('get', $url);
+
+        $this->_fileInfo['remote_url'] = $url;
+
+        $urlPath = parse_url($url, PHP_URL_PATH);
+        $urlPath = explode('/', $urlPath);
+        $fullFileName = array_pop($urlPath);
+
+        if ($fullFileName === '') {
+            $fullFileName = $this->BUtil->randomString();
+        }
+
+        $fileName = explode('.', $fullFileName);
+        if (count($fileName) >= 2) {
+            $fileExtension = array_pop($fileName);
+        } else {
+            $fileExtension = null;
+        }
+        $fileName = $fileName[0];
+
+        $this->_fileInfo['full_file_name'] = $fullFileName;
+        $this->_fileInfo['file_extension'] = $fileExtension;
+        $this->_fileInfo['file_name'] = $fileName;
+
+        $fInfo = new finfo(FILEINFO_MIME_TYPE);
+        $this->_fileInfo['file_mime_type'] = $fInfo->buffer($file);
+
+        $this->_fileInfo['file_size'] = $headers['Content-Length'];
+
+        if ($this->keepContent) {
+            $this->_fileContent = $file;
+        }
+        $this->_saveFileToTmp($file);
+
+        $this->_currentStatus = self::STATUS_REMOTE_FILE;
+
+        return $this;
+    }
+
+    /**
+     * @param $path
+     * @throws BException
+     */
+    private function _loadLocalFile($path)
+    {
+        $this->_currentStatus = self::STATUS_LOCAL_FILE;
+
+        throw new BException('Not supported at this moment');
+    }
+
+    /**
+     * @param $file
+     */
+    private function _saveFileToTmp($file)
+    {
+        $this->_currentTmpDir = $this->_tpmDir . DIRECTORY_SEPARATOR . md5(spl_object_hash($this));
+        if (!is_dir($this->_currentTmpDir)) {
+            mkdir($this->_currentTmpDir, 0777, true);
+        }
+        $this->_fileInfo['file_path'] = $this->_currentTmpDir;
+        $fullPath = $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
+
+        if (@file_put_contents($fullPath, $file)
+        ) {
+            $this->_fileInfo['file_size'] = filesize($fullPath);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $path
+     * @return $this
+     */
+    public function save($name, $path)
+    {
+        if ($this->_currentStatus == self::STATUS_LOCAL_FILE) {
+            return $this;
+        }
+
+        if (!is_file($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'])) {
+            return false;
+        }
+
+        if (@rename($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'],
+            $path . DIRECTORY_SEPARATOR . $name)
+        ) {
+            $fileName = explode('.', $name);
+            if (count($fileName) >= 2) {
+                $fileExtension = array_pop($fileName);
+            } else {
+                $fileExtension = null;
+            }
+            $fileName = $fileName[0];
+
+            $this->_fileInfo['full_file_name'] = $name;
+            $this->_fileInfo['file_extension'] = $fileExtension;
+            $this->_fileInfo['file_name'] = $fileName;
+            $this->_fileInfo['file_path'] = $path;
+
+            $this->_previousStatus = $this->_currentStatus;
+            $this->_currentStatus = self::STATUS_LOCAL_FILE;
+        }
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileInfo()
+    {
+        return $this->_fileInfo;
+    }
+
+    /**
+     * The file is stored on a this server
+     *
+     * @return bool
+     */
+    public function isLocal()
+    {
+        return $this->_currentStatus == self::STATUS_LOCAL_FILE;
+    }
+
+    /**
+     * The file is stored on a remote server
+     *
+     * @return bool
+     */
+    public function isRemote()
+    {
+        return $this->_currentStatus == self::STATUS_REMOTE_FILE;
+    }
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        self::delTree($this->_currentTmpDir);
+    }
+
+    /**
+     * Recursively delete a tree
+     *
+     * @param $dir
+     * @return bool
+     */
+    public static function delTree($dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 }
 
@@ -3993,7 +4608,7 @@ class BValidate extends BClass
 
             if (!$result) {
                 $message = $this->BUtil->injectVars($r['message'], $r['args']);
-                $message = $this->BLocale->_($message);
+                $message = $this->_($message);
                 $this->_validateErrors[$r['field']][] = $message;
                 if (!empty($r['args']['break'])) {
                     break;
@@ -4049,13 +4664,13 @@ class BValidate extends BClass
         $this->_validateRules($data);
 
         if ($this->_validateErrors && $formName) {
-            $this->BSession->set('validator-data:' . $formName, $data);
             foreach ($this->_validateErrors as $field => $errors) {
                 foreach ($errors as $error) {
-                    $msg = ['error' => $error, 'field' => $field];
-                    $this->BSession->addMessage($msg, 'error', 'validator-errors:' . $formName);
+                    $this->BSession->addMessage($error, 'error', 'validator-errors:' . $formName);
                 }
             }
+        } else {
+            $this->BSession->set('validator-data:' . $formName, $data);
         }
         return $this->_validateErrors ? false : true;
     }
@@ -4168,12 +4783,17 @@ class BValidate extends BClass
         if (!isset($data[$args['field']])) {
             return true;
         }
-        $value = $data[$args['field']];
+        return $this->validateEmail($data[$args['field']]);
+    }
+
+    /**
+     * @param string $email
+     * @return bool
+     */
+    public function validateEmail($email)
+    {
         $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
-        if (strlen($value) > 255 || !preg_match($re, $value)) {
-            return false;
-        }
-        return true;
+        return strlen($email) < 255 && preg_match($re, $email);
     }
 }
 
@@ -4271,7 +4891,7 @@ class BValidateViewHelper extends BClass
         if (empty($this->_errors[$field]['msg']['error'])) {
             return '';
         }
-        return $this->BLocale->_($this->_errors[$field]['msg']['error']);
+        return $this->_($this->_errors[$field]['msg']['error']);
     }
 
     /**
@@ -4705,6 +5325,9 @@ if (!function_exists('hash_hmac')) {
     function hash_hmac($algo, $data, $key, $raw_output = false)
     {
         $algo = strtolower($algo);
+        if (!is_callable($algo)) {
+            throw new BException('Invalid Algo');
+        }
         $pack = 'H' . strlen($algo('test'));
         $size = 64;
         $opad = str_repeat(chr(0x5C), $size);
@@ -4801,5 +5424,82 @@ if (!function_exists('oath_hotp')) {
         $pin = substr ($int, - $len);
         $pin = str_pad ($pin, $len, "0", STR_PAD_LEFT);
         return $pin;
+    }
+}
+
+if (!function_exists('mime_content_type')) {
+
+    function mime_content_type($filename)
+    {
+
+        $mime_types = array(
+
+            'txt' => 'text/plain',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+            'php' => 'text/html',
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'xml' => 'application/xml',
+            'swf' => 'application/x-shockwave-flash',
+            'flv' => 'video/x-flv',
+
+            // images
+            'png' => 'image/png',
+            'jpe' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'bmp' => 'image/bmp',
+            'ico' => 'image/vnd.microsoft.icon',
+            'tiff' => 'image/tiff',
+            'tif' => 'image/tiff',
+            'svg' => 'image/svg+xml',
+            'svgz' => 'image/svg+xml',
+
+            // archives
+            'zip' => 'application/zip',
+            'rar' => 'application/x-rar-compressed',
+            'exe' => 'application/x-msdownload',
+            'msi' => 'application/x-msdownload',
+            'cab' => 'application/vnd.ms-cab-compressed',
+
+            // audio/video
+            'mp3' => 'audio/mpeg',
+            'qt' => 'video/quicktime',
+            'mov' => 'video/quicktime',
+
+            // adobe
+            'pdf' => 'application/pdf',
+            'psd' => 'image/vnd.adobe.photoshop',
+            'ai' => 'application/postscript',
+            'eps' => 'application/postscript',
+            'ps' => 'application/postscript',
+
+            // ms office
+            'doc' => 'application/msword',
+            'rtf' => 'application/rtf',
+            'xls' => 'application/vnd.ms-excel',
+            'ppt' => 'application/vnd.ms-powerpoint',
+
+            // open office
+            'odt' => 'application/vnd.oasis.opendocument.text',
+            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+        );
+
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+        if (array_key_exists($ext, $mime_types)) {
+            return $mime_types[$ext];
+        }
+        elseif (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME);
+            $mimetype = finfo_file($finfo, $filename);
+            finfo_close($finfo);
+            return $mimetype;
+        }
+        else {
+            return 'application/octet-stream';
+        }
     }
 }

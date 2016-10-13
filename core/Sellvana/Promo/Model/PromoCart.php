@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Promo_Model_PromoCart
@@ -21,6 +21,10 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
 
     public function validateConditions(Sellvana_Promo_Model_Promo $promo, Sellvana_Sales_Model_Cart $cart)
     {
+        if ($promo->get('status') !== 'active' || $promo->get('promo_type') !== 'cart') {
+            return false;
+        }
+
         $matchType = $promo->getData('conditions/match');
 
         if (!$matchType || $matchType === 'always') {
@@ -34,9 +38,6 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
             'items' => [],
         ];
 
-        if ($promo->get('status') !== 'active' || $promo->get('promo_type') !== 'cart') {
-            return $result;
-        }
         $now = $this->BDb->now();
         if (!(
             ($this->BUtil->isEmptyDate($promo->get('from_date')) || $promo->get('from_date') < $now)

@@ -1,9 +1,10 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Order_Payment_Transaction
  *
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
+ * @property Sellvana_Sales_Model_Order_Payment_Transaction $Sellvana_Sales_Model_Order_Payment_Transaction
  */
 class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abstract
 {
@@ -15,12 +16,12 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         AUTHORIZATION = 'auth', // authorization of order transaction
         REAUTHORIZATION = 'reauth', // reauthorization after 3 days of authorization to secure funds
         CAPTURE = 'capture', // capture authorized transaction
-        VOID = 'void', // void authorization
         REFUND = 'refund', // refund captured funds
 
         PENDING = 'pending', // pending processing
         STARTED = 'started', // started transaction
         COMPLETED = 'completed', // completed transaction
+        VOID = 'void', // void authorization
         EXPIRED = 'expired'; // for order and authorization
 
     protected static $_fieldOptions = [
@@ -30,19 +31,43 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
             self::AUTHORIZATION => 'Authorization',
             self::REAUTHORIZATION => 'Re-Authorization',
             self::CAPTURE => 'Capture',
-            self::VOID => 'Void',
             self::REFUND => 'Refund',
+            self::VOID => 'Void',
         ],
 
         'transaction_status' => [
             self::PENDING => 'Pending',
             self::STARTED => 'Started',
             self::COMPLETED => 'Completed',
+            self::VOID => 'Void',
             self::EXPIRED => 'Expired',
         ],
     ];
 
     protected $_payment;
+
+    static protected $_actions = [
+        self::ORDER => [
+            self::AUTHORIZATION,
+        ],
+        self::AUTHORIZATION => [
+            self::REAUTHORIZATION,
+            self::CAPTURE,
+            self::VOID,
+        ],
+        self::REAUTHORIZATION => [
+            self::REAUTHORIZATION,
+            self::CAPTURE,
+            self::VOID,
+        ],
+        self::CAPTURE => [
+            self::REFUND
+        ],
+        self::SALE => [
+            self::REFUND
+        ],
+    ];
+
 
     /**
      * @return Sellvana_Sales_Model_Order_Payment
@@ -113,16 +138,13 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 break;
 
             case self::ORDER:
-                $payment->state()->overall()->setProcessing();
                 break;
 
             case self::AUTHORIZATION:
                 $payment->add('amount_authorized', $amount);
-                $payment->state()->overall()->setProcessing();
                 break;
 
             case self::REAUTHORIZATION:
-                $payment->state()->overall()->setProcessing();
                 break;
 
             case self::CAPTURE:
@@ -158,7 +180,7 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 }
 
                 $order->add('amount_refunded', $amount);
-                if ($order->get('amount_refunded') == $order->get('amount_captured')) {
+                if ($order->get('amount_refunded') == $order->get('amount_paid')) {
                     $order->state()->payment()->setRefunded();
                 } else {
                     $order->state()->payment()->setPartialRefunded();
@@ -171,6 +193,12 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         return $this;
     }
 
+    public function void()
+    {
+        $this->set('transaction_status', self::VOID)->save();
+        return $this;
+    }
+
     public function expireAuthorization()
     {
         $payment = $this->payment();
@@ -178,6 +206,76 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         $this->set('transaction_status', self::EXPIRED)->save();
         $payment->save();
         return $this;
+    }
+
+    /**
+     * Get maximum amount available for transaction type
+     *
+     * @param string $type
+     * @return mixed
+     */
+    protected function _getMaxAvailableAmountForAction($type)
+    {
+        $payment = $this->payment();
+
+        if (!in_array($type, [self::AUTHORIZATION, self::CAPTURE, self::REFUND])) {
+            return null;
+        }
+
+        if (!$payment->getMethodObject()->can($type . '_partial')) {
+            return null;
+        }
+
+        $transactions = $payment->findTransaction(
+            [$type], 'completed', null, true, $this->get('transaction_id')
+        );
+
+
+        $amount = $this->get('amount');
+        foreach ($transactions as $transaction) {
+            if ($transaction->id() == $this->id()) {
+                continue;
+            }
+
+            $amount -= $transaction->get('amount');
+        }
+
+        return $amount;
+    }
+
+    public function getAvailableActions()
+    {
+        $currentType = $this->get('transaction_type');
+        $newTypes = [];
+        if (array_key_exists($currentType, self::$_actions)) {
+            $newTypes = self::$_actions[$currentType];
+        }
+
+        $result = [];
+        foreach ($newTypes as $type) {
+            $typeLabels = self::$_fieldOptions['transaction_type'];
+            if (!array_key_exists($type, $typeLabels)) {
+                continue;
+            }
+
+            $types = [$type];
+            if (in_array($type, [self::REAUTHORIZATION, self::VOID])) {
+                $types = [self::CAPTURE];
+            }
+            $transactions = $this->payment()->findTransaction($types, 'completed', null, true, $this->get('transaction_id'));
+            $amount = $this->get('amount');
+            foreach ($transactions as $transaction) {
+                $amount -= $transaction->get('amount');
+            }
+
+            if (count($transactions) == 0 || $amount > 0) {
+                $result[$type] = [
+                    'label' => $typeLabels[$type],
+                    'maxAmount' => $this->_getMaxAvailableAmountForAction($type),
+                ];
+            }
+        }
+        return $result;
     }
 
     public function __destruct()

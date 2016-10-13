@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<dataset>
+
+    <fcom_customer id="1" email="test1@test.com" firstname="Test 1" />
+    <fcom_customer id="2" email="test2@test.com" firstname="Test 2" />
+
+    <fcom_product id="1" product_name="Product 1" product_sku="test-1" url_key="product-1" />
+    <fcom_product id="2" product_name="Product 2" product_sku="test-2" url_key="product-2" />
+    <fcom_product id="3" product_name="Product 3" product_sku="test-3" url_key="product-3" />
+    <fcom_product id="4" product_name="Product 4" product_sku="test-4" url_key="product-4" />
+
+    <!--<fcom_sales_cart id="1" customer_id="1" item_qty="5" item_num="2" subtotal="10" shipping_method="ShippingPlain" />-->
+</dataset>

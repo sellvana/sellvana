@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -30,14 +30,14 @@
 
 class BImport extends BClass
 {
-    protected $fields = [];
-    protected $dir = 'shared';
-    protected $model = '';
+    protected $_fields = [];
+    protected $_dir = 'shared';
+    protected $_model = '';
 
     public function getFieldData()
     {
-        $this->BEvents->fire(__METHOD__, ['fields' => &$this->fields]);
-        return $this->fields;
+        $this->BEvents->fire(__METHOD__, ['fields' => &$this->_fields]);
+        return $this->_fields;
     }
 
     public function getFieldOptions()
@@ -51,8 +51,9 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return $this->FCom_Core_Main->dir('storage/' . $this->BConfig->get('core/storage_random_dir') . '/import/' . $this->dir);
-        //return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
+        $dir = $this->BApp->storageRandomDir() . '/import/' . $this->_dir;
+        $this->BUtil->ensureDir($dir);
+        return $dir;
     }
 
     public function updateFieldsDueToInfo($info)
@@ -76,8 +77,9 @@ class BImport extends BClass
         }
 
         // open file for reading
-        if (!file_exists($file))
+        if (!file_exists($file)) {
             return false;
+        }
         $fp = fopen($file, 'r');
         // get first line in the file
         $r = fgets($fp);
@@ -122,10 +124,15 @@ class BImport extends BClass
      */
     public function config($config = null, $update = false)
     {
-        $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->dir);
-        $this->BUtil->ensureDir($dir);
+        $dir = $this->BConfig->get('fs/storage_dir') . '/run/' . $this->_dir;
         $file = $this->BSession->sessionId() . '.json';
         $filename = $dir . '/' . $file;
+
+        if (!$this->BUtil->isPathWithinRoot($filename, '@storage_dir/run')) {
+            return false;
+        }
+        $this->BUtil->ensureDir($dir);
+
         if ($config) { // create config lock
             if ($update) {
                 $old = $this->config();
@@ -163,18 +170,22 @@ class BImport extends BClass
 
         $timer = microtime(true);
 
-        if (empty($this->model)) {
+        if (empty($this->_model)) {
             throw new BException("Model is required");
         }
 
-        $modelClass = $this->model;
+        $modelClass = $this->_model;
         $model = $modelClass::i();
 
         if (!method_exists($model, 'import')) {
             throw new BException("Model should implement import method");
         }
         $config = $this->config();
-        $filename = $this->getImportDir() . '/' . $config['filename'];
+        $importDir = $this->getImportDir();
+        $filename = $importDir . '/' . $config['filename'];
+        if (!$this->BUtil->isPathWithinRoot($filename, $importDir)) {
+            throw new BException('Invalid file location');
+        }
         $status = [
             'start_time' => time(),
             'status' => 'running',
@@ -214,7 +225,7 @@ class BImport extends BClass
 
         $dataBatch = [];
         while (($r = fgetcsv($fp, 0, $config['delim']))) {
-            if (count($r) != count($config['columns'])) {
+            if (empty($config['columns']) || count($r) != count($config['columns'])) {
                 continue;
             }
             $row = array_combine($config['columns'], $r);

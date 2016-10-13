@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Model_User
@@ -54,6 +54,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             '0' => 'No',
             '1' => 'Yes',
         ],
+    ];
+
+    protected static $_fieldDefaults = [
+        'locale' => 'en_US',
     ];
 
     protected static $_validationRules = [
@@ -115,10 +119,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         parent::onAfterCreate();
 
-        $this->set([
-            'tz' => $this->BConfig->get('modules/FCom_Core/default_tz'),
-            'locale' => $this->BConfig->get('modules/FCom_admin/default_locale'),
-        ]);
+        $defaultTz = $this->BConfig->get('modules/FCom_Core/default_tz');
+        if ($defaultTz) {
+            $this->set('tz', $defaultTz);
+        }
+        $defaultLocale = $this->BConfig->get('modules/FCom_admin/default_locale');
+        if ($defaultLocale) {
+            $this->set('locale', $defaultLocale);
+        }
     }
 
     public function onBeforeSave()
@@ -160,8 +168,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function as_array(array $objHashes = [])
     {
         $data = parent::as_array();
-        unset($data['password_hash']);
-        unset($data['api_password_hash']);
+        #unset($data['password_hash']);
+        #unset($data['api_password_hash']);
         return $data;
     }
 
@@ -178,7 +186,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         $password = $data[$args['field']];
         if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
-            return $this->BLocale->_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
+            return $this->_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
         }
         return true;
     }
@@ -202,16 +210,6 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
         }
         return true;
-    }
-
-    /**
-     * @param $orm
-     * @param $role
-     * @return mixed
-     */
-    public function has_role($orm, $role)
-    {
-        return $orm->where('role', $role);
     }
 
     /**
@@ -376,7 +374,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function recoverPassword()
     {
         $this->set(['token' => $this->BUtil->randomString(), 'token_at' => $this->BDb->now()])->save();
-        $this->BLayout->view('email/admin/user-password-recover')->set('user', $this)->email();
+        $this->BLayout->getView('email/admin/user-password-recover')->set('user', $this)->email();
         return $this;
     }
 
@@ -414,7 +412,56 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
-        $this->BLayout->view('email/admin/user-password-reset')->set('user', $this)->email();
+        $this->BLayout->getView('email/admin/user-password-reset')->set('user', $this)->email();
+        return $this;
+    }
+
+    /**
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
+    public function recoverG2FA()
+    {
+        $this->set(['g2fa_token' => $this->BUtil->randomString(), 'g2fa_token_at' => $this->BDb->now()])->save();
+        $this->BLayout->getView('email/admin/user-g2fa-recover')->set('user', $this)->email();
+        return $this;
+    }
+
+    /**
+     * @param $token
+     * @return FCom_Admin_Model_User|bool
+     * @throws BException
+     */
+    public function validateResetG2FAToken($token)
+    {
+        if (!$token) {
+            return false;
+        }
+        $user = $this->load($token, 'g2fa_token');
+        if (!$user || $user->get('g2fa_token') !== $token) {
+            return false;
+        }
+        $tokenTtl = $this->BConfig->get('modules/FCom_Admin/password_reset_token_ttl_hr');
+        if (!$tokenTtl) {
+            $tokenTtl = 24;
+        }
+        if (strtotime($user->get('g2fa_token_at')) < time() - $tokenTtl * 3600) {
+            $user->set(['g2fa_token' => null, 'g2fa_token_at' => null])->save();
+            return false;
+        }
+        return $user;
+    }
+
+    /**
+     * @param $password
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
+    public function resetG2FA()
+    {
+        $this->BSession->regenerateId();
+        $this->set(['g2fa_token' => null, 'g2fa_token_at' => null, 'g2fa_secret' => null, 'g2fa_status' => 0])->save();
+        $this->BLayout->getView('email/admin/user-g2fa-reset')->set('user', $this)->email();
         return $this;
     }
 
@@ -493,18 +540,31 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->get('is_superadmin')) {
             return true;
         }
-        if (!$this->get('role_id')) {
-            return false;
-        }
-        if (!$this->get('permissions')) {
-            $this->set('permissions', $this->FCom_Admin_Model_Role->load($this->role_id)->get('permissions'));
+        $perms = $this->get('permissions');
+        if (!$perms) {
+            $roleIds = [];
+            if ($this->get('role_id')) {
+                $roleIds[] = $this->get('role_id');
+            }
+            $this->BEvents->fire(__METHOD__ . ':roles', ['role_ids' => &$roleIds, 'user' => $this, 'paths' => $paths]);
+            if (!$roleIds) {
+                return false;
+            }
+            $roles = $this->FCom_Admin_Model_Role->orm()->where_in('id', $roleIds)->find_many();
+            $perms = [];
+            foreach ($roles as $role) {
+                /* @var FCom_Admin_Model_Role $role */
+                $permissions = $role->onAfterLoad()->get('permissions');
+                $perms = array_merge($perms, $permissions);
+            }
+
+            $this->set('permissions', $perms);
         }
         if (is_string($paths)) {
             $paths = explode(',', $paths);
         }
         foreach ($paths as $p) {
-            $perms = $this->get('permissions');
-            if (!empty($perms[$p])) {
+            if (array_key_exists($p, $perms)) {
                 return true;
             }
         }

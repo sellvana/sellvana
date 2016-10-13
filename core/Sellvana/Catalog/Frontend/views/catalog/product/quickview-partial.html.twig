@@ -1,16 +1,20 @@
 {% set m = THIS.get('model') %}
-{% set images = m.media('I') %}
+{% set images = m.gallery() %}
 {% set inventory = m.getInventoryModel() %}
-{% set canOrder = inventory.canOrder() %}
+{% set canOrder = m.canOrder() %}
 
 <div class="row js-product-container">
     <!-- Product Image Column -->
     <div class="f-col-prod-img col-sm-6">
         <div class="f-rslides-container">
             <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
-                {% for img in images %}
-                    <li><img class="f-prod-img img-responsive" src="{{ img.thumbUrl(254) }}{#{ img.imageUrl(1) }#}" alt=""/></li>
-                {% endfor %}
+                {% if images %}
+                    {% for img in images %}
+                        <li><img class="f-prod-img img-responsive" src="{{ img.thumbUrl(269) }}{#{ img.imageUrl(1) }#}" alt=""/></li>
+                    {% endfor %}
+                {% else %}
+                    <li><img class="f-prod-img img-responsive" src="{{ m.thumbUrl(269) }}" alt="" itemprop="image"/></li>
+                {% endif %}
             </ul>
             <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
         </div>
@@ -46,7 +50,7 @@
             {% if MODULES.isLoaded('Sellvana_ProductReviews') %}
                 <div class="f-prod-avg-rating">
                     <div class="glyphicon f-rating-stars f-xs-stars">
-                        <span class="f-filled-stars" style="width:{{ m.getAverageStars() }}%;"></span>
+                        <span class="f-filled-stars" style="width:{{ m.getAverageRatingPercent() }}%;"></span>
                         <span class="f-empty-stars"></span>
                     </div>
                     <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(m.getNumReviews()) }}</a>
@@ -61,8 +65,10 @@
 
                 {{ THIS.view('catalog/product/variants').set('product', m) | raw }}
 
-                <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
-                <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+                <div class="f-stock-notice {{ canOrder ? '-in-stock' }}">
+                    <p class="f-in-stock">{{ 'In Stock.'|_ }}</p>
+                    <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                </div>
 
                 <div class="f-prod-add-cart">
 

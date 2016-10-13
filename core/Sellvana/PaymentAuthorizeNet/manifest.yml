@@ -1,7 +1,7 @@
 modules:
     Sellvana_PaymentAuthorizeNet:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Sales: 0.1.10 } }
         translations: { en: en.php }
         description: "Authorize.net payment methods"
@@ -20,6 +20,8 @@ modules:
                         title: "Credit Card (Authorize.net)"
                     dpm:
                         title: "Credit Card Direct Post (Authorize.net)"
+                    sim:
+                        title: "Credit Card Server Integration (Authorize.net)"
                     url: "https://secure.authorize.net/gateway/transact.dll"
                     test_url: "https://test.authorize.net/gateway/transact.dll"
 

@@ -2,7 +2,6 @@ common_js_libs:
     - view: head
         do:
             - [ requireJs, jquery.cookie, @FCom_LibJsCommon/js/jquery.cookie, { deps: [ jquery ] } ]
-            #- [ requireJs, jquery.resizableColumns, @FCom_LibJsCommon/js/jquery.resizableColumns.js, { deps: [ jquery ] } ]
             - [ requireJs, jquery.tablesorter, @FCom_LibJsCommon/js/jquery.tablesorter.min, { deps: [ jquery ] }]
             - [ requireJs, jquery.widgets, @FCom_LibJsCommon/js/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
             - [ requireJs, jquery.validate, @FCom_LibJsCommon/js/jquery.validate.min, { deps: [ jquery ] } ]
@@ -17,9 +16,12 @@ common_js_libs:
             - [ requireJs, fcom.ipmode, @FCom_Core/js/fcom/fcom.ipmode ]
             - [ requireJs, fcom.validate.ext, @FCom_Core/js/fcom/fcom.validate.ext ]
             - [ requireJs, fcom.locale, @FCom_Core/js/fcom/fcom.locale ]
+            - [ requireJs, fcom.message, @FCom_Core/js/fcom/fcom.message, { deps: [ jquery, react ] } ]
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
             - [ requireJs, bootstrap-notify, @FCom_LibJsCommon/js/bootstrap-notify.min, { deps: [ jquery, bootstrap ] } ]
+            - [ requireJs, bootstrap-ladda-spin, @FCom_LibJsCommon/js/bootstrap-ladda-spin.min, { deps: [ bootstrap ] } ]
+            - [ requireJs, bootstrap-ladda, @FCom_LibJsCommon/js/bootstrap-ladda.min, { deps: [ bootstrap, bootstrap-ladda-spin ] } ]
 
             - [ requireJs, typeahead-bundle, "@FCom_LibJsCommon/js/typeahead/typeahead-bundle" ]
             - [ requireJs, bloodhound, "@FCom_LibJsCommon/js/typeahead/bloodhound" ]
@@ -34,14 +36,13 @@ common_js_libs:
 
             #- [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
             #- [ requireModulePath, FCom_Core ]
-            #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]
             - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
-
-            #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
-            #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
+            - [ css, @FCom_LibJsCommon/js/css/bootstrap-ladda.css ]
 
             - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
             - [ requireJs, ajaxify, @FCom_LibJsCommon/js/ajaxify.min, { deps: [ jquery ] } ]
+
+            - [ requireJs, store, @FCom_LibJsCommon/js/store ]
 
 lib_visualsearch:
     - view: head
@@ -81,8 +82,21 @@ lib_griddle:
 lib_select2:
     - view: head
         do:
-            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.0/js/select2.full.min ]
-            - [ css, @FCom_LibJsCommon/js/select2-4.0.0/css/select2.min.css ]
+            #- [ requireJs, select2.en, @FCom_LibJsCommon/js/select2-4.0.2/js/i18n/en ]
+            #- [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.2/js/select2.full.min ]
+            #- [ css, @FCom_LibJsCommon/js/select2-4.0.2/css/select2.min.css ]
+
+            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-3.5.4/select2, deps: [ jquery ] ]
+            - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2.css ]
+            - [ css, @FCom_LibJsCommon/js/select2-3.5.4/select2-bootstrap.css ]
+
+lib_select2-4.0:
+    - view: head
+        do:
+            - [ requireJs, select2.en, @FCom_LibJsCommon/js/select2-4.0.2/js/i18n/en ]
+            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.2/js/select2.full.min ]
+            - [ css, @FCom_LibJsCommon/js/select2-4.0.2/css/select2.min.css ]
+
 
 lib_file_upload:
     - view: head
@@ -95,5 +109,18 @@ lib_file_upload:
             - [ requireJs, iframe-transport, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.iframe-transport.min", { deps: [ tmpl ] } ]
             - [ requireJs, jquery.fileupload, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload.min", { deps: [tmpl ] } ]
             - [ requireJs, jquery.fileupload-fp, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-fp.min", { deps: [ jquery.fileupload ] } ]
-            - [ requireJs, jquery.fileupload-ui, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
             - [ requireJs, jquery.fileupload-init, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-init", { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, jquery.fileupload-ui, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
+
+lib_media_player:
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/css/mediaelementplayer.min.css" ]
+            - [ requireJs, jquery.vimeo, "@FCom_LibJsCommon/js/jquery.vimeo.api.min", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.media-element, "@FCom_LibJsCommon/js/mediaelement-and-player.min", { deps: [ jquery ] } ]
+
+lib_colorpicker;
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" ]
+            - [ requireJs, bootstrap.colorpicker, "@FCom_LibJsCommon/js/bootstrap-colorpicker/js/bootstrap-colorpicker.min" ]

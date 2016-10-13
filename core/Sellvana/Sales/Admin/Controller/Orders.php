@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Admin_Controller_Orders
@@ -36,6 +36,14 @@
  * @property Sellvana_Sales_Model_Order_Cancel_State_Custom $Sellvana_Sales_Model_Order_Cancel_State_Custom
  * @property Sellvana_Sales_Model_Order_Refund_State_Overall $Sellvana_Sales_Model_Order_Refund_State_Overall
  * @property Sellvana_Sales_Model_Order_Refund_State_Custom $Sellvana_Sales_Model_Order_Refund_State_Custom
+ *
+ * @property Sellvana_Sales_Model_Order_Item_State_Overall $Sellvana_Sales_Model_Order_Item_State_Overall
+ * @property Sellvana_Sales_Model_Order_Item_State_Payment $Sellvana_Sales_Model_Order_Item_State_Payment
+ * @property Sellvana_Sales_Model_Order_Item_State_Delivery $Sellvana_Sales_Model_Order_Item_State_Delivery
+ * @property Sellvana_Sales_Model_Order_Item_State_Refund $Sellvana_Sales_Model_Order_Item_State_Refund
+ * @property Sellvana_Sales_Model_Order_Item_State_Return $Sellvana_Sales_Model_Order_Item_State_Return
+ * @property Sellvana_Sales_Model_Order_Item_State_Cancel $Sellvana_Sales_Model_Order_Item_State_Cancel
+ * @property Sellvana_Sales_Model_Order_Item_State_Custom $Sellvana_Sales_Model_Order_Item_State_Custom
  */
 
 class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_GridForm
@@ -75,14 +83,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Internal ID', 'width' => 70, 'hidden' => true],
             ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'ID', 'width' => 70],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date', 'cell' => 'datetime'],
 
             #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
-            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
-            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due'],
-            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid'],
-            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total', 'cell' => 'currency'],
+            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due', 'cell' => 'currency'],
+            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid', 'cell' => 'currency'],
+            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code', 'cell' => 'currency'],
 
             ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],
             ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'o.state_payment', 'options' => $paymentStates],
@@ -116,6 +124,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['field' => 'state_payment', 'type' => 'multiselect'],
             ['field' => 'state_delivery', 'type' => 'multiselect'],
             ['field' => 'state_custom', 'type' => 'multiselect'],
+
+            // ['field' => 'billing_name', 'type' => 'text'],
+            // ['field' => 'shipping_name', 'type' => 'text'],
         ];
 
         return $config;
@@ -129,9 +140,19 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         parent::gridOrmConfig($orm);
 
         $orm->select($this->_mainTableAlias . '.*');
+        #Todo: This query will remove after fix filter for some special columns
+        // $orm->raw_query('SELECT * FROM (SELECT *, CONCAT_WS(" ", billing_street1, billing_city) AS billing_address, CONCAT_WS(" ", billing_firstname, billing_lastname) AS billing_name, CONCAT_WS(" ", shipping_firstname, shipping_lastname) AS shipping_name, CONCAT_WS(" ", shipping_street1, shipping_city) AS shipping_address, COUNT(*) AS count FROM fcom_sales_order) AS '.$this->_mainTableAlias);
+        $orm->select_expr('CONCAT_WS(" ", o.billing_street1, o.billing_city)', 'billing_address')
+            ->select_expr('CONCAT_WS(" ", o.billing_firstname, o.billing_lastname)', 'billing_name')
+            ->select_expr('CONCAT_WS(" ", o.shipping_firstname, o.shipping_lastname)', 'shipping_name')
+            ->select_expr('CONCAT_WS(" ", o.shipping_street1, o.shipping_city)', 'shipping_address');
 
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
+
+        if ($this->BRequest->get('customer_id')) {
+            $orm->where('o.customer_id', $this->BRequest->get('customer_id'));
+        }
     }
 
     public function gridViewBefore($args)
@@ -139,7 +160,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         parent::gridViewBefore($args);
         $this->view('admin/griddle')->set([
             'actions' => [
-                'new' => '',
             ],
         ]);
     }
@@ -164,22 +184,27 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     'class' => ['btn', 'btn-default'],
                 ],
                 [
-                    ['span', null, $this->BLocale->_('Ship All Items')],
+                    ['span', null, $this->_('Ship All Items')],
                 ]
             ];
 
-            $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
-                . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
-                . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
-                . ' | ' . $this->_('Delivery') . ': ' . $m->state()->delivery()->getValueLabel();
-            $customState = $m->state()->custom()->getValueLabel();
-            if ($customState) {
-                $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
-            }
+            $actions['mark_paid'] = [
+                'button',
+                [
+                    'name' => 'do',
+                    'type' => 'submit',
+                    'value' => 'MARK_PAID',
+                    'class' => ['btn', 'btn-default'],
+                ],
+                [
+                    ['span', null, $this->_('Mark as Paid')],
+                ]
+            ];
+
             /** @var BView $view */
             $view->set([
                 'actions' => $actions,
-                'other_info' => $info,
+                'other_info' => $m->getStateInfo(),
             ]);
         }
     }
@@ -204,32 +229,13 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
 
         if ($args['do'] === 'SHIP_ALL') {
-            $order->shipAllShipments();
-        }
-
-        $pay = $this->BRequest->post('pay');
-        if (!empty($pay['items'])) {
-            $this->Sellvana_Sales_Model_Order_Payment->payOrderItems($order, $pay['items']);
-        }
-
-        $ship = $this->BRequest->post('ship');
-        if (!empty($ship['items'])) {
-            $this->Sellvana_Sales_Model_Order_Shipment->shipOrderItems($order, $ship['items']);
-        }
-
-        $cancel = $this->BRequest->post('cancel');
-        if (!empty($cancel['items'])) {
-            $this->Sellvana_Sales_Model_Order_Cancel->cancelOrderItems($order, $cancel['items']);
-        }
-
-        $return = $this->BRequest->post('return');
-        if (!empty($return['items'])) {
-            $this->Sellvana_Sales_Model_Order_Return->returnOrderItems($order, $return['items']);
-        }
-
-        $refund = $this->BRequest->post('refund');
-        if (!empty($refund['items'])) {
-            $this->Sellvana_Sales_Model_Order_Refund->refundOrderItems($order, $refund['items']);
+            $this->Sellvana_Sales_Main->workflowAction('adminMarksOrderAsShipped', [
+                'order' => $order
+            ]);
+        } elseif ($args['do'] === 'MARK_PAID') {
+            $this->Sellvana_Sales_Main->workflowAction('adminMarksOrderAsPaid', [
+                'order' => $order
+            ]);
         }
 
         $order->save();
@@ -254,7 +260,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             }
         }
     }
-
+    
     public function itemsOrderGridConfig(Sellvana_Sales_Model_Order $order)
     {
         $overallStates = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
@@ -280,15 +286,15 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     ['name' => 'product_name', 'label' => 'Name'],
                     ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 100],
                     ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 100, 'hidden' => true],
-                    ['name' => 'price', 'label' => 'Price', 'width' => 50],
+                    ['name' => 'price', 'label' => 'Price', 'width' => 50, 'cell' => 'currency'],
                     ['name' => 'qty_ordered', 'label' => 'Qty', 'width' => 50],
                     ['name' => 'qty_backordered', 'label' => 'Backordered', 'width' => 50, 'hidden' => true],
                     ['name' => 'qty_canceled', 'label' => 'Canceled', 'width' => 50, 'hidden' => true],
                     ['name' => 'qty_shipped', 'label' => 'Shipped', 'width' => 50, 'hidden' => true],
                     ['name' => 'qty_returned', 'label' => 'Returned', 'width' => 50, 'hidden' => true],
-                    ['name' => 'row_total', 'label' => 'Total', 'width' => 50],
-                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50, 'hidden' => true],
-                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50, 'hidden' => true],
+                    ['name' => 'row_total', 'label' => 'Total', 'width' => 50, 'cell' => 'currency'],
+                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50, 'hidden' => true, 'cell' => 'currency'],
+                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50, 'hidden' => true, 'cell' => 'currency'],
                     ['name' => 'row_discount_percent', 'label' => 'Discount Percent', 'width' => 50, 'hidden' => true],
                     ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'width' => 50, 'hidden' => true],
                     ['name' => 'shipping_size', 'label' => 'Ship Size', 'width' => 50, 'hidden' => true],
@@ -324,14 +330,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'ab.billing_name'],
-            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address'],
-            ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name'],
-            ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address'],
-            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
-            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
-            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date', 'cell' => 'date'],
+            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'o.billing_name'],
+            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'o.billing_address'],
+            ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'o.shipping_name'],
+            ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'o.shipping_address'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total', 'cell' => 'currency'],
+            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due', 'cell' => 'currency'],
+            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code', 'cell' => 'currency'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
                 'options' => $this->Sellvana_Sales_Model_StateCustom->optionsByType('order')],
             ['type' => 'btn_group', 'buttons' => [
@@ -340,74 +346,35 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
-            ['field' => 'billing_name', 'type' => 'text'],
-            ['field' => 'shipping_name', 'type' => 'text'],
+            // ['field' => 'billing_name', 'type' => 'text'],
+            // ['field' => 'shipping_name', 'type' => 'text'],
             ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         /** @var BORM $orm */
         $orm = $config['orm'];
         $orm->where('customer_id', $customer->id());
+        $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
         $this->gridOrmConfig($orm);
 
         return ['config' => $config];
     }
 
-    public function getOrderRecent()
+    /**
+     * @param ORM $orm
+     * @param string $field
+     */
+    protected function _processFilters($orm, $field = 'o.create_at')
     {
-        $dayRecent = ($this->BConfig->get('modules/Sellvana_Sales/recent_day')) ? $this->BConfig->get('modules/Sellvana_Sales/recent_day') : 7;
-        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayRecent * 86400);
-        $result = $this->Sellvana_Sales_Model_Order->orm('o')
-            ->join('Sellvana_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
-            ->where_gte('o.create_at', $recent)
-            ->select(['o.*',  'c.firstname', 'c.lastname'])->find_many();
+        $filter = $this->BApp->get('dashboard_date_filter');
+        $cond = $field . ' ' . $filter['condition'];
 
-        return $result;
+        if ($filter) {
+            $orm->where_raw($cond, $filter['params']);
+        }
     }
 
-    public function getOrderTotal($filter)
-    {
-        /*
-        // TODO: redo the whole thing
-        $orderTotal = $this->Sellvana_Sales_Model_Order_CustomStatus->orm('s')
-            ->left_outer_join('Sellvana_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
-            ->group_by('s.id')
-            ->select_expr('COUNT(o.id)', 'order')
-            ->select(['s.id', 'name']);
-        $tmp = $result = $orderTotal->find_many();
-        $tmp = [];
-        switch ($filter['type']) {
-            case 'between':
-                $tmp = $orderTotal->where_gte('o.create_at', $filter['min'])->where_lte('o.create_at', $filter['max'])->find_many();
-                break;
-            case 'to':
-                $tmp = $orderTotal->where_lte('o.create_at', $filter['date'])->find_many();
-                break;
-            case 'from':
-                $tmp = $orderTotal->where_gte('o.create_at', $filter['date'])->find_many();
-                break;
-            case 'equal':
-                $tmp = $orderTotal->where_like('o.create_at', $filter['date'] . '%')->find_many();
-                break;
-            case 'not_in':
-                $tmp = $orderTotal->where_raw('o.create_at', 'NOT BETWEEN ? AND ?', $filter['min'], $filter['max'])->find_many();
-                break;
-            default:
-                break;
-        }
-        foreach ($result as $obj) {
-            $order = 0;
-            foreach ($tmp as $key) {
-                if ($obj->get('id') == $key->get('id')) {
-                    $order = $key->get('order');
-                }
-            }
-            $obj->set('order', $order);
-        }
-        */
-        $result = [];
-        return $result;
-    }
+
 
     public function action_validate_order_number__POST()
     {
@@ -424,7 +391,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 $curSeqId = $seq->get('current_seq_id');
                 if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $curSeqId) {
                     $result['status'] = false;
-                    $result['messages'] = $this->BLocale->_('Order number must larger than order current: ' . $curSeqId);
+                    $result['messages'] = $this->_('Order number must larger than order current: ' . $curSeqId);
                 }
             }
         }
@@ -485,26 +452,35 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'orm' => $orm,
             'data_mode' => 'local',
             //'caption'      =>$caption,
+            'edit_url_required' => true,
+            'edit_url' => $this->BApp->href('payments/mass_change_state'),
             'columns' => [
                 ['type' => 'row_select'],
-                ['type' => 'btn_group', 'buttons' => [
+                /*['type' => 'btn_group', 'buttons' => [
                     ['name' => 'edit'],
-                ]],
+                ]],*/
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'payment_method', 'label' => 'Method', 'options' => $methodOptions],
-                ['name' => 'amount_authorized', 'label' => 'Authorized'],
-                ['name' => 'amount_due', 'label' => 'Due'],
-                ['name' => 'amount_captured', 'label' => 'Captured'],
-                ['name' => 'amount_refunded', 'label' => 'Refunded'],
+                ['name' => 'amount_authorized', 'label' => 'Authorized', 'cell' => 'currency'],
+                ['name' => 'amount_due', 'label' => 'Due', 'cell' => 'currency'],
+                ['name' => 'amount_captured', 'label' => 'Captured', 'cell' => 'currency'],
+                ['name' => 'amount_refunded', 'label' => 'Refunded', 'cell' => 'currency'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
                 ['name' => 'transactions', 'label' => 'Transactions'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add payment'],
-                'delete' => ['caption' => 'Remove']
+//                'new' => ['caption' => 'Add payment', 'addClass' => '_modal'],
+                'delete' => ['caption' => 'Remove'],
+                'mark_paid' => [
+                    'caption'      => 'Mark as paid',
+                    'type'         => 'button',
+                    'class'        => 'btn btn-primary',
+                    'isMassAction' => true,
+                    'callback'     => 'markAsPaid',
+                ],
             ],
             'filters' => [
                 ['field' => 'payment_method', 'type' => 'multiselect'],
@@ -547,6 +523,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'orm' => $orm,
             'data_mode' => 'local',
             //'caption'      =>$caption,
+            'edit_url_required' => true,
+            'edit_url' => $this->BApp->href('shipments/mass_change_state'),
             'columns' => [
                 ['type' => 'row_select'],
                 ['type' => 'btn_group', 'buttons' => [
@@ -558,13 +536,20 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_carrier', 'label' => 'Carrier Status', 'options' => $stateCarrierOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
                 ['name' => 'packages', 'label' => 'Packages'],
             ],
             'actions' => [
                 'add' => ['caption' => 'Add shipment'],
-                'delete' => ['caption' => 'Remove']
+                'delete' => ['caption' => 'Remove'],
+                'mark_paid' => [
+                    'caption'      => 'Mark as Shipped',
+                    'type'         => 'button',
+                    'class'        => 'btn btn-primary',
+                    'isMassAction' => true,
+                    'callback'     => 'markAsShipped',
+                ],
             ],
             'filters' => [
                 ['field' => 'carrier_code', 'type' => 'multiselect'],
@@ -603,18 +588,18 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'rma_at', 'label' => 'RMA at'],
+                ['name' => 'received_at', 'label' => 'Received at', 'cell' => 'datetime'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add return'],
-                'delete' => ['caption' => 'Remove']
+                #'add' => ['caption' => 'Add return'],
+                #'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
                 ['field' => 'state_overall', 'type' => 'multiselect'],
                 ['field' => 'state_custom', 'type' => 'multiselect'],
-                ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'update_at', 'type' => 'date-range'],
+                ['field' => 'rma_at', 'type' => 'date-range'],
+                ['field' => 'received_at', 'type' => 'date-range'],
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_returns_register',
@@ -632,7 +617,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ->select('s.*')->where('order_id', $model->id());
 
         $config = [
-            'id' => 'order_returns',
+            'id' => 'order_cancellations',
             'orm' => $orm,
             'data_mode' => 'local',
             //'caption'      =>$caption,
@@ -644,18 +629,16 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'canceled_at', 'label' => 'Timestamp', 'cell' => 'datetime'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add cancellation'],
-                'delete' => ['caption' => 'Remove']
+                #'add' => ['caption' => 'Add cancellation'],
+                #'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
                 ['field' => 'state_overall', 'type' => 'multiselect'],
                 ['field' => 'state_custom', 'type' => 'multiselect'],
-                ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'update_at', 'type' => 'date-range'],
+                ['field' => 'canceled_at', 'type' => 'date-range'],
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_cancellations_register',
@@ -686,19 +669,17 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'amount', 'label' => 'Amount'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'refunded_at', 'label' => 'Timestamp', 'cell' => 'datetime'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add refund'],
-                'delete' => ['caption' => 'Remove']
+                #'add' => ['caption' => 'Add refund'],
+                #'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
                 ['field' => 'state_overall', 'type' => 'multiselect'],
                 ['field' => 'state_custom', 'type' => 'multiselect'],
                 ['field' => 'amount', 'type' => 'number-range'],
-                ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'update_at', 'type' => 'date-range'],
+                ['field' => 'refunded_at', 'type' => 'date-range'],
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_refunds_register',
@@ -715,22 +696,31 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $config = [
             'id' => 'order_comments',
             'orm' => $orm,
-            'data_mode' => 'local',
+            'data_url' => $this->BApp->href('orders/comments_grid_data').'?order_id=' . $model->id(),
+            'edit_url' => $this->BApp->href('orders/comments_grid_data').'?order_id=' . $model->id(),
+            //'data_mode' => 'local',
             //'caption'      =>$caption,
             'columns' => [
                 ['type' => 'row_select'],
                 ['type' => 'btn_group', 'buttons' => [
-                    ['name' => 'edit'],
+                    ['name' => 'edit-custom', 'callback' => 'showModalToEditComment','cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "],
                 ]],
                 ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated', 'hidden' => true],
-                ['name' => 'from_admin', 'label' => 'Direction', 'options' => [0 => 'Received', 1 => 'Sent']],
-                ['name' => 'is_internal', 'label' => 'Visibility', 'options' => [0 => 'Public', 1 => 'Private']],
-                ['name' => 'comment_text', 'label' => 'Text'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'hidden' => true, 'cell' => 'datetime'],
+                ['name' => 'from_admin', 'label' => 'Direction', 'options' => [0 => 'Received', 1 => 'Sent'], 'editable' => true, 'editor' => 'select', 'addable' => true, ],
+                ['name' => 'is_internal', 'label' => 'Visibility', 'options' => [0 => 'Public', 1 => 'Private'], 'editable' => true, 'editor' => 'select', 'addable' => true, ],
+                ['name' => 'comment_text', 'label' => 'Text', 'addable' => true, 'editable' => true, 'editor' => 'textarea', 'validation' => ['required' => true]],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add comment'],
+                //'add' => ['caption' => 'Add comment'],
+                'add-order-comment' => [
+                    'caption'  => 'Add comment',
+                    'type'     => 'button',
+                    'id'       => 'add-order-comment',
+                    'class'    => 'btn-primary',
+                    'callback' => 'showModalToAddComment',
+                ],
                 'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
@@ -741,14 +731,88 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_comments_register',
+            'callbacks' => [
+                'componentDidMount' => 'order_comments_register'
+            ]
         ];
 
         return ['config' => $config];
     }
 
+
+    public function action_comments_grid_data__POST()
+    {
+        //todo: should we create new controller for this process and re-use the gridDataPost???
+
+        $r = $this->BRequest;
+        $id = $r->post('id');
+        $hlp = $this->Sellvana_Sales_Model_Order_Comment;
+        $data = $r->post();
+
+        $data['order_id'] = $r->get('order_id');
+
+        /** @type BModel $hlp */
+        unset($data['id'], $data['oper']);
+
+        $args = ['data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp];
+
+        $this->BEvents->fire(static::$_origClass . '::comments_grid_data__POST::before', $args);
+
+        switch ($args['oper']) {
+            case 'add':
+                //fix Undefined variable: set
+                $model = $args['model'] = $hlp->create($data)->save();
+                $result = $model->as_array();
+                break;
+
+            case 'edit':
+                $model = $hlp->load($id);
+                if ($model) {
+                    $args['model'] = $model->set($data)->save();
+                    $result = $model->as_array();
+                } else {
+                    $result = ['error' => true];
+                }
+                break;
+
+            case 'del':
+                $model = $hlp->load($id);
+                if ($model) {
+                    $args['model'] = $model->delete();
+                    $result = ['success' => true];
+                } else {
+                    $result = ['error' => true];
+                }
+                break;
+        }
+
+        $args['result'] =& $result;
+
+        $this->BEvents->fire(static::$_origClass . '::comments_grid_data__POST::after', $args);
+
+        $this->BResponse->json($result);
+        die;
+    }
+
+    public function action_comments_grid_data()
+    {
+        /** @var FCom_Core_View_BackboneGrid $view */
+        $view = $this->view('core/backbonegrid');
+        $order = $this->Sellvana_Sales_Model_Order->load($this->BRequest->get('order_id'));
+        $view->set('grid', $this->commentsGridConfig($order));
+        $data = $view->generateOutputData();
+        $this->BResponse->json([
+            ['c' => $data['state']['c']],
+            $this->BDb->many_as_array($data['rows']),
+        ]);
+
+    }
+    
     public function historyGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $entityTypes = $this->Sellvana_Sales_Model_Order_History->fieldOptions('entity_type');
+
+        $userOptions = $this->FCom_Admin_Model_User->options();
 
         $orm = $this->Sellvana_Sales_Model_Order_History->orm('s')
             ->select('s.*')->where('order_id', $model->id())->order_by_desc('id');
@@ -760,21 +824,23 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'state' => ['s' => 'create_at', 'sd' => 'desc'],
             'columns' => [
                 ['type' => 'row_select'],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'entity_id', 'label' => 'Entity ID'],
-                ['name' => 'order_item_id', 'label' => 'Item ID'],
+                ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'order_item_id', 'label' => 'Item ID', 'hidden' => true],
+                ['name' => 'user_id', 'label' => 'User', 'options' => $userOptions],
                 ['name' => 'entity_type', 'label' => 'Entity Type', 'options' => $entityTypes],
-                ['name' => 'event_type', 'label' => 'Event Type'],
+                ['name' => 'entity_id', 'label' => 'Entity ID'],
+                ['name' => 'event_type', 'label' => 'Event Type', 'hidden' => true],
                 ['name' => 'event_description', 'label' => 'Description'],
             ],
             'filters' => [
                 ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'id', 'type' => 'number-range'],
-                ['field' => 'entity_id', 'type' => 'number-range'],
-                ['field' => 'order_item_id', 'type' => 'number-range'],
+                ['field' => 'id', 'type' => 'number-range', 'hidden' => true],
+                ['field' => 'order_item_id', 'type' => 'number-range', 'hidden' => true],
+                ['field' => 'user_id', 'type' => 'multiselect'],
                 ['field' => 'entity_type', 'type' => 'multiselect'],
-                ['field' => 'event_type', 'type' => 'text'],
+                ['field' => 'entity_id', 'type' => 'number-range'],
+                ['field' => 'event_type', 'type' => 'text', 'hidden' => true],
                 ['field' => 'event_description', 'type' => 'text'],
 
             ],

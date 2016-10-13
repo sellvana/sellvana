@@ -69,13 +69,13 @@
             mainGrid = grid;
             var modalContainerEle = document.getElementById('{{ roleUserConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
-            React.renderComponent(
+            React.render(
                     React.createElement(Components.Modal, {
                                 id: "addUserModal",
                                 show: true,
-                                title: 'Add User',
-                                confirm: 'Add',
-                                cancel: 'Close',
+                                title: "{{ 'Users List'|_ }}",
+                                confirm: "{{ 'Add User'|_ }}",
+                                cancel: "{{ 'Cancel'|_ }}",
                                 onLoad: function(modal) {
                                     var node = $(modal.getDOMNode());
                                     node.find('.modal-dialog').css('width', '900px');
@@ -86,7 +86,7 @@
                     ), modalContainerEle);
             var allUserConfigCompiled = {{ UTIL.toJson(allUserConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('allUserList');
-            var instanceAttachGrid = React.renderComponent(
+            var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, { config: allUserConfigCompiled}),
                     attachGridContainerEle
             );
@@ -116,7 +116,7 @@
                 });
                 modal.close();
             } else {
-                alert('please choose at least one product');
+                alert("{{ 'please choose at least one user.'|_ }}");
             }
         };
 

@@ -3,6 +3,7 @@ base:
         do:
             - [ requireJs, fcom.checkout, "@Sellvana_Checkout/Frontend/js/fcom.checkout" ]
             - [ requireRun, fcom.checkout]
+            - [ css, "@Sellvana_Checkout/Frontend/css/fcom.checkout.css" ]
 
 checkout/base:
     - { include: base }
@@ -36,3 +37,6 @@ checkout/base:
     - { hook: main, views: checkout-simple/success }
     - { hook: before_body_end, views: custom-tags }
     - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_success } }
+
+/checkout-simple/redirect:
+    - { hook: main, views: checkout-simple/redirect }

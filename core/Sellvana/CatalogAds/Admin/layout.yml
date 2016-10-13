@@ -1,0 +1,4 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, catalog/ads, { label: Catalog Ads, href: catalog/ads } ]

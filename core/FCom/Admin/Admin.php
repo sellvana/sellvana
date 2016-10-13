@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Admin
@@ -39,13 +39,14 @@ class FCom_Admin_Admin extends BClass
     public function layout()
     {
         /** @var FCom_Core_View_Head $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
         /** @var FCom_Core_View_Text $script */
-        $script = $this->BLayout->view('head_script');
+        $script = $this->BLayout->getView('head_script');
         /** @var FCom_Core_View_Text $css */
-        $css = $this->BLayout->view('head_css');
+        $css = $this->BLayout->getView('head_css');
 
         $text = '
+FCom.jsdebug = ' . ($this->BConfig->get('modules/FCom_Admin/enable_debug_in_js') ? 'true' : 'false') . ';
 FCom.Admin = {};
 FCom.Admin.base_url = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
 FCom.Admin.code_mirror_base_url = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
@@ -80,7 +81,7 @@ FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
 
         $pers = $this->FCom_Admin_Model_User->personalize();
         if (!empty($pers['nav']['collapsed'])) {
-            $this->BLayout->view('root')->addBodyClass('main-nav-closed');
+            $this->BLayout->getView('root')->addBodyClass('main-nav-closed');
         }
     }
 
@@ -101,18 +102,5 @@ FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
                 unset($modes);
             }
         }
-    }
-
-    public function onGetDashboardWidgets($args)
-    {
-        $view = $args['view'];
-        /** @var FCom_Admin_View_Dashboard $view */
-        $view->addWidget('visitors-totals', [
-            'title' => 'Visitors',
-            'icon' => 'group',
-            'view' => 'dashboard/visitors-totals',
-            'cols' => 2,
-            'async' => true,
-        ]);
     }
 }

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * model class for table "fcom_sales_cart"
@@ -36,6 +36,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Cart_Item $Sellvana_Sales_Model_Cart_Item
@@ -64,8 +65,9 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     ];
 
     protected static $_importExportProfile = [
-        'skip'       => ['id'],
-        'unique_key' => ['customer_id', 'status', 'create_at'],
+        'skip'       => ['id', 'cookie_token'],
+        'unique_key' => ['customer_id', 'state_overall', 'create_at'],
+        'unique_key_not_null' => ['customer_id'],
         'related'    => [
             'customer_id' => 'Sellvana_Customer_Model_Customer.id',
             'admin_id'    => 'FCom_Admin_Model_User.id'
@@ -143,7 +145,6 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$cart && ($customer || $createAnonymousIfNeeded)) {
             $this->Sellvana_Sales_Main->workflowAction('customerCreatesNewCart');
         }
-
         return static::$_sessionCart;
     }
 
@@ -195,8 +196,9 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function items($assoc = true)
     {
-        if (!$this->items) {
+        if (null === $this->items) {
             $this->items = $this->Sellvana_Sales_Model_Cart_Item->orm()->where('cart_id', $this->id())->find_many_assoc();
+            /** @var Sellvana_Sales_Model_Cart_Item $item */
             foreach ($this->items as $item) {
                 $item->setCart($this);
             }
@@ -314,9 +316,9 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
             $sku = $item->get('product_sku');
             if (!$qty) {
-                $this->BSession->addMessage($this->BLocale->_('The product is not in stock: %s', $sku), 'warning', 'frontend');
+                $this->BSession->addMessage($this->_('The product is not in stock: %s', $sku), 'warning', 'frontend');
             } elseif ($qty < $item->get('qty')) {
-                $this->BSession->addMessage($this->BLocale->_('Maximum quantity reached for item %s', $sku), 'warning', 'frontend');
+                $this->BSession->addMessage($this->_('Maximum quantity reached for item %s', $sku), 'warning', 'frontend');
             }
 
             if ($inv->getAllowBackorder()) {
@@ -379,7 +381,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     /**
      * @todo combine variants and shopper fields into structure grouped differently, i.e. all output in the same array
-     * @todo move variants to Sellvana_CustomField
+     * @todo move variants to Sellvana_CatalogFields
      *
      * @param Sellvana_Catalog_Model_Product|int $product
      * @param array $params
@@ -437,7 +439,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!empty($params['inventory_id'])) {
             $skuModel = $this->Sellvana_Catalog_Model_InventorySku->load($params['inventory_id']);
         } else {
-            $skuModel = $this->Sellvana_Catalog_Model_InventorySku->load($product->get('inventory_sku'), 'inventory_sku');
+            $skuModel = $product->getInventoryModel();
         }
 
         if (!$item) {
@@ -453,6 +455,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'unique_hash' => $hash,
                 'auto_added' => !empty($params['auto_added']) ? $params['auto_added'] : 0,
                 'parent_item_id' => !empty($params['parent_item_id']) ? $params['parent_item_id'] : null,
+                'cost' => !empty($params['cost']) ? $params['cost'] : null,
             ];
             if ($skuModel) {
                 $itemData = array_merge($itemData, [
@@ -460,7 +463,6 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                     'pack_separate' => $skuModel->get('pack_separate'),
                     'shipping_weight' => $skuModel->get('shipping_weight') ?: $product->get('ship_weight'),
                     'shipping_size' => $skuModel->get('shipping_size'),
-                    'cost' => $skuModel->get('unit_cost'),
                 ]);
             }
             $item = $this->Sellvana_Sales_Model_Cart_Item->create($itemData);
@@ -646,17 +648,30 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function importAddressesFromCustomer(Sellvana_Customer_Model_Customer $customer)
     {
-        $defBilling = $customer->getDefaultBillingAddress();
-        if ($defBilling) {
-            $this->importAddressFromObject($defBilling, 'billing');
+        $billingAddressId = $this->BSession->get('billing_address_id');
+        if ($billingAddressId) {
+            $billingAddress = $this->Sellvana_Customer_Model_Address->load($billingAddressId);
+        } else {
+            $billingAddress = $customer->getDefaultBillingAddress();
         }
-        $defShipping = $customer->getDefaultShippingAddress();
-        if ($defShipping) {
-            $this->importAddressFromObject($defShipping, 'shipping');
+        if ($billingAddress) {
+            $this->importAddressFromObject($billingAddress, 'billing');
+            $this->BSession->set('billing_address_id', $billingAddress->get('id'));
+        }
+
+        $shippingAddressId = $this->BSession->get('shipping_address_id');
+        if ($shippingAddressId) {
+            $shippingAddress = $this->Sellvana_Customer_Model_Address->load($shippingAddressId);
+        } else {
+            $shippingAddress = $customer->getDefaultShippingAddress();
+        }
+        if ($shippingAddress) {
+            $this->importAddressFromObject($shippingAddress, 'shipping');
+            $this->BSession->set('shipping_address_id', $shippingAddress->get('id'));
         }
 
         $this->set([
-            'same_address' => $defBilling && $defShipping && $defBilling->id() == $defShipping->id(),
+            'same_address' => (int)($billingAddress && $shippingAddress && $billingAddress->id() == $shippingAddress->id()),
             'recalc_shipping_rates' => 1,
         ]);
 
@@ -719,9 +734,17 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$ignoreInvalid && empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
+
         if (!empty($methods[$method])) {
             $services = $methods[$method]->getServices();
-            if (null !== $service && empty($services[$service])) {
+
+            $serviceCheckNeeded = true;
+            $this->BEvents->fire('Sellvana_Sales_Model_Cart::serviceCheckNeeded', [
+                'service_check_needed' => &$serviceCheckNeeded,
+                'shipping_method' => $method
+            ]);
+
+            if ($serviceCheckNeeded && null !== $service && empty($services[$service])) {
                 throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
             }
         } else {
@@ -845,17 +868,25 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
             $servicesArr = $ratesArr[$methodCode];
             if (!empty($servicesArr['error'])) {
+                if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT'])) {
+                    $result[$methodCode] = [
+                        'title' => $method->getDescription(),
+                        'error' => $servicesArr['error'],
+                        'message' => $servicesArr['message'],
+                    ];
+                }
                 continue;
             }
             $allServices = $method->getServices();
             $services = [];
             foreach ($servicesArr as $serviceCode => $serviceRate) {
-                $serviceTitle = $allServices[$serviceCode];
+                $serviceTitle = (isset($allServices[$serviceCode])) ? $allServices[$serviceCode] : $serviceCode;
                 $services[$serviceCode] = [
                     'value' => $methodCode . ':' . $serviceCode,
                     'title' => $serviceTitle,
                     'price' => $this->convertToStoreCurrency($serviceRate['price']),
                     'max_days' => $serviceRate['max_days'],
+                    'exact_time' => !empty($serviceRate['exact_time']) ? $serviceRate['exact_time'] : null,
                     'selected' => $selMethod == $methodCode && $selService == $serviceCode,
                 ];
             }
@@ -899,19 +930,20 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function convertToStoreCurrency($amount)
+    public function getCurrencyRate()
     {
         $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
         $storeCurrency = $this->get('store_currency_code');
         if ($storeCurrency === $baseCurrency || !$this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
-            return $amount;
+            return 1;
         }
         $rate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
-        if ($rate) {
-            $amount *= $rate;
-        }
-        $amount = $this->BLocale->roundCurrency($amount);
-        return $amount;
+        return $rate ?: 1;
+    }
+
+    public function convertToStoreCurrency($amount)
+    {
+        return $this->BLocale->roundCurrency($amount * $this->getCurrencyRate());
     }
 
     public function importDataFromOrder(Sellvana_Sales_Model_Order $order)
@@ -933,10 +965,39 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function hasUnavailableItems()
+    {
+        $this->loadProducts();
+        foreach ($this->items() as $item) {
+            if ($item->getQty() == 0 || !$item->getProduct()->canOrder($item->getQty())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getCrossSellProducts()
+    {
+        $this->loadProducts();
+        $products = [];
+        foreach ($this->items() as $item) {
+            $productLinks = $item->getProduct()->getProductLinks(['cross_sell']);
+            foreach ($productLinks['cross_sell']['products'] as $product) {
+                $products[$product->id()] = $product;
+            }
+        }
+        shuffle($products);
+        $limit = $this->BConfig->get('modules/Sellvana_Sales/cross_sale_limit', 6);
+        if (count($products) > $limit) {
+            $products = array_splice($products, 0, $limit);
+        }
+
+        return $products;
+    }
+
     public function __destruct()
     {
         parent::__destruct();
         unset($this->_addresses, $this->items, $this->totals);
     }
-
 }

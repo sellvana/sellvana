@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Migrate
@@ -255,6 +255,16 @@ class Sellvana_Customer_Migrate extends BClass
         $this->BDb->ddlTableDef($table, [
             BDb::COLUMNS => [
                 'status' => "varchar(10) not null default 'new'",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $table = $this->Sellvana_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
+            BDb::COLUMNS => [
+                'data_serialized' => "mediumtext",
             ],
         ]);
     }

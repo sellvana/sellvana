@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 trait Sellvana_Sales_Model_Trait_OrderChild
 {
@@ -12,6 +12,9 @@ trait Sellvana_Sales_Model_Trait_OrderChild
     {
         if (!empty($order)) {
             $this->_order = $order;
+            if ($this->get('order_id') !== $order->id()) {
+                $this->set('order_id', $order->id());
+            }
         } elseif (!$this->_order && $this->get('order_id')) {
             $this->_order = $this->Sellvana_Sales_Model_Order->load($this->get('order_id'));
         }
@@ -31,6 +34,8 @@ trait Sellvana_Sales_Model_Trait_OrderChild
             $entityType = 'return';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Shipment) {
             $entityType = 'shipment';
+        } elseif ($this instanceof Sellvana_Sales_Model_Order_Shipment_Package) {
+            $entityType = 'package';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Comment) {
             $entityType = 'comment';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Item) {
@@ -52,5 +57,19 @@ trait Sellvana_Sales_Model_Trait_OrderChild
         }
         $history->save();
         return $this;
+    }
+
+    /**
+     * @param $field
+     * @param null $currencyCode
+     * @return BCurrencyValue
+     */
+    public function getCurrencyValue($field, $currencyCode = null)
+    {
+        if (!$currencyCode) {
+            $currencyCode = $this->BConfig->get('modules/FCom_Core/base_currency', 'USD');
+        }
+
+        return $this->BCurrencyValue->fromModel($this, $field, $currencyCode);
     }
 }

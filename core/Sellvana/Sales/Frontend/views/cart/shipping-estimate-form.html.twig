@@ -14,18 +14,23 @@
     <h4>{{ 'Shipping Methods'|_ }}</h4>
     <dl>
         {% for method in rates %}
-            <dt>{{ method.title |_ }}</dt>
-            {% for service in method.services %}
-                <dd>
-                    <label for="shipping_method-{{ service.value }}">
-                        <input type="radio" name="shipping_method" id="shipping_method-{{ service.value }}" required
-                               value="{{ service.value }}" {{ service.selected ? 'checked' }}>
-                        {{ service.title |_ }}
-                        <span class="f-price">{{ service.price ? service.price|currency : 'FREE'|_ }}</span>
-                        {% if service.max_days %}({{ '%s days'|_(service.max_days) }}){% endif %}
-                    </label>
-                </dd>
-            {% endfor %}
+            <dt>{{ method.title | _ | safehtml | raw }}</dt>
+			{% if method.error %}
+			  <dd class="error">{{ 'ERROR: %s' | _(method.message) | safehtml | raw }}</dd>
+			{% else %}
+			  {% for service in method.services %}
+			  <dd>
+				  <label for="shipping_method-{{ service.value }}">
+				  <input type="radio" name="shipping_method" id="shipping_method-{{ service.value }}" required
+					value="{{ service.value }}" {{ service.selected ? 'checked' }}>
+				  {{ service.title |_ }}
+				  <span class="f-price">{{ service.price ? service.price|currency : 'FREE'|_ }}</span>
+				  {% if service.max_days %}({{ '%s days'|_(service.max_days) }}){% endif %}
+				  {% if service.exact_time %}({{ service.exact_time|locdate('datetime_short') }}){% endif %}
+				  </label>
+			  </dd>
+			  {% endfor %}
+			{% endif %}
         {% endfor %}
     </dl>
     <button type="submit" class="btn btn-xs btn-default">{{ 'Update shipping method'|_ }}</button>

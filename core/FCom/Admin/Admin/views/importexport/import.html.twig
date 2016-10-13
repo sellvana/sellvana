@@ -5,39 +5,53 @@
     <div class="panel-body">
         <h2>{{ "Upload and import files" }}</h2>
         <div class="help-block">{{"Max file size allowed:"|_}} <span id="max_import_file_size">{{ m.import_config.max_import_file_size }}</span></div>
+        <div class="help-block">{{"File extensions supported:"|_}} json, txt, js</div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="allow_config" name="allow_config">
+                {{ 'Allow config import'|_ }}
+            </label>
+        </div>
         <div class='box-content'>
-            <div class='row fileupload-buttonbar'>
-                <div class='col-sm-12'>
-                    <span class='btn btn-success fileinput-button'>
-                        <i class='icon-plus icon-white'></i>
-                        <span>{{ "Add files..."|_ }}</span>
-                        <input data-bfi-disabled='' multiple='' name='upload[]' type='file'>
-                    </span>
-                    <button class='btn btn-primary start' type='submit'>
-                        <i class='icon-upload icon-white'></i>
-                        <span>{{ "Upload and import"|_ }}</span>
-                    </button>
-                    <button class='btn btn-warning cancel' type='reset'>
-                        <i class='icon-ban-circle icon-white'></i>
-                        <span>{{ "Cancel"|_ }}</span>
-                    </button>
-                </div>
-                <div class='col-sm-5 fileupload-progress fade'>
-                    <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active'
-                         role='progressbar'>
-                        <div class='bar' style='width:0%;'></div>
+            <div class='row'>
+                <div class="col-md-12 col-lg-6">
+                    <div class="fileupload-buttonbar">
+                        <span class='btn btn-success fileinput-button'>
+                            <i class='icon-plus icon-white'></i>
+                            <span>{{ "Add files..."|_ }}</span>
+                            <input data-bfi-disabled='' multiple='' name='upload[]' type='file'>
+                        </span>
+                        <button class='btn btn-primary start' type='submit'>
+                            <i class='icon-upload icon-white'></i>
+                            <span>{{ "Upload and import"|_ }}</span>
+                        </button>
+                        <button class='btn btn-warning cancel' type='reset'>
+                            <i class='icon-ban-circle icon-white'></i>
+                            <span>{{ "Cancel"|_ }}</span>
+                        </button>
                     </div>
-                    <div class='progress-extended'></div>
+                    <div class='fileupload-progress fade'>
+                        <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active'
+                             role='progressbar'>
+                            <div class='bar' style='width:0%;'></div>
+                        </div>
+                        <div class='progress-extended'></div>
+                    </div>
+                    <div class='fileupload-loading'></div>
+                    <br>
+                    <table class='table table-striped' role='presentation'>
+                        <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+                    </table>
+                </div>
+                <div class="col-md-12 col-lg-6">
+                    <div id="statistic-canvas"></div>
                 </div>
             </div>
-            <div class='fileupload-loading'></div>
-            <br>
-            <table class='table table-striped' role='presentation'>
-                <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
-            </table>
-        </div>
-        <div class="box-content">
-            <div id="ie-msg-log"></div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="pushserver-log"></div>
+                </div>
+            </div>
         </div>
         <script>
             var uploadTr = '{{ 'Upload'|_ }}';
@@ -113,71 +127,37 @@
                 url: '{{ APP.href("importexport/import") | raw }}',
                 multiple: false,
                 acceptFileTypes: /(\.|\/)(json|txt|js)$/i
-            })
-                    .bind('fileuploadalways', function (e, data) {
+            }).bind('fileuploadsubmit', function (e, data) {
+                data.formData = {'allow_config': $('#allow_config').is(":checked")};
+            }).bind('fileuploadalways', function (e, data) {
+                if (data.result.id) {
+                    //get self media grid
 
-                        if (data.result.id) {
-                            //get self media grid
+                    //insert uploaded file in media grid and get selected
+                    var newRow = data.result;
 
-                            //insert uploaded file in media grid and get selected
-                            var newRow = data.result;
+                    //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
+                    {% if config.multiSelAllowed %}
+                    newRow.selected = true;
+                    {{config.id}}_grid.getSelectedRows().add(data.result);
+                    {% endif %}
 
-                            //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
-                            {% if config.multiSelAllowed %}
-                            newRow.selected = true;
-                            {{config.id}}_grid.getSelectedRows().add(data.result);
-                            {% endif %}
+                    {{config.id}}_grid.getRows().add(newRow, {merge: true}).trigger('render');
 
-                            {{config.id}}_grid.getRows().add(newRow, {merge: true}).trigger('render');
-
-                            $('td.name span').each(function (i) {
-                                if ($(this).html() === data.result.file_name) {
-                                    $(this).parents('tr:first').remove();
-                                }
-                            });
+                    $('td.name span').each(function (i) {
+                        if ($(this).html() === data.result.file_name) {
+                            $(this).parents('tr:first').remove();
                         }
                     });
+                }
+            });
         });
     </script>
     <script type="text/javascript">
-        require(['jquery', 'fcom.pushclient'], function ($, PushClient) {
-            var $logCanvas = $('#ie-msg-log');
-            var found;
-
-            function channel_import(data) {
-                console.log(data);
-                /*
-                * signals:
-                * info
-                * problem
-                * start
-                * finished:[
-                *   'data'   => [
-                    'new_models'
-                    'updated_models'
-                    'not_changed'
-                ]]
-                * */
-                switch (data.signal) {
-                    case 'info':
-                        $logCanvas.html('<div class="alert-info">' + data.msg + '</div>');
-                        break;
-                    case 'problem':
-                        $logCanvas.append('<div class="alert-error">' + data.msg + '</div>');
-                        break;
-                    case 'finished':
-                        $logCanvas.append('<div class="alert-info">' + data.msg + '</div>');
-                            if(data.data) {
-                                for(var i in data.data) {
-                                    $logCanvas.append('<div class="alert-info">    ' + data.data[i] + '</div>');
-                                }
-                            }
-                        break;
-                }
-            }
-
-
-            PushClient.listen({channel: 'import', callback: channel_import});
+        require(['jquery', 'fcom.admin.import'], function ($, Import) {
+            $(document).ready(function () {
+                Import.init('statistic-canvas','pushserver-log');
+            });
         });
     </script>
 </div>

@@ -11,49 +11,82 @@
 {% set addToCartUrl = THIS.url('cart/add') %}
 
 {% set listId = 'product-list-container-' ~ UTIL.randomString(10) %}
+{% set useRollover = CONFIG.get('modules/Sellvana_Catalog/enable_rollover') %}
+{% set rolloverEffect = CONFIG.get('modules/Sellvana_Catalog/rollover_effect') %}
+
+{% set thumbWidth = 350 %}
+{% set thumbHeight = 350 %}
+
+<style type="text/css">
+    .f-prod-img-base img {
+        width: 100%;
+    }
+</style>
 
 <div class="row js-ga-product-list" id="{{ listId }}">
     {% set count = 0 %}
     {% for p in THIS.get('products') %}
-        {% set productName = p.getName() %}
-        {% set productUrl = p.url(THIS.get('category')) %}
-        <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }} js-ga-product-container" data-product-id="{{ p.id() }}">
-          <div class="thumbnail">
-            {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-                <span class="sale tooltip-test">{{ 'Sale'|_ }}</span>
-            {% endif %}
-            <div class="f-col-listing-prod-img">
-              <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
-              <a href="{{ productUrl }}" class="f-prod-img js-ga-product-view-trigger" title="{{ productName }}">
-                <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
-              </a>
+        {% if p.get('custom_grid_view') %}
+            <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }} js-ga-product-container" data-product-id="{{ p.id() }}">
+                {{ THIS.view(p.get('custom_grid_view')).set({ product:p, position:count, list_id:listId, view_type:'grid',
+                    list_name: THIS.get('list_name') }) | raw }}
             </div>
-            <div class="caption">
-              {% if THIS.get('add_wishlist') %}
-                {{ THIS.view('wishlist/add-icon').set({p:p}) | raw }}
-              {% endif %}
-              <a href="{{ productUrl }}" class="f-prod-name js-ga-product-view-trigger">{{ productName }}</a>
-              {% if not THIS.get('simple_view') %}
-                {{ THIS.view('catalog/product/price').set('product', p) | raw }}
-              {% endif %}
-              {#{ p.getShortDescription() }#}
-              <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
-                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-                <input type="hidden" name="action" value="add">
-                <input type="hidden" name="qty" value="1">
-                <p>
-                  <button type="submit" name="id" value="{{ p.id() }}" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
-                  {% if not THIS.get('simple_view') %}
-                      <a href="{{ productUrl }}" class="btn btn-link btn-sm js-ga-product-view-trigger">{{ 'View Details'|_ }}</a>
-                      {% if THIS.get('add_compare') %}
-                          {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+        {% else %}
+            {% set productName = p.getName() %}
+            {% set productUrl = p.url(THIS.get('category')) %}
+            {% set productImg = p.thumbUrl(thumbWidth, thumbHeight) %}
+            {% set productRollover = p.rolloverUrl(thumbWidth, thumbHeight) %}
+            <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }} js-ga-product-container" data-product-id="{{ p.id() }}">
+              <div class="thumbnail">
+                {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+                    <span class="sale tooltip-test">{{ 'Sale'|_ }}</span>
+                {% endif %}
+                <div class="f-col-listing-prod-img">
+                  <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" style="visibility:hidden" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
+                  <a href="{{ productUrl }}" class="f-prod-img js-ga-product-view-trigger" title="{{ productName }}">
+                      {% if useRollover and productImg != productRollover %}
+                          <div style="display: none; position: absolute;" class="f-prod-img-over"><img
+                                      src="{{ productRollover }}" alt="{{ productName }}"/></div>
                       {% endif %}
+                      <div class="f-prod-img-base"><img alt="{{ productName }}" src="{{ productImg }}"/></div>
+                  </a>
+                </div>
+                <div class="caption">
+                    <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
+                        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                        <input type="hidden" name="id" value="{{ p.id() }}">
+                        <input type="hidden" name="action" value="add">
+                        <input type="hidden" name="qty" value="1">
+                        <p>
+                            <button type="submit" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
+                        </p>
+
+                        <div class="f-stock-notice {{ p.canOrder() ? '-in-stock' }}" data-id="{{ p.id() }}">
+                            <!--<p class="f-in-stock">{{ 'In Stock.'|_ }}</p>-->
+                            <p class="f-out-of-stock">{{ 'Out Of Stock.'|_ }}</p>
+                        </div>
+                    </form>
+                  {% if THIS.get('add_wishlist') %}
+                    {{ THIS.view('wishlist/add-icon').set({p:p}) | raw }}
                   {% endif %}
-                </p>
-              </form>
+                  <a href="{{ productUrl }}" class="f-prod-name js-ga-product-view-trigger">{{ productName }}</a>
+
+                    {% if not THIS.get('simple_view') %}
+                        <a href="{{ productUrl }}" class="btn btn-link btn-sm js-ga-product-view-trigger">{{ 'View Details'|_ }}</a>
+                        {% if THIS.get('add_compare') %}
+                            {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+                        {% endif %}
+                    {% endif %}
+
+                  {% if not THIS.get('simple_view') %}
+                    {{ THIS.view('catalog/product/price').set('product', p) | raw }}
+                  {% endif %}
+                  {#{ p.getShortDescription() }#}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+        {% endif %}
+
         {% set count = count + 1 %}
         {% if count % lgColumns == 0 %}
             <div class="visible-lg clearfix"></div>
@@ -70,8 +103,38 @@
     {% endfor %}
 </div>
 
+<script type="text/javascript">
+    require(['jquery', 'jquery-ui'], function ($) {
+        var $imgs = $('.f-prod-img');
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        var effect = '{{ rolloverEffect ?: 'fade' }}';
+
+        $imgs.hover(function (e) {
+            var $cont = $(this);
+            var $over = $cont.find('.f-prod-img-over');
+            if ($over.length) {
+                var h = $cont.height();
+                $cont.height(h);
+                $cont.find('.f-prod-img-base').stop(true, true).hide();
+                $over.stop(true, true).show(effect, function () {
+                    $over.css('position', 'inherit');
+                });
+            }
+        }, function (e) {
+            var $cont = $(this);
+            var $over = $cont.find('.f-prod-img-over');
+            if ($over.length) {
+                $over.css('position', 'inherit').stop(true, true).hide();
+                $cont.find('.f-prod-img-base').stop(true, true).show(effect);
+            }
+        });
+    });
+</script>
+
 {{ THIS.hook('catalog_grid_tiles', {
     products: THIS.get('products'),
     list_name: THIS.get('list_name'),
     list_id: listId,
 }) | raw }}
+
+

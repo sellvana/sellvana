@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Modules
@@ -150,7 +150,12 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 'hidden' => true],
         ];
 
-        $config['state']['ps'] = 100;
+        $config['state'] = [
+            'ps' => 100,
+            's' => 'name',
+            'sd' => 'asc'
+        ];
+
         $config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
         $config['filters'] = [
@@ -191,7 +196,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 'onclick' => "$('#util-form').attr('action', '{$this->BApp->href('modules/migrate')}').submit()",
             ],
             [
-                ['span', null, $this->BLocale->_('Run Migration Scripts')]
+                ['span', null, $this->_('Run Migration Scripts')]
             ]
         ];
         unset($actions['new']);
@@ -201,8 +206,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     /*
     public function action_index()
     {
-        $this->BLayout->view('modules')->set('form_url', $this->BApp->href('modules').($this->BRequest->get('RECOVERY')==='' ? '?RECOVERY' : ''));
-        $grid = $this->BLayout->view('core/backgrid')->set('grid', $this->gridConfig());
+        $this->BLayout->getView('modules')->set('form_url', $this->BApp->href('modules').($this->BRequest->get('RECOVERY')==='' ? '?RECOVERY' : ''));
+        $grid = $this->BLayout->getView('core/backgrid')->set('grid', $this->gridConfig());
         $this->BEvents->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->layout('/modules');
     }*/
@@ -268,5 +273,15 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             $this->message($e->getMessage(), 'error');
         }
         $this->BResponse->redirect('modules');
+    }
+
+    public function action_reset_cache()
+    {
+        $this->BCache->deleteAll();
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+        echo "DONE";
+        die;
     }
 }

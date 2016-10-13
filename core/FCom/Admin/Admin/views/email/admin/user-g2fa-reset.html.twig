@@ -1,0 +1,19 @@
+{% set u = THIS.get('user') %}
+
+<!--{ To: "{{ u.get('firstname') ~ ' ' ~ u.get('lastname') }}" <{{ u.get('email') }}> }-->
+<!--{ From: "{{ CONFIG.get('modules/FCom_Core/site_title') }}" <{{ CONFIG.get('modules/FCom_Core/admin_email') }}> }-->
+<!--{ Subject: {{ 'Google 2FA reset confirmation'|_ }} }-->
+
+Hello {{ u.get('firstname') ?: u.get('username') }},
+
+Thank you, your 2FA has been successfully reset.
+
+<!--======-->
+
+{{ THIS.view('email/html-header') | raw }}
+
+<p>Hello {{ u.get('firstname') ?: u.get('username') }},</p>
+
+<p>Thank you, your 2FA has been successfully reset.</p>
+
+{{ THIS.view('email/html-footer') | raw }}

@@ -1,9 +1,10 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_ImportExport
  *
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
+ * #@property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -14,6 +15,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     protected $_gridTitle = 'Import Export';
     protected $_formTitle = 'Import Export';
     protected $_recordName = 'Import Export';
+    protected $_formLayoutName = '/importexport';
 
     public function getExportConfig()
     {
@@ -161,7 +163,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_index()
     {
         $model['export_config'] = $this->getExportConfig();
-        $model[ 'import_config' ] = $this->getImportConfig();
+        $model['import_config'] = $this->_getImportConfig();
 
         $this->layout();
 
@@ -176,7 +178,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $nav->setNav($this->_navPath);
         }
 
-        $this->BLayout->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
+        $this->BLayout->getView('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_form');
         }
@@ -184,9 +186,32 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         $this->processFormTabs($view, $model);
     }
+
+//    public function action_test()
+//    {
+//        $this->BResponse->startLongResponse();
+//        $file = $this->BApp->storageRandomDir() . '/export/export.json';
+//        $this->FCom_Core_ImportExport->importFile($file);
+//    }
+
+    public function action_import()
+    {
+        $this->forward(false);
+        return; //disabled, for testing only
+
+        $this->BResponse->startLongResponse(false);
+
+        $this->BDebug->mode(BDebug::MODE_IMPORT);
+
+        $fileName = $this->BApp->storageRandomDir() . '/export/export.json';
+
+        $this->FCom_Core_ImportExport->importFile($fileName);
+
+        exit;
+    }
+
     public function action_import__POST()
     {
-
         if (empty($_FILES) || !isset($_FILES['upload'])) {
             $this->BResponse->json(['msg' => "Nothing found"]);
             return;
@@ -197,6 +222,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $uploads = $_FILES['upload'];
         $rows    = [];
         try {
+            $isSubscribed = null;
+            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
+                $isSubscribed = $this->FCom_PushServer_Model_Client->sessionClient()->isSubscribed('import');
+                if ($isSubscribed !== true){
+                    $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('import');
+                }
+            }
+            $allowConfig = $this->BRequest->get('allow_config');
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
@@ -204,22 +237,19 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 }
                 $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
 
-                $fullFileName = $importer->getFullPath($fileName);
-                $this->BUtil->ensureDir(dirname($fullFileName));
+                $fullFileName = $importer->getFullPath($fileName, 'import');
                 $fileSize = 0;
                 if ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
-                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
-                    //if (function_exists('xdebug_start_trace')) {
-                    //    xdebug_start_trace();
-                    //}
-                    $importer->importFile($fileName);
-                    //if (function_exists('xdebug_stop_trace')) {
-                    //    xdebug_stop_trace();
-                    //}
+
+                    $this->BDebug->mode(BDebug::MODE_IMPORT);
+
+                    $importer->importFile($fileName, null, $allowConfig);
+
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
@@ -236,7 +266,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 }
                 $rows[] = $row;
             }
+            if ($isSubscribed !== true) {
+                $this->FCom_PushServer_Model_Client->sessionClient()->unsubscribe('import');
+            }
         } catch(Exception $e) {
+            if ($isSubscribed !== true) {
+                $this->FCom_PushServer_Model_Client->sessionClient()->unsubscribe('import');
+            }
             $this->BDebug->logException($e);
             $this->BResponse->json(['error' => $e->getMessage()]);
         }
@@ -268,7 +304,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         //}
     }
 
-    protected function getImportConfig()
+    protected function _getImportConfig()
     {
         $config = array(
             'max_import_file_size' => $this->_getMaxUploadSize()

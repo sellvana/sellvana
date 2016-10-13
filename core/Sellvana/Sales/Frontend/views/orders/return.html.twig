@@ -1,0 +1,75 @@
+{% set order = THIS.get('order') %}
+{% set returnableItems = order.getReturnableItems() %}
+{% set orderCurrency = order.get('store_currency_code') %}
+
+{% set sessCustomer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
+{% if not sessCustomer %}
+    {% set emailCustomer = APP.instance('Sellvana_Customer_Model_Customer').load(order.get('customer_email'), 'email') %}
+{% endif %}
+
+<div class="row f-mb-slideout-menu">
+    <div class="col-sm-9 f-col-main">
+        <form method="post" action="{{ APP.href('orders/return?id=' ~ order.get('unique_id')) }}">
+            <header class="f-page-header">
+                <h1 class="f-page-title">{{ "Order #%s" | _(order.get('unique_id')) }} <span class="badge">{{ order.state().overall().getValueLabel()|_ }}</span></h1>
+                {% if returnableItems %}
+                    <div class="pull-right">
+                        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                        <button type="submit" class="btn btn-primary">{{ 'Return Selected Items'|_ }}</button>
+                    </div>
+                {% endif %}
+                <a href="javascript:void(0);" id="button"
+                   class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Menu'|_ }}</a>
+            </header>
+
+            {{ THIS.view('core/messages') | raw }}
+
+            {% if returnableItems %}
+                <h4>{{ "Order items" | _ }}</h4>
+                <div class="table-responsive">
+                    <form action="{{ APP.href(REQUEST.currentUrl()) }}" method="post">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>{{ 'ID'|_ }}</th>
+                                <th>{{ "Info" | _ }}</th>
+                                <th>{{ "Qty Ordered" | _ }}</th>
+                                <th>{{ 'Qty Shipped' | _ }}</th>
+                                <th>{{ 'Qty Returned' | _ }}</th>
+                                <th>{{ 'Qty Canceled' | _ }}</th>
+                                <th>{{ "Qty To Return" | _ }}</th>
+                            </tr>
+                            </thead>
+                            {% for item in returnableItems %}
+                                <tr>
+                                    <td>{{ item.get('id') }}</td>
+                                    <td>{{ THIS.view('orders/item').set('item', item) | raw }} </td>
+                                    <td>{{ item.get('qty_ordered') }} </td>
+                                    <td>{{ item.get('qty_shipped') }} </td>
+                                    <td>{{ item.get('qty_returned') }} </td>
+                                    <td>{{ item.get('qty_canceled') }} </td>
+                                    <td>
+                                        <select name="return[{{ item.id() }}]">
+                                            {% for qty in range(0, item.getQtyCanReturn()) %}
+                                                <option value="{{ qty }}">{{ qty }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </form>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+    {{ THIS.view('customer/account/sidebar') | raw }}
+</div>
+
+<script>
+    require(['jquery'], function ($) {
+        $("#button").click(function () {
+            $('.f-mb-slideout-menu .f-col-sidebar').toggleClass("open");
+        });
+    });
+</script>

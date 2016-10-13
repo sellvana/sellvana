@@ -1,0 +1,172 @@
+{% macro widget__insert_media(widget, library, context) %}
+    {% import LAYOUT.view('core/form-elements').twigName() as forms %}
+    {% import LAYOUT.view('admin/layout-editor').twigName() as layout %}
+    {{ forms.input({label: "Width"|_, name: "#{context.prefix}[widgets][#{widget.id}][width]", value: widget.width|default('640'), field: "width-#{widget.id}"}) }}
+    {{ forms.input({label: "Height"|_, name: "#{context.prefix}[widgets][#{widget.id}][height]", value: widget.height|default('320'), field: "height-#{widget.id}"}) }}
+    {{ forms.hidden({name: "#{context.prefix}[widgets][#{widget.id}][src]", value: widget.src, field: "src-#{widget.id}"}) }}
+    <div id="lib-images-{{ widget.id }}">
+        {% set type = 'images' %}
+        {% set mediaLib = APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+
+        {# Widget media library grid config #}
+        {% set medialibConfig = mediaLib.layoutGridLibraryConfig({'id': 'media_all_' ~ type}) %}
+        {% set medialibConfigCompiled = LAYOUT.view('core/griddle').set('grid', medialibConfig).getGridConfig() %}
+            
+        {# Widget upload grid config #}
+        {% set uploadConfig = mediaLib.uploadConfig() %}
+        {% set mediaUploadConfig = { id: 'widget_' ~ widget.id, title: 'Media Library', gridConfig: medialibConfig, type: widget.type } %}
+
+        <!-- Att -->
+        <button type="button" class='btn btn-primary btn-select-images'>{{ "Select Image"|_ }}</button>
+        <div class="fade modal">
+            <div class="modal-dialog" style="width: 960px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">{{ "Choose Image"|_ }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="tabbable">
+                            <ul class="nav nav-tabs f-horiz-nav-tabs" role="tablist" style="padding: 0;">
+                                <li role="presentation" class="active gridTab"><a href="#{{ medialibConfig.config.id }}_medialib_{{ widget.id }}" aria-controls="{{ medialibConfig.config.id }}_medialib_{{ widget.id }}" role="tab" data-toggle="tab">Media Library</a></li>
+                                <li role="presentation" class="uploadTab"><a href="#{{ medialibConfig.config.id }}_upload_grid_{{ widget.id }}" aria-controls="{{ medialibConfig.config.id }}_upload_grid_{{ widget.id }}" role="tab" data-toggle="tab">Upload</a></li>
+                            </ul>
+                             <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div role="tabpanel" style="padding: 10px 0 0;" class="tab-pane active mediaGrid" id="{{ medialibConfig.config.id }}_medialib_{{ widget.id }}"></div>
+
+                                <div role="tabpanel" class="tab-pane" style="padding: 10px 0 0;" id="{{ medialibConfig.config.id }}_upload_grid_{{ widget.id }}">
+                                    <div>
+                                        <select id="media-library-upload-types-{{ widget.id }}" class="form-control">
+                                            {% for uc in uploadConfig %}
+                                                <option value="{{ uc.type }}">{{ uc.label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {{ LAYOUT.view('core/medialib/upload').set({'config': mediaUploadConfig, 'uploadConfig': uploadConfig}) | raw }}
+                                </div>
+                            </div>
+                        </div>
+                        {# {{ LAYOUT.view('core/griddle').set('grid', medialibConfig) | raw }} #}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var grids = [],
+            mediaLibGrid;
+            require(['jquery', 'underscore', 'react', 'fcom.griddle'], function ($, _, React, FComGriddleComponent) {
+
+                $(document).on('click', '.btn-select-images', function(e) {
+                    e.preventDefault();
+                    var ci                  = isNaN($(this).parents('div.js-widget-box').data('id')) 
+                                                ? $(this).parents('li').attr('id') 
+                                                : $(this).parents('div.js-widget-box').data('id');
+                    var mediaModal          = $(this).next('.modal');
+                    var ele                 = this.nextElementSibling.querySelector('.mediaGrid');
+                    var config              = {{ UTIL.toJson(medialibConfigCompiled) | raw }};
+                    var newId               = config.id + (ci < 0 ? '' : '_') + ci;
+                    var uploadConfigs       = {{ UTIL.toJSON(uploadConfig)|raw }};
+                    var uploadUrlBase       = "{{ APP.href('media/grid/upload?type=') | raw }}";
+                    var $mediaTypes         = $("#media-library-upload-types-" + $(this).parents('li').data('id').toString().replace(/\-/g, ''));
+                    var type                = $mediaTypes.val() ? $mediaTypes.val() : '';
+                    var uploadUrl           = uploadUrlBase + type;
+                    var uploaderInitialized = false;
+                    var $uploader           = $("#widget_" + ci + "-media-upload");
+                    var thumb_path          = '';
+                    $mediaTypes.on('change', function (e) {
+                        type = $(this).val();
+                        uploadUrl = uploadUrlBase + type;
+                        $uploader.fileupload('option', { url: uploadUrl });
+                        switch(type) {
+                            case 'product-images':
+                                thumb_path = 'resize.php?s=68&f=media/product/images/';
+                                break;
+                            case 'product-attachments':
+                                thumb_path = 'resize.php?s=68&f=media/product/attachment/';
+                                break;
+                            case 'images':
+                                thumb_path = 'resize.php?s=68&f=media/images/';
+                                break;
+                        }
+                    });
+
+                    window.registerGrid{{ medialibConfig.config.id }} = function(grid) {
+                        // componentDidMout for specific insert_media widget
+                        window['widget_' + ci + '_grid'] = mediaLibGrid = grid;
+                    }
+
+                    if (!_.contains(grids, newId)) {
+                        React.unmountComponentAtNode(ele);
+                        React.render(
+                            React.createElement(FComGriddleComponent, { key: newId, config: _.extend(config, { id: newId }) }), ele
+                        );
+                        grids.push(newId);
+                    
+                    }
+                    $(MediaApp).trigger('onMounted', [{ id: 'widget_' + ci }]);
+
+                    mediaModal.modal('show');
+
+                    if (!uploaderInitialized && $uploader.length) {
+                        var files = 0;
+                        $uploader.fileupload({
+                            url: uploadUrl
+                        }).bind('fileuploadchange', function (e, data) {
+                            files += data.files.length;
+                            if (files > 0) {
+                                $mediaTypes.attr('disabled', true); // disable changing upload type after initiating upload
+                            }
+                        }).bind('fileuploadfail', function (e, data) {
+                            files--;
+                            if (files == 0) {
+                                $mediaTypes.attr('disabled', false);
+                            }
+                        });
+                        uploaderInitialized = true;
+                    }
+
+                    $uploader.bind('fileuploadalways', function (e, data) {
+                        if (mediaLibGrid) {
+                            //push data to media grid after upload
+                            if ($.isArray(data.result.files)) {
+                                var rows = [], selectedRows = [];
+                                data.result.files.forEach(function (obj) {
+                                    // Thumb path missing for display images or file after upload on grid
+                                    if (!obj.thumb_path) {
+                                        obj.thumb_path = thumb_path + obj.file_name;
+                                    }
+
+                                    {% if config.multiSelAllowed %}
+                                    selectedRows.push(obj);
+                                    {% endif %}
+
+                                    rows.push(obj);
+
+                                    $('td.name span').each(function (i) {
+                                        if ($(this).html() === obj.file_name) {
+                                            $(this).parents('tr:first').remove();
+                                        }
+                                    });
+                                });
+
+                                if (selectedRows.length) {
+                                    mediaLibGrid.addSelectedRows(selectedRows);
+                                }
+                                mediaLibGrid.addRows(rows);
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+        <!-- Att end -->
+    </div>
+    {{ layout.widget_custom_params(widget, library, context) }}
+{% endmacro %}

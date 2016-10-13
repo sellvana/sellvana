@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_AutoTranslate_Main
@@ -17,7 +17,7 @@ class FCom_AutoTranslate_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/FCom_AutoTranslate' => BLocale::i()->_('Auto Translate Settings'),
+            'settings/FCom_AutoTranslate' => 'Auto Translate Settings',
         ]);
 
         $this->_apiKey = $this->BConfig->get('modules/FCom_AutoTranslate/google_api_key');
@@ -71,7 +71,9 @@ class FCom_AutoTranslate_Main extends BClass
                 }
                 $translated = htmlspecialchars_decode($result[$string1], ENT_QUOTES);
                 $translated = preg_replace('#<t v="([^"]+)"/>#', '$1', $translated);
-                #$translated = preg_replace_callback('#<t v="([^"]+)"/>#', function($a) { return htmlspecialchars_decode($a[1]); }, $translated);
+                // $translated = preg_replace_callback('#<t v="([^"]+)"/>#', function($a) {
+                //     return htmlspecialchars_decode($a[1]);
+                // }, $translated);
                 $this->_requestCache[$string] = $translated;
             }
         }
@@ -94,7 +96,7 @@ class FCom_AutoTranslate_Main extends BClass
 
     public function callGoogleTranslateApi($query, $targetLanguage = null, $sourceLanguage = null)
     {
-        if (!$query) {
+        if (!$query || !$this->_apiKey) {
             return $query;
         }
         if (!$sourceLanguage) {
@@ -106,6 +108,16 @@ class FCom_AutoTranslate_Main extends BClass
         if ($sourceLanguage === $targetLanguage) {
             return $query;
         }
+
+        if (is_array($query) && sizeof($query) > 100) {
+            $chunks = array_chunk($query, 100);
+            $result = [];
+            foreach ($chunks as $chunk) {
+                $result = array_merge($result, $this->callGoogleTranslateApi($chunk, $targetLanguage, $sourceLanguage));
+            }
+            return $result;
+        }
+
         $requestUrl = $this->BUtil->setUrlQuery($this->_apiUrl, [
             'key' => $this->_apiKey,
             'source' => $sourceLanguage,
@@ -114,16 +126,19 @@ class FCom_AutoTranslate_Main extends BClass
         foreach ((array)$query as $q) {
             $requestUrl .= '&q=' . urlencode($q);
         }
-        $response = $this->BUtil->remoteHttp('GET', $requestUrl, [], ['referer: http://www.sellvana.com/'], ['curl' => true]);
+        $response = $this->BUtil->remoteHttp('GET', $requestUrl, [], ['referer: ' . $this->BRequest->currentUrl()],
+            ['curl' => true]);
         $status = $this->BUtil->lastRemoteHttpInfo();
         #var_dump($this->BUtil->remoteHttp('GET', 'http://ipinfo.io'));
         if ($status['headers']['http']['code'] != 200) {
-            $this->BDebug->notice('Google Translate API error (1): ' . $requestUrl . "\n" . print_r($response, 1) . "\n" . print_r($status, 1));
+            $this->BDebug->notice('Google Translate API error (1): ' . $requestUrl . "\n" . print_r($response, 1) . "\n"
+                                  . print_r($status, 1));
             return false;
         }
         $apiResult = $this->BUtil->fromJson($response);
         if (empty($apiResult['data']['translations'])) {
-            $this->BDebug->notice('Google Translate API error (2): ' . $requestUrl . "\n" . print_r($response, 1) . "\n" . print_r($status, 1));
+            $this->BDebug->notice('Google Translate API error (2): ' . $requestUrl . "\n" . print_r($response, 1) . "\n"
+                                  . print_r($status, 1));
             return false;
         }
         $translations = $apiResult['data']['translations'];

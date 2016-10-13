@@ -1,5 +1,0 @@
-modules:
-    Sellvana_AdapterExcel:
-        version: 1.7.9
-        channel: alpha
-        #autoload: lib

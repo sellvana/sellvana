@@ -1,7 +1,7 @@
 modules:
     Sellvana_PaymentPaypal:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Sales: 0.1.10 } }
         translations: { en: en.php }
         description: "PayPal&reg; standard payment method"
@@ -23,7 +23,11 @@ modules:
                         api_url: "https://api-3t.sandbox.paypal.com/nvp"
                         express_checkout_url: "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token="
                         payment_action: Sale
+                        multiple_auth: 0
+                        manual_state_management: 0
                     production:
                         api_url: "https://api-3t.paypal.com/nvp"
                         express_checkout_url: "https://www.paypal.com/webscr?cmd=_express-checkout&token="
                         payment_action: Sale
+                        multiple_auth: 0
+                        manual_state_management: 0

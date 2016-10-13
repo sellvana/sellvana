@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller
@@ -13,6 +13,11 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $this->layout('/');
         //$this->BLayout->layout('/');
+    }
+
+    public function action_login()
+    {
+        $this->BResponse->redirect('');
     }
 
     public function action_static()
@@ -35,7 +40,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $model = $this->FCom_Admin_Model_User->sessionUser();
         $this->layout('/my_account');
-        $this->BLayout->view('my_account')->set('model', $model);
+        $this->BLayout->getView('my_account')->set('model', $model);
     }
 
     public function action_my_account__POST()
@@ -69,7 +74,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         //TODO add code for reports
         // $model = $this->FCom_Admin_Model_User->sessionUser();
-        //$this->BLayout->view('my_account')->set('model', $model);
+        //$this->BLayout->getView('my_account')->set('model', $model);
         $this->layout('/reports');
     }
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_product id="1" product_name="Product 1" product_sku="test-1" url_key="product-1" />
+    <fcom_product id="2" product_name="Product 2" product_sku="test-2" url_key="product-2" />
+    <fcom_product id="3" product_name="Product 3" product_sku="test-3" url_key="product-3" />
+    <fcom_product id="4" product_name="Product 4" product_sku="test-4" url_key="product-4" />
+    <fcom_product id="5" product_name="Product 5" product_sku="test-5" url_key="product-5" />
+
+    <fcom_inventory_sku id="1" inventory_sku="test-1" title="test-1" />
+    <fcom_inventory_sku id="2" inventory_sku="test-2" title="test-2" />
+    <fcom_inventory_sku id="3" inventory_sku="test-3" title="test-3" />
+    <fcom_inventory_sku id="4" inventory_sku="test-4" title="test-4" />
+
+    <fcom_customer id="1" email="test1@test.com" firstname="Test 1" lastname="Ceres" />
+    <fcom_customer id="2" email="test2@test.com" firstname="Test 2" lastname="Ceres" />
+    <fcom_customer id="3" email="test3@test.com" firstname="Test 3" lastname="Ceres" />
+
+    <fcom_sales_cart id="1" customer_id="1" item_qty="5" item_num="2" subtotal="10" shipping_method="ShippingPlain" />
+    <fcom_sales_cart id="2" customer_id="2" item_qty="1" item_num="1" subtotal="3" shipping_method="" />
+    <fcom_sales_cart id="3" customer_id="2" item_qty="1" item_num="1" subtotal="3" shipping_method="" />
+
+    <fcom_sales_cart_item id="1" cart_id="1" product_id="1" inventory_id="1" inventory_sku="test-1" qty="4" price="8" />
+    <fcom_sales_cart_item id="2" cart_id="1" product_id="2" inventory_id="2" inventory_sku="test-2" qty="1" price="2" />
+    <fcom_sales_cart_item id="3" cart_id="2" product_id="3" inventory_id="3" inventory_sku="test-3" qty="1" price="3" />
+    <fcom_sales_cart_item id="4" cart_id="3" product_id="4" inventory_id="4" inventory_sku="test-4" qty="3" price="5" />
+    <fcom_sales_cart_item id="5" cart_id="3" product_id="5" inventory_id="5" inventory_sku="test-5" qty="5" price="6" />
+
+    <fcom_sales_order id="1" customer_id="1" cart_id="1" item_qty="5" subtotal="10"/>
+    <fcom_sales_order id="2" customer_id="1" cart_id="2" item_qty="1" subtotal="3"/>
+    <fcom_sales_order id="3" customer_id="1" cart_id="3" item_qty="10" subtotal="3"/>
+
+    <fcom_sales_order_item id="1" order_id="1" product_id="1" cart_item_id="1" inventory_id="1" qty_ordered="4"/>
+    <fcom_sales_order_item id="2" order_id="1" product_id="2" cart_item_id="2" inventory_id="2" qty_ordered="1" qty_shipped="1" shipping_weight="2"/>
+    <fcom_sales_order_item id="3" order_id="2" product_id="3" cart_item_id="3" inventory_id="3" qty_ordered="5"/>
+    <fcom_sales_order_item id="4" order_id="3" product_id="4" cart_item_id="4" inventory_id="4" qty_ordered="3"/>
+    <fcom_sales_order_item id="5" order_id="1" product_id="5" cart_item_id="2" inventory_id="2" qty_ordered="1" qty_canceled="1"/>
+
+    <fcom_sales_order_payment id="1" order_id="1" payment_method="basic" />
+    <fcom_sales_order_payment id="2" order_id="1" payment_method="ups" />
+</dataset>

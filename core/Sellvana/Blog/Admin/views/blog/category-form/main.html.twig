@@ -4,11 +4,105 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
-{% set fieldData = { validator: validator } %}
+{% set mediaId = 'blog_post_image' %}
+{% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl('--IMAGE--', {s:150, cache:0}) %}
+{% set fieldData = { validator: validator, config_id: mediaId, resize_url: resizeUrl } %}
 <div class="f-section">
 <fieldset class="form-horizontal">
     {{ forms.input(fieldData, {field:'name', label:'Name'|_, required: 1 }) }}
     {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_, required: 1 }) }}
     {{ forms.textarea(fieldData, {field:'description', label:'Description'|_, input_class: "ckeditor", input_div_class: "col-md-10" }) }}
+    {{ forms.button_add_image(fieldData, [
+        {field:'default_post_image', label:'Default Image for Posts'|_ }
+    ]) }}
 </fieldset>
 </div>
+
+{% set medialibConfig = {
+id: 'blog_post_image',
+mode: 'images',
+type: 'blog-post-images',
+title: 'Images',
+folder: 'media/blog/images',
+multiSelAllowed: false,
+config: {actions: {delete: {caption : 'Remove'}}}
+} %}
+
+<script type="text/javascript">
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'fcom.admin', 'jquery.validate'], function(React, _, $, Components) {
+        var $btnAddImage = $('.{{ mediaId }}_btn_add_image');
+        var $btnImageAdd = null;
+        if (typeof setMediaModalConfig == 'function') {
+            //set modal config
+            setMediaModalConfig('{{ medialibConfig.id }}', {
+                confirm: 'Add',
+                title: '{{ 'Blog Images' |_ }}',
+                confirmClass: '{{ mediaId }}_images_add',
+                onConfirm: addImageToPost
+            });
+        }
+
+        function processImage(el, data) {
+            var parents = $(el).parents('.form-group');
+            parents.find('.{{ mediaId }}_btn_add_text').html(data.text);
+            parents.find('.{{ mediaId }}_btn_remove_image').css('display', data.display);
+            parents.find('.{{ mediaId }}_current_image').html(data.image_tag);
+            parents.find('.model_image_url').val(data.path);
+        }
+
+        function addImageToPost(modal) {
+            var node = $(modal.getDOMNode());
+            $btnImageAdd = node.find('.{{ mediaId }}_images_add');
+            if (typeof mediaLibGrid{{ medialibConfig.id }} != 'undefined') {
+                var selectedRows = mediaLibGrid{{ medialibConfig.id }}.getSelectedRows();
+                if (selectedRows.length) {
+                    var row = selectedRows[0];
+                    console.log(row);
+                    var path = row.folder + '/' + row.file_name;
+                    var thumb = row.thumb_url + '/' + row.file_name;
+                    var imageTag = $('<img/>').attr('src', thumb);
+                    $($btnAddImage).each(function () {
+                        if ($(this).hasClass('active')) {
+                            processImage(this, {
+                                text: '{{ "Add Image..."|_ }}',
+                                display: 'block',
+                                image_tag: imageTag,
+                                path: path
+                            });
+                            $(this).parents('.form-group').find('.{{ mediaId }}_btn_add_image').addClass('data-change');
+                            mediaLibGrid{{ medialibConfig.id }}.clearSelectedRows();
+                            $btnImageAdd.html('{{ "Change"|_ }}');
+                        }
+                    });
+
+                    modal.close();
+                } else {
+                    $.bootstrapGrowl("{{ 'Please choose images.' |_ }}", {
+                        type: 'warning',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 3000
+                    });
+                }
+            }
+        }
+
+        $(document).on('click', '.{{ mediaId }}_btn_add_image', function (e) {
+            $btnAddImage.removeClass('active');
+            $(this).addClass('active');
+            $('#{{ mediaId }}-media-modal').modal('show');
+        }).on('click', '.{{ mediaId }}_btn_remove_image', function (e) {
+            processImage(this, {
+                text: '{{ "Add Image..."|_ }}',
+                display: 'none',
+                image_tag: '',
+                path: ''
+            });
+            $(this).parents('.form-group').find('.{{ mediaId }}_btn_add_image').removeClass('data-change');
+            if ($btnImageAdd) $btnImageAdd.html('{{ "Add"|_ }}');
+        });
+
+    });
+</script>
+
+{{ THIS.view('core/medialib-griddle').set('config', medialibConfig) | raw }}

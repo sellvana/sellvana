@@ -5,6 +5,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
     var FComMediaLib = React.createClass({
         displayName: "FComMediaLib",
         mixins: [FCom.Mixin],
+        getInitialState: function() {
+            return {
+                isChecked: true 
+            };
+        },
         getDefaultProps: function() {
             //todo: validate received props
             return {
@@ -12,9 +17,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 "modalConfig": {},
                 "uploadConfig": {
                     "can_upload": false,
+                    "can_embed_video": false,
                     "filetype_regex": "",
                     "folder": ""
-                }
+                },
+                "showModal": true
             }
         },
         getModalConfig: function() {
@@ -85,37 +92,89 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             }
             return null
         },
-        render: function() {
-            console.log('render fcom mediablib');
-            var modalConfig = this.getModalConfig();
-            var uploadConfig = this.props.uploadConfig;
-            var mediaGridId = this.props.mediaConfig.id;
-
-            /*console.log('modalConfig', modalConfig);
-            console.log('propsmodalConfig', this.props.modalConfig);
-            console.log('uploadConfig', this.props.uploadConfig);
-            console.log('mediaConfig', this.props.mediaConfig);*/
-
-            var mainGridElement = React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
-
+        handleProviderChange: function() {
+            this.setState({
+                isChecked: !this.state.isChecked 
+            });
+        },
+        getMainGridEle: function() {
+            return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
+        },
+        getEmbedGrid: function () {
+            return (
+                <div className='video-tab-container'>
+                    <div className="col-sm-12">
+                        <div className="control-label col-sm-1">
+                            <label htmlFor="oembed_url">URL: </label>
+                        </div>
+                        <div className="controls col-sm-7">
+                            <input type="text" id="oembed_url"  name='oembed_url' className='form-control oembed_url' />
+                        </div>
+                        <div className="controls col-sm-1">
+                            <button type='button' className='btn btn-primary btn-sm btn-preview' data-loading-text='Processing...'>Preview</button>
+                        </div>
+                        <div className="controls col-sm-2">
+                            <button type='button' className='btn btn-success btn-sm btn-embed' data-loading-text='Processing...'>Add to Library</button>
+                        </div>
+                    </div>
+                    <div className="col-sm-12">
+                        <div className="control-label col-sm-1">
+                            <label htmlFor="">Provider: </label>
+                        </div>
+                        <div className="col-sm-11">
+                            <label className='radio-inline'><input type="radio" name='provider' value='youtube' checked={this.state.isChecked} onChange={this.handleProviderChange} />Youtube</label>
+                            <label className='radio-inline'><input type="radio" name='provider' value='vimeo' onChange={this.handleProviderChange} />Vimeo</label>
+                        </div>
+                    </div>
+                    <div className="col-sm-12 oembed_container"></div>
+                </div>
+            );
+        },
+        renderModal: function(modalConfig) {
             return (
                 <Components.Modal {...modalConfig}>
-                    <div className="row">
-                        <div className="tabbable">
-                            <ul className="nav nav-tabs prod-type f-horiz-nav-tabs">
-                                <li className="active">
-                                    <a data-toggle="tab" href={'#' + mediaGridId + '-attach_library'}>Library</a>
-                                </li>
-                                {uploadConfig.can_upload ? <li><a data-toggle="tab" href={'#' + mediaGridId + '-media-upload'}>Upload</a></li> : null}
-                            </ul>
-                            <div className="tab-content">
-                                <div className="tab-pane active" id={mediaGridId + '-attach_library'}>{mainGridElement}</div>
-                                {uploadConfig.can_upload ? <div className="tab-pane" id={mediaGridId + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
-                            </div>
-                        </div>
+                    <ul className="nav nav-tabs f-horiz-nav-tabs" role="tablist">
+                        <li role='presentation' className="active">
+                            <a href={'#' + this.props.mediaConfig.id + '-attach_library'} role='tab' data-toggle="tab" aria-controls={this.props.mediaConfig.id + '-attach_library'}>Library</a>
+                        </li>
+                        {this.props.uploadConfig.can_upload ? <li role='presentation'><a href={'#' + this.props.mediaConfig.id + '-media-upload'} role='tab' data-toggle="tab" aria-controls={this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
+                        {this.props.uploadConfig.can_embed_video ? <li role='presentation'><a role='tab' data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-embed'}>Media Embed</a></li> : null}
+                    </ul>
+                    <div className="tab-content">
+                        <div role="tabpanel" className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
+                        {this.props.uploadConfig.can_upload ? <div role="tabpanel" style={{ width: '870px', 'padding': '20px' }} className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
+                        {this.props.uploadConfig.can_embed_video ? <div role="tabpanel" className="tab-pane" style={{ width: '870px', 'padding': '20px' }} id={this.props.mediaConfig.id + '-media-embed'}>{this.getEmbedGrid()}</div> : null}
                     </div>
                 </Components.Modal>
             );
+        },
+        renderView: function() {
+            return (
+                <div className="tabbable">
+                    <ul className="nav nav-tabs prod-type f-horiz-nav-tabs">
+                        <li className="active">
+                            <a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-attach_library'}>Library</a>
+                        </li>
+                        {this.props.uploadConfig.can_upload ? <li><a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
+                    </ul>
+                    <div className="tab-content">
+                        <div className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
+                        {this.props.uploadConfig.can_upload ? <div className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
+                    </div>
+                </div>
+            );
+        },
+        render: function() {
+            /*console.log('modalConfig', this.getModalConfig());
+            console.log('propsmodalConfig', this.props.modalConfig);
+            console.log('uploadConfig', this.props.uploadConfig);
+            console.log('mediaConfig', this.props.mediaConfig);*/
+            if (this.props.showModal === true) {
+                var modalConfig = this.getModalConfig();
+                return this.renderModal(modalConfig);
+            } else {
+                return this.renderView();
+            }
         }
     });
 

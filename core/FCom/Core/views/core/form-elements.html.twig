@@ -15,6 +15,8 @@ Using custom id/name:
 
 #}
 
+{# ########## HELPER MACROS ############ #}
+
 {% macro label(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
@@ -39,8 +41,67 @@ Using custom id/name:
 {% macro help_block(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
-    <span class="help-block {{ p.help_block_class }}">{{ p.help_block_text }}</span>
+    <span class="help-block {{ p.help_block_class }}">{{ p.help_block_text | safehtml | raw }}</span>
 {% endmacro %}
+
+{% macro js_visible(p) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set conditions = view.jsVisibleConditions(p) %}
+    {% if conditions %}
+        {% set inputId = view.getInputId(p) %}
+        {% set toggleId = view.jsVisibleToggleId(p) %}
+        <script>
+            require(['jquery'], function($) {
+                var $toggle = $('#{{ toggleId }}');
+                var $container = $('#{{ inputId }}-container');
+                if ({{ conditions | raw }}) $container.show(); else $container.hide();
+                $toggle.change(function(ev) {
+                    if ({{ conditions | raw }}) $container.show(); else $container.hide();
+                });
+            });
+        </script>
+    {% endif %}
+{% endmacro %}
+
+{# ########## STRUCTURE MACROS ############ #}
+
+{% macro accordion_start(p) %}
+
+    <div class="accordion accordion-blue panel-group" id="{{ p.id }}">
+{% endmacro %}
+
+{% macro accordion_end(p) %}
+    </div>
+{% endmacro %}
+
+{% macro accordion_panel_start(p) %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#{{ p.id }}" data-toggle="collapse">{{ p.label }}</a>
+        </div>
+        <div class="panel-collapse accordion-body {{ p.in ? 'in' }}" id="{{ p.id }}">
+            <div class="panel-body">
+{% endmacro %}
+
+{% macro accordion_panel_end(p) %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro block_start(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% import _self as forms %}
+    {% set p = view.merge(p1, p2) %}
+    {{ forms.js_visible(p) }}
+    <div id="{{ view.getInputId(p) }}-container">
+{% endmacro %}
+
+{% macro block_end(p) %}
+    </div>
+{% endmacro %}
+
+{# ########## INPUT MACROS ############ #}
 
 {% macro hidden(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
@@ -51,12 +112,13 @@ Using custom id/name:
 {% macro input(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <input type="{{ p.type|default('text') }}"
-                id="{{ view.getInputId(p) }}"
+                id="{{ id }}"
                 name="{{ view.getInputName(p) }}"
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
@@ -73,15 +135,23 @@ Using custom id/name:
             {% endif %}
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro select(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
+            {% if p.multiple %}
+                <input type="hidden" name="{{ view.getInputName(p) }}" value="PLACEHOLDER~TO~REMOVE">
+                {% if p.remove_old is not defined or p.remove_old == true %}
+                    <input type="hidden" name="{{ view.getInputNameRemoveOld(p) }}" value="1">
+                {% endif %}
+            {% endif %}
             <select
                 id="{{ view.getInputId(p) }}"
                 name="{{ view.getInputName(p) }}"
@@ -93,17 +163,21 @@ Using custom id/name:
                 {{ view.attributes(p.attr) | raw }}
                 {{ p.multiple ? 'multiple'}}
             >
-                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)|default(p.default)) | raw }}
+                {{ UTIL.optionsHtml(view.getOptions(p), view.getInputValue(p)|default(p.default)) | raw }}
             </select>
+            {% if p.help_block_text %}
+                {{ forms.help_block(p) }}
+            {% endif %}
         </div>
     </div>
     {% if p.select2 is defined %}
         <script>
             require(['jquery', 'select2'], function($) {
-                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2)|raw : '{}' }});
+                $('#{{ view.getInputId(p) }}').select2({{ view.getSelect2ArgsText(p) }});
             })
         </script>
     {% endif %}
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro boolean(p1, p2) %}
@@ -127,9 +201,10 @@ Using custom id/name:
 {% macro textarea(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <textarea rows="{{ p.rows|default(5) }}"
@@ -145,14 +220,16 @@ Using custom id/name:
            >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro wysiwyg(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <textarea rows="{{ p.rows|default(5) }}"
@@ -171,29 +248,7 @@ Using custom id/name:
         </div>
     </div>
     <script>require(['jquery', 'ckeditor'], function($) { CKEDITOR.replace('{{ view.getInputId(p) }}') })</script>
-{% endmacro %}
-
-{% macro accordion_start(p) %}
-<div class="accordion accordion-blue panel-group" id="{{ p.id }}">
-{% endmacro %}
-
-{% macro accordion_end(p) %}
-</div>
-{% endmacro %}
-
-{% macro accordion_panel_start(p) %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#{{ p.id }}" data-toggle="collapse">{{ p.label }}</a>
-        </div>
-        <div class="panel-collapse accordion-body {{ p.in ? 'in' }}" id="{{ p.id }}">
-            <div class="panel-body">
-{% endmacro %}
-
-{% macro accordion_panel_end(p) %}
-            </div>
-        </div>
-    </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro button_add_image(m, arr) %}
@@ -202,8 +257,9 @@ Using custom id/name:
     {% import _self as forms %}
     {% for obj in arr %}
         {% set p = view.merge(m, obj) %}
+        {% set id = view.getInputId(p) %}
         {% set value = view.getInputValue(p) %}
-        <div class='form-group {{ p.form_group_class }}'>
+        <div class='form-group {{ p.form_group_class }}' id="{{ id }}-container">
             {{ forms.label(p) }}
             <div class='{{ p.input_div_class|default('col-md-10')}}'>
                 <div class='box-content'>
@@ -238,14 +294,16 @@ Using custom id/name:
                 </div>
             </div>
         </div>
+        {{ forms.js_visible(p) }}
     {% endfor %}
 {% endmacro %}
 
 {% macro image(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <input type="image"
@@ -258,13 +316,15 @@ Using custom id/name:
             />
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro upload(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <input type="file"
@@ -279,13 +339,15 @@ Using custom id/name:
             />
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro checkbox(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class=" {{ p.input_div_class|default('col-md-5') }}">
         {% for cb,k in p.options %}
@@ -308,13 +370,15 @@ Using custom id/name:
         {% endfor %}
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro radio(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class=" {{ p.input_div_class|default('col-md-5') }}">
         {% for cb,k in p.options %}
@@ -337,13 +401,15 @@ Using custom id/name:
         {% endfor %}
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}
 
 {% macro button(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% set id = view.getInputId(p) %}
     {% import _self as forms %}
-    <div class="form-group {{ p.form_group_class }}">
+    <div class="form-group {{ p.form_group_class }}" id="{{ id }}-container">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <button type="{{ p.type|default('submit') }}"
@@ -359,4 +425,5 @@ Using custom id/name:
             {% endif %}
         </div>
     </div>
+    {{ forms.js_visible(p) }}
 {% endmacro %}

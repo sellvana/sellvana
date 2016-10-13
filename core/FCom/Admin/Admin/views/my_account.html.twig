@@ -4,11 +4,10 @@
 {% set userHlp = APP.instance('FCom_Admin_Model_User') %}
 <div class="f-admin-main-view">
   <div id="content-wrapper">
-    <form id="my_account-form" class="form form-horizontal" method="post">
       <div class="page-header f-admin-page-header f-has-breadcrumbs">
         <h1 class="f-page-title">{{ m.fullname() }}</h1>
         <div class="btn-group">
-          <a class="btn btn-default">{{ 'Cancel'|_ }}</a>
+          <button type="reset" class="btn btn-default">{{ 'Cancel'|_ }}</button>
           <button type="submit" class="btn btn-primary">
             {{ 'Save' |_ }}
           </button>
@@ -27,10 +26,12 @@
         </ul>
       <div class="f-admin-main">
         {{ THIS.view('core/messages') | raw }}
-        
+
+          {{ THIS.hook('my_account:before') | raw }}
             <div class="row">
-  
+
               <div class="col-lg-6">
+                <form id="my_account-form" class="form form-horizontal" method="post">
                 <fieldset class="f-fieldset-group">
                   <div class='lead'>
                     {{ 'Account Information'|_ }}
@@ -112,15 +113,28 @@
                     </div>
                   </div>
                 </fieldset>
+                </form>
               </div>
+
               <div class="col-lg-6">
-                <div class="lead">
-                  {{ 'Notifications Subscriptions'|_ }}
-                </div>
+                <fieldset class="f-fieldset-group">
+                  <div class="lead">
+                    {{ 'Notifications Subscriptions'|_ }}
+                  </div>
+                </fieldset>
+
+                <hr class="hr-normal">
+
+                <fieldset class="f-fieldset-group">
+                  <div class="lead">
+                    {{ 'Google 2 Factor Authentication'|_ }}
+                  </div>
+                  {{ THIS.view('g2fa/account').set('user', m) | raw }}
+                </fieldset>
             </div>
           </div>
-        </div>
-    </form>
+          {{ THIS.hook('my_account:after') | raw }}
+      </div>
   </div>
 </div>
 

@@ -25,6 +25,7 @@
         {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', select2: {}, options:locales }) }}
         {{ forms.select(fieldData, {field:'allowed_locales', label:'Allowed Admin UI Locales', select2: {},
             multiple: true, options:locales }) }}
+        {{ forms.boolean(fieldData, {field:'enable_debug_in_js', label:'Enable Debug Mode In JS'|_ }) }}
     {{ forms.accordion_panel_end }}
 
 
@@ -39,6 +40,19 @@
                 <a class="btn btn-primary" href="{{ APP.href('generate_sitemap') }}">{{ 'Generate Site Map'|_ }}</a>
             </div>
         </div>
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Dashboard'|_, id:'settings-FCom_Admin-group4'}) }}
+        {{ forms.input(fieldData, {field:'default_dashboard_widget_limit', label:'Default Widgets Row Limit'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Media Library'|_, id:'settings-FCom_Admin-group5'}) }}
+        {{ forms.input(fieldData, {field:'default_media_file_size', label:'Default Media File Size (MB)'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Enable ReCaptcha'|_, id:'settings-FCom_Admin-group6'}) }}
+        {{ forms.boolean(fieldData, {field:'recaptcha_login', label:'Login Form'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'recaptcha_password_recover', label:'Password Recovery Form'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'recaptcha_g2fa_recover', label:'Google 2FA Recovery Form'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 
