@@ -1,0 +1,10 @@
+{% set countries = LOCALE.getAvailableCountries() %}
+<address>
+    <div class="f-street-address">{{ address.get('street1') }}</div>
+    {% if address.get('street2') %}<div class="f-extended-address">{{ address.get('street2') }}</div>{% endif %}
+    {% if address.get('street3') %}<div class="f-extended-address">{{ address.get('street3') }}</div>{% endif %}
+    <span class="f-city">{{ address.get('city') }}</span>,
+    <span class="f-region">{{ address.get('region') }}</span>
+    <span class="f-postal-code">{{ address.get('postcode') }}</span>
+    <div class="f-country-name">{{ countries[address.get('country')] ?: address.get('country') }}</div>
+</address>

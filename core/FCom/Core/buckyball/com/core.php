@@ -308,7 +308,7 @@ class BApp extends BClass
     public function __construct()
     {
         BDebug::i();
-        umask(0);
+        #umask(0);
     }
 
     /**

@@ -8,6 +8,10 @@ if (version_compare(PHP_VERSION, '5.4.0', '<')) {
 
 require_once __DIR__ . '/core/FCom/Core/Main.php';
 
+if (file_exists(__DIR__ . '/index.global.php')) {
+    require_once __DIR__ . '/index.global.php';
+}
+
 if (file_exists(__DIR__.'/index.local.php')) {
     require_once __DIR__.'/index.local.php';
 }

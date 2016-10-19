@@ -78,17 +78,7 @@ class Sellvana_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = $this->BLocale->getAvailableCountries();
-        return '<address>'
-            . '<div class="f-street-address">' . $obj->street1 . '</div>'
-            . ($obj->street2 ? '<div class="f-extended-address">' . $obj->street2 . '</div>' : '')
-            . ($obj->street3 ? '<div class="f-extended-address">' . $obj->street3 . '</div>' : '')
-            . '<span class="f-city">' . $obj->city . '</span>, '
-            . '<span class="f-region">' . $obj->region . '</span> '
-            . '<span class="f-postal-code">' . $obj->postcode . '</span>'
-            . '<div class="f-country-name">' . (!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country) . '</div>'
-            . '</address>';
-
+        return $this->BLayout->view('customer/address/card')->set('address', $obj);
     }
 
     public function onBeforeDelete()

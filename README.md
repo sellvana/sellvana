@@ -48,6 +48,21 @@ current instructions and to avoid confusion we'll use "SELLVANA" as subfolder na
 
 5. Now you should be able to access Sellvana by browsing your website root. To access admin section, you'll need to add SELLVANA to your URL: `https://mysite.com/SELLVANA/admin`
 
+## Moving `storage` folder from web accessible folder
+
+Sellvana uses randomly generated folder for sensitive cache, log, etc. files to avoid direct access from web, however in some server misconfiguration cases, this might not be enough.
+To move `storage` folder from web accessible folder, you will need to perform the following steps:
+
+1. Create a folder where you'd like to keep transient data (let's say `/home/user/sellvana/storage`) and make it writable for web service user.
+
+2. If you already have Sellvana installed, move `{sellvana}/storage` contents to newly created folder.
+
+3. Create `index.global.php` in the root folder where Sellvana's `index.php` lives, and add this:
+ 
+ 
+    <?php
+    
+    BConfig::i()->set('fs/storage_dir', '/home/user/sellvana/storage');
 
 ## Test Data
 
@@ -149,8 +164,8 @@ some headers. The following is an example configuration:
         location / {
             index        index.php;
             if_modified_since    off;
-            more_clear_headers    'If-None-Match';
-            more_clear_headers    'ETag';
+            # more_clear_headers    'If-None-Match';
+            # more_clear_headers    'ETag';
             etag                off;
             try_files    $uri $uri/ @sellvana;
         }
@@ -164,6 +179,18 @@ some headers. The following is an example configuration:
         location @sellvana {
             rewrite ^(.*)$ /index.php$1;
         }
+        
+        location ~ \.(yml|twig)$ {
+            return 403;
+        }
+        
+        location ~ (^|\)\. {
+            return 403;
+        }
+        
+        location /storage {
+            return 403;
+        }
 
         location ~ ^(.+\.php)(.*)$ {
             fastcgi_pass 127.0.0.1:9000;
@@ -172,7 +199,7 @@ some headers. The following is an example configuration:
             fastcgi_split_path_info ^(.+\.php)(.*)$;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             fastcgi_param PATH_INFO $fastcgi_path_info;
-            fastcgi_param HTTP_MOD_REWRITE On;
+            fastcgi_param SELLVANA_MOD_REWRITE On;
             include fastcgi_params;
         }
     }
