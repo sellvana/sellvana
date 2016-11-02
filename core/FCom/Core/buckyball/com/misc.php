@@ -3621,9 +3621,10 @@ class BDebug extends BClass
         if ($textBefore) {
             echo htmlspecialchars($textBefore) . "\n";
         }
+        $randomDir = BConfig::i()->get('core/storage_random_dir');
         debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $output = ob_get_clean();
-        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
+        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', "random-{$randomDir}"], ['/', '', 'random-<RANDOM>'], $output);
         return $output;
     }
 
