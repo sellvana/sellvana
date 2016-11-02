@@ -3624,7 +3624,7 @@ class BDebug extends BClass
         $randomDir = BConfig::i()->get('core/storage_random_dir');
         debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $output = ob_get_clean();
-        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', "random-{$randomDir}"], ['/', '', 'random-<RANDOM>'], $output);
+        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', $randomDir], ['/', '', '[RANDOM]'], $output);
         return $output;
     }
 
@@ -3763,13 +3763,16 @@ class BDebug extends BClass
         //print_r(static::$_events);
 ?><table cellspacing="0" id="buckyball-debug-table"><thead><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th>
     <th>Relevant Location</th><th>Module</th></tr></thead><tbody><?php
+        $randomDir = BConfig::i()->get('core/storage_random_dir');
         foreach (static::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6) . ($e['c'] > 1 ? ' (' . $e['c'] . ')' : '') : '';
-            echo "<tr><td>" . nl2br(htmlspecialchars($e['msg'])) . "</td><td>" . number_format($e['t'], 6)
+            $output = "<tr><td>" . nl2br(htmlspecialchars($e['msg'])) . "</td><td>" . number_format($e['t'], 6)
                 . "</td><td>" . $profile . "</td><td>" . number_format($e['mem'], 0)
                 . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>"
                 . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
+            $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', "{$randomDir}"], ['/', '', '[RANDOM]'], $output);
+            echo $output;
         }
 ?></tbody></table></div><script>
 
