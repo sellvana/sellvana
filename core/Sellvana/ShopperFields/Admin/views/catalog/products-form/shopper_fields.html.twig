@@ -407,7 +407,7 @@
             $tr.each(function (i, item) {
                 var price = {};
                 price['id'] = ++i;
-                price['product_id'] = {{ model.id }};
+                price['product_id'] = {{ model.id |default('null') }};
                 $(item).find('input, select').each(function (index, el) {
                     var key = $(this).data('type'),
                             val = $(this).val();
@@ -464,7 +464,7 @@
                 $trItems.each(function (i, item) {
                     var price = {};
                     price['id'] = ++i;
-                    price['product_id'] = {{ model.id }};
+                    price['product_id'] = {{ model.id |default('null') }};
                     $(item).find('input, select').each(function (index, el) {
                         var key = $(this).data('type'),
                                 val = $(this).val();
