@@ -2251,11 +2251,14 @@ class BSession extends BClass
             $this->{$class}->register($this->_getCookieTtl());
         } else {
             //session_set_cookie_params($ttl, $path, $domain);
-            if (($dir = $this->BApp->storageRandomDir())) {
-                $dir .= '/session';
+            $dir = $this->BConfig->get('fs/session_dir');
+            if ($dir) {
                 $this->BUtil->ensureDir($dir);
-                session_save_path($dir);
+                if (is_dir($dir) && is_writable($dir)) {
+                    session_save_path($dir);
+                }
             }
+            #var_dump($dir);
         }
     }
 
