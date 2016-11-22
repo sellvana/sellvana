@@ -1004,7 +1004,7 @@ class BUtil extends BClass
      * @param $count
      * @return string
      */
-    private function randomBytes($count)
+    public function randomBytes($count)
     {
         if (function_exists('random_bytes')) {
             return random_bytes($count);
@@ -4095,8 +4095,7 @@ class BFile extends BClass
         $this->_fileInfo['file_path'] = $this->_currentTmpDir;
         $fullPath = $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
 
-        if (@file_put_contents($fullPath, $file)
-        ) {
+        if (@file_put_contents($fullPath, $file)) {
             $this->_fileInfo['file_size'] = filesize($fullPath);
         }
     }
