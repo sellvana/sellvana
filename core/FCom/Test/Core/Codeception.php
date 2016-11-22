@@ -70,7 +70,9 @@ class FCom_Test_Core_Codeception extends BClass
         }
 
         // If the Configuration was loaded successfully, merge the configs!
-        if ($this->yaml = $this->loadConfig($site->getConfigPath(), $site->getConfigFile())) {
+        $this->yaml = $this->loadConfig($site->getConfigPath(), $site->getConfigFile());
+
+        if ($this->yaml) {
             $this->config = $this->BUtil->arrayMerge($config, $this->yaml);
             $this->loadTests(); // Load tests file on each modules on config
         }
@@ -129,12 +131,9 @@ class FCom_Test_Core_Codeception extends BClass
             $modules = $this->BModuleRegistry->getAllModules();
             foreach ($modules as $module) {
                 /** @var BModule $module */
-                if (!$module || !$module instanceof BModule || !in_array($module->name,
-                        array_keys($this->config['codecept_sites']))
-                ) {
+                if (!$module || !$module instanceof BModule/* || !in_array($module->name,array_keys($this->config['codecept_sites']))*/) {
                     continue;
                 }
-
                 $testsDir = $module->root_dir . '/Test/tests/' . strtolower($type);
                 if (is_dir($testsDir)) {
                     $files = new \RecursiveIteratorIterator(

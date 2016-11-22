@@ -123,7 +123,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
     {
         $args['order']->state()->overall()->setLegit();
         $args['order']->addHistoryEvent('legit', 'Admin user has marked the order as legitimate');
-        $args['order']->state()->overall()->setProcessing();;
+        $args['order']->state()->overall()->setProcessing();
         $args['order']->save();
     }
 

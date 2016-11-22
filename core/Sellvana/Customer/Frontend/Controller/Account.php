@@ -77,6 +77,7 @@ class Sellvana_Customer_Frontend_Controller_Account extends FCom_Frontend_Contro
             $r['old_email'] = $customer->get('email');
 
             if ($customer->validate($r, $expandRules, $formId)) {
+                //TODO: replace all Bcrypt with password_* functions
                 if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
                     $this->BResponse->redirect('customer/myaccount/edit');

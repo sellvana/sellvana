@@ -119,7 +119,7 @@ class FCom_Test_Core_Site extends BClass
     }
 
     public function getSitePath($m) {
-        return $this->sites[md5($m)]['path'];
+        return !empty($this->sites[md5($m)]) ? $this->sites[md5($m)]['path'] : null;
     }
 
     /**

@@ -4642,9 +4642,10 @@ class BValidate extends BClass
 
     /**
      * @param array $data
+     * @param BModel $model
      * @throws BException
      */
-    protected function _validateRules(array &$data)
+    protected function _validateRules(array &$data, $model)
     {
         $this->_validateErrors = [];
         foreach ($this->_expandedRules as $r) {
@@ -4657,17 +4658,17 @@ class BValidate extends BClass
 
             } elseif ($r['rule'] instanceof Closure) {
 
-                $result = $r['rule']($data, $r['args']);
+                $result = $r['rule']($data, $r['args'], $model);
 
             } elseif (is_callable($r['rule'])) {
 
-                $result = $this->BUtil->call($r['rule'], [$data, $r['args']], true);
+                $result = $this->BUtil->call($r['rule'], [$data, $r['args'], $model], true);
 
             } elseif (is_string($r['rule'])) {
 
                 $callback = $this->BUtil->extCallback($r['rule']);
                 if ($callback !== $r['rule']) {
-                    $result = $this->BUtil->call($r['rule'], [$data, $r['args']], true);
+                    $result = $this->BUtil->call($r['rule'], [$data, $r['args'], $model], true);
                 } else {
                     throw new BException('Invalid rule: ' . print_r($r['rule'], 1));
                 }
@@ -4745,11 +4746,11 @@ class BValidate extends BClass
      * @param null  $formName
      * @return bool
      */
-    public function validateInput(array &$data, $rules, $formName = null)
+    public function validateInput(array &$data, $rules, $formName = null, $model = null)
     {
         $this->_expandRules($rules);
 
-        $this->_validateRules($data);
+        $this->_validateRules($data, $model);
 
         if ($this->_validateErrors && $formName) {
             foreach ($this->_validateErrors as $field => $errors) {
@@ -4882,6 +4883,38 @@ class BValidate extends BClass
     {
         $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
         return strlen($email) < 255 && preg_match($re, $email);
+    }
+
+    /**
+     * rule email unique
+     * @param array $data
+     * @param array $args
+     * @param BModel $model
+     * @return bool
+     */
+    public function ruleFieldUnique($data, $args, BModel $model)
+    {
+        $field = $args['field'];
+        if (empty($data[$field])) {
+            return true;
+        }
+
+        $isNew = $model->isNewRecord();
+        $valueChanged = $model->old_values($field);
+
+        if (!$isNew && !$valueChanged) {
+            return true;
+        }
+
+        /** @var BORM $orm */
+        $orm = $model->orm('m')->where('m.' . $field, $data[$field]);
+        if ($model->id()) {
+            $orm->where_not_equal('m.id', $model->id());
+        }
+        if ($orm->find_one()) {
+            return false;
+        }
+        return true;
     }
 }
 

@@ -31,8 +31,8 @@ class FCom_LibGanon_Main extends BClass
         $this->_html = $args['output'];# : '<!DOCTYPE html><html><head></head><body></body></html>';
         //$args['doc'] = $this->doc();
         $args['current_path'] = $this->BRequest->rawPath();
-        $this->BEvents->fire('FCom_LibGanon::render', $args);
-        $this->BEvents->fire('FCom_LibGanon::render:' . $args['current_path'], $args);
+        $this->BEvents->fire('FCom_LibGanon_Main::render', $args);
+        $this->BEvents->fire('FCom_LibGanon_Main::render:' . $args['current_path'], $args);
 
         if ($this->_doc) {
             $args['output'] = (string)$this->_doc;

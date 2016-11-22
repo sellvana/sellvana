@@ -63,8 +63,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     protected static $_validationRules = [
         ['username', '@required'],
         ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
+        ['username', 'BValidate::ruleFieldUnique', 'An account with this user name already exists'],
         ['email', '@required'],
         ['email', '@email'],
+        ['email', 'BValidate::ruleFieldUnique', 'An account with this email address already exists'],
         ['password', 'FCom_Admin_Model_User::validatePasswordSecurity'],
 
         //array('is_superadmin', '@integer'),

@@ -120,7 +120,7 @@ class Sellvana_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->view('head')->addMeta('title', $post->get('meta_title'));
         $this->view('head')->addMeta('description', $post->get('meta_description'));
         $this->view('head')->addMeta('keywords', $post->get('meta_keywords'));
-        $post->set('views', (int)$post->get('views') + 1)->save(false);
+        $post->add('views_cnt')->save(false);
     }
 
     public function action_rss()

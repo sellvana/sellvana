@@ -405,4 +405,15 @@ class FCom_Admin_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_6_3_0__0_6_4_0()
+    {
+        $tUser = $this->FCom_Admin_Model_User->table();
+
+        $this->BDb->ddlTableDef($tUser, [
+            BDb::COLUMNS => [
+                'password_hash' => 'varchar(255) default null',
+            ],
+        ]);
+    }
 }

@@ -68,7 +68,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['email', '@required'],
-        ['email', 'Sellvana_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists'],
+        ['email', 'BValidate::ruleFieldUnique', 'An account with this email address already exists'],
         ['firstname', '@required'],
         ['lastname', '@required'],
         //array('password', '@required'),
@@ -672,34 +672,6 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             }
         }
         return $data;
-    }
-
-    /**
-     * rule email unique
-     * @param $data
-     * @param $args
-     * @return bool
-     */
-    public function ruleEmailUnique($data, $args)
-    {
-        if (empty($data[$args['field']])) {
-            return true;
-        }
-
-        $isNew = isset($data['is_new']) ? (bool)$data['is_new'] : true;
-        $emailChanged = isset($data['old_email']) ? ($data['old_email'] != $data[$args['field']]) : true;
-        if (!$isNew && !$emailChanged) {
-            return true;
-        }
-
-        $orm = $this->orm('c')->where('c.email', $data[$args['field']]);
-        if (!empty($data['id'])) {
-            $orm->where_not_equal('c.id', $data['id']);
-        }
-        if ($orm->find_one()) {
-            return false;
-        }
-        return true;
     }
 
     /**

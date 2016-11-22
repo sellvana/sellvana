@@ -3477,10 +3477,10 @@ class BModel extends Model
         if (!$ignoreModelRules) {
             $rules = array_merge($this->_validationRules(), $rules);
         }
-        $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
-        $valid = $this->BValidate->validateInput($data, $rules, $formName);
+        $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data, 'model' => $this]);
+        $valid = $this->BValidate->validateInput($data, $rules, $formName, $this);
         if (!$valid) {
-            $this->BEvents->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
+            $this->BEvents->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data, 'model' => $this]);
         }
 
         return $valid;
