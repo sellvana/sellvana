@@ -33,14 +33,14 @@
             dragging,
             collection = {},
             $mainForm = $('#catalog-products-form'),
-            initData = {{ UTIL.toJson(initialData) | raw }},
-            sites = {{ UTIL.toJson(sites) | raw }},
+            initData = {{ UTIL.fromJson(initialData)|json_encode | raw }},
+            sites = {{ sites | json_encode | raw }},
             fieldsModalNode,
             fieldsForm,
             fields = [],
-            fieldsOptions = {{ UTIL.toJson(APP.instance('Sellvana_CatalogFields_Model_Field').as_values('field_name')) | raw }},
+            fieldsOptions = {{ APP.instance('Sellvana_CatalogFields_Model_Field').as_values('field_name') | json_encode| raw }},
             fieldSets = {},
-            fieldSetOptions = {{ UTIL.toJson(fieldSetModel.as_values('set_name')) | raw }};
+            fieldSetOptions = {{ fieldSetModel.as_values('set_name') | json_encode| raw }};
 
         // Multisite change handling
         window.onMultiSiteChange = function (e, selection) {
@@ -215,7 +215,7 @@
                     id: field.field_code + '_lang_field_' + field.id,
                     data: this.parseLangs(serialized.data_serialized),
                     inputType: field.admin_input_type,
-                    locales: {{ UTIL.toJson(LOCALE.parseAllowedLocalesToOptions()) | raw }},
+                    locales: {{ LOCALE.parseAllowedLocalesToOptions() | json_encode  | raw }},
                     cClass: 'col-sm-3',
                     modalConfig: {
                         fieldCode: field.field_code,
@@ -788,7 +788,7 @@
                 }
 
                 var fieldIds = [];
-                $.get('{{ APP.href('/catalogfields/products/get_fieldset?id=') | raw }}' + setId, function (r) {
+                $.get('{{ APP.href('/catalogfields/products/get_fieldset?id=') }}' + setId, function (r) {
                     if (!r) return;
                     var sets = that.state.sets;
 
@@ -898,7 +898,7 @@
                     onfocusout: false,
                     onkeyup: false,
                     remote: {
-                        url: '{{ APP.href('/catalogfields/fields/unique_field') | raw }}',
+                        url: '{{ APP.href('/catalogfields/fields/unique_field') }}',
                         type: 'post',
                         data: {
                             _name: 'field_code'
@@ -926,7 +926,7 @@
                     hash[$(this).attr('id')] = $(this).val();
                 });
 
-                $.post('{{ APP.href('/catalogfields/fieldsets/field_grid_data') | raw }}', hash, function (r) {
+                $.post('{{ APP.href('/catalogfields/fieldsets/field_grid_data') }}', hash, function (r) {
                     this.reloadFields(r, 'new');
                     modal.close();
                 }.bind(this));
@@ -979,7 +979,7 @@
                 var that = this;
                 var modalContainer = document.getElementById('fcom_append_form');
                 React.unmountComponentAtNode(modalContainer);
-                var config = {{ UTIL.toJson(fieldsConfigCompiled) | raw }};
+                var config = {{ fieldsConfigCompiled | json_encode  | raw }};
                 React.render(
                     React.createElement(Components.Modal, {
                         id: "editFieldsModal",
@@ -1025,7 +1025,7 @@
                 }
 
                 var inputType = {};
-                $.get('{{ APP.href('/catalogfields/products/get_field?id=') | raw }}' + id, function (r) {
+                $.get('{{ APP.href('/catalogfields/products/get_field?id=') }}' + id, function (r) {
                     var index = _.findIndex(sets[firstId].fields, {id: r.id});
                     if (index == -1) sets[firstId].fields[sets[firstId].fields.length++] = r;
                     that.reloadFields(r.id, 'add');

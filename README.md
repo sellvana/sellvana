@@ -184,7 +184,7 @@ some headers. The following is an example configuration:
             return 403;
         }
         
-        location ~ (^|\)\. {
+        location ~ (^|/)\. {
             return 403;
         }
         
@@ -196,6 +196,11 @@ some headers. The following is an example configuration:
             fastcgi_pass 127.0.0.1:9000;
             ## or use unix socket, depepnding on your FPM config:
             # fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+            
+            ## you must ensure your php.ini or php-fpm pool configuration has
+            ## not disabled security.limit_extensions for PATH_INFO to not
+            ## have a security issue
+            
             fastcgi_split_path_info ^(.+\.php)(.*)$;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             fastcgi_param PATH_INFO $fastcgi_path_info;

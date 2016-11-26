@@ -16,7 +16,7 @@
                         <strong><a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display']|_ }}</a></strong>
                     {% else %}
                         <a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display']|_ }}
-                            {{ (value['cnt'] ? '<span class="count">(' ~ value['cnt'] ~ ')</span>') | raw }}</a>
+                            {{ (value['cnt'] ? '<span class="count">(' ~ value['cnt'] ~ ')</span>') |safehtml| raw }}</a>
                     {% endif %}
                 </li>
             {% endfor %}

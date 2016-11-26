@@ -29,7 +29,7 @@
           {% elseif part == 'content' and category.get('show_content') %}
 
             <div class="f-category-content">
-                {{ category.get('content') | raw }}
+                {{ category.get('content') |safehtml| raw }}
             </div>
 
           {% elseif part == 'view' and category.get('show_view') %}
@@ -42,7 +42,7 @@
             {% elseif viewInfo[0] == 'block' %}
 
               {% set blockView = APP.instance('Sellvana_Cms_Frontend_View_Block').createView(viewInfo[1]) %}
-              {{ blockView | raw }}
+              {{ blockView |safehtml| raw }}
 
             {% endif %}
 

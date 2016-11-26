@@ -2,8 +2,8 @@
 <script>
 (function() {
     function main($) {
-        var geoCountries = {{ UTIL.toJson(hlp.getAllowedCountries()) | raw }};
-        var geoRegions = {{ UTIL.toJson(hlp.getAllowedRegions()) | raw }};
+        var geoCountries = {{ hlp.getAllowedCountries() | json_encode  | raw }};
+        var geoRegions = {{ hlp.getAllowedRegions() | json_encode  | raw }};
         var defCountry = '{{ hlp.getDefaultCountry() | default('US') }}';
 
         $.fn.geoCountryRegion = function(opt) {

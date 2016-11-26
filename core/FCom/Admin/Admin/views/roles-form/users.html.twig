@@ -84,7 +84,7 @@
                             },
                             React.createElement('div', {className: 'f-grid-wrapper', id: 'allUserList'})
                     ), modalContainerEle);
-            var allUserConfigCompiled = {{ UTIL.toJson(allUserConfigCompiled) | raw }};
+            var allUserConfigCompiled = {{ allUserConfigCompiled | json_encode  | raw }};
             var attachGridContainerEle = document.getElementById('allUserList');
             var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, { config: allUserConfigCompiled}),

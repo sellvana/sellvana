@@ -55,7 +55,7 @@
     require(['jquery'], function ($) {
         var mediaGrid = window['{{ config.id }}_grid'];
         $('#{{ config.id }}').on('click', '.btn-rescan-media', function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', {do: 'rescan'}, function (response) {
+            $.post('{{ APP.href("media/grid/rescan?folder=") }}{{ config.folder }}&&type={{ config.type }}', {do: 'rescan'}, function (response) {
                 if (response.status == 'success') {
                     $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
                     mediaGrid.getRows().fetch();

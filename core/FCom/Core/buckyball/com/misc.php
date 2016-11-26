@@ -1010,12 +1010,12 @@ class BUtil extends BClass
             return random_bytes($count);
         }
 
-        if (function_exists('openssl_random_pseudo_bytes') && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
-            return openssl_random_pseudo_bytes($count);
-        }
-
         if (function_exists('mcrypt_create_iv')) {
             return bin2hex(mcrypt_create_iv($count, MCRYPT_DEV_URANDOM));
+        }
+
+        if (function_exists('openssl_random_pseudo_bytes') && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
+            return openssl_random_pseudo_bytes($count);
         }
 
         if (is_readable('/dev/urandom') && ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
@@ -1196,7 +1196,8 @@ class BUtil extends BClass
     {
         $algo = null !== $algo ? $algo : static::$_hashAlgo;
         if ('bcrypt' === $algo) {
-            return $this->Bcrypt->hash($string);
+            return password_hash($string);
+            #return $this->Bcrypt->hash($string);
         }
         $iter = null !== $iter ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
@@ -1220,7 +1221,8 @@ class BUtil extends BClass
     public function validateSaltedHash($string, $storedHash)
     {
         if (strpos($storedHash, '$2a$') === 0 || strpos($storedHash, '$2y$') === 0) {
-            return $this->Bcrypt->verify($string, $storedHash);
+            return password_verify($string, $storedHash);
+            #return $this->Bcrypt->verify($string, $storedHash);
         }
         if (!$storedHash) {
             return false;
@@ -1246,6 +1248,9 @@ class BUtil extends BClass
      */
     public function isPreferredPasswordHash($password)
     {
+        if (function_exists('password_needs_rehash')) {
+            return password_needs_rehash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+        }
         return strpos($password, '$2y$12$') === 0;
     }
 

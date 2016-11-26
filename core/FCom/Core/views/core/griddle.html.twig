@@ -57,7 +57,7 @@
         	}
         });
 
-        var config = {{ UTIL.toJson(config) | raw }};
+        var config = {{ config |json_encode| raw }};
         React.render(
             React.createElement(GriddleGrid, { config: config }), document.getElementById(config.id)
         );

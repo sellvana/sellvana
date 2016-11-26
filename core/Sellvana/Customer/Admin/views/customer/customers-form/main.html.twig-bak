@@ -15,9 +15,9 @@
     var regions={};
     var countries= {};
     require(['backbone', 'underscore', 'jquery', 'jquery.validate'], function(Backbone, _, $) {
-    var addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses))|raw }};
-    regions = {{ UTIL.toJson(LOCALE.getAllRegions.allOptions())|raw }};
-    countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
+    var addresses = {{ APP.instance('BDb').many_as_array(m.addresses) | json_encode  |raw }};
+    regions = {{ LOCALE.getAllRegions.allOptions() | json_encode  |raw }};
+    countries = {{ APP.instance('FCom_Geo_Model_Country').options() | json_encode  |raw }};
       _.templateSettings.variable = 'rc';
       var Customer = {
             Models: {},
@@ -195,7 +195,7 @@
                       <div class="form-group country-name">
                           <select class="form-control country" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;">
                             <option></option>
-                            {{ UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Country').options()) | raw }}
+                            {{ UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Country').options()) |json_encode| raw }}
                           </select>
                           <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ><%= countries[rc.country] %></span>
                       </div>

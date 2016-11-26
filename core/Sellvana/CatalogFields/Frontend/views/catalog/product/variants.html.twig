@@ -47,7 +47,7 @@
         var $sku = $('.f-sku');
         var $addToCart = $('#prod-add-to-cart');
         var $displayAll = $('#display-all-images');
-        var varData = {{ UTIL.toJson(varData) | raw }};
+        var varData = {{ varData | json_encode  | raw }};
         var firstRun = true;
 
         function processVariants() {

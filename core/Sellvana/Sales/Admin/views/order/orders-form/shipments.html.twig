@@ -250,7 +250,7 @@
 
         // link carrier and service dropdowns
         var $carrier = $('#shipment-carrier_code'), $service = $('#shipment-service_code');
-        var allServices = {{ UTIL.toJson(allServices) | raw }};
+        var allServices = {{ allServices | json_encode  | raw }};
         $carrier.change(function(ev) {
             $service.find('option').remove();
             $service.append($('<option>'));

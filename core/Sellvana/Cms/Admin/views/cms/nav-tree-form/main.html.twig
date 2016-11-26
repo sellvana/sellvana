@@ -17,7 +17,7 @@
         <label class="col-md-2 control-label" for="main-node_type">{{ 'Node Type'|_ }}</label>
         <div class="col-md-5">
             <select name="model[node_type]" class="form-control" id="main-node_type">
-                {{ UTIL.optionsHtml(THIS.node_types, m.get('node_type'))|raw }}
+                {{ UTIL.optionsHtml(THIS.node_types, m.get('node_type'))|json_encode|raw }}
             </select>
         </div>
     </div>

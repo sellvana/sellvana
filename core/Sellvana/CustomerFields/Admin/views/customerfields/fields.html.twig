@@ -105,7 +105,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                                 )
                         ))),
                 modalContainerEle);
-        var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
+        var optionsConfigCompiled = {{ optionsConfigCompiled | json_encode  | raw }};
         var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_form');
 
         if (typeof row !== 'undefined' && typeof row === 'object') {
@@ -189,7 +189,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //          fieldsGrid.getGridSkeleton().currentRow = this.model;
 //          fieldsGrid.getModalForm().render();
 
-//             optionsGrid.getRows().url = '{{ APP.href('catalogfields/fieldsets/field_option_grid_data?field_id=') | raw }}' + selectedRow.get('id');
+//             optionsGrid.getRows().url = '{{ APP.href('catalogfields/fieldsets/field_option_grid_data?field_id=') }}' + selectedRow.get('id');
 //             optionsGrid.getRows().fetch({
 //                 reset: true,
 //                 success: function () {

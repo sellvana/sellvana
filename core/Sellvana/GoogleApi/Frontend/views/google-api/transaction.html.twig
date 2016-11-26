@@ -7,7 +7,7 @@
     <script>
         (function() {
 
-            var items = {{ UTIL.toJson(ga.items) | raw }}, trans = {{ UTIL.toJson(ga.transaction) | raw }};
+            var items = {{ ga.items) |json_encode| raw }}, trans = {{ UTIL.toJson(ga.transaction | json_encode  | raw }};
 
             {% if conf.ua_enable and conf.ua_key %}
                 {% if conf.ua_enable_ec %}

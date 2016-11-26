@@ -58,10 +58,10 @@
 
     require(['underscore', 'react', 'griddle.fcomMediaLib'], function (_, React, FComMediaLib) {
         var mediaGridId = '{{ config.id }}';
-        var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigProcessed) | raw }};
-        var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
+        var mediaConfig = {{ mediaLibAttachConfigProcessed |json_encode| raw }};
+        var uploadConfig = {{ uploadConfig |json_encode| raw }};
         var modalConfig = getMediaModalConfig(mediaGridId);
-        var mainConfig = {{ UTIL.toJSON(config) | raw }};
+        var mainConfig = {{ config |json_encode| raw }};
         var containerEle;
 
         if (typeof mainConfig.showModal !== 'undefined' && mainConfig.showModal === false) {
@@ -82,7 +82,7 @@
 
         //re-scan image button
         $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-media').on('click', function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw }}&&type={{ config.type }}',
+            $.post('{{ APP.href("media/grid/rescan?folder=") }}{{ config.folder }}&&type={{ config.type }}',
                     {do: 'rescan'}, function (response) {
                         if (response.status == 'success') {
                             $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
@@ -109,7 +109,7 @@
     });
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element', 'jquery.vimeo'], function () {
-        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{ config.type ? config.type : "" }}';
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") }}{{ config.type ? config.type : "" }}';
         var maxFileSize = parseInt({{ defaultFileSizeConfig }}) * 1024000;
         var mediaGrid = mediaLibGrid{{ config.id }};
 

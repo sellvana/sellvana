@@ -136,7 +136,7 @@
                 <script>
                     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport',
                         'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'jquery.validate'], function () {
-                        var url = '{{ APP.href("promo/coupons/import")|raw}}';
+                        var url = '{{ APP.href("promo/coupons/import")}}';
                         $('#promo-import-upload-codes').fileupload({
                             url: url,
                             multiple: false,

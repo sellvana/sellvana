@@ -53,7 +53,7 @@
 
 <script type="text/javascript">
     require(['jquery'], function ($) {
-        var uploadConfigs       = {{ UTIL.toJSON(uploadConfig) | raw }};
+        var uploadConfigs       = {{ uploadConfig | json_encode | raw }};
         var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
         var thumb_path          = '';
         var $mediaTypes         = $("#media-library-upload-types");

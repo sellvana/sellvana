@@ -6,7 +6,7 @@
 {% set promo_type = validator.fieldValue('promo_type') %}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
-{% set promoDisplayData = m.getPromoDisplayData(true) %}
+{% set promoDisplayData = m.getPromoDisplayData() %}
 {% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
 {% set displayPages = APP.instance('Sellvana_Promo_Model_PromoDisplay').getDisplayPages() %}
 {% set displayPageLocations = APP.instance('Sellvana_Promo_Model_PromoDisplay').getDisplayPageLocations() %}
@@ -88,7 +88,7 @@
             var promoDisplayOptions = {
                 container: $('#add_promo_display_details')[0],
                 addDisplayBtn: $('#add_promo_display_btn'),
-                promoDisplayData: {{ promoDisplayData|raw }},
+                promoDisplayData: {{ promoDisplayData|json_encode|raw }},
                 base_url: "{{ base_url }}",
                 customerGroups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'false' }}
             };

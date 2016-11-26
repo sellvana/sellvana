@@ -6,7 +6,7 @@
 
         (function() {
 
-            var items = {{ UTIL.toJson(ga.items) | raw }}, i;
+            var items = {{ ga.items | json_encode  | raw }}, i;
             for (i in items) {
                 ga('ec:addProduct', items[i]);
             }

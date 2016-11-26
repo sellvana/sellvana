@@ -173,7 +173,7 @@ Using custom id/name:
     {% if p.select2 is defined %}
         <script>
             require(['jquery', 'select2'], function($) {
-                $('#{{ view.getInputId(p) }}').select2({{ view.getSelect2ArgsText(p) }});
+                $('#{{ view.getInputId(p) }}').select2({{ view.getSelect2Args(p) | json_encode | raw }});
             })
         </script>
     {% endif %}

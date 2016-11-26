@@ -55,7 +55,7 @@
                             },
                             React.createElement('div', {className: 'f-grid-wrapper', id: 'allProductList'})
                     ), modalContainerEle);
-            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var prodAttachConfigCompiled = {{ prodAttachConfigCompiled | json_encode  | raw }};
             var attachGridContainerEle = document.getElementById('allProductList');
             var instanceAttachGrid = React.render(
                 React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}), attachGridContainerEle

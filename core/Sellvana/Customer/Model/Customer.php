@@ -153,7 +153,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $token = $this->BUtil->randomString(16);
         $this->set([
-            'password_hash' => $this->BUtil->fullSaltedHash($password),
+            'password_hash' => password_hash($password),
             'password_session_token' => $token,
         ]);
 
@@ -344,11 +344,11 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $hash = $this->get($field);
         if ($password[0] !== '$' && $password === $hash) {
             // direct sql access for account recovery
-        } elseif (!$this->BUtil->validateSaltedHash($password, $hash)) {
+        } elseif (!password_verify($password, $hash)) {
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
-            $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
+            $this->set('password_hash', password_hash($password))->save();
         }
         return true;
     }

@@ -11,7 +11,7 @@
 {% if not sessCustomer %}
     {% if emailCustomer %}
         <p>{{ 'Our records indicate that you already have an account with this email: %s.'|_(email) }}</p>
-        <p>{{ 'If you like to merge this order into your account please <a href="%s">login here</a>.'|_(APP.href('guest/add_to_account')) | raw }}</p>
+        <p>{{ 'If you like to merge this order into your account please <a href="%s">login here</a>.'|_(APP.href('guest/add_to_account')) }}</p>
     {% else %}
 
         {{ THIS.view('guest/create-account').set('order', order) | raw }}

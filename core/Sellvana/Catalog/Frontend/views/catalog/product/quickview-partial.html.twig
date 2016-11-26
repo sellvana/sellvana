@@ -89,7 +89,7 @@
         <!-- /.tab-pane -->
         <div class="tab-pane" id="f-tab-detail">
             <div class="f-prod-short-description">
-                <p>{{ m.getDescription() | raw }}</p>
+                <p>{{ m.getDescription() |safehtml| raw }}</p>
             </div>
         </div>
     </div>

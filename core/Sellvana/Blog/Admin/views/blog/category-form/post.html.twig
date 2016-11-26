@@ -49,7 +49,7 @@
 
             React.render(
                 React.createElement(FComGriddleComponent, {
-                    config: {{ UTIL.toJson(postsAttachConfigCompiled) | raw }}
+                    config: {{ postsAttachConfigCompiled | json_encode  | raw }}
                 }), document.getElementById(grid.getConfig('id') + '_tab')
             );
         };

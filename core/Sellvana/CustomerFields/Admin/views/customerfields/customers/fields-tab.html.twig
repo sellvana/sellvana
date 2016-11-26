@@ -26,8 +26,8 @@
 <div id='fields_list'></div>
 <script>
     require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'ckeditor', 'jquery.validate', 'unique', 'fcom.admin'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage) {
-        var initData = {{ UTIL.toJson(initialData) | raw }};
-        var fieldsOptions = {{ UTIL.toJson(fieldsOptions) | raw }};
+        var initData = {{ initialData | json_encode  | raw }};
+        var fieldsOptions = {{ fieldsOptions | json_encode  | raw }};
         var fields = [];
         var fieldsForm;
 
@@ -63,7 +63,7 @@
                     this.refreshData();
                 } else {
                     // If field does not exist on local data then fetch it
-                    var url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}' + nextProps.field;
+                    var url = '{{ APP.href('/customerfields/customers/get_field?id=') }}' + nextProps.field;
                     $.get(url, function (field) {
                         fields.push(field);
                         this.refreshData();
@@ -284,7 +284,7 @@
                     id: field.field_code + '_lang_field_' + field.id,
                     data: field.langFields || [],
                     inputType: field.admin_input_type,
-                    locales: {{ UTIL.toJson(LOCALE.parseAllowedLocalesToOptions()) | raw }},
+                    locales: {{ LOCALE.parseAllowedLocalesToOptions() | json_encode  | raw }},
                     cClass: 'col-sm-3',
                     modalConfig: {
                         fieldCode: field.field_code,
@@ -406,7 +406,7 @@
                     onfocusout: false,
                     onkeyup: false,
                     remote: {
-                        url: '{{ APP.href('/customerfields/fields/unique_field') | raw }}',
+                        url: '{{ APP.href('/customerfields/fields/unique_field') }}',
                         type: 'post',
                         data: {
                             _name: 'field_code'
@@ -434,7 +434,7 @@
                     hash[$(this).attr('id')] = $(this).val();
                 });
 
-                $.post('{{ APP.href('/customerfields/fields/field_grid_data') | raw }}', hash, function (field) {
+                $.post('{{ APP.href('/customerfields/fields/field_grid_data') }}', hash, function (field) {
                     this._reloadFields(field.id, 'new', field);
                     modal.close();
                 }.bind(this));
@@ -463,7 +463,7 @@
                 var that = this;
                 var modalContainer = document.getElementById('fcom_append_form');
                 React.unmountComponentAtNode(modalContainer);
-                var config = {{ UTIL.toJson(fieldsConfigCompiled) | raw }};
+                var config = {{ fieldsConfigCompiled | json_encode  | raw }};
                 React.render(
                         React.createElement(Components.Modal, {
                                     id: "editFieldsModal",

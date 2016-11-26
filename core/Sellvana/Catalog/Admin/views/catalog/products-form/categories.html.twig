@@ -10,7 +10,7 @@
     require(['jquery', 'fcom.admin', 'jstree'], function($) {
         $(function() {
             FCom.Admin.tree('#categories', {
-                url: '{{ baseUrl | raw }}{{ THIS.get('model').id }}',
+                url: '{{ baseUrl ~ THIS.get('model').id }}',
                 checkbox: {
                     override_ui:true,
                     checked_parent_open:true,
@@ -20,9 +20,9 @@
                         return [("category_id-" + (n[0].id)), n[0].id]
                     }
                 },
-                initially_open: {{ openData | raw }}
+                initially_open: {{ openData |json_encode| raw }}
             });
-            var checked = {{ checkedData | raw }};
+            var checked = {{ checkedData |json_encode| raw }};
             $('#categories').bind('loaded.jstree', function(event, data) {
                 $('#categories').css({height:'auto'});
                 for (var id in checked) {

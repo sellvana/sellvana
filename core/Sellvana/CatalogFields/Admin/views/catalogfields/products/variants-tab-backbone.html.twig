@@ -328,7 +328,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         sel_val_field.find("option[value='"+val+"']").remove();
         resetSelect();
 
-        $.get('{{ APP.href('/catalogfields/fields/options?id=') | raw }}'+val,
+        $.get('{{ APP.href('/catalogfields/fields/options?id=') }}'+val,
                 function(response) {
                     if (response.success) {
                         addColumn(text, response.options, val, field_code);
