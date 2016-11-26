@@ -90,10 +90,10 @@
                 addDisplayBtn: $('#add_promo_display_btn'),
                 promoDisplayData: {{ promoDisplayData|json_encode|raw }},
                 base_url: "{{ base_url }}",
-                customerGroups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'false' }}
+                customerGroups: {{ customerGroups? (customerGroups | json_encode |raw) : 'false' }}
             };
-            var displayPages = {{ displayPages ? UTIL.toJson(displayPages)|raw: 'false' }};
-            var displayPageLocations = {{ displayPageLocations ? UTIL.toJson(displayPageLocations)|raw: 'false' }};
+            var displayPages = {{ displayPages ? (displayPages | json_encode |raw): 'false' }};
+            var displayPageLocations = {{ displayPageLocations ? (displayPageLocations | json_encode |raw) : 'false' }};
             if (displayPages) {
                 promoDisplayOptions['locationPages'] = displayPages;
             }
