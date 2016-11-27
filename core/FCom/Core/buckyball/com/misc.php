@@ -1196,7 +1196,7 @@ class BUtil extends BClass
     {
         $algo = null !== $algo ? $algo : static::$_hashAlgo;
         if ('bcrypt' === $algo) {
-            return password_hash($string);
+            return password_hash($string, PASSWORD_DEFAULT);
             #return $this->Bcrypt->hash($string);
         }
         $iter = null !== $iter ? $iter : static::$_hashIter;
@@ -5371,7 +5371,7 @@ if (!function_exists('password_hash')) {
      *
      * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
      */
-    function password_hash($password)
+    function password_hash($password, $algo = null)
     {
         return $this->Bcrypt->hash($password);
     }
