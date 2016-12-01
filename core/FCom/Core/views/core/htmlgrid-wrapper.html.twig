@@ -16,7 +16,7 @@
             {% if col.cell == 'select-row' %}
                 <input type="checkbox" name="[{{ config.id}}][checked][<%- id %>]">
             {% elseif col.href %}
-                <a href='{{ col.href|raw }}'>
+                <a href='{{ col.href }}'>
                     <%- {{ col.name }} %>
                 </a>
             {% else %}
@@ -95,7 +95,7 @@ require(['backbone', 'underscore','jquery', 'fcom.htmlgrid'], function(Backbone,
                 id: "{{ config.id }}",
                 grid_url: "{{ config.grid_url }}",
                 personalize_url: "{{ APP.href('my_account/personalize') }}",
-                selection: {{ config.selection ? UTIL.toJson(config.selection) : '{}' }}
+                selection: {{ config.selection|default({})|json_encode|raw }}
             })
         })
     })*/

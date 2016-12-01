@@ -5,7 +5,7 @@
     {% set ga = APP.instance('Sellvana_GoogleApi_Frontend').getProductData() %}
     <script>
 
-        ga('ec:addProduct', {{ UTIL.toJson(ga.item) | raw }});
+        ga('ec:addProduct', {{ ga.item | json_encode  | raw }});
         ga('ec:setAction', 'detail');
 
         gaProductForms[{{ ga.id }}] = ga.item;

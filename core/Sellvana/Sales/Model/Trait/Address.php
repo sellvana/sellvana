@@ -119,6 +119,6 @@ trait Sellvana_Sales_Model_Trait_Address
         ];
         $rules = array_merge($rules, $moreRules);
 
-        return $this->BValidate->validateInput($data, $rules, $formName);
+        return $this->BValidate->validateInput($data, $rules, $formName, $this);
     }
 }

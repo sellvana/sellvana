@@ -6,5 +6,5 @@
     {% set view = APP.instance('Sellvana_Cms_Frontend_View_Block').createView(blockId) %}
     {{ view.set({ product:p }) | raw }}
 {% else %}
-    {{ p.get(viewType ~ '_contents') | raw }}
+    {{ p.get(viewType ~ '_contents') |safehtml| raw }}
 {% endif %}

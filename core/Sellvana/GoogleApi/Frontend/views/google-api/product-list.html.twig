@@ -5,7 +5,7 @@
 
     <script>
         (function() {
-            var items = {{ UTIL.toJson(ga.items) | raw }}, i;
+            var items = {{ ga.items | json_encode  | raw }}, i;
             for (i in items) {
                 items[i].list = '{{ THIS.get('list_name') }}';
                 ga('ec:addImpression', items[i]);

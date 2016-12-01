@@ -183,7 +183,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         var selectedGridContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}_selected_content');
         var fieldsGridContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}_fields_content');
 
-        var selectedGridCompiled = {{ UTIL.toJson(selectedGridCompiled) | raw }};
+        var selectedGridCompiled = {{ selectedGridCompiled | json_encode  | raw }};
         if (typeof row !== 'undefined' && typeof row === 'object') {
             var getUrl = selectedGridCompiled.dataUrl + row.id;
             $.get(getUrl, function(data) {
@@ -192,7 +192,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             }, 'json');
         }
 
-        var fieldsGridCompiled = {{ UTIL.toJson(fieldsGridCompiled) | raw }};
+        var fieldsGridCompiled = {{ fieldsGridCompiled | json_encode  | raw }};
         React.render(
                 React.createElement(FComGriddleComponent, { config: selectedGridCompiled}),
                 selectedGridContainerEle
@@ -224,7 +224,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //             mainGrid.getModalForm().render();
 //             selectedGrid.getGridView().clearSelectedRows();
 //             //fetch linked field data of selected fieldset from server
-//             var url = '{{ APP.href('catalogfields/fieldsets/fieldset_modal_selected_grid_data?set_id=') | raw }}' + this.model.get('id');
+//             var url = '{{ APP.href('catalogfields/fieldsets/fieldset_modal_selected_grid_data?set_id=') }}' + this.model.get('id');
 //             currentFieldSetId =  this.model.get('id');
 //             $.get(url, function(data) {
 //                 addGrid.getRows().fetch({reset: true});

@@ -14,7 +14,7 @@
          */
         window.showModalToAddStateCustom = function(that) {
             mainGrid = that.props.getCurrentGrid();
-            mainConfig = {{ UTIL.toJson(orderCustomStateConfig.config) | raw }};
+            mainConfig = {{ orderCustomStateConfig.config | json_encode  | raw }};
             var modalContainerEle = document.getElementById('{{ orderCustomStateConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(

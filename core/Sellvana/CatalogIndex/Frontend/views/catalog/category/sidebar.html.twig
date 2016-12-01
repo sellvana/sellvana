@@ -52,7 +52,7 @@
 
 <script>
     require(['jquery', 'jquery.cookie'], function($) {
-        var collapsed = {{ REQUEST.cookie('collapsed_facets') | default('{}') | raw }};
+        var collapsed = {{ REQUEST.cookie('collapsed_facets') | default('{}') |json_encode| raw }};
         $('.f-prod-listing-filter .f-facet-title').each(function(idx, el) {
             var $a = $(el), fKey = $a.data('facet-key'), $ul = $a.parent().next('dd').find('ul');
 

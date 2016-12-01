@@ -11,7 +11,7 @@
             {% for field in cf.fields %}
                 {% if field.frontend_show == 1 %}
                 <div class="col-md-12">
-                    <label class="control-label field-label">{{ field.field_name ~": " |_ }}</label> <span class="field-value">{{ field.value|_|raw }}</span>
+                    <label class="control-label field-label">{{ field.field_name ~": " |_ }}</label> <span class="field-value">{{ field.value|safehtml|_|raw }}</span>
                 </div>
                 {% endif %}
             {% endfor %}

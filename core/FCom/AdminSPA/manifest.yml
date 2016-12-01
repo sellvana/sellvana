@@ -1,0 +1,4 @@
+modules:
+    FCom_AdminSPA:
+        version: 0.6.0.0
+        channel: alpha

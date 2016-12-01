@@ -12,6 +12,14 @@ if (PHP_SAPI !== 'cli') {
 
 #BConfig::i()->set('fs/root_dir', __DIR__);
 
+if (file_exists(__DIR__ . '/index.global.php')) {
+    require_once __DIR__ . '/index.global.php';
+}
+
+if (file_exists(__DIR__.'/shell.local.php')) {
+    require_once __DIR__.'/shell.local.php';
+}
+
 FCom_Core_Main::i()->init('FCom_Shell');
 
 FCom_Core_Shell::i()->run();

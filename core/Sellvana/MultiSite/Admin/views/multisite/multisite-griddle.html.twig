@@ -1,7 +1,7 @@
 {% set config = THIS.get('config') %}
 <script type="text/javascript">
     require(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale'], function($, _, React, Components, Locale) {
-        var sites = {{ UTIL.toJson(config.sites) | raw }};
+        var sites = {{ config.sites | json_encode  | raw }};
         var MultiSite = React.createClass({
             displayName: "MultiSite",
             mixins: [FCom.InputMixin],

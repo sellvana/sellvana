@@ -5,19 +5,19 @@
 
         <p>{{ "Pattern examples:"|_ }}</p>
 
-        <p>{{ "<code>{U8}</code> - 8 upper case alpha chars - will result to something like <code>DKABWJKQ</code>"|_|raw }}</p>
+        <p>{{ "<code>{U8}</code> - 8 upper case alpha chars - will result to something like <code>DKABWJKQ</code>"|_|safehtml|raw }}</p>
 
-        <p>{{ "<code>{l6}</code> - 6 lower case alpha chars - will result to something like <code>dkabkq</code>"|_|raw }}</p>
+        <p>{{ "<code>{l6}</code> - 6 lower case alpha chars - will result to something like <code>dkabkq</code>"|_|safehtml|raw }}</p>
 
-        <p>{{ "<code>{D4}</code> - 4 digits - will result to something like <code>5640</code>"|_|raw }}</p>
+        <p>{{ "<code>{D4}</code> - 4 digits - will result to something like <code>5640</code>"|_|safehtml|raw }}</p>
 
-        <p>{{ "<code>{UD5}</code> - 5 alphanumeric (upper case) - will result to something like <code>GHG76</code>"|_|raw }}</p>
+        <p>{{ "<code>{UD5}</code> - 5 alphanumeric (upper case) - will result to something like <code>GHG76</code>"|_|safehtml|raw }}</p>
 
-        <p>{{ "<code>{ULD5}</code> - 5 alphanumeric (mixed case) - will result to something like <code>GhG76</code>"|_|raw }}</p>
+        <p>{{ "<code>{ULD5}</code> - 5 alphanumeric (mixed case) - will result to something like <code>GhG76</code>"|_|safehtml|raw }}</p>
 
-        <p>{{ "<code>CODE-{U4}-{UD6}</code> - <code>CODE-HQNB-8A1NO3</code>"|_|raw }}</p>
+        <p>{{ "<code>CODE-{U4}-{UD6}</code> - <code>CODE-HQNB-8A1NO3</code>"|_|safehtml|raw }}</p>
 
-        <p>{{ "Note: dynamic parts of the code MUST be enclosed in {}"|_|raw }}</p>
+        <p>{{ "Note: dynamic parts of the code MUST be enclosed in {}"|_|safehtml|raw }}</p>
     </div>
     <form id="coupon-generate-form" >
         {{ forms.hidden({type: 'hidden', name:'X-CSRF-TOKEN', id:'X-CSRF-TOKEN', value:SESSION.csrfToken()}) }}

@@ -29,7 +29,7 @@
 
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {
-        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_ApiServer")|split("\n")) | raw }};
+        var mode = {{ c.get("mode_by_ip/FCom_ApiServer")|split("\n") | json_encode| raw }};
         ipMode.initMode({el: $('#settings-FCom_ApiServer-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_ApiServer]', mode: mode});
     })
 </script>

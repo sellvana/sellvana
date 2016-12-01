@@ -2,7 +2,7 @@
     <script>
         require(['fcom.adminchat'], function(AdminChat) {
             new AdminChat({
-                state: {{ UTIL.toJson(APP.instance('FCom_AdminChat_Admin').getInitialState()) | raw }},
+                state: {{ APP.instance('FCom_AdminChat_Admin').getInitialState() | json_encode| raw }},
                 username: '{{ APP.instance('FCom_Admin_Model_User').sessionUser().get('username') }}',
                 dingPath: '{{ APP.src('@FCom_Core/sound/ding.wav') }}'
             })

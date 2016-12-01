@@ -171,7 +171,7 @@ require(['jquery', 'underscore', 'jquery-ui', 'datetimepicker', 'moment', 'dater
         var select = $('#add-widget-selection');
         var addWidgetModal = $('#add-widget-modal');
         var widgetOpts = {};
-        _({{ UTIL.toJson(widgets) | raw }}).each(function (w) {
+        _({{ widgets | json_encode | raw }}).each(function (w) {
             widgetOpts[w.key] = w.title;
         });
 
@@ -275,7 +275,7 @@ require(['jquery', 'underscore', 'jquery-ui', 'datetimepicker', 'moment', 'dater
             });
 
             {% if asyncWidgets %}
-                load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
+                load({{ asyncWidgets|json_encode|default('[]')|raw }}.join(','));
             {% endif %}
         }
 

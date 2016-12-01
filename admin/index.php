@@ -16,8 +16,13 @@ BConfig::i()
     ->set('web/base_store', $storeRoot)
     ->set('web/base_href', BRequest::i()->webRoot())
 ;
-if (file_exists(__DIR__.'/index.local.php')) {
-    require_once __DIR__.'/index.local.php';
+
+if (file_exists($rootDir . '/index.global.php')) {
+    require_once $rootDir . '/index.global.php';
+}
+
+if (file_exists(__DIR__ . '/index.local.php')) {
+    require_once __DIR__ . '/index.local.php';
 }
 #error_reporting(E_ALL | E_STRICT);
 

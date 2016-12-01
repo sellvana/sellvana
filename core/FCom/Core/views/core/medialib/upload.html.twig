@@ -17,7 +17,7 @@
                 return 1024000;
             },
             initUploadFile: function() {
-                var uploadUrl = "{{ APP.href("media/grid/upload?type=") | raw }}" + this.state.type ? this.state.type : '';
+                var uploadUrl = "{{ APP.href("media/grid/upload?type=") }}" + this.state.type ? this.state.type : '';
                 var acceptFileTypes = this.state && this.state.mode == 'thumbnail' ? new RegExp(/(\.|\/)(jpe?g|tiff|gif|png|bmp|mp4)$/i) : new RegExp({{ uploadConfig.filetype_regex }});
                 var maxFileSize = this.calFileSize();
 
@@ -126,7 +126,7 @@
             }
         });
 
-        var config = {{ UTIL.toJson(config) | raw }};
+        var config = {{ config | json_encode  | raw }};
         var mediaUploadContainer = document.getElementById('{{ config.id }}-media-upload');
         React.unmountComponentAtNode(mediaUploadContainer);
         React.render(

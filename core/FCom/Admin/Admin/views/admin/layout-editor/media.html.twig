@@ -70,10 +70,10 @@
                                                 : $(this).parents('div.js-widget-box').data('id');
                     var mediaModal          = $(this).next('.modal');
                     var ele                 = this.nextElementSibling.querySelector('.mediaGrid');
-                    var config              = {{ UTIL.toJson(medialibConfigCompiled) | raw }};
+                    var config              = {{ medialibConfigCompiled | json_encode   | raw }};
                     var newId               = config.id + (ci < 0 ? '' : '_') + ci;
-                    var uploadConfigs       = {{ UTIL.toJSON(uploadConfig)|raw }};
-                    var uploadUrlBase       = "{{ APP.href('media/grid/upload?type=') | raw }}";
+                    var uploadConfigs       = {{ uploadConfig | json_encode   | raw }};
+                    var uploadUrlBase       = "{{ APP.href('media/grid/upload?type=') }}";
                     var $mediaTypes         = $("#media-library-upload-types-" + $(this).parents('li').data('id').toString().replace(/\-/g, ''));
                     var type                = $mediaTypes.val() ? $mediaTypes.val() : '';
                     var uploadUrl           = uploadUrlBase + type;

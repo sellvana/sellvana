@@ -63,8 +63,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     protected static $_validationRules = [
         ['username', '@required'],
         ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
+        ['username', 'BValidate::ruleFieldUnique', 'An account with this user name already exists'],
         ['email', '@required'],
         ['email', '@email'],
+        ['email', 'BValidate::ruleFieldUnique', 'An account with this email address already exists'],
         ['password', 'FCom_Admin_Model_User::validatePasswordSecurity'],
 
         //array('is_superadmin', '@integer'),
@@ -106,7 +108,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $token = $this->BUtil->randomString(16);
         $this->set([
-            'password_hash' => $this->BUtil->fullSaltedHash($password),
+            'password_hash' => password_hash($password),
             'password_session_token' => $token,
         ]);
         if ($this->id() === $this->sessionUserId()) {
@@ -137,7 +139,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $this->setPassword($this->get('password'));
         }
         if ($this->get('api_password')) {
-            $this->set('api_password_hash', $this->BUtil->fullSaltedHash($this->get('api_password')));
+            $this->set('api_password_hash', password_hash($this->get('api_password')));
         }
         if (!$this->get('role_id')) {
             $this->set('role_id', null);
@@ -203,11 +205,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         $hash = $this->get($field);
         if ($password[0] !== '$' && $password === $hash) {
             // direct sql access for account recovery
-        } elseif (!$this->BUtil->validateSaltedHash($password, $hash)) {
+        } elseif (!password_verify($password, $hash)) {
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
-            $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
+            $this->set('password_hash', password_hash($password))->save();
         }
         return true;
     }

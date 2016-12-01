@@ -31,7 +31,7 @@
             $('#permissions').jstree({
                 plugins: ['themes', 'json_data', 'ui', 'hotkeys', 'checkbox', 'search'],
                 core: {
-                    data: {{ UTIL.toJson(m.getAllPermissionsTree())|raw }}
+                    data: {{ m.getAllPermissionsTree() | json_encode  |raw }}
                 },
                 checkbox: {
                     override_ui: true,
@@ -42,7 +42,7 @@
                 },
                 search: {case_insensitive: true}
             }).bind('loaded.jstree', function (event, data) {
-                var checked = {{ UTIL.toJson(m.getPermissionIds())|raw }};
+                var checked = {{ m.getPermissionIds() | json_encode  |raw }};
                 for (var id in checked) {
                     data.instance.check_node('#' + id);
                 }

@@ -27,8 +27,8 @@
 
 <script>
     require(['jquery', 'select2'], function($) {
-        var termsData = ({{ UTIL.toJson(m.get('selected_terms_data')) | raw }});
-        var categoriesData = ({{ UTIL.toJson(m.get('selected_categories_data')) | raw }});
+        var termsData = ({{ m.get('selected_terms_data') | json_encode| raw }});
+        var categoriesData = ({{ m.get('selected_categories_data') | json_encode| raw }});
         var categoriesUrl = '{{ APP.href('catalog/categories/xhr_search') }}';
 
         $('#model-category_ids').select2({

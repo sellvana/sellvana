@@ -167,9 +167,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     var $descContainer = $('#desc_lang_fields');
 
     function initLangData() {
-        $nameLangContainer.val({{ UTIL.toJson(m.getData('product_name_lang_fields')) | raw }});
-        $shortDescContainer.val({{ UTIL.toJson(m.getData('short_description_lang_fields')) | raw }});
-        $descContainer.val({{ UTIL.toJson(m.getData('description_lang_fields')) | raw }});
+        $nameLangContainer.val({{ m.getData('product_name_lang_fields') | json_encode| raw }});
+        $shortDescContainer.val({{ m.getData('short_description_lang_fields') | json_encode| raw }});
+        $descContainer.val({{ m.getData('description_lang_fields') | json_encode| raw }});
     }
 
     window.saveNameFieldLang = function (modal) {

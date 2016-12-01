@@ -66,11 +66,11 @@
   </div>
   {% if s.description %}
     <div class="fcom-htmlgrid__status-description">
-      {{ s.description|raw }}
+      {{ s.description|safehtml|raw }}
     </div>
   {% endif %}
   <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped sar-table" id = {{ config.id | raw }} >
+    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped sar-table" id = {{ config.id }} >
       {#<colgroup>
         {% foreach ($config['columns'] as $colId => $column) %}
           <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>

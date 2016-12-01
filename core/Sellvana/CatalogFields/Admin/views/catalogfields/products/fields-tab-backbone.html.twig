@@ -368,7 +368,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     };
     var currentSet = null;
-    initialData = {{ UTIL.toJson(initialData) | raw }};
+    initialData = {{ initialData | json_encode  | raw }};
     var $selFields = $('#sel_fields');
     var $selSets = $('#sel_sets');
     function refresh_selects()
@@ -426,7 +426,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     $('#btn_add_set').click(function() {
         var setId = $('#sel_sets').val();
         var newSet = new CustomField.Models.FieldSet();
-        newSet.url = '{{ APP.href('/catalogfields/products/get_fieldset?id=') | raw }}'+setId;
+        newSet.url = '{{ APP.href('/catalogfields/products/get_fieldset?id=') }}'+setId;
         newSet.fetch({
             success: function() {
                 setCollection.add(newSet);
@@ -438,7 +438,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     $('#btn_add_field').click(function() {
         var fieldId = $('#sel_fields').val();
         var newField = new CustomField.Models.Field();
-        newField.url = '{{ APP.href('/catalogfields/products/get_field?id=') | raw }}'+fieldId;
+        newField.url = '{{ APP.href('/catalogfields/products/get_field?id=') }}'+fieldId;
         newField.fetch({
             success: function() {
                 var set = setCollection.at(0);
@@ -529,7 +529,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         onfocusout: false,
         onkeyup: false,
         remote: {
-            url: '{{ APP.href('/catalogfields/fields/unique_field') | raw }}',
+            url: '{{ APP.href('/catalogfields/fields/unique_field') }}',
             type: 'post',
              data: {
                 _name: 'field_code'
@@ -565,7 +565,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             hash[$(this).attr('id')] = $(this).val();
         });
         hash.oper = 'add';
-        $.post('{{ APP.href('/catalogfields/fieldsets/field_grid_data') | raw }}', hash, function(res) {
+        $.post('{{ APP.href('/catalogfields/fieldsets/field_grid_data') }}', hash, function(res) {
             var field = new CustomField.Models.Field(res);
             var flag = false;
             setCollection.each(function(set) {
@@ -767,7 +767,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             $(document).trigger('currentState:updated');
         },
         _refresh: function() {
-            this.model.url = '{{ APP.href('/catalogfields/products/get_field?id=') | raw }}'+this.model.get('id');
+            this.model.url = '{{ APP.href('/catalogfields/products/get_field?id=') }}'+this.model.get('id');
             var self = this;
             this.model.fetch({
                 success: function() {

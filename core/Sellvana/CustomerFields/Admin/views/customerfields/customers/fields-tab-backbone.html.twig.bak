@@ -296,7 +296,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
           });
         }
     };
-    var initialData = {{ ctrl.getInitialData(model) | raw }};
+    var initialData = {{ ctrl.getInitialData(model) |json_encode| raw }};
 
     function refresh_selects()
     {
@@ -360,7 +360,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     $('#btn_add_field').click(function() {
         var fieldId = $('#sel_fields').val();
         var newField = new CustomField.Models.Field();
-        newField.url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}'+fieldId;
+        newField.url = '{{ APP.href('/customerfields/customers/get_field?id=') }}'+fieldId;
         newField.fetch({
             success: function() {
                 setCollection.add(newField);
@@ -394,7 +394,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         onfocusout: false,
         onkeyup: false,
         remote: {
-            url: '{{ APP.href('/customerfields/fields/unique_field') | raw }}',
+            url: '{{ APP.href('/customerfields/fields/unique_field') }}',
             type: 'post',
              data: {
                 _name: 'field_code'
@@ -430,7 +430,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             hash[$(this).attr('id')] = $(this).val();
         });
         hash.oper = 'add';
-        $.post('{{ APP.href('/customerfields/fields/field_grid_data') | raw }}', hash, function(res) {
+        $.post('{{ APP.href('/customerfields/fields/field_grid_data') }}', hash, function(res) {
             var field = new CustomField.Models.Field(res);
             var flag = false;
 //            setCollection.each(function(set) {
@@ -606,7 +606,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.langFields.on('remove', this._removeLangView, this);
         },
         _refresh: function() {
-            this.model.url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}'+this.model.get('id');
+            this.model.url = '{{ APP.href('/customerfields/customers/get_field?id=') }}'+this.model.get('id');
             var self = this;
             this.model.fetch({
                 success: function() {

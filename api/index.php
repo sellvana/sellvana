@@ -17,8 +17,12 @@ BConfig::i()
     ->set('web/base_src', $storeRoot)
 ;
 
-if (file_exists(__DIR__.'/index.local.php')) {
-    require_once __DIR__.'/index.local.php';
+if (file_exists($rootDir . '/index.global.php')) {
+    require_once $rootDir . '/index.global.php';
+}
+
+if (file_exists(__DIR__ . '/index.local.php')) {
+    require_once __DIR__ . '/index.local.php';
 }
 
 FCom_Core_Main::i()->run('FCom_ApiServer');

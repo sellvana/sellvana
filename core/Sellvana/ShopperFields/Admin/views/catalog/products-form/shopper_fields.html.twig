@@ -407,7 +407,7 @@
             $tr.each(function (i, item) {
                 var price = {};
                 price['id'] = ++i;
-                price['product_id'] = {{ model.id }};
+                price['product_id'] = {{ model.id |default('null') }};
                 $(item).find('input, select').each(function (index, el) {
                     var key = $(this).data('type'),
                             val = $(this).val();
@@ -464,7 +464,7 @@
                 $trItems.each(function (i, item) {
                     var price = {};
                     price['id'] = ++i;
-                    price['product_id'] = {{ model.id }};
+                    price['product_id'] = {{ model.id |default('null') }};
                     $(item).find('input, select').each(function (index, el) {
                         var key = $(this).data('type'),
                                 val = $(this).val();
@@ -683,7 +683,7 @@
             );
 
             // Register options grid
-            var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
+            var optionsConfigCompiled = {{ optionsConfigCompiled | json_encode  | raw }};
             var attachGridContainerEle = document.getElementById('{{ frontendFieldGrid.config.id }}_options_grid');
 
             // Add available shopper dropdown options to options grid
@@ -1024,16 +1024,16 @@
                     prices: prices,
                     option: option,
                     addPriceCallback: 'shopperPriceTypeCallback',
-                    priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
-                    editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
-                    customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
-                    sites: {{ sites ? UTIL.toJson(sites) | raw : 'null' }},
-                    currencies: {{ currencies ? UTIL.toJson(currencies) | raw : 'null' }},
+                    priceTypes: {{ model.priceTypeOptions() | json_encode  | raw }},
+                    editablePrices: {{ priceHelper.fieldOptions('editable_prices') | json_encode| raw }},
+                    customerGroups: {{ customerGroups ? (customerGroups | json_encode | raw) : 'null' }},
+                    sites: {{ sites ? (sites | json_encode | raw) : 'null' }},
+                    currencies: {{ currencies ? (currencies | json_encode | raw) : 'null' }},
                     productId: '{{ model.id() }}',
                     optionId: _toggleSpace(this.props.row.name),
                     validatePrices: validatePrices,
-                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
-                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
+                    priceRelationOptions: {{ priceHelper.fieldOptions('price_relation_options') | json_encode| raw }},
+                    operationOptions: {{ priceHelper.fieldOptions('operation_options') | json_encode| raw }},
                     showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
                     showSites: {{ loadSites ? 'true' : 'false' }},
                     showCurrency: {{ loadCurrency ? 'true' : 'false' }}
@@ -1101,16 +1101,16 @@
                     prices: prices,
                     option: option,
                     addPriceCallback: 'shopperPriceTypeCallback',
-                    priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
-                    editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
-                    customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
-                    sites: {{ sites ? UTIL.toJson(sites) | raw : 'null' }},
-                    currencies: {{ currencies ? UTIL.toJson(currencies) | raw : 'null' }},
+                    priceTypes: {{ model.priceTypeOptions() | json_encode  | raw }},
+                    editablePrices: {{ priceHelper.fieldOptions('editable_prices') | json_encode| raw }},
+                    customerGroups: {{ customerGroups ? (customerGroups | json_encode | raw) : 'null' }},
+                    sites: {{ sites ? (sites | json_encode | raw) : 'null' }},
+                    currencies: {{ currencies ? (currencies | json_encode | raw) : 'null' }},
                     productId: '{{ model.id() }}',
                     optionId: _toggleSpace(this.props.row.name),
                     validatePrices: validatePrices,
-                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
-                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
+                    priceRelationOptions: {{ priceHelper.fieldOptions('price_relation_options') | json_encode| raw }},
+                    operationOptions: {{ priceHelper.fieldOptions('operation_options') | json_encode| raw }},
                     showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
                     showSites: {{ loadSites ? 'true' : 'false' }},
                     showCurrency: {{ loadCurrency ? 'true' : 'false' }}
@@ -1163,7 +1163,7 @@
                             id: option,
                             inputType: 'text',
                             data: this.parseLangsToOption('text', langs),
-                            locales: {{ UTIL.toJson(LOCALE.parseAllowedLocalesToOptions()) | raw }},
+                            locales: {{ LOCALE.parseAllowedLocalesToOptions() | json_encode  | raw }},
                             containerStyles: {
                                 width: '50%'
                             }

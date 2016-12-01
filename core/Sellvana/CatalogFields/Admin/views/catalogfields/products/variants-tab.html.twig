@@ -328,7 +328,7 @@
                             return;
                         }
 
-                        $.get('{{ APP.href('catalogfields/fields/options?id=') | raw }}' + val,
+                        $.get('{{ APP.href('catalogfields/fields/options?id=') }}' + val,
                                 function (response) {
                                     if (response.success) {
                                         var field = {
@@ -834,16 +834,16 @@
                     title: Locale._('Variant Prices'),
                     prices: this.props.prices,
                     deleted: deletedPrices,
-                    priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
-                    editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
-                    customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
-                    sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
-                    currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
+                    priceTypes: {{ model.priceTypeOptions() | json_encode  | raw }},
+                    editablePrices: {{ priceHelper.fieldOptions('editable_prices') | json_encode| raw }},
+                    customerGroups: {{ customerGroups ? (customerGroups|json_encode | raw) : 'null' }},
+                    sites: {{ sites ? (sites | json_encode | raw) : 'null' }},
+                    currencies: {{ currencies ? (currencies | json_encode | raw) : 'null' }},
                     productId: '{{ model.id() }}',
                     variantId: this.props.id,
                     validatePrices: validateVariantPrices,
-                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
-                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
+                    priceRelationOptions: {{ priceHelper.fieldOptions('price_relation_options') | json_encode| raw }},
+                    operationOptions: {{ priceHelper.fieldOptions('operation_options') | json_encode| raw }},
                     saleDateSeparator: ' / ',
                     showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
                     showSites: {{ loadSites ? 'true' : 'false' }},

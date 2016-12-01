@@ -9,10 +9,10 @@
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
     <!-- Grid Header Start -->
     {% if config.filters %}
-    <div class="f-grid-top f-grid-toolbar {{ config.id | raw }} clearfix">
+    <div class="f-grid-top f-grid-toolbar {{ config.id }} clearfix">
         <div class="f-col-filters-selection pull-left">
         <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}"
-        id="{{ config.id | raw }}-quick-search">
+        id="{{ config.id }}-quick-search">
         <span class="{{ config.id }} dropdown">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns" href="javascript:void(0)">
                 {{ 'Filters'|_ }}
@@ -29,7 +29,7 @@
     </div>
     {% endif %}
 
-    <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
+    <div class="row f-grid-bottom f-grid-toolbar {{ config.id }} clearfix">
         <div class="col-sm-6">
             <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
                 <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns" href="javascript:void(0)">
@@ -66,7 +66,7 @@
     </div>
     {% if s.description %}
         <div class="fcom-htmlgrid__status-description">
-            {{ s.description|raw }}
+            {{ s.description|safehtml|raw }}
         </div>
     {% endif %}
     <!-- Grid Header End -->
@@ -74,7 +74,7 @@
     <!-- Grid Body Start -->
     <div class="scrollable-area">
         <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
-                id = {{ config.id | raw }}>
+                id = {{ config.id }}>
             <thead>
                 <tr id="tr-sort-{{ config.id }}" role="row">
                     <!-- header template -->
@@ -130,6 +130,6 @@ require(['jquery', 'fcom.backbonegrid', 'backbone', 'underscore'], function($, B
 
     }
 
-    var grid = new FCom.BackboneGrid({{ UTIL.toJson(config) | raw }});
+    var grid = new FCom.BackboneGrid({{ config | json_encode  | raw }});
 });
 </script>

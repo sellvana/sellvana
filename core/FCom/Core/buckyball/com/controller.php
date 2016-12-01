@@ -1104,7 +1104,7 @@ class BRequest extends BClass
             $modules = apache_get_modules();
             $modRewrite = in_array('mod_rewrite', $modules);
         } else {
-            $modRewrite =  strtolower(getenv('HTTP_MOD_REWRITE')) == 'on' ? true : false;
+            $modRewrite =  strtolower(getenv('SELLVANA_MOD_REWRITE')) == 'on' ? true : false;
         }
         return $modRewrite;
     }

@@ -31,7 +31,7 @@
         var $zoneFields = $('#zone-field-inputs').find('.zone-field');
         var $country = $('#{{ elView.getInputId({field: 'country'}) }}');
 
-        var regions = {{ UTIL.toJson(regions)|raw }};
+        var regions = {{ regions | json_encode  |raw }};
 
         $country.on('change', function (e) {
             if($zoneTypes.val() !== 'region') {

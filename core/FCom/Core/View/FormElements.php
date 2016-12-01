@@ -108,7 +108,11 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
             $path = $prefix . $p['field'];
 
             if ($model instanceof BModel || $model instanceof BClass) {
-                return $p['model']->get($path);
+                if (!empty($p['get_prefix']) && !($model instanceof BConfig)) {
+                    return $p['model']->getData($path);
+                } else {
+                    return $p['model']->get($path);
+                }
             } elseif (is_array($model)) {
                 $node = $model;
                 foreach (explode('/', $path) as $key) {
@@ -161,13 +165,13 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         return $inputId;
     }
 
-    public function getSelect2ArgsText($p)
+    public function getSelect2Args($p)
     {
         if (empty($p['select2'])) {
-            return '{}';
+            return new StdClass;
         }
         $args = $p['select2'];
 
-        return $this->BUtil->toJson($args);
+        return $args;
     }
 }

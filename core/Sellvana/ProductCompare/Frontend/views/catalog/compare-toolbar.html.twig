@@ -1,5 +1,4 @@
 {% set compare = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet().getCompareProductsDetails(1) %}
-{% set compareJson = UTIL.toJson(compare) %}
 
 <div class="f-widget f-widget-prods-compare">
     <form method="post" action="{{ APP.href('catalog/compare') }}">
@@ -28,7 +27,7 @@
 <div class="overlay" id="compare-overlay"><div class="contentWrap"></div></div>
 <script>
 require(['jquery', 'fcom.productcompare'], function($) {
-    var compare = {{ compareJson | default('[]') | raw }};
+    var compare = {{ compare | default([]) | json_encode | raw }};
     $(function() { // let all checkboxes to load first
         // Class name `block-compare` do not available
         $(document).data('compare', new FCom.CompareBlock({

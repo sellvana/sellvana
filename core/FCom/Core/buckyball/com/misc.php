@@ -933,11 +933,12 @@ class BUtil extends BClass
         return $out;
     }
 
-    /**
-    * Create IV for mcrypt operations
-    *
-    * @return string
-    */
+     /**
+     * Create IV for mcrypt operations
+     *
+     * @deprecated not used
+     * @return string
+     */
     public function mcryptIV()
     {
         if (!static::$_mcryptIV) {
@@ -946,11 +947,12 @@ class BUtil extends BClass
         return static::$_mcryptIV;
     }
 
-    /**
-    * Fetch default encryption key from config
-    *
-    * @return string
-    */
+     /**
+     * Fetch default encryption key from config
+     *
+     * @deprecated not used
+     * @return string
+     */
     public function mcryptKey($key = null, $configPath = null)
     {
         if (null !== $key) {
@@ -962,16 +964,17 @@ class BUtil extends BClass
 
     }
 
-    /**
-    * Encrypt using AES256
-    *
-    * Requires PHP extension mcrypt
-    *
-    * @param string $value
-    * @param string $key
-    * @param boolean $base64
-    * @return string
-    */
+     /**
+     * Encrypt using AES256
+     *
+     * Requires PHP extension mcrypt
+     *
+     * @deprecated not used
+     * @param string $value
+     * @param string $key
+     * @param boolean $base64
+     * @return string
+     */
     public function encrypt($value, $key = null, $base64 = true)
     {
         if (null === $key) $key = static::mcryptKey();
@@ -980,15 +983,16 @@ class BUtil extends BClass
     }
 
     /**
-    * Decrypt using AES256
-    *
-    * Requires PHP extension mcrypt
-    *
-    * @param string $value
-    * @param string $key
-    * @param boolean $base64
-    * @return string
-    */
+     * Decrypt using AES256
+     *
+     * Requires PHP extension mcrypt
+     *
+     * @deprecated not used
+     * @param string $value
+     * @param string $key
+     * @param boolean $base64
+     * @return string
+     */
     public function decrypt($value, $key = null, $base64 = true)
     {
         if (null === $key) $key = static::mcryptKey();
@@ -996,6 +1000,86 @@ class BUtil extends BClass
         return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $enc, MCRYPT_MODE_ECB, static::mcryptIV()));
     }
 
+    /**
+     * @param $count
+     * @return string
+     */
+    public function randomBytes($count)
+    {
+        if (function_exists('random_bytes')) {
+            return random_bytes($count);
+        }
+
+        if (function_exists('mcrypt_create_iv')) {
+            return bin2hex(mcrypt_create_iv($count, MCRYPT_DEV_URANDOM));
+        }
+
+        if (function_exists('openssl_random_pseudo_bytes') && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
+            return openssl_random_pseudo_bytes($count);
+        }
+
+        if (is_readable('/dev/urandom') && ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
+            $bytes = fread($hRand, $count);
+            fclose($hRand);
+            return $bytes;
+        }
+
+        static $randomState;
+        $bytes = '';
+        if ($randomState === null) {
+            $randomState = microtime();
+            if (function_exists('getmypid')) {
+                $randomState .= getmypid();
+            }
+        }
+        for ($i = 0; $i < $count; $i += 16) {
+            $randomState = sha1(microtime() . $randomState);
+            $bytes .= sha1($randomState, true);
+        }
+        return substr($bytes, 0, $count);
+    }
+
+    public function charsetBaseConvert($fromString, $fromCharset, $toCharset)
+    {
+        if (true === $fromCharset) { // from binary
+            $fromBase = 256;
+            $chars = '';
+        } else {
+            $fromBase = strlen($fromCharset);
+            $chars = $fromCharset;
+        }
+        if (true === $toCharset) { // to binary
+            $toBase = 256;
+            $toString = '';
+        } else {
+            $toBase = strlen($toCharset);
+            $toString = $toCharset;
+        }
+
+        $length = strlen($fromString);
+        $result = '';
+        $number = [];
+        for ($i = 0; $i < $length; $i++) {
+            $number[$i] = true === $fromCharset ? ord($fromString{$i}) : strpos($chars, $fromString{$i});
+        }
+        do {
+            $divide = 0;
+            $newLen = 0;
+            for ($i = 0; $i < $length; $i++) {
+                $divide = $divide * $fromBase + $number[$i];
+                if ($divide >= $toBase) {
+                    $number[$newLen++] = (int)($divide / $toBase);
+                    $divide = $divide % $toBase;
+                } elseif ($newLen > 0) {
+                    $number[$newLen++] = 0;
+                }
+            }
+            $length = $newLen;
+            $newChar = true === $toCharset ? chr($divide) : $toString{$divide};
+            $result = $newChar . $result;
+        } while ($newLen != 0);
+        return $result;
+    }
     /**
      * Generate random string
      *
@@ -1005,13 +1089,7 @@ class BUtil extends BClass
      */
     public function randomString($strLen = 8, $chars = self::CHARPOOL_DEFAULT)
     {
-        $charsLen = strlen($chars)-1;
-        $str = '';
-        mt_srand();
-        for ($i = 0; $i < $strLen; $i++) {
-            $str .= $chars[mt_rand(0, $charsLen)];
-        }
-        return $str;
+        return substr($this->charsetBaseConvert($this->randomBytes($strLen), true, $chars), 0, $strLen);
     }
 
     /**
@@ -1118,7 +1196,8 @@ class BUtil extends BClass
     {
         $algo = null !== $algo ? $algo : static::$_hashAlgo;
         if ('bcrypt' === $algo) {
-            return $this->Bcrypt->hash($string);
+            return password_hash($string, PASSWORD_DEFAULT);
+            #return $this->Bcrypt->hash($string);
         }
         $iter = null !== $iter ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
@@ -1142,7 +1221,8 @@ class BUtil extends BClass
     public function validateSaltedHash($string, $storedHash)
     {
         if (strpos($storedHash, '$2a$') === 0 || strpos($storedHash, '$2y$') === 0) {
-            return $this->Bcrypt->verify($string, $storedHash);
+            return password_verify($string, $storedHash);
+            #return $this->Bcrypt->verify($string, $storedHash);
         }
         if (!$storedHash) {
             return false;
@@ -1168,6 +1248,9 @@ class BUtil extends BClass
      */
     public function isPreferredPasswordHash($password)
     {
+        if (function_exists('password_needs_rehash')) {
+            return password_needs_rehash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+        }
         return strpos($password, '$2y$12$') === 0;
     }
 
@@ -1287,13 +1370,17 @@ class BUtil extends BClass
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_CAINFO => $this->normalizePath(dirname(__DIR__) . '/ssl/cacert.pem'),
                 CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_HEADER => true,
             ];
+            if (!($curlCaInfo = ini_get('curl.cainfo')) || !file_exists($curlCaInfo)) {
+                $curlOpt += [
+                    CURLOPT_CAINFO => $this->normalizePath(dirname(__DIR__) . '/ssl/cacert.pem'),
+                ];
+            }
             if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
                 $curlOpt += [
                     CURLOPT_FOLLOWLOCATION => true,
@@ -3539,9 +3626,10 @@ class BDebug extends BClass
         if ($textBefore) {
             echo htmlspecialchars($textBefore) . "\n";
         }
+        $randomDir = BConfig::i()->get('core/storage_random_dir');
         debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $output = ob_get_clean();
-        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
+        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', $randomDir], ['/', '', '[RANDOM]'], $output);
         return $output;
     }
 
@@ -3680,13 +3768,16 @@ class BDebug extends BClass
         //print_r(static::$_events);
 ?><table cellspacing="0" id="buckyball-debug-table"><thead><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th>
     <th>Relevant Location</th><th>Module</th></tr></thead><tbody><?php
+        $randomDir = BConfig::i()->get('core/storage_random_dir');
         foreach (static::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6) . ($e['c'] > 1 ? ' (' . $e['c'] . ')' : '') : '';
-            echo "<tr><td>" . nl2br(htmlspecialchars($e['msg'])) . "</td><td>" . number_format($e['t'], 6)
+            $output = "<tr><td>" . nl2br(htmlspecialchars($e['msg'])) . "</td><td>" . number_format($e['t'], 6)
                 . "</td><td>" . $profile . "</td><td>" . number_format($e['mem'], 0)
                 . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>"
                 . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
+            $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', "{$randomDir}"], ['/', '', '[RANDOM]'], $output);
+            echo $output;
         }
 ?></tbody></table></div><script>
 
@@ -4009,8 +4100,7 @@ class BFile extends BClass
         $this->_fileInfo['file_path'] = $this->_currentTmpDir;
         $fullPath = $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
 
-        if (@file_put_contents($fullPath, $file)
-        ) {
+        if (@file_put_contents($fullPath, $file)) {
             $this->_fileInfo['file_size'] = filesize($fullPath);
         }
     }
@@ -4560,9 +4650,10 @@ class BValidate extends BClass
 
     /**
      * @param array $data
+     * @param BModel $model
      * @throws BException
      */
-    protected function _validateRules(array &$data)
+    protected function _validateRules(array &$data, $model)
     {
         $this->_validateErrors = [];
         foreach ($this->_expandedRules as $r) {
@@ -4575,17 +4666,17 @@ class BValidate extends BClass
 
             } elseif ($r['rule'] instanceof Closure) {
 
-                $result = $r['rule']($data, $r['args']);
+                $result = $r['rule']($data, $r['args'], $model);
 
             } elseif (is_callable($r['rule'])) {
 
-                $result = $this->BUtil->call($r['rule'], [$data, $r['args']], true);
+                $result = $this->BUtil->call($r['rule'], [$data, $r['args'], $model], true);
 
             } elseif (is_string($r['rule'])) {
 
                 $callback = $this->BUtil->extCallback($r['rule']);
                 if ($callback !== $r['rule']) {
-                    $result = $this->BUtil->call($r['rule'], [$data, $r['args']], true);
+                    $result = $this->BUtil->call($r['rule'], [$data, $r['args'], $model], true);
                 } else {
                     throw new BException('Invalid rule: ' . print_r($r['rule'], 1));
                 }
@@ -4663,11 +4754,11 @@ class BValidate extends BClass
      * @param null  $formName
      * @return bool
      */
-    public function validateInput(array &$data, $rules, $formName = null)
+    public function validateInput(array &$data, $rules, $formName = null, $model = null)
     {
         $this->_expandRules($rules);
 
-        $this->_validateRules($data);
+        $this->_validateRules($data, $model);
 
         if ($this->_validateErrors && $formName) {
             foreach ($this->_validateErrors as $field => $errors) {
@@ -4800,6 +4891,38 @@ class BValidate extends BClass
     {
         $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
         return strlen($email) < 255 && preg_match($re, $email);
+    }
+
+    /**
+     * rule email unique
+     * @param array $data
+     * @param array $args
+     * @param BModel $model
+     * @return bool
+     */
+    public function ruleFieldUnique($data, $args, BModel $model)
+    {
+        $field = $args['field'];
+        if (empty($data[$field])) {
+            return true;
+        }
+
+        $isNew = $model->isNewRecord();
+        $valueChanged = $model->old_values($field);
+
+        if (!$isNew && !$valueChanged) {
+            return true;
+        }
+
+        /** @var BORM $orm */
+        $orm = $model->orm('m')->where('m.' . $field, $data[$field]);
+        if ($model->id()) {
+            $orm->where_not_equal('m.id', $model->id());
+        }
+        if ($orm->find_one()) {
+            return false;
+        }
+        return true;
     }
 }
 
@@ -4998,54 +5121,8 @@ class Bcrypt extends BClass
         // The security weakness between 5.3.7 affects password with 8-bit characters only
         // @see: http://php.net/security/crypt_blowfish.php
         $salt = '$' . (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a') . '$12$';
-        $salt .= $this->encodeBytes($this->getRandomBytes(16));
+        $salt .= $this->encodeBytes($this->BUtil->randomBytes(16));
         return $salt;
-    }
-
-    /**
-     * @var
-     */
-    private $randomState;
-
-    /**
-     * @param $count
-     * @return string
-     */
-    private function getRandomBytes($count)
-    {
-        $bytes = '';
-
-        if (function_exists('openssl_random_pseudo_bytes') &&
-            (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
-            $bytes = openssl_random_pseudo_bytes($count);
-        }
-
-        if ($bytes === '' && is_readable('/dev/urandom') &&
-            ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
-            $bytes = fread($hRand, $count);
-            fclose($hRand);
-        }
-
-        if (strlen($bytes) < $count) {
-            $bytes = '';
-
-            if ($this->randomState === null) {
-                $this->randomState = microtime();
-                if (function_exists('getmypid')) {
-                    $this->randomState .= getmypid();
-                }
-            }
-
-            for ($i = 0; $i < $count; $i += 16) {
-                $this->randomState = md5(microtime() . $this->randomState);
-
-                $bytes .= md5($this->randomState, true);
-            }
-
-            $bytes = substr($bytes, 0, $count);
-        }
-
-        return $bytes;
     }
 
     /**
@@ -5294,7 +5371,7 @@ if (!function_exists('password_hash')) {
      *
      * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
      */
-    function password_hash($password)
+    function password_hash($password, $algo = null)
     {
         return $this->Bcrypt->hash($password);
     }

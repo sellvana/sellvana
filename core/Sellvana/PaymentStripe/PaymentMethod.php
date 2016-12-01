@@ -7,6 +7,8 @@
  */
 class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
+    static protected $_isInitialized = false;
+
     protected $_code = 'stripe';
 
     protected $_name = 'Stripe';
@@ -37,8 +39,11 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
 
     protected function _initialize()
     {
-        require_once __DIR__ . '/lib/Stripe.php';
-        Stripe::setApiKey($this->getSecretKey());
+        if (!static::$_isInitialized) {
+            require_once __DIR__ . '/lib/init.php';
+            \Stripe\Stripe::setApiKey($this->getSecretKey());
+            static::$_isInitialized = true;
+        }
     }
 
     public function can($capability)
@@ -92,7 +97,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         try {
             $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
             $transaction = $payment->createTransaction($transType)->start();
-            $charge = Stripe_Charge::create([
+            $charge = \Stripe\Charge::create([
                 'amount' => round($payment->get('amount_due') * 100),
                 'currency' => $order->get('order_currency') ?: 'USD',
                 'card' => $token,
@@ -110,10 +115,10 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
             ]);
 
             $result['success'] = true;
-        } catch (Stripe_CardError $e) {
+        } catch (\Stripe\Error\Card $e) {
             $result['error']['message'] = $e->getMessage();
             $this->_setErrorStatus($result, true);
-        } catch (Stripe_InvalidRequestError $e) {
+        } catch (\Stripe\Error\InvalidRequest $e) {
             $result['error']['message'] = $e->getMessage();
             $this->_setErrorStatus($result, true);
         } catch (Exception $e) {
@@ -150,7 +155,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
         $payment = $transaction->payment();
         try {
             $parentTransaction = $payment->findTransaction(Sellvana_Sales_Model_Order_Payment_Transaction::SALE, 'completed');
-            $charge = Stripe_Charge::retrieve($parentTransaction->get('transaction_id'));
+            $charge = \Stripe\Charge::retrieve($parentTransaction->get('transaction_id'));
             $refund = $charge->refund([
                 'amount' => round($transaction->get('amount') * 100),
                 'currency' => $transaction->payment()->order()->get('order_currency'),
@@ -160,10 +165,10 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
                 ->setData('result', $refund->__toArray(true));
 
             $result['success'] = true;
-        } catch (Stripe_CardError $e) {
+        } catch (\Stripe\Error\Card $e) {
             $result['error']['message'] = $e->getMessage();
             $this->_setErrorStatus($result);
-        } catch (Stripe_InvalidRequestError $e) {
+        } catch (\Stripe\Error\InvalidRequest $e) {
             $result['error']['message'] = $e->getMessage();
             $this->_setErrorStatus($result);
         } catch (Exception $e) {

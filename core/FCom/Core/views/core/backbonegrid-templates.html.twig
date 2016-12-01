@@ -62,10 +62,10 @@
 {% set multiselectCurrent = THIS.multiselectCurrent() %}
 
 {# grid header template #}
-<script type='template' id="{{ config.id | raw }}-header-template">
+<script type='template' id="{{ config.id }}-header-template">
     <%
     if (rc.type === 'row_select') { %>
-        <div class="{{ config.id | raw }} dropdown f-grid-display-type">
+        <div class="{{ config.id }} dropdown f-grid-display-type">
             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                 <span class="icon-placeholder">
                     <% if (rc.selectedCount>0) { %>

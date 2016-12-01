@@ -161,7 +161,7 @@
     };*/
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp',
         'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
-        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];
         $('#quick-add-images').fileupload({
             url: uploadUrl,

@@ -16,7 +16,7 @@
 
 <script>
 require(['jquery', 'ckeditor', 'fcom.admin'], function($) {
-    var renderers = {{ UTIL.toJson(LAYOUT.getAllRenderers()) | raw }};
+    var renderers = {{ LAYOUT.getAllRenderers() | json_encode  | raw }};
     function updateEditor() {
         switch (renderers[$('#model-renderer').val()].editor) {
             case 'text':

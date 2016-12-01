@@ -194,7 +194,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->select('c.id_path')
             ->find_many();
         if (!$categories) {
-            return $this->BUtil->toJson([]);
+            return [];
         }
         $result = [];
         foreach ($categories as $c) {
@@ -204,7 +204,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $result[] = 'category_id-' . $id;
             }
         }
-        return $this->BUtil->toJson($result);
+        return $result;
     }
 
     /**
@@ -216,14 +216,14 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $cp = $this->Sellvana_Catalog_Model_CategoryProduct;
         $categories = $cp->orm()->where('product_id', $model->id())->find_many();
         if (!$categories) {
-            return $this->BUtil->toJson([]);
+            return [];
         }
         $result = [];
         foreach ($categories as $c) {
             /** @var Sellvana_Catalog_Model_CategoryProduct $c */
             $result[] = 'category_id-' . $c->get('category_id');
         }
-        return $this->BUtil->toJson($result);
+        return $result;
     }
 
     /**

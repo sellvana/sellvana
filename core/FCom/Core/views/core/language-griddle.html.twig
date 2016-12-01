@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
     require(['underscore', 'react', 'griddle.fcomLanguage'], function(_, React, FComMultiLanguage) {
-        var config = {{ UTIL.toJSON(config) | raw }};
+        var config = {{ config | json_encode  | raw }};
 
         var containerEle = document.getElementById('multilang-field-{{ config.id }}');
         React.unmountComponentAtNode(containerEle);

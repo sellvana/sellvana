@@ -169,7 +169,7 @@
                     djsComponentConfig: {
 //                        showButtons: true,
                         showHiddenInput: true,
-                        postUrl: "{{ APP.href('/media/grid/upload?type=') | raw }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images')
+                        postUrl: "{{ APP.href('/media/grid/upload?type=') }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images')
                     },
                     djsConfig: {
                         addRemoveLinks: true,
@@ -219,7 +219,7 @@
                         onfocusout: false,
                         onkeyup: false,
                         remote: {
-                            url: '{{ APP.href('/catalog/products/quick-add/unique_sku') | raw }}',
+                            url: '{{ APP.href('/catalog/products/quick-add/unique_sku') }}',
                             type: 'post',
                             data: {
                                 _key: $(this).data('id'),
@@ -545,10 +545,10 @@
                                 name: 'categories['+p.id+']',
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
-                                url: '{{ APP.href('catalog/categories/xhr_search') | raw }}',
+                                url: '{{ APP.href('catalog/categories/xhr_search') }}',
                                 onChange: this.props._handleSelect2Change,
                                 value: p.categories,
-                                options: {{ UTIL.toJson(categories) | raw }},
+                                options: {{ categories | json_encode  | raw }},
                                 dataMode: 'server',
                                 initData: p.initData || [],
                                 attrs: {

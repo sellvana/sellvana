@@ -182,4 +182,54 @@ SET FOREIGN_KEY_CHECKS=1;
             ]
         ]);
     }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tPost = $this->Sellvana_Blog_Model_Post->table();
+        $tTag = $this->Sellvana_Blog_Model_Tag->table();
+        $tPostTag = $this->Sellvana_Blog_Model_PostTag->table();
+        $tCategory = $this->Sellvana_Blog_Model_Category->table();
+        $tPostCategory = $this->Sellvana_Blog_Model_PostCategory->table();
+
+        $this->BDb->ddlTableDef($tPost, [
+            BDb::COLUMNS => [
+                'views' => 'RENAME views_cnt int unsigned not null default 0',
+            ],
+            BDb::KEYS => [
+                'IDX_views_cnt' => '(views_cnt)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tTag, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tPostTag, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tCategory, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tPostCategory, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+        ]);
+    }
 }

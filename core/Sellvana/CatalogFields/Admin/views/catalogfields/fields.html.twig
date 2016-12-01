@@ -155,7 +155,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_form');
         if (!isNew) {
             if (isSelect) {
-                var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
+                var optionsConfigCompiled = {{ optionsConfigCompiled | json_encode  | raw }};
                 if (row.multilanguage == '0') {
                     optionsConfigCompiled.columns = _(optionsConfigCompiled.columns).filter(function (col, i) {
                         if (col.name == 0) return true;
@@ -192,7 +192,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                         React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}), attachGridContainerEle
                 );
             } else {
-                var langsConfigCompiled = {{ UTIL.toJson(langsConfigCompiled) | raw }};
+                var langsConfigCompiled = {{ langsConfigCompiled | json_encode  | raw }};
                 LangsComponent = React.render(
                         React.createElement(FComGriddleComponent, { config: langsConfigCompiled }), attachGridContainerEle
                 );
@@ -266,7 +266,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //          fieldsGrid.getGridSkeleton().currentRow = this.model;
 //          fieldsGrid.getModalForm().render();
 
-//             optionsGrid.getRows().url = '{{ APP.href('catalogfields/fieldsets/field_option_grid_data?field_id=') | raw }}' + selectedRow.get('id');
+//             optionsGrid.getRows().url = '{{ APP.href('catalogfields/fieldsets/field_option_grid_data?field_id=') }}' + selectedRow.get('id');
 //             optionsGrid.getRows().fetch({
 //                 reset: true,
 //                 success: function () {

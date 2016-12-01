@@ -19,7 +19,7 @@
             <div class="entry-preview">
                 {{ post.get('preview') | raw }}
             </div>
-            <p><a href="{{ url }}">Read the full post &raquo;</a> <a href="{{ url }}#disqus_thread"></a></p>
+            <p><a href="{{ url }}">{{ 'Read the full post'|_ }}&raquo;</a> <a href="{{ url }}#disqus_thread"></a></p>
         </div>
     {% endfor %}
 {% else %}
