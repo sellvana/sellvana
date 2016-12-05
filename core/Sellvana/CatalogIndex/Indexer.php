@@ -19,6 +19,8 @@
 class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
     implements Sellvana_CatalogIndex_Indexer_Interface
 {
+    const MAX_TERM_SIZE = 50;
+
     protected function _indexSaveData()
     {
         $this->_indexSaveDocs();
@@ -114,11 +116,12 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
         if ($allTerms) {
             $termIds = $termHlp->orm()->where(['term' => array_keys($allTerms)])->find_many_assoc('term', 'id');
             foreach ($allTerms as $v => $termData) {
-                if (empty($termIds[$v])) {
-                    $term = $termHlp->create(['term' => $v])->save();
-                    $termId = $term->id;
+                $v1 = substr($v, static::MAX_TERM_SIZE);
+                if (empty($termIds[$v1])) {
+                    $term = $termHlp->create(['term' => $v1])->save();
+                    $termId = $term->id();
                 } else {
-                    $termId = $termIds[$v];
+                    $termId = $termIds[$v1];
                 }
                 foreach ($termData as $pId => $productData) {
                     foreach ($productData as $fId => $idx) {
