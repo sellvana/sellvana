@@ -90,7 +90,7 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
 
     public function setBackordered()
     {
-        return $this->changestate(self::BACKORDERED);
+        return $this->changeState(self::BACKORDERED);
     }
 
     public function setComplete()

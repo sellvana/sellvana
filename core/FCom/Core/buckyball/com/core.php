@@ -2305,8 +2305,8 @@ class BSession extends BClass
             $refresh = true;
         }
         if (!$refresh && !empty($this->_config['session_check_ip'])) {
-            if (!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip
-                || !empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent
+            if ((!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip)
+                || (!empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent)
             ) {
                 $refresh = true;
             }
