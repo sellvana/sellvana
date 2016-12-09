@@ -997,6 +997,11 @@ class BClassRegistry extends BClass
      */
     static protected $_properties = [];
 
+    static protected $_traceMode = false;
+
+    static protected $_traceInstances = [];
+
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -1451,6 +1456,9 @@ class BClassRegistry extends BClass
     {
         // if singleton is requested and already exists, return the singleton
         if ($singleton && !empty(static::$_singletons[$class])) {
+//            if (static::isTraceMode()) {
+//                return static::getTraceInstance(static::$_singletons[$class]);
+//            }
             return static::$_singletons[$class];
         }
 
@@ -1475,6 +1483,10 @@ class BClassRegistry extends BClass
         if ($singleton) {
             static::$_singletons[$class] = $instance;
         }
+
+//        if (static::isTraceMode()) {
+//            return static::getTraceInstance($instance);
+//        }
 
         return $instance;
     }
@@ -1518,6 +1530,194 @@ class BClassRegistry extends BClass
     public function unsetInstance()
     {
         static::$_instance = null;
+    }
+
+    static public function setTraceMode($mode = true)
+    {
+        static::$_traceMode = $mode;
+    }
+
+    static public function isTraceMode()
+    {
+        return static::$_traceMode;
+    }
+
+    static public function getTraceInstance($instance)
+    {
+        if ($instance instanceof BDebug) {
+            return $instance;
+        }
+        $hash = spl_object_hash($instance);
+        if (empty(static::$_traceInstances[$hash])) {
+            static::$_traceInstances[$hash] = new BClassTraceProxy($instance);
+        }
+        return static::$_traceInstances[$hash];
+    }
+}
+
+class BClassTraceProxy
+{
+    /**
+     * @var BDebug
+     */
+    static protected $_BDebug;
+
+    /**
+     * @var BClass
+     */
+    protected $_decoratedComponent;
+
+    protected $_className;
+
+    /**
+     * @var string
+     */
+    protected $_logName;
+
+    protected function _logCallEnter($method, $args)
+    {
+        $info = '[' . microtime(1) . '] ENTER ' . $this->_className . '::' . $method;
+        static::$_BDebug->log($info, $this->_logName);
+    }
+
+    protected function _logCallExit($method)
+    {
+        $info = '[' . microtime(1) . '] EXIT ' . $this->_className . '::' . $method;
+        static::$_BDebug->log($info, $this->_logName);
+    }
+
+    protected function _logSetProp($prop, $value)
+    {
+        $info = '[' . microtime(1) . '] SET ' . $this->_className . '->' . $prop;
+        static::$_BDebug->log($info, $this->_logName);
+    }
+
+    public function __construct($instance)
+    {
+        if (!static::$_BDebug) {
+            static::$_BDebug = BDebug::i();
+        }
+        $this->_decoratedComponent = $instance;
+        $this->_className = get_class($instance);
+        $this->_logName = 'trace/' . $_SERVER['REMOTE_ADDR'] . '.' . date('Y-m-d.H:i:s') . '.log';
+    }
+
+    public function __destruct()
+    {
+        unset($this->_decoratedComponent);
+    }
+
+    /**
+     * Method override facility
+     *
+     * @param string $name
+     * @param array $args
+     * @return mixed Result of callback
+     */
+    public function __call($name, array $args)
+    {
+        $this->_logCallEnter($name, $args);
+        $result = $this->_decoratedComponent->$name($args);
+        $this->_logCallExit($name);
+        return $result;
+    }
+
+    /**
+     * Proxy to set decorated component property or a setter
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set($name, $value)
+    {
+        $this->_logSetProp($name, $value);
+        $this->_decoratedComponent->$name = $value;
+    }
+
+    /**
+     * Proxy to get decorated component property or a getter
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->_decoratedComponent->$name;
+    }
+
+    /**
+     * Proxy to unset decorated component property
+     *
+     * @param string $name
+     */
+    public function __unset($name)
+    {
+        unset($this->_decoratedComponent->$name);
+    }
+
+    /**
+     * Proxy to check whether decorated component property is set
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        return isset($this->_decoratedComponent->$name);
+    }
+
+    /**
+     * Proxy to return decorated component as string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->_decoratedComponent;
+    }
+
+    /**
+     * Proxy method to serialize decorated component
+     *
+     */
+    public function __sleep()
+    {
+        if (method_exists($this->_decoratedComponent, '__sleep')) {
+            return $this->_decoratedComponent->__sleep();
+        }
+        return [];
+    }
+
+    /**
+     * Proxy method to perform for decorated component on unserializing
+     *
+     */
+    public function __wakeup()
+    {
+        if (method_exists($this->_decoratedComponent, '__wakeup')) {
+            $this->_decoratedComponent->__wakeup();
+        }
+    }
+
+    /**
+     * Proxy method to invoke decorated component as a method if it is callable
+     *
+     */
+    public function __invoke()
+    {
+        if (is_callable($this->_decoratedComponent)) {
+            return $this->_decoratedComponent(func_get_args());
+        }
+        return null;
+    }
+
+    /**
+     * Return object of decorated class
+     * @return object
+     */
+    public function getDecoratedComponent()
+    {
+        return $this->_decoratedComponent;
     }
 }
 

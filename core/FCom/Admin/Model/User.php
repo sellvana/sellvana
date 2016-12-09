@@ -108,7 +108,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $token = $this->BUtil->randomString(16);
         $this->set([
-            'password_hash' => password_hash($password),
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]),
             'password_session_token' => $token,
         ]);
         if ($this->id() === $this->sessionUserId()) {
@@ -139,7 +139,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $this->setPassword($this->get('password'));
         }
         if ($this->get('api_password')) {
-            $this->set('api_password_hash', password_hash($this->get('api_password')));
+            $this->set('api_password_hash', password_hash($this->get('api_password'), PASSWORD_DEFAULT, ['cost' => 12]));
         }
         if (!$this->get('role_id')) {
             $this->set('role_id', null);
@@ -209,7 +209,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
-            $this->set('password_hash', password_hash($password))->save();
+            $this->set('password_hash', password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]))->save();
         }
         return true;
     }

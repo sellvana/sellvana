@@ -3028,60 +3028,59 @@ class BErrorException extends Exception
 class BDebug extends BClass
 {
     const EMERGENCY = 0,
-        ALERT       = 1,
-        CRITICAL    = 2,
-        ERROR       = 3,
-        WARNING     = 4,
-        NOTICE      = 5,
-        INFO        = 6,
-        DEBUG       = 7;
+        ALERT = 1,
+        CRITICAL = 2,
+        ERROR = 3,
+        WARNING = 4,
+        NOTICE = 5,
+        INFO = 6,
+        DEBUG = 7;
 
     /**
      * @var array
      */
     static protected $_levelLabels = [
         self::EMERGENCY => 'EMERGENCY',
-        self::ALERT     => 'ALERT',
-        self::CRITICAL  => 'CRITICAL',
-        self::ERROR     => 'ERROR',
-        self::WARNING   => 'WARNING',
-        self::NOTICE    => 'NOTICE',
-        self::INFO      => 'INFO',
-        self::DEBUG     => 'DEBUG',
+        self::ALERT => 'ALERT',
+        self::CRITICAL => 'CRITICAL',
+        self::ERROR => 'ERROR',
+        self::WARNING => 'WARNING',
+        self::NOTICE => 'NOTICE',
+        self::INFO => 'INFO',
+        self::DEBUG => 'DEBUG',
     ];
 
-    const MEMORY  = 0,
-        FILE      = 1,
-        SYSLOG    = 2,
-        EMAIL     = 4,
-        OUTPUT    = 8,
+    const MEMORY = 0,
+        FILE = 1,
+        SYSLOG = 2,
+        EMAIL = 4,
+        OUTPUT = 8,
         EXCEPTION = 16,
-        STOP      = 4096;
+        STOP = 4096;
 
-    const MODE_DEBUG      = 'DEBUG',
-        MODE_DEVELOPMENT  = 'DEVELOPMENT',
-        MODE_STAGING      = 'STAGING',
-        MODE_PRODUCTION   = 'PRODUCTION',
-        MODE_MIGRATION    = 'MIGRATION',
+    const MODE_DEBUG = 'DEBUG',
+        MODE_DEVELOPMENT = 'DEVELOPMENT',
+        MODE_STAGING = 'STAGING',
+        MODE_PRODUCTION = 'PRODUCTION',
+        MODE_MIGRATION = 'MIGRATION',
         MODE_INSTALLATION = 'INSTALLATION',
-        MODE_RECOVERY     = 'RECOVERY',
-        MODE_DISABLED     = 'DISABLED',
-        MODE_IMPORT       = 'IMPORT'
-    ;
+        MODE_RECOVERY = 'RECOVERY',
+        MODE_DISABLED = 'DISABLED',
+        MODE_IMPORT = 'IMPORT';
 
     /**
-    * Trigger levels for different actions
-    *
-    * - memory: remember in immediate script memory
-    * - file: write to debug log file
-    * - email: send email notification to admin
-    * - output: display error in output
-    * - exception: stop script execution by throwing exception
-    *
-    * Default are production values
-    *
-    * @var array
-    */
+     * Trigger levels for different actions
+     *
+     * - memory: remember in immediate script memory
+     * - file: write to debug log file
+     * - email: send email notification to admin
+     * - output: display error in output
+     * - exception: stop script execution by throwing exception
+     *
+     * Default are production values
+     *
+     * @var array
+     */
     static protected $_level;
 
     /**
@@ -3089,85 +3088,85 @@ class BDebug extends BClass
      */
     static protected $_levelPreset = [
         self::MODE_PRODUCTION => [
-            self::MEMORY    => false,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::ERROR,
-            self::OUTPUT    => self::CRITICAL,
+            self::MEMORY => false,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::ERROR,
+            self::OUTPUT => self::CRITICAL,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_STAGING => [
-            self::MEMORY    => false,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::ERROR,
-            self::OUTPUT    => self::CRITICAL,
+            self::MEMORY => false,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::ERROR,
+            self::OUTPUT => self::CRITICAL,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_DEVELOPMENT => [
-            self::MEMORY    => self::INFO,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
+            self::MEMORY => self::INFO,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::CRITICAL,
+            self::OUTPUT => self::NOTICE,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_DEBUG => [
-            self::MEMORY    => self::DEBUG,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
+            self::MEMORY => self::DEBUG,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::CRITICAL,
+            self::OUTPUT => self::NOTICE,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_RECOVERY => [
-            self::MEMORY    => self::DEBUG,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
+            self::MEMORY => self::DEBUG,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::CRITICAL,
+            self::OUTPUT => self::NOTICE,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_MIGRATION => [
-            self::MEMORY    => self::DEBUG,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
+            self::MEMORY => self::DEBUG,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::CRITICAL,
+            self::OUTPUT => self::NOTICE,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_INSTALLATION => [
-            self::MEMORY    => self::DEBUG,
-            self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
-            self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
+            self::MEMORY => self::DEBUG,
+            self::SYSLOG => false,
+            self::FILE => self::WARNING,
+            self::EMAIL => false, //self::CRITICAL,
+            self::OUTPUT => self::NOTICE,
             self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::STOP => self::CRITICAL,
         ],
         self::MODE_DISABLED => [
-            self::MEMORY    => false,
-            self::SYSLOG    => false,
-            self::FILE      => false,
-            self::EMAIL     => false,
-            self::OUTPUT    => false,
+            self::MEMORY => false,
+            self::SYSLOG => false,
+            self::FILE => false,
+            self::EMAIL => false,
+            self::OUTPUT => false,
             self::EXCEPTION => false,
-            self::STOP      => false,
+            self::STOP => false,
         ],
         self::MODE_IMPORT => [
-            self::MEMORY    => false,//self::DEBUG,
-            self::SYSLOG    => false,
-            self::FILE      => false,//self::WARNING,
-            self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => false,//self::NOTICE,
+            self::MEMORY => false,//self::DEBUG,
+            self::SYSLOG => false,
+            self::FILE => false,//self::WARNING,
+            self::EMAIL => false, //self::CRITICAL,
+            self::OUTPUT => false,//self::NOTICE,
             self::EXCEPTION => false,//self::ERROR,
-            self::STOP      => false,//self::CRITICAL,
+            self::STOP => false,//self::CRITICAL,
         ],
     ];
 
@@ -3199,13 +3198,13 @@ class BDebug extends BClass
      */
     static protected $_logFile = [
         self::EMERGENCY => 'error.log',
-        self::ALERT     => 'error.log',
-        self::CRITICAL  => 'error.log',
-        self::ERROR     => 'error.log',
-        self::WARNING   => 'debug.log',
-        self::NOTICE    => 'debug.log',
-        self::INFO      => 'debug.log',
-        self::DEBUG     => 'debug.log',
+        self::ALERT => 'error.log',
+        self::CRITICAL => 'error.log',
+        self::ERROR => 'error.log',
+        self::WARNING => 'debug.log',
+        self::NOTICE => 'debug.log',
+        self::INFO => 'debug.log',
+        self::DEBUG => 'debug.log',
     ];
 
     /**
@@ -3246,10 +3245,10 @@ class BDebug extends BClass
     static protected $_disableAllLogging = false;
 
     /**
-    * Constructor, remember script start time for delta timestamps
-    *
-    * @return BDebug
-    */
+     * Constructor, remember script start time for delta timestamps
+     *
+     * @return BDebug
+     */
     public function __construct()
     {
         static::$_startTime = microtime(true);
@@ -3259,7 +3258,7 @@ class BDebug extends BClass
     /**
      * Shortcut to help with IDE autocompletion
      *
-     * @param bool  $new
+     * @param bool $new
      * @param array $args
      * @return BDebug
      */
@@ -3513,10 +3512,10 @@ class BDebug extends BClass
                     $index = '{white}#' . $fileIndex . '{/}';
                     if (!empty($t['file'])) {
                         $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
-                                . $t['file'] . '{/}:{white}' . $t['line'] . '{/}';
+                            . $t['file'] . '{/}:{white}' . $t['line'] . '{/}';
                     } elseif (!empty($t['class'])) {
                         $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
-                                . $t['class'] . $t['type'] . $t['function'] . '{/}';
+                            . $t['class'] . $t['type'] . $t['function'] . '{/}';
                     }
                     $fileIndex++;
                 }
@@ -3536,7 +3535,7 @@ class BDebug extends BClass
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             //$e['msg'] = substr($e['msg'], 0, 50); $e['file'] = ''; $e['line'] = '';
             static::$_events[] = $e;
-            $id = sizeof(static::$_events)-1;
+            $id = sizeof(static::$_events) - 1;
         }
 
         $l = static::$_level[static::SYSLOG];
@@ -3587,16 +3586,16 @@ class BDebug extends BClass
                 }
             }
         }
-/*
-        $l = static::$_level[static::EXCEPTION];
-        if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-            if (is_object($msg) && $msg instanceof Exception) {
-                throw $msg;
-            } else {
-                throw new Exception($msg);
-            }
-        }
-*/
+        /*
+                $l = static::$_level[static::EXCEPTION];
+                if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
+                    if (is_object($msg) && $msg instanceof Exception) {
+                        throw $msg;
+                    } else {
+                        throw new Exception($msg);
+                    }
+                }
+        */
         $l = static::$_level[static::STOP];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             if (PHP_SAPI !== 'cli') {
@@ -3750,44 +3749,103 @@ class BDebug extends BClass
             return;
         }
         ob_start();
-?><style>
-#buckyball-debug-trigger { position:fixed; top:0; right:0; font:normal 10px Verdana; cursor:pointer; z-index:999999; background:#ffc; }
-#buckyball-debug-console { position:fixed; overflow:auto; top:10px; left:10px; bottom:10px; right:10px; border:solid 2px #f00; padding:4px; text-align:left; opacity:1; background:#FFC; font:normal 10px Verdana; z-index:20000; }
-#buckyball-debug-console table { border-collapse: collapse; }
-#buckyball-debug-console th, #buckyball-debug-console td { font:normal 10px Verdana; border: solid 1px #ccc; padding:2px 5px;}
-#buckyball-debug-console th { font-weight:bold; }
-#buckuball-debug-console xmp { margin:0; }
-</style>
-<div id="buckyball-debug-trigger" onclick="var el=document.getElementById('buckyball-debug-console');el.style.display=el.style.display?'':'none'">[DBG]</div>
-<div id="buckyball-debug-console" style="display:none"><?php
-        echo "DELTA: " . BDebug::i()->delta() . ', PEAK: ' . memory_get_peak_usage(true) . ', EXIT: ' . memory_get_usage(true);
-        echo "<pre>";
-        print_r(array_map('htmlspecialchars', BORM::get_query_log()));
-        //$this->BEvents->debug();
-        echo "</pre>";
-        //print_r(static::$_events);
-?><table cellspacing="0" id="buckyball-debug-table"><thead><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th>
-    <th>Relevant Location</th><th>Module</th></tr></thead><tbody><?php
-        $randomDir = BConfig::i()->get('core/storage_random_dir');
-        foreach (static::$_events as $e) {
-            if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
-            $profile = $e['d'] ? number_format($e['d'], 6) . ($e['c'] > 1 ? ' (' . $e['c'] . ')' : '') : '';
-            $output = "<tr><td>" . nl2br(htmlspecialchars($e['msg'])) . "</td><td>" . number_format($e['t'], 6)
-                . "</td><td>" . $profile . "</td><td>" . number_format($e['mem'], 0)
-                . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>"
-                . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
-            $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', "{$randomDir}"], ['/', '', '[RANDOM]'], $output);
-            echo $output;
-        }
-?></tbody></table></div><script>
+        ?>
+        <style>
+            #buckyball-debug-trigger {
+                position: fixed;
+                top: 0;
+                right: 0;
+                font: normal 10px Verdana;
+                cursor: pointer;
+                z-index: 999999;
+                background: #ffc;
+            }
 
-        if (typeof require !== 'undefined' && require.defined("jquery.tablesorter")) {
-            require(['jquery.tablesorter'], function() {
-                $('#buckyball-debug-table').tablesorter();
-            })
-        }
+            #buckyball-debug-console {
+                position: fixed;
+                overflow: auto;
+                top: 10px;
+                left: 10px;
+                bottom: 10px;
+                right: 10px;
+                border: solid 2px #f00;
+                padding: 4px;
+                text-align: left;
+                opacity: 1;
+                background: #FFC;
+                font: normal 10px Verdana;
+                z-index: 20000;
+            }
 
-</script><?php
+            #buckyball-debug-console table {
+                border-collapse: collapse;
+            }
+
+            #buckyball-debug-console th, #buckyball-debug-console td {
+                font: normal 10px Verdana;
+                border: solid 1px #ccc;
+                padding: 2px 5px;
+            }
+
+            #buckyball-debug-console th {
+                font-weight: bold;
+            }
+
+            #buckuball-debug-console xmp {
+                margin: 0;
+            }
+        </style>
+        <div id="buckyball-debug-trigger"
+             onclick="var el=document.getElementById('buckyball-debug-console');el.style.display=el.style.display?'':'none'">
+            [DBG]
+        </div>
+        <div id="buckyball-debug-console" style="display:none"><?php
+            echo "DELTA: " . BDebug::i()->delta() . ', PEAK: ' . memory_get_peak_usage(true) . ', EXIT: ' . memory_get_usage(true);
+            echo "<pre>";
+            print_r(array_map('htmlspecialchars', BORM::get_query_log()));
+            //$this->BEvents->debug();
+            echo "</pre>";
+            //print_r(static::$_events);
+            ?>
+            <table cellspacing="0" id="buckyball-debug-table">
+                <thead>
+                <tr>
+                    <th>Message</th>
+                    <th>Rel.Time</th>
+                    <th>Profile</th>
+                    <th>Memory</th>
+                    <th>Level</th>
+                    <th>Relevant Location</th>
+                    <th>Module</th>
+                </tr>
+                </thead>
+                <tbody><?php
+                $randomDir = BConfig::i()->get('core/storage_random_dir');
+                foreach (static::$_events as $e) {
+                    if (empty($e['file'])) {
+                        $e['file'] = '';
+                        $e['line'] = '';
+                    }
+                    $profile = $e['d'] ? number_format($e['d'], 6) . ($e['c'] > 1 ? ' (' . $e['c'] . ')' : '') : '';
+                    $output = "<tr><td>" . nl2br(htmlspecialchars($e['msg'])) . "</td><td>" . number_format($e['t'], 6)
+                        . "</td><td>" . $profile . "</td><td>" . number_format($e['mem'], 0)
+                        . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>"
+                        . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
+                    $output = str_replace(['\\', FULLERON_ROOT_DIR . '/', "{$randomDir}"], ['/', '', '[RANDOM]'], $output);
+                    echo $output;
+                }
+                ?></tbody>
+            </table>
+        </div>
+        <script>
+
+            if (typeof require !== 'undefined' && require.defined("jquery.tablesorter")) {
+                require(['jquery.tablesorter'], function () {
+                    $('#buckyball-debug-table').tablesorter();
+                })
+            }
+
+        </script><?php
         $html = ob_get_clean();
         if ($return) {
             return $html;
@@ -3797,10 +3855,10 @@ class BDebug extends BClass
     }
 
     /**
-    * Delta time from start
-    *
-    * @return float
-    */
+     * Delta time from start
+     *
+     * @return float
+     */
     public function delta()
     {
         return microtime(true) - static::$_startTime;
@@ -3817,9 +3875,13 @@ class BDebug extends BClass
                 static::dump($v);
             }
         } elseif ($var instanceof Model) {
-            echo '<pre>'; print_r($var->as_array()); echo '</pre>';
+            echo '<pre>';
+            print_r($var->as_array());
+            echo '</pre>';
         } else {
-            echo '<pre>'; print_r($var); echo '</pre>';
+            echo '<pre>';
+            print_r($var);
+            echo '</pre>';
         }
     }
 

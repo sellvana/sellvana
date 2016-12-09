@@ -153,7 +153,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $token = $this->BUtil->randomString(16);
         $this->set([
-            'password_hash' => password_hash($password),
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]),
             'password_session_token' => $token,
         ]);
 
@@ -348,7 +348,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
-            $this->set('password_hash', password_hash($password))->save();
+            $this->set('password_hash', password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]))->save();
         }
         return true;
     }
