@@ -1,0 +1,7 @@
+<div>
+    <ul>
+        <li v-for="nav in navs">
+            <router-link :to="nav.path" v-text="nav.label"></router-link>
+        </li>
+    </ul>
+</div>

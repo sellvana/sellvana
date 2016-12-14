@@ -2038,7 +2038,6 @@ class BRouting extends BClass
             $this->BDebug->debug('DIRECT ROUTE: ' . $requestRoute);
             return $this->_routes[$requestRoute];
         }
-
         $this->BDebug->debug('FIND ROUTE: ' . $requestRoute);
         foreach ($this->_routes as $routeName => $route) {
             if ($route->match($requestRoute)) {

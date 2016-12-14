@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{ THIS.view('head') | raw }}
+    {{ THIS.view('vue-app') | raw }}
+</head>
+<body>
+<div id="sv-app">
+    <div v-if="isLoggedIn">
+        <sv-header :navs="navs"></sv-header>
+    </div>
+    <router-view></router-view>
+</div>
+</body>
+</html>

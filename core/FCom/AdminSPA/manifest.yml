@@ -2,3 +2,24 @@ modules:
     FCom_AdminSPA:
         version: 0.6.0.0
         channel: alpha
+        require: { module: [ FCom_Core, FCom_LibTwig ] }
+
+        areas:
+            FCom_AdminSPA:
+                auto_use: [ layout, views, bootstrap ]
+                views:
+                    - [ root, { view_class: FCom_Core_View_Root } ]
+                    - [ head, { view_class: FCom_Core_View_Head } ]
+                routing:
+                    - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]
+                    - [ /sv-vue-app.js, FCom_AdminSPA_AdminSPA_Controller_Main.vue_app_js ]
+                    - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
+
+        default_config:
+            modules/FCom_AdminSPA/theme: FCom_AdminSPA_DefaultTheme
+
+        themes:
+            FCom_AdminSPA_DefaultTheme:
+                name: FCom_AdminSPA_DefaultTheme
+                area: FCom_AdminSPA
+                layout_before: AdminSPA/layout-before.yml

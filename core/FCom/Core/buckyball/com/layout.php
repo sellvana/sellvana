@@ -2554,10 +2554,13 @@ if ($this->BDebug->is('DEBUG')) {
                 return '';
             }
             $fsFile = str_replace('{' . $m[1] . '}', $this->BModuleRegistry->module($m[1])->root_dir, $file);
-            $file   = str_replace('{' . $m[1] . '}', $this->BModuleRegistry->module($m[1])->baseSrc(), $file);
+            $file = str_replace('{' . $m[1] . '}', $this->BModuleRegistry->module($m[1])->baseSrc(), $file);
             if ($ts && file_exists($fsFile)) {
                 $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
+        } elseif ($file[0] === '~') {
+            $file = str_replace('//', '/', substr($file, 1));
+            $file = $this->BApp->href($file);
         } elseif (!preg_match('#^(http|/)#', $file)) {
             //echo ' ***** '; var_dump($file);
         }

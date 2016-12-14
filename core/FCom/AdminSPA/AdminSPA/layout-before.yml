@@ -1,0 +1,23 @@
+/:
+    - { root: root }
+    - { hook: head, views: head }
+    - { hook: before_body_end, views: bottom_scripts }
+    - view: head
+        do:
+            - [ js, "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" ]
+            #- [ js, "https://unpkg.com/requirejs/require.js" ]
+            #- [ requireJs, text, "@FCom_Core/js/lib/plugins/text" ]
+            - [ requireJs, text, "https://unpkg.com/requirejs-text/text" ]
+            #- [ requireJs, babel, "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.19.0/babel.min" ]
+            - [ requireJs, jquery, "https://unpkg.com/jquery/dist/jquery.min" ]
+            - [ requireJs, vue, "https://unpkg.com/vue/dist/vue" ]
+            #- [ js, "https://unpkg.com/vue/dist/vue.min.js" ]
+            - [ requireJs, vue-router, "https://unpkg.com/vue-router/dist/vue-router" ]
+            - [ requireJs, axios, "https://unpkg.com/axios/dist/axios" ]
+            - [ requireJs, vue-axios, "https://unpkg.com/vue-axios/dist/vue-axios.min" ]
+            - [ requireJs, vue-i18n, "https://unpkg.com/vue-i18n/dist/vue-i18n" ]
+            - [ requireJs, sv-vue-app, "~/sv-vue-app" ]
+            - [ requireRun, sv-vue-app ]
+
+            - [ requireJs, sv-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
+            #- [ requireJs, sv-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]

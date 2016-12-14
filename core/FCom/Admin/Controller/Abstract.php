@@ -276,12 +276,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                 if ($outTabs !== 'ALL' && !in_array($k, $outTabs)) {
                     continue;
                 }
-                $view = $layout->getView($tab['view']);
-                if (!$view) {
+                $tabView = $layout->getView($tab['view']);
+                if (!$tabView) {
                     $this->BDebug->error('MISSING VIEW: ' . $tabs[$k]['view']);
                     continue;
                 }
-                $out['tabs'][$k] = (string)$view->set([
+                $out['tabs'][$k] = (string)$tabView->set([
                     'model' => $model,
                     'mode' => $mode,
                 ]);
