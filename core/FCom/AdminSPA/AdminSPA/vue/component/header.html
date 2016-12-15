@@ -1,7 +1,190 @@
-<div>
-    <ul>
-        <li v-for="nav in navs">
-            <router-link :to="nav.path" v-text="nav.label"></router-link>
-        </li>
-    </ul>
-</div>
+<header class="f-admin-header">
+    <!--
+<ul>
+    <li v-for="nav in navs">
+        <router-link :to="nav.path" v-text="nav.label"></router-link>
+    </li>
+</ul>
+<img :src="svAsset('FCom_AdminSPA', 'img/profile.png')" alt="" class='img-circle'/>
+-->
+
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-default">
+                <div class="logo-block">
+                    <a class="navbar-brand  pull-left" href="dashboard.html">
+                        <span class="logo"></span>
+                    </a>
+                    <div class=" search-block visible-xs">
+                        <form>
+                            <input type="text" placeholder="Search...">
+                            <button class="btn btn-link fa fa-search" name="button" type="submit"></button>
+                        </form>
+                    </div>
+                </div>
+                <a class="navbar-toggle btn pull-left hidden-xs" href="#">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                </a>
+                <div class="breadcrumb visible-lg visible-xs">
+                    <ul>
+                        <li><a href="dashboard.html"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i><t>Sales</t></a></li>
+                        <li><a href="#"><t>Orders</t></a></li>
+                        <li><a href="#"><t>Edit orders</t></a></li>
+                        <li><a href="#" class="favourite"><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i></a></li>
+                    </ul>
+                </div>
+                <div class="navbar-right">
+                    <a class="navbar-toggle btn pull-left visible-xs" href="#">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </a>
+                    <div class="search-block hidden-xs">
+                        <form>
+                            <input type="text" placeholder="Search..." />
+                            <button class="btn btn-link fa fa-search" name="button" type="submit"></button>
+                        </form>
+                    </div>
+                    <ul class="nav">
+                        <li class="settings">
+                            <a href="#" title="Settings" class="dropdown-collapse ">
+                                <i class="fa fa-cog" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                        <li class="dropdown favourites">
+                            <a href="#" title="Favourites" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                            </a>
+                            <div class="dropdown-menu">
+                                <ul class="dropdown-content customScroll">
+                                    <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Sales / Orders / 1000431</a></li>
+                                    <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Sales / Orders / 1000431</a></li>
+                                    <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Sales / Orders / 1000431</a></li>
+                                    <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Sales / Orders / 1000431</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="dropdown user-menu">
+                            <a href="#" title="Login menu" class="dropdown-toggle" data-toggle="dropdown">John Rich <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                                <img src="img/profile.png" alt="" class='img-circle'/></a>
+                            <ul class="dropdown-menu">
+                                <li><a href=""><i class="fa fa-user" aria-hidden="true"></i> Profile</a></li>
+                                <li><a href=""><i class="fa fa-calendar" aria-hidden="true"></i> Calendar / To Do</a></li>
+                                <li><a href=""><i class="fa fa-sign-out" aria-hidden="true"></i>Sign out</a></li>
+                            </ul>
+                            <ul>
+                                <li class="login-status">
+                                    <a href="#" title="Status menu" class="status-toggle status online "><i class="fa fa-check" aria-hidden="true"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li class="online"><a href=""><i class="fa fa-check" aria-hidden="true"></i>Online</a></li>
+                                        <li class="away"><a href=""><i class="fa fa-phone" aria-hidden="true"></i></i>Away</a></li>
+                                        <li class="na"><a href=""><i class="fa fa-minus" aria-hidden="true"></i>N/A</a></li>
+                                        <li class="offline"><a href=""><i></i>Offline</a></li>
+                                    </ul>
+
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown notification">
+                            <a href="#" title="Status menu" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-bell" aria-hidden="true"></i>
+                                <span class="badge">2</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>You have 3 pending tasks!</li>
+                                <li><img src="" alt="img" class='img-circle'/><a href="#">New User</a><span>registered</span><span class="time">1 min ago</span></li>
+                                <li><img src="" alt="img" class='img-circle'/><a href="#">Product 931</a><span>add to wishlist</span><span class="time">1 min ago</span></li>
+                                <li><img src="" alt="img" class='img-circle'/><a href="#">Product 931</a><span>add to wishlist</span><span class="time">1 min ago</span></li>
+                                <li><a href="#">All Tasks</a></li>
+                            </ul>
+                        </li>
+                        <li class="chat">
+                            <a href="#" title="chat" class="chat-toggle">
+                                <i class="fa fa-comments-o" aria-hidden="true"></i>
+                                <span class="badge">2</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <p>Chat</p>
+                                <div class="tabs">
+                                    <ul class='nav nav-tabs'>
+                                        <li class="active"><a href="#home" data-toggle="tab"><i class="fa fa-user" aria-hidden="true"></i></a></li>
+                                        <li><a href="#groups" data-toggle="tab"><i class="fa fa-users" aria-hidden="true"></i></a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div id='home' class='tab-pane customScroll active'>
+                                            <a href="#" class="online"><img src='#' alt='user' class='img-circle'/><i></i><span>User 1</span></a>
+                                            <a href="#" class="away"><img src='#' alt='user' class='img-circle'/><i></i><span>User 2</span></a>
+                                            <a href="#" class="na"><img src='#' alt='user' class='img-circle'/><i></i><span>User 3</span></a>
+                                            <a href="#" class="offline"><img src='#' alt='user' class='img-circle'/><i></i><span>User 4</span></a>
+                                        </div>
+                                        <div id="groups" class='tab-pane'>
+                                            <a href="#" class="add-group fa fa-plus"></a>
+                                            <div class="groups customScroll">
+                                                <div class="group">
+                                                    <img src="" alt="group" class="img-circle" />
+                                                    <span>Favourite</span>
+                                                    <a class='fa fa-pencil'></a>
+                                                    <a class='fa fa-times'></a>
+                                                </div>
+                                                <div class="group">
+                                                    <img src="" alt="group" class="img-circle" />
+                                                    <span>Favourite</span>
+                                                    <a class='fa fa-pencil'></a>
+                                                    <a class='fa fa-times'></a>
+                                                </div>
+                                                <div class="group">
+                                                    <img src="" alt="group" class="img-circle" />
+                                                    <span>Favourite</span>
+                                                    <a class='fa fa-pencil'></a>
+                                                    <a class='fa fa-times'></a>
+                                                </div>
+                                                <div class="group">
+                                                    <img src="" alt="group" class="img-circle" />
+                                                    <span>Favourite</span>
+                                                    <a class='fa fa-pencil'></a>
+                                                    <a class='fa fa-times'></a>
+                                                </div>
+                                            </div>
+                                            <div class="new-groups">
+                                                <div class="new-group-users">
+                                                    <img src="" class="img-circle" alt="" />
+                                                    <img src="" class="img-circle" alt="" />
+                                                    <img src="" class="img-circle" alt="" />
+                                                    <img src="" class="img-circle" alt="" />
+                                                    <img src="" class="img-circle" alt="" />
+                                                    <img src="" class="img-circle" alt="" />
+                                                </div>
+                                                <div class="new-group-controls">
+                                                    <select>
+                                                        <option>Please select user</option>
+                                                        <option>John Rich</option>
+                                                        <option>John Rich</option>
+                                                        <option>John Rich</option>
+                                                    </select>
+                                                    <input type="text" placeholder="Please enter your name group" />
+                                                    <div class="button-block">
+                                                        <button class="button3">Create group</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="row visible-sm visible-md">
+            <div class="breadcrumb">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                    <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i><span>Sales</span></a></li>
+                    <li><a href="#"><span>Orders</span></a></li>
+                    <li><a href="#"><span>Edit orders</span></a></li>
+                    <li><a href="#"><i class="fa fa-star-o" aria-hidden="true"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>

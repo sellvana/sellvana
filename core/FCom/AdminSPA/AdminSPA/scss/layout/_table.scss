@@ -1,0 +1,89 @@
+table {
+	border-bottom: 1px solid #000000;
+	min-width: 100%;
+	td, th {
+		height: 49px;
+		min-width: 70px;
+		white-space: nowrap;
+	}
+	thead {
+		border-bottom: 1px solid #000000;
+		span {
+			color: #474646;
+		}
+		tr > * {
+			position: relative;
+			padding: 0 0 0 20px;
+		}
+		.fa {
+			margin-right: 10px;
+		}
+		.fa-caret-up {
+			position: absolute;
+			left: 8px;
+			top: 16px;
+		}
+		.fa-caret-down {
+			position: absolute;
+			left: 8px;
+			top: 22px;
+		}
+	}
+	tbody {
+		span {
+			font-family: $f-main-lig;
+		}
+		tr {
+			border-bottom: 1px solid #f8f8f8;
+			th:first-child, td:first-child {
+				text-align: center;
+			}
+		}
+		tr:last-child {
+			border-bottom: 0;
+		}
+	}
+	.fa-pencil {
+		font-size: 16px; 
+		color: #dddddd;
+	}
+	.sorted-up, .sorted-down {
+		i {
+			color: #7379db;
+			top: 18px;
+		}
+	} 
+}
+.processing {
+	padding: 9px 8px;
+	background: #fff; 
+	border: 0px solid #00ceb4;
+	width: 82px;
+	color: #00ceb4;
+	text-align: center;
+	display: inline-block;
+	border-radius: 1px;
+	font-family: $f-main-bold;
+}
+.placed {
+	padding: 9px 8px;
+	background: #fff;
+	border: 2px solid #f39b12;
+	width: 82px;
+	color: #f39b12;
+	text-align: center;
+	display: inline-block;
+	border-radius: 1px;
+	font-family: $f-main-bold;
+}
+.shipped {
+	padding: 9px 8px;
+	background: #fff;
+	border: 1px solid #2fbdf2;
+	width: 82px;
+	color: #2fbdf2;
+	text-align: center;
+	display: inline-block;
+	border-radius: 1px;
+}
+

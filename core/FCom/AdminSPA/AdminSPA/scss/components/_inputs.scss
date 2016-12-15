@@ -1,0 +1,53 @@
+input[type="checkbox"] + span {
+	width: 24px;
+	height: 24px;
+	background-color: rgba(255,255,255,0);
+	border: solid 1px #ebebeb;
+	display: inline-block;
+	text-align: center;
+	margin-right: 6px; 
+	border-radius: 2px;
+	padding: 3px 0;
+	i {
+		display: none;
+		font-size: 14px;
+	}
+}
+input[type="radio"] + span {
+	width: 21px;
+	height: 21px;
+	border-radius: 21px;
+	background-color: rgba(255,255,255,0);
+	border: solid 1px #ccd1d9;
+	display: inline-block;
+	text-align: center;
+	padding: 1px 0px;
+	margin-right: 6px; 
+	i {
+		display: none;
+		font-size: 8px;
+		color: #ccd1d9;
+	}
+}
+input[type="checkbox"], input[type="radio"] {
+	display: none;
+	&:checked + span i {
+		display: inline-block;
+	}
+}
+.pagination {
+	input {
+		border: 1px solid #eaeaea;
+		width: 30px;
+		padding: 8px 0px;
+		text-align: center;
+		color: #474646;
+	}
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	/* display: none; <- Crashes Chrome on hover */
+	-webkit-appearance: none;
+	margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}

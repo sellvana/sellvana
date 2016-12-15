@@ -1,0 +1,63 @@
+.f-admin-main-view {
+	min-height: 100%;
+	margin: 0;
+	margin-left: 257px;
+	margin-top: 81px;
+	min-width: 276px;
+	background: #fff;
+	padding: 10px 0px 90px 0px;
+	box-shadow: 0 0 10px rgba(0,0,0,.3);
+	border-radius: 3px;
+}
+.main-nav-closed {
+	.f-admin-main-view {
+		margin-left: 67px; 
+	}
+}
+.scrollable-area {
+	width: 100%;
+	overflow: auto;
+	overflow-y: hidden;
+}
+.tableDiv {
+	margin: 70px 0 0 0;
+}
+.btn .caret {
+	margin-left: 5px;
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+	.f-admin-main-view {
+		min-height: 100%;
+		margin-right: 13px;
+		margin-left: 13px;
+		margin-top: 130px;
+		min-width: 276px;
+		background: #fff;
+		padding: 10px 0px 90px 0px;
+		box-shadow: 0 0 10px rgba(0,0,0,0.3);
+		border-radius: 3px;
+	}
+	.main-nav-closed {
+		.f-admin-main-view {
+			margin-left: 13px; 
+		}
+	}
+}
+@media (max-width: 767px) {
+	.f-admin-main-view {
+		min-height: 100%;
+		margin-right: 13px;
+		margin-left: 13px;
+		margin-top: 185px;
+		min-width: 276px;
+		background: #fff;
+		padding: 10px 0px 90px 0px;
+		box-shadow: 0 0 10px rgba(0,0,0,0.3);
+		border-radius: 3px;
+	}
+	.main-nav-closed {
+		.f-admin-main-view {
+			margin-left: 13px; 
+		}
+	}
+}

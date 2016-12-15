@@ -1,0 +1,97 @@
+.control-buttons-block {
+	padding: 15px 0 0;
+	text-align: right;
+}
+button {
+	padding: 6px 16px;
+	transition: 0.1s all ease-in;
+}
+.button2 {
+	background-color: #514943;
+	border: 1px solid #514943;
+	font-size: 12px;
+	color: #fff;
+	font-family: $f-med;
+	&:hover {
+		background-color:  #1b1b1b;
+		border: 1px solid #1b1b1b;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
+}
+.button1 {
+	background-color: transparent;
+	font-size: 12px;
+	color: #868a8a;
+	font-family: $f-med;
+	border: 1px solid transparent;
+	&:hover {
+		border: 1px solid #868a8a;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
+}
+.button3 {
+	background-color: transparent;
+	font-size: 12px;
+	color: #2d2d2d;
+	font-family: $f-med;
+	border: 1px solid #e5dfdf;
+	&:hover {
+		background-color: #8b8b8b;
+		color: #fff;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
+}
+.button4 {
+	background-color: #3ec234;
+	font-size: 12px;
+	color: #fff;
+	font-family: $f-med;
+	border: 1px solid transparent;
+	&:hover {
+		background-color: #16870d;
+		color: #fff;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
+}
+.button5 {
+	background-color: #e5e5e5;
+	font-size: 12px;
+	font-family: $f-med;
+	border: 1px solid #e5e5e5;
+	padding: 8px 4px;
+	width: auto;
+	span {
+		color: #454d54;	
+	}
+	&:hover {
+		background-color: #e5e5e5;
+		color: #fff;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
+}
+.btn-sm, .btn-group-sm > .btn {
+	border-radius: 1px;
+}
+.daterangepicker td.start-date {
+	border-radius: 1px 0 0 1px;
+}

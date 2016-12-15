@@ -7,10 +7,23 @@ class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstr
         $this->layout('/');
     }
 
-    public function action_vue_app_js()
+    public function action_l10n()
+    {
+        $result = <<<EOT
+[en-US]
+test = This is a test
+test.title = click me!
+[fr]
+test = Ceci est un test
+test.title = cliquez-moi !
+EOT;
+        $this->BResponse->setContentType('application/l10n')->set($result);
+    }
+
+    public function action_sv_app_dynamic_js()
     {
         $this->BDebug->mode('PRODUCTION');
-        $html = (string)$this->view('js/vue-app-js');
+        $html = (string)$this->view('js/sv-app-dynamic-js');
         $script = str_replace(['<script>', '</script>'], '', $html);
         $this->BResponse->setContentType('text/javascript')->set($script);
     }

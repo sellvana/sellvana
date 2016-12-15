@@ -1,0 +1,37 @@
+{% set spaHlp = APP.instance('FCom_AdminSPA_AdminSPA') %}
+{% set modules = spaHlp.getModules() %}
+{% set routes = spaHlp.getRoutes() %}
+{% set navs = spaHlp.getNavs() %}
+{% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
+
+<script>
+define(['sv-app', 'jquery', 'vue', 'vue-router', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-menu', 'text!sv-comp-menu-tpl'],
+    function (SvApp, $, Vue, VueRouter, SvHeader, SvHeaderTpl, SvMenu, menuTpl) {
+    Vue.use(VueRouter);
+    //Vue.use(Axios, VueAxios);
+
+    SvApp.data.modules = {{ modules|json_encode|raw }};
+
+    SvApp.views.app = new Vue({
+        el: '#sv-app',
+        //delimiters: ['[[', ']]'],
+        data: {
+            navs: {{ navs|json_encode|raw }},
+            user: {{ user.as_array()|json_encode|raw }},
+            isLoggedIn: {{ user ? 'true' : 'false' }}
+        },
+        components: {
+            'sv-comp-header': SvHeader,
+            'sv-comp-menu': SvMenu
+        },
+        router: new VueRouter({
+            routes: [
+{% for i, r in routes %}
+                {% if i %},{% endif %}{ path: '{{ r.path }}', component: SvApp.methods.routeView({{ r.require|json_encode|raw }}) }
+{% endfor %}
+            ]
+        })
+    });
+
+});
+</script>

@@ -4,20 +4,68 @@
     - { hook: before_body_end, views: bottom_scripts }
     - view: head
         do:
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/bootstrap.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/jquery-ui.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/select2.min.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/daterangepicker.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/codemirror.css" ]
+            - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
+
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap.js" ]
+#            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/daterangepicker.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jQuery.fixedTable.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
+
             - [ js, "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" ]
             #- [ js, "https://unpkg.com/requirejs/require.js" ]
             #- [ requireJs, text, "@FCom_Core/js/lib/plugins/text" ]
             - [ requireJs, text, "https://unpkg.com/requirejs-text/text" ]
             #- [ requireJs, babel, "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.19.0/babel.min" ]
             - [ requireJs, jquery, "https://unpkg.com/jquery/dist/jquery.min" ]
+            - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
+
             - [ requireJs, vue, "https://unpkg.com/vue/dist/vue" ]
             #- [ js, "https://unpkg.com/vue/dist/vue.min.js" ]
             - [ requireJs, vue-router, "https://unpkg.com/vue-router/dist/vue-router" ]
             - [ requireJs, axios, "https://unpkg.com/axios/dist/axios" ]
             - [ requireJs, vue-axios, "https://unpkg.com/vue-axios/dist/vue-axios.min" ]
             - [ requireJs, vue-i18n, "https://unpkg.com/vue-i18n/dist/vue-i18n" ]
-            - [ requireJs, sv-vue-app, "~/sv-vue-app" ]
-            - [ requireRun, sv-vue-app ]
 
-            - [ requireJs, sv-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
-            #- [ requireJs, sv-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
+            - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
+            - [ requireJs, sv-app-dynamic, "~/sv-app-dynamic" ]
+            - [ requireRun, sv-app-dynamic ]
+
+            - [ requireJs, sv-comp-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
+            - [ requireJs, sv-comp-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
+            - [ requireJs, sv-comp-menu, "@FCom_AdminSPA/AdminSPA/vue/component/menu" ]
+            - [ requireJs, sv-comp-menu-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/menu.html" ]
+
+            - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
+            - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
+            - [ requireJs, sv-comp-grid-header-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header-row.html" ]
+            - [ requireJs, sv-comp-grid-data-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data-row.html" ]
+            - [ requireJs, sv-comp-grid-pager-list-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-list.html" ]
+            - [ requireJs, sv-comp-grid-pager-select-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-select.html" ]
+            - [ requireJs, sv-comp-grid-panel-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel.html" ]
+            - [ requireJs, sv-comp-grid-panel-columns-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-columns.html" ]
+            - [ requireJs, sv-comp-grid-panel-filters-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters.html" ]
+            - [ requireJs, sv-comp-grid-panel-export-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-export.html" ]
+            - [ requireJs, sv-comp-grid-bulk-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/bulk-actions.html" ]
+
+            - [ requireJs, sv-page-dashboard, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard" ]
+            - [ requireJs, sv-page-dashboard-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard.html" ]
+
+            - [ requireJs, sv-page-login, "@FCom_AdminSPA/AdminSPA/vue/page/login" ]
+            - [ requireJs, sv-page-login-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/login.html" ]
+
+            - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
+            - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
+
+            - [ requireJs, sv-page-sales-orders, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/index" ]
+            - [ requireJs, sv-page-sales-orders-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/index.html" ]
+

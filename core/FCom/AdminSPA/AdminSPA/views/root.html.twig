@@ -2,14 +2,25 @@
 <html>
 <head>
     {{ THIS.view('head') | raw }}
-    {{ THIS.view('vue-app') | raw }}
 </head>
 <body>
 <div id="sv-app">
-    <div v-if="isLoggedIn">
-        <sv-header :navs="navs"></sv-header>
+    <div>
+        <div v-if="isLoggedIn">
+            <sv-comp-header :navs="navs"></sv-comp-header>
+        </div>
+
+        <main>
+            <div class="f-admin-container">
+                <div v-if="isLoggedIn">
+                    <sv-comp-menu :navs="navs"></sv-comp-menu>
+                </div>
+                <div class="f-admin-main-view ">
+                    <router-view></router-view>
+                </div>
+            </div>
+        </main>
     </div>
-    <router-view></router-view>
 </div>
 </body>
 </html>

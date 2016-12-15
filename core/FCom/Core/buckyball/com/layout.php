@@ -2543,11 +2543,11 @@ if ($this->BDebug->is('DEBUG')) {
                 return '';
             }
             $fsFile = $this->BModuleRegistry->module($m[1])->root_dir . $m[2];
-            $file   = $this->BModuleRegistry->module($m[1])->baseSrc() . $m[2];
+            $file   = $this->BModuleRegistry->module($m[1])->baseSrc(false) . $m[2];
             if ($ts && file_exists($fsFile)) {
                 $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
-        } elseif (preg_match('#\{([A-Za-z0-9_]+)\}#', $file, $m)) { // {Mod_Name}/file.ext (deprecated)
+        } elseif (preg_match('#\{([A-Za-z0-9_]+)\}#', $file, $m)) { // {Mod_Name}/file.ext //deprecated
             $mod = $this->BModuleRegistry->module($m[1]);
             if (!$mod) {
                 BDebug::notice('Module not found: ' . $file);

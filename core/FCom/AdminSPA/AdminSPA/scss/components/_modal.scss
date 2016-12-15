@@ -1,0 +1,11 @@
+@media (min-width: 1200px) {
+	.visible-lg {
+		display: inline-block !important;
+	}
+}
+
+@media (max-width: 767px) {
+	.visible-xs {
+		display: inline-block !important;
+	}
+}

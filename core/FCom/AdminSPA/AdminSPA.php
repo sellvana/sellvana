@@ -11,10 +11,11 @@ class FCom_AdminSPA_AdminSPA extends BClass
     public function bootstrap()
     {
         $this->addModule('FCom_AdminSPA')
-            ->addRoute(['path' => '/login', 'require' => [
-            $this->BApp->src('@FCom_AdminSPA/AdminSPA/vue/page/login.js'),
-            'text!' . $this->BApp->src('@FCom_AdminSPA/AdminSPA/vue/page/login.html'),
-        ]]);
+            ->addRoute(['path' => '/', 'require' => ['sv-page-dashboard', 'text!sv-page-dashboard-tpl']])
+            ->addRoute(['path' => '/login', 'require' => ['sv-page-login', 'text!sv-page-login-tpl']]);
+
+        $this->addRoute(['path' => '/sales/orders', 'require' => ['sv-page-sales-orders', 'text!sv-page-sales-orders-tpl']])
+            ->addNav(['path' => '/sales/orders', 'label' => 'Orders']);
     }
 
     public function addRoute($route)
@@ -26,10 +27,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
     public function getRoutes()
     {
         $routes = $this->_routes;
-        $routes[] = ['path' => '*', 'require' => [
-            '',
-            'text!' . $this->BApp->src('@FCom_AdminSPA/AdminSPA/vue/page/not-found.html'),
-        ]];
+        $routes[] = ['path' => '*', 'require' => ['', 'text!sv-page-not-found']];
         return $routes;
     }
 
