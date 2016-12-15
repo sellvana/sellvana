@@ -1,4 +1,4 @@
-define(['jquery', 'vue', 'bootstrap', 'select2'], function ($, Vue, Bootstrap) {
+define(['jquery', 'vue', 'select2'], function ($, Vue, Bootstrap) {
 
     // Translations, usage: <t>String<t> or <t tag="div" :args="{p:page, m:max}">Page {p} of {m}</t>
     //TODO: implement Sellvana logic
@@ -8,14 +8,14 @@ define(['jquery', 'vue', 'bootstrap', 'select2'], function ($, Vue, Bootstrap) {
             'args': { type: Object, default: function () { return {}; } }
         },
         render: function (h) {
-            var data = {}, result = this.$slots.default;
+            var data = {}, children = this.$slots.default;
             /*
              var translated = _(result[0].text, this.args);
              if (!translated.match(/^\{\{/)) {
-             result = translated;
+                children = translated;
              }
              */
-            return h(this.tag, data, result);
+            return h(this.tag, data, children);
         }
     });
 
@@ -31,6 +31,17 @@ define(['jquery', 'vue', 'bootstrap', 'select2'], function ($, Vue, Bootstrap) {
             options: function (options) { $(this.$el).select2({ data: options }); }
         },
         destroyed: function () { $(this.$el).off().select2('destroy'); }
+    });
+
+    Vue.component('sv-dropdown', {
+        props: {
+            'tag' : { type: String, default: 'li' },
+            'args': { type: Object, default: function () { return {}; } }
+        },
+        render: function (h) {
+            var data = {}, children = this.$slots.default;
+            return h(this.tag, data, children);
+        }
     });
 
     var Component = {

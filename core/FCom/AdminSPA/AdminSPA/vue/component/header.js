@@ -4,7 +4,10 @@ define(['sv-app', 'text!sv-comp-header-tpl'], function(SvApp, headerTpl) {
         data: function() {
             return {
                 ui: {
-
+                    dropdowns: {
+                        _current: false,
+                        chats: false
+                    }
                 }
             }
         },
