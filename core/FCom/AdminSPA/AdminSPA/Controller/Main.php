@@ -2,6 +2,11 @@
 
 class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstract
 {
+    public function authenticate($args = [])
+    {
+        return true;
+    }
+
     public function action_index()
     {
         $this->layout('/');

@@ -18,7 +18,7 @@ define(['sv-app', 'jquery', 'vue', 'vue-router', 'sv-comp-header', 'text!sv-comp
         data: {
             navs: {{ navs|json_encode|raw }},
             user: {{ user.as_array()|json_encode|raw }},
-            isLoggedIn: {{ user ? 'true' : 'false' }}
+            isLoggedIn: true{#{{ user ? 'true' : 'false' }}#}
         },
         components: {
             'sv-comp-header': SvHeader,

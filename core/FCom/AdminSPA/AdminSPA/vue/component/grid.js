@@ -1,9 +1,10 @@
-define(['vue', 'sv-app', 'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
+define(['vue', 'vue-strap', 'sv-app',
+        'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
         'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl', 'text!sv-comp-grid-panel-tpl',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl', 'text!sv-comp-grid-panel-export-tpl',
         'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvApp, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl, gridPanelTpl,
+    function(Vue, VueStrap, SvApp, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl, gridPanelTpl,
              gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelExportTpl, gridBulkActionsTpl
     ) {
 
@@ -35,7 +36,10 @@ define(['vue', 'sv-app', 'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-
         };
 
         var GridBulkActions = {
-            template: gridBulkActionsTpl
+            template: gridBulkActionsTpl,
+            components: {
+                'v-select': VueStrap.select
+            }
         };
 
         var GridPanel = {
