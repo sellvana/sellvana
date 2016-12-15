@@ -1,4 +1,4 @@
-define(['jquery', 'vue'], function ($, Vue) {
+define(['jquery', 'vue', 'bootstrap', 'select2'], function ($, Vue, Bootstrap) {
 
     // Translations, usage: <t>String<t> or <t tag="div" :args="{p:page, m:max}">Page {p} of {m}</t>
     //TODO: implement Sellvana logic
@@ -33,22 +33,11 @@ define(['jquery', 'vue'], function ($, Vue) {
         destroyed: function () { $(this.$el).off().select2('destroy'); }
     });
 
-    return {
+    var Component = {
         data: {
             modules: {}
         },
         methods: {
-            assetUrl: function (module, path) {
-                return Sellvana.data.modules[module].src_root + '/AdminSPA/' + path;
-            },
-            componentUrl: function (module, path, type) {
-                type = type || 'component';
-                var url = Sellvana.data.modules[module].src_root + '/AdminSPA/vue/' + type + '/' + path;
-                if (path.match(/\.html$/)) {
-                    url = 'text!' + url;
-                }
-                return url;
-            },
             routeView: function (args) {
                 return function (resolve, reject) {
                     require(args, function (component, template) {
@@ -66,5 +55,18 @@ define(['jquery', 'vue'], function ($, Vue) {
         views: {
 
         }
-    }
+    };
+    Component.methods.assetUrl = function (module, path) {
+        return Component.data.modules[module].src_root + '/AdminSPA/' + path;
+    };
+    Component.methods.componentUrl = function (module, path, type) {
+        type = type || 'component';
+        var url = Component.data.modules[module].src_root + '/AdminSPA/vue/' + type + '/' + path;
+        if (path.match(/\.html$/)) {
+            url = 'text!' + url;
+        }
+        return url;
+    };
+
+    return Component;
 });

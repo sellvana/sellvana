@@ -12,9 +12,9 @@
             - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
 
-#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap.js" ]
+            - [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
 #            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
-#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min.js" ]
+            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min", { deps: [ jquery ] } ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/daterangepicker.js" ]
@@ -36,6 +36,7 @@
             - [ requireJs, vue-axios, "https://unpkg.com/vue-axios/dist/vue-axios.min" ]
             - [ requireJs, vue-i18n, "https://unpkg.com/vue-i18n/dist/vue-i18n" ]
             - [ requireJs, vue-strap, "https://unpkg.com/vue-strap/dist/vue-strap" ]
+            - [ requireJs, bootstrap-vue, "https://unpkg.com/bootstrap-vue/dist/bootstrapVue" ]
 
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
             - [ requireJs, sv-app-dynamic, "~/sv-app-dynamic" ]
@@ -55,6 +56,7 @@
             - [ requireJs, sv-comp-grid-panel-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel.html" ]
             - [ requireJs, sv-comp-grid-panel-columns-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-columns.html" ]
             - [ requireJs, sv-comp-grid-panel-filters-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters.html" ]
+            - [ requireJs, sv-comp-grid-panel-filters-current-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters-current.html" ]
             - [ requireJs, sv-comp-grid-panel-export-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-export.html" ]
             - [ requireJs, sv-comp-grid-bulk-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/bulk-actions.html" ]
 

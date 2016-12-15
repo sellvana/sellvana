@@ -1,11 +1,11 @@
 define(['vue', 'vue-strap', 'sv-app',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
         'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl', 'text!sv-comp-grid-panel-tpl',
-        'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl', 'text!sv-comp-grid-panel-export-tpl',
-        'text!sv-comp-grid-bulk-actions-tpl'
+        'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl', 'text!sv-comp-grid-panel-filters-current-tpl',
+        'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
     function(Vue, VueStrap, SvApp, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl, gridPanelTpl,
-             gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelExportTpl, gridBulkActionsTpl
+             gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelFiltersCurrentTpl, gridPanelExportTpl, gridBulkActionsTpl
     ) {
 
         var GridHeaderRow = {
@@ -31,15 +31,16 @@ define(['vue', 'vue-strap', 'sv-app',
             template: gridPanelFiltersTpl
         };
 
+        var GridPanelFiltersCurrent = {
+            template: gridPanelFiltersCurrentTpl
+        };
+
         var GridPanelExport = {
             template: gridPanelExportTpl
         };
 
         var GridBulkActions = {
-            template: gridBulkActionsTpl,
-            components: {
-                'v-select': VueStrap.select
-            }
+            template: gridBulkActionsTpl
         };
 
         var GridPanel = {
@@ -47,6 +48,7 @@ define(['vue', 'vue-strap', 'sv-app',
                 'sv-comp-grid-pager-list': GridPagerList,
                 'sv-comp-grid-panel-columns': GridPanelColumns,
                 'sv-comp-grid-panel-filters': GridPanelFilters,
+                'sv-comp-grid-panel-filters-current': GridPanelFiltersCurrent,
                 'sv-comp-grid-panel-export': GridPanelExport,
                 'sv-comp-grid-bulk-actions': GridBulkActions
             },
