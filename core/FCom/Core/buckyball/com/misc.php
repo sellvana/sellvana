@@ -1249,7 +1249,7 @@ class BUtil extends BClass
     public function isPreferredPasswordHash($password)
     {
         if (function_exists('password_needs_rehash')) {
-            return password_needs_rehash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+            return !password_needs_rehash($password, PASSWORD_DEFAULT, ['cost' => 12]);
         }
         return strpos($password, '$2y$12$') === 0;
     }
