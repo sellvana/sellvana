@@ -19,6 +19,9 @@ class FCom_AdminSPA_AdminSPA extends BClass
 
         $this->addRoute(['path' => '/sales/orders/form', 'require' => ['sv-page-sales-orders-form', 'text!sv-page-sales-orders-form-tpl']])
             ->addNav(['path' => '/sales/orders/form', 'label' => 'Edit Order']);
+		
+		$this->addRoute(['path' => '/sales/orders/edit-order', 'require' => ['sv-page-sales-orders-edit-order', 'text!sv-page-sales-orders-edit-order-tpl']]);
+		
     }
 
     public function addRoute($route)

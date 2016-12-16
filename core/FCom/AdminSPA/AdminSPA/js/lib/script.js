@@ -21,7 +21,7 @@ $(document).ready(function() {
 	});
 										 
 	
-	/*jQuery('#myFixedTable').fixedTable({
+	/*jQuery('#fixed-table').fixedTable({
 		table: {
 			height: 600,
 			width: 1600

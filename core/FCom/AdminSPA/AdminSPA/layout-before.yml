@@ -59,6 +59,12 @@
             - [ requireJs, sv-comp-grid-panel-filters-current-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters-current.html" ]
             - [ requireJs, sv-comp-grid-panel-export-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-export.html" ]
             - [ requireJs, sv-comp-grid-bulk-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/bulk-actions.html" ]
+			
+			- [ requireJs, sv-comp-order-info, "@FCom_AdminSPA/AdminSPA/vue/component/orders/order-info" ]
+			- [ requireJs, sv-comp-order-info-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/orders/order-info.html" ]
+			
+			- [ requireJs, sv-comp-order-menu, "@FCom_AdminSPA/AdminSPA/vue/component/orders/order-menu" ]
+			- [ requireJs, sv-comp-order-menu-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/orders/order-menu.html" ]
 
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
@@ -77,6 +83,9 @@
 
             - [ requireJs, sv-page-sales-orders-form, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/form" ]
             - [ requireJs, sv-page-sales-orders-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/form.html" ]
+			
+			- [ requireJs, sv-page-sales-orders-edit-order, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/edit-order" ]
+			- [ requireJs, sv-page-sales-orders-edit-order-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/edit-order.html" ]
 
 /login:
     - { include: / }
