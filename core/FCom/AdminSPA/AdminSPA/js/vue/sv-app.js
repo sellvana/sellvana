@@ -1,4 +1,4 @@
-define(['jquery', 'vue', 'select2'], function ($, Vue, Bootstrap) {
+define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) {
 
     // Translations, usage: <t>String<t> or <t tag="div" :args="{p:page, m:max}">Page {p} of {m}</t>
     //TODO: implement Sellvana logic
@@ -44,40 +44,107 @@ define(['jquery', 'vue', 'select2'], function ($, Vue, Bootstrap) {
         }
     });
 
-    var Component = {
-        data: {
-            modules: {}
+    Vue.use(Vuex);
+    var store = new Vuex.Store({
+        strict: true
+    });
+
+    store.registerModule('ui', {
+        //namespaced: true,
+        state: {
+            ddCurrent: false,
+            mainNavOpen: true
+        },
+        mutations: {
+            ddToggle: function (state, ddName) {
+                state.ddCurrent = state.ddCurrent === ddName ? false : ddName;
+            },
+            mainNavToggle: function (state) {
+                state.mainNavOpen = !state.mainNavOpen;
+            }
+        }
+    });
+
+    function routeView(args) {
+        return function (resolve, reject) {
+            require(args, function (component, template) {
+                if (!component) {
+                    component = {};
+                }
+                if (template) {
+                    component.template = template;
+                }
+                resolve(component);
+            });
+        }
+    }
+
+    var modules = {};
+
+    return {
+        data: function () {
+            return {
+            };
         },
         methods: {
-            routeView: function (args) {
-                return function (resolve, reject) {
-                    require(args, function (component, template) {
-                        if (!component) {
-                            component = {};
-                        }
-                        if (template) {
-                            component.template = template;
-                        }
-                        resolve(component);
-                    });
-                }
-            }
+            routeView: routeView,
+            setModules: function (newModules) { modules = newModules; }
         },
         views: {
 
-        }
-    };
-    Component.methods.assetUrl = function (module, path) {
-        return Component.data.modules[module].src_root + '/AdminSPA/' + path;
-    };
-    Component.methods.componentUrl = function (module, path, type) {
-        type = type || 'component';
-        var url = Component.data.modules[module].src_root + '/AdminSPA/vue/' + type + '/' + path;
-        if (path.match(/\.html$/)) {
-            url = 'text!' + url;
-        }
-        return url;
-    };
+        },
+        mixins: {
+            common: {
+                data: function () {
+                    return {
 
-    return Component;
+                    };
+                },
+                computed: {
+                    ////////////////////// UI URLS
+                    assetUrl: function () {
+                        return function (module, path) {
+                            return modules[module] ? modules[module].src_root + '/AdminSPA/' + path : '';
+                        }
+                    },
+                    componentUrl: function() {
+                        return function (module, path, type) {
+                            type = type || 'component';
+                            var url = modules[module].src_root + '/AdminSPA/vue/' + type + '/' + path;
+                            if (path.match(/\.html$/)) {
+                                url = 'text!' + url;
+                            }
+                            return url;
+                        }
+                    },
+
+                    //////////////////////// UI COMPONENTS
+                    ddOpen: function () {
+                        return function(ddName) {
+                            return store.state.ui.ddCurrent === ddName;
+                        };
+                    },
+
+                    ///////////////////////// TRANSLATIONS
+                    _: function () {
+                        return function (str, args) {
+                            //TODO: implement Sellvana logic
+                            return str;
+                        }
+                    }
+                },
+                methods: {
+                    ddToggle: function (ddName) {
+                        store.commit('ddToggle', ddName);
+                    },
+                    ddStay: function () { /* dummy */ }
+                }
+            },
+            i18n: {
+                computed: {
+                }
+            }
+        },
+        store: store
+    };
 });
