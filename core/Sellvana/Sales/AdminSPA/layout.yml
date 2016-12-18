@@ -1,0 +1,10 @@
+/:
+    - view: head
+        do:
+            - [ requireJs, sv-page-sales-orders, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/index" ]
+            - [ requireJs, sv-page-sales-orders-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/index.html" ]
+
+            - [ requireJs, sv-page-sales-orders-form, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form" ]
+            - [ requireJs, sv-page-sales-orders-form-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form.html" ]
+            - [ requireJs, sv-page-sales-orders-form-nav-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/nav.html" ]
+            - [ requireJs, sv-page-sales-orders-form-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info.html" ]

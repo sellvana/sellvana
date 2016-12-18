@@ -19,6 +19,8 @@ modules:
                     package_size: 5x5x5
 
         areas:
+            FCom_AdminSPA:
+                auto_use: [ layout, bootstrap ]
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:

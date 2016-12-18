@@ -4,10 +4,19 @@
 	margin-left: 257px;
 	margin-top: 81px;
 	min-width: 276px;
+	padding: 0px 0px 80px 0px;
+	.nav {
+		a:hover {
+			color: #000;
+		}
+	}
+}
+
+.admin-main-content {
 	background: #fff;
-	padding: 10px 0px 90px 0px;
 	box-shadow: 0 0 10px rgba(0,0,0,.3);
 	border-radius: 3px;
+	padding: 10px 0px 10px 0px;
 }
 .main-nav-closed {
 	.f-admin-main-view {
@@ -24,6 +33,60 @@
 }
 .btn .caret {
 	margin-left: 5px;
+}
+.payment-info, .total-info, .delivery-info, .overall-info {
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 20px;
+	font-size: 0;
+	.icon {
+		padding: 9px 20px;
+		text-align: center;
+		display: inline-block;
+		vertical-align: top;
+	}
+	i {
+		color: #fff;
+		font-size: 30px;
+	}
+	.data {
+		display: inline-block;
+		vertical-align: middle;
+		height: 100%;
+		background: #fff;
+		padding: 5px 14px;
+	}
+	span {
+		display: block;
+		margin-bottom: 3px;
+		font-size: 12px;
+		color: #000;
+	}
+	p {
+		font-family: $f-main-bold;
+		font-size: 16px;
+		color: #000;
+	}
+}
+.payment-info {
+	.icon {
+		background: #06bfee;
+	}
+}
+.total-info {
+	.icon {
+		background: #dd4a39;
+	}
+}
+.delivery-info {
+	.icon {
+		background: #00a55b;
+	}
+}
+.overall-info {
+	.icon {
+		background: #f29b19;
+	}
 }
 @media (min-width: 768px) and (max-width: 1199px) {
 	.f-admin-main-view {

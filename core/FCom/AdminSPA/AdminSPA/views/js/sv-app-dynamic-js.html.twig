@@ -2,36 +2,55 @@
 {% set modules = spaHlp.getModules() %}
 {% set routes = spaHlp.getRoutes() %}
 {% set navs = spaHlp.getNavs() %}
+{% set navTree = spaHlp.getNavTree() %}
 {% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
 
 <script>
-define(['sv-app', 'jquery', 'vue', 'vue-router', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-menu', 'text!sv-comp-menu-tpl'],
-    function (SvApp, $, Vue, VueRouter, SvHeader, SvHeaderTpl, SvMenu, menuTpl) {
-    Vue.use(VueRouter);
-    //Vue.use(Axios, VueAxios);
+define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-menu', 'text!sv-comp-menu-tpl'],
+    function (SvApp, $, Vue, Vuex, VueRouter, SvHeader, SvHeaderTpl, SvMenu, menuTpl) {
+        Vue.use(VueRouter);
 
-    SvApp.data.modules = {{ modules|json_encode|raw }};
+        SvApp.methods.setModules({{ modules|json_encode|raw }});
 
-    SvApp.views.app = new Vue({
-        el: '#sv-app',
-        //delimiters: ['[[', ']]'],
-        data: {
-            navs: {{ navs|json_encode|raw }},
-            user: {{ user.as_array()|json_encode|raw }},
-            isLoggedIn: true{#{{ user ? 'true' : 'false' }}#}
-        },
-        components: {
-            'sv-comp-header': SvHeader,
-            'sv-comp-menu': SvMenu
-        },
-        router: new VueRouter({
-            routes: [
-{% for i, r in routes %}
-                {% if i %},{% endif %}{ path: '{{ r.path }}', component: SvApp.methods.routeView({{ r.require|json_encode|raw }}) }
-{% endfor %}
-            ]
-        })
-    });
+        var rawRoutes = ({{ routes|json_encode|raw }}), routes = [];
+        for (var i in rawRoutes) {
+            var r = rawRoutes[i];
+            routes.push({path: r.path, component: SvApp.methods.routeView(r.require)});
+        }
+
+        var navTree = ({{ navTree|json_encode|raw }}), user = ({{ user.as_array()|json_encode|raw }});
+
+        SvApp.store.commit('setNavTree', navTree);
+        SvApp.store.commit('setUser', user);
+
+        SvApp.views.app = new Vue({
+            el: '#sv-app',
+            //delimiters: ['[[', ']]'],
+            mixins: [SvApp.mixins.common],
+            data: function () {
+                return {
+                    ui: this.$store.state.ui
+                };
+            },
+            computed: {
+                isLoggedIn: function () {
+                    return true; //this.$store.state.user && this.$store.state.user.id;
+                }
+            },
+            methods: {
+                pageClick: function() {
+                    this.ddToggle(false);
+                }
+            },
+            components: {
+                'sv-comp-header': SvHeader,
+                'sv-comp-menu': SvMenu
+            },
+            router: new VueRouter({
+                routes: routes
+            }),
+            store: SvApp.store
+        });
 
 });
 </script>

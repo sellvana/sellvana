@@ -1,5 +1,5 @@
-<div class="dropdown filter">
-    <a href="#" class="btn filter-toggle"><span>Filter</span><b class="caret"></b></a>
+<div class="dropdown filter" :class="{open:ddOpen(grid.id+'/panel-filters')}">
+    <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.id+'/panel-filters')"><span>Filter</span><b class="caret"></b></a>
     <div class="dropdown-menu">
         <form class="select-filter">
             <select>

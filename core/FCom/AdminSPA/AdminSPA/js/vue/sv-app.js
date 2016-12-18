@@ -46,7 +46,28 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
 
     Vue.use(Vuex);
     var store = new Vuex.Store({
-        strict: true
+        strict: true,
+        state: {
+            user: {},
+            navTree: {},
+            navCurrent: {
+                paths: ['/sales', '/sales/orders'],
+                breadcrumbs: [
+
+                ]
+            }
+        },
+        mutations: {
+            setUser: function (state, user) {
+                state.user = user;
+            },
+            setNavTree: function (state, navTree) {
+                state.navTree = navTree;
+            },
+            setNavCurrent: function (state, navCurrent) {
+                state.navCurrent = navCurrent;
+            }
+        }
     });
 
     store.registerModule('ui', {

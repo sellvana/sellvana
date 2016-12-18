@@ -87,7 +87,9 @@ header {
 	.row {
 		box-shadow: 0 5px 5px rgba(0,0,0,0.11);
 		padding: 0 17px;
-		&:nth-of-type(1) {
+		position: relative;
+		z-index: 2;
+		&.visible-sm.visible-md {
 			z-index: 1;
 			position: relative;
 		}
@@ -187,7 +189,7 @@ header {
 			padding: 10px 0px 10px 0px;
 		}
 	}
-	li:nth-last-child(2) {
+	li.penultimate {
 		background: none;
 		a {
 			padding-right: 0;

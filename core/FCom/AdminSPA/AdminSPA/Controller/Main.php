@@ -62,19 +62,19 @@ EOT;
         $this->BResponse->set($result);
         return;
 
-        if (!$path) {
-            $result = ['error' => true, 'message' => $this->_('Invalid path')];
-        } else {
-            $view = $this->view('components/' . $path);
-            $args = $this->BRequest->request('args');
-            if ($args) {
-                $view->set($this->BUtil->fromJson($args));
-            }
-            $result = [
-                'template' => $view->render(),
-            ];
-        }
-        $script = 'define([], function() { return ' . $this->BUtil->toJson($result) . ' });';
-        $this->BResponse->setContentType('text/javascript')->set($script);
+//        if (!$path) {
+//            $result = ['error' => true, 'message' => $this->_('Invalid path')];
+//        } else {
+//            $view = $this->view('components/' . $path);
+//            $args = $this->BRequest->request('args');
+//            if ($args) {
+//                $view->set($this->BUtil->fromJson($args));
+//            }
+//            $result = [
+//                'template' => $view->render(),
+//            ];
+//        }
+//        $script = 'define([], function() { return ' . $this->BUtil->toJson($result) . ' });';
+//        $this->BResponse->setContentType('text/javascript')->set($script);
     }
 }

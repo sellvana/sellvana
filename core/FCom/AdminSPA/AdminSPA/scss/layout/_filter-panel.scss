@@ -56,7 +56,7 @@ label {
 		vertical-align: middle;
 		border-right: 1px solid #edf1f5;
 		margin-bottom: 10px;
-		&:nth-of-type(3) {
+		&.last-dropdown {
 			border-right-color: transparent;
 			margin-right: 20px;
 		}
@@ -114,7 +114,7 @@ label {
 	.col-sm-5 {
 		position: static;
 	} 
-	.col-sm-7:nth-of-type(2) {
+	.col-sm-7 {
 		padding-right: 180px;
 		position: static;
 	}
@@ -178,7 +178,7 @@ label {
 	&.datepicker {
 		width: 100%;
 		input {
-			width: 88%;
+			width: 80%;
 		}
 		.input-group-addon {
 			width: 1%;
@@ -214,9 +214,6 @@ label {
 		padding: 6px 12px 6px 12px;
 		border-radius: 0;
 		box-shadow: none;
-		&:focus {
-			
-		}
 	}
 }
 .input-group {
@@ -225,10 +222,7 @@ label {
 		width: 92px;
 		padding: 0;
 		li {
-			border-bottom: 2px solid #fff;
-			&:last-child {
-				border-bottom: 0;
-			}
+			border-top: 2px solid #fff;
 		}
 		a {
 			padding: 4px 10px 4px 10px;
@@ -471,7 +465,7 @@ label {
 				width: 100%;
 			}
 		}
-		.dropdown:nth-of-type(3) {
+		.dropdown.last-dropdown {
 			margin-right: 0px;
 		}
 	}

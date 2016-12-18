@@ -143,6 +143,10 @@ aside {
 	}
 }
 
+#main-nav .navigation .nav.nav-stacked.in {
+	display: block;
+}
+
 @media (min-width: 1200px) {
 	#main-nav.close {
 		& > .navigation > .nav > li:hover > .nav-stacked {

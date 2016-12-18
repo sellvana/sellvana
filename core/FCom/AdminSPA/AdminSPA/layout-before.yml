@@ -12,31 +12,42 @@
             - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
 
-            - [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
+            #- [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
 #            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
-            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min", { deps: [ jquery ] } ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/daterangepicker.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jQuery.fixedTable.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
 
-            - [ js, "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" ]
+            #- [ js, "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" ]
             #- [ js, "https://unpkg.com/requirejs/require.js" ]
             #- [ requireJs, text, "@FCom_Core/js/lib/plugins/text" ]
-            - [ requireJs, text, "https://unpkg.com/requirejs-text/text" ]
+            #- [ requireJs, text, "https://unpkg.com/requirejs-text/text" ]
             #- [ requireJs, babel, "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.19.0/babel.min" ]
-            - [ requireJs, jquery, "https://unpkg.com/jquery/dist/jquery.min" ]
-            - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
+            #- [ requireJs, jquery, "https://unpkg.com/jquery/dist/jquery.min" ]
 
-            - [ requireJs, vue, "https://unpkg.com/vue/dist/vue" ]
+            #- [ requireJs, vue, "https://unpkg.com/vue/dist/vue" ]
             #- [ js, "https://unpkg.com/vue/dist/vue.min.js" ]
-            - [ requireJs, vue-router, "https://unpkg.com/vue-router/dist/vue-router" ]
-            - [ requireJs, axios, "https://unpkg.com/axios/dist/axios" ]
-            - [ requireJs, vue-axios, "https://unpkg.com/vue-axios/dist/vue-axios.min" ]
-            - [ requireJs, vue-i18n, "https://unpkg.com/vue-i18n/dist/vue-i18n" ]
-            - [ requireJs, vue-strap, "https://unpkg.com/vue-strap/dist/vue-strap" ]
-            - [ requireJs, bootstrap-vue, "https://unpkg.com/bootstrap-vue/dist/bootstrapVue" ]
+            #- [ requireJs, vuex, "https://unpkg.com/vuex/dist/vuex" ]
+            #- [ requireJs, vue-router, "https://unpkg.com/vue-router/dist/vue-router" ]
+            #- [ requireJs, axios, "https://unpkg.com/axios/dist/axios" ]
+            #- [ requireJs, vue-axios, "https://unpkg.com/vue-axios/dist/vue-axios.min" ]
+            #- [ requireJs, vue-i18n, "https://unpkg.com/vue-i18n/dist/vue-i18n" ]
+            #- [ requireJs, vue-strap, "https://unpkg.com/vue-strap/dist/vue-strap" ]
+            #- [ requireJs, bootstrap-vue, "https://unpkg.com/bootstrap-vue/dist/bootstrapVue" ]
+
+            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/require-2.3.2.min.js" ]
+            - [ requireJs, text, "@FCom_AdminSPA/AdminSPA/js/lib/text-2.0.12" ]
+            - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
+            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.6" ]
+            - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
+            - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]
+            - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
+            - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
+            #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
+            - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
+            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min", { deps: [ jquery ] } ]
 
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
             - [ requireJs, sv-app-dynamic, "~/sv-app-dynamic" ]
@@ -44,6 +55,13 @@
 
             - [ requireJs, sv-comp-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
             - [ requireJs, sv-comp-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
+            - [ requireJs, sv-comp-header-breadcrumbs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/breadcrumbs.html" ]
+            - [ requireJs, sv-comp-header-search-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/search.html" ]
+            - [ requireJs, sv-comp-header-favorites-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/favorites.html" ]
+            - [ requireJs, sv-comp-header-account-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/account.html" ]
+            - [ requireJs, sv-comp-header-chat-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/chat.html" ]
+            - [ requireJs, sv-comp-header-local-notifications-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications.html" ]
+
             - [ requireJs, sv-comp-menu, "@FCom_AdminSPA/AdminSPA/vue/component/menu" ]
             - [ requireJs, sv-comp-menu-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/menu.html" ]
 
@@ -72,11 +90,6 @@
             - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
             - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
 
-            - [ requireJs, sv-page-sales-orders, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/index" ]
-            - [ requireJs, sv-page-sales-orders-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/index.html" ]
-
-            - [ requireJs, sv-page-sales-orders-form, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/form" ]
-            - [ requireJs, sv-page-sales-orders-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/sales/orders/form.html" ]
 
 /login:
     - { include: / }
