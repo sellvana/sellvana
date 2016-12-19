@@ -1,8 +1,8 @@
-{% set spaHlp = APP.instance('FCom_AdminSPA_AdminSPA') %}
-{% set modules = spaHlp.getModules() %}
-{% set routes = spaHlp.getRoutes() %}
-{% set navs = spaHlp.getNavs() %}
-{% set navTree = spaHlp.getNavTree() %}
+{% set app = THIS.view('app') %}
+{% set modules = app.getModules() %}
+{% set routes = app.getRoutes() %}
+{% set navs = app.getNavs() %}
+{% set navTree = app.getNavTree() %}
 {% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
 
 <script>

@@ -1,4 +1,4 @@
-define(['sv-comp-grid', 'json!sv-page-sales-orders-grid-config'], function (SvCompGrid, gridConfig) {
+define(['sv-comp-grid', 'json!sv-page-system-users-grid-config'], function (SvCompGrid, gridConfig) {
     return {
         data: {
             grid: {

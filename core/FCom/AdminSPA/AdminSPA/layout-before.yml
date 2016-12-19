@@ -39,6 +39,7 @@
 
             - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/require-2.3.2.min.js" ]
             - [ requireJs, text, "@FCom_AdminSPA/AdminSPA/js/lib/text-2.0.12" ]
+            - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
             - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.6" ]
             - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
@@ -81,14 +82,39 @@
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
 
+            - [ requireJs, sv-page-default-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/grid.html" ]
+            - [ requireJs, sv-page-default-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form.html" ]
+
             - [ requireJs, sv-page-dashboard, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard" ]
             - [ requireJs, sv-page-dashboard-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard.html" ]
 
             - [ requireJs, sv-page-login, "@FCom_AdminSPA/AdminSPA/vue/page/login" ]
             - [ requireJs, sv-page-login-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/login.html" ]
 
+            - [ requireJs, sv-page-system-users, "@FCom_AdminSPA/AdminSPA/vue/page/system/users" ]
+            - [ requireJs, sv-page-system-users-grid-config, "~/settings/grid_config" ]
+
+            - [ requireJs, sv-page-system-settings, "@FCom_AdminSPA/AdminSPA/vue/page/system/settings" ]
+            - [ requireJs, sv-page-system-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/system/settings.html" ]
+
             - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
             - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
+
+sv-app-dynamic-js:
+    - view: app
+        do:
+            - [ addModule, FCom_AdminSPA ]
+
+            - [ addNav, { label: Dashboard, path: /dashboard, link: /, pos: 10 }]
+            - [ addNav, { label: System, path: /system, icon_class: "fa fa-cog", pos: 900 }]
+            - [ addNav, { label: Users, path: /system/users, link: /users, pos: 10 }]
+            - [ addNav, { label: Settings, path: /system/settings, link: /settings, pos: 100 }]
+
+            - [ addRoute, { path: /, require: [sv-page-dashboard, text!sv-page-dashboard-tpl ]}]
+            - [ addRoute, { path: /login, require: [sv-page-login, text!sv-page-login-tpl ]}]
+            - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]
+            - [ addRoute, { path: /users, require: [sv-page-system-users, text!sv-page-default-grid-tpl ]}] #, json!sv-page-users-grid-config ]}]
+            - [ addRoute, { path: /settings, require: [sv-page-system-settings, text!sv-page-system-settings-tpl ]}]
 
 
 /login:

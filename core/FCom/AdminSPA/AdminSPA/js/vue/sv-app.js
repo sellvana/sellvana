@@ -33,16 +33,16 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
         destroyed: function () { $(this.$el).off().select2('destroy'); }
     });
 
-    Vue.component('sv-dropdown', {
-        props: {
-            'tag' : { type: String, default: 'li' },
-            'args': { type: Object, default: function () { return {}; } }
-        },
-        render: function (h) {
-            var data = {}, children = this.$slots.default;
-            return h(this.tag, data, children);
-        }
-    });
+    // Vue.component('sv-dropdown', {
+    //     props: {
+    //         'tag' : { type: String, default: 'li' },
+    //         'args': { type: Object, default: function () { return {}; } }
+    //     },
+    //     render: function (h) {
+    //         var data = {}, children = this.$slots.default;
+    //         return h(this.tag, data, children);
+    //     }
+    // });
 
     Vue.use(Vuex);
     var store = new Vuex.Store({

@@ -28,6 +28,7 @@ EOT;
     public function action_sv_app_dynamic_js()
     {
         $this->BDebug->mode('PRODUCTION');
+        $this->layout('sv-app-dynamic-js');
         $html = (string)$this->view('js/sv-app-dynamic-js');
         $script = str_replace(['<script>', '</script>'], '', $html);
         $this->BResponse->setContentType('text/javascript')->set($script);
