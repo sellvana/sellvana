@@ -1,0 +1,13 @@
+<li class="dropdown notification" :class="{open:ddOpen('header-local-notifications')}">
+    <a href="#" title="Status menu" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-local-notifications')">
+        <i class="fa fa-bell" aria-hidden="true"></i>
+        <span class="badge">2</span>
+    </a>
+    <ul class="dropdown-menu" @click.stop>
+        <li>You have 3 pending tasks!</li>
+        <li><img src="" alt="img" class='img-circle'/><a href="#">New User</a><span>registered</span><span class="time">1 min ago</span></li>
+        <li><img src="" alt="img" class='img-circle'/><a href="#">Product 931</a><span>add to wishlist</span><span class="time">1 min ago</span></li>
+        <li><img src="" alt="img" class='img-circle'/><a href="#">Product 931</a><span>add to wishlist</span><span class="time">1 min ago</span></li>
+        <li><a href="#">All Tasks</a></li>
+    </ul>
+</li>

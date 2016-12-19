@@ -1,22 +1,22 @@
 <div class="f-grid-filter-panel">
     <div class="col-sm-5">
-        <sv-comp-grid-panel-columns></sv-comp-grid-panel-columns>
-        <sv-comp-grid-panel-filters></sv-comp-grid-panel-filters>
-        <sv-comp-grid-panel-export></sv-comp-grid-panel-export>
+        <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
+        <sv-comp-grid-panel-filters :grid="grid"></sv-comp-grid-panel-filters>
+        <sv-comp-grid-panel-export :grid="grid"></sv-comp-grid-panel-export>
         <div class="search-block">
             <form>
                 <input type="text" placeholder="Search" />
                 <button class="btn btn-link fa fa-search" name="button" type="submit"></button>
             </form>
         </div>
-        <sv-comp-grid-bulk-actions></sv-comp-grid-bulk-actions>
+        <sv-comp-grid-bulk-actions :grid="grid"></sv-comp-grid-bulk-actions>
     </div>
     <div class="col-sm-7 text-right">
         <div class="visible-lg">
-            <sv-comp-grid-pager-list></sv-comp-grid-pager-list>
+            <sv-comp-grid-pager-list :grid="grid"></sv-comp-grid-pager-list>
         </div>
     </div>
     <div class="col-sm-12">
-        <sv-comp-grid-panel-filters-current></sv-comp-grid-panel-filters-current>
+        <sv-comp-grid-panel-filters-current :grid="grid"></sv-comp-grid-panel-filters-current>
     </div>
 </div>

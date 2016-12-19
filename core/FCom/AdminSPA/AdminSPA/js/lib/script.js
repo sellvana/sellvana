@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	
+
 	$(function() {
 		$('#daterange1').daterangepicker({
 			singleDatePicker: true,
@@ -21,7 +21,7 @@ $(document).ready(function() {
 	});
 										 
 	
-	/*jQuery('#fixed-table').fixedTable({
+	/*jQuery('#myFixedTable').fixedTable({
 		table: {
 			height: 600,
 			width: 1600

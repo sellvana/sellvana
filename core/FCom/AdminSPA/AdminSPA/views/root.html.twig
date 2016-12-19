@@ -4,23 +4,16 @@
     {{ THIS.view('head') | raw }}
 </head>
 <body>
-<div id="sv-app">
-    <div>
-        <div v-if="isLoggedIn">
-            <sv-comp-header :navs="navs"></sv-comp-header>
-        </div>
-
-        <main>
-            <div class="f-admin-container">
-                <div v-if="isLoggedIn">
-                    <sv-comp-menu :navs="navs"></sv-comp-menu>
-                </div>
-                <div class="f-admin-main-view ">
-                    <router-view></router-view>
-                </div>
+<div id="sv-app" @click="pageClick()">
+    <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
+    <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
+        <div class="f-admin-container">
+            <sv-comp-menu v-if="isLoggedIn"></sv-comp-menu>
+            <div class="f-admin-main-view ">
+                <router-view></router-view>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 </div>
 </body>
 </html>

@@ -28,6 +28,7 @@ EOT;
     public function action_sv_app_dynamic_js()
     {
         $this->BDebug->mode('PRODUCTION');
+        $this->layout('sv-app-dynamic-js');
         $html = (string)$this->view('js/sv-app-dynamic-js');
         $script = str_replace(['<script>', '</script>'], '', $html);
         $this->BResponse->setContentType('text/javascript')->set($script);
@@ -62,19 +63,19 @@ EOT;
         $this->BResponse->set($result);
         return;
 
-        if (!$path) {
-            $result = ['error' => true, 'message' => $this->_('Invalid path')];
-        } else {
-            $view = $this->view('components/' . $path);
-            $args = $this->BRequest->request('args');
-            if ($args) {
-                $view->set($this->BUtil->fromJson($args));
-            }
-            $result = [
-                'template' => $view->render(),
-            ];
-        }
-        $script = 'define([], function() { return ' . $this->BUtil->toJson($result) . ' });';
-        $this->BResponse->setContentType('text/javascript')->set($script);
+//        if (!$path) {
+//            $result = ['error' => true, 'message' => $this->_('Invalid path')];
+//        } else {
+//            $view = $this->view('components/' . $path);
+//            $args = $this->BRequest->request('args');
+//            if ($args) {
+//                $view->set($this->BUtil->fromJson($args));
+//            }
+//            $result = [
+//                'template' => $view->render(),
+//            ];
+//        }
+//        $script = 'define([], function() { return ' . $this->BUtil->toJson($result) . ' });';
+//        $this->BResponse->setContentType('text/javascript')->set($script);
     }
 }

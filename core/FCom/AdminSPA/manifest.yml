@@ -12,6 +12,11 @@ modules:
                     - [ /sv-app-dynamic.js, FCom_AdminSPA_AdminSPA_Controller_Main.sv_app_dynamic_js ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
 
+                    - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]
+                    - [ /users/?.action, FCom_AdminSPA_AdminSPA_Controller_Users ]
+                views:
+                    - [ app, FCom_AdminSPA_AdminSPA_View_App ]
+
         default_config:
             modules/FCom_AdminSPA/theme: FCom_AdminSPA_DefaultTheme
 
