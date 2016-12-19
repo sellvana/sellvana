@@ -1,6 +1,6 @@
 <div class="dropdown columns" :class="{open:ddOpen(grid.id+'/panel-columns')}">
     <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.id+'/panel-columns')"><span>Columns</span><b class="caret"></b></a>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu" @click.stop>
         <ol class="ui-sortable">
             <li><i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                 <label>

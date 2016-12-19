@@ -1,6 +1,6 @@
 <div class="dropdown export last-dropdown" :class="{open:ddOpen(grid.id+'/panel-export')}">
     <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.id+'/panel-export')"><span>Export</span><b class="caret"></b></a>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu" @click.stop>
         <ol>
             <li>
                 <label>
