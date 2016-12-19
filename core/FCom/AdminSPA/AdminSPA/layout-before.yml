@@ -105,7 +105,7 @@ sv-app-dynamic-js:
         do:
             - [ addModule, FCom_AdminSPA ]
 
-            - [ addNav, { label: Dashboard, path: /dashboard, link: /, pos: 10 }]
+            - [ addNav, { label: Dashboard, path: /dashboard, link: /, icon_class: "fa fa-tachometer", pos: 10 }]
             - [ addNav, { label: System, path: /system, icon_class: "fa fa-cog", pos: 900 }]
             - [ addNav, { label: Users, path: /system/users, link: /users, pos: 10 }]
             - [ addNav, { label: Settings, path: /system/settings, link: /settings, pos: 100 }]
