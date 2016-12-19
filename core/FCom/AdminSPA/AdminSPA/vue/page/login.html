@@ -1,7 +1,18 @@
-<div>
-    <form>
-        <label>Username</label><input type="input" v-model="username">
-        <label>Password</label><input type="password" v-model="password">
-        <input type="button" @click="submit">
+<div class="login-container">
+	<img src="/sellvanaRepo/core/core/FCom/AdminSPA/AdminSPA/img/logo-big.png" alt="" />
+    <form>		
+        <p>Welcome, please sign in</p>
+        <label>
+			<span>Username</span>
+        	<input type="text" v-model="username">
+		</label>
+        <label>
+			<span>Password</span>
+    		<input type="password" v-model="password">
+		</label>
+        <a href="#">Forgot your password?</a>
+        <div class="control-buttons-block">
+        	<input type="button" @click="submit" value="Sign in" class="button6">
+		</div>
     </form>
 </div>
