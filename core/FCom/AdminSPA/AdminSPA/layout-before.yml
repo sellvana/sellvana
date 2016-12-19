@@ -90,6 +90,9 @@
 
             - [ requireJs, sv-page-login, "@FCom_AdminSPA/AdminSPA/vue/page/login" ]
             - [ requireJs, sv-page-login-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/login.html" ]
+			
+			- [ requireJs, sv-page-password, "@FCom_AdminSPA/AdminSPA/vue/page/password" ]
+			- [ requireJs, sv-page-password-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/password.html" ]
 
             - [ requireJs, sv-page-system-users, "@FCom_AdminSPA/AdminSPA/vue/page/system/users" ]
             - [ requireJs, sv-page-system-users-grid-config, "~/settings/grid_config" ]
