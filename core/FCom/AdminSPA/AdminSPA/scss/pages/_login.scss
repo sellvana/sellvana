@@ -38,12 +38,36 @@
 	}
 	form {
 		text-align: left;
-	}
+		& > span {
+			display: block;
+			width: 80%;
+			margin: 0 auto;
+			text-align: center;
+			color: #000000;
+		}
+	}	
 }
 @media (min-width: 768px) and (max-width: 1199px) {
 	
 }
 
 @media (max-width: 767px) {
-	
+	.login-container {
+		width: 90%;
+		position: relative;
+		margin: 0 auto;
+		top: 0;
+		left: 0%;
+		transform: translate(0, 0);    
+		padding: 40px 40px 30px;
+		p {
+			font-size: 22px;
+		}
+		a {
+			
+		}
+		.control-buttons-block {
+			text-align: center; 
+		}
+	}
 }
