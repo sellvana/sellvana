@@ -22,7 +22,16 @@ define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text
             routes: routes
         });
         SvApp.router = router;
-
+/*
+        router.beforeEach(function (transition) {
+console.log(transition);
+            if (transition.path !== '/login' && !SvApp.store.state.user) {
+                router.push('/login');
+            } else {
+                router.next();
+            }
+        });
+*/
         var navTree = ({{ navTree|json_encode|raw }}),
             user = ({{ user.as_array()|json_encode|raw }}),
             env = ({{ env|json_encode|raw }}),
