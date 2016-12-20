@@ -4969,16 +4969,18 @@ class BValidate extends BClass
             return true;
         }
 
-        $isNew = $model->isNewRecord();
-        $valueChanged = $model->old_values($field);
-
-        if (!$isNew && !$valueChanged) {
-            return true;
+        $isHydrated = !!$model->orm;
+        if ($isHydrated) {
+            $isNew        = $model->isNewRecord();
+            $valueChanged = $model->old_values($field);
+            if (!$isNew && !$valueChanged) {
+                return true;
+            }
         }
 
         /** @var BORM $orm */
         $orm = $model->orm('m')->where('m.' . $field, $data[$field]);
-        if ($model->id()) {
+        if ($isHydrated && $model->id()) {
             $orm->where_not_equal('m.id', $model->id());
         }
         if ($orm->find_one()) {
