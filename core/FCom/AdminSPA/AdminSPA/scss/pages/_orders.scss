@@ -1,10 +1,62 @@
+.order-menu {
+	background: #fff;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+	border-radius: 3px;
+	.nav > li > a {
+		padding: 20px 15px;
+	}
+}
+.order-info {
+	.col-md-4 {
+		padding: 20px 20px 20px 40px;
+	}
+	.status-unpaid, .status-canceled, .status-pending {
+		padding-left: 0;
+		text-align: left;
+	}
+	strong {
+		font-family: $f-main-bold;
+	}
+	a.fa {
+		font-size: 18px;
+		color: #dddddd;
+		&:hover {
+			color: #979393;
+		}
+	}
+	.block-title {
+		border-bottom: 1px solid #edf0f5;
+		margin-bottom: 10px;
+	}
+	p, span {
+		margin-bottom: 5px;
+		display: inline-block;
+	}
+}
+.block-title {
+	margin-bottom: 20px;
+	display: inline-block;
+	p {
+		color: #2d2d2d;
+		font-family: "GothamProBold";
+		font-size: 16px;
+		padding: 8px 0;
+		display: inline-block;
+		margin-right: 10px;
+	}
+}
+.control-buttons {
+	text-align: right;
+	vertical-align: bottom;
+	margin-top: 13px;
+}
 .f-admin-main-view {
 	min-height: 100%;
 	margin: 0;
 	margin-left: 257px;
 	margin-top: 81px;
 	min-width: 276px;
-	padding: 0px 0px 80px 0px;
+	padding: 0px 15px 80px 0px;
 	.nav {
 		a:hover {
 			color: #000;
@@ -17,6 +69,7 @@
 	box-shadow: 0 0 10px rgba(0,0,0,.3);
 	border-radius: 3px;
 	padding: 10px 0px 10px 0px;
+	margin-bottom: 20px;
 }
 .main-nav-closed {
 	.f-admin-main-view {
@@ -37,34 +90,38 @@
 .payment-info, .total-info, .delivery-info, .overall-info {
 	display: inline-block;
 	vertical-align: top;
-	margin-right: 20px;
+	margin-right: 26px;
 	font-size: 0;
+	margin-bottom: 25px;
 	.icon {
-		padding: 9px 20px;
+		padding: 8px 10px 8px 10px;
 		text-align: center;
 		display: inline-block;
 		vertical-align: top;
+		min-height: 42px;
+		min-width: 60px;
 	}
 	i {
 		color: #fff;
-		font-size: 30px;
+		font-size: 22px;
 	}
 	.data {
 		display: inline-block;
 		vertical-align: middle;
 		height: 100%;
 		background: #fff;
-		padding: 5px 14px;
+		padding: 5px 14px 5px 6px;
+		min-width: 128px;
 	}
 	span {
 		display: block;
 		margin-bottom: 3px;
-		font-size: 12px;
+		font-size: 11px;
 		color: #000;
 	}
 	p {
 		font-family: $f-main-bold;
-		font-size: 16px;
+		font-size: 13px;
 		color: #000;
 	}
 }
@@ -86,6 +143,21 @@
 .overall-info {
 	.icon {
 		background: #f29b19;
+	}
+}
+.total-table {
+	padding: 30px 17px;
+	tr:nth-child(odd) {
+		background: #f8f8f8;
+	}
+	td:first-child {
+		font-family: $f-main-bold;
+		color: #2d2d2d;
+		padding: 0 0 0 15px;
+	}
+	td:last-child {
+		font-family: $f-med;
+		color: #2d2d2d;
 	}
 }
 @media (min-width: 768px) and (max-width: 1199px) {

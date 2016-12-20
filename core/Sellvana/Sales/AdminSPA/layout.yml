@@ -10,6 +10,14 @@
             - [ requireJs, sv-page-sales-orders-form-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form.html" ]
             - [ requireJs, sv-page-sales-orders-form-nav-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/nav.html" ]
             - [ requireJs, sv-page-sales-orders-form-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info.html" ]
+			- [ requireJs, sv-page-sales-orders-form-control-buttons, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/control-buttons" ]
+			- [ requireJs, sv-page-sales-orders-form-control-buttons-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/control-buttons.html" ]
+			- [ requireJs, sv-page-sales-orders-form-general-info, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/general" ]
+			- [ requireJs, sv-page-sales-orders-form-general-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/general.html" ]
+			- [ requireJs, sv-page-sales-orders-form-general-info-items-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/items.html" ]
+			- [ requireJs, sv-page-sales-orders-form-general-info-main-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/main-info.html" ]
+			- [ requireJs, sv-page-sales-orders-form-general-info-total-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/total.html" ]
+				
 
 sv-app-dynamic-js:
     - view: app

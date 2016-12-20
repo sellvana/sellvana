@@ -1,0 +1,56 @@
+.processing {
+	padding: 9px 8px;
+	background: #fff; 
+	width: 82px;
+	color: #00ceb4;
+	text-align: center;
+	display: inline-block;
+	border-radius: 1px;
+	font-family: $f-main-bold;
+}
+.placed {
+	padding: 9px 8px;
+	background: #fff;
+	width: 82px;
+	color: #f39b12;
+	text-align: center;
+	display: inline-block;
+	border-radius: 1px;
+	font-family: $f-main-bold;
+}
+.shipped {
+	padding: 9px 8px;
+	background: #fff;
+	width: 82px;
+	color: #2fbdf2;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
+.status-canceled {
+	padding: 9px 8px;
+	background: #fff;
+	width: 82px;
+	color: #dd4b39;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
+.status-pending {
+	padding: 9px 8px;
+	background: #fff;
+	width: 82px;
+	color: #f39c12;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
+.status-unpaid {
+	padding: 9px 8px;
+	background: #fff;
+	width: 82px;
+	color: #00c0ef;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
