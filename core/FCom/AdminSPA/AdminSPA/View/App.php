@@ -8,19 +8,6 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
 
     protected $_modules = [];
 
-    public function bootstrap()
-    {
-        $this->addModule('FCom_AdminSPA')
-            ->addRoute(['path' => '/', 'require' => ['sv-page-dashboard', 'text!sv-page-dashboard-tpl']])
-            ->addRoute(['path' => '/login', 'require' => ['sv-page-login', 'text!sv-page-login-tpl']]);
-
-        $this->addRoute(['path' => '/sales/orders', 'require' => ['sv-page-sales-orders', 'text!sv-page-sales-orders-tpl']])
-            ->addNav(['path' => '/sales/orders', 'label' => 'Orders']);
-
-        $this->addRoute(['path' => '/sales/orders/form', 'require' => ['sv-page-sales-orders-form', 'text!sv-page-sales-orders-form-tpl']])
-            ->addNav(['path' => '/sales/orders/form', 'label' => 'Edit Order']);
-    }
-
     public function addRoute($route)
     {
         $this->_routes[] = $route;
@@ -133,5 +120,12 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
             $modules[$modName] = ['src_root' => $mod->baseSrc(false)];
         }
         return $modules;
+    }
+
+    public function getEnv()
+    {
+        return [
+            'root_href' => $this->BApp->href(),
+        ];
     }
 }

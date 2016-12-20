@@ -1,14 +1,14 @@
-define([], function() {
+define(['sv-app'], function(SvApp) {
     return {
+        mixins: [SvApp.mixins.common],
         data: function () {
             return {
                 username: 'USERNAME',
-                password: 'PASSWORD'
             }
         },
         methods: {
             submit: function() {
-                console.log('LOGIN SUBMIT');
+                console.log('RECOVER SUBMIT');
             }
         }
     }

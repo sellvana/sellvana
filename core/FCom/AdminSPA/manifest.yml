@@ -12,6 +12,7 @@ modules:
                     - [ /sv-app-dynamic.js, FCom_AdminSPA_AdminSPA_Controller_Main.sv_app_dynamic_js ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
 
+                    - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
                     - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]
                     - [ /users/?.action, FCom_AdminSPA_AdminSPA_Controller_Users ]
                 views:

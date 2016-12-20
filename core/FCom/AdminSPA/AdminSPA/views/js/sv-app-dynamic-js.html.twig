@@ -3,6 +3,7 @@
 {% set routes = app.getRoutes() %}
 {% set navs = app.getNavs() %}
 {% set navTree = app.getNavTree() %}
+{% set env = app.getEnv() %}
 {% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
 
 <script>
@@ -17,11 +18,22 @@ define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text
             var r = rawRoutes[i];
             routes.push({path: r.path, component: SvApp.methods.routeView(r.require)});
         }
+        var router = new VueRouter({
+            routes: routes
+        });
+        SvApp.router = router;
 
-        var navTree = ({{ navTree|json_encode|raw }}), user = ({{ user.as_array()|json_encode|raw }});
+        var navTree = ({{ navTree|json_encode|raw }}),
+            user = ({{ user.as_array()|json_encode|raw }}),
+            env = ({{ env|json_encode|raw }}),
+            csrfToken = '{{ SESSION.csrfToken() }}';
 
-        SvApp.store.commit('setNavTree', navTree);
-        SvApp.store.commit('setUser', user);
+        SvApp.store.commit('setData', {
+            navTree: navTree,
+            user: user,
+            env: env,
+            csrfToken: csrfToken
+        });
 
         SvApp.views.app = new Vue({
             el: '#sv-app',
@@ -29,12 +41,13 @@ define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text
             mixins: [SvApp.mixins.common],
             data: function () {
                 return {
-                    ui: this.$store.state.ui
+                    ui: this.$store.state.ui,
+                    isLoaded: true
                 };
             },
             computed: {
                 isLoggedIn: function () {
-                    return true; //this.$store.state.user && this.$store.state.user.id;
+                    return this.$store.state.user && this.$store.state.user.id;
                 }
             },
             methods: {
@@ -46,9 +59,7 @@ define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text
                 'sv-comp-header': SvHeader,
                 'sv-comp-menu': SvMenu
             },
-            router: new VueRouter({
-                routes: routes
-            }),
+            router: router,
             store: SvApp.store
         });
 

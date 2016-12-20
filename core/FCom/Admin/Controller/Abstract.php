@@ -76,7 +76,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
      */
     public function onBeforeDispatch()
     {
-        if (!parent::onBeforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) {
+            return false;
+        }
 
         $this->view('head')->addTitle($this->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
 

@@ -1,16 +1,16 @@
 <div class="login-container">
-	<img src="/sellvanaRepo/core/core/FCom/AdminSPA/AdminSPA/img/logo-big.png" alt="" />
+	<img :src="assetUrl('FCom_AdminSPA', 'img/logo-big.png')" alt="" />
 	<form>		
-		<p>Welcome, please sign in</p>
+		<p><t>Welcome, please sign in</t></p>
 		<label>
-			<span>Username</span>
+			<span><t>Username</t></span>
 			<input type="text" v-model="username">
 		</label>
 		<label>
-			<span>Password</span>
+			<span><t>Password</t></span>
 			<input type="password" v-model="password">
 		</label>
-		<a href="#">Forgot your password?</a>
+		<router-link to="/password-recover"><t>Forgot your password?</t></router-link>
 		<div class="control-buttons-block">
 			<input type="button" @click="submit" value="Sign in" class="button button6">
 		</div>

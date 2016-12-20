@@ -2136,7 +2136,7 @@ class BRouting extends BClass
 #echo "<pre>"; print_r($this->_routes); exit;
         while (($attempts++ < 100) && (false === $forward || is_array($forward))) {
             $route = $this->findRoute($requestRoute);
-#echo "<pre>"; print_r($route); echo "</pre>";
+#echo "<pre>"; print_r($route); echo "</pre>"; exit;
             if (!$route) {
                 $route = $this->findRoute('_ /noroute');
             }
@@ -2364,7 +2364,7 @@ class BRouteNode extends BClass
         $attempts = 0;
         $observer = $this->validObserver();
         while ((++$attempts < 100) && $observer) {
-
+#print_r($observer); exit;
             $forward = $observer->dispatch();
             if (is_array($forward)) {
                 return $forward;

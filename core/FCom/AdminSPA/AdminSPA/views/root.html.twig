@@ -4,7 +4,7 @@
     {{ THIS.view('head') | raw }}
 </head>
 <body>
-<div id="sv-app" @click="pageClick()">
+<div id="sv-app" @click="pageClick()" v-show="isLoaded">
     <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
     <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
         <div class="f-admin-container">

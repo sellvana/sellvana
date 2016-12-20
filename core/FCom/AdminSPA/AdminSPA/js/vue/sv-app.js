@@ -48,6 +48,7 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
     var store = new Vuex.Store({
         strict: true,
         state: {
+            env: {},
             user: {},
             navTree: {},
             navCurrent: {
@@ -58,6 +59,14 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
             }
         },
         mutations: {
+            setData: function (state, data) {
+                for (key in data) {
+                    Vue.set(state, key, data[key]);
+                }
+            },
+            setEnv: function (state, env) {
+                state.env = env;
+            },
             setUser: function (state, user) {
                 state.user = user;
             },
@@ -102,6 +111,16 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
 
     var modules = {};
 
+    function processResponse(response) {
+
+        if (response._user) {
+            store.commit('setData', {user: response._user});
+        }
+        if (response._redirect) {
+
+        }
+    }
+
     return {
         data: function () {
             return {
@@ -109,7 +128,25 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
         },
         methods: {
             routeView: routeView,
-            setModules: function (newModules) { modules = newModules; }
+            setModules: function (newModules) { modules = newModules; },
+            sendRequest: function (method, path, request, success, error) {
+                var data = request;
+                data['X-CSRF-TOKEN'] = store.state.csrfToken;
+                return $.ajax({
+                    method: method,
+                    url: store.state.env.root_href + path,
+                    data: data,//JSON.stringify(data),
+                    success: function (response) {
+                        processResponse(response);
+                        success && success(response);
+                    },
+                    error: function (response) {
+                        processResponse(response);
+                        error && error(response);
+                    }
+                });
+            },
+            processResponse: processResponse
         },
         views: {
 
