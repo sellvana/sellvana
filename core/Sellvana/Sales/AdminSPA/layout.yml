@@ -1,6 +1,9 @@
 /:
     - view: head
         do:
+			- [ meta, Content-Type, "text/html; charset=UTF-8"]
+			- [ meta, viewport, "width=device-width, initial-scale=1"]
+		
             - [ requireJs, sv-page-sales-orders, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/index" ]
             - [ requireJs, sv-page-sales-orders-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/index.html" ]
             - [ requireJs, sv-page-sales-orders-grid-config, "~/orders/grid_config" ]
@@ -17,7 +20,17 @@
 			- [ requireJs, sv-page-sales-orders-form-general-info-items-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/items.html" ]
 			- [ requireJs, sv-page-sales-orders-form-general-info-main-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/main-info.html" ]
 			- [ requireJs, sv-page-sales-orders-form-general-info-total-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/total.html" ]
-				
+			
+			- [ requireJs, sv-page-sales-orders-form-comments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments" ]
+			- [ requireJs, sv-page-sales-orders-form-comments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-comments-control-buttons-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/control-buttons.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-comments-sort-bar-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/sort-bar.html" ]	
+			
+			- [ requireJs, sv-page-sales-orders-form-comments-comment-public-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-public.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-comments-comment-private-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-private.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-comments-comment-new-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-new.html" ]	
+			
+			
 
 sv-app-dynamic-js:
     - view: app

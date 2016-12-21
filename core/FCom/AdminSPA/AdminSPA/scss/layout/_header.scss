@@ -489,7 +489,7 @@ header {
 	display: inline-block;
 	vertical-align: middle;
 	position: relative;
-	input {
+	input[type="text"] {
 		border: 1px solid #ebebeb;
 		padding: 8px 40px 8px 10px;
 	}
