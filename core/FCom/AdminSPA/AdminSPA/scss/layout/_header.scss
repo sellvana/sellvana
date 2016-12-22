@@ -85,7 +85,7 @@ header {
 		}
 	}
 	.row {
-		box-shadow: 0 5px 5px rgba(0,0,0,0.11);
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		padding: 0 17px;
 		position: relative;
 		z-index: 2;
@@ -102,9 +102,7 @@ header {
 	}
 }
 .dropdown-menu, .dropdown-content {
-	-webkit-box-shadow: 0 4px 8px rgba(0,0,0,.04);
-	-moz-box-shadow: 0 4px 8px rgba(0,0,0,.04);
-	box-shadow: 0 4px 8px rgba(0,0,0,.04);
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	border: solid 1px #f2f2f2;
 	border-radius: 1px;
 	& > li {
@@ -275,8 +273,7 @@ header {
 		border: 1px solid #cccccc;
 		border: 1px solid rgba(0, 0, 0, 0.15);
 		border-radius: 4px;
-		-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		-webkit-background-clip: padding-box;
 		background-clip: padding-box;
 	}
@@ -788,7 +785,7 @@ header {
 		}
 		.logo-block {
 			width: 100%;
-			box-shadow: 0 3px 5px rgba(0,0,0,0.11);
+			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		}
 	}
 	.logo-block {
@@ -821,7 +818,7 @@ header {
 	.breadcrumb {
 		width: 100%;
 		margin-top: 5px;
-		box-shadow: 0 3px 5px rgba(0,0,0,0.11);
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11); 
 		margin-left: 0;
 		z-index: 1;
 		position: relative;

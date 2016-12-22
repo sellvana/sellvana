@@ -1,3 +1,45 @@
-<div>
-	New comment
+<div class="new-comment">
+	<form>
+		<div class="block-title">
+			New comment
+		</div>
+		<div class="status-control">
+			<label><input type="radio" value="public" name="comment-message"/><span><i aria-hidden="true" class="fa fa-circle"></i></span><span>Public</span></label>
+			<label><input type="radio" value="private" name="comment-message"/><span><i aria-hidden="true" class="fa fa-circle"></i></span><span>Private</span></label>
+		</div>
+		<p>Comment</p>
+		<textarea></textarea>
+		<div class="add-file-block">
+			<label class="input-file">
+				<i aria-hidden="true" class="fa fa-paperclip"></i>
+				<span class="add-image">Attach files</span>
+				<input type="file" multiple="" accept="image/*,image/jpeg">
+			</label>
+		</div>
+		<div class="control-buttons-block">
+			<input type="submit" value="Send" class="button button12" />
+		</div>
+		<div class="added-files ">
+			<div class="file">
+				<img src='#' alt="file img" />
+				<span>IMG_007.jpg</span>
+				<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+			</div>
+			<div class="file">
+				<img src='#' alt="file img" />
+				<span>IMG_007.jpg</span>
+				<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+			</div>
+			<div class="file">
+				<img src='#' alt="file img" />
+				<span>IMG_007.jpg</span>
+				<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+			</div>
+			<div class="file">
+				<img src='#' alt="file img" />
+				<span>IMG_007.jpg</span>
+				<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+			</div>
+		</div>
+	</form>
 </div>
