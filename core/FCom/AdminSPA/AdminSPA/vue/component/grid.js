@@ -7,63 +7,131 @@ define(['vue', 'sv-app', 'jquery',
     function(Vue, SvApp, $, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl, gridPanelTpl,
              gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelFiltersCurrentTpl, gridPanelExportTpl, gridBulkActionsTpl
     ) {
-        var config = {
-            id: 'sales/orders',
-            data_url: 'https://127.0.0.1/sellvana/admin-spa/sales/orders/data',
-            columns: [
-                {type: 'select-checkbox'},
-                {type: 'actions'},
-                {field: 'id', label: 'ID'},
-                {
-                    field: 'state_overall', label: 'Overall State', options: [
-                    {value: 'pending', label: 'Pending'},
-                    {value: 'processing', label: 'Processing'},
-                    {value: 'shipped', label: 'Shipped'}
-                ]
+        var GridHeaderRow = {
+            mixins: [SvApp.mixins.common],
+            props: ['grid'],
+            template: gridHeaderRowTpl,
+            computed: {
+                columns: function () {
+                    return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
+                },
+                sorted: function() {
+                    return function (col, dir, def) {
+                        if (!this.grid || !this.grid.state || this.grid.state.s !== col.field) {
+                            return def;
+                        }
+                        var sd = this.grid.state.sd;
+                        return (dir === 'up' && sd === 'asc') || (dir === 'down' && sd === 'desc');
+                    }
                 }
-            ],
-            filters: [
-                {field: 'id'},
-                {field: 'state_overall', type: 'multiselect'}
-            ],
-            export: {
-                format_options: [
-                    {value: 'csv', label: 'CSV'}
-                ]
             },
-            pager: {
-                pagesize_options: [5, 10, 20, 50, 100]
+            methods: {
+                toggleSort: function (col) {
+                    if (!this.grid.state) {
+                        Vue.set(this.grid, 'state', {});
+                    }
+                    var s = col.field, sd = 'asc';
+                    if (this.grid.state.s === s) {
+                        if (this.grid.state.sd === 'asc') {
+                            sd = 'desc';
+                        } else {
+                            s = false;
+                            sd = false;
+                        }
+                    }
+                    Vue.set(this.grid.state, 's', s);
+                    Vue.set(this.grid.state, 'sd', sd);
+                    this.$emit('fetch-data');
+                }
+            }
+        };
+        var GridDataRow = {
+            mixins: [SvApp.mixins.common],
+            props: ['grid', 'row'],
+            template: gridDataRowTpl,
+            computed: {
+                columns: function () {
+                    return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
+                },
+                cellClass: function () {
+                    return function (col, row) {
+                        return '';
+                    }
+                },
+                cellData: function () {
+                    return function (col, row) {
+                        return row[col.field];
+                    }
+                }
             }
         };
 
-        var grid = {
-            config: config,
-            rows: [
-                {id: 1, state_overall: 'processing'},
-                {id: 2, state_overall: 'pending'},
-                {id: 3, state_overall: 'shipped'}
-            ]
-        };
-
-        var GridHeaderRow = {
-            template: gridHeaderRowTpl
-        };
-        var GridDataRow = {
-            template: gridDataRowTpl
-        };
-
         var GridPagerList = {
-            template: gridPagerListTpl
+            mixins: [SvApp.mixins.common],
+            props: ['grid'],
+            store: SvApp.store,
+            template: gridPagerListTpl,
+            computed: {
+                pagesizeOptions: function () {
+                    return this.grid.config.pagesize_options;
+                },
+                curPagesize: function () {
+                    return this.grid.state ? this.grid.state.ps : 10;
+                },
+                numPages: function () {
+                    return this.grid.state ? this.grid.state.mp : 0;
+                },
+                curPage: function () {
+                    return this.grid.state ? this.grid.state.p : 1;
+                }
+            },
+            methods: {
+                setPagesize: function (ps) {
+                    this.grid.state.ps = ps;
+                    this.$emit('fetch-data');
+                },
+                setPage: function (p) {
+                    this.grid.state.p = p;
+                    this.$emit('fetch-data');
+                },
+                goPrevPage: function () {
+                    this.grid.state.p = Math.max(this.grid.state.p - 1, 1);
+                    this.$emit('fetch-data');
+                },
+                goNextPage: function () {
+                    this.grid.state.p = Math.max(this.grid.state.p + 1, this.grid.state.mp);
+                    this.$emit('fetch-data');
+                }
+            }
         };
 
-        var GridPagerSelect = {
-            template: gridPagerSelectTpl
-        };
+        var GridPagerSelect = $.extend(true, {}, GridPagerList, {template: gridPagerSelectTpl});
 
         var GridPanelColumns = {
             mixins: [SvApp.mixins.common],
             props: ['grid'],
-            template: gridPanelColumnsTpl
+            template: gridPanelColumnsTpl,
+            store: SvApp.store,
+            data: function () {
+                return {
+
+                }
+            },
+            computed: {
+                getColumn: function () {
+                    return function (col) {
+                        if (!this.$store.state.personalize || !this.$store.state.personalize.grid || !this.$store.state.personalize.grid[this.grid.config.id]) {
+                            return {};
+                        }
+                        return this.$store.state.personalize.grid[this.grid.config.id].columns[col.field];
+                    }
+                }
+            },
+            methods: {
+                toggleColumn: function (col) {
+                    this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
+                }
+            }
         };
 
         var GridPanelFilters = {
@@ -83,12 +151,14 @@ define(['vue', 'sv-app', 'jquery',
         };
 
         var GridBulkActions = {
+            mixins: [SvApp.mixins.common],
+            props: ['grid'],
             template: gridBulkActionsTpl
         };
 
         var GridPanel = {
-            props: ['grid'],
             mixins: [SvApp.mixins.common],
+            props: ['grid'],
             components: {
                 'sv-comp-grid-pager-list': GridPagerList,
                 'sv-comp-grid-panel-columns': GridPanelColumns,
@@ -101,21 +171,29 @@ define(['vue', 'sv-app', 'jquery',
         };
 
         return {
+            props: ['grid'],
             mixins: [SvApp.mixins.common],
             data: function() {
                 return {
-                    grid: grid
+                    //grid: grid
                 }
             },
             methods: {
                 fetchData: function () {
-                    var url = grid.data_url, params = {types: ['config', 'rows']}, self = this;
+                    var grid = this.grid, url = grid.config.data_url, params = {types: 'rows'};
+                    if (grid.state && grid.state.s) {
+                        params.s = grid.state.s;
+                        params.sd = grid.state.sd;
+                    }
                     $.get(url, params, function (response) {
                         if (response.config) {
-                            Vue.set(self.grid, 'config', response.config);
+                            Vue.set(grid, 'config', response.config);
+                        }
+                        if (response.state) {
+                            Vue.set(grid, 'state', response.state);
                         }
                         if (response.rows) {
-                            Vue.set(self.grid, 'rows', response.rows);
+                            Vue.set(grid, 'rows', response.rows);
                         }
                     });
                 }
@@ -127,7 +205,7 @@ define(['vue', 'sv-app', 'jquery',
                 'sv-comp-grid-header-row': GridHeaderRow,
                 'sv-comp-grid-data-row': GridDataRow,
                 'sv-comp-grid-panel': GridPanel,
-                'sv-comp-grid-pager-select': GridPagerSelect,
+                'sv-comp-grid-pager-select': GridPagerSelect
             },
             template: gridTpl
         };

@@ -64,17 +64,25 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
                     Vue.set(state, key, data[key]);
                 }
             },
-            setEnv: function (state, env) {
-                state.env = env;
-            },
-            setUser: function (state, user) {
-                state.user = user;
-            },
-            setNavTree: function (state, navTree) {
-                state.navTree = navTree;
-            },
-            setNavCurrent: function (state, navCurrent) {
-                state.navCurrent = navCurrent;
+            personalizeGridColumn: function (state, data) {
+                var grid = data.grid, col = data.col;
+                if (!state.personalize) {
+                    Vue.set(state, 'personalize', {});
+                }
+                if (!state.personalize.grid) {
+                    Vue.set(state.personalize, 'grid', {});
+                }
+                if (!state.personalize.grid[grid.config.id]) {
+                    Vue.set(state.personalize.grid, grid.config.id, {});
+                }
+                if (!state.personalize.grid[grid.config.id].columns) {
+                    Vue.set(state.personalize.grid[grid.config.id], 'columns', {});
+                }
+                if (!state.personalize.grid[grid.config.id].columns[col.field]) {
+                    Vue.set(state.personalize.grid[grid.config.id].columns, col.field, 1);
+                } else {
+                    Vue.set(state.personalize.grid[grid.config.id].columns, col.field, 0);
+                }
             }
         }
     });
@@ -112,12 +120,27 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
     var modules = {};
 
     function processResponse(response) {
-
+        var storeData = {};
         if (response._user) {
-            store.commit('setData', {user: response._user});
+            storeData.user = response._user;
         }
-        if (response._redirect) {
+        if (response._personalize) {
+            storeData.personalize = response._personalize;
+        }
+        if (response._permissions) {
+            storeData.permissions = response._permissions;
+        }
+        if (response._local_notifications) {
+            storeData.localNotifications = response._local_notifications; //TODO: merge
+        }
+        if (response._nav) {
+            storeData.navTree = response._nav;
+        }
+console.log(storeData);
+        store.commit('setData', storeData);
 
+        if (response._redirect) {
+            console.log(response._redirect);
         }
     }
 

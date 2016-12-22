@@ -1,21 +1,17 @@
 <div>
-    <template>
-        <div class="pagination hidden-lg dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true"><span>10</span><span class="caret-back"><b class="caret"></b></span></a>
-            <ul class="dropdown-menu">
-                <li class="active"><a href="#" data-value="10">10</a></li>
-                <li class=""><a href="#" data-value="20">20</a></li>
-                <li class=""><a href="#" data-value="50">50</a></li>
-                <li class=""><a href="#" data-value="100">100</a></li>
-            </ul>
-        </div>
-        <ul class="pagination pagination-sm pagination-griddle page">
-            <li class="prev"><a href="#">Previous</a></li>
-            <li class="page active">
-                <input type="number" min=1 step="1" value="1" />
-            </li>
-            <li><span>of</span><span>1</span></li>
-            <li class="next"><a href="#">Next</a></li>
+    <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(grid.config.id+'/pagesize-select')}">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(grid.config.id+'/pagesize-select')"
+           @click.prevent.stop="ddToggle(grid.config.id+'/pagesize-select')"><span>{{curPagesize}}</span><span class="caret-back"><b class="caret"></b></span></a>
+        <ul class="dropdown-menu">
+            <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}"><a href="#" @click.prevent="setPagesize(ps)" class="js-change-url page-size">{{ps}}</a></li>
         </ul>
-    </template>
+    </div>
+    <ul class="pagination pagination-sm pagination-griddle page">
+        <li class="prev"><a href="#" @click.prevent="goPrevPage()"><t>Previous</t></a></li>
+        <li class="page active">
+            <input type="number" min=1 step="1" v-model="curPage" @change="goPage()"/>
+        </li>
+        <li><t>of</t><span>{{numPages}}</span></li>
+        <li class="next"><a href="#" @click.prevent="goNextPage()"><t>Next</t></a></li>
+    </ul>
 </div>

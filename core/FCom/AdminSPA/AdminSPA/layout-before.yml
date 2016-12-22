@@ -96,7 +96,7 @@
 			- [ requireJs, sv-page-account-password-reset-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-reset.html" ]
 
             - [ requireJs, sv-page-system-users, "@FCom_AdminSPA/AdminSPA/vue/page/system/users" ]
-            - [ requireJs, sv-page-system-users-grid-config, "~/settings/grid_config" ]
+            - [ requireJs, sv-page-system-users-grid-config, "~/users/grid_config" ]
 
             - [ requireJs, sv-page-system-settings, "@FCom_AdminSPA/AdminSPA/vue/page/system/settings" ]
             - [ requireJs, sv-page-system-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/system/settings.html" ]
@@ -119,7 +119,7 @@ sv-app-dynamic-js:
             - [ addRoute, { path: /password-recover, require: [sv-page-account-password-recover, text!sv-page-account-password-recover-tpl ]}]
             - [ addRoute, { path: /password-reset, require: [sv-page-account-password-reset, text!sv-page-account-password-reset-tpl ]}]
             - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]
-            - [ addRoute, { path: /users, require: [sv-page-system-users, text!sv-page-default-grid-tpl ]}] #, json!sv-page-users-grid-config ]}]
+            - [ addRoute, { path: /users, require: [sv-page-system-users, text!sv-page-default-grid-tpl, json!sv-page-system-users-grid-config ]}] #, json!sv-page-users-grid-config ]}]
             - [ addRoute, { path: /settings, require: [sv-page-system-settings, text!sv-page-system-settings-tpl ]}]
 
 

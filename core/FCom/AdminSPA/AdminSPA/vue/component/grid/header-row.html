@@ -1,4 +1,17 @@
 <tr>
+    <th v-for="col in columns">
+        <template v-if="col.header_cell_vm === 'GridHeaderCell_RowSelect'">
+            <i class="fa fa-list" aria-hidden="true"></i><span>A</span>
+        </template>
+        <sv-comp-grid-header-cell v-else-if="col.header_cell_vm" :grid="grid" :column="col"></sv-comp-grid-header-cell>
+        <template v-else>
+            <a href="#" :class="{'sorted-up':sorted(col, 'up', 0), 'sorted-down':sorted(col, 'down', 0)}" @click.prevent="toggleSort(col)"
+                ><i class="fa fa-caret-up" aria-hidden="true" v-if="sorted(col, 'up', 1)"></i
+                ><i class="fa fa-caret-down" aria-hidden="true" v-if="sorted(col, 'down', 1)"></i
+                ><t>{{col.label}}</t></a>
+        </template>
+    </th>
+    <!--
     <th><i class="fa fa-list" aria-hidden="true"></i><span>A</span></th>
     <th><span class="sorted-up"><i class="fa fa-caret-up" aria-hidden="true"></i>Actions</span></th>
     <th><span><i class="fa fa-caret-up" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i>Internal ID</span></th>
@@ -13,4 +26,5 @@
     <th><span><i class="fa fa-caret-up" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i>Ship Last Name</span></th>
     <th><span><i class="fa fa-caret-up" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i>Return State</span></th>
     <th><span><i class="fa fa-caret-up" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i>Delivery State</span></th>
+    -->
 </tr>

@@ -1,4 +1,4 @@
-define(['sv-comp-grid', 'text!'], function (SvGrid) {
+define(['sv-comp-grid'], function (SvGrid) {
     return {
 
     };

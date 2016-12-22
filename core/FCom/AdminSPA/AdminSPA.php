@@ -13,7 +13,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
         '_user' => true,
         '_permissions' => true,
         '_nav' => true,
-        '_personalization' => true,
+        '_personalize' => true,
         '_local_notifications' => true,
         '_redirect' => true,
     ];
@@ -85,7 +85,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
         return $data;
     }
 
-    public function responseCallback_personalization($data)
+    public function responseCallback_personalize($data)
     {
         $userId = $this->FCom_Admin_Model_User->sessionUserId();
         $pers = $this->FCom_Admin_Model_Personalize->load($userId, 'user_id');

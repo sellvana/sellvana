@@ -1,4 +1,17 @@
 <tr>
+    <template v-for="col in columns">
+        <th v-if="col.data_cell_vm === 'GridDataCell_RowSelect'">
+            <label><input type="checkbox" name="" /><span><i class="fa fa-check" aria-hidden="true"></i></span></label>
+        </th>
+        <th v-else-if="col.data_cell_vm === 'GridDataCell_Actions'">
+            <router-link to="/sales/orders/form"><i class="fa fa-pencil" aria-hidden="true"></i></router-link>
+        </th>
+        <sv-comp-grid-header-cell v-else-if="col.header_cell_vm" :grid="grid" :column="col"></sv-comp-grid-header-cell>
+        <td v-else>
+            <span :class="cellClass(col, row)">{{cellData(col, row) }}</span>
+        </td>
+    </template>
+    <!--
     <th>
         <label>
             <input type="checkbox" name="" /><span><i class="fa fa-check" aria-hidden="true"></i></span></label>
@@ -7,7 +20,7 @@
     <td><span>BLAH BLAH</span></td>
     <td><span>100000001</span></td>
     <td></td>
-    <td><span class="processing">Processing</span></td><!-- placed, shipped, processing -->
+    <td><span class="processing">Processing</span></td>
     <td><span>Gurvich</span></td>
     <td><span>New York</span></td>
     <td><span>US</span></td>
@@ -16,4 +29,5 @@
     <td><span>Gurvich</span></td>
     <td><span>None</span></td>
     <td><span class="processing">Processing</span></td>
+    -->
 </tr>

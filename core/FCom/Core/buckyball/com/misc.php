@@ -4969,7 +4969,7 @@ class BValidate extends BClass
             return true;
         }
 
-        $isHydrated = !!$model->orm;
+        $isHydrated = (bool)$model->orm;
         if ($isHydrated) {
             $isNew        = $model->isNewRecord();
             $valueChanged = $model->old_values($field);

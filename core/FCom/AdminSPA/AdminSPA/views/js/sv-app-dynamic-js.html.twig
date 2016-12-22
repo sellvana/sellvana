@@ -5,6 +5,7 @@
 {% set navTree = app.getNavTree() %}
 {% set env = app.getEnv() %}
 {% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
+{% set pers = APP.instance('FCom_Admin_Model_Personalize') %}
 
 <script>
 define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-menu', 'text!sv-comp-menu-tpl'],

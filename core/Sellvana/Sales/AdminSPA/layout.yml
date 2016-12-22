@@ -4,6 +4,7 @@
 			- [ meta, Content-Type, "text/html; charset=UTF-8"]
 			- [ meta, viewport, "width=device-width, initial-scale=1"]
 		
+            - [ scss, "@Sellvana_Sales/AdminSPA/scss/orders.scss" ]
             - [ requireJs, sv-page-sales-orders, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/index" ]
             - [ requireJs, sv-page-sales-orders-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/index.html" ]
             - [ requireJs, sv-page-sales-orders-grid-config, "~/orders/grid_config" ]
@@ -38,5 +39,5 @@ sv-app-dynamic-js:
             - [ addNav, { path: /sales, label: Sales, icon_class: "fa fa-line-chart", pos: 20 } ]
             - [ addNav, { path: /sales/orders, label: Orders, link: /sales/orders, pos: 10 } ]
 
-            - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl ] } ] #, json!sv-page-sales-orders-grid-config
+            - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl, json!sv-page-sales-orders-grid-config ] } ] #, json!sv-page-sales-orders-grid-config
             - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-sales-orders-form-tpl ] } ] #, json!sv-page-sales-orders-form-config

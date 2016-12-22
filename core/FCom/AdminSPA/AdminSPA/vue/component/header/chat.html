@@ -6,53 +6,53 @@
     <ul class="dropdown-menu" @click.stop>
         <p>Chat</p>
         <div class="tabs">
-            <ul class='nav nav-tabs'>
+            <ul class="nav nav-tabs">
                 <li :class="{active:ui.curTab==='users'}"><a href="#" data-toggle="tab" @click.prevent.stop="ui.curTab='users'"><i class="fa fa-user" aria-hidden="true"></i></a></li>
                 <li :class="{active:ui.curTab==='groups'}"><a href="#" data-toggle="tab" @click.prevent.stop="ui.curTab='groups'"><i class="fa fa-users" aria-hidden="true"></i></a></li>
             </ul>
             <div class="tab-content">
-                <div id='home' class='tab-pane customScroll' :class="{active:ui.curTab==='users'}">
-                    <a href="#" class="online"><img src='#' alt='user' class='img-circle'/><i></i><span>User 1</span></a>
-                    <a href="#" class="away"><img src='#' alt='user' class='img-circle'/><i></i><span>User 2</span></a>
-                    <a href="#" class="na"><img src='#' alt='user' class='img-circle'/><i></i><span>User 3</span></a>
-                    <a href="#" class="offline"><img src='#' alt='user' class='img-circle'/><i></i><span>User 4</span></a>
+                <div id='home' class="tab-pane customScroll" :class="{active:ui.curTab==='users'}">
+                    <a href="#" class="online"><img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="user" class="img-circle"/><i></i><span>User 1</span></a>
+                    <a href="#" class="away"><img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="user" class="img-circle"/><i></i><span>User 2</span></a>
+                    <a href="#" class="na"><img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="user" class="img-circle"/><i></i><span>User 3</span></a>
+                    <a href="#" class="offline"><img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="user" class="img-circle"/><i></i><span>User 4</span></a>
                 </div>
-                <div id="groups" class='tab-pane' :class="{active:ui.curTab==='groups'}">
+                <div id="groups" class="tab-pane" :class="{active:ui.curTab==='groups'}">
                     <a href="#" class="add-group fa fa-plus"></a>
                     <div class="groups customScroll">
                         <div class="group">
-                            <img src="" alt="group" class="img-circle" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="group" class="img-circle" />
                             <span>Favourite</span>
-                            <a class='fa fa-pencil'></a>
-                            <a class='fa fa-times'></a>
+                            <a class="fa fa-pencil"></a>
+                            <a class="fa fa-times"></a>
                         </div>
                         <div class="group">
-                            <img src="" alt="group" class="img-circle" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="group" class="img-circle" />
                             <span>Favourite</span>
-                            <a class='fa fa-pencil'></a>
-                            <a class='fa fa-times'></a>
+                            <a class="fa fa-pencil"></a>
+                            <a class="fa fa-times"></a>
                         </div>
                         <div class="group">
-                            <img src="" alt="group" class="img-circle" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="group" class="img-circle" />
                             <span>Favourite</span>
-                            <a class='fa fa-pencil'></a>
-                            <a class='fa fa-times'></a>
+                            <a class="fa fa-pencil"></a>
+                            <a class="fa fa-times"></a>
                         </div>
                         <div class="group">
-                            <img src="" alt="group" class="img-circle" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" alt="group" class="img-circle" />
                             <span>Favourite</span>
-                            <a class='fa fa-pencil'></a>
-                            <a class='fa fa-times'></a>
+                            <a class="fa fa-pencil"></a>
+                            <a class="fa fa-times"></a>
                         </div>
                     </div>
                     <div class="new-groups">
                         <div class="new-group-users">
-                            <img src="" class="img-circle" alt="" />
-                            <img src="" class="img-circle" alt="" />
-                            <img src="" class="img-circle" alt="" />
-                            <img src="" class="img-circle" alt="" />
-                            <img src="" class="img-circle" alt="" />
-                            <img src="" class="img-circle" alt="" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" class="img-circle" alt="" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" class="img-circle" alt="" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" class="img-circle" alt="" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" class="img-circle" alt="" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" class="img-circle" alt="" />
+                            <img :src="assetUrl('FCom_AdminSPA', 'img/profile.png')" class="img-circle" alt="" />
                         </div>
                         <div class="new-group-controls">
                             <select>
