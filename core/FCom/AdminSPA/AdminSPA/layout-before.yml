@@ -94,6 +94,10 @@
 			- [ requireJs, sv-page-account-password-recover-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-recover.html" ]
 			- [ requireJs, sv-page-account-password-reset, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-reset" ]
 			- [ requireJs, sv-page-account-password-reset-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-reset.html" ]
+            - [ requireJs, sv-page-account-profile, "@FCom_AdminSPA/AdminSPA/vue/page/account/profile" ]
+            - [ requireJs, sv-page-account-profile-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/profile.html" ]
+            - [ requireJs, sv-page-account-logout, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout" ]
+            - [ requireJs, sv-page-account-logout-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout.html" ]
 
             - [ requireJs, sv-page-system-users, "@FCom_AdminSPA/AdminSPA/vue/page/system/users" ]
             - [ requireJs, sv-page-system-users-grid-config, "~/users/grid_config" ]
@@ -115,10 +119,12 @@ sv-app-dynamic-js:
             - [ addNav, { label: Settings, path: /system/settings, link: /settings, pos: 100 }]
 
             - [ addRoute, { path: /, require: [sv-page-dashboard, text!sv-page-dashboard-tpl ]}]
+            - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]
             - [ addRoute, { path: /login, require: [sv-page-account-login, text!sv-page-account-login-tpl ]}]
+            - [ addRoute, { path: /logout, require: [sv-page-account-logout, text!sv-page-account-logout-tpl ]}]
             - [ addRoute, { path: /password-recover, require: [sv-page-account-password-recover, text!sv-page-account-password-recover-tpl ]}]
             - [ addRoute, { path: /password-reset, require: [sv-page-account-password-reset, text!sv-page-account-password-reset-tpl ]}]
-            - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]
+            - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
             - [ addRoute, { path: /users, require: [sv-page-system-users, text!sv-page-default-grid-tpl, json!sv-page-system-users-grid-config ]}] #, json!sv-page-users-grid-config ]}]
             - [ addRoute, { path: /settings, require: [sv-page-system-settings, text!sv-page-system-settings-tpl ]}]
 

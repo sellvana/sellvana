@@ -42,7 +42,7 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 		components: {
 			'sv-page-sales-orders-form-general-info-items': GeneralInfoItems,
 			'sv-page-sales-orders-form-general-info-main-info': GeneralInfoMain,
-			'sv-page-sales-orders-form-general-info-total': GeneralInfoTotal,
+			'sv-page-sales-orders-form-general-info-total': GeneralInfoTotal
 		}
 	};
 	
@@ -73,19 +73,29 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 			'sv-page-sales-orders-form-comments-control-buttons': CommentControlButtons,
 			'sv-page-sales-orders-form-comments-comment-public': CommentPublic,
 			'sv-page-sales-orders-form-comments-comment-private': CommentPrivate,
-			'sv-page-sales-orders-form-comments-comment-new': CommentNew,
+			'sv-page-sales-orders-form-comments-comment-new': CommentNew
 		}
 	};
 	
 	return {
+		store: SvApp.store,
         components: {
             'sv-comp-form': SvCompForm,
             'sv-page-sales-orders-form-nav': FormNav,
             'sv-page-sales-orders-form-info': FormInfo,
             'sv-page-sales-orders-form-control-buttons': ControlButtons,
             'sv-page-sales-orders-form-general-info': GeneralInfo,
-			'sv-page-sales-orders-form-comments': OrderComments,
-		
+			'sv-page-sales-orders-form-comments': OrderComments
+		},
+		mounted: function () {
+            this.$store.commit('setData', {curPage: {
+                link: '/sales/orders/form',
+                label: 'Edit Order #12345',
+                breadcrumbs: [
+                    {nav:'/sales', label:'Sales', icon_class:'fa fa-line-chart'},
+                    {link:'/sales/orders', label:'Orders'}
+                ]
+            }});
 		}
     };
 });

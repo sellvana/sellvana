@@ -17,7 +17,7 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
     public function getRoutes()
     {
         $routes = $this->_routes;
-        $routes[] = ['path' => '*', 'require' => ['', 'text!sv-page-not-found-tpl']];
+        $routes[] = ['path' => '*', 'require' => ['sv-page-not-found', 'text!sv-page-not-found-tpl']];
         return $routes;
     }
 

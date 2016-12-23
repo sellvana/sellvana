@@ -51,12 +51,14 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
             env: {},
             user: {},
             navTree: {},
-            navCurrent: {
-                paths: ['/sales', '/sales/orders'],
+            curPage: {
+                link: '/',
+                label: '',
+                icon_class: '',
                 breadcrumbs: [
-
                 ]
-            }
+            },
+            favorites: []
         },
         mutations: {
             setData: function (state, data) {
@@ -83,6 +85,26 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
                 } else {
                     Vue.set(state.personalize.grid[grid.config.id].columns, col.field, 0);
                 }
+            },
+            addFavorite: function (state, fav) {
+                var favs = state.favorites || [];
+                for (var i = 0; i < favs.length; i++) {
+                    if (favs[i].link === fav.link) {
+                        return;
+                    }
+                }
+                favs.push(fav);
+                Vue.set(state, 'favorites', favs);
+            },
+            removeFavorite: function (state, fav) {
+                var favs = state.favorites;
+                for (var i = 0; i < favs.length; i++) {
+                    if (favs[i].link === fav.link) {
+                        favs.splice(i, 1);
+                        break;
+                    }
+                }
+                Vue.set(state, 'favorites', favs);
             }
         }
     });

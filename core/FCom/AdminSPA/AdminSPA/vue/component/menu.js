@@ -4,7 +4,7 @@ define(['vue', 'sv-app', 'text!sv-comp-menu-tpl'], function(Vue, SvApp, menuTpl)
         data: function () {
             return {
                 ui: this.$store.state.ui,
-                navCurrent: this.$store.state.navCurrent,
+                curPage: this.$store.state.curPage,
                 navTreeOpen: {}
             };
         },
@@ -12,6 +12,20 @@ define(['vue', 'sv-app', 'text!sv-comp-menu-tpl'], function(Vue, SvApp, menuTpl)
             navOpen: function () {
                 return function (path) {
                     return this.navTreeOpen[path];
+                }
+            },
+            inBreadcrumbs: function () {
+                return function (node) {
+                    var curPage = this.$store.state.curPage;
+                    if (curPage.link === node.link) {
+                        return true;
+                    }
+                    for (var i = 0; i < curPage.breadcrumbs.length; i++) {
+                        if (curPage.breadcrumbs[i].link === node.link) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
             }
         },

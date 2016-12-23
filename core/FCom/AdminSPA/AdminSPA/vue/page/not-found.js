@@ -1,11 +1,10 @@
-define(['sv-app', 'sv-comp-grid'], function (SvApp, SvGrid) {
+define(['sv-app'], function (SvApp) {
     return {
         store: SvApp.store,
         mounted: function () {
             this.$store.commit('setData', {curPage: {
-                link: '/',
-                label: 'Dashboard',
-                icon_class: 'fa fa-tachometer',
+                link: '/not-found',
+                label: 'Page Not Found',
                 breadcrumbs: [
                 ]
             }});

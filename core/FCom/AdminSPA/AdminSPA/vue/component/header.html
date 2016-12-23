@@ -12,9 +12,9 @@
         <div class="row">
             <nav class="navbar navbar-default">
                 <div class="logo-block">
-                    <a class="navbar-brand  pull-left" href="dashboard.html">
+                    <router-link class="navbar-brand  pull-left" to="/">
                         <span class="logo"></span>
-                    </a>
+                    </router-link>
                     <sv-comp-header-search :mobile="true"></sv-comp-header-search>
                 </div>
                 <a class="navbar-toggle btn pull-left hidden-xs" href="#" @click.prevent="mainNavToggle()">

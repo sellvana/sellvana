@@ -31,4 +31,20 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
         }
         $this->respond();
     }
+
+    public function action_logout__POST()
+    {
+        try {
+            $user = $this->FCom_Admin_Model_User->sessionUser();
+            if ($user) {
+                $user->logout();
+            }
+            $this->addResponses(true);
+        } catch (Exception $e) {
+            $this->addResponses(['_messages' => [
+                ['type' => 'error', 'message' => $e->getMessage()],
+            ]]);
+        }
+        $this->respond();
+    }
 }

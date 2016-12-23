@@ -162,22 +162,22 @@ define(['vue', 'sv-app', 'jquery',
             template: gridPanelFiltersCurrentTpl,
             computed: {
                 currentFilters: function () {
-                    var grid = this.$store.state.grid;
-                    if (!grid.state || !grid.state.filters) {
+                    var gridState = this.grid.state;
+                    if (!gridState || !gridState.filters) {
                         return [];
                     }
-                    return grid.state.filters;
+                    return gridState.filters;
                 }
             },
             methods: {
                 removeFilter: function (flt) {
-                    var grid = this.$store.state.grid;
-                    if (!grid.state || !grid.state.filters || !grid.state.filters[flt.field]) {
+                    var gridState = this.grid.state;
+                    if (!gridState || !gridState.filters || !gridState.filters[flt.field]) {
                         return;
                     }
-                    delete grid.state.filters[flt.field];
-                    if (!Object.keys(grid.state.filters).length) {
-                        delete grid.state.filters;
+                    delete gridState.filters[flt.field];
+                    if (!Object.keys(gridState.filters).length) {
+                        delete gridState.filters;
                     }
                 }
             }

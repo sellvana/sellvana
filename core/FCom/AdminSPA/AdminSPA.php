@@ -77,12 +77,12 @@ class FCom_AdminSPA_AdminSPA extends BClass
     
     public function responseCallback_permissions($data)
     {
-        return $data;
+        return [];
     }
     
     public function responseCallback_nav($data)
     {
-        return $data;
+        return [];
     }
 
     public function responseCallback_personalize($data)

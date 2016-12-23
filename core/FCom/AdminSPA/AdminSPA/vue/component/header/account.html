@@ -8,14 +8,10 @@
     </ul>
     <ul>
         <li class="login-status" :class="{open:ddOpen('header-account-status')}">
-            <a href="#" title="Status menu" class="status-toggle status online " @click.prevent.stop="ddToggle('header-account-status')"><i class="fa fa-check" aria-hidden="true"></i></a>
+            <a href="#" :title="_('Status menu')" class="status-toggle status" :class="curStatus.item_class" @click.prevent.stop="ddToggle('header-account-status')"><i :class="curStatus.icon_class" aria-hidden="true"></i></a>
             <ul class="dropdown-menu">
-                <li class="online"><a href="" @click="setStatus('online')"><i class="fa fa-check" aria-hidden="true"></i>Online</a></li>
-                <li class="away"><a href=""><i class="fa fa-phone" aria-hidden="true"></i></i>Away</a></li>
-                <li class="na"><a href=""><i class="fa fa-minus" aria-hidden="true"></i>N/A</a></li>
-                <li class="offline"><a href=""><i></i>Offline</a></li>
+                <li v-for="st in statuses" :class="st.item_class"><a href="#" @click.prevent="setStatus(st)"><i :class="st.icon_class" aria-hidden="true"></i><t>{{st.label}}</t></a></li>
             </ul>
-
         </li>
     </ul>
 </li>
