@@ -90,33 +90,28 @@ define(['vue', 'sv-app', 'jquery',
                     this.grid.state.ps = ps;
                     this.$emit('fetch-data');
                 },
-                setPage: function (p) {
+                goPage: function (p) {
                     this.grid.state.p = p;
                     this.$emit('fetch-data');
                 },
                 goPrevPage: function () {
-                    this.grid.state.p = Math.max(this.grid.state.p - 1, 1);
+                    this.grid.state.p = Math.max(this.grid.state.p * 1 - 1, 1);
                     this.$emit('fetch-data');
                 },
                 goNextPage: function () {
-                    this.grid.state.p = Math.max(this.grid.state.p + 1, this.grid.state.mp);
+                    this.grid.state.p = Math.min(this.grid.state.p * 1 + 1, this.grid.state.mp);
                     this.$emit('fetch-data');
                 }
             }
         };
 
-        var GridPagerSelect = $.extend(true, {}, GridPagerList, {template: gridPagerSelectTpl});
+        var GridPagerSelect = $.extend({}, GridPagerList, {template: gridPagerSelectTpl});
 
         var GridPanelColumns = {
             mixins: [SvApp.mixins.common],
             props: ['grid'],
             template: gridPanelColumnsTpl,
             store: SvApp.store,
-            data: function () {
-                return {
-
-                }
-            },
             computed: {
                 getColumn: function () {
                     return function (col) {
@@ -137,11 +132,55 @@ define(['vue', 'sv-app', 'jquery',
         var GridPanelFilters = {
             mixins: [SvApp.mixins.common],
             props: ['grid'],
-            template: gridPanelFiltersTpl
+            template: gridPanelFiltersTpl,
+            data: function () {
+                return {
+                    filterToAdd: ''
+                }
+            },
+            computed: {
+                availableFilters: function () {
+                    return [];
+                },
+                addedFilters: function () {
+                    return [{}];
+                }
+            },
+            methods: {
+                addFilter: function () {
+
+                },
+                applyFilters: function () {
+
+                }
+            }
         };
 
         var GridPanelFiltersCurrent = {
-            template: gridPanelFiltersCurrentTpl
+            mixins: [SvApp.mixins.common],
+            props: ['grid'],
+            template: gridPanelFiltersCurrentTpl,
+            computed: {
+                currentFilters: function () {
+                    var grid = this.$store.state.grid;
+                    if (!grid.state || !grid.state.filters) {
+                        return [];
+                    }
+                    return grid.state.filters;
+                }
+            },
+            methods: {
+                removeFilter: function (flt) {
+                    var grid = this.$store.state.grid;
+                    if (!grid.state || !grid.state.filters || !grid.state.filters[flt.field]) {
+                        return;
+                    }
+                    delete grid.state.filters[flt.field];
+                    if (!Object.keys(grid.state.filters).length) {
+                        delete grid.state.filters;
+                    }
+                }
+            }
         };
 
         var GridPanelExport = {
@@ -153,7 +192,20 @@ define(['vue', 'sv-app', 'jquery',
         var GridBulkActions = {
             mixins: [SvApp.mixins.common],
             props: ['grid'],
-            template: gridBulkActionsTpl
+            template: gridBulkActionsTpl,
+            computed: {
+                actions: function () {
+                    return [
+                        {label: 'Edit'},
+                        {label: 'Delete'}
+                    ];
+                }
+            },
+            methods: {
+                doAction: function (o) {
+
+                }
+            }
         };
 
         var GridPanel = {
@@ -166,6 +218,11 @@ define(['vue', 'sv-app', 'jquery',
                 'sv-comp-grid-panel-filters-current': GridPanelFiltersCurrent,
                 'sv-comp-grid-panel-export': GridPanelExport,
                 'sv-comp-grid-bulk-actions': GridBulkActions
+            },
+            methods: {
+                fetchData: function () {
+                    this.$emit('fetch-data');
+                }
             },
             template: gridPanelTpl
         };
@@ -181,9 +238,17 @@ define(['vue', 'sv-app', 'jquery',
             methods: {
                 fetchData: function () {
                     var grid = this.grid, url = grid.config.data_url, params = {types: 'rows'};
-                    if (grid.state && grid.state.s) {
-                        params.s = grid.state.s;
-                        params.sd = grid.state.sd;
+                    if (grid.state) {
+                        if (grid.state.s) {
+                            params.s = grid.state.s;
+                            params.sd = grid.state.sd;
+                        }
+                        if (grid.state.ps) {
+                            params.ps = grid.state.ps;
+                        }
+                        if (grid.state.p) {
+                            params.p = grid.state.p;
+                        }
                     }
                     $.get(url, params, function (response) {
                         if (response.config) {

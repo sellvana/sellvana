@@ -1,7 +1,7 @@
 <div class="dropdown action" :class="{open:ddOpen(grid.config.id+'/bulk-actions')}">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle(grid.config.id+'/bulk-actions')"><span>Bulk Action</span><span class="caret-back"><b class="caret"></b></span></a>
-    <ul class="dropdown-menu">
-        <li><a href="#">Edit</a></li>
-        <li><a href="#">Delete</a></li>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+       @click.prevent.stop="ddToggle(grid.config.id+'/bulk-actions')"><span><t>Bulk Action</t></span><span class="caret-back"><b class="caret"></b></span></a>
+    <ul class="dropdown-menu" @click.stop>
+        <li v-for="o in actions"><a href="#" @click.prevent="doAction(o)"><t>{{o.label}}</t></a></li>
     </ul>
 </div>

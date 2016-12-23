@@ -2,22 +2,18 @@
     <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.id+'/panel-filters')"><span>Filter</span><b class="caret"></b></a>
     <div class="dropdown-menu" @click.stop>
         <form class="select-filter">
-            <select>
-                <option>Order Date</option>
-                <option>Order Total</option>
-                <option>Payment State</option>
-                <option>Order State</option>
-                <option>Order State</option>
-                <option>Order State</option>
-                <option>Order State</option>
+            <select v-model="filterToAdd">
+                <option v-for="flt in availableFilters">{{flt.label}}</option>
             </select>
-            <button type="submit" class="button4">Add</button>
+            <button type="submit" class="button4" @click="addFilter"><t>Add</t></button>
         </form>
         <ul class="filter-box">
             <li>
-                <div class="input-group">
-                    <div class="input-group-btn dropdown">
-                        <button class="button5 dropdown-toggle filter-text-sub" data-toggle="dropdown" aria-expanded="true"><span>Between</span><span class="caret" data-></span></button>
+                <div class="input-group" v-for="flt in addedFilters">
+                    <div class="input-group-btn dropdown" :class="{open:ddOpen(grid.id+'/panel-filters/' + flt.field)}">
+                        <button class="button5 dropdown-toggle filter-text-sub" data-toggle="dropdown"
+                            :aria-expanded="ddOpen(grid.id+'/panel-filters/' + flt.field)"
+                            @click.prevent.stop="ddToggle(grid.id+'/panel-filters/' + flt.field)"><span>Between</span><span class="caret" data-></span></button>
                         <ul class="dropdown-menu filter-sub">
                             <li><a class="filter-op range" href="#">between</a></li>
                             <li><a class="filter-op not-range" href="#">from</a></li>
@@ -47,7 +43,7 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <div class="input-group-btn dropdown open">
+                    <div class="input-group-btn dropdown">
                         <button class="button5 dropdown-toggle" data-toggle="dropdown" aria-expanded="true"><span>Between</span><span class="caret"></span></button>
                         <ul class="dropdown-menu filter-sub">
                             <li><a class="filter_op range" data-id="between" href="#">between</a></li>
@@ -85,8 +81,8 @@
             </li>
         </ul>
         <div class="control-buttons-block">
-            <button class="button1" type="button">Reset</button>
-            <button class="button2" type="button">Apply Filters</button>
+            <button class="button1" type="button" @click="resetFilters()"><t>Reset</t></button>
+            <button class="button2" type="button" @click="applyFilters()"><t>Apply Filters</t></button>
         </div>
     </div>
 </div>

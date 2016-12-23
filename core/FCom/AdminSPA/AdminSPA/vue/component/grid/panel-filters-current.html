@@ -1,12 +1,9 @@
 
 <div class="filter-tags">
-    <div class="filter-tag">
-        <a href="#">Overall State: <span> pending</span>,<span> placed</span> <i class="fa fa-times" aria-hidden="true"></i></a>
-    </div>
-    <div class="filter-tag">
-        <a href="#">Overall State<i class="fa fa-times" aria-hidden="true"></i></a>
-    </div>
-    <div class="filter-tag">
-        <a href="#">Overall State<i class="fa fa-times" aria-hidden="true"></i></a>
+    <div class="filter-tag" v-for="flt in currentFilters">
+        <template v-if="flt.type === 'multiselect'">
+            {{flt.label}}: <template v-for="i, v in flt.values">{{#if i}},{{/if}} <span>{{v.label}}</span></template>
+        </template>
+        <a href="#" @click.prevent="removeFilter(flt)"><i class="fa fa-times" aria-hidden="true"></i></a>
     </div>
 </div>
