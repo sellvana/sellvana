@@ -8,9 +8,12 @@ input[type="checkbox"] + span {
 	margin-right: 6px; 
 	border-radius: 2px;
 	padding: 3px 0;
+	cursor: pointer;
 	i {
-		display: none;
+		display: inline-block;
 		font-size: 14px;
+		opacity: 0;
+		visibility: hidden;
 	}
 }
 input[type="radio"] + span {
@@ -24,6 +27,7 @@ input[type="radio"] + span {
 	padding: 1px 0px;
 	margin-right: 6px; 
 	vertical-align: middle;
+	cursor: pointer;
 	i {
 		display: none;
 		font-size: 8px;
@@ -34,6 +38,8 @@ input[type="checkbox"], input[type="radio"] {
 	display: none;
 	&:checked + span i {
 		display: inline-block;
+		opacity: 1;
+		visibility: visible;
 	}
 }
 .pagination {
