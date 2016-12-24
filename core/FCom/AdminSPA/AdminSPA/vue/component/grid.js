@@ -17,16 +17,27 @@ define(['vue', 'sv-app', 'jquery',
                 },
                 sorted: function() {
                     return function (col, dir, def) {
+                        if (!col.sortable) {
+                            return false;
+                        }
                         if (!this.grid || !this.grid.state || this.grid.state.s !== col.field) {
                             return def;
                         }
                         var sd = this.grid.state.sd;
                         return (dir === 'up' && sd === 'asc') || (dir === 'down' && sd === 'desc');
                     }
+                },
+                visible: function () {
+                    return function (col) {
+
+                    }
                 }
             },
             methods: {
                 toggleSort: function (col) {
+                    if (!col.sortable) {
+                        return;
+                    }
                     if (!this.grid.state) {
                         Vue.set(this.grid, 'state', {});
                     }
@@ -45,6 +56,7 @@ define(['vue', 'sv-app', 'jquery',
                 }
             }
         };
+
         var GridDataRow = {
             mixins: [SvApp.mixins.common],
             props: ['grid', 'row'],
@@ -54,14 +66,36 @@ define(['vue', 'sv-app', 'jquery',
                     return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
                 },
                 cellClass: function () {
-                    return function (col, row) {
+                    return function (row, col) {
                         return '';
                     }
                 },
                 cellData: function () {
-                    return function (col, row) {
+                    return function (row, col) {
                         return row[col.field];
                     }
+                },
+                isRowSelected: function () {
+                    return function (col) {
+                        return this.grid.rows_selected && this.grid.rows_selected[this.row[col.id_field]];
+                    }
+                }
+            },
+            methods: {
+                deleteRow: function (row, col, act) {
+                    if (!confirm(SvApp._('Are you sure you want to delete the row?'))) {
+                        return;
+                    }
+                    SvApp.methods.sendRequest('POST', act.delete_url, postData, function (response) {
+                        this.$emit('fetch-data');
+                    });
+                },
+                selectRow: function (col) {
+                    if (!this.grid.rows_selected) {
+                        Vue.set(this.grid, 'rows_selected', {});
+                    }
+                    var rowId = this.row[col.id_field];
+                    Vue.set(this.grid.rows_selected, rowId, !this.grid.rows_selected[rowId]);
                 }
             }
         };
@@ -113,17 +147,20 @@ define(['vue', 'sv-app', 'jquery',
             template: gridPanelColumnsTpl,
             store: SvApp.store,
             computed: {
-                getColumn: function () {
+                visible: function () {
                     return function (col) {
+                        /*
                         if (!this.$store.state.personalize || !this.$store.state.personalize.grid || !this.$store.state.personalize.grid[this.grid.config.id]) {
                             return {};
                         }
                         return this.$store.state.personalize.grid[this.grid.config.id].columns[col.field];
+                        */
                     }
                 }
             },
             methods: {
                 toggleColumn: function (col) {
+                    Vue.set(col, 'hidden', !col.hidden);
                     this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
                 }
             }
@@ -210,7 +247,7 @@ define(['vue', 'sv-app', 'jquery',
 
         var GridPanel = {
             mixins: [SvApp.mixins.common],
-            props: ['grid'],
+            props: ['grid', 'cnt-visible'],
             components: {
                 'sv-comp-grid-pager-list': GridPagerList,
                 'sv-comp-grid-panel-columns': GridPanelColumns,
@@ -219,9 +256,22 @@ define(['vue', 'sv-app', 'jquery',
                 'sv-comp-grid-panel-export': GridPanelExport,
                 'sv-comp-grid-bulk-actions': GridBulkActions
             },
+            data: function() {
+                return {
+                    quickSearch: ''
+                }
+            },
+            computed: {
+                cntTotal: function () {
+                    return this.grid && this.grid.state ? this.grid.state.c : 0;
+                }
+            },
             methods: {
                 fetchData: function () {
                     this.$emit('fetch-data');
+                },
+                updateQuickSearch: function () {
+                    Vue.set(this.grid.state, 'quickSearch', this.quickSearch);
                 }
             },
             template: gridPanelTpl
@@ -232,7 +282,51 @@ define(['vue', 'sv-app', 'jquery',
             mixins: [SvApp.mixins.common],
             data: function() {
                 return {
-                    //grid: grid
+                    cntVisible: 0
+                }
+            },
+            computed: {
+                columns: function () {
+                    return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
+                },
+                visibleRows: function () {
+                    var q = this.grid && this.grid.state ? this.grid.state.quickSearch : '';
+                    if (q === '') {
+                        this.cntVisible = this.grid.rows ? this.grid.rows.length : 0;
+                        return this.grid.rows;
+                    }
+                    var rows = [];
+                    for (var i in this.grid.rows) {
+                        var row = this.grid.rows[i], show = false, colOptions = {};
+                        //TODO: optimize, run only once
+                        for (var j = 0; j < this.grid.config.columns; j++) {
+                            var col1 = this.grid.config.columns[j]
+                            colOptions[col1.field] = col1.options;
+                        }
+                        for (var j in row) {
+                            if (!row[j]) {
+                                continue;
+                            }
+                            if (colOptions[j]) {
+                                var v = colOptions[j][row[j]];
+                                if (v && v.match(q)) {
+                                    show = true;
+                                    break;
+                                }
+                            } else {
+                                if (row[j].match(q)) {
+                                    show = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (show) {
+                            rows.push(row);
+                        }
+                    }
+                    this.cntVisible = rows.length;
+
+                    return rows;
                 }
             },
             methods: {
@@ -250,7 +344,7 @@ define(['vue', 'sv-app', 'jquery',
                             params.p = grid.state.p;
                         }
                     }
-                    $.get(url, params, function (response) {
+                    SvApp.methods.sendRequest('GET', url, params, function (response) {
                         if (response.config) {
                             Vue.set(grid, 'config', response.config);
                         }
@@ -263,7 +357,7 @@ define(['vue', 'sv-app', 'jquery',
                     });
                 }
             },
-            created: function () {
+            mounted: function () {
                 this.fetchData();
             },
             components: {

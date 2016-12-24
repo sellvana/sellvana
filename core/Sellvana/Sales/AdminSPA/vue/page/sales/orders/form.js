@@ -89,7 +89,7 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 		},
 		mounted: function () {
             this.$store.commit('setData', {curPage: {
-                link: '/sales/orders/form',
+                link: this.$router.currentRoute.fullPath,
                 label: 'Edit Order #12345',
                 breadcrumbs: [
                     {nav:'/sales', label:'Sales', icon_class:'fa fa-line-chart'},

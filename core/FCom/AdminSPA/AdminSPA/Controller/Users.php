@@ -6,10 +6,13 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
     {
         $config = [
             'id' => 'users',
-            'data_url' => $this->BApp->href('users/grid_data'),
+            'data_url' => 'users/grid_data',
             'columns' => [
-                ['type' => 'row-select'],
-                ['type' => 'actions'],
+                ['type' => 'row-select', 'width' => 80],
+                ['type' => 'actions', 'width' => 80, 'actions' => [
+                    ['type' => 'edit', 'link' => '/users/form?id='],
+                    ['type' => 'delete', 'delete_url' => 'users/grid_delete'],
+                ]],
                 ['field' => 'id', 'label' => 'ID'],
                 ['field' => 'username', 'label' => 'Username'],
                 ['field' => 'firstname', 'label' => 'First Name'],
@@ -39,5 +42,15 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
             'state' => $data['state'],
         ];
         $this->respond($result);
+    }
+
+    public function action_grid_delete__POST()
+    {
+
+    }
+
+    public function action_form_data()
+    {
+
     }
 }

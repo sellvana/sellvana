@@ -128,6 +128,7 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
     function routeView(args) {
         return function (resolve, reject) {
             require(args, function (component, template) {
+//console.log(args, component, template);
                 if (!component) {
                     component = {};
                 }
@@ -167,16 +168,14 @@ console.log(storeData);
     }
 
     return {
-        data: function () {
-            return {
-            };
-        },
         methods: {
             routeView: routeView,
             setModules: function (newModules) { modules = newModules; },
             sendRequest: function (method, path, request, success, error) {
                 var data = request;
-                data['X-CSRF-TOKEN'] = store.state.csrfToken;
+                if (method === 'POST' || method === 'DELETE') {
+                    data['X-CSRF-TOKEN'] = store.state.csrfToken;
+                }
                 return $.ajax({
                     method: method,
                     url: store.state.env.root_href + path,
@@ -248,6 +247,10 @@ console.log(storeData);
                 }
             }
         },
-        store: store
+        store: store,
+        _: function (str, args) {
+            // implement translation logic
+            return str;
+        }
     };
 });

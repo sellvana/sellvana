@@ -17,11 +17,11 @@ define(['vue', 'sv-app', 'text!sv-comp-menu-tpl'], function(Vue, SvApp, menuTpl)
             inBreadcrumbs: function () {
                 return function (node) {
                     var curPage = this.$store.state.curPage;
-                    if (curPage.link === node.link) {
+                    if (curPage.link === node.link || curPage.nav === node.path) {
                         return true;
                     }
                     for (var i = 0; i < curPage.breadcrumbs.length; i++) {
-                        if (curPage.breadcrumbs[i].link === node.link) {
+                        if (curPage.breadcrumbs[i].link === node.link || curPage.breadcrumbs[i].nav === node.path) {
                             return true;
                         }
                     }
