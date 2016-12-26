@@ -15,6 +15,11 @@ define(['jquery', 'sv-app'], function($, SvApp) {
                     SvApp.router.push(response._redirect);
                 });
             }
+        },
+        created: function () {
+            if (this.$store.state.user) {
+                this.$router.push('/');
+            }
         }
     }
 });

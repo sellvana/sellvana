@@ -7,6 +7,24 @@
  */
 abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Controller_Abstract
 {
+    public function authenticate($args = [])
+    {
+        $result = parent::authenticate();
+        if (!$result) {
+            $this->BResponse->header([
+                "{$this->BRequest->serverProtocol()} 401 Not authorized",
+                "Status: 401 Not authorized",
+            ]);
+            $this->addResponses([
+                '_messages' => [['type' => 'error', 'message' => 'Session expired, authorization required']],
+                '_login' => true,
+            ]);
+            $this->respond();
+            return false;
+        }
+        return $result;
+    }
+
     public function onBeforeDispatch()
     {
         if ($this->BRequest->csrf()) {

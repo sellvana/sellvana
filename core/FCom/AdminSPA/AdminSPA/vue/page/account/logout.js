@@ -12,6 +12,11 @@ define(['jquery', 'sv-app'], function($, SvApp) {
             SvApp.methods.sendRequest('POST', 'account/logout', postData, function (response) {
 
             });
+        },
+        mounted: function () {
+            if (!this.$store.state.user) {
+                this.$router.push('/login');
+            }
         }
     }
 });

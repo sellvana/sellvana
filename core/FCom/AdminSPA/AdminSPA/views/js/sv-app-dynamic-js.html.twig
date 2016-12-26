@@ -34,7 +34,7 @@ console.log(transition);
         });
 */
         var navTree = ({{ navTree|json_encode|raw }}),
-            user = ({{ user.as_array()|json_encode|raw }}),
+            user = ({{ user ? (user.as_array()|json_encode|raw) : 'false' }}),
             env = ({{ env|json_encode|raw }}),
             csrfToken = '{{ SESSION.csrfToken() }}';
 
@@ -68,6 +68,11 @@ console.log(transition);
             components: {
                 'sv-comp-header': SvHeader,
                 'sv-comp-menu': SvMenu
+            },
+            created: function () {
+                if (!user) {
+                    router.push('/login');
+                }
             },
             router: router,
             store: SvApp.store
