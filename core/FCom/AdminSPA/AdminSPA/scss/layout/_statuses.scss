@@ -1,7 +1,7 @@
 .processing {
 	padding: 9px 8px;
 	background: #fff; 
-	width: 82px;
+	width: 100px;
 	color: #00ceb4;
 	text-align: center;
 	display: inline-block;
@@ -11,7 +11,7 @@
 .placed {
 	padding: 9px 8px;
 	background: #fff;
-	width: 82px;
+	width: 100px;
 	color: #f39b12;
 	text-align: center;
 	display: inline-block;
@@ -21,7 +21,7 @@
 .shipped {
 	padding: 9px 8px;
 	background: #fff;
-	width: 82px;
+	width: 100px;
 	color: #2fbdf2;
 	text-align: center;
 	display: inline-block;
@@ -30,7 +30,7 @@
 .status-canceled {
 	padding: 9px 8px;
 	background: #fff;
-	width: 82px;
+	width: 100px;
 	color: #dd4b39;
 	text-align: center;
 	display: inline-block;
@@ -39,7 +39,7 @@
 .status-pending {
 	padding: 9px 8px;
 	background: #fff;
-	width: 82px;
+	width: 100px;
 	color: #f39c12;
 	text-align: center;
 	display: inline-block;
@@ -48,8 +48,35 @@
 .status-unpaid {
 	padding: 9px 8px;
 	background: #fff;
-	width: 82px;
+	width: 100px;
 	color: #00c0ef;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
+.status-paid {
+	padding: 9px 8px;
+	background: #fff;
+	width: 100px;
+	color: #dd4b39;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
+.status-re-stocked {
+	padding: 9px 8px;
+	background: #fff;
+	width: 100px;
+	color: #00ceb4;
+	text-align: center;
+	display: inline-block;
+	font-family: $f-main-bold;
+}
+.status-complete {
+	padding: 9px 8px;
+	background: #fff;
+	width: 100px;
+	color: #00ceb4;
 	text-align: center;
 	display: inline-block;
 	font-family: $f-main-bold;

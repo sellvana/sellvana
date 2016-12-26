@@ -27,8 +27,13 @@
 			- [ requireJs, sv-page-sales-orders-form-comments-sort-bar-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/sort-bar.html" ]	
 			
 			- [ requireJs, sv-page-sales-orders-form-comments-comment-public-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-public.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-comments-comment-private-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-private.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-comments-comment-private-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-private.html" ]
 			- [ requireJs, sv-page-sales-orders-form-comments-comment-new-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-new.html" ]	
+		
+			- [ requireJs, sv-page-sales-orders-form-details-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-details-information-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/information.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-details-payments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments.html" ]	
+			- [ requireJs, sv-page-sales-orders-form-details-payments-sku-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/product-sku.html" ]	
 			
 			
 

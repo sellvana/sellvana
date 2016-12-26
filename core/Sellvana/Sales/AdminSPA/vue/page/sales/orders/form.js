@@ -4,14 +4,22 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 		'text!sv-page-sales-orders-form-comments-control-buttons-tpl', 
 		'text!sv-page-sales-orders-form-comments-comment-public-tpl', 
 		'text!sv-page-sales-orders-form-comments-comment-private-tpl', 
-		'text!sv-page-sales-orders-form-comments-comment-new-tpl'],
+		'text!sv-page-sales-orders-form-comments-comment-new-tpl',
+		'text!sv-page-sales-orders-form-details-tpl',
+		'text!sv-page-sales-orders-form-details-information-tpl',
+		'text!sv-page-sales-orders-form-details-payments-tpl',
+		'text!sv-page-sales-orders-form-details-payments-sku-tpl'],
 	   function (SvApp, SvCompForm, formNavTpl, formInfoTpl, SvCompControlButtons, SvCompOrderGeneralInfo, SvCompOrderGeneralInfoItems, SvCompOrderGeneralInfoMain, SvCompOrderGeneralInfoTotal, 
 				  SvCompOrderComments, 
 				  SvCompOrderCommentSortBar, 
 				  SvCompOrderCommentControlButtons,
 				  SvCompOrderCommentPublic, 
 				  SvCompOrderCommentPrivate,
-				  SvCompOrderCommentNew) {
+				  SvCompOrderCommentNew,
+				  SvCompOrderDetails,
+				  SvCompOrderDetailsInformation,
+				  SvCompOrderDetailsPayments,
+				  SvCompOrderDetailsPaymentsSku) {
 
     const FormNav = {
         template: formNavTpl
@@ -77,6 +85,27 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 		}
 	};
 	
+	var DetailsInformation = {
+		template: SvCompOrderDetailsInformation
+	};
+
+	var DetailsPayments = {
+		template: SvCompOrderDetailsPayments
+	};
+	
+	var DetailsPaymentsSku = {
+		template: SvCompOrderDetailsPaymentsSku
+	};
+
+	var OrderDetails = {
+		template: SvCompOrderDetails,
+		components: {
+			'sv-page-sales-orders-form-details-information': DetailsInformation,
+			'sv-page-sales-orders-form-details-payments': DetailsPayments,
+			'sv-page-sales-orders-form-details-payments-sku': DetailsPaymentsSku,
+		}
+	};
+	
 	return {
 		store: SvApp.store,
         components: {
@@ -85,7 +114,8 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
             'sv-page-sales-orders-form-info': FormInfo,
             'sv-page-sales-orders-form-control-buttons': ControlButtons,
             'sv-page-sales-orders-form-general-info': GeneralInfo,
-			'sv-page-sales-orders-form-comments': OrderComments
+			'sv-page-sales-orders-form-comments': OrderComments,
+			'sv-page-sales-orders-form-details': OrderDetails,
 		},
 		mounted: function () {
             this.$store.commit('setData', {curPage: {

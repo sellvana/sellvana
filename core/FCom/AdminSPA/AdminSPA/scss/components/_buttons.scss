@@ -54,7 +54,7 @@ button, .button {
 	}
 	&:active {
 		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24); 
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
@@ -63,10 +63,11 @@ button, .button {
 	font-size: 12px;
 	color: #fff;
 	font-family: $f-med;
-	border: 1px solid transparent;
+	border: 1px solid #3ec234;
 	&:hover, &:focus {
 		background-color: #16870d;
 		color: #fff;
+		border: 1px solid #16870d;
 	}
 	&:active {
 		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
@@ -221,6 +222,25 @@ button, .button {
 		background: #115dda;
 		color: #fff;
 		border: 1px solid #115dda;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
+}
+.button13 {
+	background-color: #e1e1e1;
+	font-size: 12px;
+	font-family: $f-main-bold;
+	border: 1px solid #e1e1e1;
+	width: auto;
+	color: #000;
+	transition: 0.1s all ease-in;
+	&:hover, &:focus {
+		background: #514943;
+		color: #fff;
+		border: 1px solid #514943;
 	}
 	&:active {
 		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);

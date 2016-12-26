@@ -277,6 +277,9 @@
 		transition: 0.3s opacity ease-in;
 		a {
 			margin: 7px;
+			&:hover i {
+				color: #000;
+			}
 		}
 		i {
 			font-size: 20px;
@@ -467,6 +470,9 @@
 			vertical-align: middle;
 			display: inline-block;
 		}
+		&:hover i {
+			color: #000;
+		}
 	}
 	label {
 		position: relative;
@@ -526,6 +532,63 @@
 		width: 60%;
 		padding: 12px 0 0;
 		text-align: right;
+	}
+}
+
+.details-information {
+	background: #fff;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	border-radius: 2px;
+	padding: 3px 12px 40px 12px;
+	margin-bottom: 20px;
+	.block-title {
+		margin-bottom: 28px;
+		p  {
+			font-size: 14px;
+		}
+	}
+	table {
+		border-bottom: 0;
+		span {
+			font-family: GothamProMedium;
+		}
+	}
+	thead {
+		border-bottom: 1px solid #ebebeb;
+		td {
+			font-size: 12px;
+			font-family: GothamProMedium;
+			padding: 5px 0;
+		}
+	}
+	td {
+		text-align: left;
+	}
+}
+
+.existing-payments {
+	background: #fff;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	border-radius: 2px;
+	padding: 15px 16px 40px 12px;
+	.block-title {
+		background: #f6f6f6;
+		width: 100%;
+		padding: 0 10px;
+		position: relative;
+		label {
+			position: absolute;
+			right: 10px;
+			top: 6px;
+			span {
+				color: #000;
+			}
+		}
+		select {
+			position: absolute;
+			right: 90px;
+			top: 6px;
+		}
 	}
 }
 

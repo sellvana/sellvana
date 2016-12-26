@@ -1,19 +1,37 @@
-table {
-	border-bottom: 1px solid #000000;
-	min-width: 100%;
-	td, th {
-		height: 49px;
-		min-width: 70px;
-		white-space: nowrap;
-	}
-	thead {
+.admin-main-content {
+	table {
 		border-bottom: 1px solid #000000;
-		span {
-			color: #474646;
+		td, th {
+			height: 49px;
+			min-width: 70px;
+			white-space: nowrap;
 		}
-		tr > * {
-			position: relative;
+		thead {
+			border-bottom: 1px solid #000000;
+			span {
+				color: #474646;
+			}
 		}
+		tbody {
+			span {
+				font-family: $f-main-lig;
+			}
+			tr {
+				border-bottom: 1px solid #f8f8f8;
+				th:first-child, td:first-child {
+					text-align: center;
+				}
+			}
+			tr:last-child {
+				border-bottom: 0;
+			}
+		}
+	}
+}
+
+table {
+	min-width: 100%;
+	thead {
 		.fa {
 			margin-right: 10px;
 		}
@@ -26,14 +44,15 @@ table {
 			position: absolute;
 			left: 8px;
 			top: 22px;
-		}
-		td, th {
-			height: auto;
-		}
+		}		
 		a {
 			padding: 17px 0 17px 20px;
 			display: inline-block;
 			width: 100%;
+		}
+		td {
+			font-family: GothamProMedium;
+			color: #000;
 		}
 	}
 	tbody {
@@ -42,17 +61,19 @@ table {
 		}
 		tr {
 			border-bottom: 1px solid #f8f8f8;
-			th:first-child, td:first-child {
-				text-align: center;
-			}
 		}
 		tr:last-child {
 			border-bottom: 0;
 		}
 	}
-	.fa-pencil {
+	.edit, .delete {
 		font-size: 16px; 
 		color: #dddddd;
+		transition: 0.3s all ease-in;
+		margin: 0 2px;
+		&:hover i {
+			color: #000;
+		}
 	}
 	.sorted-up, .sorted-down {
 		i {
@@ -60,4 +81,7 @@ table {
 			top: 18px;
 		}
 	} 
+	td {
+		font-family: $f-main-lig;
+	}
 }
