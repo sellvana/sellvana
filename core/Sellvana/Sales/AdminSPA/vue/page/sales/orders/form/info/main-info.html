@@ -1,184 +1,201 @@
 <div class="admin-main-content order-info">
 	<div class="row">
-			<div class="col-md-4">
-				<div>
-					<div class="block-title">
-						<p>Customer information</p>
-						<a href="#" class="fa fa-pencil" aria-hidden="true"></a>
-					</div>
-					<div id="customer-section-view">
-						<p>Nadia Test Test</p>
-						<p>
-							<label>Email:</label> <strong>nv@doitua.com</strong>
-						</p>
-					</div>
-					<div id="customer-section-edit" hidden="">
-						<input type="text" class="form-control input-sm" value="nv@doitua.com" placeholder="Customer Email">
-					</div>
+		<div class="col-md-4">
+			<div class="edited-block on">
+				<div class="block-title">
+					<p>Customer information</p>
+					<a href="#">
+						<i class="fa fa-pencil editor" aria-hidden="true"></i>
+						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+					</a>
+				</div>
+				<div class="section-view">
+					<p>
+						<label>Email:</label> <strong>nv@doitua.com</strong>
+					</p>
+				</div>
+				<div class="section-edit">
+					<input type="text" class="form-control input-sm" value="nv@doitua.com" placeholder="Customer Email">
 				</div>
 			</div>
-			<div class="col-md-4">
-				<div>
-					<div class="block-title">
-						<p>Shipping information</p>
-						<a href="#" class="fa fa-pencil" aria-hidden="true"></a>
-					</div>
-					<div id="shipping-section-view">
-						<p>Nadia Vasilenko</p>
-						<div class="adr">
-							<span class="street-address">test3</span>
-							<span class="locality">test3</span>
-							<span class="region">Днепр, KS</span>
-							<span class="postal-code">49116</span>
-							<div class="country-name">United States</div>
-						</div>
-					</div>
-					<div id="shipping-section-edit" hidden="">
-						<div class="row no-gutter">
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm valid" title="First Name" placeholder="First Name" value="Nadia" disabled="">
-							</div>
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm" title="Last Name" placeholder="Last Name" value="Vasilenko" disabled="">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<input type="text" class="form-control input-sm" title="Street Line 1" placeholder="Street Line 1" value="test3" disabled="">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<input type="text" class="form-control input-sm" title="Street Line 2" placeholder="Street Line 2" value="" disabled="">
-							</div>
-						</div>
-						<div class="row no-gutter">
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm" title="City" placeholder="City" value="New York" disabled="">
-							</div>
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm" title="Zip/Postal Code" placeholder="Zip/Postal Code" value="49116" disabled="">
-							</div>
-						</div>
-						<div class="row no-gutter">
-							<div class="col-md-6">
-								<input type="text" class="geo-region form-control input-sm" title="State/Region" placeholder="State/Region" value="NY" disabled="" style="display: none;">
-								<select class="geo-region form-control input-sm" style="" disabled=""></select>
-							</div>
-							<div class="col-md-6">
-								<select class="form-control geo-country input-sm" title="Country" disabled=""></select>
-							</div>
-						</div>
+		</div>
+		<div class="col-md-4">
+			<div class="edited-block on">
+				<div class="block-title">
+					<p>Shipping information</p>
+					<a href="#">
+						<i class="fa fa-pencil editor" aria-hidden="true"></i>
+						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+					</a>
+				</div>
+				<div class="section-view">
+					<p>Nadia Vasilenko</p>
+					<div class="adr">
+						<span class="street-address">Urlivska 38</span>
+						<span class="locality">Kyiv</span>
+						<span class="region">Kyivs. obl.</span>
+						<span class="postal-code">49116</span>
+						<div class="country-name">Ukraine</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-md-4">
-				<div>
-					<div class="block-title">
-						<p>Billing Information</p>
-						<a href="#" class="fa fa-pencil" aria-hidden="true"></a>
-					</div>
-					<div id="billing-section-view">
-						<p>Nadia Vasilenko</p>
-						<div class="adr">
-							<span class="street-address">test3</span>
-							<span class="locality">test3</span>
-							<span class="region">Днепр, KS</span>
-							<span class="postal-code">49116</span>
-							<div class="country-name">United States</div>
+				<div class="section-edit">
+					<div class="row no-gutter">
+						<div class="col-md-6">
+							<input type="text" class="form-control valid" title="First Name" placeholder="First Name" value="Nadia">
+						</div>
+						<div class="col-md-6">
+							<input type="text" class="form-control" title="Last Name" placeholder="Last Name" value="Vasilenko">
 						</div>
 					</div>
-					<div id="billing-section-edit" hidden="">
-						<div class="row no-gutter">
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm valid" title="First Name" placeholder="First Name" value="Nadia" disabled="">
-							</div>
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm" title="Last Name" placeholder="Last Name" value="Vasilenko" disabled="">
-							</div>
+					<div class="row no-gutter">
+						<div class="col-md-12">
+							<input type="text" class="form-control" title="Street Line 1" placeholder="Street Line 1" value="Urlivska 38">
 						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<input type="text" class="form-control input-sm" title="Street Line 1" placeholder="Street Line 1" value="test3" disabled="">
-							</div>
+					</div>
+					<div class="row no-gutter">
+						<div class="col-md-12">
+							<input type="text" class="form-control" title="Street Line 2" placeholder="Street Line 2" value="">
 						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<input type="text" class="form-control input-sm" title="Street Line 2" placeholder="Street Line 2" value="" disabled="">
-							</div>
+					</div>
+					<div class="row no-gutter">
+						<div class="col-md-6">
+							<input type="text" class="form-control" title="City" placeholder="City" value="Kyiv">
 						</div>
-						<div class="row no-gutter">
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm" title="City" placeholder="City" value="New York" disabled="">
-							</div>
-							<div class="col-md-6">
-								<input type="text" class="form-control input-sm" title="Zip/Postal Code" placeholder="Zip/Postal Code" value="49116" disabled="">
-							</div>
+						<div class="col-md-6">
+							<input type="text" class="form-control" title="Zip/Postal Code" placeholder="Zip/Postal Code" value="49116">
 						</div>
-						<div class="row no-gutter">
-							<div class="col-md-6">
-								<input type="text" class="geo-region form-control input-sm" title="State/Region" placeholder="State/Region" value="NY" disabled="" style="display: none;">
-								<select class="geo-region form-control input-sm" style="" disabled=""></select>
-							</div>
-							<div class="col-md-6">
-								<select class="form-control geo-country input-sm" title="Country" disabled=""></select>
-							</div>
+					</div>
+					<div class="row no-gutter">
+						<div class="col-md-6">
+							<input type="text" class="geo-region form-control input-sm" title="State/Region" placeholder="State/Region" value="NY" disabled="" style="display: none;">
+							<select class="geo-region form-control" style="" ></select>
+						</div>
+						<div class="col-md-6">
+							<select class="form-control geo-country input-sm" title="Country"></select>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="col-md-4">
+			<div class="edited-block on">
+				<div class="block-title">
+					<p>Billing Information</p>
+					<a href="#">
+						<i class="fa fa-pencil editor" aria-hidden="true"></i>
+						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+					</a>
+				</div>
+				<div class="section-view">
+					<p>Nadia Vasilenko</p>
+					<div class="adr">
+						<span class="street-address">Urlivska 38</span>
+						<span class="locality">Kyiv</span>
+						<span class="region">Kyivs. obl.</span>
+						<span class="postal-code">49116</span>
+						<div class="country-name">Ukraine</div>
+					</div>
+				</div>
+				<div class="section-edit">
+					<div class="row no-gutter">
+						<div class="col-md-6">
+							<input type="text" class="form-control input-sm valid" title="First Name" placeholder="First Name" value="Nadia">
+						</div>
+						<div class="col-md-6">
+							<input type="text" class="form-control input-sm" title="Last Name" placeholder="Last Name" value="Vasilenko">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<input type="text" class="form-control input-sm" title="Street Line 1" placeholder="Street Line 1" value="Urlivska 38">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<input type="text" class="form-control input-sm" title="Street Line 2" placeholder="Street Line 2" value="">
+						</div>
+					</div>
+					<div class="row no-gutter">
+						<div class="col-md-6">
+							<input type="text" class="form-control input-sm" title="City" placeholder="City" value="Kyiv" >
+						</div>
+						<div class="col-md-6">
+							<input type="text" class="form-control input-sm" title="Zip/Postal Code" placeholder="Zip/Postal Code" value="49116" >
+						</div>
+					</div>
+					<div class="row no-gutter">
+						<div class="col-md-6">
+							<input type="text" class="geo-region form-control input-sm" title="State/Region" placeholder="State/Region" value="NY" disabled="" style="display: none;">
+							<select class="geo-region form-control input-sm" style=""></select>
+						</div>
+						<div class="col-md-6">
+							<select class="form-control geo-country input-sm" title="Country"></select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="row">
-			<div class="col-md-4">
-				<div>
-					<div class="block-title">
-						<p>Order information</p>
-						<a href="#" class="fa fa-pencil" aria-hidden="true"></a>
-					</div>
-					<div id="order-section-view">
-						<p class="status-canceled">Canceled</p>
-						<p>
-							<label>Placed:</label> <strong>Aug 11, 2016, 7:41:43 AM</strong></p>
-						<p>
-							<label>Updated:</label> <strong>Nov 10, 2016, 2:43:13 AM</strong></p>
-					</div>
-					<div id="order-section-edit" hidden="">
-						<select class="form-control input-sm" name="order_state[custom]">
-							<option value="">No Custom Order States Defined</option>
-						</select>
-					</div>
+		<div class="col-md-4">
+			<div class="edited-block on">
+				<div class="block-title">
+					<p>Order information</p>
+					<a href="#">
+						<i class="fa fa-pencil editor" aria-hidden="true"></i>
+						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+					</a>
 				</div>
-			</div>
-			<div class="col-md-4">
-				<div>
-					<div class="block-title">
-						<p>Delivery information</p>
-						<a href="#" class="fa fa-pencil" aria-hidden="true"></a>
-					</div>
-					<div id="delivery-section-view">
-						<p class="status-pending">Pending</p>
-						<strong>Plain Shipping</strong>
-					</div>
-					<div id="delivery-section-edit" hidden="">
-
-					</div>
+				<div class="section-view">
+					<p class="status-canceled">Canceled</p>
+					<p>
+						<label>Placed:</label> <strong>Aug 11, 2016, 7:41:43 AM</strong></p>
+					<p>
+						<label>Updated:</label> <strong>Nov 10, 2016, 2:43:13 AM</strong></p>
 				</div>
-			</div>
-			<div class="col-md-4">
-				<div>
-					<div class="block-title">
-						<p>Payment Information</p>
-						<a href="#" class="fa fa-pencil" aria-hidden="true"></a>
-					</div>
-					<div id="payment-section-view">
-						<p class="status-unpaid">Unpaid</p>
-						<strong>Check / Money Order</strong>
-						<span>$395.62</span>
-					</div>
-					<div id="payment-section-edit" hidden="">
-
-					</div>
+				<div class="section-edit">
+					<select class="form-control input-sm" name="order_state[custom]">
+						<option value="">No Custom Order States Defined</option>
+					</select>
 				</div>
 			</div>
 		</div>
+		<div class="col-md-4">
+			<div class="edited-block on">
+				<div class="block-title">
+					<p>Delivery information</p>
+					<a href="#">
+						<i class="fa fa-pencil editor" aria-hidden="true"></i>
+						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+					</a>
+				</div>
+				<div class="section-view">
+					<p class="status-pending">Pending</p>
+					<strong>Plain Shipping</strong>
+				</div>
+				<div class="section-edit">
+
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="edited-block on">
+				<div class="block-title">
+					<p>Payment Information</p>
+					<a href="#">
+						<i class="fa fa-pencil editor" aria-hidden="true"></i>
+						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+					</a>
+				</div>
+				<div class="section-view">
+					<p class="status-unpaid">Unpaid</p>
+					<strong>Check / Money Order</strong>
+					<span>$395.62</span>
+				</div>
+				<div class="section-edit">
+
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

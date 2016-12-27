@@ -9,14 +9,37 @@ button, .button {
 	padding: 6px 16px;
 	transition: 0.1s all ease-in;
 	display: inline-block;
+	font-size: 12px;
+	font-family: $f-med;
+}
+.button1 {
+	background-color: transparent;
+	color: #868a8a;
+	border: 1px solid transparent;
+	&:focus {
+		background-color: transparent;
+		order: 1px solid transparent;
+		color: #868a8a;
+	}
+	&:hover {
+		border: 1px solid #868a8a;
+	}
+	&:active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+	}
 }
 .button2 {
 	background-color: #514943;
 	border: 1px solid #514943;
-	font-size: 12px;
 	color: #fff;
-	font-family: $f-med;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #514943;
+		border: 1px solid #514943;
+		color: #fff;
+	}
+	&:hover  {
 		background-color:  #1b1b1b;
 		border: 1px solid #1b1b1b;
 		color: #fff;
@@ -27,28 +50,16 @@ button, .button {
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
-.button1 {
-	background-color: transparent;
-	font-size: 12px;
-	color: #868a8a;
-	font-family: $f-med;
-	border: 1px solid transparent;
-	&:hover, &:focus {
-		border: 1px solid #868a8a;
-	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
-}
 .button3 {
 	background-color: transparent;
-	font-size: 12px;
 	color: #2d2d2d;
-	font-family: $f-med;
 	border: 1px solid #e5dfdf;
-	&:hover, &:focus {
+	&:focus {
+		background-color: transparent;
+		color: #2d2d2d;
+		border: 1px solid #e5dfdf;
+	}
+	&:hover {
 		background-color: #8b8b8b;
 		color: #fff;
 	}
@@ -60,11 +71,14 @@ button, .button {
 }
 .button4 {
 	background-color: #3ec234;
-	font-size: 12px;
 	color: #fff;
-	font-family: $f-med;
 	border: 1px solid #3ec234;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #3ec234;
+		color: #fff;
+		border: 1px solid #3ec234;
+	}
+	&:hover {
 		background-color: #16870d;
 		color: #fff;
 		border: 1px solid #16870d;
@@ -77,15 +91,19 @@ button, .button {
 }
 .button5 {
 	background-color: #e5e5e5;
-	font-size: 12px;
-	font-family: $f-med;
 	border: 1px solid #e5e5e5;
 	padding: 8px 4px;
 	width: auto;
 	span {
 		color: #454d54;	
 	}
-	&:hover, &:focus {
+	&:focus {
+		background-color: #e5e5e5;
+		border: 1px solid #e5e5e5;
+		padding: 8px 4px;
+		width: auto;
+	}
+	&:hover {
 		background-color: #e5e5e5;
 		color: #fff;
 	}
@@ -103,14 +121,18 @@ button, .button {
 }
 .button6 {
 	background-color: #ff2b42;
-	font-size: 12px;
 	font-family: $f-main-bold;
 	border: 1px solid #ff2b42;
 	padding: 6px 14px;
 	width: auto;
 	color: #fff;
 	transition: 0.1s all ease-in;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #ff2b42;
+		border: 1px solid #ff2b42;
+		color: #fff;
+	}
+	&:hover {
 		background-color: #d40017;
 		border: 1px solid #d40017;
 		color: #fff;
@@ -123,13 +145,14 @@ button, .button {
 }
 .button7 {
 	background-color: transparent;
-	font-size: 12px;
 	color: #ff2d43;
-	font-family: $f-med;
 	border: 1px solid transparent;
-	padding: 6px 16px;
-	transition: 0.1s all ease-in;
-	&:hover, &:focus {
+	&:focus {
+		background-color: transparent;
+		color: #ff2d43;
+		border: 1px solid transparent;
+	}
+	&:hover {
 		border: 1px solid #ff2d43;
 		color: #d40017;
 	}
@@ -141,11 +164,14 @@ button, .button {
 }
 .button8 {
 	background-color: #00a65a;
-	font-size: 12px;
 	color: #fff;
-	font-family: $f-med;
 	border: 1px solid #00a65a;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #00a65a;
+		color: #fff;
+		border: 1px solid #00a65a;
+	}
+	&:hover {
 		background-color: #02894b;
 		border: 1px solid #02894b;
 		color: #fff;
@@ -158,11 +184,14 @@ button, .button {
 }
 .button9 {
 	background-color: #00c0ef;
-	font-size: 12px;
 	color: #fff;
-	font-family: $f-med;
 	border: 1px solid #00c0ef;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #00c0ef;
+		color: #fff;
+		border: 1px solid #00c0ef;
+	}
+	&:hover {
 		background-color: #038fb1;
 		border: 1px solid #038fb1;
 		color: #fff;
@@ -175,13 +204,17 @@ button, .button {
 }
 .button10 {
 	background-color: transparent;
-	font-size: 12px;
 	font-family: $f-main-bold;
 	border: 1px solid transparent;
 	width: auto;
 	color: #000;
 	transition: 0.1s all ease-in;
-	&:hover, &:focus {
+	&:focus {
+		background-color: transparent;
+		border: 1px solid transparent;
+		color: #000;
+	}
+	&:hover {
 		border: 1px solid #000;
 		color: #000;
 	}
@@ -193,13 +226,17 @@ button, .button {
 }
 .button11 {
 	background-color: transparent;
-	font-size: 12px;
 	font-family: $f-main-bold;
 	border: 1px solid #c9c9c9;
 	width: auto;
 	color: #4d4d4d;
 	transition: 0.1s all ease-in;
-	&:hover, &:focus {
+	&:focus {
+		background-color: transparent;
+		border: 1px solid #c9c9c9;
+		color: #4d4d4d;
+	}
+	&:hover {
 		background: #514943;
 		color: #fff;
 		border: 1px solid #c9c9c9;
@@ -212,13 +249,14 @@ button, .button {
 }
 .button12 {
 	background-color: #4c8cf6;
-	font-size: 12px;
-	font-family: $f-main-bold;
 	border: 1px solid #4c8cf6;
-	width: auto;
 	color: #fff;
-	transition: 0.1s all ease-in;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #4c8cf6;
+		border: 1px solid #4c8cf6;
+		color: #fff;
+	}
+	&:hover {
 		background: #115dda;
 		color: #fff;
 		border: 1px solid #115dda;
@@ -231,13 +269,14 @@ button, .button {
 }
 .button13 {
 	background-color: #e1e1e1;
-	font-size: 12px;
-	font-family: $f-main-bold;
 	border: 1px solid #e1e1e1;
-	width: auto;
 	color: #000;
-	transition: 0.1s all ease-in;
-	&:hover, &:focus {
+	&:focus {
+		background-color: #e1e1e1;
+		border: 1px solid #e1e1e1;
+		color: #000;
+	}
+	&:hover {
 		background: #514943;
 		color: #fff;
 		border: 1px solid #514943;

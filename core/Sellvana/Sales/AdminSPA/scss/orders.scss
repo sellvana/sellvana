@@ -14,8 +14,8 @@
 	strong {
 		font-family: GothamProBold;
 	}
-	a.fa {
-		font-size: 18px;
+	i {
+		font-size: 16px;
 		color: #dddddd;
 		&:hover {
 			color: #979393;
@@ -39,7 +39,36 @@
 		width: auto;
 	}
 }
-
+.edited-block {
+	.no-gutter {
+		margin-right: 0;
+		margin-left: 0;
+	}
+	.no-gutter [class*="col-"] {
+		padding-right: 0;
+		padding-left: 0;
+	}
+	.close-editor {
+		display: none;
+	}
+	.section-edit {
+		display: none;
+	}
+	&.on {
+		.editor {
+			display: none;
+		}
+		.close-editor {
+			display: inline-block;
+		}
+		.section-edit {
+			display: block;
+		}
+		.section-view {
+			display: none;
+		}
+	}
+}
 .block-title {
 	margin-bottom: 20px;
 	display: inline-block;
@@ -563,14 +592,16 @@
 	}
 	td {
 		text-align: left;
+		padding: 10px 0;
 	}
 }
 
-.existing-payments {
+.existing-payments, .product-sku {
 	background: #fff;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	border-radius: 2px;
-	padding: 15px 16px 40px 12px;
+	padding: 15px 16px 20px 12px;
+	margin-bottom: 10px;
 	.block-title {
 		background: #f6f6f6;
 		width: 100%;
@@ -580,9 +611,13 @@
 			position: absolute;
 			right: 10px;
 			top: 6px;
+			cursor: pointer;
 			span {
 				color: #000;
 			}
+		}
+		p {
+			font-size: 14px;
 		}
 		select {
 			position: absolute;
@@ -591,7 +626,97 @@
 		}
 	}
 }
-
+.existing-payments {
+	.control-buttons-block {
+		border-top: 1px solid #aaaaaa;
+		margin-top: 20px;
+	}
+}
+.secondary-grid {
+	table {
+		p {
+			display: block;
+		}
+		td, th {
+			padding: 10px 0 10px 10px;
+			vertical-align: top;
+		}
+		td:last-child {
+			width: 140px;
+		}
+	}
+	thead {
+		td {
+			white-space: nowrap;
+		}
+	}
+}
+.product-sku {
+	.block-title {
+		span {
+			color: #2d2d2d;
+			font-family: "GothamProMedium";
+			font-size: 14px;
+			padding: 8px 0;
+		}
+	}
+	.control-buttons-block {
+		div {
+			padding: 10px 0;
+		}
+		input {
+			width: 180px;
+			vertical-align: middle;
+			padding: 5px;
+			margin: 0 0 0 20px;
+			display: inline-block;
+		}
+		p {
+			font-family: "GothamProMedium";
+			display: inline-block;
+			vertical-align: middle;
+			color: #000;
+		}
+	}
+	.total-amount {
+		text-align: right;
+		div {
+			width: 50%;
+			min-width: 300px;
+			border-top: 1px solid #000;
+			display: inline-block;
+			padding: 18px 0;
+		}
+		span {
+			background: #f6f6f6;
+			display: inline-block;
+			padding: 7px 10px;
+			font-family: "GothamProMedium";
+			color: #000;
+			margin-left: 50px;
+		}
+		p {
+			font-family: "GothamProMedium";
+			display: inline-block;
+			vertical-align: middle;
+			color: #000;
+		}
+	}
+	.secondary-grid {
+		margin-bottom: 30px;
+	}
+}
+.create-payment {
+	text-align: center;
+	padding: 20px 0;
+	& > * {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	select {
+		margin: 0 20px;
+	}
+}
 @media (max-width: 1762px) {
 	.new-comment {
 		p,

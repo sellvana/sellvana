@@ -31,6 +31,9 @@
 
 table {
 	min-width: 100%;
+	td, th {
+		position: relative;
+	}
 	thead {
 		.fa {
 			margin-right: 10px;
