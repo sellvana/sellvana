@@ -16,8 +16,15 @@ define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text
 
         var rawRoutes = ({{ routes|json_encode|raw }}), routes = [];
         for (var i in rawRoutes) {
-            var r = rawRoutes[i];
-            routes.push({path: r.path, component: SvApp.methods.routeView(r.require)});
+            var r = rawRoutes[i], route = {path: r.path, component: SvApp.methods.routeView(r.require)};
+            if (r.children) {
+                route.children = [];
+                for (var j in r.children) {
+                    var child = r.children[j];
+                    route.children.push({path: child.path, component: SvApp.methods.routeView(child.require)});
+                }
+            }
+            routes.push(route);
         }
         var router = new VueRouter({
             routes: routes

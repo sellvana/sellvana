@@ -1,8 +1,8 @@
 <div class='order-menu'> 
 	<ul class="nav">
-		<li><a href="#">General info</a></li>
-		<li><a href="#">Details</a></li>
-		<li><a href="#">Comments</a></li>
-		<li><a href="#">History</a></li>
+		<li :class="{active:tab==='main'}"><a href="#" @click.prevent="$emit('tab', 'main')"><t>General info</t></a></li>
+		<li :class="{active:tab==='details'}"><a href="#" @click.prevent="$emit('tab', 'details')">Details</a></li>
+		<li :class="{active:tab==='comments'}"><a href="#" @click.prevent="$emit('tab', 'comments')">Comments</a></li>
+		<li :class="{active:tab==='history'}"><a href="#" @click.prevent="$emit('tab', 'history')">History</a></li>
 	</ul>
 </div>

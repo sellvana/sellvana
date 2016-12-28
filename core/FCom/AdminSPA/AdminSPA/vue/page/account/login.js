@@ -12,7 +12,9 @@ define(['jquery', 'sv-app'], function($, SvApp) {
             submit: function() {
                 var postData = {login: {username: this.username, password: this.password}};
                 SvApp.methods.sendRequest('POST', 'account/login', postData, function (response) {
-                    SvApp.router.push(response._redirect);
+                    if (response._redirect) {
+                        SvApp.router.push(response._redirect);
+                    }
                 });
             }
         },

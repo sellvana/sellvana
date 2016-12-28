@@ -20,10 +20,10 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="edited-block on">
+			<div class="edited-block" :class="{on:editing.shipping}">
 				<div class="block-title">
 					<p>Shipping information</p>
-					<a href="#">
+					<a href="#" @click.prevent="toggleEditing('shipping')">
 						<i class="fa fa-pencil editor" aria-hidden="true"></i>
 						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
 					</a>
@@ -78,10 +78,10 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="edited-block on">
+			<div class="edited-block" :class="{on:editing.billing}">
 				<div class="block-title">
 					<p>Billing Information</p>
-					<a href="#">
+					<a href="#" @click.prevent="toggleEditing('shipping')">
 						<i class="fa fa-pencil editor" aria-hidden="true"></i>
 						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
 					</a>

@@ -45,3 +45,8 @@ sv-app-dynamic-js:
 
             - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl, json!sv-page-sales-orders-grid-config ] } ]
             - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-sales-orders-form-tpl ] } ]
+
+            - [ addFormTab, { path: /sales/orders/form, name: main, label: General Info, pos: 10, component: TabMain } ]
+            - [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20, component: TabDetails } ]
+            - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30, component: TabComments } ]
+            - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40, component: TabHistory } ]

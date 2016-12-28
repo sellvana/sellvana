@@ -1,10 +1,8 @@
-<div>
-	<div class="control-buttons">
-		<a href="#" class="button button10">Back</a>
-		<a href="#" class="button button2">Delete</a>
-		<a href="#" class="button button9">Save</a>
-		<a href="#" class="button button8">Ship All items</a>
-		<a href="#" class="button button8">Mark as Paid</a>
-		<a href="#" class="button button9">Save and Continue</a>
-	</div>
+<div class="control-buttons">
+	<a href="#" class="button button10" @click.prevent="$emit('action', 'back')">Back</a>
+	<a href="#" class="button button2" @click.prevent="$emit('action', 'delete')">Delete</a>
+	<a href="#" class="button button8" @click.prevent="$emit('action', 'ship-all-items')">Ship All items</a>
+	<a href="#" class="button button8" @click.prevent="$emit('action', 'mark-as-paid')">Mark as Paid</a>
+	<a href="#" class="button button9" @click.prevent="$emit('action', 'save')">Save</a>
+	<a href="#" class="button button9" @click.prevent="$emit('action', 'save-and-continue')">Save and Continue</a>
 </div>

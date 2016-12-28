@@ -5,6 +5,12 @@
 	.nav > li > a {
 		padding: 20px 15px;
 	}
+	.nav > li.active {
+		&,
+		&:focus {
+			background: #eee;
+		}
+	}
 }
 
 .order-info {

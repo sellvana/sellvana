@@ -22,6 +22,7 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 				  SvCompOrderDetailsPaymentsSku) {
 
     const FormNav = {
+    	props: ['tab'],
         template: formNavTpl
     };
 
@@ -38,7 +39,17 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 	};
 
 	var GeneralInfoMain = {
-		template: SvCompOrderGeneralInfoMain
+		template: SvCompOrderGeneralInfoMain,
+		data: function () {
+			return {
+				editing: {shipping: false, billing: false}
+			}
+		},
+		methods: {
+			toggleEditing: function(type) {
+
+			}
+		}
 	};
 
 	var GeneralInfoTotal = {
@@ -102,7 +113,7 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 		components: {
 			'sv-page-sales-orders-form-details-information': DetailsInformation,
 			'sv-page-sales-orders-form-details-payments': DetailsPayments,
-			'sv-page-sales-orders-form-details-payments-sku': DetailsPaymentsSku,
+			'sv-page-sales-orders-form-details-payments-sku': DetailsPaymentsSku
 		}
 	};
 	
@@ -115,7 +126,20 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
             'sv-page-sales-orders-form-control-buttons': ControlButtons,
             'sv-page-sales-orders-form-general-info': GeneralInfo,
 			'sv-page-sales-orders-form-comments': OrderComments,
-			'sv-page-sales-orders-form-details': OrderDetails,
+			'sv-page-sales-orders-form-details': OrderDetails
+		},
+		data: function () {
+			return {
+				tab: 'main'
+			}
+		},
+		methods: {
+			switchTab: function (tab) {
+				this.tab = tab;
+			},
+			buttonAction: function (act) {
+				console.log(act);
+			}
 		},
 		mounted: function () {
             this.$store.commit('setData', {curPage: {
