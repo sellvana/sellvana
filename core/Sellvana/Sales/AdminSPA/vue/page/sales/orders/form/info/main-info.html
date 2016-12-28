@@ -1,10 +1,10 @@
 <div class="admin-main-content order-info">
 	<div class="row">
 		<div class="col-md-4">
-			<div class="edited-block on">
+			<div class="edited-block" :class="{on:editing.customer}">
 				<div class="block-title">
 					<p>Customer information</p>
-					<a href="#">
+					<a href="#" @click.prevent="editing.customer = !editing.customer">
 						<i class="fa fa-pencil editor" aria-hidden="true"></i>
 						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
 					</a>
@@ -23,7 +23,7 @@
 			<div class="edited-block" :class="{on:editing.shipping}">
 				<div class="block-title">
 					<p>Shipping information</p>
-					<a href="#" @click.prevent="toggleEditing('shipping')">
+					<a href="#" @click.prevent="editing.shipping = !editing.shipping">
 						<i class="fa fa-pencil editor" aria-hidden="true"></i>
 						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
 					</a>
@@ -81,7 +81,7 @@
 			<div class="edited-block" :class="{on:editing.billing}">
 				<div class="block-title">
 					<p>Billing Information</p>
-					<a href="#" @click.prevent="toggleEditing('shipping')">
+					<a href="#" @click.prevent="editing.billing = !editing.billing">
 						<i class="fa fa-pencil editor" aria-hidden="true"></i>
 						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
 					</a>
@@ -138,10 +138,10 @@
 	</div>
 	<div class="row">
 		<div class="col-md-4">
-			<div class="edited-block on">
+			<div class="edited-block" :class="{on:editing.order}">
 				<div class="block-title">
 					<p>Order information</p>
-					<a href="#">
+					<a href="#" @click.prevent="editing.order = !editing.order">
 						<i class="fa fa-pencil editor" aria-hidden="true"></i>
 						<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
 					</a>
@@ -161,7 +161,7 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="edited-block on">
+			<div class="edited-block">
 				<div class="block-title">
 					<p>Delivery information</p>
 					<a href="#">
@@ -179,7 +179,7 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="edited-block on">
+			<div class="edited-block">
 				<div class="block-title">
 					<p>Payment Information</p>
 					<a href="#">

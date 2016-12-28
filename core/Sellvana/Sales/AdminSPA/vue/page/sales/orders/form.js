@@ -42,12 +42,12 @@ define(['sv-app', 'sv-comp-form', 'text!sv-page-sales-orders-form-nav-tpl', 'tex
 		template: SvCompOrderGeneralInfoMain,
 		data: function () {
 			return {
-				editing: {shipping: false, billing: false}
+				editing: {customer: false, shipping: false, billing: false, order: false}
 			}
 		},
 		methods: {
 			toggleEditing: function(type) {
-
+				this.editing[type] = !this.editing[type];
 			}
 		}
 	};
