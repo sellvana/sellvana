@@ -10,6 +10,9 @@
 		&:focus {
 			background: #eee;
 		}
+		span {
+			color: #000;
+		}
 	}
 }
 
@@ -19,6 +22,7 @@
 	}
 	strong {
 		font-family: GothamProBold;
+		font-weight: inherit;
 	}
 	i {
 		font-size: 16px;
@@ -204,18 +208,26 @@
 }
 
 .total-table {
-	padding: 30px 17px;
+	padding: 30px 17px 22px;
+	.block-title {
+		margin-bottom: 10px;
+	}		
 	tr:nth-child(odd) {
 		background: #f8f8f8;
 	}
 	td:first-child {
 		font-family: GothamProBold;
 		color: #2d2d2d;
-		padding: 0 0 0 15px;
+		padding: 10px 0 10px 15px;
 	}
 	td:last-child {
 		font-family: GothamProMedium;
 		color: #2d2d2d;
+	}
+	table td, th {
+		height: auto;
+		min-width: 70px;
+		white-space: nowrap;
 	}
 }
 
@@ -578,8 +590,15 @@
 	margin-bottom: 20px;
 	.block-title {
 		margin-bottom: 28px;
+		width: 100%;
+		position: relative;
 		p  {
 			font-size: 14px;
+		}
+		a {
+			position: absolute;
+			right: 0;
+			top: 0;
 		}
 	}
 	table {

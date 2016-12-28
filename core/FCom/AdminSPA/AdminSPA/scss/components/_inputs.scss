@@ -63,5 +63,9 @@ input[type="text"], input[type="password"] {
 	border: 1px solid #ebebeb;
 	border-radius: 1px;
 	width: 100%;
-	padding: 12px 20px;
+}
+.login-container {
+	input[type="text"], input[type="password"] {
+		padding: 12px 20px;
+	}
 }

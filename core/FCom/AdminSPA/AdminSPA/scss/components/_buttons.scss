@@ -149,12 +149,17 @@ button, .button {
 	border: 1px solid transparent;
 	&:focus {
 		background-color: transparent;
-		color: #ff2d43;
 		border: 1px solid transparent;
+		box-shadow: none;
+		span {
+			color: #ff2d43;
+		}
 	}
 	&:hover {
 		border: 1px solid #ff2d43;
-		color: #d40017;
+		span {
+			color: #d40017;
+		}
 	}
 	&:active {
 		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);

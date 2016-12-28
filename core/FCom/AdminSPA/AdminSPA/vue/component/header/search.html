@@ -1,6 +1,10 @@
 <div class="search-block" :class="{'visible-xs':mobile}">
-    <form>
-        <input type="text" placeholder="Search...">
-        <button class="btn btn-link fa fa-search" name="button" type="submit"></button>
-    </form>
+	<form class="dropdown">
+		<button class="btn btn-link fa fa-search" name="button" type="submit"></button>
+		<input type="text" placeholder="Search..." class="dropdown-toggle">
+		<div class="dropdown-menu">
+			<a href="#/sales/orders/form" class="router-link-active">Product 725 </a>
+		</div>
+</div>
+</form>
 </div>

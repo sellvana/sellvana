@@ -481,11 +481,12 @@ header {
 	}
 }
 .form-control {
-	font-size: 10px;
-	padding: 6px 25px 6px 12px;
+	font-size: 12px;
+	padding: 6px 12px 6px 12px;
 	border-radius: 0;
 	box-shadow: none;
 	border: 1px solid #ebebeb;
+	height: auto;
 	&:hover, &:focus, &:active {
 		border: 1px solid #ebebeb;
 		box-shadow: none;
@@ -499,6 +500,9 @@ header {
 	input[type="text"] {
 		border: 1px solid #ebebeb;
 		padding: 8px 40px 8px 10px;
+		&:active + .dropdown-menu, &:focus + .dropdown-menu  {
+			display: block;
+		}
 	}
 	button {
 		border: 1px solid #ebebeb;
@@ -526,6 +530,17 @@ header {
 			box-shadow: inset 0 1px 5px rgba(0,0,0,0.125);
 			background: #dee5ec;
 			color: #373940;
+		}
+	}
+	.dropdown-menu {
+		a {
+			padding: 8px 20px;
+			display: inline-block;
+			&:hover {
+				text-decoration: none;
+				color: #262626;
+				background-color: #f5f5f5;
+			}
 		}
 	}
 }
