@@ -1,7 +1,7 @@
 <div class="f-grid-filter-panel">
     <div class="col-sm-5">
         <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
-        <sv-comp-grid-panel-filters :grid="grid" v-on:fetch-data="fetchData()"></sv-comp-grid-panel-filters>
+        <sv-comp-grid-panel-filters :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-panel-filters>
         <sv-comp-grid-panel-export :grid="grid"></sv-comp-grid-panel-export>
         <div class="search-block">
             <input type="text" :placeholder="_('Quick filter results')" v-model="quickSearch" @keyup="updateQuickSearch()"/>
@@ -11,10 +11,10 @@
     <div class="col-sm-7 text-right">
         <t>Showing {{cntVisible}} of {{cntTotal}} rows.</t>
         <div class="visible-lg">
-            <sv-comp-grid-pager-list :grid="grid" v-on:fetch-data="fetchData()"></sv-comp-grid-pager-list>
+            <sv-comp-grid-pager-list :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>
         </div>
     </div>
     <div class="col-sm-12">
-        <sv-comp-grid-panel-filters-current :grid="grid" v-on:fetch-data="fetchData()"></sv-comp-grid-panel-filters-current>
+        <sv-comp-grid-panel-filters-current :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-panel-filters-current>
     </div>
 </div>

@@ -5,7 +5,7 @@
         </th>
         <th v-else-if="col.data_cell_vm === 'GridDataCell_Actions'" v-show="!col.hidden">
             <template v-for="act in col.actions">
-                <router-link v-if="act.link" :to="act.link" class="edit"><i :class="act.icon_class" aria-hidden="true"></i></router-link>
+                <router-link v-if="act.link" :to="rowActionLink(row, col, act)" class="edit"><i :class="act.icon_class" aria-hidden="true"></i></router-link>
                 <a href="#" v-if="act.delete_url" @click.prevent="deleteRow(row, col, act)" class="delete"><i :class="act.icon_class" aria-hidden="true"></i></a>
             </template>
         </th>

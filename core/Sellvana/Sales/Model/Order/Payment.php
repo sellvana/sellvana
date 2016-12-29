@@ -378,10 +378,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
         $code = $this->get('payment_method');
-        if (empty($methods[$code])) {
-            throw new BException('Invalid payment method');
-        }
-        return $methods[$code];
+        return !empty($methods[$code]) ? $methods[$code] : false;
     }
 
     public function updateItemsAsPaid()
@@ -631,7 +628,8 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
     public function isManualStateManagementAllowed()
     {
-        return $this->getMethodObject()->isManualStateManagementAllowed();
+        $methodObj = $this->getMethodObject();
+        return $methodObj ? $methodObj->isManualStateManagementAllowed() : false;
     }
 
     public function __destruct()

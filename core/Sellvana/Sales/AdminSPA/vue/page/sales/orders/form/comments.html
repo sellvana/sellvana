@@ -4,23 +4,112 @@
 			<div class="row">
 				<div class="col-md-5">
 					<div>
-						<sv-page-sales-orders-form-comments-sort-bar></sv-page-sales-orders-form-comments-sort-bar>
+						<div class="sort-by">
+							<ul>
+								<li>{{'Sort By:'|_}}</li>
+								<li><a href="#"><span>{{'Date'|_}}</span><i aria-hidden="true" class="fa fa-caret-down"></i></a></li>
+								<li><a href="#" class="sorted-up"><span>{{'Status'|_}}</span><i aria-hidden="true" class="fa fa-caret-up"></i></a></li>
+								<li><a href="#" class="sorted-down"><span>{{'Name'|_}}</span><i aria-hidden="true" class="fa fa-caret-down"></i></a></li>
+							</ul>
+						</div>
 					</div>
 				</div>
 				<div class="col-md-7">
-					<sv-page-sales-orders-form-comments-control-buttons></sv-page-sales-orders-form-comments-control-buttons>
+					<div>
+						<div class="control-buttons">
+							<a href="" class="button button11">{{'Expand All'|_}}</a>
+							<a href="" class="button button11">{{'Collapse All'|_}}</a>
+							<a href="" class="button button8">{{'Add comment'|_}}</a>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="sent-comment">
-				<sv-page-sales-orders-form-comments-comment-public></sv-page-sales-orders-form-comments-comment-public>
+			<div v-for="comment in comments" :class="{'sent-comment':comment.type==='sent', 'received-comment':comment.type==='received'}">
+				<div class="comment-private">
+					<div class="comment-title">
+						<p class="comment-author">{{comment.author_name}}</p>
+						<div class="comment-time">
+							<span>{{comment.create_at|ago}}</span>
+							<div class="detailed-date">
+								<p>{{comment.create_at|date}}</p>
+							</div>
+						</div>
+						<div :class="{'private-status':comment.type==='private', 'public-status':comment.type!=='private'}">
+							<i class="fa fa-user" aria-hidden="true"></i>
+							<span>{{ comment.type === 'private' ? 'private' : 'public' }}</span>
+						</div>
+					</div>
+					<div class="comments-status">
+
+					</div>
+					<div class="control-panel">
+						<a href="#"><i class="fa fa-reply" aria-hidden="true"></i></a>
+						<a href="#" v-if="comment.type==='private'"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+						<a href="#" v-if="comment.type==='private'"><i class="fa fa-trash" aria-hidden="true"></i></a>
+					</div>
+					<div class="comment-text">
+						{{comment.contents}}
+					</div>
+					<div class="row">
+						<div class="col-md-10 col-xs-12 col-sm-12">
+							<div class="added-files " v-if="comment.files">
+								<i class="fa fa-paperclip" aria-hidden="true"></i>
+								<div v-for="file in comment.files" class="file">
+									<img :src="file.icon_url" :alt="file.name" />
+									<a :href="file.download_url"></a><span>{{file.name}}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="received-comment">
-				<sv-page-sales-orders-form-comments-comment-public></sv-page-sales-orders-form-comments-comment-public>
-			</div>
-			<sv-page-sales-orders-form-comments-comment-private></sv-page-sales-orders-form-comments-comment-private>
 		</div>
 		<div class="col-md-4">
-			<sv-page-sales-orders-form-comments-comment-new></sv-page-sales-orders-form-comments-comment-new>
+			<div class="new-comment">
+				<form>
+					<div class="block-title">
+						{{'New comment'|_}}
+					</div>
+					<div class="status-control">
+						<label><input type="radio" value="public" name="comment-message"/><span><i aria-hidden="true" class="fa fa-circle"></i></span><span>{{'Public'|_}}</span></label>
+						<label><input type="radio" value="private" name="comment-message"/><span><i aria-hidden="true" class="fa fa-circle"></i></span><span>{{'Private'|_}}</span></label>
+					</div>
+					<p>{{'Comment'|_}}</p>
+					<textarea></textarea>
+					<div class="add-file-block">
+						<label class="input-file">
+							<i aria-hidden="true" class="fa fa-paperclip"></i>
+							<span class="add-image">{{'Attach files'|_}}</span>
+							<input type="file" multiple="" accept="image/*,image/jpeg">
+						</label>
+					</div>
+					<div class="control-buttons-block">
+						<input type="submit" value="Send" class="button button12" />
+					</div>
+					<div class="added-files ">
+						<div class="file">
+							<img src='#' alt="file img" />
+							<span>IMG_007.jpg</span>
+							<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+						</div>
+						<div class="file">
+							<img src='#' alt="file img" />
+							<span>IMG_007.jpg</span>
+							<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+						</div>
+						<div class="file">
+							<img src='#' alt="file img" />
+							<span>IMG_007.jpg</span>
+							<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+						</div>
+						<div class="file">
+							<img src='#' alt="file img" />
+							<span>IMG_007.jpg</span>
+							<a href="#" class="delete"><i class="fa fa-times" aria-hidden="true"></i></a>
+						</div>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

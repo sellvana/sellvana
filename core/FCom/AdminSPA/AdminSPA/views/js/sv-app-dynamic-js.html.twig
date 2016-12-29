@@ -6,6 +6,10 @@
 {% set env = app.getEnv() %}
 {% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
 {% set pers = APP.instance('FCom_Admin_Model_Personalize') %}
+{% set countries = LOCALE.getAvailableCountries() %}
+{% set countriesSeq = UTIL.arrayMapToSeq(countries) %}
+{% set regions = LOCALE.getAvailableRegions() %}
+{% set regionsSeq = UTIL.arrayMapToSeq(regions, 'id', 'text', 1) %}
 
 <script>
 define(['sv-app', 'jquery', 'vue', 'vuex', 'vue-router', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-menu', 'text!sv-comp-menu-tpl'],
@@ -51,6 +55,11 @@ console.log(transition);
             env: env,
             csrfToken: csrfToken
         });
+
+        SvApp.data.countries = ({{ countries|json_encode|raw }});
+        SvApp.data.regions = ({{ regions|json_encode|raw }});
+        SvApp.data.countriesSeq = ({{ countriesSeq|json_encode|raw }});
+        SvApp.data.regionsSeq = ({{ regionsSeq|json_encode|raw }});
 
         SvApp.views.app = new Vue({
             el: '#sv-app',

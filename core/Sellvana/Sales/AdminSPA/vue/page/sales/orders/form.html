@@ -1,20 +1,72 @@
 <div>
     <div class="row">
         <div class="col-md-7">
-            <sv-page-sales-orders-form-info></sv-page-sales-orders-form-info>
+            <div>
+                <div class="total-info">
+                    <div class="icon">
+                        <i class="fa fa-money" aria-hidden="true"></i>
+                    </div>
+                    <div class="data">
+                        <span>{{'Grand Total:'|_}}</span>
+                        <p>{{order.grand_total|currency(order.store_currency_code)}}</p>
+                    </div>
+                </div>
+                <div class="overall-info">
+                    <div class="icon">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                    </div>
+                    <div class="data">
+                        <span>{{'Overall Status'|_}}</span>
+                        <p :class="'status-'+order.state_overall">{{getOption('order_state_overall', order.state_overall)}}</p>
+                    </div>
+                </div>
+                <div class="payment-info">
+                    <div class="icon">
+                        <i class="fa fa-credit-card-alt" aria-hidden="true"></i>
+                    </div>
+                    <div class="data">
+                        <span>{{'Payment:'|_}}</span>
+                        <p :class="'status-'+order.state_payment">{{getOption('order_state_payment', order.state_payment)}}</p>
+                    </div>
+                </div>
+                <div class="delivery-info">
+                    <div class="icon">
+                        <i class="fa fa-truck" aria-hidden="true"></i>
+                    </div>
+                    <div class="data">
+                        <span>{{'Delivery:'|_}}</span>
+                        <p :class="'status-'+order.state_delivery">{{getOption('order_state_delivery', order.state_delivery)}}</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-5">
-			<sv-page-sales-orders-form-control-buttons v-on:action="buttonAction"></sv-page-sales-orders-form-control-buttons>
+            <div class="control-buttons">
+                <button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+                <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                <button type="button" class="button button8" @click="shipAllItems()">{{'Ship All items'|_}}</button>
+                <button type="button" class="button button8" @click="markAsPaid()">{{'Mark as Paid'|_}}</button>
+                <button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+                <button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+            </div>
         </div>
     </div>
     <div class="row">
 		<div class="col-md-2">
-            <sv-page-sales-orders-form-nav :tab="tab" v-on:tab="switchTab"></sv-page-sales-orders-form-nav>
+            <div class='order-menu'>
+                <ul class="nav">
+                    <li :class="{active:tab==='main'}"><a href="#" @click.prevent="switchTab('main')">{{'General info'|_}}</a></li>
+                    <li :class="{active:tab==='details'}"><a href="#" @click.prevent="switchTab('details')">{{'Details'|_}}</a></li>
+                    <li :class="{active:tab==='comments'}"><a href="#" @click.prevent="switchTab('comments')">{{'Comments'|_}}</a></li>
+                    <li :class="{active:tab==='history'}"><a href="#" @click.prevent="switchTab('history')">{{'History'|_}}</a></li>
+                </ul>
+            </div>
         </div>
 		<div class="col-md-10">
-			<sv-page-sales-orders-form-general-info v-if="tab==='main'"></sv-page-sales-orders-form-general-info>
-			<sv-page-sales-orders-form-comments v-if="tab==='comments'"></sv-page-sales-orders-form-comments>
-			<sv-page-sales-orders-form-details v-if="tab==='details'"></sv-page-sales-orders-form-details>
+			<sv-page-sales-orders-form-main v-if="tab==='main'" :order="order" :items="items" :shipments="shipments" :payments="payments" :returns="returns" :refunds="refunds" :cancellations="cancellations" :options="options" @tab="switchTab"></sv-page-sales-orders-form-main>
+            <sv-page-sales-orders-form-details v-if="tab==='details'" :order="order" :shipments="shipments" :payments="payments" :returns="returns" :refunds="refunds" :cancellations="cancellations" :options="options"></sv-page-sales-orders-form-details>
+            <sv-page-sales-orders-form-comments v-if="tab==='comments'" :order="order"></sv-page-sales-orders-form-comments>
+            <sv-page-sales-orders-form-history v-if="tab==='history'" :order="order"></sv-page-sales-orders-form-history>
 		</div>
     </div>
 </div> 

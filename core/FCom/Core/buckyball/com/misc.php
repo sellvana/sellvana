@@ -309,8 +309,15 @@ class BUtil extends BClass
         return $map;
     }
 
-    public function arrayMapToSeq($array, $keyField = 'id', $valueField = 'text')
+    public function arrayMapToSeq($array, $keyField = 'id', $valueField = 'text', $depthLevel = 0)
     {
+        if ($depthLevel) {
+            $result = [];
+            foreach ($array as $k => $subArray) {
+                $result[$k] = $this->arrayMapToSeq($subArray, $keyField, $valueField, $depthLevel - 1);
+            }
+            return $result;
+        }
         $seq = [];
         foreach ($array as $k => $v) {
             $seq[] = [$keyField => $k, $valueField => $v];
@@ -5648,5 +5655,33 @@ if (!function_exists('mime_content_type')) {
         else {
             return 'application/octet-stream';
         }
+    }
+}
+
+/**
+ * Format variable using PHP5.4 square brackets for arrays
+ *
+ * @see https://stackoverflow.com/questions/24316347/how-to-format-var-export-to-php5-4-array-syntax
+ * @param $var
+ * @param string $indent
+ * @return mixed|string
+ */
+function var_export54($var, $indent="") {
+    switch (gettype($var)) {
+        case "string":
+            return '"' . addcslashes($var, "\\\$\"\r\n\t\v\f") . '"';
+        case "array":
+            $indexed = array_keys($var) === range(0, count($var) - 1);
+            $r = [];
+            foreach ($var as $key => $value) {
+                $r[] = "$indent    "
+                    . ($indexed ? "" : var_export54($key) . " => ")
+                    . var_export54($value, "$indent    ");
+            }
+            return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
+        case "boolean":
+            return $var ? "TRUE" : "FALSE";
+        default:
+            return var_export($var, TRUE);
     }
 }

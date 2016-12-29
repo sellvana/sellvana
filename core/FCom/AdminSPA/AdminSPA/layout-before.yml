@@ -15,7 +15,7 @@
             #- [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
 #            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
-#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/daterangepicker.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jQuery.fixedTable.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
@@ -49,6 +49,8 @@
             #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
             - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
             - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min", { deps: [ jquery ] } ]
+            - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
+            - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
 
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
             - [ requireJs, sv-app-dynamic, "~/sv-app-dynamic" ]

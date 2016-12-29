@@ -85,10 +85,12 @@
                         <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().payment().getValueLabel() }}</strong></p>
                         {% for p in order.payments() %}
                             {% set paymentMethod = p.getMethodObject() %}
-                            <p>
-                                <strong>{{ paymentMethod.getName() }}</strong>
-                                <span>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</span>
-                            </p>
+                            {% if paymentMethod %}
+                                <p>
+                                    <strong>{{ paymentMethod.getName() }}</strong>
+                                    <span>{{ (p.get('amount_due') + p.get('amount_captured'))|currency('base') }}</span>
+                                </p>
+                            {% endif %}
                             {% if paymentDetails %}
                                 {% for k, v in paymentDetails %}
                                     <p><label>{{ k }}:</label> {{ v }}</p>

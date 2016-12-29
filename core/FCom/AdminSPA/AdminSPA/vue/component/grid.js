@@ -79,6 +79,13 @@ define(['vue', 'sv-app', 'jquery',
                     return function (col) {
                         return this.grid.rows_selected && this.grid.rows_selected[this.row[col.id_field]];
                     }
+                },
+                rowActionLink: function () {
+                    return function (row, col, act) {
+                        return act.link.replace(/\{([a-z0-9_]+)\}/, function (a, b) {
+                            return row[b];
+                        });
+                    }
                 }
             },
             methods: {
@@ -86,9 +93,13 @@ define(['vue', 'sv-app', 'jquery',
                     if (!confirm(SvApp._('Are you sure you want to delete the row?'))) {
                         return;
                     }
-                    SvApp.methods.sendRequest('POST', act.delete_url, postData, function (response) {
-                        this.$emit('fetch-data');
-                    });
+                    this.$emit('delete-row', row)
+                    var vm = this;
+                    if (act.delete_url) {
+                        SvApp.methods.sendRequest('POST', act.delete_url, postData, function (response) {
+                            vm.$emit('fetch-data');
+                        });
+                    }
                 },
                 selectRow: function (col) {
                     if (!this.grid.rows_selected) {
@@ -344,17 +355,19 @@ define(['vue', 'sv-app', 'jquery',
                             params.p = grid.state.p;
                         }
                     }
-                    SvApp.methods.sendRequest('GET', url, params, function (response) {
-                        if (response.config) {
-                            Vue.set(grid, 'config', response.config);
-                        }
-                        if (response.state) {
-                            Vue.set(grid, 'state', response.state);
-                        }
-                        if (response.rows) {
-                            Vue.set(grid, 'rows', response.rows);
-                        }
-                    });
+                    if (url) {
+                        SvApp.methods.sendRequest('GET', url, params, function (response) {
+                            if (response.config) {
+                                Vue.set(grid, 'config', response.config);
+                            }
+                            if (response.state) {
+                                Vue.set(grid, 'state', response.state);
+                            }
+                            if (response.rows) {
+                                Vue.set(grid, 'rows', response.rows);
+                            }
+                        });
+                    }
                 }
             },
             mounted: function () {

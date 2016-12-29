@@ -1,4 +1,4 @@
-define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) {
+define(['jquery', 'vue', 'vuex', 'select2', 'accounting', 'moment'], function ($, Vue, Vuex, Bootstrap, Accounting, Moment) {
 
     // Translations, usage: <t>String<t> or <t tag="div" :args="{p:page, m:max}">Page {p} of {m}</t>
     //TODO: implement Sellvana logic
@@ -43,6 +43,39 @@ define(['jquery', 'vue', 'vuex', 'select2'], function ($, Vue, Vuex, Bootstrap) 
     //         return h(this.tag, data, children);
     //     }
     // });
+
+    Vue.filter('_', function (value, args) {
+        //TODO: implement
+        return value;
+    });
+
+    Vue.filter('currency', function (value, currencyCode) {
+        //TODO: implement config by currencyCode
+        var symbol = '$', precision = 2, thousand = ',', decimal = '.', format = '%s%v';
+        return Accounting.formatMoney(value, symbol, precision, thousand, decimal, format);
+    });
+
+    Vue.filter('date', function (value, format) {
+        switch (format || '') {
+            case '': format = 'MMMM Do YYYY, h:mm:ss a'; break;
+            case 'short': format = 'MM Do \'YY'; break;
+        }
+        return Moment(value, 'YYYY-MM-DD hh:mm:ss').format(format);
+    });
+
+    Vue.filter('ago', function (value) {
+        return Moment(value, 'YYYY-MM-DD hh:mm:ss').fromNow();
+    });
+
+    Vue.filter('size', function (value) {
+        if (typeof value === 'object') {
+            return Object.keys(value).length;
+        } else if (value.isArray()) {
+            return value.length;
+        } else {
+            return 1;
+        }
+    });
 
     Vue.use(Vuex);
     var store = new Vuex.Store({
@@ -168,11 +201,18 @@ console.log(storeData);
     }
 
     return {
+        data: {
+
+        },
         methods: {
             routeView: routeView,
             setModules: function (newModules) { modules = newModules; },
             sendRequest: function (method, path, request, success, error) {
                 var data = request;
+                if (method === 'GET' && request) {
+                    path += (path.match(/\?/) ? '&' : '?') + $.param(data);
+                    data = null;
+                }
                 if (method === 'POST' || method === 'DELETE') {
                     data['X-CSRF-TOKEN'] = store.state.csrfToken;
                 }

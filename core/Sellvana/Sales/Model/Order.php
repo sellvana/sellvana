@@ -538,11 +538,12 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function getPaymentMethod()
     {
-        if (!$this->get('payment_method')) {
+        $pm = $this->get('payment_method');
+        if (!$pm) {
             return null;
         }
         $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
-        return $methods[$this->get('payment_method')];
+        return !empty($methods[$pm]) ? $methods[$pm] : false;
     }
 
     public function loadItemsProducts()

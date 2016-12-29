@@ -11,31 +11,12 @@
 
             - [ requireJs, sv-page-sales-orders-form, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form" ]
             - [ requireJs, sv-page-sales-orders-form-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form.html" ]
-            - [ requireJs, sv-page-sales-orders-form-nav-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/nav.html" ]
-            - [ requireJs, sv-page-sales-orders-form-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info.html" ]
-			- [ requireJs, sv-page-sales-orders-form-control-buttons, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/control-buttons" ]
-			- [ requireJs, sv-page-sales-orders-form-control-buttons-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/control-buttons.html" ]
-			- [ requireJs, sv-page-sales-orders-form-general-info, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/general" ]
-			- [ requireJs, sv-page-sales-orders-form-general-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/general.html" ]
-			- [ requireJs, sv-page-sales-orders-form-general-info-items-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/items.html" ]
-			- [ requireJs, sv-page-sales-orders-form-general-info-main-info-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/main-info.html" ]
-			- [ requireJs, sv-page-sales-orders-form-general-info-total-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/info/total.html" ]
-			
-			- [ requireJs, sv-page-sales-orders-form-comments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments" ]
-			- [ requireJs, sv-page-sales-orders-form-comments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-comments-control-buttons-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/control-buttons.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-comments-sort-bar-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/sort-bar.html" ]	
-			
-			- [ requireJs, sv-page-sales-orders-form-comments-comment-public-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-public.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-comments-comment-private-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-private.html" ]
-			- [ requireJs, sv-page-sales-orders-form-comments-comment-new-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-new.html" ]	
-		
-			- [ requireJs, sv-page-sales-orders-form-details-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-details-information-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/information.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-details-payments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments.html" ]	
-			- [ requireJs, sv-page-sales-orders-form-details-payments-sku-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/product-sku.html" ]	
-			
-			
+
+			- [ requireJs, sv-page-sales-orders-form-main-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/main.html" ]
+			- [ requireJs, sv-page-sales-orders-form-details-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details.html" ]
+			- [ requireJs, sv-page-sales-orders-form-comments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments.html" ]
+			- [ requireJs, sv-page-sales-orders-form-history-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history.html" ]
+
 
 sv-app-dynamic-js:
     - view: app
@@ -46,7 +27,7 @@ sv-app-dynamic-js:
             - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl, json!sv-page-sales-orders-grid-config ] } ]
             - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-sales-orders-form-tpl ] } ]
 
-            - [ addFormTab, { path: /sales/orders/form, name: main, label: General Info, pos: 10, component: TabMain } ]
-            - [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20, component: TabDetails } ]
-            - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30, component: TabComments } ]
-            - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40, component: TabHistory } ]
+#            - [ addFormTab, { path: /sales/orders/form, name: main, label: General Info, pos: 10, component: TabMain } ]
+#            - [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20, component: TabDetails } ]
+#            - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30, component: TabComments } ]
+#            - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40, component: TabHistory } ]
