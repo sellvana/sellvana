@@ -143,6 +143,10 @@
 		border: 1px solid #ebebeb;
 		border-radius: 1px;
 	}
+	select {
+		width: 100%;
+		min-height: 29px;
+	}
 	button {
 		position: absolute;
 		z-index: 100001;

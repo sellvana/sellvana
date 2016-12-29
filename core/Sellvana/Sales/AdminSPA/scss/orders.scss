@@ -2,27 +2,26 @@
 	background: #fff;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	border-radius: 2px;
-	.nav > li > a {
+	.nav a {
 		padding: 20px 15px;
 	}
-	.nav > li.active {
-		&,
+	.nav .active {
+		background: #eee;
 		&:focus {
 			background: #eee;
 		}
-		span {
+		a {
 			color: #000;
+			background: #eee;
 		}
 	}
 }
 
 .order-info {
-	& > div {
-		padding: 20px 20px 20px 20px;
-	}
 	strong {
 		font-family: GothamProBold;
 		font-weight: inherit;
+		margin-right: 2px;
 	}
 	i {
 		font-size: 16px;
@@ -35,21 +34,14 @@
 		border-bottom: 1px solid #edf0f5;
 		margin-bottom: 10px;
 	}
-	p,
 	span {
 		margin-bottom: 5px;
-		display: block;
-	}
-	.status-unpaid,
-	.status-canceled,
-	.status-pending {
-		padding-left: 0;
-		text-align: left;
+		margin-right: 10px;
 		display: inline-block;
-		width: auto;
 	}
 }
 .edited-block {
+	padding: 20px 20px 20px 20px;
 	.no-gutter {
 		margin-right: 0;
 		margin-left: 0;
@@ -598,7 +590,7 @@
 		a,button {
 			position: absolute;
 			right: 0;
-			top: 0;
+			top: 8px;
 		}
 	}
 	table {
@@ -625,7 +617,7 @@
 	background: #fff;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	border-radius: 2px;
-	padding: 15px 16px 20px 12px;
+	padding: 11px 16px 20px 12px;
 	margin-bottom: 10px;
 	.block-title {
 		background: #f6f6f6;
@@ -655,6 +647,9 @@
 	.control-buttons-block {
 		border-top: 1px solid #aaaaaa;
 		margin-top: 20px;
+	}
+	select {
+		padding: 6px 0;
 	}
 }
 .secondary-grid {
@@ -740,6 +735,8 @@
 	}
 	select {
 		margin: 0 20px;
+		padding: 6px 0;
+		width: 40%;
 	}
 }
 @media (max-width: 1762px) {

@@ -9,7 +9,7 @@
 								<p>{{'Customer information'|_}}</p>
 								<a href="#" @click.prevent="toggleEditing('customer')">
 									<i class="fa fa-pencil editor" aria-hidden="true"></i>
-									<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
 								</a>
 							</div>
 							<div class="section-view">
@@ -29,7 +29,7 @@
 								<p>{{'Shipping information'|_}}</p>
 								<a href="#" @click.prevent="toggleEditing('shipping')">
 									<i class="fa fa-pencil editor" aria-hidden="true"></i>
-									<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
 								</a>
 							</div>
 							<div class="section-view">
@@ -72,14 +72,14 @@
 								</div>
 								<div class="row no-gutter">
 									<div class="col-md-6">
-										<input type="text" class="geo-region form-control input-sm" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="order.shipping_region" v-if="!regionOptions('shipping')">
+										<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="order.shipping_region" v-if="!regionOptions('shipping')">
 										<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="order.shipping_region" v-if="regionOptions('shipping')">
 											<option></option>
 											<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
 										</select>
 									</div>
 									<div class="col-md-6">
-										<select class="form-control geo-country input-sm" :title="'Country'|_" v-model="order.shipping_country">
+										<select class="form-control geo-country" :title="'Country'|_" v-model="order.shipping_country">
 											<option></option>
 											<option v-for="c in dict.countriesSeq" :value="c.id">{{c.text}}</option>
 										</select>
@@ -94,7 +94,7 @@
 								<p>{{'Billing information'|_}}</p>
 								<a href="#" @click.prevent="toggleEditing('billing')">
 									<i class="fa fa-pencil editor" aria-hidden="true"></i>
-									<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
 								</a>
 							</div>
 							<div class="section-view">
@@ -137,14 +137,14 @@
 								</div>
 								<div class="row no-gutter">
 									<div class="col-md-6">
-										<input type="text" class="geo-region form-control input-sm" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="order.billing_region" v-if="!regionOptions('billing')">
+										<input type="text" class="geo-region form-control " :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="order.billing_region" v-if="!regionOptions('billing')">
 										<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="order.billing_region" v-if="regionOptions('billing')">
 											<option></option>
 											<option v-for="r in regionOptions('billing')" :value="r.id">{{r.text}}</option>
 										</select>
 									</div>
 									<div class="col-md-6">
-										<select class="form-control geo-country input-sm" :title="'Country'|_" v-model="order.billing_country">
+										<select class="form-control geo-country" :title="'Country'|_" v-model="order.billing_country">
 											<option></option>
 											<option v-for="c in dict.countriesSeq" :value="c.id">{{c.text}}</option>
 										</select>
@@ -161,7 +161,7 @@
 								<p>{{'Order information'|_}}</p>
 								<a href="#" @click.prevent="toggleEditing('order')">
 									<i class="fa fa-pencil editor" aria-hidden="true"></i>
-									<i class="fa fa-eraser close-editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
 								</a>
 							</div>
 							<div class="section-view">
@@ -170,7 +170,7 @@
 								<p><label>{{'Updated:'|_}}</label> <strong>{{order.update_at|date}}</strong></p>
 							</div>
 							<div class="section-edit">
-								<select class="form-control input-sm" v-model="order.state_custom">
+								<select class="form-control" v-model="order.state_custom">
 									<option v-if="options.order_state_custom|length"></option>
 									<option v-else value="" selected>{{'No Custom Order States Defined'|_}}</option>
 									<option v-for="k, v in options.order_state_custom" :value="k">{{v}}</option>
@@ -187,7 +187,7 @@
 								</a>
 							</div>
 							<div v-for="s in shipments">
-								<p :class="'status-' + s.state_overall">{{options.shipment_state_overall[s.state_overall]}}</p>
+								<span :class="'status-' + s.state_overall">{{options.shipment_state_overall[s.state_overall]}}</span>
 								<strong>{{s.carrier_desc}} / {{s.service_desc}}</strong>
 							</div>
 							<div v-for="r in returns">
@@ -205,12 +205,12 @@
 								</a>
 							</div>
 							<div v-for="p in payments">
-								<p :class="'status-' + p.state_overall">{{options.payment_state_overall[p.state_overall]}}</p>
+								<span :class="'status-' + p.state_overall">{{options.payment_state_overall[p.state_overall]}}</span>
 								<strong>{{p.payment_method}}</strong>
 								<span>{{p.amount_captured|currency(order.store_currency_code)}}</span>
 							</div>
 							<div v-for="r in refunds">
-								<p :class="'status-' + r.state_overall">{{options.refund_state_overall[r.state_overall]}}</p>
+								<span :class="'status-' + r.state_overall">{{options.refund_state_overall[r.state_overall]}}</span>
 								<strong>({{'REFUND'|_}})</strong>
 								<span>{{r.amount|currency(order.store_currency_code)}}</span>
 							</div>

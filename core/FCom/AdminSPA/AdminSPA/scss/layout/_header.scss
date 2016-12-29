@@ -482,7 +482,7 @@ header {
 }
 .form-control {
 	font-size: 12px;
-	padding: 6px 12px 6px 12px;
+	padding: 6px;
 	border-radius: 0;
 	box-shadow: none;
 	border: 1px solid #ebebeb;
@@ -724,6 +724,7 @@ header {
 	input, select {
 		font-family: $f-main-lig;
 		font-size: 12px;
+		width: 100%;
 	}
 	input {
 		width: 100%;

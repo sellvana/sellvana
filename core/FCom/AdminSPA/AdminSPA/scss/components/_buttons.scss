@@ -11,6 +11,9 @@ button, .button {
 	display: inline-block;
 	font-size: 12px;
 	font-family: $f-med;
+	span {
+		color: #fff;
+	}
 }
 .button1 {
 	background-color: transparent;
