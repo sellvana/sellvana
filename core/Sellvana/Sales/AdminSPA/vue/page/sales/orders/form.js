@@ -205,7 +205,8 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 				returns: {},
 				refunds: {},
 				cancellations: {},
-				options: {}
+				options: {},
+				updates: {}
 			}
 		},
 		computed: {
@@ -262,10 +263,15 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 
 			},
 			save: function (stayOnPage) {
-				SvApp.methods.sendRequest('POST', 'orders/form_data')
-				if (!stayOnPage) {
-					this.$router.go(-1);
-				}
+				var vm = this;
+				SvApp.methods.sendRequest('POST', 'orders/form_data', this.updates, function (response) {
+                    for (var i in response) {
+                        vm[i] = response[i];
+                    }
+                    if (!stayOnPage) {
+                        this.$router.go(-1);
+                    }
+				})
 		    }
 		},
 		watch: {

@@ -41,7 +41,7 @@
             - [ requireJs, text, "@FCom_AdminSPA/AdminSPA/js/lib/text-2.0.12" ]
             - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
-            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.6" ]
+            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8.min" ]
             - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
             - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]
             - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
@@ -101,12 +101,13 @@
             - [ requireJs, sv-page-account-logout, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout" ]
             - [ requireJs, sv-page-account-logout-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout.html" ]
 
-            - [ requireJs, sv-page-system-users, "@FCom_AdminSPA/AdminSPA/vue/page/system/users/index" ]
-            - [ requireJs, sv-page-system-users-grid-config, "~/users/grid_config" ]
-            - [ requireJs, sv-page-system-users-form, "@FCom_AdminSPA/AdminSPA/vue/page/system/users/form" ]
+            - [ requireJs, sv-page-users, "@FCom_AdminSPA/AdminSPA/vue/page/users/index" ]
+            - [ requireJs, sv-page-users-grid-config, "~/users/grid_config" ]
+            - [ requireJs, sv-page-users-form, "@FCom_AdminSPA/AdminSPA/vue/page/users/form" ]
 
-            - [ requireJs, sv-page-system-settings, "@FCom_AdminSPA/AdminSPA/vue/page/system/settings" ]
-            - [ requireJs, sv-page-system-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/system/settings.html" ]
+            - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]
+            - [ requireJs, sv-page-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main.html" ]
+            - [ requireJs, sv-page-settings-config, "~/settings/config" ]
 
             - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
             - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
@@ -128,11 +129,23 @@ sv-app-dynamic-js:
             - [ addRoute, { path: /password-recover, require: [sv-page-account-password-recover, text!sv-page-account-password-recover-tpl ]}]
             - [ addRoute, { path: /password-reset, require: [sv-page-account-password-reset, text!sv-page-account-password-reset-tpl ]}]
             - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
-            - [ addRoute, { path: /settings, require: [sv-page-system-settings, text!sv-page-system-settings-tpl ]}]
+            - [ addRoute, { path: /settings, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
 
-            - [ addRoute, { path: /users, require: [sv-page-system-users, text!sv-page-default-grid-tpl, json!sv-page-system-users-grid-config ]}]
-            - [ addRoute, { path: /users/form, require: [sv-page-system-users-form, text!sv-page-default-form-tpl ]}]
+            - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-default-grid-tpl, json!sv-page-users-grid-config ]}]
+            - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-default-form-tpl ]}]
 
+
+sv-app-setings-config:
+    - view: app
+        do:
+            - [ addNav, { path: /areas, label: Areas, pos: 10 }]
+            - [ addNav, { path: /areas/core, label: Core Settings, pos: 10 }]
+            # {FCom_AdminSPA}/AdminSPA/vue/page/settings/{areas/core/website}.(js|html)
+            - [ addNav, { path: /areas/core/website, label: Website, pos: 10, module: FCom_AdminSPA }]
+            - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20, module: FCom_AdminSPA }]
+            - [ addNav, { path: /areas/core/session, label: Session, pos: 30, module: FCom_AdminSPA }]
+            - [ addNav, { path: /themes, label: Themes, pos: 80 }]
+            - [ addNav, { path: /other, label: Other, pos: 90 }]
 
 /login:
     - { include: / }

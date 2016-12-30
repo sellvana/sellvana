@@ -16,6 +16,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
         '_personalize' => true,
         '_local_notifications' => true,
         '_redirect' => true,
+        '_login' => true,
     ];
 
     protected $_responsesToPush = [];
@@ -99,6 +100,11 @@ class FCom_AdminSPA_AdminSPA extends BClass
     }
 
     public function responseCallback_redirect($data)
+    {
+        return $data;
+    }
+
+    public function responseCallback_login($data)
     {
         return $data;
     }

@@ -49,6 +49,25 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
         return $tree;
     }
 
+    public function normalizeSettingsNav()
+    {
+        $modRegHlp = $this->BModuleRegistry;
+        foreach ($this->_navs as &$nav) {
+            if (empty($nav['require']) && !empty($nav['module'])) {
+                $mod = $modRegHlp->module($nav['module']);
+                $relPath = '/AdminSPA/vue/page/settings' . $nav['path'];
+                $fsPath = $mod->root_dir . $relPath;
+                $webPath = /*$this->BRequest->scheme() . ':' . */$mod->baseSrc(false) . $relPath;
+                $nav['require'] = [
+                    file_exists($fsPath . '.js') ? $webPath . '.js' : '',
+                    file_exists($fsPath . '.html') ? 'text!' . $webPath . '.html' : '',
+                ];
+            }
+        }
+        unset($nav);
+        return $this;
+    }
+
     public function getNavTree()
     {
         $tree = [];
@@ -60,9 +79,7 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
                 case 3: $tree[$a[0]]['children'][$a[1]]['children'][$a[2]] = $nav; break;
             }
         }
-#print_r($tree);
         $tree = $this->sortNavRecursively($tree);
-#print_r($tree);
         return $tree;
 //        return [
 //            ['label' => 'Dashboard', 'path' => '/dashboard', 'icon_class' => 'fa fa-tachometer', 'link' => '/'],

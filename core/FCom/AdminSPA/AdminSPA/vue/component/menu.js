@@ -27,6 +27,9 @@ define(['vue', 'sv-app', 'text!sv-comp-menu-tpl'], function(Vue, SvApp, menuTpl)
                     }
                     return false;
                 }
+            },
+            mainNavOpen: function () {
+                return this.$store.state.ui.mainNavOpen;
             }
         },
         methods: {
@@ -36,6 +39,12 @@ define(['vue', 'sv-app', 'text!sv-comp-menu-tpl'], function(Vue, SvApp, menuTpl)
             }
         },
         template: menuTpl,
-        store: SvApp.store
+        watch: {
+            mainNavOpen: function (a) {
+                if (!a) {
+                    this.navTreeOpen = {};
+                }
+            }
+        }
     }
 })
