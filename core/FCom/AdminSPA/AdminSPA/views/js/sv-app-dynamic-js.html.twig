@@ -79,6 +79,7 @@ console.log(transition);
             methods: {
                 pageClick: function() {
                     this.ddToggle(false);
+                    this.$store.commit('pageClick');
                 }
             },
             components: {

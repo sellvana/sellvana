@@ -40,10 +40,12 @@
             - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/require-2.3.2.min.js" ]
             - [ requireJs, text, "@FCom_AdminSPA/AdminSPA/js/lib/text-2.0.12" ]
             - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
+            - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
-            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8.min" ]
+            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8" ]
             - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
             - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]
+            #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-beta.13.min" ]
             - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
             - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
             #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
@@ -77,7 +79,6 @@
             - [ requireJs, sv-comp-grid-panel-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel.html" ]
             - [ requireJs, sv-comp-grid-panel-columns-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-columns.html" ]
             - [ requireJs, sv-comp-grid-panel-filters-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters.html" ]
-            - [ requireJs, sv-comp-grid-panel-filters-current-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters-current.html" ]
             - [ requireJs, sv-comp-grid-panel-export-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-export.html" ]
             - [ requireJs, sv-comp-grid-bulk-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/bulk-actions.html" ]
 
@@ -144,7 +145,13 @@ sv-app-setings-config:
             - [ addNav, { path: /areas/core/website, label: Website, pos: 10, module: FCom_AdminSPA }]
             - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20, module: FCom_AdminSPA }]
             - [ addNav, { path: /areas/core/session, label: Session, pos: 30, module: FCom_AdminSPA }]
+
+            - [ addNav, { path: /areas/frontend, label: Frontend Settings, pos: 20 }]
+
+            - [ addNav, { path: /areas/admin, label: Admin Settings, pos: 30 }]
+
             - [ addNav, { path: /themes, label: Themes, pos: 80 }]
+
             - [ addNav, { path: /other, label: Other, pos: 90 }]
 
 /login:

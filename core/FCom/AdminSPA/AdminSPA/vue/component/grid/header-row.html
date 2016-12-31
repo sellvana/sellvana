@@ -8,7 +8,7 @@
             <a href="#" :class="{'sorted-up':sorted(col, 'up', 0), 'sorted-down':sorted(col, 'down', 0)}" @click.prevent="toggleSort(col)"
                 ><i class="fa fa-caret-up" aria-hidden="true" v-if="sorted(col, 'up', 1)"></i
                 ><i class="fa fa-caret-down" aria-hidden="true" v-if="sorted(col, 'down', 1)"></i
-                ><t>{{col.label}}</t></a>
+                >{{col.label|_}}</a>
         </template>
     </th>
     <!--

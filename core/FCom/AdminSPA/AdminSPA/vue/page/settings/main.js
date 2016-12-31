@@ -14,6 +14,11 @@ define(['vue', 'sv-app', 'json!sv-page-settings-config'], function (Vue, SvApp, 
                 panelsOpen: {}
             }
         },
+        computed: {
+            pageTitle: function () {
+                return this.curTab ? this.curTab.label : '';
+            }
+        },
         methods: {
             fetchData: function () {
                 var vm = this;
@@ -40,6 +45,10 @@ define(['vue', 'sv-app', 'json!sv-page-settings-config'], function (Vue, SvApp, 
         },
         watch: {
             curTab: function (tab) {
+                if (!tab.children) {
+                    this.panels = {};
+                    return;
+                }
                 var vm = this, deps = [], i, j, panel, paths = [], roles = [], panels = {};
                 this.panels = {};
                 for (i = 0; i < tab.children.length; i++) {

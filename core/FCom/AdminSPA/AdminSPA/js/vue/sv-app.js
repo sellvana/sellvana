@@ -1,34 +1,39 @@
-define(['jquery', 'vue', 'vuex', 'select2', 'accounting', 'moment'], function ($, Vue, Vuex, Bootstrap, Accounting, Moment) {
+define(['jquery', 'lodash', 'vue', 'vuex', 'accounting', 'moment', 'select2'], function ($, _, Vue, Vuex, Accounting, Moment) {
 
-    // Translations, usage: <t>String<t> or <t tag="div" :args="{p:page, m:max}">Page {p} of {m}</t>
-    //TODO: implement Sellvana logic
-    Vue.component('t', {
-        props: {
-            'tag' : { type: String, default: 'span' },
-            'args': { type: Object, default: function () { return {}; } }
-        },
-        render: function (h) {
-            var data = {}, children = this.$slots.default;
-            /*
-             var translated = _(result[0].text, this.args);
-             if (!translated.match(/^\{\{/)) {
-                children = translated;
-             }
-             */
-            return h(this.tag, data, children);
-        }
-    });
+    String.prototype.supplant = function (o) {
+        return this.replace(/{([^{}]*)}/g, function (a, b) {
+            var r = o[b];
+            return typeof r === 'string' || typeof r === 'number' ? r : a;
+        });
+    };
+
+    function translate(original, args) {
+        var translated = typeof original === 'string' ? original : '' + original; // implement Sellvana logic
+        return translated.supplant(args);
+    }
+
+    Vue.filter('_', translate);
 
     Vue.component('select2', {
-        props: ['options', 'value'],
+        props: ['options', 'value', 'params'],
         template: '<select><slot></slot></select>',
         mounted: function () {
-            var vm = this;
-            $(this.$el).val(this.value).select2({ data: this.options }).on('change', function () { vm.$emit('input', this.value); });
+            var vm = this, params = $.extend({}, this.params || {});
+            params.data = this.options;
+            $(this.$el).val(this.value).select2(params).on('change', function () {
+                vm.$emit('input', $(vm.$el).val());
+            });
         },
         watch: {
-            value: function (value) { $(this.$el).select2('val', value); },
-            options: function (options) { $(this.$el).select2({ data: options }); }
+            value: function (value) {
+                var $el = $(this.$el);
+                if (!_.isEqual($el.val(), value)) {
+                    $el.select2('val', value);
+                }
+            },
+            options: function (options) {
+                $(this.$el).select2({ data: options });
+            }
         },
         destroyed: function () { $(this.$el).off().select2('destroy'); }
     });
@@ -43,11 +48,6 @@ define(['jquery', 'vue', 'vuex', 'select2', 'accounting', 'moment'], function ($
     //         return h(this.tag, data, children);
     //     }
     // });
-
-    Vue.filter('_', function (value, args) {
-        //TODO: implement
-        return value;
-    });
 
     Vue.filter('currency', function (value, currencyCode) {
         //TODO: implement config by currencyCode
@@ -146,7 +146,8 @@ define(['jquery', 'vue', 'vuex', 'select2', 'accounting', 'moment'], function ($
         //namespaced: true,
         state: {
             ddCurrent: false,
-            mainNavOpen: true
+            mainNavOpen: true,
+            pageClickCounter: 0
         },
         mutations: {
             ddToggle: function (state, ddName) {
@@ -154,6 +155,9 @@ define(['jquery', 'vue', 'vuex', 'select2', 'accounting', 'moment'], function ($
             },
             mainNavToggle: function (state) {
                 state.mainNavOpen = !state.mainNavOpen;
+            },
+            pageClick: function (state) {
+                state.pageClickCounter++;
             }
         }
     });
@@ -192,7 +196,6 @@ define(['jquery', 'vue', 'vuex', 'select2', 'accounting', 'moment'], function ($
         if (response._nav) {
             storeData.navTree = response._nav;
         }
-console.log(storeData);
         store.commit('setData', storeData);
 
         if (response._redirect) {
@@ -262,35 +265,42 @@ console.log(storeData);
 
                     //////////////////////// UI COMPONENTS
                     ddOpen: function () {
-                        return function(ddName) {
-                            return store.state.ui.ddCurrent === ddName;
+                        return function(ddName, ddRoot) {
+                            ddRoot = ddRoot || store.state.ui;
+                            return ddRoot.ddCurrent === ddName;
                         };
+                    },
+                    pageClickCounter: function () {
+                        return this.$store.state.ui.pageClickCounter;
                     },
 
                     ///////////////////////// TRANSLATIONS
                     _: function () {
-                        return function (str, args) {
-                            //TODO: implement Sellvana logic
-                            return str;
+                        return translate;
+                    },
+                    select2Options: function () {
+                        return function (options) {
+                            var kvs = [], i;
+                            for (i in options) {
+                                kvs.push({id: i, text: options[i]});
+                            }
+                            return kvs;
                         }
                     }
                 },
                 methods: {
-                    ddToggle: function (ddName) {
-                        store.commit('ddToggle', ddName);
+                    ddToggle: function (ddName, ddRoot) {
+                        if (ddRoot) {
+                            Vue.set(ddRoot, 'ddCurrent', ddRoot.ddCurrent === ddName ? false : ddName);
+                        } else {
+                            store.commit('ddToggle', ddName);
+                        }
                     },
                     ddStay: function () { /* dummy */ }
-                }
-            },
-            i18n: {
-                computed: {
                 }
             }
         },
         store: store,
-        _: function (str, args) {
-            // implement translation logic
-            return str;
-        }
+        _: translate
     };
 });

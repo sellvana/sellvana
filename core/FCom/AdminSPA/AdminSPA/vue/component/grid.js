@@ -1,12 +1,26 @@
-define(['vue', 'sv-app', 'jquery',
+define(['vue', 'sv-app', 'jquery', 'lodash',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
         'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl', 'text!sv-comp-grid-panel-tpl',
-        'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl', 'text!sv-comp-grid-panel-filters-current-tpl',
+        'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvApp, $, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl, gridPanelTpl,
-             gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelFiltersCurrentTpl, gridPanelExportTpl, gridBulkActionsTpl
+    function(Vue, SvApp, $, _, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl,
+             gridPanelTpl, gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelExportTpl, gridBulkActionsTpl
     ) {
+        function prepareFiltersRequest(filters) {
+            var result = [], i, f, r;
+            for (i in filters) {
+                f = filters[i];
+                r = {field: f.config.field, op: f.op};
+                if (!_.isEmpty(f.values)) r.val = f.values;
+                if (f.value !== '') r.val = f.value;
+                if (f.from) r.from = f.from;
+                if (f.to) r.to = f.to;
+                result[i] = r;
+            }
+            return JSON.stringify(result);
+        }
+
         var GridHeaderRow = {
             mixins: [SvApp.mixins.common],
             props: ['grid'],
@@ -183,50 +197,98 @@ define(['vue', 'sv-app', 'jquery',
             template: gridPanelFiltersTpl,
             data: function () {
                 return {
-                    filterToAdd: ''
+                    filterToAdd: '',
+                    addedFilters: [],
+                    ddOpCurrent: ''
                 }
             },
             computed: {
-                availableFilters: function () {
-                    return [];
+                ddName: function () {
+                    return function (flt) {
+                        return this.grid.config.id + '/panel-filters/' + flt.config.field;
+                    }
                 },
-                addedFilters: function () {
-                    return [{}];
+                ddOpOpen: function () {
+                    return function (flt) {
+                        return this.ddOpCurrent === flt.config.field;
+                    }
+                },
+                availableFilters: function () {
+                    if (!this.grid || !this.grid.config || !this.grid.config.filters) {
+                        return [];
+                    }
+                    var availFilters = [], addedFilters = this.addedFilters, af = {}, i, l;
+                    for (i = 0, l = addedFilters.length; i < l; i++) {
+                        af[addedFilters[i].config.field] = addedFilters[i];
+                    }
+                    for (i = 0, l = this.grid.config.filters.length; i < l; i++) {
+                        var f = this.grid.config.filters[i];
+                        if (af[f.field]) {
+                            continue;
+                        }
+                        availFilters.push(this.grid.config.filters[i]);
+                    }
+                    return availFilters;
                 }
             },
             methods: {
                 addFilter: function () {
-
-                },
-                applyFilters: function () {
-
-                }
-            }
-        };
-
-        var GridPanelFiltersCurrent = {
-            mixins: [SvApp.mixins.common],
-            props: ['grid'],
-            template: gridPanelFiltersCurrentTpl,
-            computed: {
-                currentFilters: function () {
-                    var gridState = this.grid.state;
-                    if (!gridState || !gridState.filters) {
-                        return [];
-                    }
-                    return gridState.filters;
-                }
-            },
-            methods: {
-                removeFilter: function (flt) {
-                    var gridState = this.grid.state;
-                    if (!gridState || !gridState.filters || !gridState.filters[flt.field]) {
+                    if (!this.filterToAdd) {
                         return;
                     }
-                    delete gridState.filters[flt.field];
-                    if (!Object.keys(gridState.filters).length) {
-                        delete gridState.filters;
+                    var i, filters = this.grid.config.filters, f = null;
+                    for (i = 0, l = filters.length; i < l; i++) {
+                        if (filters[i].field === this.filterToAdd) {
+                            f = filters[i];
+                        }
                     }
+                    if (!f) {
+                        return;
+                    }
+                    var newFilter = {
+                        config: f,
+                        op: f.default_op,
+                        value: '',
+                        from: '',
+                        to: '',
+                        values: []
+                    };
+                    this.addedFilters.push(newFilter);
+                    this.filterToAdd = '';
+                },
+                removeFilter: function (i) {
+                    this.addedFilters = this.addedFilters.splice(i + 1, 1);
+                },
+                ddOpToggle: function (flt) {
+                    if (this.ddOpCurrent !== flt.config.field) {
+                        this.ddOpCurrent = flt.config.field;
+                    } else {
+                        this.ddOpClear();
+                    }
+                },
+                ddOpClear: function () {
+                    this.ddOpCurrent = '';
+                },
+                switchOp: function (flt, op) {
+                    Vue.set(flt, 'op', op);
+                    this.ddOpClear();
+                },
+                applyFilters: function () {
+                    var filters = this.addedFilters;
+                    this.$emit('apply-filters', filters);
+                    this.resetFilters();
+                    this.closeDropdown();
+                },
+                resetFilters: function () {
+                    this.addedFilters = [];
+                },
+                closeDropdown: function () {
+                    this.ddToggle(this.grid.config.id + '/panel-filters');
+                }
+            },
+            watch: {
+                pageClickCounter: function () {
+                    this.ddOpClear();
                 }
             }
         };
@@ -263,7 +325,6 @@ define(['vue', 'sv-app', 'jquery',
                 'sv-comp-grid-pager-list': GridPagerList,
                 'sv-comp-grid-panel-columns': GridPanelColumns,
                 'sv-comp-grid-panel-filters': GridPanelFilters,
-                'sv-comp-grid-panel-filters-current': GridPanelFiltersCurrent,
                 'sv-comp-grid-panel-export': GridPanelExport,
                 'sv-comp-grid-bulk-actions': GridBulkActions
             },
@@ -275,11 +336,21 @@ define(['vue', 'sv-app', 'jquery',
             computed: {
                 cntTotal: function () {
                     return this.grid && this.grid.state ? this.grid.state.c : 0;
+                },
+                currentFilters: function () {
+                    var gridState = this.grid.state;
+                    if (!gridState || !gridState.filters) {
+                        return [];
+                    }
+                    return gridState.filters;
                 }
             },
             methods: {
-                fetchData: function () {
-                    this.$emit('fetch-data');
+                applyFilters: function (filters) {
+                    this.$emit('apply-filters', filters);
+                },
+                removeFilter: function (flt) {
+                    this.$emit('remove-filter', flt);
                 },
                 updateQuickSearch: function () {
                     Vue.set(this.grid.state, 'quickSearch', this.quickSearch);
@@ -354,6 +425,9 @@ define(['vue', 'sv-app', 'jquery',
                         if (grid.state.p) {
                             params.p = grid.state.p;
                         }
+                        if (grid.filters) {
+                            params.filters = prepareFiltersRequest(grid.filters);
+                        }
                     }
                     if (url) {
                         SvApp.methods.sendRequest('GET', url, params, function (response) {
@@ -368,6 +442,19 @@ define(['vue', 'sv-app', 'jquery',
                             }
                         });
                     }
+                },
+                applyFilters: function (filters) {
+                    var oldFilters = this.grid.filters || [];
+                    Vue.set(this.grid, 'filters', oldFilters.concat(filters));
+                    this.fetchData();
+                },
+                removeFilter: function (i) {
+                    if (!this.grid || !this.grid.filters) {
+                        return;
+                    }
+                    var filters = this.grid.filters.splice(i + 1, 1);
+                    Vue.set(this.grid, 'filters', filters);
+                    this.fetchData();
                 }
             },
             mounted: function () {

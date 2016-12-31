@@ -1,16 +1,16 @@
 <div class="login-container">
 	<img :src="assetUrl('FCom_AdminSPA', 'img/logo-big.png')" alt="" />
 	<form>		
-		<p><t>Welcome, please sign in</t></p>
+		<p>{{'Welcome, please sign in'|_}}</p>
 		<label>
-			<span><t>Username</t></span>
+			<span>{{'Username'|_}}</span>
 			<input type="text" v-model="username">
 		</label>
 		<label>
-			<span><t>Password</t></span>
+			<span>{{'Password'|_}}</span>
 			<input type="password" v-model="password">
 		</label>
-		<router-link to="/password-recover"><t>Forgot your password?</t></router-link>
+		<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
 		<div class="control-buttons-block">
 			<input type="button" @click="submit" value="Sign in" class="button button6">
 		</div>

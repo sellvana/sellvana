@@ -10,7 +10,7 @@
         <li class="login-status" :class="{open:ddOpen('header-account-status')}">
             <a href="#" :title="_('Status menu')" class="status-toggle status" :class="curStatus.item_class" @click.prevent.stop="ddToggle('header-account-status')"><i :class="curStatus.icon_class" aria-hidden="true"></i></a>
             <ul class="dropdown-menu">
-                <li v-for="st in statuses" :class="st.item_class"><a href="#" @click.prevent="setStatus(st)"><i :class="st.icon_class" aria-hidden="true"></i><t>{{st.label}}</t></a></li>
+                <li v-for="st in statuses" :class="st.item_class"><a href="#" @click.prevent="setStatus(st)"><i :class="st.icon_class" aria-hidden="true"></i>{{st.label|_}}</a></li>
             </ul>
         </li>
     </ul>

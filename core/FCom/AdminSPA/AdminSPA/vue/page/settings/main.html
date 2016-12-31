@@ -15,14 +15,16 @@
         </nav>
     </div>
     <div class="content-block">
-		<ul><li v-for="panel in panels">
-            <div class="panel-header">
-                <a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
-            </div>
-            <div class="panel-container" v-if="panelsOpen[panel.path]">
-                <component :is="panel.component" :settings="settings"></component>
-            </div>
-        </li>
+        <h2>{{pageTitle}}</h2>
+		<ul>
+            <li v-for="panel in panels">
+                <div class="panel-header">
+                    <a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
+                </div>
+                <div class="panel-container" v-if="panelsOpen[panel.path]">
+                    <component :is="panel.component" :settings="settings"></component>
+                </div>
+            </li>
         </ul>
     </div>
 </div>

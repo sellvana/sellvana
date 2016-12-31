@@ -6,12 +6,13 @@
  * @property Sellvana_Sales_Model_Order Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Comment Sellvana_Sales_Model_Order_Comment
  * @property Sellvana_Sales_Model_Order_Item Sellvana_Sales_Model_Order_Item
+ * @property Sellvana_Sales_Model_Order_State_Overall Sellvana_Sales_Model_Order_State_Overall
  */
 class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
-    public function action_grid_config()
+    public function getGridConfig()
     {
-        $config = [
+        return [
             'id' => 'users',
             'data_url' => 'orders/grid_data',
             'columns' => [
@@ -22,16 +23,17 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 ]],
                 ['field' => 'id', 'label' => 'Internal ID'],
                 ['field' => 'unique_id', 'label' => 'Public ID'],
-                ['field' => 'state_overall', 'label' => 'Overall State', 'options' => [
-                    'value' => 'pending', 'label' => 'Pending',
-                ]],
+                ['field' => 'state_overall', 'label' => 'Overall State', 'options' => $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels()],
                 ['field' => 'customer_firstname', 'label' => 'Last Name'],
                 ['field' => 'customer_lastname', 'label' => 'Last Name'],
                 ['field' => 'customer_email', 'label' => 'Email'],
+                ['field' => 'create_at', 'label' => 'Created', 'type' => 'date']
             ],
             'filters' => [
-                ['field' => 'id', 'type' => 'number-range'],
-                ['field' => 'unique_id', 'type' => 'text'],
+                ['field' => 'id', 'type' => 'number'],
+                ['field' => 'unique_id'],
+                ['field' => 'state_overall'],
+                ['field' => 'create_at'],
             ],
             'export' => [
                 'format_options' => [
@@ -42,19 +44,11 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 'pagesize_options' => [5, 10, 20, 50, 100],
             ],
         ];
-        $config = $this->normalizeGridConfig($config);
-        $this->respond($config);
-
     }
 
-    public function action_grid_data()
+    public function getGridOrm()
     {
-        $data = $this->Sellvana_Sales_Model_Order->orm('o')->paginate();
-        $result = [
-            'rows' => BDb::many_as_array($data['rows']),
-            'state' => $data['state'],
-        ];
-        $this->respond($result);
+        return $this->Sellvana_Sales_Model_Order->orm('o');
     }
 
     public function action_grid_delete__POST()
