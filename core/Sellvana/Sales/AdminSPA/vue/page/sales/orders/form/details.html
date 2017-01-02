@@ -18,11 +18,11 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="p in payments" @click="viewPayment(p)">
+							<tr v-for="p in form.payments" @click="viewPayment(p)">
 								<td>{{p.create_at|date}}</td>
-								<td>{{p.amount_captured+p.amount_due|currency(order.store_currency_code)}}</td>
+								<td>{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
 								<td>{{p.payment_method}}</td>
-								<td :class="'status-' + p.state_overall">{{options.payment_state_overall[p.state_overall]}}</td>
+								<td :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>
@@ -44,7 +44,7 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="s in shipments" @click="viewShipment(s)">
+							<tr v-for="s in form.shipments" @click="viewShipment(s)">
 								<td>{{s.create_at|date}}</td>
 								<td>
 									<div v-for="item in s.items">
@@ -52,7 +52,7 @@
 									</div>
 								</td>
 								<td>{{s.carrier_desc}} / {{s.service_desc}}</td>
-								<td :class="'status-' + s.state_overall">{{options.shipment_state_overall[s.state_overall]}}</td>
+								<td :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>
@@ -73,14 +73,14 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="r in returns" @click="viewReturn(r)">
+							<tr v-for="r in form.returns" @click="viewReturn(r)">
 								<td>{{r.create_at|date}}</td>
 								<td>
-									<div v-for="item in s.items">
+									<div v-for="item in r.items">
 										<span>{{item.inventory_sku}} x{{item.qty}}</span>: {{item.product_name}}
 									</div>
 								</td>
-								<td :class="'status-' + r.state_overall">{{options.return_state_overall[r.state_overall]}}</td>
+								<td :class="'status-' + r.state_overall">{{form.options.return_state_overall[r.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>
@@ -102,11 +102,11 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="r in refunds" @click="viewRefund(r)">
+							<tr v-for="r in form.refunds" @click="viewRefund(r)">
 								<td>{{r.create_at|date}}</td>
-								<td>{{r.amount|currency(order.store_currency_code)}}</td>
+								<td>{{r.amount|currency(form.order.store_currency_code)}}</td>
 								<td>{{r.method_desc}}</td>
-								<td :class="'status-' + r.state_overall">{{options.refund_state_overall[r.state_overall]}}</td>
+								<td :class="'status-' + r.state_overall">{{form.options.refund_state_overall[r.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>
@@ -127,14 +127,14 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr v-for="c in cancellations" @click="viewCancellation(c)">
+							<tr v-for="c in form.cancellations" @click="viewCancellation(c)">
 								<td>{{c.create_at|date}}</td>
 								<td>
 									<div v-for="item in c.items">
 										<span>{{item.inventory_sku}} x{{item.qty}}</span>: {{item.product_name}}
 									</div>
 								</td>
-								<td :class="'status-' + c.state_overall">{{options.cancel_state_overall[c.state_overall]}}</td>
+								<td :class="'status-' + c.state_overall">{{form.options.cancel_state_overall[c.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>

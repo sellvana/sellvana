@@ -8,7 +8,7 @@
                     </div>
                     <div class="data">
                         <span>{{'Grand Total:'|_}}</span>
-                        <p>{{order.grand_total|currency(order.store_currency_code)}}</p>
+                        <p>{{form.order.grand_total|currency(form.order.store_currency_code)}}</p>
                     </div>
                 </div>
                 <div class="overall-info">
@@ -17,7 +17,7 @@
                     </div>
                     <div class="data">
                         <span>{{'Overall Status'|_}}</span>
-                        <p :class="'status-'+order.state_overall">{{getOption('order_state_overall', order.state_overall)}}</p>
+                        <p :class="'status-'+form.order.state_overall">{{getOption('order_state_overall', form.order.state_overall)}}</p>
                     </div>
                 </div>
                 <div class="payment-info">
@@ -26,7 +26,7 @@
                     </div>
                     <div class="data">
                         <span>{{'Payment:'|_}}</span>
-                        <p :class="'status-'+order.state_payment">{{getOption('order_state_payment', order.state_payment)}}</p>
+                        <p :class="'status-'+form.order.state_payment">{{getOption('order_state_payment', form.order.state_payment)}}</p>
                     </div>
                 </div>
                 <div class="delivery-info">
@@ -35,7 +35,7 @@
                     </div>
                     <div class="data">
                         <span>{{'Delivery:'|_}}</span>
-                        <p :class="'status-'+order.state_delivery">{{getOption('order_state_delivery', order.state_delivery)}}</p>
+                        <p :class="'status-'+form.order.state_delivery">{{getOption('order_state_delivery', form.order.state_delivery)}}</p>
                     </div>
                 </div>
             </div>
@@ -63,10 +63,10 @@
             </div>
         </div>
 		<div class="col-md-10">
-			<sv-page-sales-orders-form-main v-if="tab==='main'" :order="order" :items="items" :shipments="shipments" :payments="payments" :returns="returns" :refunds="refunds" :cancellations="cancellations" :options="options" @tab="switchTab"></sv-page-sales-orders-form-main>
-            <sv-page-sales-orders-form-details v-if="tab==='details'" :order="order" :shipments="shipments" :payments="payments" :returns="returns" :refunds="refunds" :cancellations="cancellations" :options="options"></sv-page-sales-orders-form-details>
-            <sv-page-sales-orders-form-comments v-if="tab==='comments'" :order="order"></sv-page-sales-orders-form-comments>
-            <sv-page-sales-orders-form-history v-if="tab==='history'" :order="order"></sv-page-sales-orders-form-history>
+			<sv-page-sales-orders-form-main v-if="tab==='main'" :form="form" @tab="switchTab"></sv-page-sales-orders-form-main>
+            <sv-page-sales-orders-form-details v-if="tab==='details'" :form="form"></sv-page-sales-orders-form-details>
+            <sv-page-sales-orders-form-comments v-if="tab==='comments'" :form="form"></sv-page-sales-orders-form-comments>
+            <sv-page-sales-orders-form-history v-if="tab==='history'" :form="form"></sv-page-sales-orders-form-history>
 		</div>
     </div>
 </div> 

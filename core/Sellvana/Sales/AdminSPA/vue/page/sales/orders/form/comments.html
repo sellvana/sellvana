@@ -24,7 +24,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-for="comment in comments" :class="{'sent-comment':comment.type==='sent', 'received-comment':comment.type==='received'}">
+			<div v-for="comment in form.comments" :class="{'sent-comment':comment.type==='sent', 'received-comment':comment.type==='received'}">
 				<div class="comment-private">
 					<div class="comment-title">
 						<p class="comment-author">{{comment.author_name}}</p>

@@ -21,7 +21,7 @@
                             <li v-for="(opLabel, op) in flt.config.ops"><a class="filter-op" href="#" @click.prevent="switchOp(flt, op)">{{opLabel|_}}</a></li>
                         </ul>
                     </div>
-                    <div v-if="flt.op.match(/^(equals|starts_with|ends_with|lt|lte|gt|gte)$/)" class="input-group-btn not-range">
+                    <div v-if="flt.op.match(/^(equals|starts|ends|lt|lte|gt|gte)$/)" class="input-group-btn not-range">
                         <input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.value">
                         <input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.value">
                         <input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.value">

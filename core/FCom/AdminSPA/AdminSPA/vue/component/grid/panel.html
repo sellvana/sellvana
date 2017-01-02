@@ -1,8 +1,8 @@
 <div class="f-grid-filter-panel">
     <div class="col-sm-5">
         <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
-        <sv-comp-grid-panel-filters :grid="grid" @apply-filters="applyFilters"></sv-comp-grid-panel-filters>
-        <sv-comp-grid-panel-export :grid="grid"></sv-comp-grid-panel-export>
+        <sv-comp-grid-panel-filters :grid="grid" @apply-filters="applyFilters" v-if="grid.config.filters"></sv-comp-grid-panel-filters>
+        <sv-comp-grid-panel-export :grid="grid" v-if="grid.config.export"></sv-comp-grid-panel-export>
         <div class="search-block">
             <input type="text" :placeholder="'Quick filter results'|_" v-model="quickSearch" @keyup="updateQuickSearch()"/>
         </div>
@@ -17,16 +17,19 @@
     <div class="col-sm-12">
         <div class="filter-tags">
             <div class="filter-tag" v-for="(flt, i) in grid.filters">
-                {{flt.config.label|_}} {{flt.config.ops[flt.op]}}
-                <template v-if="flt.config.type==='select' && flt.op.match(/^(in|not_in)$/)">
-                    <template v-for="(v, j) in flt.values"><span v-if="j">, </span><span>{{flt.config.options[v]}}</span></template>
-                </template>
-                <template v-else-if="flt.op.match(/^(between|not_between)$/)">
-                    {{'{from} and {to}'|_(flt)}}
-                </template>
-                <template v-else>
-                    {{flt.value}}
-                </template>
+                <strong>{{flt.config.label|_}}</strong>
+                {{flt.config.ops[flt.op]}}
+                <strong>
+                    <template v-if="flt.config.type==='select' && flt.op.match(/^(in|not_in)$/)">
+                        <template v-for="(v, j) in flt.values"><span v-if="j">, </span><span>{{flt.config.options[v]}}</span></template>
+                    </template>
+                    <template v-else-if="flt.op.match(/^(between|not_between)$/)">
+                        {{'{from} and {to}'|_(flt)}}
+                    </template>
+                    <template v-else>
+                        {{flt.value}}
+                    </template>
+                </strong>
                 <a href="#" @click.prevent="removeFilter(i)"><i class="fa fa-times" aria-hidden="true"></i></a>
             </div>
         </div>

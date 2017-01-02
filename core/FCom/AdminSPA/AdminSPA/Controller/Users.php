@@ -2,9 +2,9 @@
 
 class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
-    public function action_grid_config()
+    public function getGridConfig()
     {
-        $config = [
+        return [
             'id' => 'users',
             'data_url' => 'users/grid_data',
             'columns' => [
@@ -30,18 +30,11 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
                 ['name' => 'delete', 'label' => 'Delete'],
             ],
         ];
-        $config = $this->normalizeGridConfig($config);
-        $this->respond($config);
     }
 
-    public function action_grid_data()
+    public function getGridOrm()
     {
-        $data = $this->FCom_Admin_Model_User->orm('u')->paginate();
-        $result = [
-            'rows' => BDb::many_as_array($data['rows']),
-            'state' => $data['state'],
-        ];
-        $this->respond($result);
+        return $data = $this->FCom_Admin_Model_User->orm('u');
     }
 
     public function action_grid_delete__POST()

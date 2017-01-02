@@ -31,7 +31,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
         'date' => [
             'equals' => 'equals',
             'between' => 'between',
-            'not between' => 'not between',
+            'not_between' => 'not between',
             'lt' => 'before',
             'gt' => 'after',
             'empty' => 'is empty',
@@ -64,18 +64,42 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
 
     public function action_grid_data()
     {
-        $config = $this->getGridConfig();
-        $orm = $this->getGridOrm();
-        $filters = $this->BRequest->request('filters');
-        if ($filters) {
-            $this->processGridFilters($config, $this->BUtil->fromJson($filters), $orm);
-        }
-        $data = $orm->paginate();
+        $data = $this->getGridRequestOrm()->paginate();
         $result = [
             'rows' => BDb::many_as_array($data['rows']),
             'state' => $data['state'],
         ];
         $this->respond($result);
+    }
+
+    public function action_grid_export()
+    {
+        $orm = $this->getGridRequestOrm();
+        $type = $this->BRequest->request('type') ?: 'csv';
+        switch ($type) {
+            case 'csv':
+                $this->exportCsv($orm);
+                die;
+                break;
+
+            default:
+                throw new BException('Invalid export type');
+        }
+    }
+
+    public function getGridRequestOrm()
+    {
+        $config = $this->getGridConfig();
+        $config = $this->normalizeGridConfig($config);
+        $orm = $this->getGridOrm();
+        $filters = $this->BRequest->request('filters');
+        if ($filters) {
+            if (is_string($filters)) {
+                $filters = $this->BUtil->fromJson($filters);
+            }
+            $this->processGridFilters($config, $filters, $orm);
+        }
+        return $orm;
     }
 
     public function normalizeGridConfig($config)
@@ -119,16 +143,24 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                             $col['label'] = 'Actions';
                         }
                         if (empty($col['actions'])) {
-                            $col['actions'] = [
-                                ['type' => 'edit', 'link' => $config['edit_link']],
-                                ['type' => 'delete', 'link' => $config['delete_link']],
-                            ];
+                            if (!empty($config['edit_link'])) {
+                                $col['actions'][] = ['type' => 'edit', 'link' => $config['edit_link']];
+                            }
+                            if (!empty($config['delete_link'])) {
+                                $col['actions'][] = ['type' => 'delete', 'link' => $config['delete_link']];
+                            }
                         }
-                        foreach ($col['actions'] as $j => $a) {
-                            if (empty($a['icon_class'])) {
-                                switch ($a['type']) {
-                                    case 'edit': $col['actions'][$j]['icon_class'] = 'fa fa-pencil'; break;
-                                    case 'delete': $col['actions'][$j]['icon_class'] = 'fa fa-trash'; break;
+                        if (!empty($col['actions'])) {
+                            foreach ($col['actions'] as $j => $a) {
+                                if (empty($a['icon_class'])) {
+                                    switch ($a['type']) {
+                                        case 'edit':
+                                            $col['actions'][$j]['icon_class'] = 'fa fa-pencil';
+                                            break;
+                                        case 'delete':
+                                            $col['actions'][$j]['icon_class'] = 'fa fa-trash';
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -160,6 +192,9 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                     } else {
                         $flt['type'] = !empty($flt['options']) ? 'select' : 'text';
                     }
+                }
+                if (empty($flt['index'])) {
+                    $flt['index'] = !empty($col['index']) ? $col['index'] : $col['field'];
                 }
                 if (empty($flt['label'])) {
                     if (!empty($col['label'])) {
@@ -199,7 +234,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
     {
         $configFilterFields = [];
         if (!empty($config['filters'])) {
-            $indexes = $this->BUtil->arraySeqToMap($config['columns'], 'name', 'index');
+            $indexes = $this->BUtil->arraySeqToMap($config['filters'], 'field', 'index');
+            $types = $this->BUtil->arraySeqToMap($config['filters'], 'field', 'type');
             foreach ($filters as $fId => &$f) {
                 if (is_array($f)) {
                     $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
@@ -208,6 +244,10 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                     }
                     if (!preg_match('#^[A-Za-z0-9_.]+$#', $f['field'])) {
                         unset($filters[$fId]);
+                        continue;
+                    }
+                    if (empty($f['type'])) {
+                        $f['type'] = $types[$f['field']];
                     }
                 }
             }
@@ -231,10 +271,10 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
             if ($fId === '_quick'
                 || !is_array($f)
                 || empty($f['type'])
-                || !isset($f['val'])
+                || (!isset($f['val']) && !isset($f['from']) && !isset($f['to']))
                 || $f['val'] === ''
                 || (empty($f['val']) && $f['val'] !== 0 && $f['val'] !== '0')
-                || empty($configFilterFields[$fId])
+                || empty($configFilterFields[$f['field']])
             ) {
                 continue;
             }
@@ -366,4 +406,67 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
         }
     }
 
+    public function exportCsv($orm)
+    {
+        $skipColumn = function ($col) {
+            if (empty($col['field'])) {
+                return true;
+            }
+            if (!empty($col['hidden']) && $col['hidden'] !== 'false') {
+                return true;
+            }
+            if (!empty($col['cell']) || (!empty($col['type']) && $col['type'] === 'thumb')) {
+                return true;
+            }
+            if (!empty($col['type']) && in_array($col['type'], ['actions', 'row-select'])) {
+                return true;
+            }
+            return false;
+        };
+
+        $config = $this->getGridConfig();
+        $config = $this->normalizeGridConfig($config);
+        $config = $this->applyGridPersonalization($config);
+        $columns = $config['columns'];
+        $headers = [];
+        foreach ($columns as $i => $col) {
+            if ($skipColumn($col)) {
+                continue;
+            }
+            $headers[] = $col['field'];
+        }
+        $dir = $this->BApp->storageRandomDir() . '/export';
+        $this->BUtil->ensureDir($dir);
+        $filename = $dir . '/' . $config['id'] . '.csv';
+        $fp = fopen($filename, 'w');
+        fwrite($fp, "\xEF\xBB\xBF"); // add UTF8 BOM character to open excel.
+        fputcsv($fp, $headers);
+
+        $orm->iterate(function ($row) use ($columns, $fp, $skipColumn) {
+            $data = [];
+            foreach ($columns as $col) {
+                if ($skipColumn($col)) {
+                    continue;
+                }
+                $k = $col['field'];
+                $val = $row->get($k);
+                if ($val === null) {
+                    $val = '';
+                }
+                if (isset($col['options'][$val])) {
+                    $val = $col['options'][$val];
+                }
+                $data[] = $val;
+            }
+            fputcsv($fp, $data);
+        });
+
+        fclose($fp);
+        $this->BResponse->sendFile($filename);
+    }
+
+    public function applyGridPersonalization($config)
+    {
+        return $config;
+    }
 }

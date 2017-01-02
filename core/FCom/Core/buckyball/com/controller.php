@@ -1418,11 +1418,27 @@ class BResponse extends BClass
 
     public function fileContentType($fileName)
     {
-        $type = 'application/octet-stream';
-        switch (strtolower(pathinfo($fileName, PATHINFO_EXTENSION))) {
-            case 'jpeg': case 'jpg': $type = 'image/jpg'; break;
-            case 'png': $type = 'image/png'; break;
-            case 'gif': $type = 'image/gif'; break;
+        if (file_exists($fileName)) {
+            $type = mime_content_type($fileName);
+        }
+
+        if (empty($type)) {
+            $type = 'application/octet-stream';
+            switch (strtolower(pathinfo($fileName, PATHINFO_EXTENSION))) {
+                case 'jpeg':
+                case 'jpg':
+                    $type = 'image/jpg';
+                    break;
+                case 'png':
+                    $type = 'image/png';
+                    break;
+                case 'gif':
+                    $type = 'image/gif';
+                    break;
+                case 'csv':
+                    $type = 'text/csv';
+                    break;
+            }
         }
         return $type;
     }
@@ -1460,7 +1476,7 @@ class BResponse extends BClass
             'Cache-Control: must-revalidate, post-check=0, pre-check=0',
             'Content-Length: ' . filesize($source),
             'Last-Modified: ' . date('r'),
-            'Content-Type: ' . $this->fileContentType($fileName),
+            'Content-Type: ' . $this->fileContentType($source),
             'Content-Disposition: ' . $disposition . '; filename=' . $fileName,
         ]);
 

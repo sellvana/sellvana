@@ -12,13 +12,59 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
             for (i in filters) {
                 f = filters[i];
                 r = {field: f.config.field, op: f.op};
-                if (!_.isEmpty(f.values)) r.val = f.values;
-                if (f.value !== '') r.val = f.value;
-                if (f.from) r.from = f.from;
-                if (f.to) r.to = f.to;
+                if (!_.isEmpty(f.values)) {
+                    r.val = f.values;
+                }
+                if (f.value !== '') {
+                    r.val = f.value;
+                }
+                if (f.from) {
+                    r.from = f.from;
+                }
+                if (f.to) {
+                    r.to = f.to;
+                }
                 result[i] = r;
             }
             return JSON.stringify(result);
+        }
+
+        function prepareDataRequest(grid) {
+            var params = {};
+            if (grid && grid.state) {
+                if (grid.state.s) {
+                    params.s = grid.state.s;
+                    params.sd = grid.state.sd;
+                }
+                if (grid.state.ps) {
+                    params.ps = grid.state.ps;
+                }
+                if (grid.state.p) {
+                    params.p = grid.state.p;
+                }
+                if (grid.filters) {
+                    params.filters = prepareFiltersRequest(grid.filters);
+                }
+            }
+            return params;
+        }
+
+        function initGridState(grid) {
+            var state = grid.state || {};
+            if (!state.c) {
+                state.c = grid.rows && _.isArrayLike(grid.rows) ? grid.rows.length : 0;
+            }
+            if (!state.p) {
+                state.p = 1;
+            }
+            if (!state.ps) {
+                state.ps = grid.config.default_pagesize || 10;
+            }
+            if (!state.mp) {
+                state.mp = Math.ceil(state.c / state.ps);
+            }
+console.log(state, grid);
+            Vue.set(grid, 'state', state);
         }
 
         var GridHeaderRow = {
@@ -146,19 +192,23 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
             },
             methods: {
                 setPagesize: function (ps) {
-                    this.grid.state.ps = ps;
+                    initGridState(this.grid);
+                    Vue.set(this.grid.state, 'ps', ps);
                     this.$emit('fetch-data');
                 },
                 goPage: function (p) {
-                    this.grid.state.p = p;
+                    initGridState(this.grid);
+                    Vue.set(this.grid.state, 'p',  p);
                     this.$emit('fetch-data');
                 },
                 goPrevPage: function () {
-                    this.grid.state.p = Math.max(this.grid.state.p * 1 - 1, 1);
+                    initGridState(this.grid);
+                    Vue.set(this.grid.state, 'p', Math.max(this.grid.state.p * 1 - 1, 1));
                     this.$emit('fetch-data');
                 },
                 goNextPage: function () {
-                    this.grid.state.p = Math.min(this.grid.state.p * 1 + 1, this.grid.state.mp);
+                    initGridState(this.grid);
+                    Vue.set(this.grid.state, 'p', Math.min(this.grid.state.p * 1 + 1, this.grid.state.mp));
                     this.$emit('fetch-data');
                 }
             }
@@ -257,7 +307,7 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
                     this.filterToAdd = '';
                 },
                 removeFilter: function (i) {
-                    this.addedFilters = this.addedFilters.splice(i + 1, 1);
+                    this.addedFilters.splice(i, 1);
                 },
                 ddOpToggle: function (flt) {
                     if (this.ddOpCurrent !== flt.config.field) {
@@ -296,7 +346,32 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
         var GridPanelExport = {
             mixins: [SvApp.mixins.common],
             props: ['grid'],
-            template: gridPanelExportTpl
+            template: gridPanelExportTpl,
+            data: function () {
+                return {
+                    type: 'csv',
+                    export_urls: []
+                }
+            },
+            computed: {
+                formatOptions: function () {
+                    return this.grid && this.grid.config.export ? this.grid.config.export.format_options : {};
+                }
+            },
+            methods: {
+                submit: function () {
+                    var url = this.grid.config.export.url;
+                    if (!url) {
+                        console.error('No export URL privided');
+                        return;
+                    }
+                    url = this.$store.state.env.root_href + url;
+                    var params = prepareDataRequest(this.grid);
+                    params.type = this.type;
+                    this.export_urls.push(url + (url.match(/\?/) ? '&' : '?') + $.param(params));
+                    this.ddToggle(this.grid.config.id + '/panel-export');
+                }
+            }
         };
 
         var GridBulkActions = {
@@ -346,6 +421,9 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
                 }
             },
             methods: {
+                fetchData: function () {
+                    this.$emit('fetch-data');
+                },
                 applyFilters: function (filters) {
                     this.$emit('apply-filters', filters);
                 },
@@ -353,6 +431,7 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
                     this.$emit('remove-filter', flt);
                 },
                 updateQuickSearch: function () {
+                    initGridState(this.grid);
                     Vue.set(this.grid.state, 'quickSearch', this.quickSearch);
                 }
             },
@@ -371,6 +450,14 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
                 columns: function () {
                     return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
                 },
+                columnOptions: function () {
+                    var colOptions = {};
+                    for (var j = 0; j < this.grid.config.columns; j++) {
+                        var col1 = this.grid.config.columns[j]
+                        colOptions[col1.field] = col1.options;
+                    }
+                    return colOptions;
+                },
                 visibleRows: function () {
                     var q = this.grid && this.grid.state ? this.grid.state.quickSearch : '';
                     if (q === '') {
@@ -379,12 +466,8 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
                     }
                     var rows = [];
                     for (var i in this.grid.rows) {
-                        var row = this.grid.rows[i], show = false, colOptions = {};
+                        var row = this.grid.rows[i], show = false, colOptions = this.columnOptions;
                         //TODO: optimize, run only once
-                        for (var j = 0; j < this.grid.config.columns; j++) {
-                            var col1 = this.grid.config.columns[j]
-                            colOptions[col1.field] = col1.options;
-                        }
                         for (var j in row) {
                             if (!row[j]) {
                                 continue;
@@ -413,35 +496,24 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
             },
             methods: {
                 fetchData: function () {
-                    var grid = this.grid, url = grid.config.data_url, params = {types: 'rows'};
-                    if (grid.state) {
-                        if (grid.state.s) {
-                            params.s = grid.state.s;
-                            params.sd = grid.state.sd;
-                        }
-                        if (grid.state.ps) {
-                            params.ps = grid.state.ps;
-                        }
-                        if (grid.state.p) {
-                            params.p = grid.state.p;
-                        }
-                        if (grid.filters) {
-                            params.filters = prepareFiltersRequest(grid.filters);
-                        }
+                    var grid = this.grid, url = grid.config.data_url, params = prepareDataRequest(grid);
+                    if (!url) { // local data
+                        console.log(grid.state);
+                        return;
                     }
-                    if (url) {
-                        SvApp.methods.sendRequest('GET', url, params, function (response) {
-                            if (response.config) {
-                                Vue.set(grid, 'config', response.config);
-                            }
-                            if (response.state) {
-                                Vue.set(grid, 'state', response.state);
-                            }
-                            if (response.rows) {
-                                Vue.set(grid, 'rows', response.rows);
-                            }
-                        });
-                    }
+                    SvApp.methods.sendRequest('GET', url, params, function (response) {
+                        if (response.config) {
+                            Vue.set(grid, 'config', response.config);
+                        }
+                        if (response.state) {
+                            Vue.set(grid, 'state', response.state);
+                        } else {
+                            initGridState(grid);
+                        }
+                        if (response.rows) {
+                            Vue.set(grid, 'rows', response.rows);
+                        }
+                    });
                 },
                 applyFilters: function (filters) {
                     var oldFilters = this.grid.filters || [];
@@ -452,9 +524,14 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
                     if (!this.grid || !this.grid.filters) {
                         return;
                     }
-                    var filters = this.grid.filters.splice(i + 1, 1);
-                    Vue.set(this.grid, 'filters', filters);
+                    this.grid.filters.splice(i, 1);
+                    //Vue.set(this.grid, 'filters', filters);
                     this.fetchData();
+                }
+            },
+            watch: {
+                grid: function (grid) {
+                    initGridState(grid);
                 }
             },
             mounted: function () {

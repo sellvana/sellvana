@@ -5598,6 +5598,7 @@ if (!function_exists('mime_content_type')) {
             'xml' => 'application/xml',
             'swf' => 'application/x-shockwave-flash',
             'flv' => 'video/x-flv',
+            'csv' => 'text/csv',
 
             // images
             'png' => 'image/png',

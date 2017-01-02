@@ -33,6 +33,9 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
                     if (this.isFavorite) {
                         var cur = {link: curPage.link};
                         this.$store.commit('removeFavorite', cur);
+                        SvApp.methods.sendRequest('POST', 'favorites/remove', cur, function (response) {
+
+                        });
                     } else {
                         var labelArr = [], iconClass = null;
                         for (var i = 0; i < curPage.breadcrumbs.length; i++) {
@@ -45,6 +48,9 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
                         labelArr.push(curPage.label);
                         var cur = {link: curPage.link, label: labelArr.join(' > '), icon_class: iconClass};
                         this.$store.commit('addFavorite', cur);
+                        SvApp.methods.sendRequest('POST', 'favorites/add', cur, function (response) {
+
+                        });
                     }
                 }
             }
@@ -68,6 +74,9 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
             methods: {
                 removeFavorite: function (fav) {
                     this.$store.commit('removeFavorite', fav);
+                    SvApp.methods.sendRequest('POST', 'favorites/remove', fav, function (response) {
+
+                    });
                 }
             }
         };

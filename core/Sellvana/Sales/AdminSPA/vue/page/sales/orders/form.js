@@ -1,13 +1,29 @@
-define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
-		'text!sv-page-sales-orders-form-main-tpl',
+define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
+		'text!sv-page-sales-orders-form-main-tpl', 'json!sv-page-sales-orders-form-items-config',
 		'text!sv-page-sales-orders-form-details-tpl',
 		'text!sv-page-sales-orders-form-comments-tpl',
         'text!sv-page-sales-orders-form-history-tpl'],
-	   function (SvApp, SvCompGrid, SvCompForm, tabMainTpl, tabDetailsTpl, tabCommentsTpl, tabHistoryTpl) {
+	   function (Vue, SvApp, SvCompGrid, SvCompForm, tabMainTpl, itemsGridConfig, tabDetailsTpl, tabCommentsTpl, tabHistoryTpl) {
+
+	var defForm = {
+        order: {},
+        items: {},
+        shipments: {},
+        payments: {},
+        returns: {},
+        refunds: {},
+        cancellations: {},
+        options: {},
+        updates: {}
+    };
 
 	var TabMain = {
 		template: tabMainTpl,
-		props: ['order', 'items', 'shipments', 'payments', 'returns', 'refunds', 'cancellations', 'options'],
+		props: {
+            form: {
+            	default: defForm
+            }
+        },
 		data: function () {
 			return {
 				editing: {customer: false, shipping: false, billing: false, order: false},
@@ -17,31 +33,16 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 		computed: {
 			regionOptions: function () {
 				return function (type) {
-					if (!this.order.id) {
+					if (!this.form.order.id) {
 						return [];
 					}
-                    return this.dict.regionsSeq['@' + this.order[type + '_country']];
+                    return this.dict.regionsSeq['@' + this.form.order[type + '_country']];
                 }
 			},
 			itemsGrid: function () {
-				console.log(this.items);
 				return {
-					config: {
-						columns: [
-							{type:'row-select'},
-							{type:'actions'},
-							{field:'id', label:'ID'},
-							{field:'product_name', label:'Product Name'},
-							{field:'product_sku', label:'Product SKU'},
-							{field:'price', label:'Price'},
-							{field:'qty_ordered', label:'Qty'},
-							{field:'row_total', label:'Total'},
-                            {field:'state_overall', label:'Overall', options:this.options.item_state_overall},
-                            {field:'state_delivery', label:'Delivery', options:this.options.item_state_delivery},
-                            {field:'state_custom', label:'Custom', options:this.options.item_state_custom}
-						]
-					},
-					rows: this.items
+					config: itemsGridConfig,
+					rows: this.form.items
 				}
 			},
 			paidByStoreCredit: function () {
@@ -66,7 +67,7 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 		},
 		watch: {
 			order: function () {
-				console.log(this.order.shipping_country);
+				console.log(this.form.order.shipping_country);
 			}
 		},
 		components: {
@@ -75,7 +76,11 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 	};
 
 	var TabDetails = {
-        props: ['order', 'shipments', 'payments', 'returns', 'refunds', 'cancellations', 'options'],
+        props: {
+            form: {
+                default: defForm
+            }
+        },
 		template: tabDetailsTpl,
 		data: function () {
         	return {
@@ -136,42 +141,48 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 	};
 
 	var TabComments = {
-		props: ['order'],
+        props: {
+            form: {
+                default: defForm
+            }
+        },
 		template: tabCommentsTpl,
-		computed: {
-			comments: function () {
-				return [
-                    {
-                        author_name: 'Boris Gurvich',
-                        create_at: '2016-12-28 18:42:00',
-                        type: 'sent',
-						files: [
-							{name: 'test.jpg'}
-						]
-                    },
-                    {
-                        author_name: 'Boris Gurvich',
-                        create_at: '2016-12-28 18:42:00',
-                        type: 'received'
-                    },
-                    {
-                        author_name: 'Boris Gurvich',
-                        create_at: '2016-12-28 18:42:00',
-                        type: 'private'
-                    }
-				]
-			}
+		created: function () {
+            Vue.set(this.form, 'comments', [
+				{
+					author_name: 'Boris Gurvich',
+					create_at: '2016-12-28 18:42:00',
+					type: 'sent',
+					files: [
+						{name: 'test.jpg'}
+					]
+				},
+				{
+					author_name: 'Boris Gurvich',
+					create_at: '2016-12-28 18:42:00',
+					type: 'received'
+				},
+				{
+					author_name: 'Boris Gurvich',
+					create_at: '2016-12-28 18:42:00',
+					type: 'private'
+				}
+			]);
 		}
 	};
 
 	var TabHistory = {
-		props: ['order'],
+        props: {
+            form: {
+                default: defForm
+            }
+        },
 		computed: {
 			grid: function () {
 				return {
 					config: {
 						id: 'sales_order_histoy',
-						data_url: 'orders/form_history_grid_data?id=' + this.order.id,
+						data_url: 'orders/form_history_grid_data?id=' + this.form.order.id,
 						columns: [
 							{field:'id', label:'ID'},
 							{field:'create_at', label:'Timestamp'}
@@ -198,27 +209,19 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 		data: function () {
 			return {
 				tab: 'main',
-				order: {},
-				items: {},
-				shipments: {},
-				payments: {},
-				returns: {},
-				refunds: {},
-				cancellations: {},
-				options: {},
-				updates: {}
+				form: defForm
 			}
 		},
 		computed: {
 			getOption: function () {
                 return function (type, value) {
-                    if (!this.options[type]) {
+                    if (!this.form.options[type]) {
                         return {};
                     }
                     if (!value) {
-                        return this.options[type];
+                        return this.form.options[type];
                     }
-                    return this.options[type][value];
+                    return this.form.options[type][value];
                 }
 			}
 		},
@@ -242,10 +245,8 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
                 SvApp.methods.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
-                	for (var i in response) {
-                		vm[i] = response[i];
-					}
-                    vm.updateBreadcrumbs(SvApp._('Order #' + vm.order.unique_id));
+					vm.form = response.form;
+                    vm.updateBreadcrumbs(SvApp._('Order #' + vm.form.order.unique_id));
                 });
 			},
 			goBack: function () {
@@ -266,7 +267,7 @@ define(['sv-app', 'sv-comp-grid', 'sv-comp-form',
 				var vm = this;
 				SvApp.methods.sendRequest('POST', 'orders/form_data', this.updates, function (response) {
                     for (var i in response) {
-                        vm[i] = response[i];
+                        Vue.set(vm.form, i, response.form[i]);
                     }
                     if (!stayOnPage) {
                         this.$router.go(-1);

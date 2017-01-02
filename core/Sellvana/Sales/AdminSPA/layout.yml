@@ -16,6 +16,7 @@
 			- [ requireJs, sv-page-sales-orders-form-details-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details.html" ]
 			- [ requireJs, sv-page-sales-orders-form-comments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments.html" ]
 			- [ requireJs, sv-page-sales-orders-form-history-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history.html" ]
+			- [ requireJs, sv-page-sales-orders-form-items-config, "~/orders/form_items_grid_config" ]
 
 
 sv-app-dynamic-js:

@@ -13,7 +13,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     public function getGridConfig()
     {
         return [
-            'id' => 'users',
+            'id' => 'orders',
             'data_url' => 'orders/grid_data',
             'columns' => [
                 ['type' => 'row-select'],
@@ -22,7 +22,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     ['type' => 'delete', 'delete_url' => 'orders/grid_delete', 'icon_class' => 'fa fa-trash'],
                 ]],
                 ['field' => 'id', 'label' => 'Internal ID'],
-                ['field' => 'unique_id', 'label' => 'Public ID'],
+                ['field' => 'unique_id', 'label' => 'Order ID'],
                 ['field' => 'state_overall', 'label' => 'Overall State', 'options' => $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels()],
                 ['field' => 'customer_firstname', 'label' => 'Last Name'],
                 ['field' => 'customer_lastname', 'label' => 'Last Name'],
@@ -36,6 +36,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 ['field' => 'create_at'],
             ],
             'export' => [
+                'url' => 'orders/grid_export',
                 'format_options' => [
                     ['value' => 'csv', 'label' => 'CSV'],
                 ],
@@ -67,7 +68,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $refunds = $order->getAllRefunds();
         $cancellations = $order->getAllCancellations();
         $comments = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $orderId)->find_many();
-        $data = [
+        $formData = [
             'order' => $order->as_array(),
             'items' => $this->BDb->many_as_array($items),
             'shipments' => $this->BDb->many_as_array($shipments),
@@ -91,14 +92,17 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
             ],
         ];
-        $this->respond($data);
+        $result = [
+            'form' => $formData,
+        ];
+        $this->respond($result);
     }
 
     public function action_form_data__POST()
     {
         $result = [];
         try {
-            $orderId =
+            //$orderId =
             $this->addResponses([
                 'ok' => true,
             ]);
@@ -110,6 +114,37 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             ]);
         }
         $this->respond($result);
+    }
+
+    public function getFormItemsGridConfig()
+    {
+        $itemStateOverallOptions = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
+        $itemStateDeliveryOptions = $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels();
+        $itemStateCustomOptions = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
+
+        return [
+            'columns' =>  [
+                ['type' => 'row-select'],
+                ['type' => 'actions'],
+                ['field' => 'id', 'label' => 'ID'],
+                ['field' => 'product_name', 'label' => 'Product Name'],
+                ['field' => 'product_sku', 'label' => 'Product SKU'],
+                ['field' => 'price', 'label' => 'Price'],
+                ['field' => 'qty_ordered', 'label' => 'Qty'],
+                ['field' => 'row_total', 'label' => 'Total'],
+                ['field' => 'state_overall', 'label' => 'Overall', 'options' => $itemStateOverallOptions],
+                ['field' => 'state_delivery', 'label' => 'Delivery', 'options' => $itemStateDeliveryOptions],
+                ['field' => 'state_custom', 'label' => 'Custom', 'options' => $itemStateCustomOptions],
+            ],
+        ];
+    }
+
+    public function action_form_items_grid_config()
+    {
+        $config = $this->getFormItemsGridConfig();
+        $config = $this->normalizeGridConfig($config);
+        $config = $this->applyGridPersonalization($config);
+        $this->respond($config);
     }
 
     public function action_form_history_grid_data()

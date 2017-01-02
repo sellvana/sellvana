@@ -5,6 +5,7 @@
 {% set navTree = app.getNavTree() %}
 {% set env = app.getEnv() %}
 {% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
+{% set favorites = APP.instance('FCom_Admin_Model_Favorite').getUserFavorites() %}
 {% set pers = APP.instance('FCom_Admin_Model_Personalize') %}
 {% set countries = LOCALE.getAvailableCountries() %}
 {% set countriesSeq = UTIL.arrayMapToSeq(countries) %}
@@ -47,13 +48,15 @@ console.log(transition);
         var navTree = ({{ navTree|json_encode|raw }}),
             user = ({{ user ? (user.as_array()|json_encode|raw) : 'false' }}),
             env = ({{ env|json_encode|raw }}),
-            csrfToken = '{{ SESSION.csrfToken() }}';
+            csrfToken = '{{ SESSION.csrfToken() }}',
+            favorites = ({{ favorites|json_encode|raw }});
 
         SvApp.store.commit('setData', {
             navTree: navTree,
             user: user,
             env: env,
-            csrfToken: csrfToken
+            csrfToken: csrfToken,
+            favorites: favorites
         });
 
         SvApp.data.countries = ({{ countries|json_encode|raw }});

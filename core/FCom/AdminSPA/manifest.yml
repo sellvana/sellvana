@@ -2,7 +2,7 @@ modules:
     FCom_AdminSPA:
         version: 0.6.0.0
         channel: alpha
-        require: { module: [ FCom_Core, FCom_LibScssPhp, FCom_LibTwig ] }
+        require: { module: [ FCom_Core, FCom_LibScssPhp, FCom_LibTwig, FCom_Admin ] }
 
         areas:
             FCom_AdminSPA:
@@ -13,6 +13,7 @@ modules:
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
 
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
+                    - [ /favorites/?.action, FCom_AdminSPA_AdminSPA_Controller_Favorites ]
                     - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]
                     - [ /users/?.action, FCom_AdminSPA_AdminSPA_Controller_Users ]
                 views:
