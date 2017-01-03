@@ -15,10 +15,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
                 "{$this->BRequest->serverProtocol()} 401 Not authorized",
                 "Status: 401 Not authorized",
             ]);
-            $this->addResponses([
-                '_messages' => [['type' => 'error', 'message' => 'Session expired, authorization required']],
-                '_login' => true,
-            ]);
+            $this->addMessage('Session expired, authorization required', 'error');
+            $this->addResponses(['_login' => true]);
             $this->respond();
             return false;
         }
@@ -28,7 +26,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
     public function onBeforeDispatch()
     {
         if ($this->BRequest->csrf()) {
-            $this->addResponses(['_messages' => [['type' => 'warning', 'message' => 'Session token expired, please try again']]]);
+            $this->addMessage('Session token expired, please try again', 'warning');
             $this->respond();
             return false;
             #$this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
@@ -44,6 +42,28 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
     public function addResponses($updates)
     {
         $this->FCom_AdminSPA_AdminSPA->addResponses($updates);
+        return $this;
+    }
+
+    public function addMessage($text, $type = null)
+    {
+        if ($text instanceof Exception) {
+            $text = $text->getMessage();
+            $type = 'error';
+        } elseif (is_string($text) && !$type) {
+            $type = 'info';
+        } else {
+            throw new BException('Invalid message text type');
+        }
+        $this->addResponses(['_messages' => [
+            ['type' => $type, 'text' => $text],
+        ]]);
+        return $this;
+    }
+
+    public function ok()
+    {
+        $this->addResponses(['ok' => true]);
         return $this;
     }
 

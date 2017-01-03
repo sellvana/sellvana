@@ -103,8 +103,11 @@
             - [ requireJs, sv-page-account-logout-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout.html" ]
 
             - [ requireJs, sv-page-users, "@FCom_AdminSPA/AdminSPA/vue/page/users/index" ]
+            - [ requireJs, sv-page-users-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/index.html" ]
             - [ requireJs, sv-page-users-grid-config, "~/users/grid_config" ]
             - [ requireJs, sv-page-users-form, "@FCom_AdminSPA/AdminSPA/vue/page/users/form" ]
+            - [ requireJs, sv-page-users-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form.html" ]
+            - [ requireJs, sv-page-users-form-main-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main.html" ]
 
             - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]
             - [ requireJs, sv-page-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main.html" ]
@@ -132,8 +135,8 @@ sv-app-dynamic-js:
             - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
             - [ addRoute, { path: /settings, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
 
-            - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-default-grid-tpl, json!sv-page-users-grid-config ]}]
-            - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-default-form-tpl ]}]
+            - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-users-tpl, json!sv-page-users-grid-config ]}]
+            - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-users-form-tpl ]}]
 
 
 sv-app-setings-config:
@@ -156,3 +159,9 @@ sv-app-setings-config:
 
 /login:
     - { include: / }
+
+
+/users/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /users/form, name: main, label: User Info, pos: 10, component: sv-page-users-form-main } ]

@@ -156,7 +156,8 @@ console.log(state, grid);
                     this.$emit('delete-row', row)
                     var vm = this;
                     if (act.delete_url) {
-                        SvApp.methods.sendRequest('POST', act.delete_url, postData, function (response) {
+                        var url = vm.rowActionLink(row, col, {link: act.delete_url});
+                        SvApp.methods.sendRequest('POST', url, {}, function (response) {
                             vm.$emit('fetch-data');
                         });
                     }
@@ -276,9 +277,17 @@ console.log(state, grid);
                         if (af[f.field]) {
                             continue;
                         }
-                        availFilters.push(this.grid.config.filters[i]);
+                        availFilters.push({id:f.field, text:f.label});
                     }
                     return availFilters;
+                },
+                addFilterSelect2Params: function () {
+                    return {
+                        allowClear: true,
+                        placeholder: this.availableFilters.length
+                            ? SvApp._('Add filter...')
+                            : SvApp._('No more filters available to add')
+                    };
                 }
             },
             methods: {
@@ -339,6 +348,13 @@ console.log(state, grid);
             watch: {
                 pageClickCounter: function () {
                     this.ddOpClear();
+                },
+                filterToAdd: function (value) {
+                    if (!value) {
+                        return;
+                    }
+                    this.addFilter();
+                    this.filterToAdd = '';
                 }
             }
         };

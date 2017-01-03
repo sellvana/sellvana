@@ -6,7 +6,7 @@
         <ul class="dropdown-content customScroll">
             <li v-for="fav in favorites">
                 <router-link :to="fav.link"><i :class="fav.icon_class" aria-hidden="true"></i> {{fav.label}}</router-link>
-                <a href="#" @click.prevent="removeFavorite(fav)" class="remove"><i class="fa fa-times"></i></a>
+                <a href="#" @click.prevent.stop="removeFavorite(fav)" class="remove"><i class="fa fa-times"></i></a>
 			  </li>
         </ul>
     </div>

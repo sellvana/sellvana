@@ -2,9 +2,9 @@
     <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"><span>{{'Filter'|_}}</span><b class="caret"></b></a>
     <div class="dropdown-menu" @click.stop="ddOpClear()" style="min-width:600px">
         <form class="select-filter">
-            <select v-model="filterToAdd" @change="addFilter()">
+            <select v-model="filterToAdd" @change="addFilter()" :options="availableFilters" :params="addFilterSelect2Params">
                 <option value="">{{(availableFilters.length ? 'Add filter...' : 'No more filters available to add')|_}}</option>
-                <option v-for="flt in availableFilters" :value="flt.field">{{flt.label}}</option>
+                <option v-for="flt in availableFilters" :value="flt.id">{{flt.text}}</option>
             </select>
             <!--<button type="button" class="button4" @click="addFilter()">{{'Add'|_}}</button>-->
         </form>

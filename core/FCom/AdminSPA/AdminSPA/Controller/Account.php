@@ -23,11 +23,9 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
                 throw new BException($this->_('Invalid user name or password.'));
             }
             $user->login();
-            $this->addResponses(true)->addResponses(['_redirect' => '/']);
+            $this->ok()->addResponses(true)->addResponses(['_redirect' => '/']);
         } catch (Exception $e) {
-            $this->addResponses(['_messages' => [
-                ['type' => 'error', 'message' => $e->getMessage()],
-            ]]);
+            $this->addMessage($e);
         }
         $this->respond();
     }
@@ -39,11 +37,9 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
             if ($user) {
                 $user->logout();
             }
-            $this->addResponses(true);
+            $this->ok()->addResponses(true);
         } catch (Exception $e) {
-            $this->addResponses(['_messages' => [
-                ['type' => 'error', 'message' => $e->getMessage()],
-            ]]);
+            $this->addMessage($e);
         }
         $this->respond();
     }

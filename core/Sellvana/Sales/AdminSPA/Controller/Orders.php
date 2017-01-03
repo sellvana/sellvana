@@ -19,7 +19,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 ['type' => 'row-select'],
                 ['type' => 'actions', 'actions' => [
                     ['type' => 'edit', 'link' => '/sales/orders/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-                    ['type' => 'delete', 'delete_url' => 'orders/grid_delete', 'icon_class' => 'fa fa-trash'],
+                    //['type' => 'delete', 'delete_url' => 'orders/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
                 ]],
                 ['field' => 'id', 'label' => 'Internal ID'],
                 ['field' => 'unique_id', 'label' => 'Order ID'],
@@ -35,14 +35,10 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 ['field' => 'state_overall'],
                 ['field' => 'create_at'],
             ],
-            'export' => [
-                'url' => 'orders/grid_export',
-                'format_options' => [
-                    ['value' => 'csv', 'label' => 'CSV'],
-                ],
-            ],
-            'pager' => [
-                'pagesize_options' => [5, 10, 20, 50, 100],
+            'export' => true,
+            'pager' => true,
+            'bulk_actions' => [
+                ['name' => 'custom_state', 'label' => 'Change Custom State'],
             ],
         ];
     }
@@ -69,6 +65,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $cancellations = $order->getAllCancellations();
         $comments = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $orderId)->find_many();
         $formData = [
+            'tabs' => $this->getFormTabs('/sales/orders/form'),
             'order' => $order->as_array(),
             'items' => $this->BDb->many_as_array($items),
             'shipments' => $this->BDb->many_as_array($shipments),
@@ -107,11 +104,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 'ok' => true,
             ]);
         } catch (Exception $e) {
-            $this->addResponses([
-                '_messages' => [
-                    ['type' => 'error', 'message' => $e->getMessage()],
-                ]
-            ]);
+            $this->addMessage($e);
         }
         $this->respond($result);
     }

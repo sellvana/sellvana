@@ -24,11 +24,10 @@ class FCom_AdminSPA_AdminSPA_Controller_Favorites extends FCom_AdminSPA_AdminSPA
             ];
             $custData = $this->BUtil->arrayMask($post, ['label', 'link'], true);
             $this->FCom_Admin_Model_Favorite->create($data)->setData($custData)->save();
-            $this->addResponses(['_ok' => true]);
+            $this->ok();
         } catch (Exception $e) {
-            $this->addResponses(['_messages' => [
-                ['type' => 'error', 'message' => $e->getMessage()],
-            ]]);
+            $this->addMessage($e);
+
         }
         $this->respond($result);
     }
@@ -48,11 +47,10 @@ class FCom_AdminSPA_AdminSPA_Controller_Favorites extends FCom_AdminSPA_AdminSPA
                 throw new BException('Favorite not found');
             }
             $fav->delete();
-            $this->addResponses(['_ok' => true]);
+            $this->ok();
         } catch (Exception $e) {
-            $this->addResponses(['_messages' => [
-                ['type' => 'error', 'message' => $e->getMessage()],
-            ]]);
+            $this->addMessage($e);
+
         }
         $this->respond($result);
     }

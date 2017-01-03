@@ -6,15 +6,17 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 	   function (Vue, SvApp, SvCompGrid, SvCompForm, tabMainTpl, itemsGridConfig, tabDetailsTpl, tabCommentsTpl, tabHistoryTpl) {
 
 	var defForm = {
+        options: {},
+        updates: {},
+        tabs: [],
+
         order: {},
         items: {},
         shipments: {},
         payments: {},
         returns: {},
         refunds: {},
-        cancellations: {},
-        options: {},
-        updates: {}
+        cancellations: {}
     };
 
 	var TabMain = {
@@ -66,7 +68,7 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 			}
 		},
 		watch: {
-			order: function () {
+			'form.order': function () {
 				console.log(this.form.order.shipping_country);
 			}
 		},
@@ -198,9 +200,8 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 	};
 
 	return {
-		store: SvApp.store,
+		mixins: [SvApp.mixins.common, SvApp.mixins.form],
         components: {
-            'sv-comp-form': SvCompForm,
             'sv-page-sales-orders-form-main': TabMain,
 			'sv-page-sales-orders-form-comments': TabComments,
             'sv-page-sales-orders-form-details': TabDetails,
@@ -208,27 +209,10 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 		},
 		data: function () {
 			return {
-				tab: 'main',
 				form: defForm
 			}
 		},
-		computed: {
-			getOption: function () {
-                return function (type, value) {
-                    if (!this.form.options[type]) {
-                        return {};
-                    }
-                    if (!value) {
-                        return this.form.options[type];
-                    }
-                    return this.form.options[type][value];
-                }
-			}
-		},
 		methods: {
-			switchTab: function (tab) {
-				this.tab = tab;
-			},
 			buttonAction: function (act) {
 				console.log(act);
 			},
@@ -246,16 +230,21 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
                 var orderId = this.$router.currentRoute.query.id, vm = this;
                 SvApp.methods.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
 					vm.form = response.form;
+                    if (!vm.form.updates) {
+                        Vue.set(vm.form, 'updates', {});
+                    }
                     vm.updateBreadcrumbs(SvApp._('Order #' + vm.form.order.unique_id));
                 });
-			},
-			goBack: function () {
-				this.$router.go(-1);
 			},
 			doDelete: function () {
 				if (!confirm(SvApp._('Are you sure you want to delete this order?'))) {
 					return;
 				}
+				SvApp.methods.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {
+					if (!response._ok) {
+
+					}
+				});
 			},
 			shipAllItems: function () {
 
@@ -265,22 +254,34 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 			},
 			save: function (stayOnPage) {
 				var vm = this;
-				SvApp.methods.sendRequest('POST', 'orders/form_data', this.updates, function (response) {
-                    for (var i in response) {
+				SvApp.methods.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
+					if (!response._ok) {
+
+					}
+                    for (var i in response.form) {
                         Vue.set(vm.form, i, response.form[i]);
                     }
+                    if (!vm.form.updates) {
+						Vue.set(vm.form, 'updates', {});
+					}
                     if (!stayOnPage) {
-                        this.$router.go(-1);
+                        vm.$router.go(-1);
                     }
 				})
 		    }
 		},
 		watch: {
-			'$route': 'fetchData'
+			'form.order': function (order) {
+
+			}
 		},
-		created: function () {
-			this.updateBreadcrumbs(SvApp._('Loading order data...'));
-			this.fetchData();
+		beforeRouteLeave: function (to, from, next) {
+			// TODO: doesn't trigger on route args change (?id=5)
+			if (!_.isEmpty(this.form.updates) && !confirm('There are unsaved changes, are you sure you want to leave?')) {
+				next(false);
+            } else {
+				next();
+			}
 		}
     };
 });

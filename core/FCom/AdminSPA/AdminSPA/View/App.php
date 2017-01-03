@@ -8,6 +8,8 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
 
     protected $_modules = [];
 
+    protected $_formTabs = [];
+
     public function addRoute($route)
     {
         $this->_routes[] = $route;
@@ -144,5 +146,28 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
         return [
             'root_href' => $this->BApp->href(),
         ];
+    }
+
+    public function addFormTab($tab)
+    {
+        $this->_formTabs[] = $tab;
+        return $this;
+    }
+
+    public function getFormTabs($path)
+    {
+        $tabs = [];
+        foreach ($this->_formTabs as $t) {
+            if ($t['path'] === $path) {
+                unset($t['path']);
+                $tabs[] = $t;
+            }
+        }
+        usort($tabs, function($a, $b) {
+            $p1 = !empty($a['pos']) ? $a['pos'] : 9999;
+            $p2 = !empty($b['pos']) ? $b['pos'] : 9999;
+            return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
+        });
+        return $tabs;
     }
 }

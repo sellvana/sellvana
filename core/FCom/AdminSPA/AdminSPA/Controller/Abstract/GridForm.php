@@ -173,6 +173,15 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
         unset($col);
 
         if (!empty($config['filters'])) {
+            if ($config['filters'] === true) {
+                $config['filters'] = [];
+                foreach ($config['columns'] as $col) {
+                    if (!empty($col['type']) && in_array($col['type'], ['row-select', 'actions'])) {
+                        continue;
+                    }
+                    $config['filters'][] = ['field' => $col['field']];
+                }
+            }
             foreach ($config['filters'] as &$flt) {
                 if (empty($flt['field'])) {
                     if (!empty($flt['name'])) {
@@ -219,9 +228,21 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
             unset($flt);
         }
 
-        if (empty($config['pagesize_options'])) {
-            $config['pagesize_options'] = [5, 10, 20, 50, 100];
+        if (!empty($config['pager']) && $config['pager'] === true) {
+            $config['pager'] = [
+                'pagesize_options' => [5, 10, 20, 50, 100],
+            ];
         }
+
+        if (!empty($config['export']) && $config['export'] === true) {
+            $config['export'] = [
+                'url' => 'orders/grid_export',
+                'format_options' => [
+                    ['value' => 'csv', 'label' => 'CSV'],
+                ],
+            ];
+        }
+
         return $config;
     }
 
@@ -468,5 +489,11 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
     public function applyGridPersonalization($config)
     {
         return $config;
+    }
+
+    public function getFormTabs($path)
+    {
+        $this->layout($path);
+        return $this->view('app')->getFormTabs($path);
     }
 }

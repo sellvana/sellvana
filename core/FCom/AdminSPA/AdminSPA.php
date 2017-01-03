@@ -17,7 +17,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
         '_local_notifications' => true,
         '_redirect' => true,
         '_login' => true,
-        '_ok' => true,
+//        '_ok' => true,
     ];
 
     protected $_responsesToPush = [];
@@ -110,8 +110,8 @@ class FCom_AdminSPA_AdminSPA extends BClass
         return $data;
     }
 
-    public function responseCallback_ok($data)
-    {
-        return $data;
-    }
+//    public function responseCallback_ok($data)
+//    {
+//        return $data;
+//    }
 }

@@ -55,18 +55,12 @@
 		<div class="col-md-2">
             <div class='order-menu'>
                 <ul class="nav">
-                    <li :class="{active:tab==='main'}"><a href="#" @click.prevent="switchTab('main')">{{'General info'|_}}</a></li>
-                    <li :class="{active:tab==='details'}"><a href="#" @click.prevent="switchTab('details')">{{'Details'|_}}</a></li>
-                    <li :class="{active:tab==='comments'}"><a href="#" @click.prevent="switchTab('comments')">{{'Comments'|_}}</a></li>
-                    <li :class="{active:tab==='history'}"><a href="#" @click.prevent="switchTab('history')">{{'History'|_}}</a></li>
+                    <li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
                 </ul>
             </div>
         </div>
 		<div class="col-md-10">
-			<sv-page-sales-orders-form-main v-if="tab==='main'" :form="form" @tab="switchTab"></sv-page-sales-orders-form-main>
-            <sv-page-sales-orders-form-details v-if="tab==='details'" :form="form"></sv-page-sales-orders-form-details>
-            <sv-page-sales-orders-form-comments v-if="tab==='comments'" :form="form"></sv-page-sales-orders-form-comments>
-            <sv-page-sales-orders-form-history v-if="tab==='history'" :form="form"></sv-page-sales-orders-form-history>
+			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component" :form="form" @tab="switchTab"></component>
 		</div>
     </div>
 </div> 

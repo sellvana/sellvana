@@ -1,17 +1,17 @@
 <div class="f-grid-filter-panel">
     <div class="col-sm-5">
         <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
-        <sv-comp-grid-panel-filters :grid="grid" @apply-filters="applyFilters" v-if="grid.config.filters"></sv-comp-grid-panel-filters>
-        <sv-comp-grid-panel-export :grid="grid" v-if="grid.config.export"></sv-comp-grid-panel-export>
+        <sv-comp-grid-panel-filters v-if="grid.config.filters" :grid="grid" @apply-filters="applyFilters"></sv-comp-grid-panel-filters>
+        <sv-comp-grid-panel-export v-if="grid.config.export" :grid="grid"></sv-comp-grid-panel-export>
         <div class="search-block">
             <input type="text" :placeholder="'Quick filter results'|_" v-model="quickSearch" @keyup="updateQuickSearch()"/>
         </div>
-        <sv-comp-grid-bulk-actions :grid="grid"></sv-comp-grid-bulk-actions>
+        <sv-comp-grid-bulk-actions v-if="grid.config.bulk_actions" :grid="grid"></sv-comp-grid-bulk-actions>
     </div>
     <div class="col-sm-7 text-right">
         {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}}
         <div class="visible-lg">
-            <sv-comp-grid-pager-list :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>
+            <sv-comp-grid-pager-list v-if="grid.config.pager" :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>
         </div>
     </div>
     <div class="col-sm-12">

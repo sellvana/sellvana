@@ -20,6 +20,15 @@ define(['jquery', 'lodash', 'vue', 'vuex', 'accounting', 'moment', 'select2'], f
         mounted: function () {
             var vm = this, params = $.extend({}, this.params || {});
             params.data = this.options;
+            if (params.sv) {
+                if (params.sv.id_field) {
+                    params.formatSelection = function (item) { return item[params.sv.id_field]; };
+                }
+                if (params.sv.text_field) {
+                    params.formatResult = function (item) { return item[params.sv.id_field]; };
+                }
+            }
+            console.log(this.params, params);
             $(this.$el).val(this.value).select2(params).on('change', function () {
                 vm.$emit('input', $(vm.$el).val());
             });
@@ -240,6 +249,7 @@ define(['jquery', 'lodash', 'vue', 'vuex', 'accounting', 'moment', 'select2'], f
         },
         mixins: {
             common: {
+                store: store,
                 data: function () {
                     return {
 
@@ -297,6 +307,45 @@ define(['jquery', 'lodash', 'vue', 'vuex', 'accounting', 'moment', 'select2'], f
                         }
                     },
                     ddStay: function () { /* dummy */ }
+                }
+            },
+            form: {
+                data: function () {
+                    return {
+                        tab: 'main'
+                    };
+                },
+                computed: {
+                    getOption: function () {
+                        return function (type, value) {
+                            if (!this.form.options[type]) {
+                                return {};
+                            }
+                            if (!value) {
+                                return this.form.options[type];
+                            }
+                            return this.form.options[type][value];
+                        }
+                    }
+                },
+                methods: {
+
+                    switchTab: function (tab) {
+                        this.tab = tab;
+                    },
+                    goBack: function () {
+                        this.$router.go(-1);
+                    },
+                    addUpdates: function (part) {
+                        Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
+                    },
+                },
+                watch: {
+                    '$route': 'fetchData'
+                },
+                created: function () {
+                    this.updateBreadcrumbs(translate('Loading data...'));
+                    this.fetchData();
                 }
             }
         },
