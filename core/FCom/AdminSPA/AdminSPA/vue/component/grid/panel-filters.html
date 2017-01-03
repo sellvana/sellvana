@@ -1,52 +1,48 @@
-<div class="dropdown filter" :class="{open:ddOpen(grid.config.id+'/panel-filters')}">
-    <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"><span>{{'Filter'|_}}</span><b class="caret"></b></a>
-    <div class="dropdown-menu" @click.stop="ddOpClear()" style="min-width:600px">
-        <form class="select-filter">
-            <select v-model="filterToAdd" @change="addFilter()" :options="availableFilters" :params="addFilterSelect2Params">
-                <option value="">{{(availableFilters.length ? 'Add filter...' : 'No more filters available to add')|_}}</option>
-                <option v-for="flt in availableFilters" :value="flt.id">{{flt.text}}</option>
-            </select>
-            <!--<button type="button" class="button4" @click="addFilter()">{{'Add'|_}}</button>-->
-        </form>
-        <ul class="filter-box">
-            <li>
-                <div class="input-group" v-for="(flt, i) in addedFilters">
-                    <a href="#" @click.prevent="removeFilter(i)"><i class="fa fa-trash"></i></a>
-                    <label>{{flt.config.label|_}}</label>
-                    <div class="input-group-btn dropdown" :class="{open:ddOpOpen(flt)}">
-                        <button class="button5 dropdown-toggle filter-text-sub" data-toggle="dropdown"
-                            :aria-expanded="ddOpOpen(flt)"
-                            @click.stop="ddOpToggle(flt)"><span>{{flt.config.ops[flt.op]}}</span><span class="caret"></span></button>
-                        <ul class="dropdown-menu filter-sub">
-                            <li v-for="(opLabel, op) in flt.config.ops"><a class="filter-op" href="#" @click.prevent="switchOp(flt, op)">{{opLabel|_}}</a></li>
-                        </ul>
-                    </div>
-                    <div v-if="flt.op.match(/^(equals|starts|ends|lt|lte|gt|gte)$/)" class="input-group-btn not-range">
-                        <input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.value">
-                        <input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.value">
-                        <input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.value">
-                    </div>
-                    <div v-if="flt.op.match(/^(contains|not_contains)$/)" class="input-group-btn not-range">
-                        <input type="text" :placeholder="'value'|_" class="form-control" v-model="flt.value">
-                    </div>
-                    <div v-if="flt.op.match(/^(in|not_in)$/)" class="input-group-btn not-range">
-                        <select2 class="form-control" v-model="flt.values" multiple aria-multiselectable="true" :options="select2Options(flt.config.options)"></select2>
-                    </div>
-                    <div v-if="flt.op.match(/^(between|not_between)$/)" class="input-group-btn range">
-                        <input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.from">
-                        <input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.from">
-                        <input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.from">
-
-                        <input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.to">
-                        <input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.to">
-                        <input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.to">
-                    </div>
-                </div>
-            </li>
-        </ul>
-        <div class="control-buttons-block">
-            <button class="button1" type="button" @click="resetFilters()">{{'Reset'|_}}</button>
-            <button class="button2" type="button" @click="applyFilters()">{{'Apply Filters'|_}}</button>
-        </div>
-    </div>
+<div class="dropdown filter" :class="{open:ddOpen(grid.config.id+'/panel-filters')}"> <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"><span>{{'Filter'|_}}</span><b class="caret"></b></a>
+	<div class="dropdown-menu" @click.stop="ddOpClear()">
+		<form class="select-filter">
+			<select v-model="filterToAdd" @change="addFilter()" :options="availableFilters" :params="addFilterSelect2Params">
+				<option value="">{{(availableFilters.length ? 'Add filter...' : 'No more filters available to add')|_}}</option>
+				<option v-for="flt in availableFilters" :value="flt.id">{{flt.text}}</option>
+			</select>
+			<!--<button type="button" class="button4" @click="addFilter()">{{'Add'|_}}</button>-->
+		</form>
+		<ul class="filter-box">
+			<li>
+				<div class="input-group" v-for="(flt, i) in addedFilters">
+					<div> <a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
+						<label>{{flt.config.label|_}}</label>
+					</div>
+					<div>
+						<div class="input-group-btn dropdown" :class="{open:ddOpOpen(flt)}">
+							<button class="button5 dropdown-toggle filter-text-sub" data-toggle="dropdown" :aria-expanded="ddOpOpen(flt)" @click.stop="ddOpToggle(flt)"><span>{{flt.config.ops[flt.op]}}</span><span class="caret"></span></button>
+							<ul class="dropdown-menu filter-sub">
+								<li v-for="(opLabel, op) in flt.config.ops"><a class="filter-op" href="#" @click.prevent="switchOp(flt, op)">{{opLabel|_}}</a></li>
+							</ul>
+						</div>
+						<div v-if="flt.op.match(/^(equals|starts|ends|lt|lte|gt|gte)$/)" class="input-group-btn not-range">
+							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.value">
+							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.value">
+							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.value"> </div>
+						<div v-if="flt.op.match(/^(contains|not_contains)$/)" class="input-group-btn not-range">
+							<input type="text" :placeholder="'value'|_" class="form-control" v-model="flt.value"> </div>
+						<div v-if="flt.op.match(/^(in|not_in)$/)" class="input-group-btn not-range">
+							<select2 class="form-control" v-model="flt.values" multiple aria-multiselectable="true" :options="select2Options(flt.config.options)"></select2>
+						</div>
+						<div v-if="flt.op.match(/^(between|not_between)$/)" class="input-group-btn range">
+							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.from">
+							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.from">
+							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.from">
+							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.to">
+							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.to">
+							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.to"></div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="control-buttons-block">
+			<button class="button1" type="button" @click="resetFilters()">{{'Reset'|_}}</button>
+			<button class="button2" type="button" @click="applyFilters()">{{'Apply Filters'|_}}</button>
+		</div>
+	</div>
 </div>

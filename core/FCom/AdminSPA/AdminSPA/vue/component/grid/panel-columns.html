@@ -1,5 +1,5 @@
 <div class="dropdown columns" :class="{open:ddOpen(grid.config.id+'/panel-columns')}">
-    <a href="#" class="btn filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-columns')">{{'Columns'|_}}<b class="caret"></b></a>
+    <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-columns')">{{'Columns'|_}}<b class="caret"></b></a>
     <div class="dropdown-menu" @click.stop>
         <ol class="ui-sortable">
             <li v-for="col in grid.config.columns">

@@ -3,39 +3,7 @@
 		display: block;
 	}
 }
-.columns {
-	.dropdown-menu {
-		overflow-y: scroll;
-		height: 170px;
-		width: 500px;
-	}
-	.ui-sortable {
-		font-size: 0;
-	}
-	li {
-		display: inline-block;
-		width: 32%;
-		margin-right: 5px;
-		padding: 6px 0;
-		& > * {
-			display: inline-block;
-			vertical-align: middle;
-		}
-		span {
-			font-family: $f-main-lig;
-		}
-	} 	
-}
-.export {
-	.dropdown-menu {
-		width: 222px;
-	}
-}
-.filter {
-	.dropdown-menu {
-		min-width: 400px;
-	}
-}
+
 
 .f-grid-filter-panel {
 	position: relative;
@@ -45,14 +13,14 @@
 		& > * {
 			display: inline-block;
 			vertical-align: middle;
-		} 
+		}
 	}
 	.pagination {
 		padding: 0;
 	}
 	.dropdown {
 		display: inline-block;
-		vertical-align: middle;
+		vertical-align: top;
 		border-right: 1px solid #edf1f5;
 		margin-bottom: 10px;
 		&.last-dropdown {
@@ -70,12 +38,13 @@
 		border-top: 1px solid transparent;
 		border-bottom: 0;
 		border-radius: 1px 1px 0 0;
+		display: inline-block;
 		&:active {
 			box-shadow: none;
 			border-left: 1px solid #edf1f5;
 			border-right: 1px solid #edf1f5;
 			border-top: 1px solid #edf1f5;
-			border-radius: 1px 1px 0 0;  
+			border-radius: 1px 1px 0 0;
 		}
 		&:focus {
 			box-shadow: none;
@@ -87,7 +56,7 @@
 	}
 	.dropdown-menu {
 		padding: 20px 12px;
-		top: 91%;
+		top: 29px;
 		z-index: 5;
 		min-width: 295px;
 	}
@@ -101,7 +70,7 @@
 			z-index: 6;
 		}
 		.dropdown-menu {
-			border-radius: 0 1px 1px 1px;			
+			border-radius: 0 1px 1px 1px;
 		}
 	}
 	.search-block {
@@ -109,10 +78,11 @@
 	}
 	.input-group {
 		margin: 10px 0;
+		width: 80%;
 	}
 	.col-sm-5 {
 		position: static;
-	} 
+	}
 	.col-sm-7 {
 		padding-right: 180px;
 		position: static;
@@ -122,12 +92,54 @@
 	}
 }
 
+.filter {
+	.dropdown-menu {
+		min-width: 600px;
+		top: 25px;
+		z-index: 5;
+	}
+}
+
+.columns {
+	.dropdown-menu {
+		overflow-y: scroll;
+		height: 170px;
+		width: 500px;
+		top: 25px;
+		z-index: 5;
+	}
+	.ui-sortable {
+		font-size: 0;
+	}
+	li {
+		display: inline-block;
+		width: 32%;
+		margin-right: 5px;
+		padding: 6px 0;
+		& > * {
+			display: inline-block;
+			vertical-align: middle;
+		}
+		span {
+			font-family: $f-main-lig;
+		}
+	}
+}
+
+.export {
+	.dropdown-menu {
+		width: 222px;
+		top: 25px;
+		z-index: 5;
+	}
+}
 .input-group-addon {
 	background-color: #f2f2f2;
 	border: 1px solid #ebebeb;
 	border-radius: 1px;
 	padding: 10px 12px;
 }
+
 .select-filter {
 	position: relative;
 	.select2-container {
@@ -167,7 +179,7 @@
 		border-bottom-right-radius: 0;
 	}
 	&.dropdown {
-		display: table-cell; 
+		display: table-cell;
 	}
 	&.not-range {
 		width: 100%;
@@ -193,7 +205,18 @@
 		}
 	}
 }
+
 .filter-box {
+	label {
+		display: block;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+	.delete {
+		position: absolute;
+		right: 0;
+		top: 0;
+	}
 	.input-group-btn {
 		.dropdown-toggle {
 			border-left: 1px solid #e5e5e5;
@@ -201,8 +224,7 @@
 			border-right: 1px solid #e5e5e5;
 			border-radius: 1px 0 0 1px;
 			z-index: 6;
-			padding: 9px 15px 9px 10px;
-			height: 34px;
+			padding: 7px 15px 7px 10px;
 			margin-right: -1px;
 			span {
 				color: #000;
@@ -219,10 +241,10 @@
 		box-shadow: none;
 	}
 }
+
 .input-group {
 	.dropdown-menu {
 		min-width: 100%;
-		width: 92px;
 		padding: 0;
 		li {
 			border-top: 2px solid #fff;
@@ -239,6 +261,7 @@
 		}
 	}
 }
+
 .pagination {
 	vertical-align: middle;
 	margin: 0;
@@ -288,11 +311,12 @@
 	& > li {
 		& > a {
 			color: #474646;
-			background-color: transparent; 
+			background-color: transparent;
 			border: 0;
 			float: none;
 			padding: 10px 8px;
-			&:hover, &:focus {
+			&:hover,
+			&:focus {
 				z-index: 2;
 				color: #000;
 				border: 0;
@@ -301,11 +325,12 @@
 		}
 		& > span {
 			color: #474646;
-			background-color: transparent; 
+			background-color: transparent;
 			border: 0;
 			float: none;
 			padding: 5px 8px;
-			&:hover, &:focus {
+			&:hover,
+			&:focus {
 				color: #474646;
 				background-color: transparent;
 				cursor: default;
@@ -313,10 +338,17 @@
 		}
 	}
 	& > .active {
-		& > a, & > a:hover, & > a:focus {
+		& > a,
+		& > a:hover,
+		& > a:focus {
 			border: 1px solid #eaeaea;
-		} 
-		a, span, a:hover, span:hover, a:focus, span:focus {
+		}
+		a,
+		span,
+		a:hover,
+		span:hover,
+		a:focus,
+		span:focus {
 			z-index: 3;
 			color: #474646;
 			background-color: transparent;
@@ -325,7 +357,12 @@
 	}
 }
 
-.pagination > li:first-child > a, .pagination > li:first-child > span {
+.amount-rows, .pagination-block {
+	display: inline-block;
+	vertical-align: middle;	
+}
+.pagination > li:first-child > a,
+.pagination > li:first-child > span {
 	border-radius: 0;
 }
 
@@ -356,18 +393,19 @@
 		border: 0;
 		width: 100%;
 		border: 1px solid #ebeff3;
-		&:active, &:focus {
+		&:active,
+		&:focus {
 			box-shadow: none;
 		}
 		span {
-			color: #868a8a;	
+			color: #868a8a;
 		}
 	}
 	.dropdown-menu {
 		padding: 0;
 		width: 160px;
 		min-width: 160px;
-		a  {
+		a {
 			padding: 7px 10px;
 			display: inline-block;
 			width: 100%;
@@ -386,6 +424,7 @@
 		}
 	}
 }
+
 .filter-tags {
 	.filter-tag {
 		position: relative;
@@ -413,18 +452,21 @@
 		.filter-toggle {
 			padding: 6px 14px;
 		}
+		.input-group {
+			width: 100%;
+		}
 	}
 	.export {
-		& >	.dropdown-menu {
+		& > .dropdown-menu {
 			left: inherit;
 			min-width: 294px;
 			width: 294px;
-			right: -18px;			
+			right: -18px;
 		}
 	}
 	.filter {
 		& > .dropdown-menu {
-			left: 44%;
+			left: 49%;
 			transform: translateX(-50%);
 			min-width: 294px;
 			width: 294px;
@@ -449,6 +491,7 @@
 		}
 		.dropdown-toggle {
 			padding: 6px 15px;
+			width: 100%;
 		}
 		.filter-toggle {
 			padding: 6px 14px;
@@ -471,6 +514,9 @@
 		.dropdown.last-dropdown {
 			margin-right: 0px;
 		}
+		.input-group {
+			width: 100%;
+		}
 	}
 	.notification {
 		.dropdown-menu {
@@ -482,16 +528,16 @@
 		}
 	}
 	.export {
-		& >	.dropdown-menu {
+		& > .dropdown-menu {
 			left: inherit;
 			min-width: 294px;
 			width: 294px;
-			right: -18px;			
+			right: -26px;
 		}
 	}
 	.filter {
 		& > .dropdown-menu {
-			left: 44%;
+			left: 49%;
 			transform: translateX(-50%);
 			min-width: 294px;
 			width: 294px;

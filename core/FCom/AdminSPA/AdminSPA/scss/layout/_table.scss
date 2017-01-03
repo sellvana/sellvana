@@ -65,6 +65,9 @@ table {
 		tr:last-child {
 			border-bottom: 0;
 		}
+		td, th {
+			padding: 0 0 0 20px; 
+		}
 	}
 	.edit, .delete {
 		font-size: 16px; 

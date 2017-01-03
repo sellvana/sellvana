@@ -69,3 +69,34 @@ input[type="text"], input[type="password"] {
 		padding: 12px 20px;
 	}
 }
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border: solid #ebebeb 1px;
+    border-radius: 1px;
+}
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid #ebebeb;
+  }
+.select2-container--default .select2-search--inline .select2-search__field {
+	    font-size: 12px;
+    box-shadow: none;
+	margin: 0;
+}
+.select2-container .select2-selection--multiple {
+    min-height: 31px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+	input[type="date"].form-control,
+	input[type="time"].form-control,
+	input[type="datetime-local"].form-control,
+	input[type="month"].form-control {
+		line-height: 1.4;
+	}
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+	    background: #e3e3e3;
+    border: none;
+    border-radius: 1px;
+	color: #868a8a;
+	    padding: 2px 8px;
+}
