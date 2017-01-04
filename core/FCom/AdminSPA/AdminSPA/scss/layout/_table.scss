@@ -1,9 +1,9 @@
 .admin-main-content {
 	table {
 		border-bottom: 1px solid #000000;
-		td, th {
+		td,
+		th {
 			height: 49px;
-			min-width: 70px;
 			white-space: nowrap;
 		}
 		thead {
@@ -11,24 +11,41 @@
 			span {
 				color: #474646;
 			}
+			th:first-child,
+			td:first-child,
+			th:nth-of-type(2) a,
+			td:nth-of-type(2) a {
+				text-align: left;
+				padding: 0 10px;
+			}
 		}
 		tbody {
 			tr {
 				border-bottom: 1px solid #f8f8f8;
-				th:first-child, td:first-child {
-					text-align: center;
-				}
 			}
 			tr:last-child {
 				border-bottom: 0;
 			}
+		}
+		.column-choise {
+			width: 50px;
+			padding: 0 10px;
+			min-width: auto;
+			text-align: left;
+		}
+		.column-action {
+			width: 70px;
+			padding: 0 10px;
+			min-width: auto;
+			text-align: left;
 		}
 	}
 }
 
 table {
 	min-width: 100%;
-	td, th {
+	td,
+	th {
 		position: relative;
 	}
 	thead {
@@ -44,7 +61,7 @@ table {
 			position: absolute;
 			left: 8px;
 			top: 22px;
-		}		
+		}
 		a {
 			padding: 17px 0 17px 20px;
 			display: inline-block;
@@ -65,12 +82,14 @@ table {
 		tr:last-child {
 			border-bottom: 0;
 		}
-		td, th {
-			padding: 0 0 0 20px; 
+		td,
+		th {
+			padding: 0 0 0 20px;
 		}
 	}
-	.edit, .delete {
-		font-size: 16px; 
+	.edit,
+	.delete {
+		font-size: 16px;
 		color: #dddddd;
 		transition: 0.3s all ease-in;
 		margin: 0 2px;
@@ -78,13 +97,26 @@ table {
 			color: #000;
 		}
 	}
-	.sorted-up, .sorted-down {
+	.sorted-up,
+	.sorted-down {
 		i {
 			color: #7379db;
 			top: 18px;
 		}
-	} 
+	}
 	td {
 		font-family: $f-main-lig;
+	}
+	.column-choise {
+		width: 50px;
+		padding: 0;
+		min-width: auto;
+		text-align: left;
+	}
+	.column-action {
+		width: 70px;
+		padding: 0;
+		min-width: auto;
+		text-align: left;
 	}
 }

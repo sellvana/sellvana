@@ -72,6 +72,7 @@ input[type="text"], input[type="password"] {
 .select2-container--default.select2-container--focus .select2-selection--multiple {
     border: solid #ebebeb 1px;
     border-radius: 1px;
+	    padding: 0px 0 2px; 
 }
 .select2-container--default .select2-selection--multiple {
     border: 1px solid #ebebeb;
@@ -79,10 +80,13 @@ input[type="text"], input[type="password"] {
 .select2-container--default .select2-search--inline .select2-search__field {
 	    font-size: 12px;
     box-shadow: none;
-	margin: 0;
+	margin: 5px 0 0 0;
+	line-height: 1.4;
+       padding: 2px 0px 1px;
 }
 .select2-container .select2-selection--multiple {
-    min-height: 31px;
+    min-height: auto;
+	padding: 0px 0 2px 0;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -99,4 +103,5 @@ input[type="text"], input[type="password"] {
     border-radius: 1px;
 	color: #868a8a;
 	    padding: 2px 8px;
+	   margin: 5px 3px 0px 0;
 }

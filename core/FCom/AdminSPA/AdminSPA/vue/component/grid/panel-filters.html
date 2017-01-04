@@ -1,17 +1,18 @@
 <div class="dropdown filter" :class="{open:ddOpen(grid.config.id+'/panel-filters')}"> <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"><span>{{'Filter'|_}}</span><b class="caret"></b></a>
 	<div class="dropdown-menu" @click.stop="ddOpClear()">
 		<form class="select-filter">
-			<select v-model="filterToAdd" @change="addFilter()" :options="availableFilters" :params="addFilterSelect2Params">
+			<select2 v-model="filterToAdd" @change="addFilter()" :options="availableFilters" :params="addFilterSelect2Params">
 				<option value="">{{(availableFilters.length ? 'Add filter...' : 'No more filters available to add')|_}}</option>
 				<option v-for="flt in availableFilters" :value="flt.id">{{flt.text}}</option>
-			</select>
+			</select2>
 			<!--<button type="button" class="button4" @click="addFilter()">{{'Add'|_}}</button>-->
 		</form>
 		<ul class="filter-box">
 			<li>
 				<div class="input-group" v-for="(flt, i) in addedFilters">
-					<div> <a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
+					<div>
 						<label>{{flt.config.label|_}}</label>
+						 <a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
 					</div>
 					<div>
 						<div class="input-group-btn dropdown" :class="{open:ddOpOpen(flt)}">

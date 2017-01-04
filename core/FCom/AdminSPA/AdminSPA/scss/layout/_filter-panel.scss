@@ -4,7 +4,6 @@
 	}
 }
 
-
 .f-grid-filter-panel {
 	position: relative;
 	label {
@@ -133,6 +132,7 @@
 		z-index: 5;
 	}
 }
+
 .input-group-addon {
 	background-color: #f2f2f2;
 	border: 1px solid #ebebeb;
@@ -172,7 +172,7 @@
 	font-size: 0;
 	width: 1%;
 	white-space: nowrap;
-	vertical-align: middle;
+	vertical-align: top;
 	&.input-group-btn.dropdown {
 		border-right: none;
 		border-top-right-radius: 0;
@@ -208,15 +208,11 @@
 
 .filter-box {
 	label {
-		display: block;
-		width: 100%;
+		display: inline;
 		margin-bottom: 5px;
+		margin-right: 5px;
 	}
-	.delete {
-		position: absolute;
-		right: 0;
-		top: 0;
-	}
+	.delete {}
 	.input-group-btn {
 		.dropdown-toggle {
 			border-left: 1px solid #e5e5e5;
@@ -357,10 +353,12 @@
 	}
 }
 
-.amount-rows, .pagination-block {
+.amount-rows,
+.pagination-block {
 	display: inline-block;
-	vertical-align: middle;	
+	vertical-align: middle;
 }
+
 .pagination > li:first-child > a,
 .pagination > li:first-child > span {
 	border-radius: 0;
@@ -430,17 +428,14 @@
 		position: relative;
 		display: inline-block;
 		vertical-align: middle;
-		padding: 10px 0;
-		i {
-			margin-left: 5px;
-		}
+		padding: 0px 10px;
+		background: #e3e3e3;
+		margin: 5px 5px 0 0;
+		border-radius: 1px;
 	}
 	a {
-		border-radius: 1px;
-		background: #e3e3e3;
-		color: #868a8a;
 		display: inline-block;
-		padding: 5px 10px;
+		padding: 5px 0 5px 5px;
 	}
 }
 
