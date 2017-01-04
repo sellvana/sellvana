@@ -2,6 +2,7 @@
     - { root: root }
     - { hook: head, views: head }
     - { hook: before_body_end, views: bottom_scripts }
+
     - view: head
         do:
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/bootstrap.css" ]
@@ -54,9 +55,9 @@
             - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
 
+            - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
-            - [ requireJs, sv-app-dynamic, "~/sv-app-dynamic" ]
-            - [ requireRun, sv-app-dynamic ]
+            - [ requireRun, sv-app ]
 
             - [ requireJs, sv-comp-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
             - [ requireJs, sv-comp-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
@@ -116,7 +117,6 @@
             - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
             - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
 
-sv-app-dynamic-js:
     - view: app
         do:
             - [ addModule, FCom_AdminSPA ]

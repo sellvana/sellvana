@@ -12,11 +12,12 @@ class FCom_AdminSPA_AdminSPA extends BClass
         '_messages' => true,
         '_user' => true,
         '_permissions' => true,
-        '_nav' => true,
+        //'_nav' => true,
         '_personalize' => true,
         '_local_notifications' => true,
         '_redirect' => true,
         '_login' => true,
+        '_csrf_token' => true,
 //        '_ok' => true,
     ];
 
@@ -49,6 +50,9 @@ class FCom_AdminSPA_AdminSPA extends BClass
     public function mergeResponses(array $result = [])
     {
         foreach ($this->_responsesToPush as $type => $data) {
+            if (empty($this->_responseTypes[$type])) {
+                continue;
+            }
             $callback = $this->_responseTypes[$type];
             if (true === $callback) {
                 $callback = [$this, 'responseCallback' . $type];
@@ -114,4 +118,10 @@ class FCom_AdminSPA_AdminSPA extends BClass
 //    {
 //        return $data;
 //    }
+
+    public function responseCallback_csrf_token($data)
+    {
+        return $this->BSession->csrfToken();
+    }
+
 }

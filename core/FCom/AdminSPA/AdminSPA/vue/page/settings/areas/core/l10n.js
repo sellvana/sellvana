@@ -1,4 +1,4 @@
-define(['sv-app'], function (SvApp) {
+define(['sv-hlp'], function (SvHlp) {
     console.log('TEST');
     return {
         props: ['settings'],

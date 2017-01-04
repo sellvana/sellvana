@@ -1,9 +1,9 @@
-define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
+define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
 		'text!sv-page-sales-orders-form-main-tpl', 'json!sv-page-sales-orders-form-items-config',
 		'text!sv-page-sales-orders-form-details-tpl',
 		'text!sv-page-sales-orders-form-comments-tpl',
         'text!sv-page-sales-orders-form-history-tpl'],
-	   function (Vue, SvApp, SvCompGrid, SvCompForm, tabMainTpl, itemsGridConfig, tabDetailsTpl, tabCommentsTpl, tabHistoryTpl) {
+	   function (Vue, SvHlp, SvCompGrid, SvCompForm, tabMainTpl, itemsGridConfig, tabDetailsTpl, tabCommentsTpl, tabHistoryTpl) {
 
 	var defForm = {
         options: {},
@@ -29,7 +29,7 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 		data: function () {
 			return {
 				editing: {customer: false, shipping: false, billing: false, order: false},
-				dict: SvApp.data
+				dict: SvAppData
 			}
 		},
 		computed: {
@@ -38,7 +38,7 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 					if (!this.form.order.id) {
 						return [];
 					}
-                    return this.dict.regionsSeq['@' + this.form.order[type + '_country']];
+                    return this.dict.regions_seq['@' + this.form.order[type + '_country']];
                 }
 			},
 			itemsGrid: function () {
@@ -200,7 +200,7 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 	};
 
 	return {
-		mixins: [SvApp.mixins.common, SvApp.mixins.form],
+		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
         components: {
             'sv-page-sales-orders-form-main': TabMain,
 			'sv-page-sales-orders-form-comments': TabComments,
@@ -228,19 +228,19 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
             },
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
-                SvApp.methods.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
+                SvHlp.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
 					vm.form = response.form;
                     if (!vm.form.updates) {
                         Vue.set(vm.form, 'updates', {});
                     }
-                    vm.updateBreadcrumbs(SvApp._('Order #' + vm.form.order.unique_id));
+                    vm.updateBreadcrumbs(SvHlp._('Order #' + vm.form.order.unique_id));
                 });
 			},
 			doDelete: function () {
-				if (!confirm(SvApp._('Are you sure you want to delete this order?'))) {
+				if (!confirm(SvHlp._('Are you sure you want to delete this order?'))) {
 					return;
 				}
-				SvApp.methods.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {
+				SvHlp.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {
 					if (!response._ok) {
 
 					}
@@ -254,7 +254,7 @@ define(['vue', 'sv-app', 'sv-comp-grid', 'sv-comp-form',
 			},
 			save: function (stayOnPage) {
 				var vm = this;
-				SvApp.methods.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
+				SvHlp.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
 					if (!response._ok) {
 
 					}

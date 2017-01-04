@@ -1,8 +1,8 @@
-define(['vue', 'sv-app', 'json!sv-page-settings-config'], function (Vue, SvApp, settingsConfig) {
+define(['vue', 'sv-hlp', 'json!sv-page-settings-config'], function (Vue, SvHlp, settingsConfig) {
 
     return {
-        store: SvApp.store,
-        mixins: [SvApp.mixins.common],
+        store: SvHlp.store,
+        mixins: [SvHlp.mixins.common],
         data: function () {
             return {
                 settings: {
@@ -22,7 +22,7 @@ define(['vue', 'sv-app', 'json!sv-page-settings-config'], function (Vue, SvApp, 
         methods: {
             fetchData: function () {
                 var vm = this;
-                SvApp.methods.sendRequest('GET', 'settings/data', {}, function (response) {
+                SvHlp.sendRequest('GET', 'settings/data', {}, function (response) {
                     Vue.set(vm.settings, 'data', response.data);
                 });
             },

@@ -18,8 +18,6 @@
 			- [ requireJs, sv-page-sales-orders-form-history-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history.html" ]
 			- [ requireJs, sv-page-sales-orders-form-items-config, "~/orders/form_items_grid_config" ]
 
-
-sv-app-dynamic-js:
     - view: app
         do:
             - [ addNav, { path: /sales, label: Sales, icon_class: "fa fa-line-chart", pos: 20 } ]

@@ -3251,6 +3251,8 @@ class BDebug extends BClass
 
     static protected $_disableAllLogging = false;
 
+    static protected $_disableDumpLog = false;
+
     /**
      * Constructor, remember script start time for delta timestamps
      *
@@ -3752,6 +3754,7 @@ class BDebug extends BClass
         if (!(static::$_mode === static::MODE_DEBUG || static::$_mode === static::MODE_DEVELOPMENT)
             || $this->BResponse->getContentType() !== 'text/html'
             || $this->BRequest->xhr()
+            || static::$_disableDumpLog
         ) {
             return;
         }
@@ -3908,6 +3911,11 @@ class BDebug extends BClass
         BORM::configure('logging', 0);
         $this->BConfig->set('db/logging', 0);
         return $this;
+    }
+
+    public function disableDumpLog()
+    {
+        static::$_disableDumpLog = true;
     }
 }
 

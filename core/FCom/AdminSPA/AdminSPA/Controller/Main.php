@@ -9,7 +9,28 @@ class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstr
 
     public function action_index()
     {
+        $this->BDebug->disableAllLogging();
+        $this->BDebug->disableDumpLog();
         $this->layout('/');
+        /** @var FCom_AdminSPA_AdminSPA_View_App $app */
+        $app = $this->view('app');
+        $countries = $this->BLocale->getAvailableCountries();
+        $regions = $this->BLocale->getAvailableRegions();
+        $user = $this->FCom_Admin_Model_User->sessionUser();
+        $this->view('root')->set(['data' => [
+            'modules' => $app->getModules(),
+            'routes' => $app->getRoutes(),
+            //'navs' => $app->getNavs(),
+            'nav_tree' => $app->getNavTree(),
+            'env' => $app->getEnv(),
+            'user' => $user ? $user->as_array() : false,
+            'favorites' => $this->FCom_Admin_Model_Favorite->getUserFavorites(),
+            'countries' => $countries,
+            'countries_seq' => $this->BUtil->arrayMapToSeq($countries),
+            'regions' => $regions,
+            'regions_seq' => $this->BUtil->arrayMapToSeq($regions),
+            'csrf_token' => $this->BSession->csrfToken(),
+        ]]);
     }
 
     public function action_l10n()
@@ -32,6 +53,27 @@ EOT;
         $html = (string)$this->view('js/sv-app-dynamic-js');
         $script = str_replace(['<script>', '</script>'], '', $html);
         $this->BResponse->setContentType('application/javascript')->set($script);
+    }
+
+    public function action_sv_app_data()
+    {
+        /*
+{% set app = THIS.view('app') %}
+{% set modules = app.getModules() %}
+{% set routes = app.getRoutes() %}
+{% set navs = app.getNavs() %}
+{% set navTree = app.getNavTree() %}
+{% set env = app.getEnv() %}
+{% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
+{% set favorites = APP.instance('FCom_Admin_Model_Favorite').getUserFavorites() %}
+{% set pers = APP.instance('FCom_Admin_Model_Personalize') %}
+{% set countries = LOCALE.getAvailableCountries() %}
+{% set countriesSeq = UTIL.arrayMapToSeq(countries) %}
+{% set regions = LOCALE.getAvailableRegions() %}
+{% set regionsSeq = UTIL.arrayMapToSeq(regions, 'id', 'text', 1) %}
+         */
+        $this->BDebug->mode('PRODUCTION');
+        $this->respond($result);
     }
 
     public function action_components()

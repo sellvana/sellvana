@@ -1,10 +1,10 @@
-define(['vue', 'sv-app', 'jquery', 'lodash',
+define(['vue', 'sv-hlp', 'jquery', 'lodash',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
         'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl', 'text!sv-comp-grid-panel-tpl',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvApp, $, _, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl,
+    function(Vue, SvHlp, $, _, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl,
              gridPanelTpl, gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelExportTpl, gridBulkActionsTpl
     ) {
         function prepareFiltersRequest(filters) {
@@ -63,12 +63,11 @@ define(['vue', 'sv-app', 'jquery', 'lodash',
             if (!state.mp) {
                 state.mp = Math.ceil(state.c / state.ps);
             }
-console.log(state, grid);
             Vue.set(grid, 'state', state);
         }
 
         var GridHeaderRow = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridHeaderRowTpl,
             computed: {
@@ -118,7 +117,7 @@ console.log(state, grid);
         };
 
         var GridDataRow = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid', 'row'],
             template: gridDataRowTpl,
             computed: {
@@ -150,14 +149,14 @@ console.log(state, grid);
             },
             methods: {
                 deleteRow: function (row, col, act) {
-                    if (!confirm(SvApp._('Are you sure you want to delete the row?'))) {
+                    if (!confirm(SvHlp._('Are you sure you want to delete the row?'))) {
                         return;
                     }
                     this.$emit('delete-row', row)
                     var vm = this;
                     if (act.delete_url) {
                         var url = vm.rowActionLink(row, col, {link: act.delete_url});
-                        SvApp.methods.sendRequest('POST', url, {}, function (response) {
+                        SvHlp.sendRequest('POST', url, {}, function (response) {
                             vm.$emit('fetch-data');
                         });
                     }
@@ -173,13 +172,13 @@ console.log(state, grid);
         };
 
         var GridPagerList = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid'],
-            store: SvApp.store,
+            store: SvHlp.store,
             template: gridPagerListTpl,
             computed: {
                 pagesizeOptions: function () {
-                    return this.grid.config.pagesize_options;
+                    return this.grid.config && this.grid.config.pager ? this.grid.config.pager.pagesize_options : [];
                 },
                 curPagesize: function () {
                     return this.grid.state ? this.grid.state.ps : 10;
@@ -218,10 +217,10 @@ console.log(state, grid);
         var GridPagerSelect = $.extend({}, GridPagerList, {template: gridPagerSelectTpl});
 
         var GridPanelColumns = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridPanelColumnsTpl,
-            store: SvApp.store,
+            store: SvHlp.store,
             computed: {
                 visible: function () {
                     return function (col) {
@@ -243,7 +242,7 @@ console.log(state, grid);
         };
 
         var GridPanelFilters = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridPanelFiltersTpl,
             data: function () {
@@ -285,8 +284,8 @@ console.log(state, grid);
                     return {
                         allowClear: true,
                         placeholder: this.availableFilters.length
-                            ? SvApp._('Add filter...')
-                            : SvApp._('No more filters available to add')
+                            ? SvHlp._('Add filter...')
+                            : SvHlp._('No more filters available to add')
                     };
                 }
             },
@@ -360,7 +359,7 @@ console.log(state, grid);
         };
 
         var GridPanelExport = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridPanelExportTpl,
             data: function () {
@@ -391,7 +390,7 @@ console.log(state, grid);
         };
 
         var GridBulkActions = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridBulkActionsTpl,
             computed: {
@@ -410,7 +409,7 @@ console.log(state, grid);
         };
 
         var GridPanel = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             props: ['grid', 'cnt-visible'],
             components: {
                 'sv-comp-grid-pager-list': GridPagerList,
@@ -456,7 +455,7 @@ console.log(state, grid);
 
         return {
             props: ['grid'],
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             data: function() {
                 return {
                     cntVisible: 0
@@ -517,7 +516,7 @@ console.log(state, grid);
                         console.log(grid.state);
                         return;
                     }
-                    SvApp.methods.sendRequest('GET', url, params, function (response) {
+                    SvHlp.sendRequest('GET', url, params, function (response) {
                         if (response.config) {
                             Vue.set(grid, 'config', response.config);
                         }

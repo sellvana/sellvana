@@ -1,6 +1,6 @@
-define(['sv-app', 'sv-comp-grid', 'json!sv-page-users-grid-config'], function (SvApp, SvCompGrid, gridConfig) {
+define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-users-grid-config'], function (SvHlp, SvCompGrid, gridConfig) {
     return {
-        store: SvApp.store,
+        store: SvHlp.store,
         data: function () {
             return {
                 grid: {

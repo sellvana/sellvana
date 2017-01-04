@@ -4,11 +4,11 @@
 		<p>{{'Welcome, please sign in'|_}}</p>
 		<label>
 			<span>{{'Username'|_}}</span>
-			<input type="text" v-model="username">
+			<input type="text" v-model="username" @keyup.enter="submit">
 		</label>
 		<label>
 			<span>{{'Password'|_}}</span>
-			<input type="password" v-model="password">
+			<input type="password" v-model="password" @keyup.enter="submit">
 		</label>
 		<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
 		<div class="control-buttons-block">

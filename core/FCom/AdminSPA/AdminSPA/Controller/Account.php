@@ -4,7 +4,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
 {
     public function authenticate($args = [])
     {
-        if (in_array($this->_action, ['login', 'password_recover', 'password_reset'])) {
+        if (in_array($this->_action, ['login', 'logout', 'password_recover', 'password_reset'])) {
             return true;
         }
         return parent::authenticate($args);
@@ -22,8 +22,25 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
             if (!$user) {
                 throw new BException($this->_('Invalid user name or password.'));
             }
+
+            if (!empty($r['remember_me'])) {
+                $days = $this->BConfig->get('cookie/remember_days');
+                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
+            }
+
+            if ($user->get('g2fa_status') == 9) {
+                $token = $this->BRequest->cookie('g2fa_token');
+                $rec = $this->FCom_Admin_Model_UserG2FA->verifyToken($user->id(), $token);
+                if (!$rec) {
+                    $this->BSession->set('g2fa_user_id', $user->id());
+                    $this->BResponse->redirect('g2fa/login');
+                    return;
+                }
+            }
+
             $user->login();
-            $this->ok()->addResponses(true)->addResponses(['_redirect' => '/']);
+
+            $this->ok()->addResponses(true);#->addResponses(['_redirect' => '/']);
         } catch (Exception $e) {
             $this->addMessage($e);
         }

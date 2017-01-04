@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script>
+        var SvAppData = ({{ data|json_encode|raw }});
+    </script>
     {{ THIS.view('head') | raw }}
 </head>
 <body>
+{% verbatim %}
 <div id="sv-app" @click="pageClick()" v-show="isLoaded">
     <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
     <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
@@ -15,5 +19,6 @@
         </div>
     </main>
 </div>
+{% endverbatim %}
 </body>
 </html>

@@ -1,7 +1,7 @@
-define(['jquery', 'sv-app'], function($, SvApp) {
+define(['jquery', 'sv-hlp'], function($, SvHlp) {
     return {
-        mixins: [SvApp.mixins.common],
-        store: SvApp.store,
+        mixins: [SvHlp.mixins.common],
+        store: SvHlp.store,
         data: function () {
             return {
                 username: '',
@@ -11,15 +11,15 @@ define(['jquery', 'sv-app'], function($, SvApp) {
         methods: {
             submit: function() {
                 var postData = {login: {username: this.username, password: this.password}};
-                SvApp.methods.sendRequest('POST', 'account/login', postData, function (response) {
+                SvHlp.sendRequest('POST', 'account/login', postData, function (response) {
                     if (response._redirect) {
-                        SvApp.router.push(response._redirect);
+                        SvHlp.router.push(response._redirect);
                     }
                 });
             }
         },
         created: function () {
-            if (this.$store.state.user) {
+            if (this.$store.state.user && this.$store.state.user.id) {
                 this.$router.push('/');
             }
         }

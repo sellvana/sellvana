@@ -1,14 +1,14 @@
-define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tpl',
+define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tpl',
         'text!sv-comp-header-search-tpl', 'text!sv-comp-header-favorites-tpl', 'text!sv-comp-header-account-tpl',
         'text!sv-comp-header-chat-tpl', 'text!sv-comp-header-local-notifications-tpl'],
-    function(SvApp, headerTpl, headerBreadcrumbsTpl, headerSearchTpl, headerFavoritesTpl, headerAccountTpl,
+    function(SvHlp, headerTpl, headerBreadcrumbsTpl, headerSearchTpl, headerFavoritesTpl, headerAccountTpl,
              headerChatTpl, headerLocalNotificationsTpl) {
         //var dropdowns = {};
 
         var HeaderBreadcrumbs = {
             props: ['mobile'],
-            mixins: [SvApp.mixins.common],
-            store: SvApp.store,
+            mixins: [SvHlp.mixins.common],
+            store: SvHlp.store,
             template: headerBreadcrumbsTpl,
             computed: {
                 breadcrumbParts: function () {
@@ -33,7 +33,7 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
                     if (this.isFavorite) {
                         var cur = {link: curPage.link};
                         this.$store.commit('removeFavorite', cur);
-                        SvApp.methods.sendRequest('POST', 'favorites/remove', cur, function (response) {
+                        SvHlp.sendRequest('POST', 'favorites/remove', cur, function (response) {
 
                         });
                     } else {
@@ -48,7 +48,7 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
                         labelArr.push(curPage.label);
                         var cur = {link: curPage.link, label: labelArr.join(' > '), icon_class: iconClass};
                         this.$store.commit('addFavorite', cur);
-                        SvApp.methods.sendRequest('POST', 'favorites/add', cur, function (response) {
+                        SvHlp.sendRequest('POST', 'favorites/add', cur, function (response) {
 
                         });
                     }
@@ -58,14 +58,14 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
 
         var HeaderSearch = {
             props: ['mobile'],
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             template: headerSearchTpl
         };
 
         var HeaderFavorites = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             template: headerFavoritesTpl,
-            store: SvApp.store,
+            store: SvHlp.store,
             computed: {
                 favorites: function () {
                     return this.$store.state.favorites || [];
@@ -74,7 +74,7 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
             methods: {
                 removeFavorite: function (fav) {
                     this.$store.commit('removeFavorite', fav);
-                    SvApp.methods.sendRequest('POST', 'favorites/remove', fav, function (response) {
+                    SvHlp.sendRequest('POST', 'favorites/remove', fav, function (response) {
 
                     });
                 }
@@ -82,7 +82,7 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
         };
 
         var HeaderAccount = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             template: headerAccountTpl,
             data: function () {
                 return {
@@ -111,13 +111,13 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
         };
 
         var HeaderLocalNotifications = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             template: headerLocalNotificationsTpl,
-            store: SvApp.store
+            store: SvHlp.store
         };
 
         var HeaderChat = {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             data: function () {
                 return {
                     ui: {
@@ -126,13 +126,13 @@ define(['sv-app', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
                 }
             },
             template: headerChatTpl,
-            store: SvApp.store
+            store: SvHlp.store
         };
 
         return {
-            mixins: [SvApp.mixins.common],
+            mixins: [SvHlp.mixins.common],
             template: headerTpl,
-            store: SvApp.store,
+            store: SvHlp.store,
             components: {
                 'sv-comp-header-breadcrumbs': HeaderBreadcrumbs,
                 'sv-comp-header-search': HeaderSearch,

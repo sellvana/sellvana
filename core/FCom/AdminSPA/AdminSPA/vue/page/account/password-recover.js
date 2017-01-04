@@ -1,6 +1,6 @@
-define(['sv-app'], function(SvApp) {
+define(['sv-hlp'], function(SvHlp) {
     return {
-        mixins: [SvApp.mixins.common],
+        mixins: [SvHlp.mixins.common],
         data: function () {
             return {
                 username: 'USERNAME',

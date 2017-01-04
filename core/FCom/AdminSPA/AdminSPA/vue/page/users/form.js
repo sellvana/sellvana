@@ -1,4 +1,4 @@
-define(['vue', 'sv-app', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], function (Vue, SvApp, SvCompForm, tabMainTpl) {
+define(['vue', 'sv-hlp', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], function (Vue, SvHlp, SvCompForm, tabMainTpl) {
 
     var defForm = {
         options: {},
@@ -18,7 +18,7 @@ define(['vue', 'sv-app', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], fu
     };
 
     return {
-        mixins: [SvApp.mixins.common, SvApp.mixins.form],
+        mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
         data: function () {
             return {
                 form: defForm
@@ -42,17 +42,17 @@ define(['vue', 'sv-app', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], fu
             },
             fetchData: function () {
                 var userId = this.$router.currentRoute.query.id, vm = this;
-                SvApp.methods.sendRequest('GET', 'users/form_data', {id: userId}, function (response) {
+                SvHlp.sendRequest('GET', 'users/form_data', {id: userId}, function (response) {
                     vm.form = response.form;
                     if (!vm.form.updates) {
                         Vue.set(vm.form, 'updates', {});
                     }
-                    vm.updateBreadcrumbs(SvApp._(vm.form.user.email));
+                    vm.updateBreadcrumbs(SvHlp._(vm.form.user.email));
                 });
             },
             save: function (stayOnPage) {
                 var vm = this;
-                SvApp.methods.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
+                SvHlp.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
                     if (!response._ok) {
 
                     }

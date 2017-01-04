@@ -81,7 +81,7 @@
 									<div class="col-md-6">
 										<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 											<option></option>
-											<option v-for="c in dict.countriesSeq" :value="c.id">{{c.text}}</option>
+											<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
 										</select>
 									</div>
 								</div>
@@ -146,7 +146,7 @@
 									<div class="col-md-6">
 										<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.billing_country">
 											<option></option>
-											<option v-for="c in dict.countriesSeq" :value="c.id">{{c.text}}</option>
+											<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
 										</select>
 									</div>
 								</div>
