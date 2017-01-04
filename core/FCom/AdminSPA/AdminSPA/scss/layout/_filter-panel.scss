@@ -6,6 +6,7 @@
 
 .f-grid-filter-panel {
 	position: relative;
+	    padding: 10px 0;
 	label {
 		width: 80%;
 		cursor: pointer;
@@ -369,7 +370,7 @@
 	text-align: left;
 	position: absolute;
 	right: 15px;
-	top: 0;
+	top: 10px;
 	border-right: 0;
 	.caret-back {
 		background: #ebeff3;

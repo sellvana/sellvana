@@ -1,0 +1,69 @@
+.main-info-block {
+	display: flex;
+	justify-content: space-between;
+	padding: 15px 0;
+	div {
+		border-radius: 4px;
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+		padding: 10px;
+		min-width: 254px;
+		display: inline-block;
+	}
+	p {
+		color: #fff;
+	}
+	.number {
+		font-size: 26px;
+		font-family: "GothamProBold";
+	}
+	.title {
+		text-transform: uppercase;
+		font-size: 11px;
+	}
+}
+
+.total-sales {
+	background: #92b99a;
+}
+
+.total-users {
+	background: #b4e5be;
+}
+
+.total-members {
+	background: #92b99a;
+}
+
+.total-revenue {
+	background: #ecfec0;
+	p {
+		color: #000;
+	}
+}
+
+.dashboard-title {
+	position: relative;
+	background: #f4f4f4;
+	padding: 5px 15px 5px 5px;
+	    margin-bottom: 20px;
+	p {
+		font-family: "GothamProBold";
+		font-size: 14px;
+		text-transform: uppercase;
+		color: #000;
+	}
+	.roll-up {
+		position: absolute;
+		right: 20px;
+		top: 0;
+		font-size: 14px;
+		padding: 5px 8px;
+	}
+	.delete {
+		position: absolute;
+		right: 0;
+		top: 0;
+		font-size: 15px;
+		padding: 5px 8px;
+	}
+}

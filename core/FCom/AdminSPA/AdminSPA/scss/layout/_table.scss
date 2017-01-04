@@ -1,9 +1,15 @@
+.main-grid {
+	td,
+	th {
+		height: 49px;
+	}
+}
+
 .admin-main-content {
 	table {
 		border-bottom: 1px solid #000000;
 		td,
 		th {
-			height: 49px;
 			white-space: nowrap;
 		}
 		thead {
@@ -47,6 +53,7 @@ table {
 	td,
 	th {
 		position: relative;
+		padding: 7px 10px;
 	}
 	thead {
 		.fa {
@@ -82,10 +89,6 @@ table {
 		tr:last-child {
 			border-bottom: 0;
 		}
-		td,
-		th {
-			padding: 0 0 0 20px;
-		}
 	}
 	.edit,
 	.delete {
@@ -118,5 +121,19 @@ table {
 		padding: 0;
 		min-width: auto;
 		text-align: left;
+	}
+}
+
+.fixed-table {
+	td,
+	th {
+		height: 49px;
+		padding: 0 0 0 20px;
+	}
+	thead {
+		td,
+		th {
+			padding: 0;
+		}
 	}
 }
