@@ -1,7 +1,27 @@
 <div>
 	<div class="row">
 		<div class="col-md-12">
-			<div class="control-buttons"> </div>
+			<div class="control-buttons"> 
+				<select2>
+					<option>Today</option>
+					<option>Yeasterday</option>
+					<option>Last 7 Days</option>
+					<option>Last 30 Days</option>
+					<option>This Month</option>
+					<option>Last Month</option>
+					<option>Custom</option>
+				</select2>
+				<select2>
+					<option>Select a widget...</option>
+					<option>Latest Product Reviews</option>
+					<option>Latest Newsletter Subscriptions</option>
+					<option>Late Orders</option>
+					<option>Products With No Image</option>
+					<option>Order Totals</option>
+					<option>Latest Nes Products</option>
+				</select2>
+				<button class="button4">Add</button>
+			</div>
 		</div>
 	</div>
 	<div class="row">
@@ -9,19 +29,19 @@
 			<div class="main-info-block">
 				<div class="total-sales">
 					<p class="number">232</p>
-					<p class="title">sales</p>
+					<p class="title">{{'sales'|_}}</p>
 				</div>
 				<div class="total-users">
 					<p class="number">1,353</p>
-					<p class="title">total users</p>
+					<p class="title">{{'total users'|_}}</p>
 				</div>
 				<div class="total-members">
 					<p class="number">+24%</p>
-					<p class="title">new members</p>
+					<p class="title">{{'new members'|_}}</p>
 				</div>
 				<div class="total-revenue">
 					<p class="number">$15,000</p>
-					<p class="title">revenue</p>
+					<p class="title">{{'revenue'|_}}</p>
 				</div>
 			</div>
 		</div>
@@ -30,7 +50,7 @@
 		<div class="col-md-5">
 			<div class="admin-main-content">
 				<div class="dashboard-title">
-					<p>mountly recap report</p>
+					<p>{{'mountly recap report'|_}}</p>
 					<a href="#" class="roll-up"> <i class="fa fa-window-minimize"></i> </a>
 					<a href="#" class="delete"> <i class="fa fa-times"></i> </a>
 				</div>
@@ -39,7 +59,7 @@
 		<div class="col-md-4">
 			<div class="admin-main-content">
 				<div class="dashboard-title">
-					<p>latest product reviews</p>
+					<p>{{'latest product reviews'|_}}</p>
 					<a href="#" class="roll-up"> <i class="fa fa-window-minimize"></i> </a>
 					<a href="#" class="delete"> <i class="fa fa-times"></i> </a>
 				</div>
@@ -47,8 +67,8 @@
 		</div>
 		<div class="col-md-3">
 			<div class="admin-main-content">
-				<div class="dashboard-title">
-					<p>latest newsletter subscription</p>
+				<div class="dashboard-title">   
+					<p>{{'latests newsletter subscription'|_}}</p>
 					<a href="#" class="roll-up"> <i class="fa fa-window-minimize"></i> </a>
 					<a href="#" class="delete"> <i class="fa fa-times"></i> </a>
 				</div>
@@ -56,7 +76,7 @@
 					<table>
 						<thead>
 							<tr>
-								<td>Email</td>
+								<td>{{'Email'|_}}</td>
 							</tr>
 						</thead>
 						<tbody>

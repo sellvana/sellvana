@@ -105,3 +105,14 @@ input[type="text"], input[type="password"] {
 	    padding: 2px 8px;
 	   margin: 5px 3px 0px 0;
 }
+
+.f-section {
+	padding: 20px;
+}
+.select2-container--default .select2-selection--single {
+    border: 1px solid #ebebeb;
+    border-radius: 1px;
+}
+.select2-container {
+   min-width: 100%;
+}

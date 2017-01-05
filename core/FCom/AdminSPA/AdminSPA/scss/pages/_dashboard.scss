@@ -67,3 +67,12 @@
 		padding: 5px 8px;
 	}
 }
+.control-buttons {
+	.select2-container {
+		min-width: 250px;
+		text-align: left;
+	}
+	.select2-container .select2-selection--single {
+		height: 29px;
+	}
+}
