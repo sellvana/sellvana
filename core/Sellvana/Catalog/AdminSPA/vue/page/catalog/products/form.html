@@ -1,51 +1,11 @@
 <div>
     <div class="row">
         <div class="col-md-7">
-            <div>
-                <div class="total-info">
-                    <div class="icon">
-                        <i class="fa fa-money" aria-hidden="true"></i>
-                    </div>
-                    <div class="data">
-                        <span>{{'Grand Total:'|_}}</span>
-                        <p>{{form.order.grand_total|currency(form.order.store_currency_code)}}</p>
-                    </div>
-                </div>
-                <div class="overall-info">
-                    <div class="icon">
-                        <i class="fa fa-line-chart" aria-hidden="true"></i>
-                    </div>
-                    <div class="data">
-                        <span>{{'Overall Status'|_}}</span>
-                        <p :class="'status-'+form.order.state_overall">{{getOption('order_state_overall', form.order.state_overall)}}</p>
-                    </div>
-                </div>
-                <div class="payment-info">
-                    <div class="icon">
-                        <i class="fa fa-credit-card-alt" aria-hidden="true"></i>
-                    </div>
-                    <div class="data">
-                        <span>{{'Payment:'|_}}</span>
-                        <p :class="'status-'+form.order.state_payment">{{getOption('order_state_payment', form.order.state_payment)}}</p>
-                    </div>
-                </div>
-                <div class="delivery-info">
-                    <div class="icon">
-                        <i class="fa fa-truck" aria-hidden="true"></i>
-                    </div>
-                    <div class="data">
-                        <span>{{'Delivery:'|_}}</span>
-                        <p :class="'status-'+form.order.state_delivery">{{getOption('order_state_delivery', form.order.state_delivery)}}</p>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="col-md-5">
             <div class="control-buttons">
                 <button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
                 <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-                <button type="button" class="button button8" @click="shipAllItems()">{{'Ship All items'|_}}</button>
-                <button type="button" class="button button8" @click="markAsPaid()">{{'Mark as Paid'|_}}</button>
                 <button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
                 <button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
             </div>
@@ -60,7 +20,7 @@
             </div>
         </div>
 		<div class="col-md-10">
-			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component" :form="form" @tab="switchTab"></component>
+			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
 		</div>
     </div>
 </div> 

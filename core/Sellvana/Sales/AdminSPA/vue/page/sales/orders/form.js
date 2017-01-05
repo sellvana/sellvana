@@ -1,9 +1,5 @@
-define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
-		'text!sv-page-sales-orders-form-main-tpl', 'json!sv-page-sales-orders-form-items-config',
-		'text!sv-page-sales-orders-form-details-tpl',
-		'text!sv-page-sales-orders-form-comments-tpl',
-        'text!sv-page-sales-orders-form-history-tpl'],
-	   function (Vue, SvHlp, SvCompGrid, SvCompForm, tabMainTpl, itemsGridConfig, tabDetailsTpl, tabCommentsTpl, tabHistoryTpl) {
+define(['vue', 'sv-hlp'],
+	   function (Vue, SvHlp) {
 
 	var defForm = {
         options: {},
@@ -19,184 +15,8 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
         cancellations: {}
     };
 
-	var TabMain = {
-		mixins: [SvHlp.mixins.common],
-		template: tabMainTpl,
-		props: {
-            form: {
-            	default: defForm
-            }
-        },
-		data: function () {
-			return {
-				editing: {customer: false, shipping: false, billing: false, order: false},
-				dict: SvAppData
-			}
-		},
-		computed: {
-			regionOptions: function () {
-				return function (type) {
-					if (!this.form.order.id) {
-						return [];
-					}
-                    return this.dict.regions_seq['@' + this.form.order[type + '_country']];
-                }
-			},
-			itemsGrid: function () {
-				return {
-					config: itemsGridConfig,
-					rows: this.form.items
-				}
-			},
-			paidByStoreCredit: function () {
-				return 0;
-			}
-		},
-		methods: {
-			toggleEditing: function(type) {
-				this.editing[type] = !this.editing[type];
-			}
-		},
-		watch: {
-			'form.order': function () {
-				console.log(this.form.order.shipping_country);
-			}
-		},
-		components: {
-			'sv-comp-grid': SvCompGrid
-		}
-	};
-
-	var TabDetails = {
-        props: {
-            form: {
-                default: defForm
-            }
-        },
-		template: tabDetailsTpl,
-		data: function () {
-        	return {
-        		curPayment: {},
-				curShipment: {},
-				curReturn: {},
-				curRefund: {},
-				curCancellation: {},
-
-				curHlpSection: false
-			};
-		},
-		methods: {
-        	addPayment: function () {
-        		this.curHlpSection = 'add-payment';
-				this.curPayment = {};
-			},
-        	addShipment: function () {
-                this.curHlpSection = 'add-shipment';
-				this.curShipment = {};
-			},
-			addReturn: function () {
-                this.curHlpSection = 'add-return';
-				this.curReturn = {};
-			},
-			addRefund: function () {
-                this.curHlpSection = 'add-refund';
-				this.curRefund = {};
-			},
-			addCancellation: function () {
-                this.curHlpSection = 'add-cancellation';
-				this.curCancellation = {};
-			},
-			viewPayment: function (p) {
-                this.curHlpSection = 'view-payment';
-				this.curPayment = p;
-			},
-			viewShipment: function (s) {
-                this.curHlpSection = 'view-shipment';
-                this.curShipment = s;
-			},
-			viewReturn: function (r) {
-                this.curHlpSection = 'view-return';
-				this.curReturn = r;
-			},
-			viewRefund: function (r) {
-                this.curHlpSection = 'view-refund';
-				this.curRefund = r;
-			},
-			viewCancellation: function (c) {
-                this.curHlpSection = 'view-cancellation';
-				this.curCancellation = c;
-			},
-			closeHlpSection: function () {
-        		this.curHlpSection = false;
-			}
-		}
-	};
-
-	var TabComments = {
-        props: {
-            form: {
-                default: defForm
-            }
-        },
-		template: tabCommentsTpl,
-		created: function () {
-            Vue.set(this.form, 'comments', [
-				{
-					author_name: 'Boris Gurvich',
-					create_at: '2016-12-28 18:42:00',
-					type: 'sent',
-					files: [
-						{name: 'test.jpg'}
-					]
-				},
-				{
-					author_name: 'Boris Gurvich',
-					create_at: '2016-12-28 18:42:00',
-					type: 'received'
-				},
-				{
-					author_name: 'Boris Gurvich',
-					create_at: '2016-12-28 18:42:00',
-					type: 'private'
-				}
-			]);
-		}
-	};
-
-	var TabHistory = {
-        props: {
-            form: {
-                default: defForm
-            }
-        },
-		computed: {
-			grid: function () {
-				return {
-					config: {
-						id: 'sales_order_histoy',
-						data_url: 'orders/form_history_grid_data?id=' + this.form.order.id,
-						columns: [
-							{field:'id', label:'ID'},
-							{field:'create_at', label:'Timestamp'}
-						]
-					}
-				}
-			}
-        },
-		template: tabHistoryTpl,
-		components: {
-			'sv-comp-grid': SvCompGrid
-		}
-	};
-
 	return {
 		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
-        components: {
-            'sv-page-sales-orders-form-main': TabMain,
-			'sv-page-sales-orders-form-comments': TabComments,
-            'sv-page-sales-orders-form-details': TabDetails,
-            'sv-page-sales-orders-form-history': TabHistory
-		},
 		data: function () {
 			return {
 				form: defForm
@@ -219,10 +39,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
                 SvHlp.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
-					vm.form = response.form;
-                    if (!vm.form.updates) {
-                        Vue.set(vm.form, 'updates', {});
-                    }
+                    vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(SvHlp._('Order #' + vm.form.order.unique_id));
                 });
 			},
@@ -231,7 +48,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
 					return;
 				}
 				SvHlp.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {
-					if (!response._ok) {
+					if (!response.ok) {
 
 					}
 				});

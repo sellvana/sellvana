@@ -119,6 +119,7 @@
             - [ requireJs, sv-page-users-grid-config, "~/users/grid_config" ]
             - [ requireJs, sv-page-users-form, "@FCom_AdminSPA/AdminSPA/vue/page/users/form" ]
             - [ requireJs, sv-page-users-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form.html" ]
+            - [ requireJs, sv-page-users-form-main, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main" ]
             - [ requireJs, sv-page-users-form-main-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main.html" ]
 
             - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]

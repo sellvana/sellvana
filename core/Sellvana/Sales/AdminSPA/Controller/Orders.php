@@ -55,43 +55,48 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
     public function action_form_data()
     {
-        $orderId = $this->BRequest->get('id');
-        $order = $this->Sellvana_Sales_Model_Order->load($orderId);
-        $items = $order->items(false);
-        $shipments = $order->getAllShipments();
-        $returns = $order->getAllReturns();
-        $payments = $order->getAllPayments();
-        $refunds = $order->getAllRefunds();
-        $cancellations = $order->getAllCancellations();
-        $comments = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $orderId)->find_many();
-        $formData = [
-            'tabs' => $this->getFormTabs('/sales/orders/form'),
-            'order' => $order->as_array(),
-            'items' => $this->BDb->many_as_array($items),
-            'shipments' => $this->BDb->many_as_array($shipments),
-            'returns' => $this->BDb->many_as_array($returns),
-            'payments' => $this->BDb->many_as_array($payments),
-            'refunds' => $this->BDb->many_as_array($refunds),
-            'cancellations' => $this->BDb->many_as_array($cancellations),
-            'comments' => $this->BDb->many_as_array($comments),
-            'options' => [
-                'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
-                'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
-                'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
-                'order_state_custom' => $order->state()->custom()->getAllValueLabels(),
-                'item_state_overall' => $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels(),
-                'item_state_delivery' => $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels(),
-                'item_state_custom' => $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels(),
-                'shipment_state_overall' => $this->Sellvana_Sales_Model_Order_Shipment_State_Overall->getAllValueLabels(),
-                'payment_state_overall' => $this->Sellvana_Sales_Model_Order_Payment_State_Overall->getAllValueLabels(),
-                'return_state_overall' => $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels(),
-                'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
-                'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
-            ],
-        ];
-        $result = [
-            'form' => $formData,
-        ];
+        $result = [];
+        try {
+            $orderId       = $this->BRequest->get('id');
+            $order         = $this->Sellvana_Sales_Model_Order->load($orderId);
+            if (!$order) {
+                throw new BException('Order not found');
+            }
+            $items         = $order->items(false);
+            $shipments     = $order->getAllShipments();
+            $returns       = $order->getAllReturns();
+            $payments      = $order->getAllPayments();
+            $refunds       = $order->getAllRefunds();
+            $cancellations = $order->getAllCancellations();
+            $comments      = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $orderId)->find_many();
+            $result['form'] = [
+                'tabs' => $this->getFormTabs('/sales/orders/form'),
+                'order' => $order->as_array(),
+                'items' => $this->BDb->many_as_array($items),
+                'shipments' => $this->BDb->many_as_array($shipments),
+                'returns' => $this->BDb->many_as_array($returns),
+                'payments' => $this->BDb->many_as_array($payments),
+                'refunds' => $this->BDb->many_as_array($refunds),
+                'cancellations' => $this->BDb->many_as_array($cancellations),
+                'comments' => $this->BDb->many_as_array($comments),
+                'options' => [
+                    'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
+                    'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
+                    'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
+                    'order_state_custom' => $order->state()->custom()->getAllValueLabels(),
+                    'item_state_overall' => $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels(),
+                    'item_state_delivery' => $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels(),
+                    'item_state_custom' => $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels(),
+                    'shipment_state_overall' => $this->Sellvana_Sales_Model_Order_Shipment_State_Overall->getAllValueLabels(),
+                    'payment_state_overall' => $this->Sellvana_Sales_Model_Order_Payment_State_Overall->getAllValueLabels(),
+                    'return_state_overall' => $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels(),
+                    'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
+                    'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
+                ],
+            ];
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
         $this->respond($result);
     }
 

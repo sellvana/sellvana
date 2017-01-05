@@ -3,6 +3,7 @@
 /**
  * Class Sellvana_Sales_AdminSPA_Controller_Orders
  *
+ * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_ProductMedia Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
@@ -21,9 +22,9 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
                 ]],
                 ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
                 ['name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
-                    'datacell_template' => '<img :src="row.thumb_url" :alt="row.product_name">'],
+                    'datacell_template' => '<td><img :src="row.thumb_url" :alt="row.product_name"></td>'],
                 ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
-                ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
+                ['name' => 'product_sku', 'label' => 'Product SKU', 'index' => 'p.product_sku', 'width' => 100],
                 ['name' => 'short_description', 'label' => 'Description',  'width' => 200, 'hidden' => true],
                 ['name' => 'is_hidden', 'label' => 'Hidden?', 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
                 ['name' => 'manage_inventory', 'label' => 'Manage Inv?', 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
@@ -72,5 +73,24 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
     public function action_grid_delete__POST()
     {
 
+    }
+
+    public function action_form_data()
+    {
+        $result = [];
+        $pId = $this->BRequest->get('id');
+        try {
+            $product = $this->Sellvana_Catalog_Model_Product->load($pId);
+            if (!$product) {
+                throw new BException('Product not found');
+            }
+            $result['form'] = [
+                'tabs' => $this->getFormTabs('/catalog/products/form'),
+                'product' => $product->as_array(),
+            ];
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+        $this->respond($result);
     }
 }

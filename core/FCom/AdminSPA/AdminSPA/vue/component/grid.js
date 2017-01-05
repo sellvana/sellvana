@@ -508,8 +508,6 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             created: function () {
                 initGridComponents(this.grid);
-            },
-            mounted: function () {
                 this.fetchData();
             },
             components: {

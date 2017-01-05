@@ -2,7 +2,7 @@ define(['sv-hlp'], function (SvHlp) {
     console.log('TEST');
     return {
         props: ['settings'],
-        create: function () {
+        created: function () {
             console.log('CREATED');
         }
     }

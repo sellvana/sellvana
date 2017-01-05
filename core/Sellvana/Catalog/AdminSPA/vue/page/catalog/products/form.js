@@ -1,5 +1,5 @@
-define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form', 'text!sv-page-catalog-products-form-main-tpl'],
-	   function (Vue, SvHlp, SvCompGrid, SvCompForm, tabMainTpl) {
+define(['vue', 'sv-hlp'],
+	   function (Vue, SvHlp) {
 
 	var defForm = {
         options: {},
@@ -9,25 +9,8 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form', 'text!sv-page-catalog-p
         product: {}
     };
 
-	var TabMain = {
-		template: tabMainTpl,
-		props: {
-            form: {
-            	default: defForm
-            }
-        },
-		data: function () {
-			return {
-				dict: SvAppData
-			}
-		}
-	};
-
 	return {
 		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
-        components: {
-            'sv-page-sales-orders-form-main': TabMain
-		},
 		data: function () {
 			return {
 				form: defForm
@@ -50,10 +33,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form', 'text!sv-page-catalog-p
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
                 SvHlp.sendRequest('GET', 'products/form_data', {id: orderId}, function (response) {
-					vm.form = response.form;
-                    if (!vm.form.updates) {
-                        Vue.set(vm.form, 'updates', {});
-                    }
+                    vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(vm.form.product.product_name);
                 });
 			},

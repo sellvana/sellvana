@@ -138,7 +138,7 @@ header {
 	.nav {
 		.notification,
 		.settings,
-		.favourites,
+		.favorites,
 		.chat {
 			a {
 				padding: 19px 12px 20px;
@@ -213,7 +213,7 @@ header {
 }
 
 .nav {
-	.favourites {
+	.favorites {
 		.dropdown-content {
 			width: auto;
 			max-height: 500px;
@@ -225,6 +225,12 @@ header {
 			a {
 				padding: 8px 28px 8px 10px;
 				display: block;
+			}
+		}
+		li.active {
+			a {
+				color: #AAF;
+				font-weight: bold;
 			}
 		}
 		.remove {
@@ -1007,7 +1013,7 @@ i {
 	}
 	header .nav .notification a,
 	header .nav .settings a,
-	header .nav .favourites a,
+	header .nav .favorites a,
 	header .nav .chat a {
 		padding: 20px 10px 20px;
 	}
@@ -1034,7 +1040,7 @@ i {
 		left: inherit;
 	}
 	.nav {
-		.favourites {
+		.favorites {
 			.dropdown-menu:before {
 				right: inherit;
 				left: 14px;

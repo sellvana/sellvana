@@ -8,7 +8,7 @@
         <li class="page active">
             <input type="number" min=1 step="1" v-model="curPage" @change="goPage()"/>
         </li>
-        <li><span>of</span><span>{{numPages}}</span></li>
+        <li><span>{{'of'|_}}</span><span>{{numPages}}</span></li>
         <li class="next"><a href="#" @click.prevent="goNextPage()">{{'Next'|_}}</a></li>
     </ul>
 </div>

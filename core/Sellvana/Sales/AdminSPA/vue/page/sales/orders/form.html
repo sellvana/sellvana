@@ -60,7 +60,7 @@
             </div>
         </div>
 		<div class="col-md-10">
-			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component" :form="form" @tab="switchTab"></component>
+			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
 		</div>
     </div>
 </div> 

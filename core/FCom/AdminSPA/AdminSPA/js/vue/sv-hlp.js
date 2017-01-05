@@ -336,7 +336,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             form: {
                 data: function () {
                     return {
-                        tab: 'main'
+                        tab: false
                     };
                 },
                 computed: {
@@ -353,7 +353,6 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                     }
                 },
                 methods: {
-
                     switchTab: function (tab) {
                         this.tab = tab;
                     },
@@ -362,6 +361,24 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                     },
                     addUpdates: function (part) {
                         Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
+                    },
+                    processFormDataResponse: function (response) {
+                        if (!response.form.updates) {
+                            response.form.updates = {};
+                        }
+
+                        var deps = [], i, l, vm = this;
+                        for (i = 0, l = response.form.tabs.length; i < l; i++) {
+                            deps.push(response.form.tabs[i].component);
+                        }
+                        require(deps, function () {
+                            var tabs = response.form.tabs
+                            for (i = 0, l = response.form.tabs.length; i < l; i++) {
+                                Vue.set(vm.form.tabs[i], 'component_config', arguments[i]);
+                            }
+                            vm.switchTab(response.form.tabs[0].name);
+                        });
+                        Vue.set(this, 'form', response.form);
                     }
                 },
                 watch: {

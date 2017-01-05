@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], function (Vue, SvHlp, SvCompForm, tabMainTpl) {
+define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 
     var defForm = {
         options: {},
@@ -6,15 +6,6 @@ define(['vue', 'sv-hlp', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], fu
         tabs: [],
 
         user: {}
-    };
-
-    var TabMain = {
-        props: {
-            form: {
-                default: defForm
-            }
-        },
-        template: tabMainTpl
     };
 
     return {
@@ -43,10 +34,7 @@ define(['vue', 'sv-hlp', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], fu
             fetchData: function () {
                 var userId = this.$router.currentRoute.query.id, vm = this;
                 SvHlp.sendRequest('GET', 'users/form_data', {id: userId}, function (response) {
-                    vm.form = response.form;
-                    if (!vm.form.updates) {
-                        Vue.set(vm.form, 'updates', {});
-                    }
+                    vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(SvHlp._(vm.form.user.email));
                 });
             },
@@ -67,9 +55,6 @@ define(['vue', 'sv-hlp', 'sv-comp-form', 'text!sv-page-users-form-main-tpl'], fu
                     }
                 })
             }
-        },
-        components: {
-            'sv-page-users-form-main': TabMain
         }
     };
 });

@@ -69,6 +69,12 @@ define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
             computed: {
                 favorites: function () {
                     return this.$store.state.favorites || [];
+                },
+                isActive: function () {
+                    var vm = this;
+                    return function (fav) {
+                        return fav.link === this.$route.fullPath;
+                    }
                 }
             },
             methods: {
