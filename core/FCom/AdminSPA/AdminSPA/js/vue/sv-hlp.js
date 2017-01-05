@@ -68,15 +68,19 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                     var $el = $(this.$el);
                     // if (!_.isEqual($el.select2('data'), options)) {
 //console.log('update options', options);
-                        $el.select2('data', options);
+                    var params = _.extend({}, this.params, {data: options});
+                    $el.empty().select2('data', options);
+                        //$el.select2('data', options);
                     // }
                 },
                 params: function (params) {
                     //params.data = this.options;
 //console.log('params', params);
                     var $el = $(this.$el);
-                    $el.select2('data', []);
-                    $el.select2(params);
+                    if (this.options) {
+                        params = _.extend(params, {data: this.options});
+                    }
+                    $el.empty().select2(params);
                 }
             },
             destroyed: function () {

@@ -241,7 +241,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 },
                 addFilterSelect2Params: function () {
                     return {
-                        //data: this.availableFilters,
+                        data: this.availableFilters,
                         allowClear: true,
                         placeholder: SvHlp._(this.availableFilters.length > 1 ? 'Add filter...' : 'No filters available to add')
                     };

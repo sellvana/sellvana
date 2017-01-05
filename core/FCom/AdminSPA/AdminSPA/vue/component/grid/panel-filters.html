@@ -1,9 +1,9 @@
 <div class="dropdown filter" :class="{open:ddOpen(grid.config.id+'/panel-filters')}"> <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"><span>{{'Filter'|_}}</span><b class="caret"></b></a>
 	<div class="dropdown-menu" @click.stop="ddOpClear()">
 		<form class="select-filter">
-			<select v-model="filterToAdd" :params="addFilterSelect2Params">
-				<option v-for="flt in availableFilters" :value="flt.id">{{flt.text|_}}</option>
-			</select>
+			<select2 v-model="filterToAdd" :params="addFilterSelect2Params" :options="availableFilters">
+				<!--<option v-for="flt in availableFilters" :value="flt.id">{{flt.text|_}}</option>-->
+			</select2>
 			<!--<button type="button" class="button4" @click="addFilter()">{{'Add'|_}}</button>-->
 		</form>
 		<ul class="filter-box">
