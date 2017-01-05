@@ -51,7 +51,7 @@
             - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
             #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
             - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
-            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2.min", { deps: [ jquery ] } ]
+            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2-4.0.3.min", { deps: [ jquery ] } ]
             - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
 

@@ -23,7 +23,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             var result = [], i, f, r;
             for (i in filters) {
                 f = filters[i];
-                r = {field: f.config.field, op: f.op};
+                r = {field: f.config.name, op: f.op};
                 if (!_.isEmpty(f.values)) {
                     r.val = f.values;
                 }
@@ -186,7 +186,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                         if (!this.$store.state.personalize || !this.$store.state.personalize.grid || !this.$store.state.personalize.grid[this.grid.config.id]) {
                             return {};
                         }
-                        return this.$store.state.personalize.grid[this.grid.config.id].columns[col.field];
+                        return this.$store.state.personalize.grid[this.grid.config.id].columns[col.name];
                         */
                     }
                 }
@@ -213,37 +213,37 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             computed: {
                 ddName: function () {
                     return function (flt) {
-                        return this.grid.config.id + '/panel-filters/' + flt.config.field;
+                        return this.grid.config.id + '/panel-filters/' + flt.config.name;
                     }
                 },
                 ddOpOpen: function () {
                     return function (flt) {
-                        return this.ddOpCurrent === flt.config.field;
+                        return this.ddOpCurrent === flt.config.name;
                     }
                 },
                 availableFilters: function () {
+                    var availFilters = [{id:'', text:''}];
                     if (!this.grid || !this.grid.config || !this.grid.config.filters) {
-                        return [];
+                        return availFilters;
                     }
-                    var availFilters = [], addedFilters = this.addedFilters, af = {}, i, l;
+                    var addedFilters = this.addedFilters, af = {}, i, l;
                     for (i = 0, l = addedFilters.length; i < l; i++) {
-                        af[addedFilters[i].config.field] = addedFilters[i];
+                        af[addedFilters[i].config.name] = addedFilters[i];
                     }
                     for (i = 0, l = this.grid.config.filters.length; i < l; i++) {
                         var f = this.grid.config.filters[i];
-                        if (af[f.field]) {
+                        if (af[f.name]) {
                             continue;
                         }
-                        availFilters.push({id:f.field, text:f.label});
+                        availFilters.push({id: f.name, text: f.label});
                     }
                     return availFilters;
                 },
                 addFilterSelect2Params: function () {
                     return {
+                        //data: this.availableFilters,
                         allowClear: true,
-                        placeholder: this.availableFilters.length
-                            ? SvHlp._('Add filter...')
-                            : SvHlp._('No more filters available to add')
+                        placeholder: SvHlp._(this.availableFilters.length > 1 ? 'Add filter...' : 'No filters available to add')
                     };
                 }
             },
@@ -254,7 +254,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     }
                     var i, filters = this.grid.config.filters, f = null;
                     for (i = 0, l = filters.length; i < l; i++) {
-                        if (filters[i].field === this.filterToAdd) {
+                        if (filters[i].name === this.filterToAdd) {
                             f = filters[i];
                         }
                     }
@@ -276,8 +276,8 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     this.addedFilters.splice(i, 1);
                 },
                 ddOpToggle: function (flt) {
-                    if (this.ddOpCurrent !== flt.config.field) {
-                        this.ddOpCurrent = flt.config.field;
+                    if (this.ddOpCurrent !== flt.config.name) {
+                        this.ddOpCurrent = flt.config.name;
                     } else {
                         this.ddOpClear();
                     }
@@ -427,7 +427,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     var colOptions = {};
                     for (var j = 0; j < this.grid.config.columns; j++) {
                         var col1 = this.grid.config.columns[j]
-                        colOptions[col1.field] = col1.options;
+                        colOptions[col1.name] = col1.options;
                     }
                     return colOptions;
                 },
@@ -452,7 +452,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                                     break;
                                 }
                             } else {
-                                if (row[j].match(q)) {
+                                if ((_.isString(row[j]) || _.isNumber(row[j])) && row[j].match(q)) {
                                     show = true;
                                     break;
                                 }

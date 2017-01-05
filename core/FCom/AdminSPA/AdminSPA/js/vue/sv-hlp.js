@@ -19,35 +19,69 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         Vue.filter('_', translate);
 
         Vue.component('select2', {
-            props: ['options', 'value', 'params'],
+            props: {
+                value: {},
+                options: {
+                    type: Array,
+                    default: function () {
+                        return [];
+                    }
+                },
+                params: {
+                    type: Object,
+                    default: function () {
+                        return {};
+                    }
+                },
+                onChange: {
+                    type: Function
+                }
+            },
             template: '<select><slot></slot></select>',
             mounted: function () {
-                var vm = this, params = $.extend({}, this.params || {});
-                params.data = this.options;
-                if (params.sv) {
-                    if (params.sv.id_field) {
-                        params.formatSelection = function (item) { return item[params.sv.id_field]; };
-                    }
-                    if (params.sv.text_field) {
-                        params.formatResult = function (item) { return item[params.sv.id_field]; };
-                    }
+                var vm = this, params = $.extend({}, this.params);
+                if (this.options) {
+                    params.data = this.options;
                 }
+//console.log('mounted', this.value);
                 $(this.$el).val(this.value).select2(params).on('change', function () {
-                    vm.$emit('input', $(vm.$el).val());
+                    var $el = $(vm.$el), val = $el.val();
+                    vm.$emit('input', val);
+                    if (vm.onChange) {
+                        vm.onChange(val);
+                    }
+//console.log('HERE');
+                    // vm.options = null;
+                    // $el.select2('data', []);
                 });
             },
             watch: {
                 value: function (value) {
+//console.log('value', value);
                     var $el = $(this.$el);
                     if (!_.isEqual($el.val(), value)) {
-                        $el.select2('val', value);
+                        $el.val(value).trigger('change.select2');
                     }
                 },
                 options: function (options) {
-                    $(this.$el).select2({ data: options });
+//console.log('options', options);
+                    var $el = $(this.$el);
+                    // if (!_.isEqual($el.select2('data'), options)) {
+//console.log('update options', options);
+                        $el.select2('data', options);
+                    // }
+                },
+                params: function (params) {
+                    //params.data = this.options;
+//console.log('params', params);
+                    var $el = $(this.$el);
+                    $el.select2('data', []);
+                    $el.select2(params);
                 }
             },
-            destroyed: function () { $(this.$el).off().select2('destroy'); }
+            destroyed: function () {
+                $(this.$el).off().select2('destroy');
+            }
         });
 
         Vue.filter('currency', function (value, currencyCode) {
