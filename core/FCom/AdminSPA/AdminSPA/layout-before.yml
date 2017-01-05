@@ -73,8 +73,6 @@
 
             - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
             - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
-            - [ requireJs, sv-comp-grid-header-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header-row.html" ]
-            - [ requireJs, sv-comp-grid-data-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data-row.html" ]
             - [ requireJs, sv-comp-grid-pager-list-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-list.html" ]
             - [ requireJs, sv-comp-grid-pager-select-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-select.html" ]
             - [ requireJs, sv-comp-grid-panel-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel.html" ]
@@ -82,6 +80,19 @@
             - [ requireJs, sv-comp-grid-panel-filters-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters.html" ]
             - [ requireJs, sv-comp-grid-panel-export-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-export.html" ]
             - [ requireJs, sv-comp-grid-bulk-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/bulk-actions.html" ]
+
+            #- [ requireJs, sv-comp-grid-header-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header-row.html" ]
+            #- [ requireJs, sv-comp-grid-data-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data-row.html" ]
+
+            - [ requireJs, sv-comp-grid-header-row, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/row" ]
+            - [ requireJs, sv-comp-grid-header-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-default" ]
+            - [ requireJs, sv-comp-grid-header-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-row-select" ]
+
+            - [ requireJs, sv-comp-grid-data-row, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/row" ]
+            - [ requireJs, sv-comp-grid-data-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-default" ]
+            - [ requireJs, sv-comp-grid-data-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-row-select" ]
+            - [ requireJs, sv-comp-grid-data-cell-actions, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions" ]
+
 
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]

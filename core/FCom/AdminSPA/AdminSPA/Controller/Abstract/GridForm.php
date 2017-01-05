@@ -65,8 +65,9 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
     public function action_grid_data()
     {
         $data = $this->getGridRequestOrm()->paginate();
+        $data = $this->processGridPageData($data);
         $result = [
-            'rows' => BDb::many_as_array($data['rows']),
+            'rows' => $data['rows'],
             'state' => $data['state'],
         ];
         $this->respond($result);
@@ -102,6 +103,13 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
         return $orm;
     }
 
+    public function processGridPageData($data)
+    {
+        $data['rows'] = BDb::many_as_array($data['rows']);
+        return $data;
+    }
+
+
     public function normalizeGridConfig($config)
     {
         $colsByName = [];
@@ -109,17 +117,20 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
             if (!isset($col['sortable'])) {
                 $col['sortable'] = true;
             }
+            if (empty($col['field']) && !empty($col['name'])) {
+                $col['field'] = $col['name'];
+            }
             if (!empty($col['type'])) {
                 switch ($col['type']) {
                     case 'row-select':
-                        if (empty($col['header_cell_vm'])) {
-                            $col['header_cell_vm'] = 'GridHeaderCell_RowSelect';
+                        if (empty($col['header_component'])) {
+                            $col['header_component'] = 'sv-comp-grid-header-cell-row-select';
                         }
-                        if (empty($col['data_cell_vm'])) {
-                            $col['data_cell_vm'] = 'GridDataCell_RowSelect';
+                        if (empty($col['datacell_component'])) {
+                            $col['datacell_component'] = 'sv-comp-grid-data-cell-row-select';
                         }
-                        if (empty($col['field'])) {
-                            $col['field'] = 'row-select';
+                        if (empty($col['name'])) {
+                            $col['name'] = 'row-select';
                         }
                         if (empty($col['label'])) {
                             $col['label'] = 'Selection';
@@ -130,14 +141,14 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                         break;
 
                     case 'actions':
-                        if (empty($col['header_cell_vm'])) {
-                            //$col['header_cell_vm'] = 'GridHeaderCell_Actions';
+                        if (empty($col['header_component'])) {
+                            //$col['header_component'] = 'sv-comp-grid-header-cell-actions';
                         }
-                        if (empty($col['data_cell_vm'])) {
-                            $col['data_cell_vm'] = 'GridDataCell_Actions';
+                        if (empty($col['datacell_component'])) {
+                            $col['datacell_component'] = 'sv-comp-grid-data-cell-actions';
                         }
-                        if (empty($col['field'])) {
-                            $col['field'] = 'actions';
+                        if (empty($col['name'])) {
+                            $col['name'] = 'actions';
                         }
                         if (empty($col['label'])) {
                             $col['label'] = 'Actions';
@@ -168,7 +179,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                         break;
                 }
             }
-            $colsByName[$col['field']] = $col;
+            $colsByName[$col['name']] = $col;
         }
         unset($col);
 
@@ -179,7 +190,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                     if (!empty($col['type']) && in_array($col['type'], ['row-select', 'actions'])) {
                         continue;
                     }
-                    $config['filters'][] = ['field' => $col['field']];
+                    $config['filters'][] = ['name' => $col['name']];
                 }
             }
             foreach ($config['filters'] as &$flt) {
@@ -188,7 +199,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                         $flt['field'] = $flt['name'];
                     }
                 }
-                $col = !empty($colsByName[$flt['field']]) ? $colsByName[$flt['field']] : [];
+                $col = !empty($colsByName[$flt['name']]) ? $colsByName[$flt['name']] : [];
 
                 if (empty($flt['options'])) {
                     if (!empty($col['options'])) {
@@ -429,61 +440,75 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
 
     public function exportCsv($orm)
     {
-        $skipColumn = function ($col) {
-            if (empty($col['field'])) {
-                return true;
-            }
-            if (!empty($col['hidden']) && $col['hidden'] !== 'false') {
-                return true;
-            }
-            if (!empty($col['cell']) || (!empty($col['type']) && $col['type'] === 'thumb')) {
-                return true;
-            }
-            if (!empty($col['type']) && in_array($col['type'], ['actions', 'row-select'])) {
-                return true;
-            }
-            return false;
-        };
-
         $config = $this->getGridConfig();
         $config = $this->normalizeGridConfig($config);
         $config = $this->applyGridPersonalization($config);
-        $columns = $config['columns'];
-        $headers = [];
-        foreach ($columns as $i => $col) {
-            if ($skipColumn($col)) {
-                continue;
-            }
-            $headers[] = $col['field'];
-        }
+
         $dir = $this->BApp->storageRandomDir() . '/export';
         $this->BUtil->ensureDir($dir);
         $filename = $dir . '/' . $config['id'] . '.csv';
         $fp = fopen($filename, 'w');
         fwrite($fp, "\xEF\xBB\xBF"); // add UTF8 BOM character to open excel.
+
+        $headers = $this->buildExportHeaders($config);
         fputcsv($fp, $headers);
 
-        $orm->iterate(function ($row) use ($columns, $fp, $skipColumn) {
-            $data = [];
-            foreach ($columns as $col) {
-                if ($skipColumn($col)) {
-                    continue;
-                }
-                $k = $col['field'];
-                $val = $row->get($k);
-                if ($val === null) {
-                    $val = '';
-                }
-                if (isset($col['options'][$val])) {
-                    $val = $col['options'][$val];
-                }
-                $data[] = $val;
-            }
+        $orm->iterate(function ($row) use ($config, $fp) {
+            $data = $this->buildExportDataRow($row, $config);
             fputcsv($fp, $data);
         });
 
         fclose($fp);
         $this->BResponse->sendFile($filename);
+    }
+
+    public function callbackSkipColumn($col)
+    {
+        if (empty($col['field'])) {
+            return true;
+        }
+        if (!empty($col['hidden']) && $col['hidden'] !== 'false') {
+            return true;
+        }
+        if (!empty($col['cell']) || (!empty($col['type']) && $col['type'] === 'thumb')) {
+            return true;
+        }
+        if (!empty($col['type']) && in_array($col['type'], ['actions', 'row-select'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function buildExportHeaders($config)
+    {
+        $headers = [];
+        foreach ($config['columns'] as $i => $col) {
+            if ($this->callbackSkipColumn($col)) {
+                continue;
+            }
+            $headers[] = $col['field'];
+        }
+        return $headers;
+    }
+
+    public function buildExportDataRow($row, $config)
+    {
+        $data = [];
+        foreach ($config['columns'] as $col) {
+            if ($this->callbackSkipColumn($col)) {
+                continue;
+            }
+            $k = $col['field'];
+            $val = $row->get($k);
+            if ($val === null) {
+                $val = '';
+            }
+            if (isset($col['options'][$val])) {
+                $val = $col['options'][$val];
+            }
+            $data[] = $val;
+        }
+        return $data;
     }
 
     public function applyGridPersonalization($config)

@@ -20,6 +20,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
     };
 
 	var TabMain = {
+		mixins: [SvHlp.mixins.common],
 		template: tabMainTpl,
 		props: {
             form: {
@@ -49,18 +50,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
 			},
 			paidByStoreCredit: function () {
 				return 0;
-			},
-            length: function () {
-                return function (value) {
-                    if (typeof value === 'object') {
-                        return Object.keys(value).length;
-                    } else if (value.isArray()) {
-                        return value.length;
-                    } else {
-                        return 1;
-                    }
-                }
-            }
+			}
 		},
 		methods: {
 			toggleEditing: function(type) {
@@ -255,7 +245,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
 			save: function (stayOnPage) {
 				var vm = this;
 				SvHlp.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
-					if (!response._ok) {
+					if (!response.ok) {
 
 					}
                     for (var i in response.form) {
@@ -273,14 +263,6 @@ define(['vue', 'sv-hlp', 'sv-comp-grid', 'sv-comp-form',
 		watch: {
 			'form.order': function (order) {
 
-			}
-		},
-		beforeRouteLeave: function (to, from, next) {
-			// TODO: doesn't trigger on route args change (?id=5)
-			if (!_.isEmpty(this.form.updates) && !confirm('There are unsaved changes, are you sure you want to leave?')) {
-				next(false);
-            } else {
-				next();
 			}
 		}
     };

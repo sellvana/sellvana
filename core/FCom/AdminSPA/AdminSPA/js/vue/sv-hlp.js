@@ -32,7 +32,6 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                         params.formatResult = function (item) { return item[params.sv.id_field]; };
                     }
                 }
-                console.log(this.params, params);
                 $(this.$el).val(this.value).select2(params).on('change', function () {
                     vm.$emit('input', $(vm.$el).val());
                 });
@@ -210,11 +209,9 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         }
 
         function processResponse(response) {
-            console.log(response);
             var storeData = {};
             if (response._login) {
                 storeData.user = {};
-
             }
             if (response._user) {
                 storeData.user = response._user;
@@ -302,6 +299,8 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                     _: function () {
                         return translate;
                     },
+
+                    ///////////////////////// MISC
                     select2Options: function () {
                         return function (options) {
                             var kvs = [], i;
@@ -309,6 +308,17 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                                 kvs.push({id: i, text: options[i]});
                             }
                             return kvs;
+                        }
+                    },
+                    length: function () {
+                        return function (value) {
+                            if (typeof value === 'object') {
+                                return Object.keys(value).length;
+                            } else if (value.isArray()) {
+                                return value.length;
+                            } else {
+                                return 1;
+                            }
                         }
                     }
                 },
@@ -360,13 +370,20 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 created: function () {
                     this.updateBreadcrumbs(translate('Loading data...'));
                     this.fetchData();
+                },
+                beforeRouteLeave: function (to, from, next) {
+                    // TODO: doesn't trigger on route args change (?id=5)
+                    if (!_.isEmpty(this.form.updates) && !confirm('There are unsaved changes, are you sure you want to leave?')) {
+                        next(false);
+                    } else {
+                        next();
+                    }
                 }
             }
         };
 
         $(window).resize(function (ev) {
-            var w = $(window).width();
-            store.commit('windowResize', w);
+            store.commit('windowResize', $(window).width());
         });
 
         return {

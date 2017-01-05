@@ -1,12 +1,24 @@
 define(['vue', 'sv-hlp', 'jquery', 'lodash',
-        'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
-        'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl', 'text!sv-comp-grid-panel-tpl',
+        'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
+        'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
+        'text!sv-comp-grid-tpl', //'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
+        'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl',
+        'text!sv-comp-grid-panel-tpl',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvHlp, $, _, gridTpl, gridHeaderRowTpl, gridDataRowTpl, gridPagerListTpl, gridPagerSelectTpl,
-             gridPanelTpl, gridPanelColumnsTpl, gridPanelFiltersTpl, gridPanelExportTpl, gridBulkActionsTpl
+    function(Vue, SvHlp, $, _,
+             SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
+             SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
+             gridTpl, // gridHeaderRowTpl, gridDataRowTpl,
+             gridPagerListTpl, gridPagerSelectTpl,
+             gridPanelTpl,
+             gridPanelColumnsTpl, gridPanelFiltersTpl,
+             gridPanelExportTpl, gridBulkActionsTpl
     ) {
+
+        var dataRowCellComponents = {};
+
         function prepareFiltersRequest(filters) {
             var result = [], i, f, r;
             for (i in filters) {
@@ -66,112 +78,58 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             Vue.set(grid, 'state', state);
         }
 
-        var GridHeaderRow = {
-            mixins: [SvHlp.mixins.common],
-            props: ['grid'],
-            template: gridHeaderRowTpl,
-            computed: {
-                columns: function () {
-                    return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
-                },
-                sorted: function() {
-                    return function (col, dir, def) {
-                        if (!col.sortable) {
-                            return false;
-                        }
-                        if (!this.grid || !this.grid.state || this.grid.state.s !== col.field) {
-                            return def;
-                        }
-                        var sd = this.grid.state.sd;
-                        return (dir === 'up' && sd === 'asc') || (dir === 'down' && sd === 'desc');
-                    }
-                },
-                visible: function () {
-                    return function (col) {
-
-                    }
-                }
-            },
-            methods: {
-                toggleSort: function (col) {
-                    if (!col.sortable) {
-                        return;
-                    }
-                    if (!this.grid.state) {
-                        Vue.set(this.grid, 'state', {});
-                    }
-                    var s = col.field, sd = 'asc';
-                    if (this.grid.state.s === s) {
-                        if (this.grid.state.sd === 'asc') {
-                            sd = 'desc';
-                        } else {
-                            s = false;
-                            sd = false;
-                        }
-                    }
-                    Vue.set(this.grid.state, 's', s);
-                    Vue.set(this.grid.state, 'sd', sd);
-                    this.$emit('fetch-data');
-                }
+        function initGridComponents(grid) {
+            if (!grid.components) {
+                Vue.set(grid, 'components', {
+                    header_columns: {},
+                    datacell_columns: {}
+                });
             }
-        };
+            var columns = grid.config.columns, header_deps = [], header_names = [], datacell_deps = [], datacell_names = [];
+            for (var i = 0, l = columns.length; i < l; i++) {
+                var col = columns[i];
+                if (col.header_component) {
+                    header_deps.push(col.header_component);
+                    header_names.push(col.name);
+                } else if (col.header_template) {
+                    Vue.set(grid.components.header_columns, col.name, {
+                        props: ['grid', 'col'],
+                        template: col.datacell_template
+                    });
+                } else {
+                    Vue.set(grid.components.header_columns, col.name, SvCompGridHeaderCellDefault);
+                }
 
-        var GridDataRow = {
-            mixins: [SvHlp.mixins.common],
-            props: ['grid', 'row'],
-            template: gridDataRowTpl,
-            computed: {
-                columns: function () {
-                    return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
-                },
-                cellClass: function () {
-                    return function (row, col) {
-                        return '';
-                    }
-                },
-                cellData: function () {
-                    return function (row, col) {
-                        return row[col.field];
-                    }
-                },
-                isRowSelected: function () {
-                    return function (col) {
-                        return this.grid.rows_selected && this.grid.rows_selected[this.row[col.id_field]];
-                    }
-                },
-                rowActionLink: function () {
-                    return function (row, col, act) {
-                        return act.link.replace(/\{([a-z0-9_]+)\}/, function (a, b) {
-                            return row[b];
-                        });
-                    }
+                if (col.datacell_component) {
+                    datacell_deps.push(col.datacell_component);
+                    datacell_names.push(col.name);
+                } else if (col.datacell_template) {
+                    Vue.set(grid.components.datacell_columns, col.name, {
+                        props: ['grid', 'row', 'col'],
+                        template: col.datacell_template
+                    });
+                } else {
+                    Vue.set(grid.components.datacell_columns, col.name, SvCompGridDataCellDefault);
                 }
-            },
-            methods: {
-                deleteRow: function (row, col, act) {
-                    if (!confirm(SvHlp._('Are you sure you want to delete the row?'))) {
-                        return;
-                    }
-                    this.$emit('delete-row', row)
-                    var vm = this;
-                    if (act.delete_url) {
-                        var url = vm.rowActionLink(row, col, {link: act.delete_url});
-                        SvHlp.sendRequest('POST', url, {}, function (response) {
-                            vm.$emit('fetch-data');
-                        });
-                    }
-                },
-                selectRow: function (col) {
-                    if (!this.grid.rows_selected) {
-                        Vue.set(this.grid, 'rows_selected', {});
-                    }
-                    var rowId = this.row[col.id_field];
-                    Vue.set(this.grid.rows_selected, rowId, !this.grid.rows_selected[rowId]);
-                }
+
             }
-        };
+            if (header_deps.length) {
+                require(header_deps, function () {
+                    for (var i = 0, l = arguments.length; i < l; i++) {
+                        Vue.set(grid.components.header_columns, header_names[i], arguments[i]);
+                    }
+                });
+            }
+            if (datacell_deps.length) {
+                require(datacell_deps, function () {
+                    for (var i = 0, l = arguments.length; i < l; i++) {
+                        Vue.set(grid.components.datacell_columns, datacell_names[i], arguments[i]);
+                    }
+                });
+            }
+        }
 
-        var GridPagerList = {
+        var SvCompGridPagerList = {
             mixins: [SvHlp.mixins.common],
             props: ['grid'],
             store: SvHlp.store,
@@ -214,9 +172,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         };
 
-        var GridPagerSelect = $.extend({}, GridPagerList, {template: gridPagerSelectTpl});
+        var SvCompGridPagerSelect = $.extend({}, SvCompGridPagerList, {template: gridPagerSelectTpl});
 
-        var GridPanelColumns = {
+        var SvCompGridPanelColumns = {
             mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridPanelColumnsTpl,
@@ -241,7 +199,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         };
 
-        var GridPanelFilters = {
+        var SvCompGridPanelFilters = {
             mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridPanelFiltersTpl,
@@ -358,7 +316,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         };
 
-        var GridPanelExport = {
+        var SvCompGridPanelExport = {
             mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridPanelExportTpl,
@@ -389,7 +347,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         };
 
-        var GridBulkActions = {
+        var SvCompGridBulkActions = {
             mixins: [SvHlp.mixins.common],
             props: ['grid'],
             template: gridBulkActionsTpl,
@@ -408,15 +366,15 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         };
 
-        var GridPanel = {
+        var SvCompGridPanel = {
             mixins: [SvHlp.mixins.common],
             props: ['grid', 'cnt-visible'],
             components: {
-                'sv-comp-grid-pager-list': GridPagerList,
-                'sv-comp-grid-panel-columns': GridPanelColumns,
-                'sv-comp-grid-panel-filters': GridPanelFilters,
-                'sv-comp-grid-panel-export': GridPanelExport,
-                'sv-comp-grid-bulk-actions': GridBulkActions
+                'sv-comp-grid-pager-list': SvCompGridPagerList,
+                'sv-comp-grid-panel-columns': SvCompGridPanelColumns,
+                'sv-comp-grid-panel-filters': SvCompGridPanelFilters,
+                'sv-comp-grid-panel-export': SvCompGridPanelExport,
+                'sv-comp-grid-bulk-actions': SvCompGridBulkActions
             },
             data: function() {
                 return {
@@ -513,7 +471,6 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 fetchData: function () {
                     var grid = this.grid, url = grid.config.data_url, params = prepareDataRequest(grid);
                     if (!url) { // local data
-                        console.log(grid.state);
                         return;
                     }
                     SvHlp.sendRequest('GET', url, params, function (response) {
@@ -549,14 +506,17 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     initGridState(grid);
                 }
             },
+            created: function () {
+                initGridComponents(this.grid);
+            },
             mounted: function () {
                 this.fetchData();
             },
             components: {
-                'sv-comp-grid-header-row': GridHeaderRow,
-                'sv-comp-grid-data-row': GridDataRow,
-                'sv-comp-grid-panel': GridPanel,
-                'sv-comp-grid-pager-select': GridPagerSelect
+                'sv-comp-grid-header-row': SvCompGridHeaderRow,
+                'sv-comp-grid-data-row': SvCompGridDataRow,
+                'sv-comp-grid-panel': SvCompGridPanel,
+                'sv-comp-grid-pager-select': SvCompGridPagerSelect
             },
             template: gridTpl
         };

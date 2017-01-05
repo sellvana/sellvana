@@ -20,7 +20,7 @@ modules:
 
         areas:
             FCom_AdminSPA:
-                auto_use: [ layout, bootstrap ]
+                auto_use: [ layout ]
                 routing:
                     - [ /orders/?.action, Sellvana_Sales_AdminSPA_Controller_Orders ]
 

@@ -9,9 +9,8 @@
         <sv-comp-grid-bulk-actions v-if="grid.config.bulk_actions" :grid="grid"></sv-comp-grid-bulk-actions>
     </div>
     <div class="col-sm-7 text-right">
-       
         <div class="visible-lg">
-			<span class="amount-rows"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>  
+			<span class="amount-rows"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
             <sv-comp-grid-pager-list v-if="grid.config.pager" :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>
         </div>
     </div>

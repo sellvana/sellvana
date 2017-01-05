@@ -33,13 +33,13 @@
 				border-bottom: 0;
 			}
 		}
-		.column-choise {
+		.column-row-select {
 			width: 50px;
 			padding: 0 10px;
 			min-width: auto;
 			text-align: left;
 		}
-		.column-action {
+		.column-actions {
 			width: 70px;
 			padding: 0 10px;
 			min-width: auto;
@@ -110,13 +110,13 @@ table {
 	td {
 		font-family: $f-main-lig;
 	}
-	.column-choise {
+	.column-row-select {
 		width: 50px;
 		padding: 0;
 		min-width: auto;
 		text-align: left;
 	}
-	.column-action {
+	.column-actions {
 		width: 70px;
 		padding: 0;
 		min-width: auto;

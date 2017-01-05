@@ -87,6 +87,11 @@ modules:
                         filetype: jpeg,jpg,tiff,gif,png,bmp
                         folder: media/category/images
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+                routing:
+                    - [ /products/?.action, Sellvana_Catalog_AdminSPA_Controller_Products ]
+
             FCom_Frontend:
                 routing:
                     - [ /*category, Sellvana_Catalog_Frontend_Controller_Category.index ]
