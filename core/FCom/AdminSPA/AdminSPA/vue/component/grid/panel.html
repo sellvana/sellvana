@@ -6,7 +6,7 @@
         <div class="search-block">
             <input type="text" :placeholder="'Quick filter results'|_" v-model="quickSearch" @keyup="updateQuickSearch()"/>
         </div>
-        <sv-comp-grid-bulk-actions v-if="grid.config.bulk_actions" :grid="grid"></sv-comp-grid-bulk-actions>
+        <sv-comp-grid-bulk-actions v-if="grid.config.bulk_actions" :grid="grid" @bulk-action="bulkAction"></sv-comp-grid-bulk-actions>
     </div>
     <div class="col-sm-7 text-right">
         <div class="visible-lg">

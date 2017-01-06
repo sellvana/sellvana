@@ -22,7 +22,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                 }
             },
             anchorClass: function () {
-                return {'sorted-up':this.sorted(this.col, 'up', 0), 'sorted-down':this.sorted(this.col, 'down', 0)};
+                return {'sorted-up':this.sorted('up', 0), 'sorted-down':this.sorted('down', 0)};
             }
         },
         methods: {

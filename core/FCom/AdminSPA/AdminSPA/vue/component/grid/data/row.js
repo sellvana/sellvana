@@ -8,7 +8,7 @@ define(['vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-sel
     return {
         //mixins: [SvHlp.mixins.common],
         props: ['grid', 'row'],
-        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :grid="grid" :row="row" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
+        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :row="row" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
         computed: {
             columns: function () {
                 return this.grid && this.grid.config.columns ? this.grid.config.columns : [];

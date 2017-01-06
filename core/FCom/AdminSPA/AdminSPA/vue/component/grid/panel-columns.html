@@ -1,9 +1,9 @@
 <div class="dropdown columns" :class="{open:ddOpen(grid.config.id+'/panel-columns')}">
     <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-columns')">{{'Columns'|_}}<b class="caret"></b></a>
     <div class="dropdown-menu" @click.stop>
-        <ol class="ui-sortable">
+        <ol class="ui-sortable" v-sortable="{onUpdate:sortingUpdate}">
             <li v-for="col in grid.config.columns">
-                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                <i class="handle fa fa-ellipsis-v" aria-hidden="true"></i>
                 <label>
                     <input type="checkbox" :checked="!col.hidden" @click="toggleColumn(col)"/><span><i class="fa fa-check" aria-hidden="true"></i></span><span>{{col.label}}</span></label>
             </li>

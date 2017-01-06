@@ -1,4 +1,5 @@
 define(['sv-hlp'], function (SvHlp) {
+
     return {
         store: SvHlp.store,
         mounted: function () {
@@ -9,6 +10,11 @@ define(['sv-hlp'], function (SvHlp) {
                 breadcrumbs: [
                 ]
             }});
+        },
+        methods: {
+            sortingUpdate: function (ev) {
+                console.log(ev);
+            }
         }
     };
 });

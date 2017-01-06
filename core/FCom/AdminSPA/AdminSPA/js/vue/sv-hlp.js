@@ -1,5 +1,5 @@
-define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'select2'],
-    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment) {
+define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'select2'],
+    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable) {
 
         Vue.use(VueRouter);
         Vue.use(Vuex);
@@ -17,6 +17,19 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         }
 
         Vue.filter('_', translate);
+
+        Vue.directive('sortable', {
+            inserted: function(el, binding) {
+                var params = binding.value;
+                // params.onUpdate = function (ev) {
+                //     console.log(ev);
+                // };
+                el.sortableInstance = Sortable.create(el, params);
+            },
+            unbind: function (el) {
+                el.sortableInstance.destroy();
+            }
+        });
 
         Vue.component('select2', {
             props: {

@@ -2,9 +2,10 @@ define(['vue'], function (Vue) {
     return {
         props: ['grid', 'row', 'col'],
         template: '<th class="column-row-select">'
-        + '<label @click.prevent="selectRow(col)"><input type="checkbox" :checked="isRowSelected(col)"/>'
-        + '<span><i class="fa fa-check" aria-hidden="true"></i></span></label>'
-        + '</th>',
+            + '<label @click.prevent="selectRow(col)"><input type="checkbox" :checked="isRowSelected(col)"/>'
+            + '<span><i class="fa fa-check" aria-hidden="true"></i></span></label>'
+            + '</th>',
+
         computed: {
             isRowSelected: function () {
                 return function (col) {
@@ -17,8 +18,16 @@ define(['vue'], function (Vue) {
                 if (!this.grid.rows_selected) {
                     Vue.set(this.grid, 'rows_selected', {});
                 }
-                var rowId = this.row[col.id_field];
-                Vue.set(this.grid.rows_selected, rowId, !this.grid.rows_selected[rowId]);
+                var rowId = this.row[col.id_field], rowsSel = this.grid.rows_selected;
+                Vue.set(this.grid.rows_selected, rowId, !rowsSel[rowId]);
+                // if (rowsSel[rowId]) {
+                //     Vue.set(this.grid.rows_selected, rowId, false);
+                    // delete rowsSel[rowId];
+                    // delete this.grid.rows_selected[rowId];
+                    // Vue.set(this.grid, 'rows_selected', rowsSel);
+                // } else {
+                //     Vue.set(this.grid.rows_selected, rowId, this.row);
+                // }
             }
         }
     };
