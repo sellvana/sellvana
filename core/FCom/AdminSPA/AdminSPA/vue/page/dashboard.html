@@ -1,6 +1,43 @@
 <div>
+	<div class="notifications-block">
+		<div class="notifications-container">
+			<div class="error-notification">This is an error notification <a href="#" class="remove"><i class="fa fa-times"></i></a></div>
+			<div class="succes-notification">A succes notification <a href="#" class="remove"><i class="fa fa-times"></i></a></div>
+			<div class="warning-notification">This is warning notifications <a href="#" class="remove"><i class="fa fa-times"></i></a></div>
+			<div class="info-notification">This is info notifications<a href="#" class="remove"><i class="fa fa-times"></i></a></div>
+		</div>
+	</div>
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-7">
+		<div class="main-info-block"> 
+				<div class="total-sales">
+					<div class="icon"> <i class="fa fa-bar-chart" aria-hidden="true"></i></div>
+					<div class="data"> <span>232</span>
+						<p>{{'sales'|_}}</p>
+					</div>
+				</div>
+				<div class="total-users">
+					<div class="icon"> <i class="fa fa-user" aria-hidden="true"></i>
+</div>
+					<div class="data"> <span>1,353</span>
+						<p>{{'total users'|_}}</p>
+					</div>
+				</div>
+				<div class="total-members">
+					<div class="icon"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+					<div class="data"> <span>+24%</span>
+						<p>{{'new members'|_}}</p>
+					</div>
+				</div>
+				<div class="total-revenue">
+					<div class="icon"><i class="fa fa-money" aria-hidden="true"></i></div>
+					<div class="data"> <span>$15,000</span>
+						<p>{{'revenue'|_}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-5">
 			<div class="control-buttons"> 
 				<select2>
 					<option>Today</option>
@@ -20,29 +57,7 @@
 					<option>Order Totals</option>
 					<option>Latest Nes Products</option>
 				</select2>
-				<button class="button4">Add</button>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12">
-			<div class="main-info-block">
-				<div class="total-sales">
-					<p class="number">232</p>
-					<p class="title">{{'sales'|_}}</p>
-				</div>
-				<div class="total-users">
-					<p class="number">1,353</p>
-					<p class="title">{{'total users'|_}}</p>
-				</div>
-				<div class="total-members">
-					<p class="number">+24%</p>
-					<p class="title">{{'new members'|_}}</p>
-				</div>
-				<div class="total-revenue">
-					<p class="number">$15,000</p>
-					<p class="title">{{'revenue'|_}}</p>
-				</div>
+				
 			</div>
 		</div>
 	</div>

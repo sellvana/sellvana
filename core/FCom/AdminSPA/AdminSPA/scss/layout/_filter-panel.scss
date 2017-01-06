@@ -80,10 +80,10 @@
 		margin: 10px 0;
 		width: 80%;
 	}
-	.col-sm-5 {
+	.col-lg-4 {
 		position: static;
 	}
-	.col-sm-7 {
+	.col-md-8 {
 		padding-right: 180px;
 		position: static;
 	}
@@ -103,8 +103,8 @@
 .columns {
 	.dropdown-menu {
 		overflow-y: scroll;
-		height: 170px;
-		width: 500px;
+		max-height: 314px;
+		min-width: auto;
 		top: 25px;
 		z-index: 5;
 	}
@@ -112,10 +112,9 @@
 		font-size: 0;
 	}
 	li {
-		display: inline-block;
-		width: 32%;
 		margin-right: 5px;
 		padding: 6px 0;
+		white-space: nowrap;
 		& > * {
 			display: inline-block;
 			vertical-align: middle;
@@ -265,13 +264,12 @@
 	padding: 20px 0;
 	border-radius: 1px;
 	.dropdown-toggle {
-		padding: 8px 11px;
+		padding: 8px 35px 8px 11px;
 		display: inline-block;
 		background: #fff;
 		position: static;
 		z-index: 4;
 		border: 1px solid #ebeff3;
-		width: 60px;
 		text-align: left;
 		position: relative;
 	}
@@ -364,13 +362,16 @@
 .pagination > li:first-child > span {
 	border-radius: 0;
 }
-
+.f-grid-filter-panel {
+	.dropdown.action {
+		position: absolute;
+		right: 15px;
+		top: 10px;
+	}
+}
 .dropdown.action {
 	width: 160px;
 	text-align: left;
-	position: absolute;
-	right: 15px;
-	top: 10px;
 	border-right: 0;
 	.caret-back {
 		background: #ebeff3;
@@ -381,7 +382,7 @@
 		text-align: center;
 		display: inline-block;
 		height: 100%;
-		padding: 6px 0;
+		    padding: 8px 0;
 	}
 	.dropdown-toggle {
 		padding: 8px 10px;
@@ -442,7 +443,7 @@
 
 @media (min-width: 768px) and (max-width: 1199px) {
 	.f-grid-filter-panel {
-		.col-sm-7 {
+		.col-sm-8 {
 			padding: 0;
 		}
 		.filter-toggle {
@@ -482,7 +483,7 @@
 
 @media (max-width: 767px) {
 	.f-grid-filter-panel {
-		.col-sm-7 {
+		.col-sm-8 {
 			position: relative;
 		}
 		.dropdown-toggle {
@@ -496,6 +497,7 @@
 			position: relative;
 			width: 48%;
 			right: 0;
+			top: 0;
 			.dropdown-menu {
 				width: 100%;
 				min-width: auto;

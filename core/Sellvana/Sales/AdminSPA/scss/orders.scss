@@ -138,7 +138,6 @@
 .overall-info {
 	display: inline-block;
 	vertical-align: top;
-	margin-right: 26px;
 	font-size: 0;
 	margin-bottom: 25px;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
@@ -739,6 +738,29 @@
 		width: 40%;
 	}
 }
+
+.tablet-panel {
+	text-align: right;
+	margin: 10px 0;
+	.order-menu, .control-buttons {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.order-menu {
+		min-width: 160px;
+		text-align: left;
+	}
+	.control-buttons {
+		display: inline-block;
+		vertical-align: middle;
+		    margin: 0 0 0 10px;
+		padding: 0 20px;
+		.dropdown {
+			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+		}
+		
+	}
+}
 @media (max-width: 1762px) {
 	.new-comment {
 		p,
@@ -765,15 +787,18 @@
 		}
 	}
 }
-
 @media (min-width: 768px) and (max-width: 1199px) {
+	.f-admin-main-view {
+		margin-top: 130px;
+	}
+}
+@media (min-width: 768px) and (max-width: 1023px) {
 	.f-admin-main-view {
 		min-height: 100%;
 		margin-right: 13px;
 		margin-left: 13px;
-		margin-top: 130px;
 		min-width: 276px;
-		padding: 10px 0px 90px 0px;
+		padding: 0px 0px 90px 0px;
 	}
 	.main-nav-closed {
 		.f-admin-main-view {
@@ -789,7 +814,7 @@
 		margin-left: 13px;
 		margin-top: 185px;
 		min-width: 276px;
-		padding: 10px 0px 90px 0px;
+		padding: 0px 0px 90px 0px;
 	}
 	.main-nav-closed {
 		.f-admin-main-view {

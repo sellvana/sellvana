@@ -4,7 +4,9 @@
 		height: 49px;
 	}
 }
-
+.f-grid-wrapper {
+    padding: 10px 20px 50px 20px;
+}
 .admin-main-content {
 	table {
 		border-bottom: 1px solid #000000;
@@ -128,12 +130,15 @@ table {
 	td,
 	th {
 		height: 49px;
-		padding: 0 0 0 20px;
+		padding: 10px 0 10px 20px;
 	}
 	thead {
 		td,
 		th {
 			padding: 0;
 		}
+	}
+	.thumb_path {
+		padding: 10px 10px 10px 10px;
 	}
 }

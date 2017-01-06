@@ -2,12 +2,47 @@
 	display: flex;
 	justify-content: space-between;
 	padding: 15px 0;
-	div {
-		border-radius: 4px;
-		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-		padding: 10px;
-		min-width: 254px;
+	flex-wrap: wrap;
+	.total-sales,
+	.total-users,
+	.total-members,
+	.total-revenue {
 		display: inline-block;
+		vertical-align: top;
+		font-size: 0;
+		margin-bottom: 25px;
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+		.icon {
+			padding: 8px 10px 8px 10px;
+			text-align: center;
+			display: inline-block;
+			vertical-align: top;
+			min-height: 42px;
+			min-width: 60px;
+		}
+		i {
+			color: #fff;
+			font-size: 22px;
+		}
+		span {
+			font-family: GothamProBold;
+			font-size: 13px;
+			color: #000;
+		}
+		p {
+			display: block;
+			margin-bottom: 3px;
+			font-size: 11px;
+			color: #000;
+		}
+		.data {
+			display: inline-block;
+			vertical-align: middle;
+			height: 100%;
+			background: #fff;
+			padding: 5px 14px 5px 6px;
+			    min-width: 90px;
+		}
 	}
 	p {
 		color: #fff;
@@ -23,21 +58,26 @@
 }
 
 .total-sales {
-	background: #92b99a;
+	.icon {
+		background: #06bfee;
+	}
 }
 
 .total-users {
-	background: #b4e5be;
+	.icon {
+		background: #dd4a39;
+	}
 }
 
 .total-members {
-	background: #92b99a;
+	.icon {
+		background: #00a55b;
+	}
 }
 
 .total-revenue {
-	background: #ecfec0;
-	p {
-		color: #000;
+	.icon {
+		background: #f29b19;
 	}
 }
 
@@ -45,7 +85,7 @@
 	position: relative;
 	background: #f4f4f4;
 	padding: 5px 15px 5px 5px;
-	    margin-bottom: 20px;
+	margin-bottom: 20px;
 	p {
 		font-family: "GothamProBold";
 		font-size: 14px;
@@ -67,6 +107,7 @@
 		padding: 5px 8px;
 	}
 }
+
 .control-buttons {
 	.select2-container {
 		min-width: 250px;

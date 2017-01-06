@@ -1,14 +1,16 @@
-<th>
-    <a href="#" @click.prevent="ddToggle(grid.config.id+'/row-select-header')">
+<th class="dropdown" :class="{open:ddOpen(grid.config.id+'row-select-header')}">
+    <a href="#" @click.prevent="ddToggle(grid.config.id+'/row-select-header')" class="dropdown-toggle" data-toggle="dropdown">
         {{(showSelectedOnly ? 'Selected' : 'All')|_}}
         <span v-if="selectedCnt">({{selectedCnt}})</span>
     </a>
-    <ul class="dropdown-menu" :class="{open:ddOpen(grid.config.id+'/row-select-header')}">
-        <li><a href="#" @click.prevent="viewAll">{{'View All'|_}}</a></li>
-        <li><a href="#" @click.prevent="viewSelected">{{'View Selected'|_}}</a></li>
-        <li class="divider"></li>
-        <li><a href="#" @click.prevent="selectVisible">{{'Select Visible'|_}}</a></li>
-        <li><a href="#" @click.prevent="unselectVisible">{{'Unselect Visible'|_}}</a></li>
-        <li><a href="#" @click.prevent="unselectAll">{{'Unselect All'|_}}</a></li>
-    </ul>
+	<div class="dropdown-menu" :class="{open:ddOpen(grid.config.id+'/row-select-header')}">
+		<ul class="dropdown-content" >
+			<li><a href="#" @click.prevent="viewAll">{{'View All'|_}}</a></li>
+			<li><a href="#" @click.prevent="viewSelected">{{'View Selected'|_}}</a></li>
+			<li class="divider"></li>
+			<li><a href="#" @click.prevent="selectVisible">{{'Select Visible'|_}}</a></li>
+			<li><a href="#" @click.prevent="unselectVisible">{{'Unselect Visible'|_}}</a></li>
+			<li><a href="#" @click.prevent="unselectAll">{{'Unselect All'|_}}</a></li>
+		</ul>
+	</div>
 </th>

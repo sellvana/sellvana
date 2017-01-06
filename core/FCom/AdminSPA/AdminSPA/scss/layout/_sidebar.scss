@@ -8,7 +8,7 @@ aside {
 	top: 0;
 	bottom: 0;
 	z-index: 99999;
-	height: 100%;
+	height: 100vh;
 	padding: 68px 0 0 0;
 }
 #main-nav {
@@ -147,7 +147,7 @@ aside {
 	display: block;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1023px) {
 	#main-nav.close {
 		& > .navigation > .nav > li:hover > .nav-stacked {
 			display: block;
