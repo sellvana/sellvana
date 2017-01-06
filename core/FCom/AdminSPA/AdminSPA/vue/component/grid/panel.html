@@ -1,5 +1,5 @@
 <div class="f-grid-filter-panel">
-    <div class="col-sm-5">
+    <div class="col-sm-4">
         <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
         <sv-comp-grid-panel-filters v-if="grid.config.filters" :grid="grid" @apply-filters="applyFilters"></sv-comp-grid-panel-filters>
         <sv-comp-grid-panel-export v-if="grid.config.export" :grid="grid"></sv-comp-grid-panel-export>
@@ -8,7 +8,7 @@
         </div>
         <sv-comp-grid-bulk-actions v-if="grid.config.bulk_actions" :grid="grid"></sv-comp-grid-bulk-actions>
     </div>
-    <div class="col-sm-7 text-right">
+    <div class="col-sm-8 text-right">
         <div class="visible-lg">
 			<span class="amount-rows"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
             <sv-comp-grid-pager-list v-if="grid.config.pager" :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>
