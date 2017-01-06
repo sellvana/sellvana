@@ -54,6 +54,7 @@
             - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2-4.0.3.min", { deps: [ jquery ] } ]
             - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
+            - [ requireJs, sortable, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
 
             - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
@@ -87,6 +88,7 @@
             - [ requireJs, sv-comp-grid-header-row, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/row" ]
             - [ requireJs, sv-comp-grid-header-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-default" ]
             - [ requireJs, sv-comp-grid-header-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-row-select" ]
+            - [ requireJs, sv-comp-grid-header-cell-row-select-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-row-select.html" ]
 
             - [ requireJs, sv-comp-grid-data-row, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/row" ]
             - [ requireJs, sv-comp-grid-data-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-default" ]

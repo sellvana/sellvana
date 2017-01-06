@@ -7,7 +7,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-heade
     return {
         mixins: [SvHlp.mixins.common],
         props: ['grid'],
-        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :grid="grid" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
+        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
         computed: {
             columns: function () {
                 return this.grid && this.grid.config.columns ? this.grid.config.columns : [];

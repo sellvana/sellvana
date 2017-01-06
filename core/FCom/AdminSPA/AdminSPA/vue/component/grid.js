@@ -1,7 +1,7 @@
 define(['vue', 'sv-hlp', 'jquery', 'lodash',
         'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
         'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
-        'text!sv-comp-grid-tpl', //'text!sv-comp-grid-header-row-tpl', 'text!sv-comp-grid-data-row-tpl',
+        'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-cell-row-select-tpl',
         'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl',
         'text!sv-comp-grid-panel-tpl',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
@@ -10,7 +10,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
     function(Vue, SvHlp, $, _,
              SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
              SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
-             gridTpl, // gridHeaderRowTpl, gridDataRowTpl,
+             gridTpl, gridHeaderCellRowSelectTpl,
              gridPagerListTpl, gridPagerSelectTpl,
              gridPanelTpl,
              gridPanelColumnsTpl, gridPanelFiltersTpl,
@@ -195,6 +195,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 toggleColumn: function (col) {
                     Vue.set(col, 'hidden', !col.hidden);
                     this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
+                },
+                sortingUpdate: function (ev) {
+                    console.log(ev);
                 }
             }
         };
@@ -353,15 +356,12 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             template: gridBulkActionsTpl,
             computed: {
                 actions: function () {
-                    return [
-                        {label: 'Edit'},
-                        {label: 'Delete'}
-                    ];
+                    return this.grid.config ? this.grid.config.bulk_actions : [];
                 }
             },
             methods: {
-                doAction: function (o) {
-
+                bulkAction: function (o) {
+                    this.$emit('bulk-action', o);
                 }
             }
         };
@@ -406,6 +406,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 updateQuickSearch: function () {
                     initGridState(this.grid);
                     Vue.set(this.grid.state, 'quickSearch', this.quickSearch);
+                },
+                bulkAction: function (act) {
+                    this.$emit('bulk-action', act);
                 }
             },
             template: gridPanelTpl
@@ -499,6 +502,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     this.grid.filters.splice(i, 1);
                     //Vue.set(this.grid, 'filters', filters);
                     this.fetchData();
+                },
+                bulkAction: function (act) {
+                    console.log(act);
                 }
             },
             watch: {
