@@ -60,6 +60,8 @@
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
             - [ requireRun, sv-app ]
 
+            - [ requireJs, sv-comp-messages, "@FCom_AdminSPA/AdminSPA/vue/component/messages" ]
+
             - [ requireJs, sv-comp-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
             - [ requireJs, sv-comp-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
             - [ requireJs, sv-comp-header-breadcrumbs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/breadcrumbs.html" ]

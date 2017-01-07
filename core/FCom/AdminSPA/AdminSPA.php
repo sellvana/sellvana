@@ -50,14 +50,15 @@ class FCom_AdminSPA_AdminSPA extends BClass
     public function mergeResponses(array $result = [])
     {
         foreach ($this->_responsesToPush as $type => $data) {
-            if (empty($this->_responseTypes[$type])) {
-                continue;
+            if (!empty($this->_responseTypes[$type])) {
+                $callback = $this->_responseTypes[$type];
+                if (true === $callback) {
+                    $callback = [$this, 'responseCallback' . $type];
+                }
+                $result[$type] = $this->BUtil->call($callback, $data);
+            } else {
+                $result[$type] = !empty($result[$type]) ? $this->BUtil->arrayMerge($result[$type], $data) : $data;
             }
-            $callback = $this->_responseTypes[$type];
-            if (true === $callback) {
-                $callback = [$this, 'responseCallback' . $type];
-            }
-            $result[$type] = $this->BUtil->call($callback, $data);
         }
         return $result;
     }

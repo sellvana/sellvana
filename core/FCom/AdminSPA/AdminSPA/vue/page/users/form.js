@@ -40,7 +40,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
             },
             save: function (stayOnPage) {
                 var vm = this;
-                SvHlp.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
+                SvHlp.sendRequest('POST', 'users/form_data', this.form.updates, function (response) {
                     if (!response._ok) {
 
                     }

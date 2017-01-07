@@ -557,32 +557,34 @@ i {
 		color: #000;
 	}
 }
-.notifications-block {
+.messages-block {
 	text-align: center;
-	position: absolute;
-	width: 100%;
-	top: 100px;
+	position: fixed;
+	width: 50%;
+	margin: 0 25%;
+	top: 60px;
     z-index: 1;
 }
-.notifications-container {
+.messages-container {
 	display: inline-block;
-	div {
+	.message {
 		width: 100%;
-		padding: 15px 20px 15px 10px;
+		padding: 15px 40px 15px 40px;
 		color: #4a5629;
 		margin-bottom: 5px;
 		position: relative;
+		box-shadow: 7px 7px 5px 0 rgba(0, 0, 0, 0.11);
 	}
-	.error-notification {
+	.error-message {
 		background: #f4b0af;
 	}
-	.succes-notification {
+	.success-message {
 		background: #d9fcdb;
 	}
-	.warning-notification {
+	.warning-message {
 		background: #f8f5cc;
 	}
-	.info-notification {
+	.info-message {
 		background: #d2e3f5;
 	}
 	.remove {

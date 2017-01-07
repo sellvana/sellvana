@@ -105,9 +105,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $result = [];
         try {
             //$orderId =
-            $this->addResponses([
-                'ok' => true,
-            ]);
+            $this->ok()->addMessage('Order changes has been saved successfully', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
         }

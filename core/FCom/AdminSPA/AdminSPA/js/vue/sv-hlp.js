@@ -137,6 +137,12 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 navTree: SvAppData.nav_tree,
                 csrfToken: SvAppData.csrf_token,
                 favorites: SvAppData.favorites,
+                messages: [
+                    // {type: 'error', text: 'Error message'},
+                    // {type: 'warning', text: 'Warning message'},
+                    // {type: 'success', text: 'Success message'},
+                    // {type: 'info', text: 'Info message'}
+                ],
                 curPage: {
                     link: '/',
                     label: '',
@@ -193,6 +199,17 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 },
                 logout: function (state) {
                     Vue.set(state, 'user', {});
+                },
+                addMessage: function (state, message) {
+                    state.messages.push(message);
+                },
+                removeMessage: function (state, message) {
+                    for (var i = 0, l = state.messages.length; i < l; i++) {
+                        if (_.isEqual(state.messages[i], message)) {
+                            state.messages.splice(i, 1);
+                            break;
+                        }
+                    }
                 }
             }
         });
@@ -281,6 +298,9 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             }
             if (response._csrf_token) {
                 storeData.csrfToken = response._csrf_token;
+            }
+            if (response._messages) {
+                storeData.messages = store.state.messages.concat(response._messages);
             }
             store.commit('setData', storeData);
 
@@ -414,6 +434,8 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                         Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
                     },
                     processFormDataResponse: function (response) {
+                        processResponse(response);
+
                         if (!response.form.updates) {
                             response.form.updates = {};
                         }
@@ -441,8 +463,11 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 },
                 beforeRouteLeave: function (to, from, next) {
                     // TODO: doesn't trigger on route args change (?id=5)
-                    if (!_.isEmpty(this.form.updates) && !confirm('There are unsaved changes, are you sure you want to leave?')) {
-                        next(false);
+                    if (Object.keys(this.form.updates).length > 1) {
+                        if (!confirm('There are unsaved changes, are you sure you want to leave?')) {
+                            console.log(this.form.updates);
+                            next(false);
+                        }
                     } else {
                         next();
                     }

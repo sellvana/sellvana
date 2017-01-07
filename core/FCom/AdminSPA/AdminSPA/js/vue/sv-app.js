@@ -1,5 +1,5 @@
-define(['vue', 'sv-hlp', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-menu', 'text!sv-comp-menu-tpl'],
-    function (Vue, SvHlp, SvHeader, SvHeaderTpl, SvMenu, menuTpl) {
+define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-messages', 'sv-comp-menu', 'text!sv-comp-header-tpl', 'text!sv-comp-menu-tpl'],
+    function (Vue, SvHlp, SvCompHeader, SvCompMessages, SvCompMenu) {
 
     var SvApp = {
         el: '#sv-app',
@@ -22,8 +22,9 @@ define(['vue', 'sv-hlp', 'sv-comp-header', 'text!sv-comp-header-tpl', 'sv-comp-m
             }
         },
         components: {
-            'sv-comp-header': SvHeader,
-            'sv-comp-menu': SvMenu
+            'sv-comp-header': SvCompHeader,
+            'sv-comp-messages': SvCompMessages,
+            'sv-comp-menu': SvCompMenu
         },
         created: function () {
             if (!this.isLoggedIn) {

@@ -93,4 +93,16 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         }
         $this->respond($result);
     }
+
+    public function action_form_data__POST()
+    {
+        $result = [];
+        try {
+            $data = $this->BRequest->post();
+            $this->ok()->addMessage('Product was saved successfully', 'success');
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+        $this->respond($result);
+    }
 }
