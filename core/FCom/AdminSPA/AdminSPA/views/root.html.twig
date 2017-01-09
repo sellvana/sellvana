@@ -12,7 +12,7 @@
     <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
     <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
         <div class="f-admin-container">
-            <sv-comp-menu v-if="isLoggedIn"></sv-comp-menu>
+            <sv-comp-nav v-if="isLoggedIn"></sv-comp-nav>
             <div class="f-admin-main-view ">
                 <router-view></router-view>
             </div>

@@ -30,6 +30,9 @@ modules:
                 observe:
                     - [ "Sellvana_Catalog_Admin_Controller_ProductsAdd::action_index__POST:after", "Sellvana_CatalogIndex_Main.onProductsQuickAdd" ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 observe:
                     - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_data", Sellvana_CatalogIndex_Frontend.onCategoryProductsData ]

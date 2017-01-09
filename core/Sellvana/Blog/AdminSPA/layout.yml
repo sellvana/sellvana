@@ -1,0 +1,7 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /cms/blog-posts, label: Blog Posts, link: /cms/blog-posts, pos: 20 } ]
+            - [ addNav, { path: /cms/blog-categories, label: Blog Categories, link: /cms/blog-categories, pos: 30 } ]
+
+

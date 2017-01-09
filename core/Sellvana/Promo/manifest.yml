@@ -25,6 +25,9 @@ modules:
                     - [ "/promo/form/:id/products", Sellvana_Promo_Admin_Controller.form_products ]
                     - [ "/promo/form/:id/group", Sellvana_Promo_Admin_Controller.form_group ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 routing:
                     - [ /promo/?.action, Sellvana_Promo_Frontend_Controller ]

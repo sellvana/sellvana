@@ -35,6 +35,10 @@ modules:
                     request_fields_whitelist:
                         /cms/blocks/form:
                             POST/model/content: "*"
+
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 views:
                     - [ cms/form-fields, { view_class: Sellvana_Cms_Frontend_View_FormFields } ]

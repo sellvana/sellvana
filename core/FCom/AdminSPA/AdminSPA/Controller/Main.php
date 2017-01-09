@@ -46,36 +46,6 @@ EOT;
         $this->BResponse->setContentType('application/l10n')->set($result);
     }
 
-    public function action_sv_app_dynamic_js()
-    {
-        $this->BDebug->mode('PRODUCTION');
-        $this->layout('sv-app-dynamic-js');
-        $html = (string)$this->view('js/sv-app-dynamic-js');
-        $script = str_replace(['<script>', '</script>'], '', $html);
-        $this->BResponse->setContentType('application/javascript')->set($script);
-    }
-
-    public function action_sv_app_data()
-    {
-        /*
-{% set app = THIS.view('app') %}
-{% set modules = app.getModules() %}
-{% set routes = app.getRoutes() %}
-{% set navs = app.getNavs() %}
-{% set navTree = app.getNavTree() %}
-{% set env = app.getEnv() %}
-{% set user = APP.instance('FCom_Admin_Model_User').sessionUser() %}
-{% set favorites = APP.instance('FCom_Admin_Model_Favorite').getUserFavorites() %}
-{% set pers = APP.instance('FCom_Admin_Model_Personalize') %}
-{% set countries = LOCALE.getAvailableCountries() %}
-{% set countriesSeq = UTIL.arrayMapToSeq(countries) %}
-{% set regions = LOCALE.getAvailableRegions() %}
-{% set regionsSeq = UTIL.arrayMapToSeq(regions, 'id', 'text', 1) %}
-         */
-        $this->BDebug->mode('PRODUCTION');
-        $this->respond($result);
-    }
-
     public function action_components()
     {
         $this->_getComponent();

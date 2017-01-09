@@ -1,0 +1,7 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /customers/customer-groups, label: Customer Groups, link: /customers/customer-groups, pos: 30 } ]
+
+
+

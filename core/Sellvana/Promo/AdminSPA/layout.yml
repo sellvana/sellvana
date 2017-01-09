@@ -1,0 +1,5 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /catalog/promos, label: Promotions, link: /catalog/promos, pos: 100 } ]
+

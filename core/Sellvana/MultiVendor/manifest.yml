@@ -13,6 +13,9 @@ modules:
                 observe:
                     - [ "Sellvana_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", Sellvana_MultiVendor_Admin.onProductFormPostAfterValidate ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
         observe:
             - [ "Sellvana_Sales_Model_Order_State_Overall::changeState", Sellvana_MultiVendor_Main.onOrderChangeState ]
             - [ "Sellvana_Sales_Model_Order_State_Payment::changeState", Sellvana_MultiVendor_Main.onOrderChangeState ]

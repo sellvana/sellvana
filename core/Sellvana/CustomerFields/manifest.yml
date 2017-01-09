@@ -24,6 +24,10 @@ modules:
                     request_fields_whitelist:
                         /catalog/products/form:
                             POST/custom_fields: "+"
+
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 observe:
                     - [ "BLayout::hook:customer-edit-form", Sellvana_CustomerFields_Frontend.hookEdit ]

@@ -1,0 +1,11 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /customers, label: Customers, icon_class: "fa fa-user", pos: 40 } ]
+            - [ addNav, { path: /customers/customers, label: Customers, link: /customers/customers, pos: 10 } ]
+            - [ addNav, { path: /customers/customers-import, label: Customers CSV Import, link: /customers/customers-import, pos: 20 } ]
+
+            - [ addNav, { path: /reports/customers, label: Customers, pos: 20 } ]
+            - [ addNav, { path: /reports/customers/by-country, label: Customers by Country, link: /customers/reports/by-country, pos: 10 } ]
+            - [ addNav, { path: /reports/customers/product-history, label: Customer Product History, link: /customers/reports/product-history, pos: 20 } ]
+            - [ addNav, { path: /reports/customers/order-history, label: Customer Order History, link: /customers/reports/order-history, pos: 30 } ]

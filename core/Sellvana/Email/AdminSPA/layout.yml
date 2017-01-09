@@ -1,0 +1,7 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /customers/email-prefs, label: Email Subscriptions, link: /customers/email-prefs, pos: 50 } ]
+
+
+

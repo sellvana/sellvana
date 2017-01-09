@@ -37,6 +37,9 @@ modules:
                         filetype: csv,txt
                         folder: {random}/import/customers
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 auto_use: [ layout, views ]
                 routing:

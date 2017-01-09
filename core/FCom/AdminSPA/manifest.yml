@@ -9,7 +9,6 @@ modules:
                 auto_use: [ layout, views ]
                 routing:
                     - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]
-                    - [ /sv-app-dynamic.js, FCom_AdminSPA_AdminSPA_Controller_Main.sv_app_dynamic_js ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
 
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]

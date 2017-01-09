@@ -26,6 +26,22 @@
         do:
             - [ addNav, { path: /sales, label: Sales, icon_class: "fa fa-line-chart", pos: 20 } ]
             - [ addNav, { path: /sales/orders, label: Orders, link: /sales/orders, pos: 10 } ]
+            - [ addNav, { path: /sales/custom-states, label: Custom States, link: /sales/custom-states, pos: 20 } ]
+
+            - [ addNav, { path: /reports/sales, label: Sales, pos: 10 } ]
+            - [ addNav, { path: /reports/sales/product-performance, label: Product Performance, link: /sales/reports/product-performance, pos: 10 } ]
+            - [ addNav, { path: /reports/sales/cart-abandonment, label: Cart Abandonment, link: /sales/reports/cart-abandonment, pos: 20 } ]
+            - [ addNav, { path: /reports/sales/by-customer-group, label: Sales by Customer Group, link: /sales/reports/sales-by-customer-group, pos: 30 } ]
+            - [ addNav, { path: /reports/sales/by-payment-method, label: Sales by Payment Method, link: /sales/reports/sales-by-payment-method, pos: 40 } ]
+            - [ addNav, { path: /reports/sales/by-country, label: Sales by Country, link: /sales/reports/sales-by-country, pos: 50 } ]
+            - [ addNav, { path: /reports/sales/by-region, label: Sales by State/Province, link: /sales/reports/sales-by-region, pos: 60 } ]
+            - [ addNav, { path: /reports/sales/by-hour-of-day, label: Sales by Hour of the Day, link: /sales/reports/sales-by-hour-of-day, pos: 70 } ]
+            - [ addNav, { path: /reports/sales/by-day-of-week, label: Sales by Day of Week, link: /sales/reports/sales-by-day-of-week, pos: 80 } ]
+            - [ addNav, { path: /reports/sales/order-detail, label: Sales Order Detail Report, link: /sales/reports/order-detail, pos: 90 } ]
+            - [ addNav, { path: /reports/sales/item-detail, label: Sales Item Detail Report, link: /sales/reports/item-detail, pos: 100 } ]
+            - [ addNav, { path: /reports/sales/shipping-methods, label: Shipping Methods, link: /sales/reports/shipping-methods, pos: 110 } ]
+            - [ addNav, { path: /reports/sales/customer-performance, label: Customer Performance, link: /sales/reports/customer-performance, pos: 120 } ]
+            - [ addNav, { path: /reports/sales/product-history, label: Product History, link: /sales/reports/product-history, pos: 130 } ]
 
             - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl, json!sv-page-sales-orders-grid-config ] } ]
             - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-sales-orders-form-tpl ] } ]

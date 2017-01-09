@@ -1,0 +1,8 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /modules/download, label: Install from Market, link: /modules/download, pos: 20 } ]
+            - [ addNav, { path: /modules/publish, label: Publish to Market, link: /modules/publish, pos: 30 } ]
+
+
+

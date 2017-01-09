@@ -1,5 +1,6 @@
-define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'select2'],
-    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable) {
+define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'vue-ckeditor', 'vue-select2',
+    'ckeditor', 'select2'],
+    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2) {
 
         Vue.use(VueRouter);
         Vue.use(Vuex);
@@ -16,90 +17,20 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             return translated.supplant(args);
         }
 
-        Vue.filter('_', translate);
-
         Vue.directive('sortable', {
             inserted: function(el, binding) {
-                var params = binding.value;
-                // params.onUpdate = function (ev) {
-                //     console.log(ev);
-                // };
-                el.sortableInstance = Sortable.create(el, params);
+                el.sortableInstance = Sortable.create(el, binding.value);
             },
             unbind: function (el) {
                 el.sortableInstance.destroy();
             }
         });
 
-        Vue.component('select2', {
-            props: {
-                value: {},
-                options: {
-                    type: Array,
-                    default: function () {
-                        return [];
-                    }
-                },
-                params: {
-                    type: Object,
-                    default: function () {
-                        return {};
-                    }
-                },
-                onChange: {
-                    type: Function
-                }
-            },
-            template: '<select><slot></slot></select>',
-            mounted: function () {
-                var vm = this, params = $.extend({}, this.params);
-                if (this.options) {
-                    params.data = this.options;
-                }
-//console.log('mounted', this.value);
-                $(this.$el).val(this.value).select2(params).on('change', function () {
-                    var $el = $(vm.$el), val = $el.val();
-                    vm.$emit('input', val);
-                    if (vm.onChange) {
-                        vm.onChange(val);
-                    }
-//console.log('HERE');
-                    // vm.options = null;
-                    // $el.select2('data', []);
-                });
-            },
-            watch: {
-                value: function (value) {
-//console.log('value', value);
-                    var $el = $(this.$el);
-                    if (!_.isEqual($el.val(), value)) {
-                        $el.val(value).trigger('change.select2');
-                    }
-                },
-                options: function (options) {
-//console.log('options', options);
-                    var $el = $(this.$el);
-                    // if (!_.isEqual($el.select2('data'), options)) {
-//console.log('update options', options);
-                    var params = _.extend({}, this.params, {data: options});
-                    $el.empty().select2('data', options);
-                        //$el.select2('data', options);
-                    // }
-                },
-                params: function (params) {
-                    //params.data = this.options;
-//console.log('params', params);
-                    var $el = $(this.$el);
-                    if (this.options) {
-                        params = _.extend(params, {data: this.options});
-                    }
-                    $el.empty().select2(params);
-                }
-            },
-            destroyed: function () {
-                $(this.$el).off().select2('destroy');
-            }
-        });
+        Vue.component('ckeditor', VueCkeditor);
+
+        Vue.component('select2', VueSelect2);
+
+        Vue.filter('_', translate);
 
         Vue.filter('currency', function (value, currencyCode) {
             //TODO: implement config by currencyCode
@@ -128,7 +59,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 return 1;
             }
         });
-
+console.log(SvAppData.nav_tree);
         var store = new Vuex.Store({
             strict: true,
             state: {

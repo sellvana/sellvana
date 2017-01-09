@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'text!sv-comp-menu-tpl'], function(Vue, SvHlp, menuTpl) {
+define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
     return {
         store: SvHlp.store,
         data: function () {
@@ -37,7 +37,7 @@ define(['vue', 'sv-hlp', 'text!sv-comp-menu-tpl'], function(Vue, SvHlp, menuTpl)
                 Vue.set(this.navTreeOpen, path, !this.navTreeOpen[path]);
             }
         },
-        template: menuTpl,
+        template: navTpl,
         watch: {
             mainNavOpen: function (a) {
                 if (!a) {

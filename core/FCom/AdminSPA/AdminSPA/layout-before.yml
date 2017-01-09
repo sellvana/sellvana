@@ -5,6 +5,9 @@
 
     - view: head
         do:
+			- [ meta, Content-Type, "text/html; charset=UTF-8"]
+			- [ meta, viewport, "width=device-width, initial-scale=1"]
+
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/bootstrap.css" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/jquery-ui.css" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/select2.min.css" ]
@@ -55,6 +58,9 @@
             - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
             - [ requireJs, sortable, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
+            - [ requireJs, ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/ckeditor/ckeditor" ]
+            - [ requireJs, vue-ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-ckeditor" ]
+            - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select2" ]
 
             - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
@@ -71,8 +77,8 @@
             - [ requireJs, sv-comp-header-chat-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/chat.html" ]
             - [ requireJs, sv-comp-header-local-notifications-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications.html" ]
 
-            - [ requireJs, sv-comp-menu, "@FCom_AdminSPA/AdminSPA/vue/component/menu" ]
-            - [ requireJs, sv-comp-menu-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/menu.html" ]
+            - [ requireJs, sv-comp-nav, "@FCom_AdminSPA/AdminSPA/vue/component/nav" ]
+            - [ requireJs, sv-comp-nav-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/nav.html" ]
 
             - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
             - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
@@ -138,9 +144,18 @@
             - [ addModule, FCom_AdminSPA ]
 
             - [ addNav, { label: Dashboard, path: /dashboard, link: /, icon_class: "fa fa-tachometer", pos: 10 }]
-            - [ addNav, { label: System, path: /system, icon_class: "fa fa-cog", pos: 900 }]
+
+            - [ addNav, { label: Reports, path: /reports, icon_class: "fa fa-filter", pos: 80 }]
+
+            - [ addNav, { label: Modules, path: /modules, icon_class: "fa fa-puzzle-piece", pos: 90 }]
+            - [ addNav, { label: Manage Modules, path: /modules/manage, link: /modules, pos: 10 }]
+
+            - [ addNav, { label: System, path: /system, icon_class: "fa fa-cog", pos: 100 }]
             - [ addNav, { label: Users, path: /system/users, link: /users, pos: 10 }]
+            - [ addNav, { label: Roles & Permissions, path: /system/roles, link: /roles, pos: 20 }]
+            - [ addNav, { label: Global Import / Export, path: /system/import-export, link: /import-export, pos: 30 }]
             - [ addNav, { label: Settings, path: /system/settings, link: /settings, pos: 100 }]
+            - [ addNav, { label: Media Library, path: /system/media-library, link: /media-library, pos: 110 }]
 
             - [ addRoute, { path: /, require: [sv-page-dashboard, text!sv-page-dashboard-tpl ]}]
             - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]

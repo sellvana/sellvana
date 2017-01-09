@@ -1,0 +1,7 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /cms, label: CMS, icon_class: "fa fa-folder-open", pos: 50 } ]
+            - [ addNav, { path: /cms/blocks, label: Blocks / Pages, link: /cms/blocks, pos: 10 } ]
+
+
