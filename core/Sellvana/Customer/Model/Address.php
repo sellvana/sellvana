@@ -110,6 +110,7 @@ class Sellvana_Customer_Model_Address extends FCom_Core_Model_Abstract
         foreach ($customerAddress as $address) {
             $result[] = [
                 'id' => $address->id,
+                'email'             => $address->email,
                 'customer_id'       => $address->customer_id,
                 'firstname'         => $address->firstname,
                 'lastname'          => $address->lastname,
@@ -134,6 +135,9 @@ class Sellvana_Customer_Model_Address extends FCom_Core_Model_Abstract
     {
         $data = [];
 
+        if (!empty($post['email'])) {
+            $data['email'] = $post['email'];
+        }
         if (!empty($post['firstname'])) {
             $data['firstname'] = $post['firstname'];
         }
