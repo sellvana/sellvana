@@ -1,28 +1,68 @@
 .nav .dropdown {
     display: inline-block;
 }
-
-.content-block {
-    background: #fff; 
-    box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-    border-radius: 2px;
-	margin-bottom: 20px;
+.admin-main-content {
     .navbar {
         min-height: auto;
     }
 }
-
 .panel-header {
-    background: #eee;
+	background: #edf1f5;
 	border: 1px solid #fff;
+	margin: 0 10px;
     a {
-        font-size: 14px;
+        font-size: 12px;
         color: #000;
         padding: 8px 10px;
         display: inherit;
+		font-family: 'GothamProMedium';
     }
 }
-
 .panel-container {
-    padding: 8px 10px;
+	padding: 8px 20px;
+}
+.form-group {
+	label {
+		display: block;
+	}
+	.control-label {
+		display: inline-block;
+		font-family: 'GothamProMedium';
+		font-size: 12px;
+		color: #000;
+	}
+}
+fieldset {
+	border: 0;
+}
+
+.checkbox-block {
+	width: 48px;
+	height: 28px;
+	border-radius: 20px;
+	border: 1px solid #eee;
+	transition: 0.1s all ease-in;
+	position: relative;
+	cursor: pointer;
+	.checkbox-elem {
+		width: 26px;
+		height: 26px;
+		border-radius: 100%;
+		background: #ffffff;
+		position: absolute;
+		left: -1px;
+		top: 0px;
+		transition: 0.2s all ease-in;
+		border: 1px solid #eee;
+		box-shadow: 2px 1px 3px 0px rgba(0, 0, 0, 0.06); 
+	}
+}
+
+input[type="checkbox"]:checked + .checkbox-block {
+	background: #4dd865;
+	border: 1px solid #4dd865;
+	.checkbox-elem {
+		left: 20px;
+		border: 1px solid #fff;
+	}
 }

@@ -1,6 +1,6 @@
 <div>
 	<div class="row">
-		<div class="col-md-7">
+		<div class="col-md-12 col-lg-6 hidden-xs">
 			<div class="main-info-block"> 
 				<div class="total-info">
 					<div class="icon"> <i class="fa fa-money" aria-hidden="true"></i> </div>
@@ -28,20 +28,17 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-5">
+		<div class="col-md-12 col-lg-6 text-right"> 
 			<div class="tablet-panel hidden-lg">
-				<div class='order-menu'>
-					<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
-						<div class="dropdown-menu">
-							<ul class="dropdown-content">
-								<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
-							</ul>
-						</div>
+				<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+					<div class="dropdown-menu">
+						<ul class="dropdown-content">
+							<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+						</ul>
 					</div>
-					
 				</div>
-				<div class="control-buttons">
+				
 					<div class="dropdown action" :class="{open:ddOpen('control-buttons')}">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
 						<div class="dropdown-menu">
@@ -55,7 +52,7 @@
 							</ul>
 						</div>
 					</div>
-				</div>
+				
 			</div>
 			<div class="control-buttons visible-lg">
 				<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
@@ -65,17 +62,17 @@
 				<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
 				<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
 			</div>
-		</div>
+		</div> 
 	</div>
 	<div class="row">
 		<div class="col-lg-2 visible-lg">
-			<div class='order-menu'>
+			<div class='secondary-menu'>
 				<ul class="nav">
 					<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
 				</ul>
 			</div>
 		</div>
-		<div class="col-md-10">
+		<div class="col-md-12 col-lg-10">
 			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
 		</div>
 	</div>

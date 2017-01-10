@@ -91,17 +91,17 @@ table {
 		tr:last-child {
 			border-bottom: 0;
 		}
-	}
-	.edit,
-	.delete {
-		font-size: 16px;
-		color: #dddddd;
-		transition: 0.3s all ease-in;
-		margin: 0 2px;
-		&:hover i {
-			color: #000;
+		.fa {
+			font-size: 16px;
+			color: #dddddd;
+			transition: 0.3s all ease-in;
+			margin: 0 2px;
+			&:hover  {
+				color: #000;
+			}
 		}
 	}
+	
 	.sorted-up,
 	.sorted-down {
 		i {

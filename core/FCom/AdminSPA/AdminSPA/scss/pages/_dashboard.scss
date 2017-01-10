@@ -84,7 +84,7 @@
 .dashboard-title {
 	position: relative;
 	background: #f4f4f4;
-	padding: 5px 15px 5px 5px;
+	padding: 5px 50px 5px 5px;
 	margin-bottom: 20px;
 	p {
 		font-family: "GothamProBold";
@@ -115,5 +115,13 @@
 	}
 	.select2-container .select2-selection--single {
 		height: 29px;
+	}
+}
+
+@media (max-width: 767px) {
+	.control-buttons .select2-container {
+		min-width: 100%;
+		text-align: left;
+		margin-bottom: 10px;
 	}
 }

@@ -980,6 +980,10 @@ i {
 			display: block;
 		}
 	}
+	.messages-block {
+		top: 120px;
+		z-index: 9999;
+	}
 }
 @media (max-width: 767px) {
 	.f-admin-header {
@@ -1093,5 +1097,9 @@ i {
 				width: 250px;
 			}
 		}
+	}
+	.messages-block {
+		top: 165px;
+		z-index: 9999;
 	}
 }

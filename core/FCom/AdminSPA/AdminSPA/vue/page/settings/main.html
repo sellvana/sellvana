@@ -1,10 +1,10 @@
 <div>
-    <div class="content-block">
+	<div class="admin-main-content">
         <nav class="navbar navbar-default">
             <ul class="nav">
                 <li v-for="l1 in settings.config.nav" class="dropdown" :class="{open:ddOpen('settings/' + l1.path)}">
                     <a href="#" :title="l1.label" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">
-                        <i class="fa fa-caret" aria-hidden="true"></i>
+						<i class="fa fa-caret-down" aria-hidden="true"></i>
                         {{l1.label}}
                     </a>
                     <ul class="dropdown-menu">
@@ -14,9 +14,9 @@
             </ul>
         </nav>
     </div>
-    <div class="content-block">
-        <h2>{{pageTitle}}</h2>
-		<ul>
+	<div class="admin-main-content">
+		<div class="block-title"><p>{{pageTitle}}</p></div>
+        <ul>
             <li v-for="panel in panels">
                 <div class="panel-header">
                     <a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>

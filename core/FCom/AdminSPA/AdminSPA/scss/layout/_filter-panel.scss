@@ -80,15 +80,19 @@
 		margin: 10px 0;
 		width: 80%;
 	}
-	.col-lg-4 {
+	.col-lg-5 {
 		position: static;
 	}
-	.col-md-8 {
+	.col-lg-7 {
 		padding-right: 180px;
 		position: static;
 	}
 	.row {
 		position: relative;
+	}
+	.paginations-block {
+		float: right;
+		padding-right: 180px;
 	}
 }
 
@@ -110,6 +114,10 @@
 	}
 	.ui-sortable {
 		font-size: 0;
+		.handle {
+			cursor: pointer;
+			padding: 0px 6px;
+		}
 	}
 	li {
 		margin-right: 5px;
@@ -373,6 +381,8 @@
 	width: 160px;
 	text-align: left;
 	border-right: 0;
+	display: inline-block;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	.caret-back {
 		background: #ebeff3;
 		position: absolute;

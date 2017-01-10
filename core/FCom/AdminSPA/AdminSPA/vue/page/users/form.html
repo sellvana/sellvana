@@ -1,25 +1,20 @@
 <div>
     <div class="row">
-        <div class="col-md-7">
-            <div class="control-buttons">
-                <button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
-                <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-                <button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
-                <button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
         <div class="col-md-2">
             <img :src="avatarUrl" width="100">
-            <div class='order-menu'>
+            <div class='secondary-menu'>
                 <ul class="nav">
                     <li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
                 </ul>
             </div>
         </div>
         <div class="col-md-10">
+			<div class="control-buttons">
+				<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+				<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+				<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+				<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+			</div>
             <component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
         </div>
     </div>

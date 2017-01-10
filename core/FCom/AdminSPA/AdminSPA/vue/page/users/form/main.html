@@ -1,30 +1,76 @@
 <div class="admin-main-content">
-	<div class="row">
-		<div class="col-md-7">
-			<div>
-				<div class="form-horizontal">
-					<div class="f-section">
-						<div class="form-group"> <span class="col-md-2 control-label">{{'Input'|_}}</span>
-							<div class="col-md-10">
-								<input type="text" class="form-control" /> </div>
-						</div>
-						<div class="form-group"> <span class="col-md-2 control-label">{{'Textarea'|_}}</span>
-							<div class="col-md-10">
-								<textarea class="form-control"> </textarea>
-							</div>
-						</div>
-						<div class="form-group"> <span class="col-md-2 control-label">{{'Select'|_}}</span>
-							<div class="col-md-10">
-								<select2 type="text" class="form-control">
-								<option>First task</option>
-								<option>Second task</option>
-								<option>Third task</option>
-								</select2>
-							</div>
+	<form class="form-horizontal">
+		<div class="form-group">
+			<label>
+				<p class="col-md-2 control-label">{{'Input'|_}}</p>
+				<div class="col-md-5">
+					<input class="form-control" type="text" />
+				</div>
+			</label>
+		</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-2 control-label">{{'Textarea'|_}}</p>
+				<div class="col-md-5">
+					<textarea class="form-control" rows="5"></textarea>
+				</div>
+			</label>
+		</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-2 control-label">{{'Select'|_}}</p>
+				<div class="col-md-5">
+					<select2 class="form-control">
+						<option>Option1</option>
+						<option>Option2</option>
+						<option>Option3</option>
+						<option>Option4</option>						
+					</select2>
+				</div>
+			</label>
+		</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-2 control-label">{{'Select multiple'|_}}</p>
+				<div class="col-md-5">
+					<select2 multiple="" aria-multiselectable="true" class="form-control select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+						<option>Option1</option>
+						<option>Option2</option>
+						<option>Option3</option>
+						<option>Option4</option>									
+					</select2>
+				</div>
+			</label>
+		</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-2 control-label">{{'Checkbox'|_}}</p>
+				<div class="col-md-5">
+					<input type="checkbox" >
+					<div class="checkbox-block">
+						<div class="checkbox-elem">							
 						</div>
 					</div>
 				</div>
-			</div>
+			</label>
 		</div>
-	</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-2 control-label">{{'Number input'|_}}</p>
+				<div class="col-md-5">
+					<input class="form-control" type="number" />
+				</div>
+			</label>
+		</div>	<div class="form-group">
+		<label>
+			<p class="col-md-2 control-label">
+				<a class="pull-right help-icon" href="#" data-toggle="popover" data-trigger="focus" data-content="Details for Customers" data-container="body" data-original-title="" title="">
+					<span class="icon-question-sign"></span></a>
+			</p>
+			<div class="col-md-5">
+				<textarea rows="5"></textarea>
+			</div>
+		</label>
+		</div>
+	</form>
 </div>
