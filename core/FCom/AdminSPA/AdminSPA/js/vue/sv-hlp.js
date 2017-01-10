@@ -59,7 +59,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 return 1;
             }
         });
-console.log(SvAppData.nav_tree);
+
         var store = new Vuex.Store({
             strict: true,
             state: {

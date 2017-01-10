@@ -59,7 +59,22 @@ define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
         var HeaderSearch = {
             props: ['mobile'],
             mixins: [SvHlp.mixins.common],
-            template: headerSearchTpl
+            template: headerSearchTpl,
+            data: function () {
+                return {
+                    query: '',
+                    results: []
+                }
+            },
+            methods: {
+                submitSearch: function () {
+                    SvHlp.sendRequest('GET', '/header/search', {q: this.query}, function (response) {
+                        if (response.link) {
+                            SvHlp.router.push(response.link);
+                        }
+                    });
+                }
+            }
         };
 
         var HeaderFavorites = {

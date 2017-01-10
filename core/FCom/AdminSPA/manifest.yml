@@ -9,12 +9,15 @@ modules:
                 auto_use: [ layout, views ]
                 routing:
                     - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]
+                    - [ /header/.action, FCom_AdminSPA_AdminSPA_Controller_Header ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
 
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
                     - [ /favorites/?.action, FCom_AdminSPA_AdminSPA_Controller_Favorites ]
                     - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]
                     - [ /users/?.action, FCom_AdminSPA_AdminSPA_Controller_Users ]
+
+                    - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                 views:
                     - [ app, FCom_AdminSPA_AdminSPA_View_App ]
 

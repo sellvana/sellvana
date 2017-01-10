@@ -1,11 +1,31 @@
 /:
+    - view: head
+        do:
+            - [ requireJs, sv-page-customers, "@Sellvana_Customer/AdminSPA/vue/page/customers/index" ]
+            - [ requireJs, sv-page-customers-tpl, "@Sellvana_Customer/AdminSPA/vue/page/customers/index.html" ]
+            - [ requireJs, sv-page-customers-grid-config, "~/customers/grid_config" ]
+
+            - [ requireJs, sv-page-customers-form, "@Sellvana_Customer/AdminSPA/vue/page/customers/form" ]
+            - [ requireJs, sv-page-customers-form-tpl, "@Sellvana_Customer/AdminSPA/vue/page/customers/form.html" ]
+
+			- [ requireJs, sv-page-customers-form-main, "@Sellvana_Customer/AdminSPA/vue/page/customers/form/main" ]
+			- [ requireJs, sv-page-customers-form-main-tpl, "@Sellvana_Customer/AdminSPA/vue/page/customers/form/main.html" ]
+			
     - view: app
         do:
             - [ addNav, { path: /customers, label: Customers, icon_class: "fa fa-user", pos: 40 } ]
-            - [ addNav, { path: /customers/customers, label: Customers, link: /customers/customers, pos: 10 } ]
-            - [ addNav, { path: /customers/customers-import, label: Customers CSV Import, link: /customers/customers-import, pos: 20 } ]
+            - [ addNav, { path: /customers/customers, label: Customers, link: /customers, pos: 10 } ]
+            - [ addNav, { path: /customers/customers-import, label: Customers CSV Import, link: /customers-import, pos: 20 } ]
 
             - [ addNav, { path: /reports/customers, label: Customers, pos: 20 } ]
             - [ addNav, { path: /reports/customers/by-country, label: Customers by Country, link: /customers/reports/by-country, pos: 10 } ]
             - [ addNav, { path: /reports/customers/product-history, label: Customer Product History, link: /customers/reports/product-history, pos: 20 } ]
             - [ addNav, { path: /reports/customers/order-history, label: Customer Order History, link: /customers/reports/order-history, pos: 30 } ]
+
+            - [ addRoute, { path: /customers, require: [ sv-page-customers, text!sv-page-default-grid-tpl, json!sv-page-customers-grid-config ] } ]
+            - [ addRoute, { path: /customers/form, require: [ sv-page-customers-form, text!sv-page-customers-form-tpl ] } ]
+
+/customers/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /customers/form, name: main, label: Customer Info, pos: 10, component: sv-page-customers-form-main } ]

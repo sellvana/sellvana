@@ -163,7 +163,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                         }
                         if (!empty($col['actions'])) {
                             foreach ($col['actions'] as $j => $a) {
-                                if (empty($a['icon_class'])) {
+                                if (empty($a['icon_class']) && !empty($a['type'])) {
                                     switch ($a['type']) {
                                         case 'edit':
                                             $col['actions'][$j]['icon_class'] = 'fa fa-pencil';
@@ -251,6 +251,12 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm extends FCom_
                 'format_options' => [
                     ['value' => 'csv', 'label' => 'CSV'],
                 ],
+            ];
+        }
+
+        if (empty($config['state'])) {
+            $config['state'] = [
+                'ps' => 10,
             ];
         }
 

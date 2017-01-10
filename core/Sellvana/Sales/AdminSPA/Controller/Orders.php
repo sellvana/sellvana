@@ -40,6 +40,10 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'bulk_actions' => [
                 ['name' => 'custom_state', 'label' => 'Change Custom State'],
             ],
+            'state' => [
+                's' => 'id',
+                'sd' => 'desc',
+            ],
         ];
     }
 
@@ -152,5 +156,27 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'state' => $data['state'],
         ];
         $this->respond($result);
+    }
+
+    public function onHeaderSearch($args)
+    {
+        $r = $this->BRequest->get();
+        if (isset($r['q']) && $r['q'] != '') {
+            $value = '%' . (string)$r['q'] . '%';
+            $result = $this->Sellvana_Sales_Model_Order->orm()
+                ->where(['OR' => [
+                    ['id like ?', $value],
+                    ['customer_email like ?', $value],
+                    ['unique_id like ?', $value],
+                    ['coupon_code like ?', $value],
+                ]])->find_one();
+            $args['result']['order'] = null;
+            if ($result) {
+                $args['result']['order'] = [
+                    'priority' => 20,
+                    'link' => '/sales/orders/form?id=' . $result->id(),
+                ];
+            }
+        }
     }
 }

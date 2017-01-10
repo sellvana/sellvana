@@ -39,6 +39,10 @@ modules:
 
             FCom_AdminSPA:
                 auto_use: [ layout ]
+                routing:
+                    - [ /customers/?.action, Sellvana_Customer_AdminSPA_Controller_Customers ]
+                observe:
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Customer_AdminSPA_Controller_Customers.onHeaderSearch ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]

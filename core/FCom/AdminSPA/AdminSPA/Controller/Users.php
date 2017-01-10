@@ -25,6 +25,9 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
             'bulk_actions' => [
                 ['name' => 'delete', 'label' => 'Delete'],
             ],
+            'state' => [
+                'sc' => 'username asc'
+            ]
         ];
     }
 

@@ -1,13 +1,7 @@
-define(['sv-hlp'], function (SvHlp) {
+define(['sv-hlp', 'text!sv-comp-grid-data-cell-actions-tpl'], function (SvHlp, actionsTpl) {
     return {
         props: ['grid', 'row', 'col'],
-        template: '<th class="column-actions">'
-            + '<template v-for="act in col.actions">'
-            + '<router-link v-if="act.link" :to="rowActionLink(row, act)" class="edit"><i :class="act.icon_class" aria-hidden="true"></i></router-link>'
-            + '<a href="#" v-if="act.delete_url" @click.prevent="deleteRow(row, act)" class="delete"><i :class="act.icon_class" aria-hidden="true"></i></a>'
-            + '</template>'
-            + '</th>',
-
+        template: actionsTpl,
         computed: {
             rowActionLink: function () {
                 return function (row, act) {

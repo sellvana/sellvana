@@ -102,6 +102,7 @@
             - [ requireJs, sv-comp-grid-data-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-default" ]
             - [ requireJs, sv-comp-grid-data-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-row-select" ]
             - [ requireJs, sv-comp-grid-data-cell-actions, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions" ]
+            - [ requireJs, sv-comp-grid-data-cell-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions.html" ]
 
 
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]

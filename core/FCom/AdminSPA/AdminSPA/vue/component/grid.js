@@ -62,7 +62,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
         }
 
         function initGridState(grid) {
-            var state = grid.state || {};
+            var state = _.extend({}, grid.config.state || {}, grid.state || {});
             if (!state.c) {
                 state.c = grid.rows && _.isArrayLike(grid.rows) ? grid.rows.length : 0;
             }
@@ -74,6 +74,11 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
             if (!state.mp) {
                 state.mp = Math.ceil(state.c / state.ps);
+            }
+            if (state.sc) {
+                var s = state.sc.split(' ');
+                state.s = s[0];
+                state.sd = s[1];
             }
             Vue.set(grid, 'state', state);
         }
@@ -127,6 +132,32 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     }
                 });
             }
+        }
+
+        function processDataResponse(response, grid) {
+            if (response.config) {
+                Vue.set(grid, 'config', response.config);
+            }
+            if (response.state) {
+                Vue.set(grid, 'state', response.state);
+            } else {
+                initGridState(grid);
+            }
+            if (response.rows) {
+                Vue.set(grid, 'rows', response.rows);
+            }
+        }
+
+        function fetchData(grid) {
+            grid = grid || this.grid;
+            var url = grid.config.data_url;
+            if (!url) { // local data
+                return;
+            }
+            var params = prepareDataRequest(grid);
+            SvHlp.sendRequest('GET', url, params, function (response) {
+                processDataResponse(response, grid);
+            });
         }
 
         var SvCompGridPagerList = {
@@ -403,15 +434,16 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 removeFilter: function (flt) {
                     this.$emit('remove-filter', flt);
                 },
-                updateQuickSearch: function () {
-                    initGridState(this.grid);
-                    Vue.set(this.grid.state, 'quickSearch', this.quickSearch);
-                },
                 bulkAction: function (act) {
                     this.$emit('bulk-action', act);
                 }
             },
-            template: gridPanelTpl
+            template: gridPanelTpl,
+            watch: {
+                quickSearch: function (value) {
+                    Vue.set(this.grid.state, 'quickSearch', value);
+                }
+            }
         };
 
         return {
@@ -471,25 +503,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 }
             },
             methods: {
-                fetchData: function () {
-                    var grid = this.grid, url = grid.config.data_url, params = prepareDataRequest(grid);
-                    if (!url) { // local data
-                        return;
-                    }
-                    SvHlp.sendRequest('GET', url, params, function (response) {
-                        if (response.config) {
-                            Vue.set(grid, 'config', response.config);
-                        }
-                        if (response.state) {
-                            Vue.set(grid, 'state', response.state);
-                        } else {
-                            initGridState(grid);
-                        }
-                        if (response.rows) {
-                            Vue.set(grid, 'rows', response.rows);
-                        }
-                    });
-                },
+                fetchData: fetchData,
                 applyFilters: function (filters) {
                     var oldFilters = this.grid.filters || [];
                     Vue.set(this.grid, 'filters', oldFilters.concat(filters));
@@ -507,12 +521,8 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     console.log(act);
                 }
             },
-            watch: {
-                grid: function (grid) {
-                    initGridState(grid);
-                }
-            },
             created: function () {
+                initGridState(this.grid);
                 initGridComponents(this.grid);
                 this.fetchData();
             },

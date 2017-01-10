@@ -1,0 +1,7 @@
+<th class="column-actions">
+    <template v-for="act in col.actions">
+        <component v-if="act.template" :is="{props:['row', 'col', 'act'], template: act.template}" :row="row" :col="col" :act="act"></component>
+        <router-link v-else-if="act.link" :to="rowActionLink(row, act)" class="edit" :class="act.class" :title="act.title"><i :class="act.icon_class" aria-hidden="true"></i></router-link>
+        <a href="#" v-else-if="act.delete_url" @click.prevent="deleteRow(row, act)" class="delete"><i :class="act.icon_class" aria-hidden="true"></i></a>
+    </template>
+</th>

@@ -1,10 +1,10 @@
 <div class="search-block" :class="{'visible-xs':mobile}">
 	<form class="dropdown">
 		<button class="btn btn-link fa fa-search" name="button" type="submit"></button>
-		<input type="text" placeholder="Search..." class="dropdown-toggle">
-		<div class="dropdown-menu">
-			<a href="#/sales/orders/form" class="router-link-active">Product 725 </a>
-		</div>
-</div>
-</form>
+		<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch">
+		<!--<input type="text" :placeholder="'Search...'|_" class="dropdown-toggle" v-model="query" @keyup.enter="submitSearch">-->
+		<!--<div class="dropdown-menu">-->
+			<!--<router-link v-for="r in results" :to="r.link" :title="r.label"><img :src="r.thumb" :alt="r.label">{{r.label}}</router-link>-->
+		<!--</div>-->
+	</form>
 </div>

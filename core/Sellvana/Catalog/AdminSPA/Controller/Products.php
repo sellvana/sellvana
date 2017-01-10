@@ -106,4 +106,26 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         }
         $this->respond($result);
     }
+
+    public function onHeaderSearch($args)
+    {
+        $q = $this->BRequest->get('q');
+        if (isset($q) && $q != '') {
+            $value = '%' . $q . '%';
+            $result = $this->Sellvana_Catalog_Model_Product->orm('p')
+                ->where(['OR' => [
+                    ['p.id like ?', (int)$value],
+                    ['p.product_sku like ?', (string)$value],
+                    ['p.url_key like ?', (string)$value],
+                    ['p.product_name like ?', (string)$value],
+                ]])->find_one();
+            $args['result']['product'] = null;
+            if ($result) {
+                $args['result']['product'] = [
+                    'priority' => 1,
+                    'link' => '/catalog/products/form?id=' . $result->id(),
+                ];
+            }
+        }
+    }
 }

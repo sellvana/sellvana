@@ -23,6 +23,8 @@ modules:
                 auto_use: [ layout ]
                 routing:
                     - [ /orders/?.action, Sellvana_Sales_AdminSPA_Controller_Orders ]
+                observe:
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Sales_AdminSPA_Controller_Orders.onHeaderSearch ]
 
             FCom_Admin:
                 auto_use: [ views, layout ]

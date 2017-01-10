@@ -91,6 +91,8 @@ modules:
                 auto_use: [ layout ]
                 routing:
                     - [ /products/?.action, Sellvana_Catalog_AdminSPA_Controller_Products ]
+                observe:
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Catalog_AdminSPA_Controller_Products.onHeaderSearch ]
 
             FCom_Frontend:
                 routing:

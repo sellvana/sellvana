@@ -1977,6 +1977,9 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
      */
     public function gravatar($email, $params = [])
     {
+        if (is_string($params) || is_numeric($params)) {
+            $params = ['s' => $params];
+        }
         if (empty($params['default'])) {
             $params['default'] = 'identicon';
         }
