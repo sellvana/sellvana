@@ -1,7 +1,7 @@
 <div>
 	<div class="row">
 		<div class="col-md-12 col-lg-6 hidden-xs">
-			<div class="main-info-block"> 
+			<div class="main-info-block">
 				<div class="total-info">
 					<div class="icon"> <i class="fa fa-money" aria-hidden="true"></i> </div>
 					<div class="data"> <span>{{'Grand Total:'|_}}</span>
@@ -28,7 +28,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-12 col-lg-6 text-right"> 
+		<div class="col-md-12 col-lg-6 text-right">
 			<div class="tablet-panel hidden-lg">
 				<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
@@ -38,21 +38,19 @@
 						</ul>
 					</div>
 				</div>
-				
-					<div class="dropdown action" :class="{open:ddOpen('control-buttons')}">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
-						<div class="dropdown-menu">
-							<ul class="dropdown-content">
-								<li><a href="#" @click="goBack()">{{'Back'|_}}</a></li>
-								<li><a href="#" @click="doDelete() ">{{'Delete'|_}}</a></li>
-								<li><a href="#" @click="shipAllItems()">{{'Ship All items'|_}}</a></li>
-								<li><a href="#" @click="markAsPaid()">{{'Mark as Paid'|_}}</a></li>
-								<li><a href="#" @click="save()">{{'Save'|_}}</a></li>
-								<li><a href="#" @click="save(true)">{{'Save and Continue'|_}}</a></li>
-							</ul>
-						</div>
+				<div class="dropdown action" :class="{open:ddOpen('control-buttons')}">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
+					<div class="dropdown-menu">
+						<ul class="dropdown-content">
+							<li><a href="#" @click="goBack()">{{'Back'|_}}</a></li>
+							<li><a href="#" @click="doDelete() ">{{'Delete'|_}}</a></li>
+							<li><a href="#" @click="shipAllItems()">{{'Ship All items'|_}}</a></li>
+							<li><a href="#" @click="markAsPaid()">{{'Mark as Paid'|_}}</a></li>
+							<li><a href="#" @click="save()">{{'Save'|_}}</a></li>
+							<li><a href="#" @click="save(true)">{{'Save and Continue'|_}}</a></li>
+						</ul>
 					</div>
-				
+				</div>
 			</div>
 			<div class="control-buttons visible-lg">
 				<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
@@ -62,7 +60,7 @@
 				<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
 				<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
 			</div>
-		</div> 
+		</div>
 	</div>
 	<div class="row">
 		<div class="col-lg-2 visible-lg">

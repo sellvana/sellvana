@@ -1,40 +1,40 @@
 <div>
 	<div class="row">
-		<div class="col-md-12 col-lg-4">
+		<div class="col-md-12 col-lg-5">
 			<div>
-				<div class="details-information">
+				<div class="admin-main-content details-information">
 					<div class="block-title">
 						<p>{{'Payments'|_}}</p>
 						<button type="button" class="button4" @click="addPayment()">{{'Add'|_}}</button>
 					</div>
-					<div>
-						<table>
+					<div class="scrollable-area">
+						<table class="label-table">
 							<thead>
-							<tr>
-								<td>{{'Timeline'|_}}</td>
-								<td>{{'Total Amount'|_}}</td>
-								<td>{{'Method'|_}}</td>
-								<td>{{'Status'|_}}</td>
-							</tr>
+								<tr>
+									<td>{{'Timeline'|_}}</td>
+									<td>{{'Total Amount'|_}}</td>
+									<td>{{'Method'|_}}</td>
+									<td>{{'Status'|_}}</td>
+								</tr>
 							</thead>
 							<tbody>
 							<tr v-for="p in form.payments" @click="viewPayment(p)">
-								<td>{{p.create_at|date}}</td>
-								<td>{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
-								<td>{{p.payment_method}}</td>
-								<td :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</td>
+								<td data-label="Timeline">{{p.create_at|date}}</td>
+								<td data-label="Total Amount">{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
+								<td data-label="Method">{{p.payment_method}}</td>
+								<td data-label="Status" :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
-				<div class="details-information">
+				<div class="admin-main-content details-information">
 					<div class="block-title">
 						<p>{{'Shipments'|_}}</p>
 						<button type="button" class="button4" @click="addShipment()">{{'Add'|_}}</button>
 					</div>
-					<div>
-						<table>
+					<div class="scrollable-area">
+						<table class="secondary-table">
 							<thead>
 							<tr>
 								<td>{{'Timeline'|_}}</td>
@@ -58,12 +58,12 @@
 						</table>
 					</div>
 				</div>
-				<div class="details-information">
+				<div class="admin-main-content details-information">
 					<div class="block-title">
 						<p>{{'Returns'|_}}</p>
 						<button type="button" class="button button4" @click="addReturn()">{{'Add'|_}}</button>
 					</div>
-					<div>
+					<div class="scrollable-area">
 						<table>
 							<thead>
 							<tr>
@@ -86,12 +86,12 @@
 						</table>
 					</div>
 				</div>
-				<div class="details-information">
+				<div class="admin-main-content details-information">
 					<div class="block-title">
 						<p>{{'Refunds'|_}}</p>
 						<button type="button" class="button button4" @click="addRefund()">{{'Add'|_}}</button>
 					</div>
-					<div>
+					<div class="scrollable-area">
 						<table>
 							<thead>
 							<tr>
@@ -112,12 +112,12 @@
 						</table>
 					</div>
 				</div>
-				<div class="details-information">
+				<div class="admin-main-content details-information">
 					<div class="block-title">
 						<p>{{'Cancellations Information'|_}}</p>
 						<button type="button" class="button button4" @click="addCancellation()">{{'Add'|_}}</button>
 					</div>
-					<div>
+					<div class="scrollable-area">
 						<table>
 							<thead>
 							<tr>
@@ -142,23 +142,23 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-12 col-lg-8">
+		<div class="col-md-12 col-lg-7">
 			<div>
 				<div class="existing-payments" v-if="curHlpSection === 'view-payment'">
 					<div class="block-title">
 						<p>Existing Payments</p>
 						<span>Aug 22, 2016, 1:43:33 AM</span>
-						<select>
+						<select2>
 							<option>Shipped</option>
 							<option>Plain</option>
 							<option>Refunded</option>
-						</select>
+						</select2>
 						<label>
 							<input type="checkbox">
 							<span><i aria-hidden="true" class="fa fa-check"></i></span><span>Delete</span></label>
 					</div>
-					<div class="secondary-grid">
-						<table>
+					<div class="scrollable-area">
+						<table class="secondary-table">
 							<thead>
 							<tr>
 								<td>Method</td>
@@ -187,22 +187,23 @@
 							</tr>
 							</tbody>
 						</table>
-						<div class="control-buttons-block">
-							<button type="button" class="button13" @click="closeHlpSection()">{{'Cancel'|_}}</button>
-							<button type="button" class="button2">{{'Apply'|_}}</button>
-						</div>
+					</div>
+					<div class="control-buttons-block">
+						<button type="button" class="button13" @click="closeHlpSection()">{{'Cancel'|_}}</button>
+						<button type="button" class="button2">{{'Apply'|_}}</button>
 					</div>
 				</div>
 			</div>
 
 			<div>
 				<div class="product-sku" v-if="curHlpSection === 'add-payment'">
-					<div class="secondary-grid">
+					<div>
 						<div class="block-title">
 							<p>Product SKU</p>
 							<span>1078987321</span>
 						</div>
-						<table>
+						<div class="scrollable-area">
+							<table class="secondary-table">
 							<thead>
 							<tr>
 								<td>Inventory SKU</td>
@@ -226,6 +227,7 @@
 							</tr>
 							</tbody>
 						</table>
+						</div>
 						<div class="control-buttons-block">
 							<div>
 								<p>Amount to Pay</p>
@@ -238,7 +240,8 @@
 							<p>Product SKU</p>
 							<span>1078987321</span>
 						</div>
-						<table>
+						<div class="scrollable-area">
+							<table class="secondary-table">
 							<thead>
 							<tr>
 								<td>Inventory SKU</td>
@@ -262,6 +265,7 @@
 							</tr>
 							</tbody>
 						</table>
+						</div>
 						<div class="control-buttons-block">
 							<div>
 								<p>Amount to Pay</p>
@@ -277,13 +281,13 @@
 					</div>
 					<div class="create-payment">
 						<span>Check / Money Order</span>
-						<select>
+						<select2>
 							<option value="stripe">Stripe</option>
 							<option value="paypal">PayPal Express Checkout</option>
 							<option value="cc">Credit Card</option>
 							<option value="basic" selected="">Check / Money Order</option>
 							<option value="ogone">Ogone</option>
-						</select>
+						</select2>
 						<button type="button" class="button button12">{{'Create'|_}}</button>
 					</div>
 					<div class="control-buttons-block">

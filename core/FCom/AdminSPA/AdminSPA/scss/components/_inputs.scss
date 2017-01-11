@@ -109,6 +109,9 @@ input[type="text"], input[type="password"] {
 .select2-container .select2-selection--single {
     height: 33px;
 }
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	height: 100%;
+}
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     line-height: 33px;
 }

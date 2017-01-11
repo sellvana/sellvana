@@ -1,4 +1,4 @@
-@media (min-width: 1200px) {
+@media (min-width: 1366px) {
 	.visible-lg {
 		display: inline-block !important;
 	}
@@ -8,4 +8,9 @@
 	.visible-xs {
 		display: inline-block !important;
 	}
+}
+
+.cke_editor_editor_dialog {
+	width: 50% !important;
+	margin: 0 auto  !important;
 }
