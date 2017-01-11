@@ -26,7 +26,7 @@ define(['vue', 'sv-hlp'],
                     label: label,
                     breadcrumbs: [
                         {nav:'/catalog', label:'Catalog', icon_class:'fa fa-book'},
-                        {link:'/sales/products', label:'Products'}
+                        {link:'/catalog/products', label:'Products'}
                     ]
                 }});
             },

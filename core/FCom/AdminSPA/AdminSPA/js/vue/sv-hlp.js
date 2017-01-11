@@ -30,6 +30,27 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
 
         Vue.component('select2', VueSelect2);
 
+        Vue.component('checkbox', {
+            template: '<span><input type="checkbox" v-model="internal"><div class="checkbox-block"><div class="checkbox-elem"></div></div></span>',
+            props: ['value'],
+            data: function () {
+                return {
+                    internal: null
+                }
+            },
+            created: function () {
+                this.internal = this.value;
+            },
+            watch: {
+                value: function (value) {
+                    this.internal = this.value;
+                },
+                internal: function (internal) {
+                    this.$emit('input', internal);
+                }
+            }
+        });
+
         Vue.filter('_', translate);
 
         Vue.filter('currency', function (value, currencyCode) {
@@ -365,8 +386,6 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                         Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
                     },
                     processFormDataResponse: function (response) {
-                        processResponse(response);
-
                         if (!response.form.updates) {
                             response.form.updates = {};
                         }
@@ -376,7 +395,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                             deps.push(response.form.tabs[i].component);
                         }
                         require(deps, function () {
-                            var tabs = response.form.tabs
+                            var tabs = response.form.tabs;
                             for (i = 0, l = response.form.tabs.length; i < l; i++) {
                                 Vue.set(vm.form.tabs[i], 'component_config', arguments[i]);
                             }
@@ -390,11 +409,11 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 },
                 created: function () {
                     this.updateBreadcrumbs(translate('Loading data...'));
-                    this.fetchData();
+                    this.fetchData(this.$route);
                 },
                 beforeRouteLeave: function (to, from, next) {
                     // TODO: doesn't trigger on route args change (?id=5)
-                    if (Object.keys(this.form.updates).length > 1) {
+                    if (this.form.updates && Object.keys(this.form.updates).length > 1) {
                         if (!confirm('There are unsaved changes, are you sure you want to leave?')) {
                             console.log(this.form.updates);
                             next(false);

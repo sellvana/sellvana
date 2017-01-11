@@ -50,7 +50,7 @@
 /sales/orders/form:
     - view: app
         do:
-            - [ addFormTab, { path: /sales/orders/form, name: main, label: General Info, pos: 10, component: sv-page-sales-orders-form-main } ]
-            - [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20, component: sv-page-sales-orders-form-details } ]
-            - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30, component: sv-page-sales-orders-form-comments } ]
-            - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40, component: sv-page-sales-orders-form-history } ]
+            - [ addFormTab, { path: /sales/orders/form, name: main, label: General Info, pos: 10 } ]
+            - [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20 } ]
+            - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30 } ]
+            - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40 } ]

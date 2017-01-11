@@ -1,0 +1,30 @@
+.tree-node {
+
+  cursor: pointer;
+
+  &.open {
+    font-weight: bold;
+  }
+
+  & > ul {
+    padding-left: 1em;
+    line-height: 1.5em;
+    list-style-type: dot;
+  }
+
+  & > .node-line {
+    & > .add-child {
+      display: none;
+    }
+
+    &:hover > .add-child {
+      display: inline-block;
+    }
+
+    &.active .node-label {
+      font-weight: bold;
+      color: #000;
+    }
+  }
+
+}

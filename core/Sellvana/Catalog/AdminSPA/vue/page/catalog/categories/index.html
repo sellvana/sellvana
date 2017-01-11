@@ -1,0 +1,35 @@
+<div>
+    <div class="row">
+        <div class="col-sm-12 col-md-4 col-lg-2">
+            <div class="admin-main-content">
+                <sv-comp-tree :tree="tree" :cur-node="curNode" tree-id="categories" @event="treeEvent"></sv-comp-tree>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-8 col-lg-10">
+            <div class="row">
+                <div class="col-md-7">
+                </div>
+                <div class="col-md-5">
+                    <div class="control-buttons">
+                        <button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+                        <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                        <button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+                        <button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="secondary-menu">
+                        <ul class="nav">
+                            <li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

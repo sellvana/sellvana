@@ -104,6 +104,8 @@
             - [ requireJs, sv-comp-grid-data-cell-actions, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions" ]
             - [ requireJs, sv-comp-grid-data-cell-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions.html" ]
 
+            - [ requireJs, sv-comp-tree, "@FCom_AdminSPA/AdminSPA/vue/component/tree" ]
+            - [ requireJs, sv-comp-tree-node-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/tree/node.html" ]
 
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
@@ -196,4 +198,4 @@ sv-app-setings-config:
 /users/form:
     - view: app
         do:
-            - [ addFormTab, { path: /users/form, name: main, label: User Info, pos: 10, component: sv-page-users-form-main } ]
+            - [ addFormTab, { path: /users/form, name: main, label: User Info, pos: 10 } ]

@@ -16,7 +16,7 @@ define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-catalog-products-grid-config'], 
                 link: '/catalog/products',
                 label: 'Products',
                 breadcrumbs: [
-                    {nav:'/catalog', label:'Catalog', icon_class:'fa fa-book'},
+                    {nav:'/catalog', label:'Catalog', icon_class:'fa fa-book'}
                 ]
             }});
         }

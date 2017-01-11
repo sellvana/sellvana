@@ -13,7 +13,7 @@
     </div>
     <div class="row">
 		<div class="col-md-2">
-            <div class="order-menu">
+            <div class="secondary-menu">
                 <ul class="nav">
                     <li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
                 </ul>

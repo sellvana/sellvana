@@ -28,4 +28,4 @@
 /customers/form:
     - view: app
         do:
-            - [ addFormTab, { path: /customers/form, name: main, label: Customer Info, pos: 10, component: sv-page-customers-form-main } ]
+            - [ addFormTab, { path: /customers/form, name: main, label: Customer Info, pos: 10 } ]
