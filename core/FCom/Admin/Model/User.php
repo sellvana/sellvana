@@ -362,8 +362,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         $this->BEvents->fire(__METHOD__);
         #$this->BSession->set('admin_user_id', null);
         #$this->BSession->set('admin_user_password_token', null);
-        $sessData =& $this->BSession->set();
-        $sessData = [];
+        $this->BSession->set(true, []);
 
         $this->BSession->regenerateId();
 
