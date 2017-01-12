@@ -228,10 +228,27 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             });
         }
 
+        var routes = [];
+        for (var i in SvAppData.routes) {
+            var r = SvAppData.routes[i], route = {path: r.path, component: routeView(r.require)};
+            if (r.children) {
+                route.children = [];
+                for (var j in r.children) {
+                    var child = r.children[j];
+                    route.children.push({path: child.path, component: routeView(child.require)});
+                }
+            }
+            routes.push(route);
+        }
+        var router = new VueRouter({
+            routes: routes
+        });
+
         function processResponse(response) {
             var storeData = {};
             if (response._login) {
                 storeData.user = {};
+                router.push('/login');
             }
             if (response._user) {
                 storeData.user = response._user;
@@ -257,24 +274,34 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             store.commit('setData', storeData);
 
             if (response._redirect) {
-                //console.log(response._redirect);
+                router.push(response._redirect);
             }
         }
 
-        var routes = [];
-        for (var i in SvAppData.routes) {
-            var r = SvAppData.routes[i], route = {path: r.path, component: routeView(r.require)};
-            if (r.children) {
-                route.children = [];
-                for (var j in r.children) {
-                    var child = r.children[j];
-                    route.children.push({path: child.path, component: routeView(child.require)});
+        requirejs.onError = function (err) {
+console.log('onError', err.xhr);
+            if (err.xhr.status === 401) {
+                router.push('/login');
+            }
+        };
+
+        requirejs.config({
+            config: {
+                text: {
+                    onXhrComplete: function (xhr, url) {
+                        var response = xhr.response;
+                        if (_.isString(response) && response[0] === '{') {
+                            response = JSON.parse(response);
+                        } else {
+                            return;
+                        }
+                        console.log(response, response._login);
+                        if (response._login) {
+                            router.push('/login');
+                        }
+                    }
                 }
             }
-            routes.push(route);
-        }
-        var router = new VueRouter({
-            routes: routes
         });
 
         var mixins = {

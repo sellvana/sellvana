@@ -1,13 +1,26 @@
 <?php
 
+/**
+ * Class FCom_AdminSPA_AdminSPA_Controller_Account
+ *
+ * @property FCom_Admin_Model_UserG2FA FCom_Admin_Model_UserG2FA
+ */
 class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_Controller_Abstract
 {
     public function authenticate($args = [])
     {
-        if (in_array($this->_action, ['login', 'logout', 'password_recover', 'password_reset'])) {
+        if (in_array($this->_action, ['login', 'logout', 'password_recover', 'password_reset'], true)) {
             return true;
         }
         return parent::authenticate($args);
+    }
+
+    public function action_login()
+    {
+        $result = [
+            'is_logged_in' => $this->FCom_Admin_Model_User->isLoggedIn(),
+        ];
+        $this->respond($result);
     }
 
     public function action_login__POST()
@@ -40,7 +53,11 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
 
             $user->login();
 
-            $this->ok()->addResponses(true);#->addResponses(['_redirect' => '/']);
+            $this->addResponses(['debug' => $_SESSION]);
+
+            $this->ok()->addResponses(['_user', '_permissions', '_personalize', '_local_notifications', '_csrf_token',
+                '_redirect' => '/',
+            ]);
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -54,7 +71,9 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
             if ($user) {
                 $user->logout();
             }
-            $this->ok()->addResponses(true);
+            $this->ok()->addResponses(['_user', '_permissions', '_personalize', '_local_notifications', '_csrf_token',
+                '_redirect' => '/login',
+            ]);
         } catch (Exception $e) {
             $this->addMessage($e);
         }

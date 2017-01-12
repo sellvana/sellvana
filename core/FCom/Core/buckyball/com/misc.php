@@ -204,14 +204,14 @@ class BUtil extends BClass
             $out = [];
             if (!empty($val) && ($isObj || array_keys($val) !== range(0, count($val)-1))) { // assoc?
                 foreach ($val as $k => $v) {
-                    $out[] = "'" . addslashes($k) . "':" . static::toJavaScript($v);
+                    $out[] = "'" . addslashes($k) . "':" . $this->toJavaScript($v);
                 }
-                return '{' . join(',', $out) . '}';
+                return '{' . implode(',', $out) . '}';
             } else {
                 foreach ($val as $k => $v) {
-                    $out[] = static::toJavaScript($v);
+                    $out[] = $this->toJavaScript($v);
                 }
-                return '[' . join(',', $out) . ']';
+                return '[' . implode(',', $out) . ']';
             }
         }
         return '"UNSUPPORTED TYPE"';
@@ -1570,7 +1570,7 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
             foreach ($a as $p) {
                 if ($p === '..') array_pop($b); else $b[] = $p;
             }
-            $path = join('/', $b);
+            $path = implode('/', $b);
         }
         return $path;
     }
@@ -1846,7 +1846,7 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
             } elseif (is_array($v)) {
                 switch ($k) {
                     case 'class':
-                        $v = join(' ', $v);
+                        $v = implode(' ', $v);
                         break;
 
                     case 'style':
@@ -1854,16 +1854,16 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
                         foreach ($v as $k1 => $v1) {
                             $attrHtmlArr[] = $k1 . ':' . $v1;
                         }
-                        $v = join('; ', $attrHtmlArr);
+                        $v = implode('; ', $attrHtmlArr);
                         break;
 
                     default:
-                        $v = join('', $v);
+                        $v = implode('', $v);
                 }
             }
             $attrsHtmlArr[] = $k . '="' . htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . '"';
         }
-        return join(' ', $attrsHtmlArr);
+        return implode(' ', $attrsHtmlArr);
     }
 
 
@@ -1888,7 +1888,7 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
             }
         }
         if (is_array($content)) {
-            $content = join('', array_map([$this, 'tagHtml'], $content));
+            $content = implode('', array_map([$this, 'tagHtml'], $content));
         }
         return '<' . $tag . ' ' . $this->tagAttributes($attrs) . '>' . $content . '</' . $tag . '>';
     }
@@ -1930,7 +1930,7 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
             $htmlArr[] = $this->tagHtml('option', $attr, $v);
         }
 
-        return join("\n", $htmlArr);
+        return implode("\n", $htmlArr);
     }
 
     /**
@@ -2823,8 +2823,8 @@ class BEmail extends BClass
             $data['to'],
             $data['subject'],
             $data['body'],
-            join("\r\n", $data['headers']),
-            join(' ', $data['params'])
+            explode("\r\n", $data['headers']),
+            explode(' ', $data['params'])
         );
     }
 }
@@ -4864,9 +4864,9 @@ class BValidate extends BClass
     {
         $result = [];
         foreach ($this->_validateErrors as $field => $errors) {
-            $result[] = $field . ': ' . join('; ', $errors);
+            $result[] = $field . ': ' . implode('; ', $errors);
         }
-        return join("\n", $result);
+        return implode("\n", $result);
     }
 
     /**

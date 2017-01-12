@@ -223,8 +223,8 @@ class BLayout extends BClass
         foreach ($params['file_ext'] as $ext) {
             static::$_extRenderers[$ext] = $params;
         }
-        static::$_extRegex = join('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
-        BDebug::debug('ADD RENDERER: ' . join('; ', $params['file_ext']));
+        static::$_extRegex = implode('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
+        BDebug::debug('ADD RENDERER: ' . implode('; ', $params['file_ext']));
         return $this;
     }
 
@@ -1382,7 +1382,7 @@ class BLayout extends BClass
         foreach ($this->_currentViewStack as $i => $view) {
             $output[] = "#{$i}: @{$view->getParam('module_name')}/{$view->getParam('view_name')}";
         }
-        return join("\n", $output);
+        return implode("\n", $output);
     }
 
     /**
@@ -1671,11 +1671,11 @@ class BView extends BClass
             $result .= "<!-- START HOOK: {$hookName} -->\n";
         }
 
-        $result .= join('', $this->BEvents->fire('BView::hook:before', ['view' => $this, 'name' => $hookName]));
+        $result .= implode('', $this->BEvents->fire('BView::hook:before', ['view' => $this, 'name' => $hookName]));
 
-        $result .= join('', $this->BEvents->fire('BLayout::hook:' . $hookName, $args));
+        $result .= implode('', $this->BEvents->fire('BLayout::hook:' . $hookName, $args));
 
-        $result .= join('', $this->BEvents->fire('BView::hook:after', ['view' => $this, 'name' => $hookName]));
+        $result .= implode('', $this->BEvents->fire('BView::hook:after', ['view' => $this, 'name' => $hookName]));
 
         if ($debug) {
             $result .= "<!-- END HOOK: {$hookName} -->\n";
@@ -1812,7 +1812,7 @@ class BView extends BClass
         // TODO: link views with layouts
         $this->BLayout->viewStackOn($this);
 
-        $result .= join('', $this->BEvents->fire('BView::render:before', ['view' => $this]));
+        $result .= implode('', $this->BEvents->fire('BView::render:before', ['view' => $this]));
 
         $viewContent = $this->_render();
 
@@ -1822,7 +1822,7 @@ class BView extends BClass
         }
 
         $result .= $viewContent;
-        $result .= join('', $this->BEvents->fire('BView::render:after', ['view' => $this]));
+        $result .= implode('', $this->BEvents->fire('BView::render:after', ['view' => $this]));
 
         $this->BLayout->viewStackOff($this);
 
@@ -1869,7 +1869,7 @@ class BView extends BClass
             BDebug::profile($t);
             return $viewContent;
         }
-        $metaContent = join("\n", $matches[0]);
+        $metaContent = implode("\n", $matches[0]);
         if ($prerendered) {
             $metaOutput = $metaContent;
         } else {
@@ -2423,7 +2423,7 @@ class BViewHead extends BView
             $this->_title = array_reverse($this->_title);
         }
 
-        return '<title>' . $this->q(join($this->_titleSeparator, $this->_title)) . '</title>';
+        return '<title>' . $this->q(implode($this->_titleSeparator, $this->_title)) . '</title>';
     }
 
     public function removeTitle($pattern)
@@ -2448,7 +2448,7 @@ if ($this->BDebug->is('DEBUG')) {
     public function getMeta($name = null)
     {
         if (null === $name) {
-            return join("\n", $this->_meta);
+            return implode("\n", $this->_meta);
         }
 
         return !empty($this->_meta[$name]) ? $this->_meta[$name] : null;
@@ -2636,10 +2636,10 @@ if ($this->BDebug->is('DEBUG')) {
             //$res1[$type == 'css' ? 0 : 1][] = $this->getElement($type, $name);
         }
 //        for ($i = 0; $i <= 1; $i++) {
-//            if (!empty($res1[$i])) $result[] = join("\n", $res1[$i]);
+//            if (!empty($res1[$i])) $result[] = implode("\n", $res1[$i]);
 //        }
 
-        return preg_replace('#\n{2,}#', "\n", join("\n", $result));
+        return preg_replace('#\n{2,}#', "\n", implode("\n", $result));
     }
 
     /**
@@ -2733,9 +2733,9 @@ if ($this->BDebug->is('DEBUG')) {
             $jsArr[] = "require.config(" . $this->BUtil->toJavaScript($config) . "); ";
         }
         if (!empty($this->_requireJs['run'])) {
-            $jsArr[] = "require(['" . join("', '", $this->_requireJs['run']) . "']);";
+            $jsArr[] = "require(['" . implode("', '", $this->_requireJs['run']) . "']);";
         }
-        return join("\n", $jsArr);
+        return implode("\n", $jsArr);
     }
 
     /**
@@ -2760,7 +2760,7 @@ if ($this->BDebug->is('DEBUG')) {
             }
 
             if ($scriptsArr) {
-                $html .= "<script>" . join("\n", $scriptsArr) . "</script>";
+                $html .= "<script>" . implode("\n", $scriptsArr) . "</script>";
             }
 
             return $html;
@@ -2897,7 +2897,7 @@ class BViewList extends BView
             $output[] = $childView->render($args);
         }
 
-        return join('', $output);
+        return implode('', $output);
     }
 
     /**

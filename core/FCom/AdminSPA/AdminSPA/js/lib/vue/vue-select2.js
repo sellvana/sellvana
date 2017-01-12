@@ -24,7 +24,7 @@ define(['jquery', 'lodash', 'select2'], function ($, _) {
             if (this.options) {
                 params.data = this.options;
             }
-//console.log('mounted', this.value);
+//console.log('mounted', params, this.value);
             $(this.$el).val(this.value).select2(params).on('change', function () {
                 var $el = $(vm.$el), val = $el.val();
                 vm.$emit('input', val);

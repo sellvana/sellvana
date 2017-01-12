@@ -84,6 +84,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
         }
 
         function initGridComponents(grid) {
+            if (!grid.config.columns) {
+                return;
+            }
             if (!grid.components) {
                 Vue.set(grid, 'components', {
                     header_columns: {},

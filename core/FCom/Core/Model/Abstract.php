@@ -101,7 +101,7 @@ class FCom_Core_Model_Abstract extends BModel
     public function setData($path, $value = null, $merge = false)
     {
         if (is_array($path)) {
-            foreach ($path as $p => $v) {
+            foreach ((array)$path as $p => $v) {
                 $this->setData($p, $v, $merge);
             }
             return $this;

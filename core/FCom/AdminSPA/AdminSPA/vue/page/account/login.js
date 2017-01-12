@@ -1,7 +1,6 @@
 define(['jquery', 'sv-hlp'], function($, SvHlp) {
     return {
         mixins: [SvHlp.mixins.common],
-        store: SvHlp.store,
         data: function () {
             return {
                 username: '',
@@ -20,7 +19,15 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
         },
         created: function () {
             if (this.$store.state.user && this.$store.state.user.id) {
-                this.$router.push('/');
+                var vm = this;
+                SvHlp.sendRequest('GET', 'account/login', {}, function (response) {
+                    console.log(response);
+                    if (response.is_logged_in) {
+                        vm.$router.push('/');
+                    } else {
+                        vm.$store.commit('setData', {user: false});
+                    }
+                });
             }
         }
     }

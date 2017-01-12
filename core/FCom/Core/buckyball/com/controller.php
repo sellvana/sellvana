@@ -621,6 +621,7 @@ class BRequest extends BClass
         if (empty($path)) {
             $path = $this->webRoot();
         }
+        $path = rtrim($path, '/') . '/';
         return $path;
     }
 

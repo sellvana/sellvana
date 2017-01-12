@@ -878,8 +878,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->FCom_Admin_Model_User->personalize($persData);
 
         if ($stateKey) {
-            $sess =& $this->BSession->dataToUpdate();
-            $sess['grid_state'][$stateKey] = $r;
+            $this->BSession->set('grid_state/' . $stateKey, $r);
         }
         if ($forceRequest) {
             $r = array_replace_recursive($r, $forceRequest);

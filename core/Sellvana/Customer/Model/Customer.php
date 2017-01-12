@@ -374,10 +374,9 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             if (!$userId) {
                 return false;
             }
-            $sessData =& $this->BSession->dataToUpdate();
-            $user = static::$_sessionUser = $this->load($userId);
+            static::$_sessionUser = $user = $this->load($userId);
             if (!$user) {
-                $sessData['customer_id'] = null;
+                $this->BSession->set('customer_id', null);
                 return false;
             }
             if (!$this->BSession->get('admin_user_id')) {
@@ -396,9 +395,10 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
                 if ($save) {
                     $user->save();
                 }
-                if (empty($sessData['customer_password_token'])) {
-                    $sessData['customer_password_token'] = $token;
-                } elseif ($sessData['customer_password_token'] !== $token) {
+                $sessPassToken = $this->BSession->get('customer_password_token');
+                if (!$sessPassToken) {
+                    $this->BSession->set('customer_password_token', $token);
+                } elseif ($sessPassToken !== $token) {
                     $user->logout();
                     $this->BResponse->cookie('remember_me', 0);
                     $this->BResponse->redirect('');
@@ -469,8 +469,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->BEvents->fire(__METHOD__ . ':before', ['user' => $this->sessionUser()]);
 
-        $sessData =& $this->BSession->dataToUpdate();
-        $sessData = [];
+        $this->BSession->set(true, []);
         static::$_sessionUser = null;
 
         $this->BSession->regenerateId();

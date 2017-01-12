@@ -12,10 +12,10 @@ class Sellvana_Catalog_Model_SearchHistory extends FCom_Core_Model_Abstract
         }
 
         $sData =& $this->BSession->dataToUpdate();
-        if (!empty($sData['search_history'][$query])) {
+        if ($this->BSession->get("search_history/{$query}")) {
             return null;
         }
-        $sData['search_history'][$query] = $query;
+        $this->BSession->set("search_history/{$query}", $query);
         //TODO: add 'W'ord functionality
         $data = ['term_type' => 'F', 'query' => (string)$query];
         $record = $this->loadWhere($data);

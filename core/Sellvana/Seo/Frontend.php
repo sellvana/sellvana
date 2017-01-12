@@ -9,13 +9,11 @@ class Sellvana_Seo_Frontend extends BClass
 
     public function rememberReferrer()
     {
-        $referrer =& $this->BSession->dataToUpdate('referrer');
+        $referrer = $this->BSession->get('referrer');
         if (empty($referrer)) {
             $url = $this->BRequest->referrer();
             if (!$url) {
-                $referrer = [
-                    'url' => null,
-                ];
+                $this->BSession->set('referrer', ['url' => null]);
             } else {
                 $parts = parse_url($url);
                 $source = null;
@@ -44,12 +42,12 @@ class Sellvana_Seo_Frontend extends BClass
                         $keywords = preg_split('/\W+/', $keywords);
                     }
                 }
-                $referrer = [
+                $this->BSession->set('referrer', [
                     'url' => $url,
                     'source_host' => $parts['host'],
                     'source' => $source,
                     'keywords' => $keywords,
-                ];
+                ]);
             }
         }
     }

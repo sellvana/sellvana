@@ -3,6 +3,7 @@
 /**
  * Class FCom_AdminSPA_AdminSPA
  *
+ * @property FCom_AdminSPA_AdminSPA_View_App FCom_AdminSPA_AdminSPA_View_App
  * @property FCom_Admin_Model_User FCom_Admin_Model_User
  * @property FCom_Admin_Model_Personalize FCom_Admin_Model_Personalize
  */
@@ -12,7 +13,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
         '_messages' => true,
         '_user' => true,
         '_permissions' => true,
-        //'_nav' => true,
+        '_nav' => true,
         '_personalize' => true,
         '_local_notifications' => true,
         '_redirect' => true,
@@ -84,12 +85,13 @@ class FCom_AdminSPA_AdminSPA extends BClass
     
     public function responseCallback_permissions($data)
     {
-        return [];
+        return new StdClass;
     }
     
     public function responseCallback_nav($data)
     {
-        return [];
+        $this->BLayout->applyLayout('/');
+        return $this->FCom_AdminSPA_AdminSPA_View_App->getNavTree();
     }
 
     public function responseCallback_personalize($data)

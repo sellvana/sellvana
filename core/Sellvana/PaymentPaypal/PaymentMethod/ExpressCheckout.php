@@ -73,8 +73,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'online' => 1,
         ])->save();
 
-        $sData =& $this->BSession->dataToUpdate();
-        $sData['paypal']['token'] = $token;
+        $this->BSession->set('paypal/token', $token);
 
         $result['redirect_to'] = $this->getConfig('express_checkout_url') . $token;
 
@@ -100,8 +99,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             'online' => 1,
         ])->save();
 
-        $sData =& $this->BSession->dataToUpdate();
-        $sData['paypal']['token'] = $token;
+        $this->BSession->set('paypal/token', $token);
 
         $result['redirect_to'] = $this->getConfig('express_checkout_url') . $token;
 
@@ -112,17 +110,16 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
     public function processReturnFromExternalCheckout()
     {
-        $sData =& $this->BSession->dataToUpdate();
         $token = $this->BRequest->get('token');
         $payerId = $this->BRequest->get('PayerID');
 
         $result = ['token' => $token, 'payer_id' => $payerId];
-        if (empty($sData['last_order_id'])) {
+        if (!$this->BSession->get('last_order_id')) {
             $result['error']['message'] = 'Session Expired';
             $this->_setErrorStatus($result, true);
             return $result;
         }
-        if ($token !== $sData['paypal']['token']) {
+        if ($token !== $this->BSession->get('paypal/token')) {
             $result['error']['message'] = 'Invalid PayPal Return Token';
             $this->_setErrorStatus($result, true);
             return $result;
@@ -133,7 +130,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $this->_setErrorStatus($result, true);
             return $result;
         }
-        if ($payment->get('order_id') !== $sData['last_order_id']) {
+        if ($payment->get('order_id') !== $this->BSession->get('last_order_id')) {
             $result['error']['message'] = "Order doesn't match the payment token";
             $this->_setErrorStatus($result, true);
             return $result;

@@ -342,7 +342,7 @@ class BApp extends BClass
             $folders = explode(',', $folders);
         }
         $modules = $this->BModuleRegistry;
-        foreach ($folders as $folder) {
+        foreach ((array)$folders as $folder) {
             $modules->scan($folder);
         }
         return $this;
@@ -1308,7 +1308,8 @@ class BClassRegistry extends BClass
         // here $class is the overriding object class, and config for methods
         // is keyed with overridden class name, so findMethodInfo will never return true, unless
         // overriding and overridden class are the same!
-        if (($info = static::findMethodInfo($class, $method, 0, 'override'))) {
+        $info = static::findMethodInfo($class, $method, 0, 'override');
+        if ($info) {
             $callback = $info['callback'];
             array_unshift($args, $origObject);
             $overridden = true;
@@ -1450,7 +1451,7 @@ class BClassRegistry extends BClass
      * @param string $class
      * @param mixed $args
      * @param bool $singleton
-     * @return object
+     * @return BClass
      */
     static public function instance($class, array $args = [], $singleton = false)
     {
@@ -2486,6 +2487,8 @@ class BSession extends BClass
         $domain = $this->BRequest->getCookieDomain();
         $https = $this->BRequest->https();
 
+        header_remove('Set-Cookie');
+
         session_set_cookie_params($ttl, $path, $domain, $https, true);
 
         session_start();
@@ -2677,27 +2680,68 @@ class BSession extends BClass
         return $this;
     }
 
-    public function get($key, $default = null)
+    public function get($key = null, $default = null)
     {
         $this->open();
 
-        return isset($this->data[$key]) ? $this->data[$key] : $default;
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
+        if (!$_SESSION[$namespace]) {
+            return null;
+        }
+
+        $data = $_SESSION[$namespace];
+
+        if ($key === null) {
+            return $data;
+        }
+
+        if (strpos($key, '/') !== false) {
+            $pathArr = explode('/', trim($key, '/'));
+            foreach ($pathArr as $k) {
+                if (!isset($data[$k])) {
+                    return $default;
+                }
+                $data = $data[$k];
+            }
+            return $data;
+        }
+
+        return isset($data[$key]) ? $data[$key] : $default;
     }
 
-    public function set($key, $value = null)
+    public function set($key, $value = null, $merge = false)
     {
         $this->open();
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
 
+        if (true === $key) {
+            $_SESSION[$namespace] = $value;
+        }
         if (is_array($key)) {
             foreach ($key as $k => $v) {
                 $this->set($k, $v);
             }
             return $this;
         }
-        if (!isset($this->data[$key]) || $this->data[$key] !== $value) {
+
+        $node =& $_SESSION[$namespace];
+        if (strpos($key, '/') !== false) {
+            foreach (explode('/', trim($key, '/')) as $k) {
+                $node =& $node[$k];
+            }
+        } else {
+            $node =& $node[$key];
+        }
+
+        if ($node !== $value) {
             $this->setDirty();
         }
-        $this->data[$key] = $value;
+
+        if ($merge) {
+            $node = $this->BUtil->arrayMerge((array)$node, (array)$value);
+        } else {
+            $node = $value;
+        }
         return $this;
     }
 
@@ -2711,12 +2755,14 @@ class BSession extends BClass
     /**
      * Get reference to session data and set dirty flag true
      *
+     * @deprecated use BSession::set()
      * @return array
      */
     public function &dataToUpdate()
     {
         $this->setDirty();
-        return $this->data;
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
+        return $_SESSION[$namespace];
     }
 
     /**
@@ -2726,6 +2772,9 @@ class BSession extends BClass
      */
     public function close()
     {
+        session_write_close();
+        return $this;
+
         if (!$this->_dirty/* || !empty( $_SESSION )*/) {
 #echo "<pre>"; var_dump($this->_dirty, $_SESSION); echo "</pre>";
             $this->_isOpen = false;
@@ -2809,8 +2858,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $message = ['type' => $type];
         if (is_array($msg) && !empty($msg[0])) {
             $msgs = [];
-            foreach ($msg as $m) {
-                if (is_string($m) || is_object($m) && method_exists($m, '__toString')) {
+            foreach ((array)$msg as $m) {
+                if (is_string($m) || (is_object($m) && method_exists($m, '__toString'))) {
                     $msgs[] = (string)$m;
                 } elseif (is_array($m)) {
                     $m['title'] = !empty($m['title']) ? (string)$m['title'] : null;
@@ -2866,9 +2915,10 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function csrfToken($validating = false, $hashReferrer = null)
     {
-        $data =& static::dataToUpdate();
-        if (empty($data['_csrf_token'])) {
-            $data['_csrf_token'] = $this->BUtil->randomString(32);
+        $csrfToken = $this->get('_csrf_token');
+        if (!$csrfToken) {
+            $csrfToken = $this->BUtil->randomString(32);
+            $this->set('_csrf_token', $csrfToken);
         }
         if (null === $hashReferrer) {
             $hashReferrer = $this->BConfig->get('web/csrf_check_method') === 'token+referrer';
@@ -2881,9 +2931,9 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
                 $url = $this->BRequest->currentUrl();
             }
             $url = rtrim(str_replace('/index.php', '', $url), '/?&#');
-            return sha1($data['_csrf_token'] . $url);
+            return sha1($csrfToken . $url);
         }
-        return $data['_csrf_token'];
+        return $csrfToken;
     }
 
     public function validateCsrfToken($token)

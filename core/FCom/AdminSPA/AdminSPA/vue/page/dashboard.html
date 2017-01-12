@@ -32,7 +32,7 @@
 			<div class="control-buttons"> 
 				<div class="row">
 					<div class="col-sm-6">
-						<select2>
+						<select2 :params="{placeholder:'Date Range...'}">
 							<option>Today</option>
 							<option>Yeasterday</option>
 							<option>Last 7 Days</option>
@@ -43,8 +43,7 @@
 						</select2>
 					</div>
 					<div class="col-sm-6">
-						<select2>
-							<option>Select a widget...</option>
+						<select2 :params="{placeholder:'Add a widget...'}">
 							<option>Latest Product Reviews</option>
 							<option>Latest Newsletter Subscriptions</option>
 							<option>Late Orders</option>
