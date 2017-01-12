@@ -7,8 +7,8 @@
 						<p>{{'Payments'|_}}</p>
 						<button type="button" class="button4" @click="addPayment()">{{'Add'|_}}</button>
 					</div>
-					<div class="scrollable-area">
-						<table class="label-table">
+					<div>
+						<table class="secondary-table">
 							<thead>
 								<tr>
 									<td>{{'Timeline'|_}}</td>
@@ -19,10 +19,10 @@
 							</thead>
 							<tbody>
 							<tr v-for="p in form.payments" @click="viewPayment(p)">
-								<td data-label="Timeline">{{p.create_at|date}}</td>
-								<td data-label="Total Amount">{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
-								<td data-label="Method">{{p.payment_method}}</td>
-								<td data-label="Status" :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</td>
+								<td>{{p.create_at|date}}</td>
+								<td>{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
+								<td>{{p.payment_method}}</td>
+								<td :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</td>
 							</tr>
 							</tbody>
 						</table>
@@ -33,7 +33,7 @@
 						<p>{{'Shipments'|_}}</p>
 						<button type="button" class="button4" @click="addShipment()">{{'Add'|_}}</button>
 					</div>
-					<div class="scrollable-area">
+					<div>
 						<table class="secondary-table">
 							<thead>
 							<tr>
@@ -63,7 +63,7 @@
 						<p>{{'Returns'|_}}</p>
 						<button type="button" class="button button4" @click="addReturn()">{{'Add'|_}}</button>
 					</div>
-					<div class="scrollable-area">
+					<div>
 						<table>
 							<thead>
 							<tr>
@@ -91,7 +91,7 @@
 						<p>{{'Refunds'|_}}</p>
 						<button type="button" class="button button4" @click="addRefund()">{{'Add'|_}}</button>
 					</div>
-					<div class="scrollable-area">
+					<div>
 						<table>
 							<thead>
 							<tr>
@@ -117,7 +117,7 @@
 						<p>{{'Cancellations Information'|_}}</p>
 						<button type="button" class="button button4" @click="addCancellation()">{{'Add'|_}}</button>
 					</div>
-					<div class="scrollable-area">
+					<div>
 						<table>
 							<thead>
 							<tr>

@@ -1,10 +1,3 @@
-.main-grid {
-	td,
-	th {
-		height: 49px;
-	}
-}
-
 table {
 	min-width: 100%;
 	td,
@@ -50,9 +43,10 @@ table {
 		.fa {
 			font-size: 16px;
 			color: #dddddd;
-			transition: 0.3s all ease-in;
 			margin: 0 2px;
-			&:hover {
+		}
+		a:hover {
+			i {
 				color: #000;
 			}
 		}
@@ -113,6 +107,12 @@ table {
 		tr:last-child {
 			border-bottom: 0;
 		}
+		tr:hover {
+			background: #fdfcfc;
+			td, a, i {
+				color: #000;
+			}
+		}
 	}
 	.column-row-select {
 		width: 50px;
@@ -148,13 +148,11 @@ table {
 	th {
 		height: auto;
 		min-width: 70px;
-		white-space: nowrap;
 	}
 }
 
 .secondary-table {
 	border-bottom: 0;
-	white-space: nowrap;
 	thead {
 		border-bottom: 1px solid #ebebeb;
 		td {
@@ -169,28 +167,3 @@ table {
 	}
 }
 
-.label-table {
-	white-space: nowrap;
-}
-
-@media (min-width: 1366px) and (max-width: 1600px) {
-	.label-table {
-		thead {
-			display: none;
-		}
-		td {
-			width: 100%;
-			display: block;
-			text-align: right;
-		}
-		td:before {
-			content: attr(data-label);
-			float: left;
-			text-transform: uppercase;
-			font-family: 'GothamProBold'; 
-			display: block;
-			padding: 0 8px;
-			color: #000;
-		}
-	}
-}

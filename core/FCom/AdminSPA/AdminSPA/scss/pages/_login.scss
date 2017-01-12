@@ -54,17 +54,17 @@
 @media (max-width: 767px) {
 	.login-container {
 		width: 90%;
-		position: relative;
+		position: absolute;
 		margin: 0 auto;
-		top: 0;
-		left: 0%;
-		transform: translate(0, 0);    
+		top: 20px;
+		left: 50%;
+		transform: translate(-50%, 0%);
 		padding: 40px 40px 30px;
 		p {
-			font-size: 22px;
+			font-size: 16px;
 		}
 		a {
-			
+			margin: 0 0 15px 0;
 		}
 		.control-buttons-block {
 			text-align: center; 

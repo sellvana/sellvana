@@ -4,7 +4,7 @@
 	border-radius: 2px;
 	margin-bottom: 20px;
 	.nav a {
-		padding: 20px 15px;
+		padding: 12px 15px;
 	}
 	.nav .active {
 		background: #eee;
@@ -17,6 +17,7 @@
 		}
 	}
 	.dropdown-menu {
+		padding: 0;
 		a {
 			padding: 3px 20px;
 		}
@@ -143,6 +144,9 @@
 	width: 100%;
 	overflow: auto;
 	overflow-y: hidden;
+	table {
+		white-space: nowrap;
+	}
 }
 
 .tableDiv {
@@ -945,5 +949,17 @@
 				margin-left: 10px;
 			}
 		}
+	}
+	.control-buttons-block, .control-buttons {
+		padding: 5px 0 0;
+		text-align: center;
+		button, a, input {
+			margin-bottom: 5px;
+		}
+	}
+	button, .button {
+		padding: 4px 12px;
+		font-size: 11px;
+		font-family: 'GothamProLight';
 	}
 }

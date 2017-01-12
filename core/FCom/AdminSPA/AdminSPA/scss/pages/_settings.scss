@@ -1,5 +1,11 @@
-.nav .dropdown {
-    display: inline-block;
+.horizontal-menu {
+	display: inline-block;
+	li {
+		display: inline-block;
+	}
+	.dropdown li {
+		display: block;
+	}
 }
 .admin-main-content {
     .navbar {
@@ -41,9 +47,9 @@ fieldset {
 	height: 28px;
 	border-radius: 20px;
 	border: 1px solid #eee;
-	transition: 0.1s all ease-in;
+	transition: 0.1s all ease-in; 
 	position: relative;
-	cursor: pointer;
+	cursor: pointer; 
 	.checkbox-elem {
 		width: 26px;
 		height: 26px;
@@ -57,12 +63,8 @@ fieldset {
 		box-shadow: 2px 1px 3px 0px rgba(0, 0, 0, 0.06); 
 	}
 }
-
-input[type="checkbox"]:checked + .checkbox-block {
-	background: #4dd865;
-	border: 1px solid #4dd865;
-	.checkbox-elem {
-		left: 20px;
-		border: 1px solid #fff;
-	}
+.avatar-img {
+	margin-bottom: 20px;
+	margin: 0 auto 20px;
+	display: block;
 }

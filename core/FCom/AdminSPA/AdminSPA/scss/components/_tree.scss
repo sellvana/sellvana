@@ -1,30 +1,42 @@
 .tree-node {
+	cursor: pointer;
+	&.open {
+		font-weight: bold;
+	}
+	.node-line {
+		padding: 6px 0;
+		.node-name {
+			display: inline-block;
+			width: 79%;
+			vertical-align: top;
+		}
+	}
+	& > ul {
+		padding-left: 1em;
+		line-height: 1.5em;
+		list-style-type: dot;
+	}
+	& > .node-line {
+		.add-child {
+			display: none;
+		}
+		&:hover .add-child {
+			display: inline-block;
+			width: 16px;
+		}
+		&.active .node-label {
+			font-family: "GothamProBold";
+			color: #000;
+		}
+	}
+	& * {
+		color: #595959;
+	}
+}
 
-  cursor: pointer;
-
-  &.open {
-    font-weight: bold;
-  }
-
-  & > ul {
-    padding-left: 1em;
-    line-height: 1.5em;
-    list-style-type: dot;
-  }
-
-  & > .node-line {
-    & > .add-child {
-      display: none;
-    }
-
-    &:hover > .add-child {
-      display: inline-block;
-    }
-
-    &.active .node-label {
-      font-weight: bold;
-      color: #000;
-    }
-  }
-
+.leaf-icon,
+.folder-icon {
+	display: inline-block;
+	width: 16px;
+	padding: 0 4px 0 0;
 }

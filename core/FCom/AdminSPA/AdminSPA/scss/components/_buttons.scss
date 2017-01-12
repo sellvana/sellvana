@@ -295,7 +295,34 @@ button, .button {
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
-
+.button-lock {
+	border: 0;
+	background: none;
+	.fa {
+		font-size: 22px;
+	}
+	.fa-lock {
+		display: inline-block;
+		color: darkred;
+	}
+	.fa-unlock {
+		display: none;
+		color: limegreen;
+	}
+	&.open {
+		.fa-lock {
+			display: none;
+		}
+		.fa-unlock {
+			display: inline-block;
+		}
+	}
+}
+.col-md-2, .col-lg-2 {
+	.control-buttons {
+		text-align: center;
+	}
+}
 @media (max-width: 767px) {
 	.control-buttons-block {
 		padding: 5px 0 0;
