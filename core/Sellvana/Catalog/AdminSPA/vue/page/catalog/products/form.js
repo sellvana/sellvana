@@ -5,6 +5,7 @@ define(['vue', 'sv-hlp'],
         options: {},
         updates: {},
         tabs: [],
+		errors: {},
 
         product: {}
     };
@@ -16,6 +17,11 @@ define(['vue', 'sv-hlp'],
 				form: defForm
 			}
 		},
+        computed: {
+            thumbUrl: function () {
+                return this.form && this.form.thumb ? this.form.thumb.thumb_url : '';
+            }
+        },
 		methods: {
 			buttonAction: function (act) {
 				console.log(act);
@@ -64,11 +70,6 @@ define(['vue', 'sv-hlp'],
                     }
 				})
 		    }
-		},
-		watch: {
-			'form.product': function (product) {
-
-			}
 		}
     };
 });

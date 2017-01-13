@@ -88,6 +88,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             $result['form'] = [
                 'tabs' => $this->getFormTabs('/catalog/products/form'),
                 'product' => $product->as_array(),
+                'thumb' => ['thumb_url' => $product->thumbUrl(100)],
             ];
         } catch (Exception $e) {
             $this->addMessage($e);

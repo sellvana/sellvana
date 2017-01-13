@@ -10,6 +10,20 @@
 
 			- [ requireJs, sv-page-catalog-products-form-main, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/main" ]
 			- [ requireJs, sv-page-catalog-products-form-main-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/main.html" ]
+			- [ requireJs, sv-page-catalog-products-form-inventory, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/inventory" ]
+			- [ requireJs, sv-page-catalog-products-form-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/inventory.html" ]
+			- [ requireJs, sv-page-catalog-products-form-prices, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices" ]
+			- [ requireJs, sv-page-catalog-products-form-prices-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices.html" ]
+			- [ requireJs, sv-page-catalog-products-form-merchandizing, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing" ]
+			- [ requireJs, sv-page-catalog-products-form-merchandizing-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing.html" ]
+			- [ requireJs, sv-page-catalog-products-form-images, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/images" ]
+			- [ requireJs, sv-page-catalog-products-form-images-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/images.html" ]
+			- [ requireJs, sv-page-catalog-products-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/layout" ]
+			- [ requireJs, sv-page-catalog-products-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/layout.html" ]
+			- [ requireJs, sv-page-catalog-products-form-videos, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/videos" ]
+			- [ requireJs, sv-page-catalog-products-form-videos-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/videos.html" ]
+			- [ requireJs, sv-page-catalog-products-form-custom_views, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/custom_views" ]
+			- [ requireJs, sv-page-catalog-products-form-custom_views-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/custom_views.html" ]
 
             - [ requireJs, sv-page-catalog-categories, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/index" ]
             - [ requireJs, sv-page-catalog-categories-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/index.html" ]
@@ -55,6 +69,13 @@
     - view: app
         do:
             - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: prices, label: Prices, pos: 20 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: inventory, label: Inventory & Shipping, pos: 30 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: merchandizing, label: Merchandizing, pos: 40 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: images, label: Images, pos: 50 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: videos, label: Videos, pos: 60 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 70 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: custom_views, label: Custom Views, pos: 80 } ]
 
 
 /catalog/categories/form:

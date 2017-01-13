@@ -31,11 +31,30 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         Vue.component('select2', VueSelect2);
 
         Vue.component('checkbox', {
-            template: '<span><input type="checkbox" v-model="internal"><div class="checkbox-block"><div class="checkbox-elem"></div></div></span>',
-            props: ['value'],
+            template: '<label><input type="checkbox" v-model="internal"><div class="checkbox-block" :style="blockStyle"><div class="checkbox-elem" :style="elemStyle"></div></div></label>',
+            props: ['value', 'height', 'width'],
             data: function () {
                 return {
                     internal: null
+                }
+            },
+            computed: {
+                blockStyle: function () {
+                    var style = {};
+                    if (this.height) {
+                        style.height = this.height + 'px';
+                    }
+                    if (this.width) {
+                        style.width = this.width + 'px';
+                    }
+                    return style;
+                },
+                elemStyle: function () {
+                    var style = {};
+                    if (this.height) {
+                        style.height = style.width = (this.height - 2) + 'px';
+                    }
+                    return style;
                 }
             },
             created: function () {
@@ -280,8 +299,12 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
 
         requirejs.onError = function (err) {
 console.log('onError', err.xhr);
-            if (err.xhr.status === 401) {
-                router.push('/login');
+            if (err.xhr) {
+                if (err.xhr.status === 401) {
+                    router.push('/login');
+                }
+            } else {
+                console.log(err);
             }
         };
 
@@ -447,6 +470,31 @@ console.log('onError', err.xhr);
                         }
                     } else {
                         next();
+                    }
+                }
+            },
+            formTab: {
+                computed: {
+                    fieldClass: function () {
+                        var vm = this;
+                        return function (field) {
+                            return {};
+                        }
+                    }
+                },
+                methods: {
+                    validate: function (field, value) {
+                        var config = this.formValidationConfig;
+                        if (!config.fields || !config.fields[field]) {
+                            return;
+                        }
+                        var tab = config.fields[field].tab;
+                        for (var i = 0, l = this.form.tabs.length; i < l; i++) {
+                            if (this.form.tabs[i].name === tab) {
+                                Vue.set(this.form.tabs[i], 'edited', true);
+                                break;
+                            }
+                        }
                     }
                 }
             }

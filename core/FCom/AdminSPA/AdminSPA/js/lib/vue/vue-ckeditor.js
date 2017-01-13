@@ -19,9 +19,9 @@ define(['ckeditor'], function () {
             },
             toolbar: {
                 type: Array,
-                // default: function () {
-                //     return [['Format'], ['Bold', 'Italic'], ['Undo', 'Redo']];
-                // }
+                default: function () {
+                    return [['Format'], ['Bold', 'Italic'], ['Undo', 'Redo']];
+                }
             },
             language: {
                 type: String,
@@ -39,6 +39,7 @@ define(['ckeditor'], function () {
             }
         },
         mounted: function () {
+            var vm = this;
             var ckeditorId = this.id;
             var ckeditorConfig = {
                 toolbar: this.toolbar,
@@ -51,14 +52,14 @@ define(['ckeditor'], function () {
             CKEDITOR.instances[ckeditorId].on('change', function () {
                 var ckeditorData = CKEDITOR.instances[ckeditorId].getData();
                 if (ckeditorData !== this.value) {
-                    this.$emit('input', ckeditorData);
+                    vm.$emit('input', ckeditorData);
                 }
             });
         },
-        destroyed: function () {
+        beforeDestroy: function () {
             var ckeditorId = this.id;
             if (CKEDITOR.instances[ckeditorId]) {
-                CKEDITOR.instances[ckeditorId].destroy();
+                //CKEDITOR.instances[ckeditorId].destroy();
             }
         }
     };
