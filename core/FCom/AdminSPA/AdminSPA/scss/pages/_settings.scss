@@ -36,8 +36,26 @@
 		font-family: 'GothamProMedium';
 		font-size: 12px;
 		color: #000;
+		cursor: pointer;
+	}
+	.error-message {
+		visibility: hidden;
 	}
 }
+.error-message {
+	color: darkred;
+	padding: 0 0 0 6px;
+	visibility: visible;
+}
+.error {
+	.error-message {
+		visibility: visible;
+	}
+	.form-control {
+		border: 1px solid darkred;
+	}
+}
+
 fieldset {
 	border: 0;
 }
@@ -67,4 +85,61 @@ fieldset {
 	margin-bottom: 20px;
 	margin: 0 auto 20px;
 	display: block;
+}
+.icon-question-sign {
+	position: relative;
+	margin-left: 5px;
+	i {
+		color: #0096d6;
+	}
+	.tooltip {
+		padding: 5px 10px;
+		border: 1px solid #ebebeb;
+		background: #fff;
+		opacity: 0;
+		visibility: hidden;
+		transition: 0.2s opacity ease-in;
+		position: absolute;
+		top: -36px;
+		left: 50%;
+		transform: translate(-50%, 0);
+		color: #000;
+		font-family: "GothamProMedium";
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	}
+	&:hover {
+		.tooltip {
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+}
+.del-mode {
+	background: #ff2b42;
+	&:hover {
+		background: #d40017;
+	}
+}
+.add-mode {
+	background: #00c0ef;
+	&:hover {
+		background: #038fb1;
+	}
+}
+.del-mode, .add-mode {
+	padding: 8px;
+	display: inline-block;
+	font-size: 14px;
+	i {
+		color: #fff;
+	}
+}
+.row.ip-mode {
+	margin: 0px 0 5px;
+	.text-right {
+		span {
+			margin: 9px 0 0 0;
+			display: inline-block;
+		}
+	}
 }

@@ -1,10 +1,11 @@
 <div class="admin-main-content">
 	<form class="form-horizontal">
-		<div class="form-group">
+		<div class="form-group error">
 			<label>
 				<p class="col-md-3 control-label">{{'Input'|_}}</p>
 				<div class="col-md-9">
 					<input class="form-control" type="text" />
+					<span class="error-message">Error description under the field</span>
 				</div>
 			</label>
 		</div>
@@ -24,7 +25,7 @@
 						<option>Option1</option>
 						<option>Option2</option>
 						<option>Option3</option>
-						<option>Option4</option>						
+						<option>Option4</option>
 					</select2>
 				</div>
 			</label>
@@ -37,7 +38,7 @@
 						<option>Option1</option>
 						<option>Option2</option>
 						<option>Option3</option>
-						<option>Option4</option>									
+						<option>Option4</option>
 					</select2>
 				</div>
 			</label>
@@ -57,16 +58,69 @@
 					<input class="form-control" type="number" />
 				</div>
 			</label>
-		</div>	<div class="form-group">
-		<label>
-			<p class="col-md-3 control-label">
-				<a class="pull-right help-icon" href="#" data-toggle="popover" data-trigger="focus" data-content="Details for Customers" data-container="body" data-original-title="" title="">
-					<span class="icon-question-sign"></span></a>
-			</p>
-			<div class="col-md-9">
-				<textarea rows="5"></textarea>
-			</div>
-		</label>
+		</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-3 control-label">
+					en_US
+					<span class="icon-question-sign">
+							<i class="fa fa-question-circle" aria-hidden="true"></i>
+							<span class="tooltip">Message</span>
+					</span>
+				</p>
+				<div class="col-md-9">
+					<textarea class="form-control" rows="5"></textarea>
+				</div>
+			</label>
+		</div>
+		<div class="form-group">
+			<label>
+				<p class="col-md-3 control-label">
+					IP: mode
+				</p>
+				<div class="col-md-9">
+					<div class="row ip-mode">
+						<div class="col-xs-5 text-right">
+							<span>Default</span>
+						</div>
+						<div class="col-xs-5">
+							<select2 class="form-control">
+								<option value="DEBUG">DEBUG</option>
+								<option value="DEVELOPMENT">DEVELOPMENT</option>
+								<option value="STAGING">STAGING</option>
+								<option value="PRODUCTION">PRODUCTION</option>
+								<option value="RECOVERY">RECOVERY</option>
+								<option value="DISABLED">DISABLED</option>
+							</select2>
+						</div>
+						<div class="col-xs-2">
+							<a href="#" class="add-mode">
+								<i class="fa fa-plus" aria-hidden="true"></i> 
+							</a>
+						</div>
+					</div>
+					<div class="row ip-mode">
+						<div class="col-xs-5 text-right">
+							<input type="text" class="form-control">
+						</div>
+						<div class="col-xs-5">
+							<select2 class="form-control">
+								<option value="DEBUG">DEBUG</option>
+								<option value="DEVELOPMENT">DEVELOPMENT</option>
+								<option value="STAGING">STAGING</option>
+								<option value="PRODUCTION">PRODUCTION</option>
+								<option value="RECOVERY">RECOVERY</option>
+								<option value="DISABLED">DISABLED</option>
+							</select2>
+						</div>
+						<div class="col-xs-2">
+							<a href="#" class="del-mode">
+								<i class="fa fa-times" aria-hidden="true"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+			</label>
 		</div>
 	</form>
 </div>

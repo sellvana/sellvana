@@ -4,41 +4,41 @@
 			<div class="form-horizontal">
 				<div class="f-section">
 					<div class="form-group" :class="fieldClass('product_name')">
-						<span class="col-md-3 control-label">{{'Product Name'|_}} <span class="required">*</span></span>
+						<label><span class="col-md-3 control-label">{{'Product Name'|_}} <span class="required">*</span></span>
 						<div class="col-md-9"><input type="text" class="form-control" v-model="form.product.product_name"></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('url_key')">
-						<span class="col-md-3 control-label">{{'URL Key (optional)'|_}}</span>
+						<label><span class="col-md-3 control-label">{{'URL Key (optional)'|_}}</span>
 						<div class="col-md-9"><input type="text" class="form-control" v-model="form.product.url_key"></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('product_sku')">
-						<span class="col-md-3 control-label">{{'Product SKU'|_}} <span class="required">*</span></span>
+						<label><span class="col-md-3 control-label">{{'Product SKU'|_}} <span class="required">*</span></span>
 						<div class="col-md-9"><input type="text" class="form-control" v-model="form.product.product_sku"></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('categories')">
-						<span class="col-md-3 control-label">{{'Categories'|_}} <span class="required">*</span></span>
+						<label><span class="col-md-3 control-label">{{'Categories'|_}} <span class="required">*</span></span>
 						<div class="col-md-9"><select2 class="form-control" v-model="form.product.categories"></select2></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('short_description')">
-						<span class="col-md-3 control-label">{{'Short Description'|_}} <span class="required">*</span></span>
+						<label><span class="col-md-3 control-label">{{'Short Description'|_}} <span class="required">*</span></span>
 						<div class="col-md-9"><textarea class="form-control" v-model="form.product.short_description"></textarea></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('description')">
-						<span class="col-md-3 control-label">{{'Long Description'|_}} <span class="required">*</span></span>
+						<label><span class="col-md-3 control-label">{{'Long Description'|_}} <span class="required">*</span></span>
 						<div class="col-md-9"><ckeditor v-model="form.product.description"></ckeditor></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('is_hidden')">
-						<span class="col-md-3 control-label">{{'Hide Product'|_}}</span>
+						<label><span class="col-md-3 control-label">{{'Hide Product'|_}}</span>
 						<div class="col-md-9"><checkbox v-model="form.product.is_hidden"></checkbox></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('is_featured')">
-						<span class="col-md-3 control-label">{{'Featured Product'|_}}</span>
+						<label><span class="col-md-3 control-label">{{'Featured Product'|_}}</span>
 						<div class="col-md-9"><checkbox v-model="form.product.is_featured"></checkbox></div>
-					</div>
+						</label></div>
 					<div class="form-group" :class="fieldClass('is_popular')">
-						<span class="col-md-3 control-label">{{'Popular Product'|_}}</span>
+						<label><span class="col-md-3 control-label">{{'Popular Product'|_}}</span>
 						<div class="col-md-9"><checkbox v-model="form.product.is_popular"></checkbox></div>
-					</div>
+						</label></div>
 				</div>
 			</div>
 		</div>
