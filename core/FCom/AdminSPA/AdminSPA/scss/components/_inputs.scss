@@ -14,6 +14,7 @@ input[type="checkbox"] + span {
 		font-size: 14px;
 		opacity: 0;
 		visibility: hidden;
+		color: #868a8a;
 	}
 }
 input[type="radio"] + span {
@@ -125,9 +126,7 @@ input[type="text"], input[type="password"] {
 .select2-container {
    min-width: 100%;
 }
-.form-horizontal {
-	padding: 20px;
-}
+
 
 
 input[type="checkbox"]:checked + .checkbox-block {
@@ -137,4 +136,23 @@ input[type="checkbox"]:checked + .checkbox-block {
 		left: 20px;
 		border: 1px solid #fff;
 	}
+}
+
+.translate-icon {
+	position: absolute;
+	right: -13px;
+	top: 0;
+	font-size: 18px;
+	padding: 4px 5px;
+}
+
+@media (max-width: 767px) {
+	.translate-icon {
+		position: absolute;
+		right: 15px;
+		top: 0;
+		font-size: 18px;
+		padding: 4px 5px;
+	}
+
 }

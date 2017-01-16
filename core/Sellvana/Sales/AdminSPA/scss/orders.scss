@@ -688,20 +688,24 @@
 	}
 	.total-amount {
 		text-align: right;
+		
 		div {
 			width: 50%;
 			min-width: 300px;
 			border-top: 1px solid #000;
 			display: inline-block;
 			padding: 18px 0;
+			white-space: nowrap;
 		}
-		span {
-			background: #f6f6f6;
-			display: inline-block;
-			padding: 7px 10px;
-			font-family: "GothamProMedium";
-			color: #000;
-			margin-left: 50px;
+		.total-amount-pay {
+			span {
+				background: #f6f6f6;
+				display: inline-block;
+				padding: 7px 10px;
+				font-family: "GothamProMedium";
+				color: #000;
+				margin-left: 50px;
+			}
 		}
 		p {
 			font-family: "GothamProMedium";
@@ -716,17 +720,16 @@
 }
 
 .create-payment {
-	text-align: center;
+	text-align: right;
 	padding: 20px 0;
 	& > * {
 		display: inline-block;
 		vertical-align: middle;
 	}
 	.select2-container {
-		min-width: 200px;
-		margin: 0 20px;
+		min-width: 160px;
+		margin: 0 0px 0 20px;
 		padding: 6px 0;
-		width: 40%;
 	}
 }
 
@@ -751,7 +754,15 @@
 		}
 	}
 }
-
+.multilanguage-block {
+	.delete {
+		padding: 6px 0;
+		display: inline-block;
+		i {
+			font-size: 16px;
+		}
+	}			
+}
 @media (max-width: 1762px) {
 	.new-comment {
 		p,
@@ -957,6 +968,7 @@
 	.control-buttons-block, .control-buttons {
 		padding: 5px 0 0;
 		text-align: center;
+		margin: 2px 0;
 		button, a, input {
 			margin-bottom: 5px;
 		}
@@ -965,5 +977,9 @@
 		padding: 4px 12px;
 		font-size: 11px;
 		font-family: 'GothamProLight';
+	}
+	.dropdown.action {
+		width: 132px;
+		margin-bottom: 10px;
 	}
 }

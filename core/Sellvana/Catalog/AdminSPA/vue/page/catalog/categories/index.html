@@ -1,42 +1,94 @@
 <div>
 	<div class="row">
 		<div class="col-sm-12 col-md-2 col-lg-2">
-			<div class="admin-main-content">
+			<div class="admin-main-content tree-block">
 				<div class="control-buttons">
 					<button class="button button11">Expand All</button>
 					<button class="button button11">Collapse All</button>
 					<button class="button-lock" :class="{open:ddOpen('root-lock')}" @click.prevent.stop="ddToggle('root-lock')"><i class="fa fa-lock" aria-hidden="true"></i><i class="fa fa-unlock" aria-hidden="true"></i></button>
+
+				</div>
+				<sv-comp-tree :tree="tree" :cur-node="curNode" tree-id="categories" @event="treeEvent"></sv-comp-tree>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-10 col-lg-10">
+			<div class="row">
+				<div class="col-xs-6 col-md-6 col-lg-12">
+					<div class="control-buttons visible-md visible-lg">
+						<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+						<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+						<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+						<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-6 col-lg-12">
+					<div class="secondary-menu horizontal-menu visible-md visible-lg">
+						<ul class="nav">
+							<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+						</ul>
+					</div>
+					<div class="hidden-md hidden-lg">
+						<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+							<div class="dropdown-menu">
+								<ul class="dropdown-content">
+									<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="dropdown action" :class="{open:ddOpen('control-buttons')}">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
+							<div class="dropdown-menu">
+								<ul class="dropdown-content">
+									<li><a href="#" @click="goBack()">{{'Back'|_}}</a></li>
+									<li><a href="#" @click="doDelete() ">{{'Delete'|_}}</a></li>
+									<li><a href="#" @click="save()">{{'Save'|_}}</a></li>
+									<li><a href="#" @click="save(true)">{{'Save and Continue'|_}}</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
 				
 			</div>
-			<sv-comp-tree :tree="tree" :cur-node="curNode" tree-id="categories" @event="treeEvent"></sv-comp-tree>
-		</div>
-	</div>
-	<div class="col-sm-12 col-md-10 col-lg-10">
-		<div class="row">
-			<div class="col-sm-12 col-md-7">
-				<div class="secondary-menu horizontal-menu">
-					<ul class="nav">
-						<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
-					</ul>
+			<div class="row">
+				<div class="col-md-12 col-lg-6">
+					<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+				</div>
+				<div class="col-md-12 col-lg-6">
+					<div class="admin-main-content">
+						<div class="multilanguage-block">
+							<div class="block-title">
+								<p>Multi Language</p>
+							</div>
+							<div>
+								<div class="row form-group">
+									<div class="col-xs-5">
+										<select2 class="form-control">
+											<option>Language1</option>
+											<option>Language2</option>
+										</select2>
+									</div>
+									<div class="col-xs-5">
+										<input class="form-control" type="text" />
+									</div>
+									<div class="col-xs-1">
+										<a href="#" class="delete"><i aria-hidden="true" class="fa fa-trash"></i></a>
+									</div>
+								</div>
+								<div class="row form-group">
+									<div class="col-xs-5">
+										<select2 class="form-control">
+											<option>Language1</option>
+											<option>Language2</option>
+										</select2>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="col-sm-12 col-md-5">
-				<div class="control-buttons">
-					<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
-					<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-					<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
-					<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 col-lg-6">
-				<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
-			</div>
-			<div class="col-md-12 col-lg-6">
-				<div class="admin-main-content"></div>
-			</div>
 		</div>
 	</div>
-</div>
 </div>

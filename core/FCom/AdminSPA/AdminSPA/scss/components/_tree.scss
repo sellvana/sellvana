@@ -1,3 +1,11 @@
+.tree-block {
+	.control-buttons {
+		button {
+			padding: 6px;
+			vertical-align: middle;
+		}
+	}
+}
 .tree-node {
 	cursor: pointer;
 	&.open {

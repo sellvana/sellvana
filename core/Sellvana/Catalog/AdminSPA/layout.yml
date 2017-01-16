@@ -38,6 +38,8 @@
 			- [ requireJs, sv-page-catalog-categories-form-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/products.html" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout.html" ]
+			
+			
 
     - view: app
         do:

@@ -16,6 +16,9 @@
 	.visible-lg {
 		display: inline-block !important;
 	}
+	.control-buttons.visible-md.visible-lg {
+		display: block !important;
+	}
 }
 
 @media (max-width: 767px) {
