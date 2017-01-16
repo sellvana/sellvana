@@ -36,11 +36,11 @@
                             <tr><th>{{'Total:'|_}}</th><td>{{item.row_total|currency}}</td></tr>
                             <tr><th>{{'Paid:'|_}}</th><td>{{item.amount_paid|currency}}</td></tr>
                             <tr><th>{{'In Payments:'|_}}</th><td>{{item.amount_in_payments|currency}}</td></tr>
+                            <tr><th>{{'Due:'|_}}</th><td>{{item.amount_due|currency}}</td></tr>
                         </tbody></table>
                     </td>
                     <td>
                         <table class="combined-columns"><tbody>
-                            <tr><th>{{'Payable:'|_}}</th><td>{{item.amount_due|currency}}</td></tr>
                             <tr><th>{{'To Pay:'|_}}</th><td><input type="text" v-model="item.amount_to_pay" :disabled="!isItemSelected(item)"></td></tr>
                         </tbody></table>
                     </td>

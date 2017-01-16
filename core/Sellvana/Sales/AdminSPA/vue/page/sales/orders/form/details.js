@@ -116,7 +116,7 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
             template: returnsEditTpl
         },
 
-        Cancellations: {
+        cancellations: {
             props: ['form'],
             template: cancellationsTpl
         },
@@ -129,6 +129,28 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
             template: cancellationsEditTpl
         }
     };
+
+    function populateOrderItems(form) {
+        var type, i, j, l, m, itemsById = {}, item;
+        for (i = 0, l = form.items.length; i < l; i++) {
+            itemsById[form.items[i].id] = form.items[i];
+        }
+        for (type in ['payments', 'shipments', 'returns', 'refunds', 'cancellations']) {
+            if (!form[type] || !form[type].length) {
+                continue;
+            }
+            for (i = 0, l = form[type].length; i < l; i++) {
+                if (!form[type][i].items || !form[type][i].items.length) {
+                    continue;
+                }
+                for (j = 0, m = form[type][i].items.length; j < m; j++) {
+                    item = form[type][i].item[j];
+                    Vue.set(item, 'order_item', itemsById[item.order_item_id]);
+                }
+            }
+        }
+console.log(form, form.payments[0].items[0].order_item);
+    }
 
     return {
         props: {
@@ -176,6 +198,14 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
                 switch (action.type) {
                     case 'close': this.closeHlpSection();
                 }
+            }
+        },
+        created: function () {
+            populateOrderItems(this.form);
+        },
+        watch: {
+            'form.order.id': function (orderId) {
+                populateOrderItems(this.form);
             }
         }
     };

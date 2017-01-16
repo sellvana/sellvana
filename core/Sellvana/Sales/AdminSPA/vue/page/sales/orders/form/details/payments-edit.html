@@ -42,9 +42,50 @@
             </tbody>
         </table>
     </div>
+    <div class="scrollable-area">
+        <table class="secondary-table combined-table">
+            <thead>
+            <tr>
+                <td>{{'Thumbnail'|_}}</td>
+                <td>{{'Product Info'|_}}</td>
+                <td>{{'Amounts'|_}}</td>
+                <td>{{'Payable'|_}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in entity.items">
+                <td>
+                    <img :src="item.thumb_url" :alt="item.product_name">
+                </td>
+                <td>
+                    <table class="combined-columns"><tbody>
+                    <tr><th>{{'Name:'|_}}</th><td>{{item.product_name}}</td></tr>
+                    <tr><th>{{'Qty:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
+                    <tr><th>{{'P.SKU:'|_}}</th><td>{{item.product_sku}}</td></tr>
+                    <tr><th>{{'I.SKU:'|_}}</th><td>{{item.inventory_sku}}</td></tr>
+                    </tbody></table>
+                </td>
+                <td>
+                    <table class="combined-columns"><tbody>
+                    <tr><th>{{'Total:'|_}}</th><td>{{item.row_total|currency}}</td></tr>
+                    <tr><th>{{'Total Paid:'|_}}</th><td>{{item.amount_paid|currency}}</td></tr>
+                    <tr><th>{{'In Payments:'|_}}</th><td>{{item.amount_in_payments|currency}}</td></tr>
+                    <tr><th>{{'Amount Due:'|_}}</th><td>{{item.amount_due|currency}}</td></tr>
+                    </tbody></table>
+                </td>
+                <td>
+                    <table class="combined-columns"><tbody>
+                    <tr><th>{{'Paid by this payment:'|_}}</th><td>{{item.amount|currency}}</td></tr>
+                    </tbody></table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <div class="control-buttons-block">
         <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
-        <button type="button" class="button2">{{'Apply'|_}}</button>
+        <button type="button" class="button2">{{'Delete Payment'|_}}</button>
+        <button type="button" class="button2">{{'Save Changes'|_}}</button>
     </div>
     {{entity}}
 </div>
