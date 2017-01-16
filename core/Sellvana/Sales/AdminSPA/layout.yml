@@ -14,13 +14,47 @@
 
 			- [ requireJs, sv-page-sales-orders-form-main, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/main" ]
 			- [ requireJs, sv-page-sales-orders-form-main-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/main.html" ]
-			- [ requireJs, sv-page-sales-orders-form-items-config, "~/orders/form_items_grid_config" ]
+
 			- [ requireJs, sv-page-sales-orders-form-details, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details" ]
 			- [ requireJs, sv-page-sales-orders-form-details-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details.html" ]
+
+#			- [ requireJs, sv-page-sales-orders-form-details-payments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments" ]
+			- [ requireJs, sv-page-sales-orders-form-details-payments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-payments-add, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments-add" ]
+			- [ requireJs, sv-page-sales-orders-form-details-payments-add-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments-add.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-payments-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments-edit" ]
+			- [ requireJs, sv-page-sales-orders-form-details-payments-edit-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/payments-edit.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-shipments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/shipments" ]
+			- [ requireJs, sv-page-sales-orders-form-details-shipments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/shipments.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-shipments-add, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/shipments-add" ]
+			- [ requireJs, sv-page-sales-orders-form-details-shipments-add-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/shipments-add.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-shipments-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/shipments" ]
+			- [ requireJs, sv-page-sales-orders-form-details-shipments-edit-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/shipments-edit.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-refunds, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/refunds" ]
+			- [ requireJs, sv-page-sales-orders-form-details-refunds-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/refunds.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-refunds-add, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/refunds-add" ]
+			- [ requireJs, sv-page-sales-orders-form-details-refunds-add-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/refunds-add.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-refunds-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/refunds-edit" ]
+			- [ requireJs, sv-page-sales-orders-form-details-refunds-edit-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/refunds-edit.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-returns, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/returns" ]
+			- [ requireJs, sv-page-sales-orders-form-details-returns-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/returns.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-returns-add, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/returns-add" ]
+			- [ requireJs, sv-page-sales-orders-form-details-returns-add-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/returns-add.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-returns-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/returns-edit" ]
+			- [ requireJs, sv-page-sales-orders-form-details-returns-edit-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/returns-edit.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-cancellations, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/cancellations" ]
+			- [ requireJs, sv-page-sales-orders-form-details-cancellations-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/cancellations.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-cancellations-add, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/cancellations-add" ]
+			- [ requireJs, sv-page-sales-orders-form-details-cancellations-add-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/cancellations-add.html" ]
+#			- [ requireJs, sv-page-sales-orders-form-details-cancellations-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/cancellations-edit" ]
+			- [ requireJs, sv-page-sales-orders-form-details-cancellations-edit-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/details/cancellations-edit.html" ]
+
 			- [ requireJs, sv-page-sales-orders-form-comments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments" ]
 			- [ requireJs, sv-page-sales-orders-form-comments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments.html" ]
+
 			- [ requireJs, sv-page-sales-orders-form-history, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history" ]
 			- [ requireJs, sv-page-sales-orders-form-history-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history.html" ]
+			- [ requireJs, sv-page-sales-orders-form-history-config, "~/orders/form/history/grid_config" ]
 
     - view: app
         do:
@@ -54,3 +88,11 @@
             - [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20 } ]
             - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30 } ]
             - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40 } ]
+
+    - view: sales/orders/form
+        do:
+            - [ addDetailsSection, { name: payments, pos: 10 } ]
+            - [ addDetailsSection, { name: shipments, pos: 20 } ]
+            - [ addDetailsSection, { name: refunds, pos: 30 } ]
+            - [ addDetailsSection, { name: returns, pos: 40 } ]
+            - [ addDetailsSection, { name: cancellations, pos: 50 } ]

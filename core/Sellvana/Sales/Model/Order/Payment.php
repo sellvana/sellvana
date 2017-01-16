@@ -609,7 +609,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
                 break;
             }
             $oItem = $this->Sellvana_Sales_Model_Order_Item->load($pItem->get('order_item_id'));
-            $itemBalanceAmount = $oItem->getBalanceAmount();
+            $itemBalanceAmount = $oItem->getAmountDue();
             $oItem->add('amount_paid', min($itemBalanceAmount, $totalBalanceAmount));
             $totalBalanceAmount -= $itemBalanceAmount;
             $oItem->save();

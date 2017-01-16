@@ -1,5 +1,5 @@
-define(['vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions'],
-    function (Vue, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions) {
+define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions'],
+    function (_, Vue, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions) {
 
     // Vue.component('sv-comp-grid-data-cell-default', SvCompGridDataCellDefault);
     // Vue.component('sv-comp-grid-data-cell-row-select', SvCompGridDataCellRowSelect);
@@ -11,7 +11,7 @@ define(['vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-sel
         template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :row="row" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
         computed: {
             columns: function () {
-                return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
+                return _.get(this.grid, 'config.columns', []);
             },
             cellComponent: function () {
                 var vm = this;

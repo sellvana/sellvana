@@ -1,36 +1,18 @@
-define(['sv-comp-grid', 'text!sv-page-sales-orders-form-history-tpl'], function (SvCompGrid, tabHistoryTpl) {
-
-    var defForm = {
-        options: {},
-        updates: {},
-        tabs: [],
-
-        order: {},
-        items: {},
-        shipments: {},
-        payments: {},
-        returns: {},
-        refunds: {},
-        cancellations: {}
-    };
+define(['sv-comp-grid', 'text!sv-page-sales-orders-form-history-tpl', 'json!sv-page-sales-orders-form-history-config'], function (SvCompGrid, tabHistoryTpl, historyGridConfig) {
 
     return {
         props: {
             form: {
-                default: defForm
+                type: Object
             }
         },
-        computed: {
-            grid: function () {
-                return {
-                    config: {
-                        id: 'sales_order_histoy',
-                        data_url: 'orders/form_history_grid_data?id=' + this.form.order.id,
-                        columns: [
-                            {field:'id', label:'ID'},
-                            {field:'create_at', label:'Timestamp'}
-                        ]
-                    }
+        data: function () {
+            if (historyGridConfig.data_url && this.form.order && this.form.order.id) {
+                historyGridConfig.data_url = historyGridConfig.data_url.supplant({id: this.form.order.id});
+            }
+            return {
+                grid: {
+                    config: historyGridConfig
                 }
             }
         },

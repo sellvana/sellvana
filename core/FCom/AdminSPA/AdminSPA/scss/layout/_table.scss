@@ -88,13 +88,13 @@ table {
 		span {
 			color: #474646;
 		}
-		th:first-child,
-		td:first-child,
-		th:nth-of-type(2) a,
-		td:nth-of-type(2) a {
-			text-align: left;
-			padding: 0 10px;
-		}
+		//th:first-child,
+		//td:first-child,
+		//th:nth-of-type(2) a,
+		//td:nth-of-type(2) a {
+		//	text-align: left;
+		//	padding: 0 10px;
+		//}
 		td,
 		th {
 			padding: 0;
@@ -167,3 +167,29 @@ table {
 	}
 }
 
+.combined-table {
+	& > tbody {
+		& > tr {
+			border-bottom: 1px solid #ebebeb;
+		}
+		& > td {
+			vertical-align: top;
+		}
+	}
+}
+
+.combined-columns {
+	tr {
+		border: none;
+	}
+	th {
+		padding: 2px 5px;
+		text-align: right;
+		font-weight: normal;
+	}
+	td {
+		padding: 2px 5px;
+		font-weight: bold;
+		color: #000;
+	}
+}

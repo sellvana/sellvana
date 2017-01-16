@@ -1,0 +1,28 @@
+
+<div class="admin-main-content details-information">
+    <div class="block-title">
+        <p>{{'Payments'|_}}</p>
+        <button type="button" class="button4" @click="$emit('add', 'payment')">{{'Add'|_}}</button>
+    </div>
+    <div>
+        <table v-if="form.payments.length" class="secondary-table">
+            <thead>
+            <tr>
+                <td>{{'Timeline'|_}}</td>
+                <td>{{'Amount Paid'|_}}</td>
+                <td>{{'Method'|_}}</td>
+                <td>{{'Status'|_}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="p in form.payments" @click="$emit('edit', 'payment', p)">
+                <td>{{p.create_at|date}}</td>
+                <td>{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
+                <td>{{p.payment_method}}</td>
+                <td :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <div v-else>{{'No payments created yet'|_}}</div>
+    </div>
+</div>

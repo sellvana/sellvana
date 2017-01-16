@@ -1,0 +1,30 @@
+
+<div class="admin-main-content details-information">
+    <div class="block-title">
+        <p>{{'Returns'|_}}</p>
+        <button type="button" class="button button4" @click="$emit('add', 'return')">{{'Add'|_}}</button>
+    </div>
+    <div>
+        <table v-if="form.returns.length">
+            <thead>
+            <tr>
+                <td>{{'Timeline'|_}}</td>
+                <td>{{'Items'|_}}</td>
+                <td>{{'Status'|_}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="r in form.returns" @click="$emit('edit', 'return', r)">
+                <td>{{r.create_at|date}}</td>
+                <td>
+                    <div v-for="item in r.items">
+                        <span>{{item.inventory_sku}} x{{item.qty}}</span>: {{item.product_name}}
+                    </div>
+                </td>
+                <td :class="'status-' + r.state_overall">{{form.options.return_state_overall[r.state_overall]}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <div v-else>{{'No returns created yet'|_}}</div>
+    </div>
+</div>

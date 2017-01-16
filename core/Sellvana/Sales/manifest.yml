@@ -21,8 +21,12 @@ modules:
         areas:
             FCom_AdminSPA:
                 auto_use: [ layout ]
+                views:
+                    - [ sales/orders/form, Sellvana_Sales_AdminSPA_View_Orders_Form ]
                 routing:
                     - [ /orders/?.action, Sellvana_Sales_AdminSPA_Controller_Orders ]
+                    - [ /orders/form/items/?.action, Sellvana_Sales_AdminSPA_Controller_Orders_Items ]
+                    - [ /orders/form/history/?.action, Sellvana_Sales_AdminSPA_Controller_Orders_History ]
                 observe:
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Sales_AdminSPA_Controller_Orders.onHeaderSearch ]
 

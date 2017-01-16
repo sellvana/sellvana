@@ -66,23 +66,27 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             if (!$order) {
                 throw new BException('Order not found');
             }
-            $items         = $order->items(false);
-            $shipments     = $order->getAllShipments();
-            $returns       = $order->getAllReturns();
-            $payments      = $order->getAllPayments();
-            $refunds       = $order->getAllRefunds();
-            $cancellations = $order->getAllCancellations();
-            $comments      = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $orderId)->find_many();
             $result['form'] = [
                 'tabs' => $this->getFormTabs('/sales/orders/form'),
-                'order' => $order->as_array(),
-                'items' => $this->BDb->many_as_array($items),
-                'shipments' => $this->BDb->many_as_array($shipments),
-                'returns' => $this->BDb->many_as_array($returns),
-                'payments' => $this->BDb->many_as_array($payments),
-                'refunds' => $this->BDb->many_as_array($refunds),
-                'cancellations' => $this->BDb->many_as_array($cancellations),
-                'comments' => $this->BDb->many_as_array($comments),
+                'details_sections' => $this->view('sales/orders/form')->getDetailsSections(),
+
+                'order' => $this->_getOrderData($order),
+                'items' => $this->_getOrderItems($order),
+
+                'shipments' => $this->_getShipments($order),
+                'returns' => $this->_getReturns($order),
+                'payments' => $this->_getPayments($order),
+                'refunds' => $this->_getRefunds($order),
+                'cancellations' => $this->_getCancellations($order),
+
+                'items_payable' => $this->_getPayableItems($order),
+                'items_shippable' => $this->_getShippableItems($order),
+                'items_returnable' => $this->_getReturnableItems($order),
+                'items_refundable' => $this->_getRefundableItems($order),
+                'items_cancellable' => $this->_getCancellableItems($order),
+
+                'comments' => $this->_getComments($order),
+
                 'options' => [
                     'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
                     'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
@@ -97,11 +101,136 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
                     'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
                 ],
+
+                'items_grid_config' => $this->applyGridPersonalization($this->normalizeGridConfig($this->getItemsGridConfig())),
             ];
         } catch (Exception $e) {
             $this->addMessage($e);
         }
         $this->respond($result);
+    }
+
+    protected function _getOrderData(Sellvana_Sales_Model_Order $order)
+    {
+        return $order->as_array();
+    }
+
+    protected function _getOrderItems(Sellvana_Sales_Model_Order $order)
+    {
+        $order->loadItemsProducts(true);
+        $items = $order->items(false);
+        /** @var Sellvana_Sales_Model_Order_Item $item */
+        foreach ($items as $item) {
+            $item->set('thumb_url', $item->thumbUrl(48));
+        }
+
+        return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getPayments(Sellvana_Sales_Model_Order $order)
+    {
+        $payments      = $order->getAllPayments(true);
+
+        return $this->BDb->many_as_array($payments);
+    }
+
+    protected function _getShipments(Sellvana_Sales_Model_Order $order)
+    {
+        $shipments     = $order->getAllShipments(true);
+
+        return $this->BDb->many_as_array($shipments);
+    }
+
+    protected function _getReturns(Sellvana_Sales_Model_Order $order)
+    {
+        $returns       = $order->getAllReturns(true);
+
+        return $this->BDb->many_as_array($returns);
+    }
+
+    protected function _getRefunds(Sellvana_Sales_Model_Order $order)
+    {
+        $refunds       = $order->getAllRefunds(true);
+
+        return $this->BDb->many_as_array($refunds);
+    }
+
+    protected function _getCancellations(Sellvana_Sales_Model_Order $order)
+    {
+        $cancellations = $order->getAllCancellations(true);
+
+        return $this->BDb->many_as_array($cancellations);
+    }
+
+    protected function _getPayableItems(Sellvana_Sales_Model_Order $order)
+    {
+        $items = $order->getPayableItems();
+
+        return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getShippableItems(Sellvana_Sales_Model_Order $order)
+    {
+        $items = $order->getShippableItems();
+
+        return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getReturnableItems(Sellvana_Sales_Model_Order $order)
+    {
+        $items = $order->getReturnableItems();
+
+        return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getRefundableItems(Sellvana_Sales_Model_Order $order)
+    {
+        $items = $order->getRefundableItems();
+
+        return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getCancellableItems(Sellvana_Sales_Model_Order $order)
+    {
+        $items = $order->getCancelableItems();
+
+        return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getComments($order)
+    {
+        $comments = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $order->id())->find_many();
+
+        return $this->BDb->many_as_array($comments);
+    }
+
+    public function getItemsGridConfig()
+    {
+        $itemStateOverallOptions = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
+        $itemStateDeliveryOptions = $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels();
+        $itemStateCustomOptions = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
+
+        return [
+            'id' => 'order_items',
+            'columns' =>  [
+                ['type' => 'row-select'],
+                //['type' => 'actions'],
+                ['name' => 'id', 'label' => 'ID'],
+                ['name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
+                    'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
+                ['name' => 'product_name', 'label' => 'Product Name'],
+                ['name' => 'product_sku', 'label' => 'Product SKU'],
+                ['name' => 'price', 'label' => 'Price'],
+                ['name' => 'qty_ordered', 'label' => 'Qty'],
+                ['name' => 'row_total', 'label' => 'Total'],
+                ['name' => 'state_overall', 'label' => 'Overall', 'options' => $itemStateOverallOptions],
+                ['name' => 'state_delivery', 'label' => 'Delivery', 'options' => $itemStateDeliveryOptions],
+                ['name' => 'state_custom', 'label' => 'Custom', 'options' => $itemStateCustomOptions],
+            ],
+            'bulk_actions' => [
+                ['name' => 'delete', 'label' => 'Delete Items'],
+            ],
+        ];
     }
 
     public function action_form_data__POST()
@@ -116,36 +245,6 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $this->respond($result);
     }
 
-    public function getFormItemsGridConfig()
-    {
-        $itemStateOverallOptions = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
-        $itemStateDeliveryOptions = $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels();
-        $itemStateCustomOptions = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
-
-        return [
-            'columns' =>  [
-                ['type' => 'row-select'],
-                ['type' => 'actions'],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'product_name', 'label' => 'Product Name'],
-                ['name' => 'product_sku', 'label' => 'Product SKU'],
-                ['name' => 'price', 'label' => 'Price'],
-                ['name' => 'qty_ordered', 'label' => 'Qty'],
-                ['name' => 'row_total', 'label' => 'Total'],
-                ['name' => 'state_overall', 'label' => 'Overall', 'options' => $itemStateOverallOptions],
-                ['name' => 'state_delivery', 'label' => 'Delivery', 'options' => $itemStateDeliveryOptions],
-                ['name' => 'state_custom', 'label' => 'Custom', 'options' => $itemStateCustomOptions],
-            ],
-        ];
-    }
-
-    public function action_form_items_grid_config()
-    {
-        $config = $this->getFormItemsGridConfig();
-        $config = $this->normalizeGridConfig($config);
-        $config = $this->applyGridPersonalization($config);
-        $this->respond($config);
-    }
 
     public function action_form_history_grid_data()
     {

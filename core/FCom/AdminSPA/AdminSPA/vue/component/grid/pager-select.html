@@ -1,7 +1,7 @@
 <div>
-    <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(grid.config.id+'/pagesize-select')}">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(grid.config.id+'/pagesize-select')"
-           @click.prevent.stop="ddToggle(grid.config.id+'/pagesize-select')"><span>{{curPagesize}}</span><span class="caret-back"><b class="caret"></b></span></a>
+    <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(ddName)}">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(ddName)"
+           @click.prevent.stop="ddToggle(ddName)"><span>{{curPagesize}}</span><span class="caret-back"><b class="caret"></b></span></a>
         <ul class="dropdown-menu">
             <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}"><a href="#" @click.prevent="setPagesize(ps)" class="js-change-url page-size">{{ps}}</a></li>
         </ul>

@@ -1,5 +1,5 @@
-define(['sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl', 'json!sv-page-sales-orders-form-items-config'],
-    function (SvHlp, SvCompGrid, tabMainTpl, itemsGridConfig) {
+define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
+    function (_, SvHlp, SvCompGrid, tabMainTpl) {
 
     var defForm = {
         options: {},
@@ -26,7 +26,11 @@ define(['sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl', 'js
         data: function () {
             return {
                 editing: {customer: false, shipping: false, billing: false, order: false},
-                dict: SvAppData
+                dict: SvAppData,
+                itemsGrid: {
+                    config: _.get(this.form, 'items_grid_config', {}),
+                    rows: this.form.items
+                }
             }
         },
         computed: {
@@ -36,12 +40,6 @@ define(['sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl', 'js
                         return [];
                     }
                     return this.dict.regions_seq['@' + this.form.order[type + '_country']];
-                }
-            },
-            itemsGrid: function () {
-                return {
-                    config: itemsGridConfig,
-                    rows: this.form.items
                 }
             },
             paidByStoreCredit: function () {

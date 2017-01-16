@@ -1,5 +1,5 @@
-define(['vue', 'sv-hlp', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select'],
-    function (Vue, SvHlp, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect) {
+define(['lodash', 'vue', 'sv-hlp', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select'],
+    function (_, Vue, SvHlp, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect) {
 
     // Vue.component('sv-comp-grid-header-cell-default', SvCompGridHeaderCellDefault);
     // Vue.component('sv-comp-grid-header-cell-row-select', SvCompGridHeaderCellRowSelect);
@@ -10,7 +10,7 @@ define(['vue', 'sv-hlp', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-heade
         template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
         computed: {
             columns: function () {
-                return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
+                return _.get(this.grid, 'config.columns', []);
             },
             cellComponent: function () {
                 var vm = this;

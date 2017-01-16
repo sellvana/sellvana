@@ -5,6 +5,11 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         Vue.use(VueRouter);
         Vue.use(Vuex);
 
+        function translate(original, args) {
+            var translated = typeof original === 'string' ? original : '' + original; // implement Sellvana logic
+            return translated.supplant(args);
+        }
+
         String.prototype.supplant = function (o) {
             return this.replace(/{([^{}]*)}/g, function (a, b) {
                 var r = o[b];
@@ -12,10 +17,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             });
         };
 
-        function translate(original, args) {
-            var translated = typeof original === 'string' ? original : '' + original; // implement Sellvana logic
-            return translated.supplant(args);
-        }
+        String.prototype._ = function (args) { return translate(this, args); }
 
         Vue.directive('sortable', {
             inserted: function(el, binding) {
@@ -69,6 +71,9 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 }
             }
         });
+
+
+        Vue.filter('@', function (path) { return _.at(this, [path])[0]; });
 
         Vue.filter('_', translate);
 
@@ -234,7 +239,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             }
             return $.ajax({
                 method: method,
-                url: store.state.env.root_href + path,
+                url: store.state.env.root_href.replace(/\/$/, '') + '/' + path.replace(/^\//, ''),
                 data: data,//JSON.stringify(data),
                 success: function (response) {
                     processResponse(response);
@@ -318,7 +323,6 @@ console.log('onError', err.xhr);
                         } else {
                             return;
                         }
-                        console.log(response, response._login);
                         if (response._login) {
                             router.push('/login');
                         }
@@ -428,6 +432,7 @@ console.log('onError', err.xhr);
                 methods: {
                     switchTab: function (tab) {
                         this.tab = tab;
+                        //this.$router.go({query: {tab: tab}});
                     },
                     goBack: function () {
                         this.$router.go(-1);

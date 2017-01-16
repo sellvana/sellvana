@@ -1,0 +1,30 @@
+
+<div class="admin-main-content details-information">
+    <div class="block-title">
+        <p>{{'Cancellations'|_}}</p>
+        <button type="button" class="button button4" @click="$emit('add', 'cancellation')">{{'Add'|_}}</button>
+    </div>
+    <div>
+        <table v-if="form.cancellations.length">
+            <thead>
+            <tr>
+                <td>{{'Timeline'|_}}</td>
+                <td>{{'Items'|_}}</td>
+                <td>{{'Status'|_}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="c in form.cancellations" @click="$emit('edit', 'cancellation', c)">
+                <td>{{c.create_at|date}}</td>
+                <td>
+                    <div v-for="item in c.items">
+                        <span>{{item.inventory_sku}} x{{item.qty}}</span>: {{item.product_name}}
+                    </div>
+                </td>
+                <td :class="'status-' + c.state_overall">{{form.options.cancel_state_overall[c.state_overall]}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <div v-else>{{'No cancellations created yet'|_}}</div>
+    </div>
+</div>

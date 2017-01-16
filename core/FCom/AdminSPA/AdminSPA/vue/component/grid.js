@@ -62,7 +62,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
         }
 
         function initGridState(grid) {
-            var state = _.extend({}, grid.config.state || {}, grid.state || {});
+            var state = _.extend({}, _.get(grid, 'config.state', {}), grid.state || {});
             if (!state.c) {
                 state.c = grid.rows && _.isArrayLike(grid.rows) ? grid.rows.length : 0;
             }
@@ -70,7 +70,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 state.p = 1;
             }
             if (!state.ps) {
-                state.ps = grid.config.default_pagesize || 10;
+                state.ps = _.get(grid, 'config.default_pagesize', 10);
             }
             if (!state.mp) {
                 state.mp = Math.ceil(state.c / state.ps);
@@ -84,7 +84,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
         }
 
         function initGridComponents(grid) {
-            if (!grid.config.columns) {
+            if (!grid.config || !grid.config.columns) {
                 return;
             }
             if (!grid.components) {
@@ -153,6 +153,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
 
         function fetchData(grid) {
             grid = grid || this.grid;
+            if (!grid.config) {
+                return;
+            }
             var url = grid.config.data_url;
             if (!url) { // local data
                 return;
@@ -169,17 +172,21 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             store: SvHlp.store,
             template: gridPagerListTpl,
             computed: {
+                ddName: function () {
+                    return _.get(this.grid, 'config.id', Math.random()) + '/pagesize-select';
+                },
                 pagesizeOptions: function () {
-                    return this.grid.config && this.grid.config.pager ? this.grid.config.pager.pagesize_options : [];
+                    return _.get(this.grid, 'config.pager.pagesize_options', []);
+                    //return this.grid.config && this.grid.config.pager ? this.grid.config.pager.pagesize_options : [];
                 },
                 curPagesize: function () {
-                    return this.grid.state ? this.grid.state.ps : 10;
+                    return _.get(this.grid, 'state.ps', 10);
                 },
                 numPages: function () {
-                    return this.grid.state ? this.grid.state.mp : 0;
+                    return _.get(this.grid, 'state.mp', 0);
                 },
                 curPage: function () {
-                    return this.grid.state ? this.grid.state.p : 1;
+                    return _.get(this.grid, 'state.p', 1);
                 }
             },
             methods: {
@@ -260,7 +267,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 },
                 availableFilters: function () {
                     var availFilters = [{id:'', text:''}];
-                    if (!this.grid || !this.grid.config || !this.grid.config.filters) {
+                    if (!_.get(this.grid, 'config.filters')) {
                         return availFilters;
                     }
                     var addedFilters = this.addedFilters, af = {}, i, l;
@@ -365,7 +372,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             computed: {
                 formatOptions: function () {
-                    return this.grid && this.grid.config.export ? this.grid.config.export.format_options : {};
+                    return _.get(this.grid, 'config.export.format_options', {});
                 }
             },
             methods: {
@@ -390,7 +397,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             template: gridBulkActionsTpl,
             computed: {
                 actions: function () {
-                    return this.grid.config ? this.grid.config.bulk_actions : [];
+                    return _.get(this.grid, 'config.bulk_actions', []);
                 }
             },
             methods: {
@@ -417,14 +424,10 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             computed: {
                 cntTotal: function () {
-                    return this.grid && this.grid.state ? this.grid.state.c : 0;
+                    return _.get(this.grid, 'state.c', 0);
                 },
                 currentFilters: function () {
-                    var gridState = this.grid.state;
-                    if (!gridState || !gridState.filters) {
-                        return [];
-                    }
-                    return gridState.filters;
+                    return _.get(this.grid, 'state.filters', []);
                 }
             },
             methods: {
@@ -459,18 +462,18 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             computed: {
                 columns: function () {
-                    return this.grid && this.grid.config.columns ? this.grid.config.columns : [];
+                    return _.get(this.grid, 'config.columns', []);
                 },
                 columnOptions: function () {
-                    var colOptions = {};
-                    for (var j = 0; j < this.grid.config.columns; j++) {
-                        var col1 = this.grid.config.columns[j]
+                    var columns = _.get(this.grid, 'config.columns', []), colOptions = {};
+                    for (var j = 0; j < columns; j++) {
+                        var col1 = columns[j];
                         colOptions[col1.name] = col1.options;
                     }
                     return colOptions;
                 },
                 visibleRows: function () {
-                    var q = this.grid && this.grid.state ? this.grid.state.quickSearch : '';
+                    var q = _.get(this.grid, 'state.quickSearch', '');
                     if (q === '') {
                         this.cntVisible = this.grid.rows ? this.grid.rows.length : 0;
                         return this.grid.rows;
