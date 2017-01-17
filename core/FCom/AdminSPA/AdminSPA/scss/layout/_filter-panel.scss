@@ -132,7 +132,14 @@
 		}
 	}
 }
-
+.ui-sortable {
+	font-size: 0;
+	li {
+		margin-right: 5px;
+		padding: 6px 0;
+		white-space: nowrap;
+	}
+}
 .export {
 	.dropdown-menu {
 		width: 222px;
