@@ -21,7 +21,7 @@
         color: #000;
         padding: 8px 10px;
         display: inherit;
-		font-family: 'GothamProMedium';
+		font-weight: bold;
     }
 }
 .panel-container {
@@ -33,7 +33,7 @@
 	}
 	.control-label {
 		display: inline-block;
-		font-family: 'GothamProMedium';
+		font-weight: bold;
 		font-size: 12px;
 		color: #000;
 		cursor: pointer;
@@ -104,7 +104,7 @@ fieldset {
 		left: 50%;
 		transform: translate(-50%, 0);
 		color: #000;
-		font-family: "GothamProMedium";
+		font-weight: bold;
 		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	}
 	&:hover {

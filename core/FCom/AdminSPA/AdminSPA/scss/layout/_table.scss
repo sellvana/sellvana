@@ -26,13 +26,13 @@ table {
 			width: 100%;
 		}
 		td {
-			font-family: GothamProMedium;
+			font-weight: bold;
 			color: #000;
 		}
 	}
 	tbody {
 		span {
-			font-family: $f-main-lig;
+			font-weight: 300;
 		}
 		tr {
 			border-bottom: 1px solid #f8f8f8;
@@ -59,7 +59,7 @@ table {
 		}
 	}
 	td {
-		font-family: $f-main-lig;
+		font-weight: 300;
 	}
 	.column-row-select {
 		width: 50px;
@@ -138,13 +138,12 @@ table {
 	tr:nth-child(odd) {
 		background: #f8f8f8;
 	}
-	td:first-child {
-		font-family: GothamProBold;
+	th {
+		font-weight: bold;
 		color: #2d2d2d;
 		padding: 10px 0 10px 15px;
 	}
-	td:last-child {
-		font-family: GothamProMedium;
+	td {
 		color: #2d2d2d;
 	}
 	td,
@@ -160,7 +159,7 @@ table {
 		border-bottom: 1px solid #ebebeb;
 		td {
 			font-size: 12px;
-			font-family: GothamProMedium;
+			font-weight: bold;
 			padding: 5px;
 		}
 	}

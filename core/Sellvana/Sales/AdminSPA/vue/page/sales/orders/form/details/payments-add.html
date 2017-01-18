@@ -50,19 +50,24 @@
         </div>
         <div class="total-amount">
             <div class="total-amount-pay">
-                <p>Total Amount to Pay</p>
-                <span>{{totalAmountToPay|currency}}</span>
-            </div>
-			<div class="create-payment">
+              	<div>
+					<p>Total Amount to Pay</p>
+					<span class="total-sum">{{totalAmountToPay|currency}}</span>
+				</div>
+				<div>
 				<p>Payment Method</p>
-				<select2>
-					<option value="stripe">Stripe</option>
-					<option value="paypal">PayPal Express Checkout</option>
-					<option value="cc">Credit Card</option>
-					<option value="basic" selected="">Check / Money Order</option>
-					<option value="ogone">Ogone</option>
-				</select2>
+					<select2>
+						<option value="stripe">Stripe</option>
+						<option value="paypal">PayPal Express Checkout</option>
+						<option value="cc">Credit Card</option>
+						<option value="basic" selected="">Check / Money Order</option>
+						<option value="ogone">Ogone</option>
+					</select2>
+				</div>
             </div>
+			<!--<div class="create-payment">
+				
+            </div>-->
         </div>
       <!--  <div class="">
             

@@ -30,7 +30,7 @@ aside {
 	.dropdown-collapse {
 		&.in {
 			span {
-				font-family: $f-main-bold;
+				font-weight: bold;
 				color: #000;
 			}
 			i {
@@ -46,7 +46,7 @@ aside {
 		}
 	}
 	li.active {
-		font-family: $f-main-bold;
+		font-weight: bold;
 	}
 	i {
 		font-size: 16px;
@@ -68,7 +68,7 @@ aside {
 			color: #000;
 		}
 		span {
-			font-family: "GothamProBold";
+			font-weight: bold;
 		}
 	}
 }

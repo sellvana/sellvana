@@ -10,7 +10,7 @@ button, .button {
 	transition: 0.1s all ease-in;
 	display: inline-block;
 	font-size: 12px;
-	font-family: $f-med;
+	font-weight: bold;
 	span {
 		color: #fff;
 	}
@@ -124,7 +124,7 @@ button, .button {
 }
 .button6 {
 	background-color: #ff2b42;
-	font-family: $f-main-bold;
+	font-weight: bold;
 	border: 1px solid #ff2b42;
 	padding: 6px 14px;
 	width: auto;
@@ -212,7 +212,7 @@ button, .button {
 }
 .button10 {
 	background-color: transparent;
-	font-family: $f-main-bold;
+	font-weight: bold;
 	border: 1px solid transparent;
 	width: auto;
 	color: #000;
@@ -234,7 +234,7 @@ button, .button {
 }
 .button11 {
 	background-color: transparent;
-	font-family: $f-main-bold;
+	font-weight: bold;
 	border: 1px solid #c9c9c9;
 	width: auto;
 	color: #4d4d4d;
@@ -295,6 +295,75 @@ button, .button {
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
+.button14 {
+	background-color: #00c0ef;
+	color: #fff;
+	border: 1px solid #00c0ef;
+	padding: 0px 6px;
+	&:focus {
+		background-color: #038fb1;
+		border: 1px solid #038fb1;
+		color: #fff;
+	}
+	&:hover {
+		background: #038fb1;
+		color: #fff;
+		border: 1px solid #038fb1;
+	}
+	&:active, &.active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		background-color: #038fb1;
+		border: 1px solid #038fb1;
+	}
+}
+.button15 {
+	background-color: #00a65a;
+	color: #fff;
+	border: 1px solid #00a65a;
+	padding: 0px 6px;
+	&:focus {
+		background-color: #02894b;
+		border: 1px solid #02894b;
+		color: #fff;
+	}
+	&:hover {
+		background: #02894b;
+		color: #fff;
+		border: 1px solid #02894b;
+	}
+	&:active, &.active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		background-color: #02894b;
+		border: 1px solid #02894b;
+	}
+}
+.button16 {
+	background-color: #dac303;
+	border: 1px solid #dac303;
+	color: #fff;
+	padding: 0px 6px;
+	&:focus {
+		background-color: #cbb607;
+		border: 1px solid #cbb607;
+		color: #fff;
+	}
+	&:hover {
+		background: #cbb607;
+		color: #fff;
+		border: 1px solid #cbb607;
+	}
+	&:active, .active {
+		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		background-color: #cbb607;
+		border: 1px solid #cbb607;
+	}
+}
 .button-lock {
 	border: 0;
 	background: none;
@@ -334,6 +403,6 @@ button, .button {
 	button, .button {
 		padding: 4px 12px;
 		font-size: 11px;
-		font-family: 'GothamProLight';
+		font-weight: 300;
 	}
 }

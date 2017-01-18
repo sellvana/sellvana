@@ -145,7 +145,19 @@ input[type="checkbox"]:checked + .checkbox-block {
 	font-size: 18px;
 	padding: 4px 5px;
 }
-
+.required {
+	.control-label {
+		position: relative;
+		padding-right: 2em;
+		&:after {
+			content: "*";
+			display: inline-block;
+			position: absolute;
+			right: 15px;
+			top: 5px;
+		}
+	}
+}
 @media (max-width: 767px) {
 	.translate-icon {
 		position: absolute;

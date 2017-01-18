@@ -83,13 +83,35 @@ input,
 textarea {
 	margin: 0;
 	padding: 0;
-	font-size: $s-main;
+	font-size: 12px;
 	line-height: 1.25em;
-	font-family: $f-main, sans-serif;
+	font-family: "GothamProRegular", sans-serif;
 	box-sizing: border-box;
 	color: $t-main;
 }
 
+.medium * {
+	color: #000;
+	font-family: "GothamProMedium", sans-serif;
+}
+.proxima * {
+	font-family: "Proxima", sans-serif;
+}
+.helvetica * {
+	font-family: "HelveticaNeue", sans-serif;
+}
+.avenir * {
+	font-family: "Avenir", sans-serif;
+}
+.lato * {
+	font-family: "Futura", sans-serif;
+}
+.futura * {
+	font-family: "Futura", sans-serif;
+}
+.din * {
+	font-family: "din", sans-serif;
+}
 input,
 iframe {
 	border: 0;
@@ -285,7 +307,7 @@ header {
 		display: inline-block;
 		margin-right: 10px;
 		min-height: 40px;
-		font-family: $f-main-lig;
+		font-weight: 300;
 		font-size: 13px;
 		color: #474646;
 	}
@@ -295,7 +317,7 @@ header {
 		vertical-align: middle;
 	}
 	span {
-		font-family: $f-main-lig;
+		font-weight: 300;
 		font-size: 13px;
 		color: #474646;
 	}
@@ -309,7 +331,7 @@ header {
 		background: none;
 		a {
 			padding-right: 0;
-			font-family: $f-main-bold;
+			font-weight: bold;
 			color: #000;
 		}
 	}
@@ -724,7 +746,7 @@ i {
 		min-width: 190px;
 		& > p {
 			font-size: 18px;
-			font-family: $f-main-lig;
+			font-weight: 300;
 			color: #606060;
 			padding: 0 5px;
 		}
@@ -750,7 +772,7 @@ i {
 		}
 		span {
 			color: #606060;
-			font-family: $f-main-lig;
+			font-weight: 300;
 			display: inline-block;
 			vertical-align: middle;
 		}
@@ -890,7 +912,7 @@ i {
 			top: 4px;
 		}
 		span {
-			font-family: $f-main-lig;
+			font-weight: 300;
 			color: #2d2d2d;
 		}
 	}
@@ -900,7 +922,7 @@ i {
 	}
 	input,
 	select {
-		font-family: $f-main-lig;
+		font-weight: 300;
 		font-size: 12px;
 		width: 100%;
 	}

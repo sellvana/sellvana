@@ -228,35 +228,35 @@
 				</div>
 				<table class="striped-table">
 					<tr>
-						<td>{{'Subtotal'|_}}</td>
+						<th>{{'Subtotal'|_}}</th>
 						<td>{{form.order.subtotal|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Shipping & Handling'|_}}</td>
+						<th>{{'Shipping & Handling'|_}}</th>
 						<td>{{form.order.shipping_price|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Discount'|_}}</td>
+						<th>{{'Discount'|_}}</th>
 						<td>{{form.order.discount_amount|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Tax'|_}}</td>
+						<th>{{'Tax'|_}}</th>
 						<td>{{form.order.tax_amount|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Grand Total'|_}}</td>
+						<th>{{'Grand Total'|_}}</th>
 						<td>{{form.order.grand_total|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Store Credit'|_}}</td>
+						<th>{{'Store Credit'|_}}</th>
 						<td>{{paidByStoreCredit|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Amount Captured'|_}}</td>
+						<th>{{'Amount Captured'|_}}</th>
 						<td>{{form.order.amount_paid|currency(form.order.store_currency_code)}}</td>
 					</tr>
 					<tr>
-						<td>{{'Balance Due'|_}}</td>
+						<th>{{'Balance Due'|_}}</th>
 						<td>{{form.order.amount_due|currency(form.order.store_currency_code)}}</td>
 					</tr>
 				</table>
