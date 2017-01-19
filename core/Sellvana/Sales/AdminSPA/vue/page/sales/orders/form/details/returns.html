@@ -14,7 +14,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="r in form.returns" @click="$emit('edit', 'return', r)">
+            <tr v-for="r in form.returns" @click="$emit('edit', 'return', r)" :class="{active:entity===r}">
                 <td>{{r.create_at|date}}</td>
                 <td>
                     <div v-for="item in r.items">

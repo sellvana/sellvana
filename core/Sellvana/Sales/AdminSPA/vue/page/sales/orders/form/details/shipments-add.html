@@ -1,98 +1,79 @@
 <div class="product-sku">
-    <div>
-        <div class="block-title">
-            <p>Product SKU</p>
-            <span>1078987321</span>
-        </div>
+    <div class="block-title">
+        <p>{{'Add a new shipment'|_}}</p>
+    </div>
+    <div v-if="form.items_payable">
         <div class="scrollable-area">
-            <table class="secondary-table">
+            <table class="secondary-table combined-table">
                 <thead>
                 <tr>
-                    <td>Inventory SKU</td>
-                    <td>Product Name</td>
-                    <td>Qty Ordered</td>
-                    <td>Total Amount</td>
-                    <td>Paid</td>
-                    <td>Amount in Payments</td>
-                    <td>Payable Amount</td>
+                    <td>{{'Pay'|_}}</td>
+                    <td>{{'Thumbnail'|_}}</td>
+                    <td>{{'Product Info'|_}}</td>
+                    <td>{{'Amounts'|_}}</td>
+                    <td>{{'Payable'|_}}</td>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>test-100</td>
-                    <td>Product 1</td>
-                    <td>1</td>
-                    <td>$ 3,433.60</td>
-                    <td>$0.00</td>
-                    <td>$0.00</td>
-                    <td>$ 3,433.60</td>
+                <tr v-for="item in form.items_shippable" :class="{selected: isItemSelected(item)}">
+                    <th class="column-row-select">
+                        <label @click.prevent="toggleItem(item)"><input type="checkbox" :checked="isItemSelected(item)"/>
+                            <span><i class="fa fa-check" aria-hidden="true"></i></span></label>
+                    </th>
+                    <td>
+                        <img :src="item.thumb_url" :alt="item.product_name">
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Name:'|_}}</th><td>{{item.product_name}}</td></tr>
+                        <tr><th>{{'Qty:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
+                        <tr><th>{{'P.SKU:'|_}}</th><td>{{item.product_sku}}</td></tr>
+                        <tr><th>{{'I.SKU:'|_}}</th><td>{{item.inventory_sku}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Total:'|_}}</th><td>{{item.row_total|currency}}</td></tr>
+                        <tr><th>{{'Paid:'|_}}</th><td>{{item.amount_paid|currency}}</td></tr>
+                        <tr><th>{{'In Payments:'|_}}</th><td>{{item.amount_in_payments|currency}}</td></tr>
+                        <tr><th>{{'Due:'|_}}</th><td>{{item.amount_due|currency}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'To Pay:'|_}}</th><td><input type="text" class="form-control" v-model="item.amount_to_pay" :disabled="!isItemSelected(item)"></td></tr>
+                        </tbody></table>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div class="control-buttons-block">
-            <div>
-                <p>Amount to Pay</p>
-                <input type="text" name=""/>
+        <div class="total-amount">
+            <div class="total-amount-pay">
+                <p>{{'Total Amount to Pay'|_}}</p>
+                <span>{{totalAmountToPay|currency}}</span>
             </div>
-        </div>
-    </div>
-    <div class="secondary-grid">
-        <div class="block-title">
-            <p>Product SKU</p>
-            <span>1078987321</span>
-        </div>
-        <div class="scrollable-area">
-            <table class="secondary-table">
-                <thead>
-                <tr>
-                    <td>Inventory SKU</td>
-                    <td>Product Name</td>
-                    <td>Qty Ordered</td>
-                    <td>Total Amount</td>
-                    <td>Paid</td>
-                    <td>Amount in Payments</td>
-                    <td>Payable Amount</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>test-100</td>
-                    <td>Product 1</td>
-                    <td>1</td>
-                    <td>$ 3,433.60</td>
-                    <td>$0.00</td>
-                    <td>$0.00</td>
-                    <td>$ 3,433.60</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="control-buttons-block">
-            <div>
-                <p>Amount to Pay</p>
-                <input type="text" name=""/>
+            <div class="create-payment">
+                <p>{{'Payment Method'|_}}</p>
+                <select2 :options="form.payment_methods" v-model="payment_method">
+                </select2>
             </div>
+            <!--<div class="create-payment">
+
+            </div>-->
+        </div>
+        <!--  <div class="">
+
+          </div>-->
+        <div class="control-buttons-block">
+            <button type="button" class="button button12" @click="submit()" :diabled="!totalAmountToPay">{{'Create and Save Payment'|_}}</button>
+            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
     </div>
-    <div class="total-amount">
-        <div>
-            <p>Total Amount to Pay</p>
-            <span>$ 1,707.60</span>
+    <div v-else>
+        {{'No payable items found.'|_}}
+        <div class="control-buttons-block">
+            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
-    </div>
-    <div class="create-payment">
-        <span>Check / Money Order</span>
-        <select2>
-            <option value="stripe">Stripe</option>
-            <option value="paypal">PayPal Express Checkout</option>
-            <option value="cc">Credit Card</option>
-            <option value="basic" selected="">Check / Money Order</option>
-            <option value="ogone">Ogone</option>
-        </select2>
-        <button type="button" class="button button12">{{'Create'|_}}</button>
-    </div>
-    <div class="control-buttons-block">
-        <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
     </div>
 </div>

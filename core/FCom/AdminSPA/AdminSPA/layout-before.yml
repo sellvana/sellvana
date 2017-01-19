@@ -16,6 +16,9 @@
             - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
 
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.css" ]
+            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.js" ]
+
             #- [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
 #            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
@@ -42,6 +45,7 @@
             #- [ requireJs, bootstrap-vue, "https://unpkg.com/bootstrap-vue/dist/bootstrapVue" ]
 
             - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/require-2.3.2.min.js" ]
+
             - [ requireJs, text, "@FCom_AdminSPA/AdminSPA/js/lib/text-2.0.12" ]
             - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
             - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]

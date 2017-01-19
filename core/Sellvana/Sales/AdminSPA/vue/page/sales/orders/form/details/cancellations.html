@@ -14,7 +14,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="c in form.cancellations" @click="$emit('edit', 'cancellation', c)">
+            <tr v-for="c in form.cancellations" @click="$emit('edit', 'cancellation', c)" :class="{active:entity===c}">
                 <td>{{c.create_at|date}}</td>
                 <td>
                     <div v-for="item in c.items">

@@ -3,6 +3,7 @@
 /**
  * Class Sellvana_Sales_AdminSPA_Controller_Orders
  *
+ * @property Sellvana_Sales_Main Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Order Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Comment Sellvana_Sales_Model_Order_Comment
  * @property Sellvana_Sales_Model_Order_Item Sellvana_Sales_Model_Order_Item
@@ -57,53 +58,63 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
     }
 
+    protected function _getFullOrderFormData($orderId)
+    {
+        $order         = $this->Sellvana_Sales_Model_Order->load($orderId);
+        if (!$order) {
+            throw new BException('Order not found');
+        }
+        return [
+            'tabs' => $this->getFormTabs('/sales/orders/form'),
+            'details_sections' => $this->view('sales/orders/form')->getDetailsSections(),
+
+            'order' => $this->_getOrderData($order),
+            'items' => $this->_getOrderItems($order),
+            'totals' => $this->_getOrderTotals($order),
+
+            'shipments' => $this->_getShipments($order),
+            'returns' => $this->_getReturns($order),
+            'payments' => $this->_getPayments($order),
+            'refunds' => $this->_getRefunds($order),
+            'cancellations' => $this->_getCancellations($order),
+
+            'items_payable' => $this->_getPayableItems($order),
+            'items_shippable' => $this->_getShippableItems($order),
+            'items_returnable' => $this->_getReturnableItems($order),
+            'items_refundable' => $this->_getRefundableItems($order),
+            'items_cancellable' => $this->_getCancellableItems($order),
+
+            'comments' => $this->_getComments($order),
+
+            'options' => [
+                'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
+                'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
+                'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
+                'order_state_custom' => $order->state()->custom()->getAllValueLabels(),
+                'item_state_overall' => $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels(),
+                'item_state_delivery' => $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels(),
+                'item_state_custom' => $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels(),
+                'shipment_state_overall' => $this->Sellvana_Sales_Model_Order_Shipment_State_Overall->getAllValueLabels(),
+                'payment_state_overall' => $this->Sellvana_Sales_Model_Order_Payment_State_Overall->getAllValueLabels(),
+                'return_state_overall' => $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels(),
+                'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
+                'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
+            ],
+
+            'items_grid_config' => $this->applyGridPersonalization($this->normalizeGridConfig($this->getItemsGridConfig())),
+
+            'payment_methods' => $this->_getPaymentMethods(),
+
+            'updates' => [],
+        ];
+    }
+
     public function action_form_data()
     {
         $result = [];
         try {
-            $orderId       = $this->BRequest->get('id');
-            $order         = $this->Sellvana_Sales_Model_Order->load($orderId);
-            if (!$order) {
-                throw new BException('Order not found');
-            }
-            $result['form'] = [
-                'tabs' => $this->getFormTabs('/sales/orders/form'),
-                'details_sections' => $this->view('sales/orders/form')->getDetailsSections(),
-
-                'order' => $this->_getOrderData($order),
-                'items' => $this->_getOrderItems($order),
-
-                'shipments' => $this->_getShipments($order),
-                'returns' => $this->_getReturns($order),
-                'payments' => $this->_getPayments($order),
-                'refunds' => $this->_getRefunds($order),
-                'cancellations' => $this->_getCancellations($order),
-
-                'items_payable' => $this->_getPayableItems($order),
-                'items_shippable' => $this->_getShippableItems($order),
-                'items_returnable' => $this->_getReturnableItems($order),
-                'items_refundable' => $this->_getRefundableItems($order),
-                'items_cancellable' => $this->_getCancellableItems($order),
-
-                'comments' => $this->_getComments($order),
-
-                'options' => [
-                    'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
-                    'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
-                    'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
-                    'order_state_custom' => $order->state()->custom()->getAllValueLabels(),
-                    'item_state_overall' => $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels(),
-                    'item_state_delivery' => $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels(),
-                    'item_state_custom' => $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels(),
-                    'shipment_state_overall' => $this->Sellvana_Sales_Model_Order_Shipment_State_Overall->getAllValueLabels(),
-                    'payment_state_overall' => $this->Sellvana_Sales_Model_Order_Payment_State_Overall->getAllValueLabels(),
-                    'return_state_overall' => $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels(),
-                    'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
-                    'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
-                ],
-
-                'items_grid_config' => $this->applyGridPersonalization($this->normalizeGridConfig($this->getItemsGridConfig())),
-            ];
+            $orderId        = $this->BRequest->get('id');
+            $result['form'] = $this->_getFullOrderFormData($orderId);
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -125,6 +136,19 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         }
 
         return $this->BDb->many_as_array($items);
+    }
+
+    protected function _getOrderTotals(Sellvana_Sales_Model_Order $order)
+    {
+        $result = [];
+        foreach ($order->getData('totals') as $id => $total) {
+            if (in_array($id, ['shipping', 'tax']) || !(float)$total['value']) {
+                $total['amount_due'] = $total['value'];
+            }
+            $total['name'] = $id;
+            $result[] = $total;
+        }
+        return $result;
     }
 
     protected function _getPayments(Sellvana_Sales_Model_Order $order)
@@ -204,6 +228,16 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         return $this->BDb->many_as_array($comments);
     }
 
+    protected function _getPaymentMethods()
+    {
+        $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
+        $result = [];
+        foreach ($methods as $methodCode => $method) {
+            $result[] = ['id' => $methodCode, 'text' => $method->getName()];
+        }
+        return $result;
+    }
+
     public function getItemsGridConfig()
     {
         $itemStateOverallOptions = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
@@ -256,6 +290,200 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         ];
         $this->respond($result);
     }
+
+    public function action_payment_add__POST()
+    {
+        $result = [];
+        try {
+            $orderId = $this->BRequest->post('order_id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $paymentData = $this->BRequest->post('payment');
+            $amounts = $this->BRequest->post('amounts');
+            $totals = $this->BRequest->post('totals');
+
+            $this->Sellvana_Sales_Main->workflowAction('adminCreatesPayment', [
+                'order' => $order,
+                'data' => $paymentData,
+                'amounts' => $amounts,
+                'totals' => $totals,
+            ]);
+            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $this->ok()->addMessage('Payment has been created', 'success');
+        } catch (Exception $e) {
+            $this->error()->addMessage($e->getMessage(), 'error');
+        }
+
+        $this->respond($result);
+    }
+
+    public function action_payment_edit__POST()
+    {
+
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $payments = $this->BRequest->post('payments');
+            $transactions = $this->BRequest->post('transactions');
+            $delete = $this->BRequest->post('delete');
+            if ($payments) {
+                foreach ($payments as $id => $s) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPayment', [
+                        'order' => $order,
+                        'payment_id' => $id,
+                        'data' => $s,
+                    ]);
+                }
+            }
+            if ($transactions) {
+                foreach ($transactions as $id => $p) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesTransaction', [
+                        'order' => $order,
+                        'transaction_id' => $id,
+                        'data' => $p,
+                    ]);
+                }
+            }
+            if ($delete) {
+                foreach ($delete as $id => $_) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminDeletesPayment', [
+                        'order' => $order,
+                        'payment_id' => $id,
+                    ]);
+                }
+            }
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Payment updates have been applied');
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['payments'] = (string)$this->view('order/orders-form/payments')->set('model', $order);
+        $result['otherInfo'] = $order->getStateInfo();
+        $this->BResponse->json($result);
+    }
+
+    public function action_shipment_add__POST()
+    {
+
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $shipmentData = $this->BRequest->post('shipment');
+            $qtys = $this->BRequest->post('qtys');
+
+            $this->Sellvana_Sales_Main->workflowAction('adminCreatesShipment', [
+                'order' => $order,
+                'data' => $shipmentData,
+                'qtys' => $qtys,
+            ]);
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Shipment has been created');
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
+        $this->BResponse->json($result);
+    }
+
+    public function action_shipment_edit__POST()
+    {
+        try {
+            $orderId = $this->BRequest->get('id');
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+
+            if (!$order) {
+                throw new BException('Invalid order');
+            }
+
+            $shipments = $this->BRequest->post('shipments');
+            $packages = $this->BRequest->post('packages');
+            $delete = $this->BRequest->post('delete');
+            if ($shipments) {
+                foreach ($shipments as $id => $s) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesShipment', [
+                        'order' => $order,
+                        'shipment_id' => $id,
+                        'data' => $s,
+                    ]);
+                }
+            }
+            if ($packages) {
+                foreach ($packages as $id => $p) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPackage', [
+                        'order' => $order,
+                        'package_id' => $id,
+                        'data' => $p,
+                    ]);
+                }
+            }
+            if ($delete) {
+                foreach ($delete as $id => $_) {
+                    $this->Sellvana_Sales_Main->workflowAction('adminDeletesShipment', [
+                        'order' => $order,
+                        'shipment_id' => $id,
+                    ]);
+                }
+            }
+            $result = $this->_resetOrderTabs($order);
+            $result['message'] = $this->_('Shipment updates have been applied');
+        } catch (Exception $e) {
+            $result['error'] = true;
+            $result['message'] = $e->getMessage();
+        }
+
+        $result['tabs']['shipments'] = (string)$this->view('order/orders-form/shipments')->set('model', $order);
+        $result['otherInfo'] = $order->getStateInfo();
+        $this->BResponse->json($result);
+    }
+
+    public function action_refund_add__POST()
+    {
+
+    }
+
+    public function action_refund_edit__POST()
+    {
+
+    }
+
+    public function action_return_add__POST()
+    {
+
+    }
+
+    public function action_return_edit__POST()
+    {
+
+    }
+
+    public function action_cancellation_add__POST()
+    {
+
+    }
+
+    public function action_cancellation_edit__POST()
+    {
+
+    }
+
 
     public function onHeaderSearch($args)
     {

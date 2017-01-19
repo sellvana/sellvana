@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
+define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         // 'sv-page-sales-orders-form-details-payment-add',
         // 'sv-page-sales-orders-form-details-payment-edit',
         // 'sv-page-sales-orders-form-details-shipment-add',
@@ -25,7 +25,7 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-add-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-edit-tpl'
-    ], function (_, Vue, tabDetailsTpl,
+    ], function (_, Vue, SvHlp, tabDetailsTpl,
          // PaymentAdd, PaymentEdit, ShipmentAdd, ShipmentEdit, RefundAdd, RefundEdit, ReturnAdd, ReturnEdit, CancellationAdd, CancellationEdit,
         paymentsTpl, paymentsAddTpl, paymentsEditTpl,
         shipmentsTpl, shipmentsAddTpl, shipmentsEditTpl,
@@ -34,97 +34,171 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
         cancellationsTpl, cancellationsAddTpl, cancellationsEditTpl
 ) {
 
+    var orderItemsById = {};
+
+    function getOrderItem(form, entityItem) {
+        if (_.isEmpty(orderItemsById) || true === entityItem) {
+            for (var i = 0, l = form.items.length; i < l; i++) {
+                orderItemsById[form.items[i].id] = form.items;
+            }
+        }
+        return orderItemsById[entityItem.order_item_id];
+    }
+
+    var EntityAddMixin = {
+        props: ['form', 'entity'],
+        data: function () {
+            return {
+                items_selected: {}
+            }
+        },
+        computed: {
+            isItemSelected: function () {
+                return function (item) {
+                    var id = item.id || item.name;
+                    return this.items_selected[id];
+                }
+            }
+        },
+        methods: {
+            toggleItem: function (item) {
+                var id = item.id || item.name;
+                Vue.set(this.items_selected, id, !this.items_selected[id]);
+                if (this.items_selected[id]) {
+                    Vue.set(item, 'amount_to_pay', item.amount_due || item.value);
+                } else {
+                    Vue.set(item, 'amount_to_pay', '');
+                }
+            }
+        }
+    };
+
+    var EntityEditMixin = {
+
+    };
+
     var SectionComponents = {
         payments: {
-            props: ['form'],
+            props: ['form', 'entity'],
             template: paymentsTpl
         },
         paymentAdd: {
-            props: ['form', 'entity'],
+            mixins: [EntityAddMixin],
             template: paymentsAddTpl,
             data: function () {
                 return {
-                    items_selected: {}
+                    payment_method: ''
                 }
             },
             computed: {
-                isItemSelected: function () {
-                    return function (item) {
-                        return this.items_selected[item.id];
-                    }
-                },
                 totalAmountToPay: function () {
                     var total = 0, i;
                     for (i = 0, l = this.form.items_payable.length; i < l; i++) {
-                        total += this.form.items_payable[i].amount_to_pay;
+                        total += 1 * this.form.items_payable[i].amount_to_pay;
+                    }
+                    for (i = 0, l = this.form.totals.length; i < l; i++) {
+                        if (_.isNumber(this.form.totals[i].amount_to_pay)) {
+                            total += 1 * this.form.totals[i].amount_to_pay;
+                        }
                     }
                     return total;
                 }
             },
             methods: {
-                toggleItem: function (item) {
-                    Vue.set(this.items_selected, item.id, !this.items_selected[item.id]);
-                    if (this.items_selected[item.id]) {
-                        Vue.set(item, 'amount_to_pay', item.amount_due);
-                    } else {
-                        Vue.set(item, 'amount_to_pay', '');
+                submit: function () {
+                    var i, l, item, postData = {
+                        order_id: this.form.order.id,
+                        payment: {
+                            method: this.payment_method
+                        },
+                        amounts: {},
+                        totals: {}
+                    };
+                    for (i = 0, l = this.form.items_payable.length; i < l; i++) {
+                        item = this.form.items_payable[i];
+                        postData.amounts[item.id] = item.amount_to_pay;
                     }
+                    for (i = 0, l = this.form.totals.length; i < l; i++) {
+                        var total = this.form.totals[i];
+                        postData.totals[total.name] = total.amount_to_pay;
+                    }
+                    SvHlp.sendRequest('POST', 'orders/payment_add', postData, function (response) {
+console.log(response);
+                        this.$emit('action', {type: 'update-form', form: response.form});
+                    });
                 }
             }
         },
         paymentEdit: {
+            mixins: [EntityEditMixin],
             props: ['form', 'entity'],
-            template: paymentsEditTpl
+            template: paymentsEditTpl,
+            computed: {
+                orderItem: function () {
+                    var vm = this;
+                    return function (entityItem) {
+                        return getOrderItem(vm.form, entityItem);
+                    }
+                }
+            }
         },
         
         shipments: {
-            props: ['form'],
+            props: ['form', 'entity'],
             template: shipmentsTpl
         },
         shipmentAdd: {
+            mixins: [EntityAddMixin],
             props: ['form', 'entity'],
             template: shipmentsAddTpl
         },
         shipmentEdit: {
+            mixins: [EntityEditMixin],
             props: ['form', 'entity'],
             template: shipmentsEditTpl
         },
         
         refunds: {
-            props: ['form'],
+            props: ['form', 'entity'],
             template: refundsTpl
         },
         refundAdd: {
+            mixins: [EntityAddMixin],
             props: ['form', 'entity'],
             template: refundsAddTpl
         },
         refundEdit: {
+            mixins: [EntityEditMixin],
             props: ['form', 'entity'],
             template: refundsEditTpl
         },
         
         returns: {
-            props: ['form'],
+            props: ['form', 'entity'],
             template: returnsTpl
         },
         returnAdd: {
+            mixins: [EntityAddMixin],
             props: ['form', 'entity'],
             template: returnsAddTpl
         },
         returnEdit: {
+            mixins: [EntityEditMixin],
             props: ['form', 'entity'],
             template: returnsEditTpl
         },
 
         cancellations: {
-            props: ['form'],
+            props: ['form', 'entity'],
             template: cancellationsTpl
         },
         cancellationAdd: {
+            mixins: [EntityAddMixin],
             props: ['form', 'entity'],
             template: cancellationsAddTpl
         },
         cancellationEdit: {
+            mixins: [EntityEditMixin],
             props: ['form', 'entity'],
             template: cancellationsEditTpl
         }
@@ -149,7 +223,7 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
                 }
             }
         }
-console.log(form, form.payments[0].items[0].order_item);
+//console.log(form, form.payments[0].items[0].order_item);
     }
 
     return {
@@ -196,7 +270,8 @@ console.log(form, form.payments[0].items[0].order_item);
                     action = {type: action};
                 }
                 switch (action.type) {
-                    case 'close': this.closeHlpSection();
+                    case 'update-form': this.$emit('action', action); break;
+                    case 'close': this.closeHlpSection(); break;
                 }
             }
         },
@@ -206,6 +281,10 @@ console.log(form, form.payments[0].items[0].order_item);
         watch: {
             'form.order.id': function (orderId) {
                 populateOrderItems(this.form);
+            },
+            'form.items': {
+                handler: function () { getOrderItem(this.form, true); },
+                deep: true
             }
         }
     };

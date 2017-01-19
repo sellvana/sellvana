@@ -15,7 +15,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="r in form.refunds" @click="$emit('edit', 'refund', r)">
+            <tr v-for="r in form.refunds" @click="$emit('edit', 'refund', r)" :class="{active:entity===r}">
                 <td>{{r.create_at|date}}</td>
                 <td>{{r.amount|currency(form.order.store_currency_code)}}</td>
                 <td>{{r.method_desc}}</td>

@@ -1,7 +1,8 @@
 <div>
 	<div class="row">
 		<div class="col-md-12 col-lg-5">
-			<component v-for="section in detailsSections" :is="section.component" :name="section.name" :form="form" @add="addEntity" @edit="editEntity"></component>
+			<component v-for="section in detailsSections" :is="section.component" :name="section.name" :form="form"
+					   :entity="curHlpEntity" @add="addEntity" @edit="editEntity"></component>
 		</div>
 
 		<div class="col-md-12 col-lg-7">

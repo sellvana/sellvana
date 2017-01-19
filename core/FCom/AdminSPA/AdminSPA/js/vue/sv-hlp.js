@@ -1,5 +1,5 @@
 define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'vue-ckeditor', 'vue-select2',
-    'ckeditor', 'select2'],
+        'ckeditor', 'select2'],
     function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2) {
 
         Vue.use(VueRouter);
@@ -31,6 +31,19 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         Vue.component('ckeditor', VueCkeditor);
 
         Vue.component('select2', VueSelect2);
+
+        Vue.component('jsontree', {
+            template: '<div></div>',
+            props: ['json'],
+            mounted: function () {
+                $(this.$el).html(JSONTree.create(this.json));
+            },
+            watch: {
+                json: function (json) {
+                    $(this.$el).html(JSONTree.create(this.json));
+                }
+            }
+        });
 
         Vue.component('checkbox', {
             template: '<label><input type="checkbox" v-model="internal"><div class="checkbox-block" :style="blockStyle"><div class="checkbox-elem" :style="elemStyle"></div></div></label>',

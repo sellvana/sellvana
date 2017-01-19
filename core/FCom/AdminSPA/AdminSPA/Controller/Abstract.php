@@ -72,6 +72,11 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         return $this;
     }
 
+    public function error()
+    {
+        $this->addResponses(['error' => true]);
+    }
+
     public function respond($result = [])
     {
         $result = $this->FCom_AdminSPA_AdminSPA->mergeResponses($result);

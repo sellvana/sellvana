@@ -15,7 +15,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="p in form.payments" @click="$emit('edit', 'payment', p)">
+            <tr v-for="p in form.payments" @click="$emit('edit', 'payment', p)" :class="{active:entity===p}">
                 <td>{{p.create_at|date}}</td>
                 <td>{{p.amount_captured+p.amount_due|currency(form.order.store_currency_code)}}</td>
                 <td>{{p.payment_method}}</td>

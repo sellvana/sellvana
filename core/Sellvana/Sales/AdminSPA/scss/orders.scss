@@ -590,6 +590,12 @@
 			top: 8px;
 		}
 	}
+	td {
+		cursor: pointer;
+	}
+	tr.active td {
+		background: #fcfcfc;
+	}
 }
 
 .existing-payments,
@@ -639,7 +645,7 @@
 		padding: 6px 0;
 	}
 	.block-title {
-		padding: 0 200px 0 16px;
+		//padding: 0 200px 0 16px;
 	}
 }
 

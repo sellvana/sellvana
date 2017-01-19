@@ -43,6 +43,13 @@ define(['vue', 'sv-hlp'],
                     vm.updateBreadcrumbs(SvHlp._('Order #' + vm.form.order.unique_id));
                 });
 			},
+			doAction: function (action) {
+				switch (action.type) {
+					case 'update-form':
+						Vue.set(this, 'form', action.form);
+						break;
+				}
+			},
 			doDelete: function () {
 				if (!confirm(SvHlp._('Are you sure you want to delete this order?'))) {
 					return;

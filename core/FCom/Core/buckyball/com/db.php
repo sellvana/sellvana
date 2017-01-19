@@ -3254,6 +3254,8 @@ class BModel extends Model
                 foreach ($v as $k1 => $v1) {
                     $data[$k][$k1] = $v1->as_array($objHashes);
                 }
+            } elseif ($k === 'data_serialized') {
+                $data[$k] = json_decode($v);
             }
         }
         return $data;

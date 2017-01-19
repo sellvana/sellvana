@@ -25,6 +25,15 @@
                     <a class="navbar-toggle btn pull-left visible-xs" href="#" @click.prevent="mainNavToggle()">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </a>
+                    <select @change="changeBodyClass($event)">
+                        <option></option>
+                        <option>proxima</option>
+                        <option>helvetica</option>
+                        <option>avenir</option>
+                        <option>lato</option>
+                        <option>futura</option>
+                        <option>din</option>
+                    </select>
                     <sv-comp-header-search :mobile="false" class="hidden-xs"></sv-comp-header-search>
                     <ul class="nav">
                         <li class="settings">

@@ -19,15 +19,12 @@ define(['vue'], function (Vue) {
                     Vue.set(this.grid, 'rows_selected', {});
                 }
                 var rowId = this.row[col.id_field], rowsSel = this.grid.rows_selected;
-                Vue.set(this.grid.rows_selected, rowId, !rowsSel[rowId]);
-                // if (rowsSel[rowId]) {
-                //     Vue.set(this.grid.rows_selected, rowId, false);
-                    // delete rowsSel[rowId];
-                    // delete this.grid.rows_selected[rowId];
-                    // Vue.set(this.grid, 'rows_selected', rowsSel);
-                // } else {
-                //     Vue.set(this.grid.rows_selected, rowId, this.row);
-                // }
+                // Vue.set(this.grid.rows_selected, rowId, !rowsSel[rowId]);
+                if (rowsSel[rowId]) {
+                    Vue.delete(this.grid.rows_selected, rowId);
+                } else {
+                    Vue.set(this.grid.rows_selected, rowId, this.row);
+                }
             }
         }
     };

@@ -165,6 +165,9 @@ define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
             methods: {
                 mainNavToggle: function () {
                     this.$store.commit('mainNavToggle');
+                },
+                changeBodyClass: function (ev) {
+                    $('body').removeClass().addClass(ev.target.value);
                 }
             }
         };
