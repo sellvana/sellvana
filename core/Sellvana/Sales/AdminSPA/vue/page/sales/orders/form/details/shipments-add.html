@@ -7,11 +7,11 @@
             <table class="secondary-table combined-table">
                 <thead>
                 <tr>
-                    <td>{{'Pay'|_}}</td>
-                    <td>{{'Thumbnail'|_}}</td>
-                    <td>{{'Product Info'|_}}</td>
-                    <td>{{'Amounts'|_}}</td>
-                    <td>{{'Payable'|_}}</td>
+                    <th>{{'Pay'|_}}</th>
+                    <th>{{'Thumbnail'|_}}</th>
+                    <th>{{'Product Info'|_}}</th>
+                    <th>{{'Amounts'|_}}</th>
+                    <th>{{'Payable'|_}}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -51,7 +51,7 @@
         <div class="total-amount">
             <div class="total-amount-pay">
                 <p>{{'Total Amount to Pay'|_}}</p>
-                <span>{{totalAmountToPay|currency}}</span>
+				<span class="total-sum">{{totalAmountToPay|currency}}</span>
             </div>
             <div class="create-payment">
                 <p>{{'Payment Method'|_}}</p>

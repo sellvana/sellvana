@@ -1,12 +1,3 @@
-.horizontal-menu {
-	display: inline-block;
-	li {
-		display: inline-block;
-	}
-	.dropdown li {
-		display: block;
-	}
-}
 .admin-main-content {
     .navbar {
         min-height: auto;
@@ -68,6 +59,7 @@ fieldset {
 	transition: 0.1s all ease-in; 
 	position: relative;
 	cursor: pointer; 
+	background: #fff;
 	.checkbox-elem {
 		width: 26px;
 		height: 26px;

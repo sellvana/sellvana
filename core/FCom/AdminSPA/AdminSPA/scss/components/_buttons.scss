@@ -392,6 +392,76 @@ button, .button {
 		text-align: center;
 	}
 }
+.dropdown.action.dropdown-buttons {
+	.color1 {
+		background-color: transparent;
+		color: #868a8a;
+	}
+	.color2 {
+		background-color: #514943;
+		color: #fff;
+	}
+	.color3 {
+		background-color: transparent;
+		color: #2d2d2d;
+	}
+	.color4 {
+		background-color: #3ec234;
+		color: #fff;
+	}
+	.color5 {
+		background-color: #e5e5e5;
+		color: #454d54;	
+	}
+	.color6 {
+		background-color: #ff2b42;
+		color: #fff;
+	}
+	.color7 {
+		background-color: transparent;
+		color: #ff2d43;
+	}
+	.color8 {
+		background-color: #00a65a;
+		color: #fff;
+	}
+	.color9 {
+		background-color: #00c0ef;
+		color: #fff;
+	}
+	.color10 {
+		background-color: transparent;
+		color: #000;
+	}
+	.color11 {
+		background-color: transparent;
+		color: #4d4d4d;
+	}
+	.color12 {
+		background-color: #4c8cf6;
+		color: #fff;
+	}
+	.color13 {
+		background-color: #e1e1e1;
+		color: #000;
+	}
+	.color14 {
+		background-color: #00c0ef;
+		color: #fff;
+	}
+	.color15 {
+		background-color: #00a65a;
+		color: #fff;
+	}
+	.color16 {
+		background-color: #dac303;
+		color: #fff;
+	}
+}
+
+.btn .caret {
+	margin-left: 5px;
+}
 @media (max-width: 767px) {
 	.control-buttons-block {
 		padding: 5px 0 0;
@@ -403,6 +473,6 @@ button, .button {
 	button, .button {
 		padding: 4px 12px;
 		font-size: 11px;
-		font-weight: 300;
+		font-weight: normal;
 	}
 }

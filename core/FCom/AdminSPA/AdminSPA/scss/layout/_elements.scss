@@ -1,0 +1,85 @@
+.secondary-control-block {
+	float: right;
+}
+.control-buttons {
+	text-align: right;
+	vertical-align: bottom;
+	margin: 13px 0;
+	button {
+		margin-bottom: 4px;
+	}
+}
+.admin-main-content {
+	background: #fff;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	border-radius: 2px;
+	margin-bottom: 20px;
+	padding: 15px;
+}
+.scrollable-area {
+	width: 100%;
+	overflow: auto;
+	overflow-y: hidden;
+	table {
+		white-space: nowrap;
+	}
+}
+
+.tableDiv {
+	margin: 70px 0 0 0;
+}
+
+
+.multilanguage-block {
+	.delete {
+		padding: 6px 0;
+		display: inline-block;
+		i {
+			font-size: 16px;
+		}
+	}			
+}
+.block-title {
+	margin-bottom: 10px;
+	display: inline-block;
+	padding: 0 0 0 16px;
+	width: 100%;
+	p {
+		color: #2d2d2d;
+		font-weight: bold;
+		font-size: 16px;
+		padding: 8px 0;
+		display: inline-block;
+		margin-right: 5px;
+	}
+}
+@media (max-width: 767px) {
+	.secondary-control-block {
+		float: none;
+	}
+	.block-title {
+		margin-bottom: 10px;
+		display: inline-block;
+		padding: 0 0 0 10px;
+		width: 100%;
+		p {
+			font-size: 14px;
+		}
+	}
+
+	.admin-main-content {
+		margin-bottom: 10px;
+		padding: 10px;
+	}
+	.control-buttons-block,
+	.control-buttons {
+		padding: 5px 0 0;
+		text-align: center;
+		margin: 2px 0;
+		button,
+		a,
+		input {
+			margin-bottom: 5px;
+		}
+	}
+}

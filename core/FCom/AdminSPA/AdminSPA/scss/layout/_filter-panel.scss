@@ -127,9 +127,6 @@
 			display: inline-block;
 			vertical-align: middle;
 		}
-		span {
-			font-weight: 300;
-		}
 	}
 }
 .ui-sortable {
@@ -465,23 +462,7 @@
 		}
 	}
 }
-.dropdown.action.dropdown-buttons {
-	a {
-		color: #fff;
-	}
-	.color1 {
-		background-color: #514943;
-	}
-	.color2 {
-		background-color: #00a65a;
-	}
-	.color3 {
-		background-color: #00c0ef;
-	}
-	.color4 {
-		background-color: #dac303;
-	}
-}
+
 .filter-tags {
 	.filter-tag {
 		position: relative;
@@ -612,5 +593,12 @@
 		input {
 			width: 80%;
 		}
+	}
+	.dropdown.action .dropdown-menu {
+		width: 100%;
+	}
+	.dropdown.action {
+		width: 132px;
+		margin-bottom: 10px;
 	}
 }

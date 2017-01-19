@@ -51,86 +51,8 @@
 				</div>
 				
 			</div>
-			<div class="row">
-				<div class="col-md-12 col-lg-6">
-					<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
-				</div>
-				<div class="col-md-12 col-lg-6">
-					<div class="admin-main-content">
-						<div class="multilanguage-block">
-							<div class="block-title">
-								<p>Multi Language</p>
-							</div>
-							<div>
-								<div class="row form-group">
-									<div class="col-xs-5">
-										<select2 class="form-control">
-											<option>Language1</option>
-											<option>Language2</option>
-										</select2>
-									</div>
-									<div class="col-xs-5">
-										<input class="form-control" type="text" />
-									</div>
-									<div class="col-xs-1">
-										<a href="#" class="delete"><i aria-hidden="true" class="fa fa-trash"></i></a>
-									</div>
-								</div>
-								<div class="row form-group">
-									<div class="col-xs-5">
-										<select2 class="form-control">
-											<option>Language1</option>
-											<option>Language2</option>
-										</select2>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="admin-main-content">
-						<div class="multilanguage-block">
-							<div class="block-title">
-								<p>Category Images</p>
-							</div>
-							<div>
-								<div class="secondary-menu horizontal-menu">
-									<ul class="nav">
-										<li class="active"><a href="#">Library</a></li>
-										<li><a href="#">Upload</a></li>
-									</ul>
-								</div>
-								<div class="text-center">
-									<button class="button button4">Add Files</button>
-									<button class="button button12">Start Upload</button>
-									<button class="button button13">Cancel</button> 
-								</div>
-								<div class="control-buttons text-right">
-									<button class="button button11">Cancel</button>
-									<button class="button button4">Add</button>
-								</div>
-								<div>
-									<table>
-										<tr>
-											<td><label><input type="checkbox"><span><i aria-hidden="true" class="fa fa-check"></i></span></label></td>
-											<td>1</td>
-										<td>100000001</td>
-										</tr>
-										<tr>
-											<td><label><input type="checkbox"><span><i aria-hidden="true" class="fa fa-check"></i></span></label></td>
-											<td>2</td>
-											<td>100000002</td>
-										</tr>
-									</table>
-								</div>
-								<div class="control-button-block text-right">
-									<button class="button button11">Cancel</button>
-									<button class="button button9">Save chages</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+				
 		</div>
 	</div>
 </div>

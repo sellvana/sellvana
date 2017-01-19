@@ -5,16 +5,16 @@
 				<p>Widget Library</p>
 			</div>
 		</div>
-		<div class="col-md-1">
+		<div class="col-md-1">  
 			<div>
 				<ul class="widget-menu">
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-font" aria-hidden="true"></i></a></li>
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-cog" aria-hidden="true"></i></a></li>
-					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a></li>
-					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a></li>
+					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-columns" aria-hidden="true"></i></a></li>
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-th-large" aria-hidden="true"></i></a></li>
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-th" aria-hidden="true"></i></a></li>
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-tags" aria-hidden="true"></i></a></li>
+					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-dropbox" aria-hidden="true"></i></a></li>
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-trash" aria-hidden="true"></i></a></li>
 					<li><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
 				</ul>
@@ -23,69 +23,370 @@
 		<div class="col-md-11">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="widget">
-						<div class="widget-title">
-							<div class="control-buttons text-left">
-								<button class="button button14">Inherit</button>
-								<button class="button button15">Visible</button>
-								<button class="button button16">Show</button>
-							</div>
+					<div class="widget-block">
+						<div class="widget-block-title">
 							<p>HEADER</p>
+							<div class="dropdown action dropdown-buttons open">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Visibility</span><span class="caret-back"><b class="caret"></b></span></a>
+								<div class="dropdown-menu">
+									<ul class="dropdown-content">
+										<li><a href="#" class="color14">Inherit</a></li>
+										<li><a href="#" class="color15">Visible</a></li>
+										<li><a href="#" class="color16">Hidden</a></li>
+									</ul>
+								</div>
+							</div>
 						</div>
-						<div class="widget-content">
-							But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious 
+						<div class="widget-block-content">
+							<div class="widget">
+								<div class="widget-title">
+									<p>CMS Block</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<select2>
+										<option>Option1</option>
+										<option>Option2</option>
+									</select2>
+									<div class="input-group input-group-sm">
+										<input type="text" class="form-control" value="" placeholder="Param">
+										<span class="input-group-addon"> = </span>
+										<input type="text" class="form-control" value="" placeholder="Value">
+										<a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+									</div>
+									<div class="input-group input-group-sm">
+										<input type="text" class="form-control" value="" placeholder="Param">
+										<span class="input-group-addon"> = </span>
+										<input type="text" class="form-control" value="" placeholder="Value">
+										<a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+									</div>
+									<div class="control-block">
+										<button class="button button2">Add custom param</button>
+									</div>
+								</div>
+							</div>
+							<div class="widget">
+								<div class="widget-title">
+									<p>Products Carousel</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<form class="form-horizontal">
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Product SKUs'|_}}</p>
+												<div class="col-md-9">
+													<select2 class="form-control">
+														<option>Option1</option>
+														<option>Option2</option>
+														<option>Option3</option>
+														<option>Option4</option>
+													</select2>
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Carousel Height'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="number" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Carousel Speed'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="number" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Pause Carousel on Hover'|_}}</p>
+												<div class="col-md-9">
+													<checkbox v-model="test"></checkbox>
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Allow Carousel to React to Keyboard'|_}}</p>
+												<div class="col-md-9">
+													<checkbox v-model="test"></checkbox>
+												</div>
+											</label>
+										</div>
+									</form>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-md-3">
-					<div class="widget">
-						<div class="widget-title">
-							<div class="control-buttons text-left">
-								<button class="button button14">Inherit</button>
-								<button class="button button15">Visible</button>
-								<button class="button button16">Show</button>
+				<div class="col-md-12 col-lg-3">
+					<div class="widget-block">
+						<div class="widget-block-title">
+							<p>Left column</p>
+							<div class="dropdown action dropdown-buttons open">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Visibility</span><span class="caret-back"><b class="caret"></b></span></a>
+								<div class="dropdown-menu">
+									<ul class="dropdown-content">
+										<li><a href="#" class="color14">Inherit</a></li>
+										<li><a href="#" class="color15">Visible</a></li>
+										<li><a href="#" class="color16">Hidden</a></li>
+									</ul>
+								</div>
 							</div>
-							<p>Left column</p>							
+						</div>
+						<div class="widget-block-content">
+							<div class="widget">
+								<div class="widget-title">
+									<p>Split 2 Columns</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<div class="row">
+										<div class="col-md-6">
+											<div class="widget-container">
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="widget-container">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="widget">
+								<div class="widget-title">
+									<p>Split 3 Columns</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<div class="row">
+										<div class="col-md-4">
+											<div class="widget-container">
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="widget-container">
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="widget-container">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-md-6">
-					<div class="widget main-widget">
-						<div class="widget-title">
-							<div class="control-buttons text-left">
-								<button class="button button14">Inherit</button>
-								<button class="button button15">Visible</button>
-								<button class="button button16">Show</button>
+				<div class="col-md-12 col-lg-6">
+					<div class="widget-block main-widget-block">
+						<div class="widget-block-title">
+							<p>Main</p>
+							<div class="dropdown action dropdown-buttons open">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Visibility</span><span class="caret-back"><b class="caret"></b></span></a>
+								<div class="dropdown-menu">
+									<ul class="dropdown-content">
+										<li><a href="#" class="color14">Inherit</a></li>
+										<li><a href="#" class="color15">Visible</a></li>
+										<li><a href="#" class="color16">Hidden</a></li>
+									</ul>
+								</div>
 							</div>
-							<p>Main</p>							
 						</div>
-						<div class="widget-content">
-							Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+						<div class="widget-block-content">
+							<div class="widget">
+								<div class="widget-title">
+									<p>Text</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<div class="form-horizontal">
+										<div class="form-group">
+											<div class="col-md-12">
+												<textarea class="form-control" rows="5"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="widget">
+								<div class="widget-title">
+									<p>Widget</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<select2>
+										<option>Option1</option>
+										<option>Option2</option>
+									</select2>
+									<div class="input-group input-group-sm">
+										<input type="text" class="form-control" value="" placeholder="Param">
+										<span class="input-group-addon"> = </span>
+										<input type="text" class="form-control" value="" placeholder="Value">
+										<a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+									</div>
+									<div class="input-group input-group-sm">
+										<input type="text" class="form-control" value="" placeholder="Param">
+										<span class="input-group-addon"> = </span>
+										<input type="text" class="form-control" value="" placeholder="Value">
+										<a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+									</div>
+									<div class="control-block">
+										<button class="button button2">Add custom param</button>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-md-3">
-					<div class="widget">
-						<div class="widget-title">
-							<div class="control-buttons text-left">
-								<button class="button button14">Inherit</button>
-								<button class="button button15">Visible</button>
-								<button class="button button16">Show</button>
+				<div class="col-md-12 col-lg-3">
+					<div class="widget-block">
+						<div class="widget-block-title">
+							<p>Right column</p>
+							<div class="dropdown action dropdown-buttons open">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Visibility</span><span class="caret-back"><b class="caret"></b></span></a>
+								<div class="dropdown-menu">
+									<ul class="dropdown-content">
+										<li><a href="#" class="color14">Inherit</a></li>
+										<li><a href="#" class="color15">Visible</a></li>
+										<li><a href="#" class="color16">Hidden</a></li>
+									</ul>
+								</div>
 							</div>
-							<p>Right column</p>							
 						</div>
-						<div class="widget-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+						<div class="widget-block-content">
+							<div class="widget">
+								<div class="widget-title">
+									<p>Remove view</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<div class="form-horizontal">
+										<div class="form-group">
+											<div class="col-md-12">
+												<input class="form-control" type="text" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="col-md-12">
-					<div class="widget">
-						<div class="widget-title">
-							<div class="control-buttons text-left">
-								<button class="button button14">Inherit</button>
-								<button class="button button15">Visible</button>
-								<button class="button button16">Show</button>
+					<div class="widget-block">
+						<div class="widget-block-title">
+							<p>Footer</p>
+							<div class="dropdown action dropdown-buttons open">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>Visibility</span><span class="caret-back"><b class="caret"></b></span></a>
+								<div class="dropdown-menu">
+									<ul class="dropdown-content">
+										<li><a href="#" class="color14">Inherit</a></li>
+										<li><a href="#" class="color15">Visible</a></li>
+										<li><a href="#" class="color16">Hidden</a></li>
+									</ul>
+								</div>
 							</div>
-							<p>Footer</p>							
+						</div>
+						<div class="widget-block-content">
+							<div class="widget">
+								<div class="widget-title">
+									<p>Video Embed (YouTube)</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<form class="form-horizontal">
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Embed URL'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="text" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Width'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="number" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Height'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="number" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Embed using iFrame'|_}}</p>
+												<div class="col-md-9">
+													<checkbox v-model="test"></checkbox>
+												</div>
+											</label>
+										</div>
+										<div class="input-group input-group-sm">
+											<input type="text" class="form-control" value="" placeholder="Param">
+											<span class="input-group-addon"> = </span>
+											<input type="text" class="form-control" value="" placeholder="Value">
+											<a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+										</div>
+										<div class="control-block">
+											<button class="button button2">Add custom param</button>
+										</div>
+									</form>
+								</div>
+							</div>
+							<div class="widget">
+								<div class="widget-title">
+									<p>Insert media</p>
+									<a href="#" class="delete" draggable="false"><i class="fa fa-times"></i></a>
+								</div>
+								<div class="widget-content">
+									<form class="form-horizontal">
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Width'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="number" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<label>
+												<p class="col-md-3 control-label">{{'Height'|_}}</p>
+												<div class="col-md-9">
+													<input class="form-control" type="number" />
+												</div>
+											</label>
+										</div>
+										<div class="form-group">
+											<div class="col-md-3 control-label">
+												<button class="button button4">Select image</button>
+											</div>
+											<div class="col-md-9">
+
+											</div>
+										</div>
+										<div class="input-group input-group-sm">
+											<input type="text" class="form-control" value="" placeholder="Param">
+											<span class="input-group-addon"> = </span>
+											<input type="text" class="form-control" value="" placeholder="Value">
+											<a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+										</div>
+										<div class="control-block">
+											<button class="button button2">Add custom param</button>
+										</div>
+									</form>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

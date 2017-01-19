@@ -91,11 +91,15 @@ textarea {
 }
 
 .medium * {
+	font-family: "GothamProMedium", sans-serif;
+}
+.mediumBlack * {
 	color: #000;
 	font-family: "GothamProMedium", sans-serif;
 }
 .proxima * {
 	font-family: "Proxima", sans-serif;
+	color: #000;
 }
 .helvetica * {
 	font-family: "HelveticaNeue", sans-serif;
@@ -104,7 +108,7 @@ textarea {
 	font-family: "Avenir", sans-serif;
 }
 .lato * {
-	font-family: "Futura", sans-serif;
+	font-family: "Lato", sans-serif;
 }
 .futura * {
 	font-family: "Futura", sans-serif;
@@ -307,7 +311,6 @@ header {
 		display: inline-block;
 		margin-right: 10px;
 		min-height: 40px;
-		font-weight: 300;
 		font-size: 13px;
 		color: #474646;
 	}
@@ -317,7 +320,6 @@ header {
 		vertical-align: middle;
 	}
 	span {
-		font-weight: 300;
 		font-size: 13px;
 		color: #474646;
 	}
@@ -746,7 +748,6 @@ i {
 		min-width: 190px;
 		& > p {
 			font-size: 18px;
-			font-weight: 300;
 			color: #606060;
 			padding: 0 5px;
 		}
@@ -772,7 +773,6 @@ i {
 		}
 		span {
 			color: #606060;
-			font-weight: 300;
 			display: inline-block;
 			vertical-align: middle;
 		}
@@ -912,7 +912,6 @@ i {
 			top: 4px;
 		}
 		span {
-			font-weight: 300;
 			color: #2d2d2d;
 		}
 	}
@@ -922,7 +921,6 @@ i {
 	}
 	input,
 	select {
-		font-weight: 300;
 		font-size: 12px;
 		width: 100%;
 	}
@@ -997,6 +995,7 @@ i {
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 }
+
 @media (max-width: 1023px) {
 	.search-block {
 		button {

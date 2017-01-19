@@ -31,9 +31,6 @@ table {
 		}
 	}
 	tbody {
-		span {
-			font-weight: 300;
-		}
 		tr {
 			border-bottom: 1px solid #f8f8f8;
 		}
@@ -57,9 +54,6 @@ table {
 			color: #7379db;
 			top: 18px;
 		}
-	}
-	td {
-		font-weight: 300;
 	}
 	.column-row-select {
 		width: 50px;
@@ -195,3 +189,20 @@ table {
 		color: #000;
 	}
 }
+
+.secondary-grid {
+	table {
+		p {
+			display: block;
+		}
+		td,
+		th {
+			padding: 10px 0 10px 10px;
+			vertical-align: top;
+		}
+		td:last-child {
+			width: 140px;
+		}
+	}
+}
+

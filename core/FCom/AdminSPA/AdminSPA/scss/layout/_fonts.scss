@@ -34,15 +34,7 @@
 	font-style: normal;
 	font-weight: 500;
 }
-@font-face {
-	font-family: "GothamProRegular";
-	src: url("../fonts/GothamProLight/GothamProLight.eot");
-	src: url("../fonts/GothamProLight/GothamProLight.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/GothamProLight/GothamProLight.woff") format("woff"),
-		url("../fonts/GothamProLight/GothamProLight.ttf") format("truetype");
-	font-style: normal;
-	font-weight: 300;
-}
+
 @font-face {
 	font-family: "Avenir";
 	src: url("../fonts/Avenir/Avenir-Roman.eot");
@@ -52,15 +44,7 @@
 	font-style: normal;
 	font-weight: normal;
 }
-@font-face {
-	font-family: "Avenir";
-	src: url("../fonts/Avenir-Light/Avenir-Light.eot");
-	src: url("../fonts/Avenir-Light/Avenir-Light.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Avenir-Light/Avenir-Light.woff") format("woff"),
-		url("../fonts/Avenir-Light/Avenir-Light.ttf") format("truetype");
-	font-style: normal;
-	font-weight: 300;
-}
+
 @font-face {
 	font-family: "Avenir";
 	src: url("../fonts/Avenir-Bold/Avenir-Bold.eot");
@@ -68,7 +52,7 @@
 		url("../fonts/Avenir-Bold/Avenir-Bold.woff") format("woff"),
 		url("../fonts/Avenir-Bold/Avenir-Bold.ttf") format("truetype");
 	font-style: normal;
-	font-weight: 300;
+	font-weight: bold;
 }
 @font-face {
 	font-family: "HelveticaNeue";
@@ -79,21 +63,13 @@
 	font-style: normal;
 	font-weight: normal;
 }
+
 @font-face {
 	font-family: "HelveticaNeue";
-	src: url("../fonts/HelveticaNeue-Light/HelveticaNeue-Light.eot");
-	src: url("../fonts/HelveticaNeue-Light/HelveticaNeue-Light.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/HelveticaNeue-Light/HelveticaNeue-Light.woff") format("woff"),
-		url("../fonts/HelveticaNeue-Light/HelveticaNeue-Light.ttf") format("truetype");
-	font-style: normal;
-	font-weight: 300;
-}
-@font-face {
-	font-family: "HelveticaNeue";
-	src: url("../fonts/HelveticaNeue-Bold/HelveticaNeue-Bold.eot");
-	src: url("../fonts/HelveticaNeue-Bold/HelveticaNeue-Bold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/HelveticaNeue-Bold/HelveticaNeue-Bold.woff") format("woff"),
-		url("../fonts/HelveticaNeue-Bold/HelveticaNeue-Bold.ttf") format("truetype");
+	src: url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.eot");
+	src: url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.eot?#iefix")format("embedded-opentype"),
+		url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.woff") format("woff"),
+		url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.ttf") format("truetype");
 	font-style: normal;
 	font-weight: bold;
 }
@@ -105,15 +81,6 @@
 		url("../fonts/Proxima/ProximaNova-Regular.ttf") format("truetype");
 	font-style: normal;
 	font-weight: normal;
-}
-@font-face {
-	font-family: "Proxima";
-	src: url("../fonts/Proxima-Light/ProximaNova-Light.eot");
-	src: url("../fonts/Proxima-Light/ProximaNova-Light.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Proxima-Light/ProximaNova-Light.woff") format("woff"),
-		url("../fonts/Proxima-Light/ProximaNova-Light.ttf") format("truetype");
-	font-style: normal;
-	font-weight: 300;
 }
 @font-face {
 	font-family: "Proxima";
@@ -123,15 +90,6 @@
 		url("../fonts/Proxima-Bold/ProximaNova-Bold.ttf") format("truetype");
 	font-style: normal;
 	font-weight: bold;
-}
-@font-face {
-	font-family: "Proxima";
-	src: url("../fonts/Proxima/ProximaNova-Regular.eot");
-	src: url("../fonts/Proxima/ProximaNova-Regular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Proxima/ProximaNova-Regular.woff") format("woff"),
-		url("../fonts/Proxima/ProximaNova-Regular.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
 }
 @font-face {
 	font-family: "Lato";

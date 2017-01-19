@@ -1,32 +1,3 @@
-.secondary-menu {
-	background: #fff;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-	border-radius: 2px;
-	margin-bottom: 20px;
-	.nav a {
-		padding: 12px 15px;
-	}
-	.nav .active {
-		background: #eee;
-		&:focus {
-			background: #eee;
-		}
-		a {
-			color: #000;
-			background: #eee;
-		}
-	}
-	.dropdown-menu {
-		padding: 0;
-		a {
-			padding: 3px 20px;
-		}
-	}
-	.fa-warning, .fa-pencil {
-		float: right;
-		padding: 2px 7px;
-	}
-}
 .edited-block {
 	padding: 10px;
 	.no-gutter {
@@ -88,77 +59,6 @@
 			display: none;
 		}
 	}
-}
-
-.block-title {
-	margin-bottom: 10px;
-	display: inline-block;
-	padding: 0 0 0 16px;
-	width: 100%;
-	p {
-		color: #2d2d2d;
-		font-weight: bold;
-		font-size: 16px;
-		padding: 8px 0;
-		display: inline-block;
-		margin-right: 5px;
-	}
-}
-.secondary-control-block {
-	float: right;
-}
-.control-buttons {
-	text-align: right;
-	vertical-align: bottom;
-	margin: 13px 0;
-	button {
-		margin-bottom: 4px;
-	}
-}
-
-.f-admin-main-view {
-	min-height: 100%;
-	margin: 0;
-	margin-left: 257px;
-	margin-top: 81px;
-	min-width: 276px;
-	padding: 0px 15px 80px 0px;
-	.nav {
-		a:hover {
-			color: #000;
-		}
-	}
-}
-
-.admin-main-content {
-	background: #fff;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-	border-radius: 2px;
-	margin-bottom: 20px;
-	padding: 15px;
-}
-
-.main-nav-closed {
-	.f-admin-main-view {
-		margin-left: 67px;
-	}
-}
-
-.scrollable-area {
-	width: 100%;
-	overflow: auto;
-	overflow-y: hidden;
-	table {
-		white-space: nowrap;
-	}
-}
-
-.tableDiv {
-	margin: 70px 0 0 0;
-}
-
-.btn .caret {
-	margin-left: 5px;
 }
 
 .payment-info,
@@ -226,6 +126,7 @@
 		background: #f29b19;
 	}
 }
+
 .sort-by {
 	margin-top: 20px;
 	li {
@@ -644,25 +545,6 @@
 	select {
 		padding: 6px 0;
 	}
-	.block-title {
-		//padding: 0 200px 0 16px;
-	}
-}
-
-.secondary-grid {
-	table {
-		p {
-			display: block;
-		}
-		td,
-		th {
-			padding: 10px 0 10px 10px;
-			vertical-align: top;
-		}
-		td:last-child {
-			width: 140px;
-		}
-	}
 }
 
 .product-sku {
@@ -695,31 +577,35 @@
 	.total-amount {
 		text-align: right;
 		.total-amount-pay {
+			border-top: 1px solid #000;
+		}
+		.total-amount-pay,
+		.create-payment {
 			width: 50%;
 			min-width: 300px;
-			border-top: 1px solid #000;
 			display: inline-block;
 			padding: 18px 0;
 			white-space: nowrap;
-			.total-sum {
-				background: #f6f6f6;
-				display: inline-block;
-				padding: 7px 10px;
-				font-weight: bold;
-				color: #000;
-				margin-left: 50px;
-			}
+			text-align: right;
 			.select2-container {
 				min-width: 160px;
 				margin: 0 0px 0 20px;
 				padding: 6px 0;
+				text-align: left;
 			}
 		}
 		p {
-			font-weight: bold;
 			display: inline-block;
 			vertical-align: middle;
 			color: #000;
+		}
+		.total-sum {
+			background: #f6f6f6;
+			display: inline-block;
+			padding: 7px 10px;
+			font-weight: bold;
+			color: #000;
+			margin-left: 50px;
 		}
 	}
 	.secondary-grid {
@@ -728,13 +614,15 @@
 }
 
 .create-payment {
-	text-align: right;
+	text-align: center;
 	padding: 20px 0;
 	& > * {
 		display: inline-block;
 		vertical-align: middle;
 	}
-	
+	.select2-container {
+		min-width: 50%;
+	}
 }
 
 .tablet-panel {
@@ -758,66 +646,7 @@
 		}
 	}
 }
-.multilanguage-block {
-	.delete {
-		padding: 6px 0;
-		display: inline-block;
-		i {
-			font-size: 16px;
-		}
-	}			
-}
 
-.widget-menu {
-	position: relative;
-	left: -15px;
-	li {
-		margin-bottom: 5px;
-	}
-	a {
-		padding: 20px;
-		display: inline-block;
-		max-width: 110px;
-		background: #ededed;
-	}
-	i {
-		font-size: 25px;
-		vertical-align: middle;
-		color: #000;
-	}
-	.fa-ellipsis-v {
-		font-size: 16px;
-		margin-right: 10px;		
-	}
-}
-.widget {
-	background: #fafafa;
-	margin-bottom: 20px;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-}
-.main-widget {
-	background: #dcdcdc;
-}
-.widget-title {
-	padding: 3px 0 3px 12px;
-	background: #eeeeee;
-	overflow: hidden;
-	p {
-		text-transform: uppercase;
-		font-size: 15px;
-		padding: 4px 0 4px 0;
-		color: #000;
-	}
-	.control-buttons {
-		float: right;
-		margin: 5px 12px 0 0;
-		text-align: right;
-		max-width: 162px;
-	}	
-}
-.widget-content {
-	padding: 10px;
-}
 @media (max-width: 1762px) {
 	.new-comment {
 		p,
@@ -846,12 +675,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 1365px) {
-	.f-admin-main-view {
-		margin-top: 130px;
-	}
-	.main-nav-closed  .f-admin-main-view {
-		margin-left: 17px;
-	}
 	.main-info-block .total-sales,
 	.main-info-block .total-users,
 	.main-info-block .total-members,
@@ -869,18 +692,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-	.f-admin-main-view {
-		min-height: 100%;
-		margin-right: 13px;
-		margin-left: 13px; 
-		min-width: 276px;
-		padding: 0px 0px 90px 0px;
-	}
-	.main-nav-closed {
-		.f-admin-main-view {
-			margin-left: 13px;
-		}
-	}
 	.main-info-block .total-sales,
 	.main-info-block .total-users,
 	.main-info-block .total-members,
@@ -905,19 +716,6 @@
 }
 
 @media (max-width: 767px) {
-	.f-admin-main-view {
-		min-height: 100%;
-		margin-right: 13px;
-		margin-left: 13px;
-		margin-top: 185px;
-		min-width: 276px;
-		padding: 0px 0px 90px 0px;
-	}
-	.main-nav-closed {
-		.f-admin-main-view {
-			margin-left: 13px;
-		}
-	}
 	.main-info-block .total-sales,
 	.main-info-block .total-users,
 	.main-info-block .total-members,
@@ -934,9 +732,6 @@
 			min-width: 100px;
 		}
 	}
-	.secondary-control-block {
-		float: none;
-	}
 	.tablet-panel {
 		text-align: center;
 		.dropdown.action {
@@ -947,30 +742,17 @@
 			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		}
 	}
-	.block-title {
-		margin-bottom: 10px;
-		display: inline-block;
-		padding: 0 0 0 10px;
-		width: 100%;
-		p {
-			font-size: 14px;
-		}
-	}
-	.admin-main-content {
-		margin-bottom: 10px;
-		padding: 10px;
-	}
 	.existing-payments {
 		width: 100%;
 		overflow: auto;
 		overflow-y: hidden;
 		.scrollable-area {
 			width: auto;
-			overflow: inherit; 
+			overflow: inherit;
 			overflow-y: inherit;
 		}
 		.block-title {
-			padding: 0 0px 0 10px; 
+			padding: 0 0px 0 10px;
 			p {
 				width: 100%;
 			}
@@ -993,7 +775,7 @@
 				position: relative;
 				right: 0;
 				top: 0;
-				min-width: 100px; 
+				min-width: 100px;
 			}
 			label {
 				position: relative;
@@ -1019,22 +801,5 @@
 				margin-left: 10px;
 			}
 		}
-	}
-	.control-buttons-block, .control-buttons {
-		padding: 5px 0 0;
-		text-align: center;
-		margin: 2px 0;
-		button, a, input {
-			margin-bottom: 5px;
-		}
-	}
-	button, .button {
-		padding: 4px 12px;
-		font-size: 11px;
-		font-weight: 300;
-	}
-	.dropdown.action {
-		width: 132px;
-		margin-bottom: 10px;
 	}
 }
