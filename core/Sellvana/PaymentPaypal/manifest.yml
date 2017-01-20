@@ -6,12 +6,14 @@ modules:
         translations: { en: en.php }
         description: "PayPal&reg; standard payment method"
 
+        auto_use: [ bootstrap ]
+
         areas:
             FCom_Admin:
-                auto_use: [ bootstrap, views, layout ]
+                auto_use: [ views, layout ]
 
             FCom_Frontend:
-                auto_use: [ bootstrap, views, layout ]
+                auto_use: [ views, layout ]
                 routing:
                     - [ /paypal/.action, Sellvana_PaymentPaypal_Frontend_Controller_ExpressCheckout ]
 

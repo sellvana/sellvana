@@ -293,39 +293,28 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      * @return Sellvana_Sales_Model_Order_Payment_Transaction|Sellvana_Sales_Model_Order_Payment_Transaction[]
      * @throws BException
      */
-    public function findTransaction($type, $status = null, $amount = null, $all = false, $parentId = null)
+    public function findTransactions($type, $status = null, $amount = null, $all = false, $parentId = null)
     {
-        $orm = $this->Sellvana_Sales_Model_Order_Payment_Transaction->orm();
-        $orm->where('payment_id', $this->id());
-        if (is_string($type)) {
-            $orm->where('transaction_type', $type);
-        } elseif (is_array($type)) {
-            $orm->where_in('transaction_type', $type);
-        } else {
-            throw new BException('Invalid transaction type argument');
+        $transactions = $this->transactions();
+        $result = [];
+        foreach ($transactions as $t) {
+            $tStatus = $t->get('transaction_status');
+            if (!in_array($t->get('transaction_type'), (array)$type)
+                || !($status === true && $tStatus === 'pending')
+                || !($status === false && $tStatus !== 'pending')
+                || !($status !== true & $status !== false && $status !== null && $tStatus !== $status)
+                || !($amount !== null && $t->get('amount') != $amount)
+                || !($parentId !== null && $t->get('parent_transaction_id') == $parentId)
+            ) {
+                continue;
+            }
+            if (!$all) {
+                return $t;
+            } else {
+                $result[] = $t;
+            }
         }
-
-        if ($status === true) { // open transaction
-            $orm->where('transaction_status', 'pending');
-        } elseif ($status === false) { // closed transaction
-            $orm->where_not_equal('transaction_status', 'pending');
-        } elseif (null !== $status) { // any status
-            $orm->where('transaction_status', $status);
-        }
-
-        if (null !== $amount) {
-            $orm->where('amount', $amount);
-        }
-
-        if (null !== $parentId) {
-            $orm->where('parent_transaction_id', $parentId);
-        }
-
-        if (!$all) {
-            return $orm->find_one();
-        } else {
-            return $orm->find_many();
-        }
+        return $result;
     }
 
     public function fetchTransactionsTotalAmounts()
@@ -339,7 +328,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'amount_refunded'     => 0,
         ];
         foreach ($this->transactions() as $trans) {
-            $amount = $trans->get('amount');
+            $amount = $this->BCurrencyValue->create($trans->get('amount'));
             switch ($trans->get('transaction_type')) {
                 case 'order':
                     $a['amount_ordered'] += $amount;
@@ -457,17 +446,17 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         if (null === $parent) {
-            $parent = $this->findTransaction('order', 'completed');
+            $parent = $this->findTransactions('order', 'completed');
         }
 
         $transaction = $this->createTransaction('auth', $amount, $parent)->start();
 
         $result = $method->authorize($transaction);
         if (empty($result['error'])) {
-            //TODO: handle error during authorized
+            throw new BException($result['error']);
         }
 
-        $transaction->complete();
+        $transaction->complete($parent);
 
         $this->Sellvana_Sales_Main->workflowAction('adminAuthorizesPayment', [
             'transaction' => $transaction,
@@ -487,7 +476,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         if (null === $parent) {
-            $parent = $this->findTransaction('auth', 'completed');
+            $parent = $this->findTransactions('auth', 'completed');
         }
 
         if (!$parent) {
@@ -498,7 +487,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         $method->reauthorize($transaction);
 
-        $transaction->complete();
+        $transaction->complete($parent);
 
         $this->Sellvana_Sales_Main->workflowAction('adminReAuthorizesPayment', [
             'transaction' => $transaction,
@@ -518,7 +507,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         if (null === $parent) {
-            $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+            $parent = $this->findTransactions(['auth', 'reauth'], 'completed');
         }
 
         if (!$parent) {
@@ -529,7 +518,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         $method->void($transaction);
 
-        $transaction->complete();
+        $transaction->complete($parent);
 
         $this->Sellvana_Sales_Main->workflowAction('adminVoidsAuthorization', [
             'transaction' => $transaction,
@@ -549,7 +538,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         if (null === $parent) {
-            $parent = $this->findTransaction(['auth', 'reauth'], 'completed');
+            $parent = $this->findTransactions(['auth', 'reauth'], 'completed');
         }
 
         if (!$parent) {
@@ -560,7 +549,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         $method->capture($transaction);
 
-        $transaction->complete();
+        $transaction->complete($parent);
 
         $this->Sellvana_Sales_Main->workflowAction('adminCapturesPayment', [
             'transaction' => $transaction,
@@ -578,7 +567,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         if (null === $parent) {
-            $parent = $this->findTransaction('capture', 'completed');
+            $parent = $this->findTransactions('capture', 'completed');
         }
 
         if (!$parent) {
@@ -589,10 +578,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         $method->refund($transaction);
 
-        $transaction->complete();
+        $transaction->complete($parent);
 
         $this->Sellvana_Sales_Main->workflowAction('adminRefundsPayment', [
             'transaction' => $transaction,
+            'parent' => $parent,
         ]);
 
         return $this;

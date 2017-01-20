@@ -154,7 +154,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
 
         $payment = $transaction->payment();
         try {
-            $parentTransaction = $payment->findTransaction(Sellvana_Sales_Model_Order_Payment_Transaction::SALE, 'completed');
+            $parentTransaction = $payment->findTransactions(Sellvana_Sales_Model_Order_Payment_Transaction::SALE, 'completed');
             $charge = \Stripe\Charge::retrieve($parentTransaction->get('transaction_id'));
             $refund = $charge->refund([
                 'amount' => round($transaction->get('amount') * 100),

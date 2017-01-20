@@ -127,7 +127,6 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
             if (!$order) {
                 throw new BException('Invalid order');
             }
-#print_r($this->BRequest->post()); exit;
             $paymentData = $this->BRequest->post('payment');
             $amounts = $this->BRequest->post('amounts');
             $totals = $this->BRequest->post('totals');

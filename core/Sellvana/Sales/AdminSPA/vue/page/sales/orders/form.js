@@ -44,9 +44,26 @@ define(['vue', 'sv-hlp'],
                 });
 			},
 			doAction: function (action) {
+				var vm = this;
 				switch (action.type) {
 					case 'update-form':
+						action.form.tabs = this.form.tabs;
 						Vue.set(this, 'form', action.form);
+						break;
+
+					case 'delete':
+						if (!confirm(SvHlp._('Are you sure you want to delete this ' + action.entity.entity_type + '?'))) {
+							return;
+						}
+						var postData = {
+							order_id: this.form.order.id,
+							entity_type: action.entity.entity_type,
+							entity_id: action.entity.id
+						};
+						SvHlp.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
+                            response.form.tabs = vm.form.tabs;
+                            Vue.set(vm, 'form', response.form);
+						});
 						break;
 				}
 			},
@@ -61,10 +78,22 @@ define(['vue', 'sv-hlp'],
 				});
 			},
 			shipAllItems: function () {
-
+				var vm = this, postData = {order_id: this.form.order.id};
+				SvHlp.sendRequest('POST', 'orders/ship_all_items', postData, function (response) {
+					if (response.form) {
+                        response.form.tabs = vm.form.tabs;
+                        Vue.set(vm, 'form', response.form);
+					}
+				});
 			},
 			markAsPaid: function () {
-
+                var vm = this, postData = {order_id: this.form.order.id};
+                SvHlp.sendRequest('POST', 'orders/mark_as_paid', postData, function (response) {
+                    if (response.form) {
+                        response.form.tabs = vm.form.tabs;
+                        Vue.set(vm, 'form', response.form);
+                    }
+                });
 			},
 			save: function (stayOnPage) {
 				var vm = this;

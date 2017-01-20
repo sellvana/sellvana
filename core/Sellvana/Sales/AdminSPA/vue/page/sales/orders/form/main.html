@@ -189,12 +189,12 @@
 								</a>
 							</div>
 							<div v-for="s in form.shipments">
-								<span :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</span>
 								<strong>{{s.carrier_desc}} / {{s.service_desc}}</strong>
+								<span :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</span>
 							</div>
 							<div v-for="r in form.returns">
+								<strong>{{'RETURN'|_}}</strong>
 								<p :class="'status-' + r.state_overall">{{form.options.return_state_overall[r.state_overall]}}</p>
-								<strong>({{'RETURN'|_}})</strong>
 							</div>
 						</div>
 					</div>
@@ -207,13 +207,14 @@
 								</a>
 							</div>
 							<div v-for="p in form.payments">
-								<span :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</span>
 								<strong>{{p.payment_method}}</strong>
+								<span :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</span>
 								<span>{{p.amount_captured|currency(form.order.store_currency_code)}}</span>
+								<span>({{p.amount_due|currency(form.order.store_currency_code)}})</span>
 							</div>
 							<div v-for="r in form.refunds">
+								<strong>{{'REFUND: '|_}}</strong>
 								<span :class="'status-' + r.state_overall">{{form.options.refund_state_overall[r.state_overall]}}</span>
-								<strong>({{'REFUND'|_}})</strong>
 								<span>{{r.amount|currency(form.order.store_currency_code)}}</span>
 							</div>
 						</div>

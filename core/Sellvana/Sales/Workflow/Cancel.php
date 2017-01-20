@@ -102,6 +102,8 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $order->calcItemQuantities('cancels');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
+
+        return ['new_cancel' => $cancel];
     }
 
     public function action_adminUpdatesCancel($args)

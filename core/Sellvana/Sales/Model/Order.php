@@ -668,6 +668,9 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->saveAllDetails();
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getShippableItems()
     {
         $items = [];
@@ -679,6 +682,9 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getPayableItems()
     {
         $items = [];
@@ -705,6 +711,9 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $totals;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getCancelableItems()
     {
         $items = [];
@@ -716,6 +725,9 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getReturnableItems()
     {
         $items = [];
@@ -727,6 +739,9 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getRefundableItems()
     {
         $items = [];
@@ -738,7 +753,12 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $items;
     }
 
-    public function getAllPayments($withItems = false)
+    /**
+     * @param bool $withItems
+     * @param bool $withTransactions
+     * @return Sellvana_Sales_Model_Order_Payment[]
+     */
+    public function getAllPayments($withItems = false, $withTransactions = false)
     {
         $payments = $this->Sellvana_Sales_Model_Order_Payment->orm()
             ->where('order_id', $this->id())
@@ -756,11 +776,23 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 }
             }
         }
+
+        if ($withTransactions) {
+            /** @var Sellvana_Sales_Model_Order_Payment $payment */
+            foreach ($payments as $id => $payment) {
+                $payment->set('transactions', $payment->transactions());
+            }
+        }
         
         return array_values($payments);
     }
 
-    public function getAllShipments($withItems = false)
+    /**
+     * @param bool $withItems
+     * @param bool $withPackages
+     * @return Sellvana_Sales_Model_Order_Shipment[]
+     */
+    public function getAllShipments($withItems = false, $withPackages = false)
     {
         $shipments = $this->Sellvana_Sales_Model_Order_Shipment->orm()
             ->where('order_id', $this->id())
@@ -778,10 +810,21 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 }
             }
         }
+
+        if ($withPackages) {
+            /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
+            foreach ($shipments as $id => $shipment) {
+                $shipment->set('packages', $shipment->packages());
+            }
+        }
         
         return array_values($shipments);
     }
 
+    /**
+     * @param bool $withItems
+     * @return Sellvana_Sales_Model_Order_Return[]
+     */
     public function getAllReturns($withItems = false)
     {
         $returns = $this->Sellvana_Sales_Model_Order_Return->orm()
@@ -804,6 +847,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return array_values($returns);
     }
 
+    /**
+     * @param bool $withItems
+     * @return Sellvana_Sales_Model_Order_Refund[]
+     */
     public function getAllRefunds($withItems = false)
     {
         $refunds = $this->Sellvana_Sales_Model_Order_Refund->orm()
@@ -826,6 +873,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return array_values($refunds);
     }
 
+    /**
+     * @param bool $withItems
+     * @return Sellvana_Sales_Model_Order_Cancel[]
+     */
     public function getAllCancellations($withItems = false)
     {
         $cancellations = $this->Sellvana_Sales_Model_Order_Cancel->orm()

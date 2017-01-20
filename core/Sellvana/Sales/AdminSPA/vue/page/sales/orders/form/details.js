@@ -39,7 +39,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     function getOrderItem(form, entityItem) {
         if (_.isEmpty(orderItemsById) || true === entityItem) {
             for (var i = 0, l = form.items.length; i < l; i++) {
-                orderItemsById[form.items[i].id] = form.items;
+                orderItemsById[form.items[i].id] = form.items[i];
             }
         }
         return orderItemsById[entityItem.order_item_id];
@@ -59,22 +59,18 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                     return this.items_selected[id];
                 }
             }
-        },
-        methods: {
-            toggleItem: function (item) {
-                var id = item.id || item.name;
-                Vue.set(this.items_selected, id, !this.items_selected[id]);
-                if (this.items_selected[id]) {
-                    Vue.set(item, 'amount_to_pay', item.amount_due || item.value);
-                } else {
-                    Vue.set(item, 'amount_to_pay', '');
-                }
-            }
         }
     };
 
     var EntityEditMixin = {
-
+        computed: {
+            orderItem: function () {
+                var vm = this;
+                return function (entityItem) {
+                    return getOrderItem(vm.form, entityItem);
+                }
+            }
+        }
     };
 
     var SectionComponents = {
@@ -105,11 +101,16 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                 }
             },
             methods: {
+                toggleItem: function (item) {
+                    var id = item.id || item.name;
+                    Vue.set(this.items_selected, id, !this.items_selected[id]);
+                    Vue.set(item, 'amount_to_pay', this.items_selected[id] ? (item.amount_due || item.value) : '');
+                },
                 submit: function () {
-                    var i, l, item, postData = {
+                    var vm = this, i, l, item, postData = {
                         order_id: this.form.order.id,
                         payment: {
-                            method: this.payment_method
+                            payment_method: this.payment_method
                         },
                         amounts: {},
                         totals: {}
@@ -123,8 +124,12 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         postData.totals[total.name] = total.amount_to_pay;
                     }
                     SvHlp.sendRequest('POST', 'orders/payment_add', postData, function (response) {
-console.log(response);
-                        this.$emit('action', {type: 'update-form', form: response.form});
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                        if (response.ok) {
+                            vm.$emit('action', {type: 'switch-entity', entity_type: 'payment', entity_id: response.new_entity_id});
+                        }
                     });
                 }
             }
@@ -134,11 +139,68 @@ console.log(response);
             props: ['form', 'entity'],
             template: paymentsEditTpl,
             computed: {
-                orderItem: function () {
+                paymentMethod: function () {
+                    return this.form.payment_methods[this.entity.payment_method] || {};
+                },
+                totalAmount: function () {
+                    return 1 * this.entity.amount_captured + 1 * this.entity.amount_due - this.entity.amount_refunded;
+                },
+                isRootTransactionNeeded: function () {
+                    var meta = this.paymentMethod.meta;
+                    return meta && meta.is_root_transaction_needed && meta.capabilities.pay_by_url;
+                },
+                transactionStatus: function () {
                     var vm = this;
-                    return function (entityItem) {
-                        return getOrderItem(vm.form, entityItem);
+                    return function (t) {
+                        return t.transaction_status == 'completed' ? 'Success' : (t.transaction_status == 'void') ? 'Void' : 'Failure';
                     }
+                }
+            },
+            methods: {
+                sendRootTransactionUrl: function () {
+                    var vm = this, postData = {
+                        order_id: this.form.order.id,
+                        payment_id: this.entity.id
+                    };
+                    SvHlp.sendRequest('POST', 'orders/send_root_transaction_url', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                    });
+                },
+                changePaymentState: function (type, value) {
+                    var vm = this, postData = {
+                        order_id: this.form.order.id,
+                        payment_id: this.entity.id,
+                        type: type,
+                        value: value
+                    };
+                    SvHlp.sendRequest('POST', 'orders/payment_state', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                        if (response.ok) {
+                            vm.$emit('action', {type: 'switch-entity', entity_type: 'payment', entity_id: vm.entity.id});
+                        }
+                    });
+                },
+                doTransactionAction: function (transaction, action) {
+                    console.log(transaction, action);
+                    var vm = this, postData = {
+                        order_id: this.form.order.id,
+                        payment_id: this.entity.id,
+                        transaction_id: transaction.id,
+                        action_type: action,
+                        amount: transaction.available_actions[action].amount
+                    };
+                    SvHlp.sendRequest('POST', 'orders/transaction_action', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                        if (response.ok) {
+                            vm.$emit('action', {type: 'switch-entity', entity_type: 'payment', entity_id: vm.entity.id});
+                        }
+                    });
                 }
             }
         },
@@ -150,12 +212,94 @@ console.log(response);
         shipmentAdd: {
             mixins: [EntityAddMixin],
             props: ['form', 'entity'],
-            template: shipmentsAddTpl
+            template: shipmentsAddTpl,
+            data: function () {
+                return {
+                    shipment: {
+                        carrier_code: '',
+                        service_code: '',
+                        shipping_weight: '',
+                        shipping_size: '',
+                        carrier_price: 0
+                    }
+                }
+            },
+            computed: {
+                totalQtyToShip: function () {
+                    var total = 0, i, l, item;
+                    for (i = 0, l = this.form.items_shippable.length; i < l; i++) {
+                        item = this.form.items_shippable[i];
+                        if (item.qty_to_ship) {
+                            total += 1 * item.qty_to_ship;
+                        }
+                    }
+                    return total;
+                },
+                shippingServices: function () {
+                    if (!this.shipment.carrier_code) {
+                        return [];
+                    }
+                    var i, j, l, m, services = [];
+                    for (i = 0, l = this.form.shipping_methods.length; i < l; i++) {
+                        m = this.form.shipping_methods[i];
+                        if (m.id === this.shipment.carrier_code) {
+                            for (j in m.services) {
+                                services.push({id: j, text: m.services[j]});
+                            }
+                            break;
+                        }
+                    }
+                    return services;
+                }
+            },
+            methods: {
+                toggleItem: function (item) {
+                    var id = item.id;
+                    Vue.set(this.items_selected, id, !this.items_selected[id]);
+                    Vue.set(item, 'qty_to_ship', this.items_selected[id] ? item.qty_can_ship : '');
+                },
+                submit: function () {
+                    var vm = this, i, l, item, postData = {
+                        order_id: this.form.order.id,
+                        shipment: this.shipment,
+                        qtys: {}
+                    };
+                    for (i = 0, l = this.form.items_shippable.length; i < l; i++) {
+                        item = this.form.items_shippable[i];
+                        postData.qtys[item.id] = item.qty_to_ship;
+                    }
+                    SvHlp.sendRequest('POST', 'orders/shipment_add', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                        if (response.ok) {
+                            vm.$emit('action', {type: 'switch-entity', entity_type: 'shipment', entity_id: response.new_entity_id});
+                        }
+                    });
+                }
+            }
         },
         shipmentEdit: {
             mixins: [EntityEditMixin],
             props: ['form', 'entity'],
-            template: shipmentsEditTpl
+            template: shipmentsEditTpl,
+            methods: {
+                updateTracking: function () {
+                    var vm = this, i, l, pkg, postData = {
+                        order_id: this.form.order.id,
+                        packages: {}
+                    };
+                    for (i = 0, l = this.entity.packages.length; i < l; i++) {
+                        pkg = this.entity.packages[i];
+                        postData.packages[pkg.id] = {tracking_number: pkg.tracking_number};
+                    }
+                    SvHlp.sendRequest('POST', 'orders/shipment_edit', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                    });
+                }
+            }
         },
         
         refunds: {
@@ -270,8 +414,43 @@ console.log(response);
                     action = {type: action};
                 }
                 switch (action.type) {
-                    case 'update-form': this.$emit('action', action); break;
-                    case 'close': this.closeHlpSection(); break;
+                    case 'close':
+                        this.closeHlpSection();
+                        break;
+
+                    case 'switch-entity':
+                        var vm = this;
+                        this.$nextTick(function () {
+                            var i, l, entities = vm.form[action.entity_type + 's'];
+                            for (i = 0, l = entities.length; i < l; i++) {
+                                console.log(entities[i], action);
+                                if (entities[i].id == action.entity_id) {
+                                    vm.editEntity(action.entity_type, entities[i]);
+                                    break;
+                                }
+                            }
+                        });
+                        break;
+
+                    case 'delete':
+                        if (!confirm(SvHlp._('Are you sure you want to delete this ' + action.entity.entity_type + '?'))) {
+                            return;
+                        }
+                        var vm = this, postData = {
+                            order_id: this.form.order.id,
+                            entity_type: action.entity.entity_type,
+                            entity_id: action.entity.id
+                        };
+                        SvHlp.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
+                            if (response.ok) {
+                                vm.$emit('action', {type: 'update-form', form: response.form});
+                            }
+                            vm.closeHlpSection();
+                        });
+                        break;
+
+                    default:
+                        this.$emit('action', action);
                 }
             }
         },
@@ -285,6 +464,11 @@ console.log(response);
             'form.items': {
                 handler: function () { getOrderItem(this.form, true); },
                 deep: true
+            },
+            'entity': function (entity) {
+                if (!entity) {
+                    this.closeHlpSection();
+                }
             }
         }
     };

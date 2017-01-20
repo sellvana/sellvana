@@ -211,8 +211,8 @@
                                                                 <div class="form-group form-group-sm">
                                                                     <input type="hidden" name="actions[{{ p.id() }}][{{ t.id() }}][type]" value="{{ action }}" />
                                                                     <button type="button" class="btn btn-xs transaction-action ladda-button" id="action-{{ t.id() }}-{{ action }}" data-style="expand-left">{{ actionData.label }}</button>
-                                                                    {% if actionData.maxAmount %}
-                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.maxAmount }}" class="form-control input-sm" /> of {{ actionData.maxAmount | currency('base') }}
+                                                                    {% if actionData.max_amount %}
+                                                                        <input type="text" name="actions[{{ p.id() }}][{{ t.id() }}][amount]" value="{{ actionData.max_amount }}" class="form-control input-sm" /> of {{ actionData.max_amount | currency('base') }}
                                                                     {% endif %}
                                                                 </div>
                                                                 <br>

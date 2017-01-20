@@ -214,7 +214,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     public function isManualStateManagementAllowed()
     {
         $config = $this->getConfig();
-        if (array_key_exists('manual_state_management', $config)) {
+        if (is_array($config) && array_key_exists('manual_state_management', $config)) {
             return $config['manual_state_management'];
         }
 
@@ -230,6 +230,16 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
     {
         $labels = $this->Sellvana_Sales_Model_Order_Payment_Transaction->fieldOptions('transaction_type');
         return $labels[Sellvana_Sales_Model_Order_Payment_Transaction::CAPTURE];
+    }
+
+    public function getAllMetaInfo()
+    {
+        return [
+            'capabilities' => $this->_capabilities,
+            'is_manual_state_management_allowed' => $this->isManualStateManagementAllowed(),
+            'is_root_transaction_needed' => $this->isRootTransactionNeeded(),
+            'root_transaction_type' => $this->getRootTransactionType(),
+        ];
     }
 
     /**
@@ -250,8 +260,10 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
             'result' => $result,
             'setErrorState' => $setErrorState,
         ]);
-        $this->_transaction->setData('error', $result['error']['message']);
-        $this->_transaction->save();
+        if ($this->_transaction) {
+            $this->_transaction->setData('error', $result['error']['message']);
+            $this->_transaction->save();
+        }
         throw new BException($result['error']['message']);
     }
 

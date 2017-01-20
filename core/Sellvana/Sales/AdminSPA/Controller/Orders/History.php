@@ -37,6 +37,8 @@ class Sellvana_Sales_AdminSPA_Controller_Orders_History extends FCom_AdminSPA_Ad
                 ['name' => 'event_description'],
             ],
             'state' => ['s' => 'create_at', 'sd' => 'desc'],
+            'pager' => true,
+            'export' => true,
         ];
     }
 

@@ -1,9 +1,20 @@
 define(['jquery', 'lodash', 'select2'], function ($, _) {
+    function normalizeOptions(options) {
+        if (_.isArrayLike(options)) {
+            return options;
+        }
+        var result = [], i;
+        for (i in options) {
+            result.push({id: i, text: options[i]});
+        }
+        return result;
+    }
+
     return {
         props: {
             value: {},
             options: {
-                type: Array,
+                type: [Array, Object],
                 default: function () {
                     return [];
                 }
@@ -24,43 +35,33 @@ define(['jquery', 'lodash', 'select2'], function ($, _) {
             if (this.options) {
                 params.data = this.options;
             }
-//console.log('mounted', params, this.value);
+            params.data = normalizeOptions(params.data);
             $(this.$el).val(this.value).select2(params).on('change', function () {
                 var $el = $(vm.$el), val = $el.val();
                 vm.$emit('input', val);
                 if (vm.onChange) {
                     vm.onChange(val);
                 }
-//console.log('HERE');
-                // vm.options = null;
-                // $el.select2('data', []);
             });
         },
         watch: {
             value: function (value) {
-//console.log('value', value);
                 var $el = $(this.$el);
                 if (!_.isEqual($el.val(), value)) {
                     $el.val(value).trigger('change.select2');
                 }
             },
             options: function (options) {
-//console.log('options', options);
                 var $el = $(this.$el);
-                // if (!_.isEqual($el.select2('data'), options)) {
-//console.log('update options', options);
-                var params = _.extend({}, this.params, {data: options});
-                $el.empty().select2('data', options);
-                //$el.select2('data', options);
-                // }
+                var options1 = normalizeOptions(options);
+                $el.empty().select2('data', options1);
             },
             params: function (params) {
-                //params.data = this.options;
-//console.log('params', params);
                 var $el = $(this.$el);
                 if (this.options) {
                     params = _.extend(params, {data: this.options});
                 }
+                params.data = normalizeOptions(params.data);
                 $el.empty().select2(params);
             }
         },

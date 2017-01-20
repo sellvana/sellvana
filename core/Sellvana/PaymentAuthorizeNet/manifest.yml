@@ -8,11 +8,13 @@ modules:
         #autoload: lib
 
         auto_use: [ bootstrap ]
+
         encrypt_config:
             - modules/Sellvana_PaymentAuthorizeNet/aim/login
             - modules/Sellvana_PaymentAuthorizeNet/aim/trans_key
             - modules/Sellvana_PaymentAuthorizeNet/dpm/login
             - modules/Sellvana_PaymentAuthorizeNet/dpm/trans_key
+
         default_config:
             modules:
                 Sellvana_PaymentAuthorizeNet:

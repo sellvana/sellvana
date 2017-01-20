@@ -97,24 +97,27 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
     public function importItemsFromPayment(Sellvana_Sales_Model_Order_Payment $payment)
     {
         $amount = $this->get('amount');
-        $oItems = $payment->order()->items();
+        $order = $payment->order();
+        $oItems = $order->items();
         foreach ($payment->items() as $oItemId => $pItem) {
             if ($pItem->get('amount') <= $pItem->get('amount_refunded')) {
                 continue;
             }
-
+            $oItemId = $pItem->get('order_item_id');
             $refundableAmount = $pItem->get('amount') - $pItem->get('amount_refunded');
             $toRefund = min($amount, $refundableAmount);
             $this->Sellvana_Sales_Model_Order_Refund_Item->create([
                 'refund_id' => $this->id(),
-                'order_id' => $payment->order()->id(),
+                'order_id' => $order->id(),
                 'order_item_id' => $oItemId,
                 'amount' => $toRefund,
                 'payment_item_id' => $pItem->id(),
             ])->save();
             $pItem->add('amount_refunded', $toRefund);
             $pItem->save();
-            $oItems[$oItemId]->add('amount_refunded', $toRefund)->save();
+            if ($oItemId) {
+                $oItems[$oItemId]->add('amount_refunded', $toRefund)->save();
+            }
             $amount -= $toRefund;
 
             if ($amount <= 0) {

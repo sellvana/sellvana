@@ -53,6 +53,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
             if (!$type) {
                 $type = 'error';
             }
+            $this->error();
         } elseif (is_string($text)) {
             if (!$type) {
                 $type = 'info';
@@ -75,6 +76,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
     public function error()
     {
         $this->addResponses(['error' => true]);
+        return $this;
     }
 
     public function respond($result = [])

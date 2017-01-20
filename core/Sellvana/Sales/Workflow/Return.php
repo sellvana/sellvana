@@ -90,6 +90,8 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         $order->calcItemQuantities('returns');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
+
+        return ['new_return' => $return];
     }
 
     public function action_adminUpdatesReturn($args)

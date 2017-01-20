@@ -5,7 +5,7 @@
     {% if balance %}
         {% set balanceCurrency = cart.convertToStoreCurrency(balance.get('amount')) %}
         {% set totalCurrency = cart.convertToStoreCurrency(cart.get('grand_total')) %}
-        {% set maxAmount = min(balanceCurrency, totalCurrency) %}
+        {% set max_amount = min(balanceCurrency, totalCurrency) %}
         {% set amountCurrency = cart.getData('store_credit/amount_currency') %}
         <p>
             {{ 'Available store credit balance:' | _ }}
@@ -16,7 +16,7 @@
                 <span id="store_credit-amount-container">
                     <label for="store_credit-amount">{{ 'Amount:'|_ }}</label>
                     <input type="number" id="store_credit-amount_currency" name="store_credit[amount_currency]"
-                           value="{{ amountCurrency ? min(amountCurrency, maxAmount) : maxAmount }}" step="0.01" min="0" max="{{ maxAmount }}">
+                           value="{{ amountCurrency ? min(amountCurrency, max_amount) : max_amount }}" step="0.01" min="0" max="{{ max_amount }}">
                 </span>
             {% endif %}
         </p>

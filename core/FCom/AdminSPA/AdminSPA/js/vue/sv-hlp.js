@@ -85,7 +85,6 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             }
         });
 
-
         Vue.filter('@', function (path) { return _.at(this, [path])[0]; });
 
         Vue.filter('_', translate);
@@ -467,7 +466,9 @@ console.log('onError', err.xhr);
                             for (i = 0, l = response.form.tabs.length; i < l; i++) {
                                 Vue.set(vm.form.tabs[i], 'component_config', arguments[i]);
                             }
-                            vm.switchTab(response.form.tabs[0].name);
+                            if (!this.tab) {
+                                vm.switchTab(response.form.tabs[0].name);
+                            }
                         });
                         Vue.set(this, 'form', response.form);
                     }
@@ -520,6 +521,15 @@ console.log('onError', err.xhr);
 
         $(window).resize(function (ev) {
             store.commit('windowResize', $(window).width());
+        });
+
+        Vue.component('dropdown', {
+            mixins: [mixins.common],
+            props: ['id', 'label'],
+            template: '<div class="dropdown action" :class="{open:ddOpen(id)}">' +
+                '<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(id)">' +
+                    '<span>{{label}}</span><span class="caret-back"><b class="caret"></b></span></a>' +
+                '<div class="dropdown-menu" @click.stop><slot></slot></div></div>'
         });
 
         return {

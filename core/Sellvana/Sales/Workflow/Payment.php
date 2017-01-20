@@ -195,6 +195,8 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
+
+        return ['new_payment' => $payment];
     }
 
     public function action_adminUpdatesPayment($args)
