@@ -3,18 +3,25 @@
 	left: -15px;
 	li {
 		margin-bottom: 5px;
-		white-space: nowrap;
 	}
 	a {
-		padding: 20px;
+		padding: 10px;
 		display: inline-block;
-		max-width: 110px;
 		background: #ededed;
+		width: 100%;
+		span {
+			font-size: 11px;
+			color: #000;
+			display: inline-block;
+			width: 80%;
+			vertical-align: middle;
+		}		
 	}
 	i {
 		font-size: 25px;
 		vertical-align: middle;
 		color: #000;
+		display: inline-block;
 	}
 	.fa-ellipsis-v {
 		font-size: 16px;
@@ -102,5 +109,16 @@
 	}
 	.input-group {
 		margin: 5px 0;
+	}
+}
+
+@media (max-width: 767px) {
+	.widget-menu {
+		left: 0;
+		a {
+			span {
+				font-size: 9px;
+			}		
+		}
 	}
 }

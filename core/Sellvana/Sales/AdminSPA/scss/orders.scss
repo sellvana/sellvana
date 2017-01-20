@@ -499,8 +499,7 @@
 	}
 }
 
-.existing-payments,
-.product-sku {
+.details-additional-block {
 	background: #fff;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	border-radius: 2px;
@@ -511,10 +510,8 @@
 		padding: 0 10px;
 		position: relative;
 		label {
-			position: absolute;
-			right: 10px;
-			top: 4px;
-			cursor: pointer;
+			margin: 4px 10px;
+			color: #000;
 			span {
 				color: #000;
 			}
@@ -537,29 +534,15 @@
 	}
 }
 
-.existing-payments {
+.details-additional-block {
 	.control-buttons-block {
-		border-top: 1px solid #aaaaaa;
 		margin-top: 20px;
-	}
-	select {
-		padding: 6px 0;
+		padding: 15px 0;
 	}
 }
 
-.product-sku {
-	.block-title {
-		span {
-			color: #2d2d2d;
-			font-weight: bold;
-			font-size: 14px;
-			padding: 8px 0;
-		}
-	}
+.details-additional-block {
 	.control-buttons-block {
-		div {
-			padding: 10px 0;
-		}
 		input {
 			width: 180px;
 			vertical-align: middle;
@@ -584,14 +567,15 @@
 			width: 50%;
 			min-width: 300px;
 			display: inline-block;
-			padding: 18px 0;
+			padding: 10px 0;
 			white-space: nowrap;
 			text-align: right;
 			.select2-container {
-				min-width: 160px;
+				max-width: 160px;
 				margin: 0 0px 0 20px;
 				padding: 6px 0;
 				text-align: left;
+				display: inline-block;
 			}
 		}
 		p {
@@ -616,12 +600,22 @@
 .create-payment {
 	text-align: center;
 	padding: 20px 0;
-	& > * {
+	.select2-container {
+		max-width: 160px; 
+		min-width: auto;
 		display: inline-block;
 		vertical-align: middle;
 	}
-	.select2-container {
-		min-width: 50%;
+	p {
+		display: inline-block;
+		vertical-align: middle;	
+	}
+	.form-control {
+		width: 160px;
+		max-width: 160px;
+		margin: 0 0px 0 20px;
+		text-align: left;
+		display: inline-block;
 	}
 }
 
@@ -742,7 +736,7 @@
 			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		}
 	}
-	.existing-payments {
+	.details-additional-block {
 		width: 100%;
 		overflow: auto;
 		overflow-y: hidden;
@@ -785,7 +779,7 @@
 			}
 		}
 	}
-	.product-sku {
+	.details-additional-block {
 		.control-buttons-block {
 			input {
 				margin: 0 0 0 0px;

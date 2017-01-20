@@ -1,18 +1,32 @@
 <div class="login-container">
 	<img :src="assetUrl('FCom_AdminSPA', 'img/logo-big.png')" alt="" />
-	<form>		
-		<p>{{'Welcome, please sign in'|_}}</p>
-		<label>
-			<span>{{'Username'|_}}</span>
-			<input type="text" v-model="username" @keyup.enter="submit">
-		</label>
-		<label>
-			<span>{{'Password'|_}}</span>
-			<input type="password" v-model="password" @keyup.enter="submit">
-		</label>
-		<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
-		<div class="control-buttons-block">
-			<input type="button" @click="submit" value="Sign in" class="button button6">
-		</div>
-	</form>
+	<div class="form-horizontal">
+		<form>
+			<p>{{'Welcome, please sign in'|_}}</p>
+			<div class="form-group">
+				<label>
+					<span>{{'Username'|_}}</span>
+					<input type="text" v-model="username" @keyup.enter="submit">
+				</label>
+			</div>
+			<div class="form-group">
+				<label>
+					<span>{{'Password'|_}}</span>
+					<input type="password" v-model="password" @keyup.enter="submit">
+				</label>
+			</div>
+			<div class="form-group">
+				<label>
+					<p class="col-md-4 control-label">{{'Remember me'|_}}</p>
+					<div class="col-md-8">
+						<checkbox v-model="test"></checkbox>
+					</div>
+				</label>
+			</div>
+			<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
+			<div class="control-buttons-block">
+				<input type="button" @click="submit" value="Sign in" class="button button6">
+			</div>
+		</form>
+	</div>
 </div>

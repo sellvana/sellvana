@@ -32,7 +32,16 @@
 		url("../fonts/GothamProMedium/GothamProMedium.woff") format("woff"),
 		url("../fonts/GothamProMedium/GothamProMedium.ttf") format("truetype");
 	font-style: normal;
-	font-weight: 500;
+	font-weight: normal;
+}
+@font-face {
+	font-family: "GothamProMedium";
+	src: url("../fonts/GothamProBold/GothamProBold.eot");
+	src: url("../fonts/GothamProBold/GothamProBold.eot?#iefix")format("embedded-opentype"),
+		url("../fonts/GothamProBold/GothamProBold.woff") format("woff"),
+		url("../fonts/GothamProBold/GothamProBold.ttf") format("truetype");
+	font-style: normal;
+	font-weight: bold;
 }
 
 @font-face {
