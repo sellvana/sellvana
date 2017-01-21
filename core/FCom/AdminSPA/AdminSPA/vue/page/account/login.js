@@ -4,12 +4,13 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
         data: function () {
             return {
                 username: '',
-                password: ''
+                password: '',
+                remember_me: false
             }
         },
         methods: {
             submit: function() {
-                var postData = {login: {username: this.username, password: this.password}};
+                var postData = {login: {username: this.username, password: this.password, remember_me: this.remember_me}};
                 SvHlp.sendRequest('POST', 'account/login', postData, function (response) {
                     if (response._redirect) {
                         SvHlp.router.push(response._redirect);

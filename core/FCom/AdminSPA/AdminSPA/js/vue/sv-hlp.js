@@ -1,6 +1,6 @@
-define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'vue-ckeditor', 'vue-select2',
+define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'vue-ckeditor', 'vue-select2', 'spin', 'ladda',
         'ckeditor', 'select2'],
-    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2) {
+    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2, Spin, Ladda) {
 
         Vue.use(VueRouter);
         Vue.use(Vuex);
@@ -25,6 +25,31 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             },
             unbind: function (el) {
                 el.sortableInstance.destroy();
+            }
+        });
+
+        Vue.directive('ladda', {
+            bind: function (el, binding) {
+                var $el = $(el);
+                $el.addClass('ladda-button').wrapInner('<span class="ladda-label"></span>');
+                if (!$el.attr('data-style')) {
+                    $el.attr('data-style', binding.value.style || 'zoom-out');
+                }
+                if (!$el.attr('data-spinner-size')) {
+                    $el.attr('data-spinner-size', binding.value.spinner_size || 20);
+                }
+
+                el.ladda = Ladda.create(el);
+            },
+            update: function (el, binding) {
+                if (binding.value.on && !binding.oldValue.on) {
+                    el.ladda.start();
+                }  else if (!binding.value.on && binding.oldValue.on) {
+                    el.ladda.stop();
+                }
+                if (_.isNumber(binding.value.progress)) {
+                    el.ladda.setProgress(binding.value.progress);
+                }
             }
         });
 

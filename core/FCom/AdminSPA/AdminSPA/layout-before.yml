@@ -19,6 +19,9 @@
             - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.css" ]
             - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.js" ]
 
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda-themeless.css" ]
+            #- [ css, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda.min.css" ]
+
             #- [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
 #            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
@@ -50,6 +53,9 @@
             - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
             - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
+            - [ requireJs, spin, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/spin" ]
+            - [ requireJs, ladda, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda" ]
+
             - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8" ]
             - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
             - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]

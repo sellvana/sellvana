@@ -57,7 +57,6 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             }
 
             $user->login();
-            var_dump($_SESSION); exit;
 
             $url = $this->BSession->get('admin_login_orig_url');
             $result = 'success';

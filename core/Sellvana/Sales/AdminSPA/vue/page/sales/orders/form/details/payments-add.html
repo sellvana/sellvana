@@ -94,7 +94,6 @@
             <button type="button" class="button button12" @click="submit()" :diabled="!totalAmountToPay">{{'Create and Save Payment'|_}}</button>
             <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
-        <jsontree :json="form.payment_methods"></jsontree>
     </div>
     <div v-else>
         {{'No payable items found.'|_}}

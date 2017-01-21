@@ -49,7 +49,8 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         props: ['form', 'entity'],
         data: function () {
             return {
-                items_selected: {}
+                items_selected: {},
+                action_in_progress: ''
             }
         },
         computed: {
@@ -63,6 +64,11 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     };
 
     var EntityEditMixin = {
+        data: function () {
+            return {
+                action_in_progress: ''
+            }
+        },
         computed: {
             orderItem: function () {
                 var vm = this;
@@ -137,6 +143,11 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         paymentEdit: {
             mixins: [EntityEditMixin],
             props: ['form', 'entity'],
+            data: function () {
+                return {
+                    show_failed_transactions: false
+                };
+            },
             template: paymentsEditTpl,
             computed: {
                 paymentMethod: function () {
@@ -185,6 +196,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                     });
                 },
                 doTransactionAction: function (transaction, action) {
+                    this.action_in_progress = action + '-' + transaction.id;
                     console.log(transaction, action);
                     var vm = this, postData = {
                         order_id: this.form.order.id,
@@ -200,6 +212,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         if (response.ok) {
                             vm.$emit('action', {type: 'switch-entity', entity_type: 'payment', entity_id: vm.entity.id});
                         }
+                        vm.action_in_progress = '';
                     });
                 }
             }

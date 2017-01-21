@@ -103,24 +103,6 @@
 									<th>{{'Paid by this payment:'|_}}</th>
 									<td>{{item.amount|currency}}</td>
 								</tr>
-								<tr>
-									<th>
-										<button class="button button9">Button1</button>
-									</th>
-								</tr>
-								<tr>
-									<th>
-										<button class="button button9">Button2</button>
-									</th>
-									<td>
-										<input type="number" class="form-control" />
-									</td>
-								</tr>
-								<tr>
-									<th>
-										<button class="button button9">Button1</button>
-									</th>
-								</tr>
 							</tbody>
 						</table>
 					</td>
@@ -132,6 +114,7 @@
 	<div v-if="entity.transactions.length">
 		<div class="block-title">
 			<p>{{'Transactions in this payment:'|_}}</p>
+			<label><input type="checkbox" v-model="show_failed_transactions"><span><i aria-hidden="true" class="fa fa-check"></i></span><span>{{'Show failed transactions'|_}}</span></label>
 		</div>
 		<div class="scrollable-area">
 			<table class="secondary-table combined-table">
@@ -145,55 +128,37 @@
 					</tr>
 				</thead>
 				<tbody>
-					<template v-for="t in entity.transactions">
-						<tr>
-							<td>
-								<strong>{{ t.create_at }}</strong>
-							</td>
-							<td>
-								<strong>{{ t.transaction_type }}</strong>
-								<div>
-									<a v-if="t.data_serialized.error" href="#" :title="t.data_serialized.error" @click.prevent>{{ transactionStatus(t) }}</a>
-									<span v-else>{{ transactionStatus(t)|_ }}</span>
-								</div>
-							</td>
-							<td>
-								<strong>{{ t.transaction_id }}</strong>
-								<div v-if="t.parent_transaction_id">{{'Parent:'|_}} {{t.parent_transaction_id}}</div>
-							</td>
-							<td>
-								<strong>{{ t.amount|currency }}</strong>
-								<div v-if="t.transaction_fee > 0">{{'Fee:'|_}} {{t.transaction_fee|currency}}</div>
-								<div v-if="t.amount_authorized > 0">{{'Authorized:'|_}} {{t.amount_authorized|currency}}</div>
-								<div v-if="t.amount_captured > 0">{{'Captured:'|_}} {{t.amount_captured|currency}}</div>
-								<div v-if="t.amount_refunded > 0">{{'Refunded:'|_}} {{t.amount_refunded|currency}}</div>
-							</td>
-							<td>
-								<!--<dropdown v-if="t.transaction_id && t.transaction_status != 'void'" :id="'dd-transaction-'+t.id"-->
-								<!--class="dropdown-buttons" :label="'Actions'|_">-->
-								<!--<ul class="dropdown-content">-->
-								<!--<li v-for="(actionData, action) in t.available_actions">-->
-								<!--<a href="#" @click.prevent="doTransactionAction(action)">{{actionData.label|_}}</a>-->
-								<!--<input v-if="actionData.max_amount" type="text" v-model="actionData.amount"-->
-								<!--class="form-control input-sm">-->
-								<!--</li>-->
-								<!--</ul>-->
-								<!--</dropdown>-->
-								<div v-for="(actionData, action) in t.available_actions">
-									<button class="button button9" @click="doTransactionAction(t, action)">{{actionData.label|_}}</button>
-									<input v-if="actionData.partial" type="number" v-model="actionData.amount" class="form-control input-sm" @keyup.enter="doTransactionAction(t, action)">
-								</div>
-							</td>
-						</tr>
-						<!--<tr>-->
-						<!--<td colspan="7">-->
-						<!--<span v-for="(actionData, action) in t.available_actions">-->
-						<!--<button class="button" @click="doTransactionAction(t, action)">{{actionData.label|_}}</button>-->
-						<!--<input v-if="actionData.max_amount" type="number" v-model="actionData.amount" class="input-sm">-->
-						<!--</span>-->
-						<!--</td>-->
-						<!--</tr>-->
-					</template>
+					<tr v-for="t in entity.transactions" v-if="t.transaction_status == 'completed' || t.transaction_status == 'void' || show_failed_transactions">
+						<td>
+							<strong>{{ t.create_at }}</strong>
+						</td>
+						<td>
+							<strong>{{ t.transaction_type }}</strong>
+							<div>
+								<a v-if="t.data_serialized.error" href="#" :title="t.data_serialized.error" @click.prevent>{{ transactionStatus(t) }}</a>
+								<span v-else>{{ transactionStatus(t)|_ }}</span>
+							</div>
+						</td>
+						<td>
+							<strong>{{ t.transaction_id }}</strong>
+							<div v-if="t.parent_transaction_id">{{'Parent:'|_}} {{t.parent_transaction_id}}</div>
+						</td>
+						<td>
+							<strong>{{ t.amount|currency }}</strong>
+							<div v-if="t.transaction_fee > 0">{{'Fee:'|_}} {{t.transaction_fee|currency}}</div>
+							<div v-if="t.amount_authorized > 0">{{'Authorized:'|_}} {{t.amount_authorized|currency}}</div>
+							<div v-if="t.amount_captured > 0">{{'Captured:'|_}} {{t.amount_captured|currency}}</div>
+							<div v-if="t.amount_refunded > 0">{{'Refunded:'|_}} {{t.amount_refunded|currency}}</div>
+						</td>
+						<td>
+							<div v-for="(actionData, action) in t.available_actions">
+								<button v-ladda="{on: action_in_progress === action + '-' + t.id}" :disabled="action_in_progress !== ''"
+										class="button button9" @click="doTransactionAction(t, action)">{{actionData.label|_}}</button>
+								<input v-if="actionData.partial" type="number" v-model="actionData.amount"
+									   class="form-control" @keyup.enter="doTransactionAction(t, action)" style="display:inline-block; width:80px">
+							</div>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

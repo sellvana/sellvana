@@ -608,26 +608,20 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
             $request["{$p}REDEEMEDOFFERAMOUNT"] = $order->get('discount_amount');
         }
 
-        $pItems = [];
-        foreach ($payment->items() as $item) {
-            if ($item->get('order_item_id')) {
-                $pItems[$item->get('order_item_id')] = $item;
-            }
-        }
-
-        $oItems = [];
-        foreach ($order->items() as $item) {
-            $pItem = $pItems[$item->id()];
-            $oItems[$pItem->id()] = $item;
-        }
-
+        $oItems = $order->items();
         $i = 0;
         $itemsTotal = 0;
         foreach ($payment->items() as $pItem) {
-            if (!array_key_exists($pItem->id(), $oItems)) {
+            $oItem = false;
+            foreach ($oItems as $oi) {
+                if ($oi->id() === $pItem->get('order_item_id')) {
+                    $oItem = $oi;
+                    break;
+                }
+            }
+            if (!$oItem) {
                 continue; // we don't need totals here for now
             }
-            $oItem = $oItems[$pItem->id()];
             $qty = (int)$oItem->get('qty_ordered');
             $itemAmount = (float)$pItem->get('amount');
             $request["L_{$p}NAME{$i}"] = $oItem->get('product_name');
