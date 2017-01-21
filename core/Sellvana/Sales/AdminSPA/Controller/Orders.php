@@ -422,60 +422,11 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $this->respond($result);
     }
 
-    public function action_payment_edit__POST()
-    {
-
-        try {
-            $orderId = $this->BRequest->get('id');
-            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
-
-            if (!$order) {
-                throw new BException('Invalid order');
-            }
-
-            $payments = $this->BRequest->post('payments');
-            $transactions = $this->BRequest->post('transactions');
-            $delete = $this->BRequest->post('delete');
-            if ($payments) {
-                foreach ($payments as $id => $s) {
-                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesPayment', [
-                        'order' => $order,
-                        'payment_id' => $id,
-                        'data' => $s,
-                    ]);
-                }
-            }
-            if ($transactions) {
-                foreach ($transactions as $id => $p) {
-                    $this->Sellvana_Sales_Main->workflowAction('adminUpdatesTransaction', [
-                        'order' => $order,
-                        'transaction_id' => $id,
-                        'data' => $p,
-                    ]);
-                }
-            }
-            if ($delete) {
-                foreach ($delete as $id => $_) {
-                    $this->Sellvana_Sales_Main->workflowAction('adminDeletesPayment', [
-                        'order' => $order,
-                        'payment_id' => $id,
-                    ]);
-                }
-            }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
-            $this->ok()->addMessage('Payment has been updated', 'success');
-        } catch (Exception $e) {
-            $this->addMessage($e);
-        }
-
-        $this->respond($result);
-    }
-
     public function action_payment_state__POST()
     {
         $result = [];
+        $orderId = $this->BRequest->post('order_id');
         try {
-            $orderId = $this->BRequest->post('order_id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
             if (!$order) {
                 throw new BException('Invalid order');
@@ -514,13 +465,13 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             Sellvana_Sales_Model_Order_Payment_Transaction::AUTHORIZATION => 'authorize',
             Sellvana_Sales_Model_Order_Payment_Transaction::VOID => 'void',
         ];
+        $orderId = $this->BRequest->post('order_id');
         try {
             $type = $this->BRequest->post('action_type');
             if (!$type || !array_key_exists($type, $typeToPaymentMethods)) {
                 throw new BException('Invalid action type');
             }
 
-            $orderId = $this->BRequest->post('order_id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
             if (!$order) {
                 throw new BException('Invalid order ID');
@@ -553,7 +504,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
             $this->ok()->addMessage('Transaction has been added successfully.', 'success');
         } catch (Exception $e) {
-            $this->addMessage($e, 'error');
+            $this->addMessage($e);
         }
         $result['form'] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
@@ -562,8 +513,8 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     public function action_send_root_transaction_url__POST()
     {
         $result = [];
+        $orderId = $this->BRequest->post('order_id');
         try {
-            $orderId = $this->BRequest->post('order_id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
             if (!$order) {
                 throw new BException('Invalid order ID');
@@ -583,7 +534,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
             $this->ok()->addMessage('Root transaction URL has been sent successfully.', 'success');
         } catch (Exception $e) {
-            $this->addMessage($e, 'error');
+            $this->addMessage($e);
         }
         $result['form'] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
@@ -613,11 +564,11 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     $result['new_entity_id'] = $r['new_shipment']->id();
                 }
             }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
             $this->ok()->addMessage('Shipment has been created', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
         }
+        $result['form'] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 

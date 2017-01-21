@@ -613,6 +613,11 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function calcAllAmounts()
+    {
+        //TODO: implement
+    }
+
      /**
      * Save order with items and other details
      *
