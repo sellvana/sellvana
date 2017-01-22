@@ -27,7 +27,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
     {
         if ($this->BRequest->csrf()) {
             $this->addMessage('Session token expired, please try again', 'warning');
-            $this->addResponses(['_csrf_token' => true]);
+            $this->addResponses(['_csrf_token' => true, '_retry' => true]);
             $this->respond();
             return false;
             #$this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');

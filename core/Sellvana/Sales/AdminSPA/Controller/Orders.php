@@ -160,9 +160,9 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $payments = $order->getAllPayments(true, true);
         foreach ($payments as $p) {
             $p->set('entity_type', 'payment');
-            $method = $p->getMethodObject();
             $p->set('is_manual_state_management_allowed', $p->isManualStateManagementAllowed());
-            if ($method->isRootTransactionNeeded() && $method->can('pay_by_url')) {
+            $method = $p->getMethodObject();
+            if ($method && $method->isRootTransactionNeeded() && $method->can('pay_by_url')) {
                 $p->set('root_transaction_url', $p->getRootTransactionUrl());
             }
             if (($nextValues = $p->state()->overall()->getNextValueLabels())) {

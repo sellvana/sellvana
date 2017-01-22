@@ -265,7 +265,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             }
         }
 
-        function sendRequest(method, path, request, success, error) {
+        function sendRequest(method, path, request, success, error, lastTry) {
             var data = request;
             if (method === 'GET' && request) {
                 path += (path.match(/\?/) ? '&' : '?') + $.param(data);
@@ -274,12 +274,18 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             if (method === 'POST' || method === 'DELETE') {
                 data['X-CSRF-TOKEN'] = store.state.csrfToken;
             }
+            if (lastTry) {
+                data._lastTry = lastTry;
+            }
             return $.ajax({
                 method: method,
                 url: store.state.env.root_href.replace(/\/$/, '') + '/' + path.replace(/^\//, ''),
                 data: data,//JSON.stringify(data),
                 success: function (response) {
                     processResponse(response);
+                    if (response._retry && !lastTry) {
+                        return sendRequest(method, path, data, success, error, true);
+                    }
                     success && success(response);
                 },
                 error: function (response) {
@@ -329,7 +335,7 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             if (response._csrf_token) {
                 storeData.csrfToken = response._csrf_token;
             }
-            if (response._messages) {
+            if (response._messages && !response._retry) {
                 storeData.messages = store.state.messages.concat(response._messages);
             }
             store.commit('setData', storeData);
@@ -478,6 +484,10 @@ console.log('onError', err.xhr);
                         Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
                     },
                     processFormDataResponse: function (response) {
+                        if (!response.form) {
+                            console.log('No form object in response', response);
+                            return;
+                        }
                         if (!response.form.updates) {
                             response.form.updates = {};
                         }

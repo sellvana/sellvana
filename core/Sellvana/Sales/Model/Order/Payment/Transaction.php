@@ -246,7 +246,9 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
             if (empty($typeLabels[$type])) {
                 continue;
             }
-            $partial = $partial && !empty($payment->getMethodObject()->can($type . '_partial'));
+            $paymentMethod = $payment->getMethodObject();
+
+            $partial = $partial && $paymentMethod && !empty($paymentMethod->can($type . '_partial'));
 
             $curHlp     = $this->BCurrencyValue;
             $maxAmount = $curHlp->create($this->get('amount'));
