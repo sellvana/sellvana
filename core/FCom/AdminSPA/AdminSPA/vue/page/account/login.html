@@ -17,14 +17,14 @@
 			</div>
 			<div class="form-group">
 				<label>
-					<div class="col-md-2">
+					<div class="col-xs-2">
 						<checkbox v-model="remember_me"></checkbox>
 					</div>
-					<p class="col-md-10 control-label">{{'Remember me'|_}}</p>
+					<p class="col-xs-10 control-label">{{'Remember me'|_}}</p>
 				</label>
 			</div>
 			<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
-			<div class="control-buttons-block">
+			<div class="control-buttons-block text-right">
 				<input type="button" @click="submit" value="Sign in" class="button button6">
 			</div>
 		</form>

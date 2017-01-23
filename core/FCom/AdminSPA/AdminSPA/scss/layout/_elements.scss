@@ -1,14 +1,6 @@
 .secondary-control-block {
 	float: right;
 }
-.control-buttons {
-	text-align: right;
-	vertical-align: bottom;
-	margin: 13px 0;
-	button {
-		margin-bottom: 4px;
-	}
-}
 .admin-main-content {
 	background: #fff;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
@@ -71,10 +63,5 @@
 		margin-bottom: 10px;
 		padding: 10px;
 	}
-	.control-buttons-block,
-	.control-buttons {
-		padding: 5px 0 0;
-		text-align: center;
-		margin: 2px 0;
-	}
+	
 }

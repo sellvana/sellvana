@@ -164,7 +164,7 @@
 		</div>
 	</div>
 
-	<div class="control-buttons-block">
+	<div class="control-buttons-block text-right">
 		<dropdown v-if="entity.is_manual_state_management_allowed && entity.state_overall_next_values" id="payment_change_overall_state" class="dropdown-buttons" :label="'Change Overall State'|_">
 			<ul class="dropdown-content">
 				<li v-for="(label, value) in entity.state_overall_next_values">

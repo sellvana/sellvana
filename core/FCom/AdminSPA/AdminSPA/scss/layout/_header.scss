@@ -672,11 +672,12 @@ i {
 
 .form-control {
 	font-size: 12px;
-	padding: 6px;
+	padding: 7px 6px;
 	border-radius: 0;
 	box-shadow: none;
 	border: 1px solid #ebebeb;
 	height: auto;
+	min-width: 100px;
 	&:hover,
 	&:focus,
 	&:active {

@@ -1,9 +1,20 @@
 .control-buttons-block {
-	padding: 15px 0 0;
-	text-align: right;
+	margin: 15px 0 15px;
+	button {
+		margin-bottom: 4px;
+	}
+	.select2-container {
+		min-width: 250px;
+		text-align: left;
+	}
+}
+.f-grid-filter-panel {
+	.control-buttons-block {
+		margin: 15px 0 0px;
+	}
 }
 button, .button {
-	padding: 6px 16px;
+	padding: 8px 16px;
 	transition: 0.1s all ease-in;
 	display: inline-block;
 	font-size: 12px;
@@ -385,7 +396,7 @@ button, .button {
 	}
 }
 .col-md-2, .col-lg-2 {
-	.control-buttons {
+	.control-buttons-block {
 		text-align: center;
 	}
 }
@@ -455,20 +466,23 @@ button, .button {
 		color: #fff;
 	}
 }
-
 .btn .caret {
 	margin-left: 5px;
 }
 @media (max-width: 767px) {
 	.control-buttons-block {
-		padding: 5px 0 0;
+		margin: 5px 0 5px 0;
 		text-align: center;
 		button, a, input {
 			margin-bottom: 5px;
 		}
+		.select2-container {
+			min-width: 120px;
+			width: 100% !important;
+		}
 	}
 	button, .button {
-		padding: 4px 12px;
+		padding: 4px 8px;
 		font-size: 11px;
 		font-weight: normal;
 	}

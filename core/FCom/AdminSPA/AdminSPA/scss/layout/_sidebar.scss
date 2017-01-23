@@ -115,7 +115,9 @@ aside {
 		& > .nav-stacked > li:hover {
 			background-color: #eeeeee;
 			color: black;
-			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11); 
+		}
+		& > .nav-stacked > li:hover > a {
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
 		}
 		& > .nav-stacked > li:hover > .nav-stacked > li:hover {
 			& > a > span, & > a > i {
@@ -152,11 +154,11 @@ aside {
 	#main-nav.close {
 		& > .navigation > .nav > li:hover > .nav-stacked {
 			display: block;
-			box-shadow: 3.5px 2.3px 13px 3px rgba(0, 0, 0, 0.11);
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
 		}
 		& > .navigation > .nav > li:hover > .nav-stacked > li:hover > .nav-stacked {
 			display: block;
-			box-shadow: 3.5px 2.3px 13px 3px rgba(0, 0, 0, 0.11);
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
 			
 		}
 		& > .navigation > .nav > li > a > i:last-child {
@@ -180,7 +182,7 @@ aside {
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1365px) {
 	aside {
 		position: fixed;
 		left: 0;

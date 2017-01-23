@@ -34,6 +34,7 @@
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	.dropdown.action {
 		width: 100px;
+		min-width: 100px;
 		position: absolute;
 		right: 10px;
 		top: 7px;
@@ -121,4 +122,10 @@
 			}		
 		}
 	}
+	.widget {
+		.input-group-sm > .form-control, .input-group-sm > .input-group-addon, .input-group-sm > .input-group-btn > .btn {
+			padding: 5px 5px;
+		}
+	}
 }
+

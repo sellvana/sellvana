@@ -429,6 +429,7 @@
 		width: 100%;
 		padding: 0;
 		position: relative;
+		margin: 0;
 		input {
 			margin-bottom: 0;
 			position: absolute;
@@ -488,7 +489,7 @@
 		button {
 			position: absolute;
 			right: 0;
-			top: 8px;
+			top: 0px;
 		}
 	}
 	td {
@@ -531,13 +532,6 @@
 		.select2-container--default .select2-selection--single .select2-selection__rendered {
 			line-height: 24px;
 		}
-	}
-}
-
-.details-additional-block {
-	.control-buttons-block {
-		margin-top: 20px;
-		padding: 15px 0;
 	}
 }
 
@@ -623,7 +617,7 @@
 	text-align: right;
 	margin: 10px 0;
 	.order-menu,
-	.control-buttons {
+	.control-buttons-block {
 		display: inline-block;
 		vertical-align: middle;
 	}
@@ -631,9 +625,7 @@
 		min-width: 160px;
 		text-align: left;
 	}
-	.control-buttons {
-		display: inline-block;
-		vertical-align: middle;
+	.control-buttons-block {
 		margin: 0 0 0 10px;
 		.dropdown {
 			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
@@ -730,20 +722,16 @@
 		text-align: center;
 		.dropdown.action {
 			width: 49%;
+			min-width: inherit;
 			text-align: left;
-			border-right: 0;
+			border-right: 0; 
 			display: inline-block;
-			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		}
 	}
 	.details-additional-block {
 		width: 100%;
-		overflow: auto;
-		overflow-y: hidden;
 		.scrollable-area {
 			width: auto;
-			overflow: inherit;
-			overflow-y: inherit;
 		}
 		.block-title {
 			padding: 0 0px 0 10px;
