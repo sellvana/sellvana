@@ -33,7 +33,7 @@
             dragging,
             collection = {},
             $mainForm = $('#catalog-products-form'),
-            initData = {{ UTIL.fromJson(initialData)|json_encode | raw }},
+            initData = {{ initialData |json_encode | raw }},
             sites = {{ sites | json_encode | raw }},
             fieldsModalNode,
             fieldsForm,

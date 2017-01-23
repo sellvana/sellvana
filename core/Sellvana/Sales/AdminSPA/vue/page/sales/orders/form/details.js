@@ -45,7 +45,13 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         return orderItemsById[entityItem.order_item_id];
     }
 
+    var EntityListMixin = {
+        mixins: [SvHlp.mixins.common],
+        props: ['form', 'entity']
+    };
+
     var EntityAddMixin = {
+        mixins: [SvHlp.mixins.common],
         props: ['form', 'entity'],
         data: function () {
             return {
@@ -64,6 +70,8 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     };
 
     var EntityEditMixin = {
+        mixins: [SvHlp.mixins.common],
+        props: ['form', 'entity'],
         data: function () {
             return {
                 action_in_progress: ''
@@ -81,7 +89,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
 
     var SectionComponents = {
         payments: {
-            props: ['form', 'entity'],
+            mixins: [EntityListMixin],
             template: paymentsTpl
         },
         paymentAdd: {
@@ -129,7 +137,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         var total = this.form.totals[i];
                         postData.totals[total.name] = total.amount_to_pay;
                     }
-                    SvHlp.sendRequest('POST', 'orders/payment_add', postData, function (response) {
+                    this.sendRequest('POST', 'orders/payment_add', postData, function (response) {
                         if (response.form) {
                             vm.$emit('action', {type: 'update-form', form: response.form});
                         }
@@ -142,7 +150,6 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         paymentEdit: {
             mixins: [EntityEditMixin],
-            props: ['form', 'entity'],
             data: function () {
                 return {
                     show_failed_transactions: false
@@ -173,7 +180,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         order_id: this.form.order.id,
                         payment_id: this.entity.id
                     };
-                    SvHlp.sendRequest('POST', 'orders/send_root_transaction_url', postData, function (response) {
+                    this.sendRequest('POST', 'orders/send_root_transaction_url', postData, function (response) {
                         if (response.form) {
                             vm.$emit('action', {type: 'update-form', form: response.form});
                         }
@@ -186,7 +193,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         type: type,
                         value: value
                     };
-                    SvHlp.sendRequest('POST', 'orders/payment_state', postData, function (response) {
+                    this.sendRequest('POST', 'orders/payment_state', postData, function (response) {
                         if (response.form) {
                             vm.$emit('action', {type: 'update-form', form: response.form});
                         }
@@ -205,7 +212,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         action_type: action,
                         amount: transaction.available_actions[action].amount
                     };
-                    SvHlp.sendRequest('POST', 'orders/transaction_action', postData, function (response) {
+                    this.sendRequest('POST', 'orders/transaction_action', postData, function (response) {
                         if (response.form) {
                             vm.$emit('action', {type: 'update-form', form: response.form});
                         }
@@ -219,12 +226,11 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         
         shipments: {
-            props: ['form', 'entity'],
+            mixins: [EntityListMixin],
             template: shipmentsTpl
         },
         shipmentAdd: {
             mixins: [EntityAddMixin],
-            props: ['form', 'entity'],
             template: shipmentsAddTpl,
             data: function () {
                 return {
@@ -281,7 +287,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         item = this.form.items_shippable[i];
                         postData.qtys[item.id] = item.qty_to_ship;
                     }
-                    SvHlp.sendRequest('POST', 'orders/shipment_add', postData, function (response) {
+                    this.sendRequest('POST', 'orders/shipment_add', postData, function (response) {
                         if (response.form) {
                             vm.$emit('action', {type: 'update-form', form: response.form});
                         }
@@ -294,7 +300,6 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         shipmentEdit: {
             mixins: [EntityEditMixin],
-            props: ['form', 'entity'],
             template: shipmentsEditTpl,
             methods: {
                 updateTracking: function () {
@@ -306,7 +311,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         pkg = this.entity.packages[i];
                         postData.packages[pkg.id] = {tracking_number: pkg.tracking_number};
                     }
-                    SvHlp.sendRequest('POST', 'orders/shipment_edit', postData, function (response) {
+                    this.sendRequest('POST', 'orders/shipment_edit', postData, function (response) {
                         if (response.form) {
                             vm.$emit('action', {type: 'update-form', form: response.form});
                         }
@@ -316,47 +321,41 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         
         refunds: {
-            props: ['form', 'entity'],
+            mixins: [EntityListMixin],
             template: refundsTpl
         },
         refundAdd: {
             mixins: [EntityAddMixin],
-            props: ['form', 'entity'],
             template: refundsAddTpl
         },
         refundEdit: {
             mixins: [EntityEditMixin],
-            props: ['form', 'entity'],
             template: refundsEditTpl
         },
         
         returns: {
-            props: ['form', 'entity'],
+            mixins: [EntityListMixin],
             template: returnsTpl
         },
         returnAdd: {
             mixins: [EntityAddMixin],
-            props: ['form', 'entity'],
             template: returnsAddTpl
         },
         returnEdit: {
             mixins: [EntityEditMixin],
-            props: ['form', 'entity'],
             template: returnsEditTpl
         },
 
         cancellations: {
-            props: ['form', 'entity'],
+            mixins: [EntityListMixin],
             template: cancellationsTpl
         },
         cancellationAdd: {
             mixins: [EntityAddMixin],
-            props: ['form', 'entity'],
             template: cancellationsAddTpl
         },
         cancellationEdit: {
             mixins: [EntityEditMixin],
-            props: ['form', 'entity'],
             template: cancellationsEditTpl
         }
     };
@@ -384,6 +383,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     }
 
     return {
+        mixins: [SvHlp.mixins.common],
         props: {
             form: {
                 type: Object
@@ -454,7 +454,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                             entity_type: action.entity.entity_type,
                             entity_id: action.entity.id
                         };
-                        SvHlp.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
+                        this.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
                             if (response.ok) {
                                 vm.$emit('action', {type: 'update-form', form: response.form});
                             }

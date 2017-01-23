@@ -38,7 +38,7 @@ define(['vue', 'sv-hlp'],
             },
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
-                SvHlp.sendRequest('GET', 'products/form_data', {id: orderId}, function (response) {
+                this.sendRequest('GET', 'products/form_data', {id: orderId}, function (response) {
                     vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(vm.form.product.product_name);
                 });
@@ -47,7 +47,7 @@ define(['vue', 'sv-hlp'],
 				if (!confirm(SvHlp._('Are you sure you want to delete this product?'))) {
 					return;
 				}
-				SvHlp.sendRequest('POST', 'products/form_delete', {id: this.form.product.id}, function (response) {
+				this.sendRequest('POST', 'products/form_delete', {id: this.form.product.id}, function (response) {
 					if (!response.ok) {
 
 					}
@@ -55,7 +55,7 @@ define(['vue', 'sv-hlp'],
 			},
 			save: function (stayOnPage) {
 				var vm = this;
-				SvHlp.sendRequest('POST', 'products/form_data', this.form.updates, function (response) {
+				this.sendRequest('POST', 'products/form_data', this.form.updates, function (response) {
 					if (!response._ok) {
 
 					}

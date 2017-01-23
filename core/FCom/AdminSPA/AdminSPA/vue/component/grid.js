@@ -151,21 +151,6 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         }
 
-        function fetchData(grid) {
-            grid = grid || this.grid;
-            if (!grid.config) {
-                return;
-            }
-            var url = grid.config.data_url;
-            if (!url) { // local data
-                return;
-            }
-            var params = prepareDataRequest(grid);
-            SvHlp.sendRequest('GET', url, params, function (response) {
-                processDataResponse(response, grid);
-            });
-        }
-
         var SvCompGridPagerList = {
             mixins: [SvHlp.mixins.common],
             props: ['grid'],
@@ -509,7 +494,20 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 }
             },
             methods: {
-                fetchData: fetchData,
+                fetchData: function (grid) {
+                    grid = grid || this.grid;
+                    if (!grid.config) {
+                        return;
+                    }
+                    var url = grid.config.data_url;
+                    if (!url) { // local data
+                        return;
+                    }
+                    var params = prepareDataRequest(grid);
+                    this.sendRequest('GET', url, params, function (response) {
+                        processDataResponse(response, grid);
+                    });
+                },
                 applyFilters: function (filters) {
                     var oldFilters = this.grid.filters || [];
                     Vue.set(this.grid, 'filters', oldFilters.concat(filters));

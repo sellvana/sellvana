@@ -266,16 +266,20 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
         }
 
         function sendRequest(method, path, request, success, error, lastTry) {
-            var data = request;
+            var vm = this, data = request;
+            if (!_.isObject(data) || _.isArrayLike(data)) {
+                console.log('Invalid request', request);
+                return;
+            }
             if (method === 'GET' && request) {
                 path += (path.match(/\?/) ? '&' : '?') + $.param(data);
                 data = null;
             }
-            if (method === 'POST' || method === 'DELETE') {
+            if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
                 data['X-CSRF-TOKEN'] = store.state.csrfToken;
             }
             if (lastTry) {
-                data._lastTry = lastTry;
+                data._last_try = lastTry;
             }
             return $.ajax({
                 method: method,
@@ -450,7 +454,8 @@ console.log('onError', err.xhr);
                             store.commit('ddToggle', ddName);
                         }
                     },
-                    ddStay: function () { /* dummy */ }
+                    ddStay: function () { /* dummy */ },
+                    sendRequest: sendRequest
                 }
             },
             form: {
@@ -488,7 +493,7 @@ console.log('onError', err.xhr);
                             console.log('No form object in response', response);
                             return;
                         }
-                        if (!response.form.updates) {
+                        if (!response.form.updates || _.isArrayLike(response.form.updates)) {
                             response.form.updates = {};
                         }
 
@@ -521,6 +526,8 @@ console.log('onError', err.xhr);
                         if (!confirm('There are unsaved changes, are you sure you want to leave?')) {
                             console.log(this.form.updates);
                             next(false);
+                        } else {
+                            next();
                         }
                     } else {
                         next();

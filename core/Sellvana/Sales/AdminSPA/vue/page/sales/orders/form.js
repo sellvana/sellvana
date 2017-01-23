@@ -38,7 +38,7 @@ define(['vue', 'sv-hlp'],
             },
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
-                SvHlp.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
+                this.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
                     vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(SvHlp._('Order #' + vm.form.order.unique_id));
                 });
@@ -60,7 +60,7 @@ define(['vue', 'sv-hlp'],
 							entity_type: action.entity.entity_type,
 							entity_id: action.entity.id
 						};
-						SvHlp.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
+						this.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
                             response.form.tabs = vm.form.tabs;
                             Vue.set(vm, 'form', response.form);
 						});
@@ -71,7 +71,7 @@ define(['vue', 'sv-hlp'],
 				if (!confirm(SvHlp._('Are you sure you want to delete this order?'))) {
 					return;
 				}
-				SvHlp.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {
+				this.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {
 					if (!response.ok) {
 
 					}
@@ -79,7 +79,7 @@ define(['vue', 'sv-hlp'],
 			},
 			shipAllItems: function () {
 				var vm = this, postData = {order_id: this.form.order.id};
-				SvHlp.sendRequest('POST', 'orders/ship_all_items', postData, function (response) {
+				this.sendRequest('POST', 'orders/ship_all_items', postData, function (response) {
 					if (response.form) {
                         response.form.tabs = vm.form.tabs;
                         Vue.set(vm, 'form', response.form);
@@ -88,7 +88,7 @@ define(['vue', 'sv-hlp'],
 			},
 			markAsPaid: function () {
                 var vm = this, postData = {order_id: this.form.order.id};
-                SvHlp.sendRequest('POST', 'orders/mark_as_paid', postData, function (response) {
+                this.sendRequest('POST', 'orders/mark_as_paid', postData, function (response) {
                     if (response.form) {
                         response.form.tabs = vm.form.tabs;
                         Vue.set(vm, 'form', response.form);
@@ -97,7 +97,7 @@ define(['vue', 'sv-hlp'],
 			},
 			save: function (stayOnPage) {
 				var vm = this;
-				SvHlp.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
+				this.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
 					if (!response.ok) {
 
 					}

@@ -5,13 +5,22 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
             return {
                 username: '',
                 password: '',
-                remember_me: false
+                remember_me: false,
+                logging_in: false
             }
         },
         methods: {
             submit: function() {
-                var postData = {login: {username: this.username, password: this.password, remember_me: this.remember_me}};
-                SvHlp.sendRequest('POST', 'account/login', postData, function (response) {
+                var vm = this, postData = {
+                    login: {
+                        username: this.username,
+                        password: this.password,
+                        remember_me: this.remember_me
+                    }
+                };
+                this.logging_in = true;
+                this.sendRequest('POST', 'account/login', postData, function (response) {
+                    vm.logging_in = false;
                     if (response._redirect) {
                         SvHlp.router.push(response._redirect);
                     }
@@ -21,7 +30,7 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
         created: function () {
             if (this.$store.state.user && this.$store.state.user.id) {
                 var vm = this;
-                SvHlp.sendRequest('GET', 'account/login', {}, function (response) {
+                this.sendRequest('GET', 'account/login', {}, function (response) {
                     console.log(response);
                     if (response.is_logged_in) {
                         vm.$router.push('/');

@@ -36,11 +36,6 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
                 throw new BException($this->_('Invalid user name or password.'));
             }
 
-            if (!empty($r['remember_me'])) {
-                $days = $this->BConfig->get('cookie/remember_days');
-                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
-            }
-
             if ($user->get('g2fa_status') == 9) {
                 $token = $this->BRequest->cookie('g2fa_token');
                 $rec = $this->FCom_Admin_Model_UserG2FA->verifyToken($user->id(), $token);
@@ -52,6 +47,11 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
             }
 
             $user->login();
+
+            if (!empty($r['remember_me'])) {
+                $days = $this->BConfig->get('cookie/remember_days');
+                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
+            }
 
             $this->addResponses(['debug' => $_SESSION]);
 

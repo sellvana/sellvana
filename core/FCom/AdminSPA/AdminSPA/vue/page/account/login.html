@@ -25,7 +25,7 @@
 			</div>
 			<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
 			<div class="control-buttons-block text-right">
-				<input type="button" @click="submit" value="Sign in" class="button button6">
+				<input type="button" @click="submit" value="Sign in" class="button button6" v-ladda="{on:logging_in}">
 			</div>
 		</form>
 	</div>

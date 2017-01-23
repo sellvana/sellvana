@@ -109,7 +109,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'payment_methods' => $this->_getPaymentMethods(),
             'shipping_methods' => $this->_getShippingMethods(),
 
-            'updates' => [],
+            'updates' => new stdClass,
         ];
     }
 

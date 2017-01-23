@@ -12,7 +12,7 @@ define(['sv-hlp'], function(SvHlp) {
                 this.$router.push('/login');
             }
             var postData = {}, vm = this;
-            SvHlp.sendRequest('POST', 'account/logout', postData, function (response) {
+            this.sendRequest('POST', 'account/logout', postData, function (response) {
                 SvHlp.processResponse(response);
                 vm.$router.push("/login");
             });

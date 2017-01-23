@@ -33,14 +33,14 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
             },
             fetchData: function () {
                 var userId = this.$router.currentRoute.query.id, vm = this;
-                SvHlp.sendRequest('GET', 'users/form_data', {id: userId}, function (response) {
+                this.sendRequest('GET', 'users/form_data', {id: userId}, function (response) {
                     vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(SvHlp._(vm.form.user.email));
                 });
             },
             save: function (stayOnPage) {
                 var vm = this;
-                SvHlp.sendRequest('POST', 'users/form_data', this.form.updates, function (response) {
+                this.sendRequest('POST', 'users/form_data', this.form.updates, function (response) {
                     if (!response._ok) {
 
                     }

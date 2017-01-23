@@ -22,7 +22,7 @@ define(['vue', 'sv-hlp', 'json!sv-page-settings-config'], function (Vue, SvHlp, 
         methods: {
             fetchData: function () {
                 var vm = this;
-                SvHlp.sendRequest('GET', 'settings/data', {}, function (response) {
+                this.sendRequest('GET', 'settings/data', {}, function (response) {
                     Vue.set(vm.settings, 'data', response.data);
                 });
             },

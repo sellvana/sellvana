@@ -57,7 +57,7 @@ define(['lodash', 'sv-hlp', 'sv-comp-tree', 'sv-comp-grid'/*, 'json!sv-page-cata
                 if (_.isEmpty(this.tree)) {
                     params.tree = 1;
                 }
-                SvHlp.sendRequest('GET', 'categories/form_data', params, function (response) {
+                this.sendRequest('GET', 'categories/form_data', params, function (response) {
                     if (response.tree) {
                         vm.tree = response.tree[0];
                     }

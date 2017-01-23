@@ -20,7 +20,7 @@ define(['sv-hlp', 'text!sv-comp-grid-data-cell-actions-tpl'], function (SvHlp, a
                 var vm = this;
                 if (act.delete_url) {
                     var url = vm.rowActionLink(row, {link: act.delete_url});
-                    SvHlp.sendRequest('POST', url, {}, function (response) {
+                    this.sendRequest('POST', url, {}, function (response) {
                         vm.$emit('fetch-data');
                     });
                 }
