@@ -2685,7 +2685,7 @@ class BSession extends BClass
         $this->open();
 
         $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
-        if (!$_SESSION[$namespace]) {
+        if (empty($_SESSION[$namespace])) {
             return null;
         }
 

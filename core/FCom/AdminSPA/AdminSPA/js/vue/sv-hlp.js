@@ -290,11 +290,15 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                     if (response._retry && !lastTry) {
                         return sendRequest(method, path, data, success, error, true);
                     }
-                    success && success(response);
+                    if (success) {
+                        success(response);
+                    }
                 },
                 error: function (response) {
                     processResponse(response);
-                    error && error(response);
+                    if (error) {
+                        error(response);
+                    }
                 }
             });
         }
