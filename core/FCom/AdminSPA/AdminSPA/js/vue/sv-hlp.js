@@ -1,6 +1,7 @@
-define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable', 'vue-ckeditor', 'vue-select2', 'spin', 'ladda',
+define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
+        'vue-ckeditor', 'vue-select2', 'spin', 'ladda', 'nprogress',
         'ckeditor', 'select2'],
-    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2, Spin, Ladda) {
+    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2, Spin, Ladda, NProgress) {
 
         Vue.use(VueRouter);
         Vue.use(Vuex);
@@ -280,12 +281,16 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
             }
             if (lastTry) {
                 data._last_try = lastTry;
+                NProgress.set(.5);
+            } else {
+                NProgress.start();
             }
             return $.ajax({
                 method: method,
                 url: store.state.env.root_href.replace(/\/$/, '') + '/' + path.replace(/^\//, ''),
                 data: data,//JSON.stringify(data),
                 success: function (response) {
+                    NProgress.inc();
                     processResponse(response);
                     if (response._retry && !lastTry) {
                         return sendRequest(method, path, data, success, error, true);
@@ -293,12 +298,15 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                     if (success) {
                         success(response);
                     }
+                    NProgress.done();
                 },
                 error: function (response) {
+                    NProgress.inc();
                     processResponse(response);
                     if (error) {
                         error(response);
                     }
+                    NProgress.done();
                 }
             });
         }
@@ -387,7 +395,7 @@ console.log('onError', err.xhr);
                 store: store,
                 data: function () {
                     return {
-
+                        action_in_progress: ''
                     };
                 },
                 computed: {
@@ -465,7 +473,12 @@ console.log('onError', err.xhr);
             form: {
                 data: function () {
                     return {
-                        tab: false
+                        tab: false,
+                        form: {
+                            options: {},
+                            updates: {},
+                            tabs: []
+                        }
                     };
                 },
                 computed: {
@@ -479,6 +492,17 @@ console.log('onError', err.xhr);
                             }
                             return this.form.options[type][value];
                         }
+                    },
+                    formTabLabel: function () {
+                        if (!this.form || !this.form.tabs || _.isEmpty(this.form.tabs)) {
+                            return '';
+                        }
+                        for (var i = 0, l = this.form.tabs.length; i < l; i++) {
+                            if (this.form.tabs[i].name === this.tab) {
+                                return this.form.tabs[i].label;
+                            }
+                        }
+                        return '';
                     }
                 },
                 methods: {

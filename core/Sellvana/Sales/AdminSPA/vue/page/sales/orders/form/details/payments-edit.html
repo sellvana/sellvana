@@ -107,6 +107,18 @@
 						</table>
 					</td>
 				</tr>
+
+				<tr v-for="item in entity.items" v-if="!item.order_item_id">
+					<td colspan="3" style="text-align:right">
+						<strong>{{item.data_serialized.custom_label|_}}</strong>
+					</td>
+					<td>
+						<table class="combined-columns">
+							<tr><th>{{'Paid:'|_}}</th><td>{{item.amount|currency}}</td></tr>
+							<tr v-if="item.amount_refunded"><th>{{'Refunded:'|_}}</th><td>{{item.amount_refunded|currency}}</td></tr>
+						</table>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>

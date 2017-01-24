@@ -1,98 +1,94 @@
 <div class="details-additional-block">
-    <div>
-        <div class="block-title">
-            <p>Product SKU</p>
-            <span>1078987321</span>
-        </div>
+    <div class="block-title">
+        <p>{{'Add a new return'|_}}</p>
+    </div>
+    <div v-if="form.items_returnable.length">
         <div class="scrollable-area">
-            <table class="secondary-table">
+            <table class="secondary-table combined-table">
                 <thead>
                 <tr>
-                    <th>Inventory SKU</th>
-                    <th>Product Name</th>
-                    <th>Qty Ordered</th>
-                    <th>Total Amount</th>
-                    <th>Paid</th>
-                    <th>Amount in Payments</th>
-                    <th>Payable Amount</th>
+                    <td>{{'Return'|_}}</td>
+                    <td>{{'Thumbnail'|_}}</td>
+                    <td>{{'Product Info'|_}}</td>
+                    <td>{{'Item Qtys'|_}}</td>
+                    <td>{{'Returnable'|_}}</td>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>test-100</td>
-                    <td>Product 1</td>
-                    <td>1</td>
-                    <td>$ 3,433.60</td>
-                    <td>$0.00</td>
-                    <td>$0.00</td>
-                    <td>$ 3,433.60</td>
+                <tr v-for="item in form.items_returnable" :class="{selected: isItemSelected(item)}">
+                    <th class="column-row-select">
+                        <label @click.prevent="toggleItem(item)"><input type="checkbox" :checked="isItemSelected(item)"/>
+                            <span><i class="fa fa-check" aria-hidden="true"></i></span></label>
+                    </th>
+                    <td>
+                        <img :src="item.thumb_url" :alt="item.product_name">
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Name:'|_}}</th><td>{{item.product_name}}</td></tr>
+                        <tr><th>{{'Qty:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
+                        <tr><th>{{'P.SKU:'|_}}</th><td>{{item.product_sku}}</td></tr>
+                        <tr><th>{{'I.SKU:'|_}}</th><td>{{item.inventory_sku}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Ordered:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
+                        <tr><th>{{'Shipped:'|_}}</th><td>{{item.qty_shipped}}</td></tr>
+                        <tr><th>{{'In Returns:'|_}}</th><td>{{item.qty_in_returns}}</td></tr>
+                        <tr><th>{{'Returnable:'|_}}</th><td>{{item.qty_can_return}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'To Return:'|_}}</th><td><input type="number" class="form-control" v-model="item.qty_to_return" :disabled="!isItemSelected(item)"></td></tr>
+                        </tbody></table>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div class="control-buttons-block text-right">
-            <div>
-                <p>Amount to Pay</p>
-                <input type="text" name=""/>
+        <div class="total-amount">
+            <div class="total-amount-pay">
+                <p>{{'Total Qty to Return'|_}}</p>
+                <span class="total-sum">{{totalQtyToReturn}}</span>
+            </div>
+            <div class="create-payment">
+                <p>{{'Shipping Method'|_}}</p>
+                <select2 v-model="rma.carrier_code" class="form-control">
+                    <option></option>
+                    <option v-for="m in form.shipping_methods" :value="m.id">{{m.text}}</option>
+                </select2>
+            </div>
+            <div class="create-payment" v-if="rma.carrier_code">
+                <p>{{'Shipping Service'|_}}</p>
+                <select2 v-model="rma.service_code" class="form-control">
+                    <option></option>
+                    <option v-for="s in shippingServices" :value="s.id">{{s.text}}</option>
+                </select2>
+            </div>
+            <div class="create-payment">
+                <p>{{'Shipping Weight'|_}}</p>
+                <input type="number" v-model="rma.shipping_weight" class="form-control">
+            </div>
+            <div class="create-payment">
+                <p>{{'Shipping Size'|_}}</p>
+                <input type="text" v-model="rma.shipping_size" class="form-control">
+            </div>
+            <div class="create-payment">
+                <p>{{'Carrier Price'|_}}</p>
+                <input type="number" v-model="rma.carrier_price" class="form-control">
             </div>
         </div>
-    </div>
-    <div class="secondary-grid">
-        <div class="block-title">
-            <p>Product SKU</p>
-            <span>1078987321</span>
-        </div>
-        <div class="scrollable-area">
-            <table class="secondary-table">
-                <thead>
-                <tr>
-                    <th>Inventory SKU</th>
-                    <th>Product Name</th>
-                    <th>Qty Ordered</th>
-                    <th>Total Amount</th>
-                    <th>Paid</th>
-                    <th>Amount in Payments</th>
-                    <th>Payable Amount</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>test-100</td>
-                    <td>Product 1</td>
-                    <td>1</td>
-                    <td>$ 3,433.60</td>
-                    <td>$0.00</td>
-                    <td>$0.00</td>
-                    <td>$ 3,433.60</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
         <div class="control-buttons-block text-right">
-            <div>
-                <p>Amount to Pay</p>
-                <input type="text" name=""/>
-            </div>
+            <button type="button" class="button button12" @click="submit()" :diabled="!totalQtyToReturn">{{'Create and Save Return'|_}}</button>
+            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
     </div>
-    <div class="total-amount">
-        <div>
-            <p>Total Amount to Pay</p>
-			<span class="total-sum">$ 1,707.60</span>
+    <div v-else>
+        {{'No returnable items found.'|_}}
+        <div class="control-buttons-block text-right">
+            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
-    </div>
-    <div class="create-payment">
-        <span>Check / Money Order</span>
-        <select2>
-            <option value="stripe">Stripe</option>
-            <option value="paypal">PayPal Express Checkout</option>
-            <option value="cc">Credit Card</option>
-            <option value="basic" selected="">Check / Money Order</option>
-            <option value="ogone">Ogone</option>
-        </select2>
-        <button type="button" class="button button12">{{'Create'|_}}</button>
-    </div>
-    <div class="control-buttons-block text-right">
-        <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
     </div>
 </div>

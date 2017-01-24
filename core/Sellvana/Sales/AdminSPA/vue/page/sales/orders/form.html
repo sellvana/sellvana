@@ -31,7 +31,7 @@
 		<div class="col-md-12 col-lg-6 text-right">
 			<div class="tablet-panel hidden-lg">
 				<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{formTabLabel|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
 					<div class="dropdown-menu">
 						<ul class="dropdown-content">
 							<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
@@ -39,26 +39,26 @@
 					</div>
 				</div>
 				<div class="dropdown action dropdown-buttons" :class="{open:ddOpen('control-buttons')}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>{{'Actions'|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
 					<div class="dropdown-menu">
 						<ul class="dropdown-content">
 							<li><a href="#" class="color10" @click="goBack()">{{'Back'|_}}</a></li>
-							<li><a href="#" class="color2" @click="doDelete() ">{{'Delete'|_}}</a></li>
-							<li><a href="#" class="color8" @click="shipAllItems()">{{'Ship All items'|_}}</a></li>
-							<li><a href="#" class="color8" @click="markAsPaid()">{{'Mark as Paid'|_}}</a></li>
-							<li><a href="#" class="color9" @click="save()">{{'Save'|_}}</a></li>
-							<li><a href="#" class="color9" @click="save(true)">{{'Save and Continue'|_}}</a></li>
+							<li><a href="#" class="color2" @click="doDelete()" v-ladda="{on:action_in_progress==='delete'}">{{'Delete'|_}}</a></li>
+							<li><a href="#" class="color8" @click="shipAllItems()" v-ladda="{on:action_in_progress==='ship_all_items'}">{{'Ship All items'|_}}</a></li>
+							<li><a href="#" class="color8" @click="markAsPaid()" v-ladda="{on:action_in_progress==='mark_as_paid'}">{{'Mark as Paid'|_}}</a></li>
+							<li><a href="#" class="color9" @click="save()" v-ladda="{on:action_in_progress==='save'}">{{'Save'|_}}</a></li>
+							<li><a href="#" class="color9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</a></li>
 						</ul>
 					</div>
 				</div>
 			</div>
 			<div class="control-buttons-block visible-lg">
 				<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
-				<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-				<button type="button" class="button button8" @click="shipAllItems()">{{'Ship All items'|_}}</button>
-				<button type="button" class="button button8" @click="markAsPaid()">{{'Mark as Paid'|_}}</button>
-				<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
-				<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+				<button type="button" class="button button2" @click="doDelete()" v-ladda="{on:action_in_progress==='delete'}">{{'Delete'|_}}</button>
+				<button type="button" class="button button8" @click="shipAllItems()" v-ladda="{on:action_in_progress==='ship_all_items'}">{{'Ship All items'|_}}</button>
+				<button type="button" class="button button8" @click="markAsPaid()" v-ladda="{on:action_in_progress==='mark_as_paid'}">{{'Mark as Paid'|_}}</button>
+				<button type="button" class="button button9" @click="save()" v-ladda="{on:action_in_progress==='save'}">{{'Save'|_}}</button>
+				<button type="button" class="button button9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</button>
 			</div>
 		</div>
 	</div>
