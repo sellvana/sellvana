@@ -55,8 +55,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         props: ['form', 'entity'],
         data: function () {
             return {
-                items_selected: {},
-                action_in_progress: ''
+                items_selected: {}
             }
         },
         computed: {
@@ -72,11 +71,6 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     var EntityEditMixin = {
         mixins: [SvHlp.mixins.common],
         props: ['form', 'entity'],
-        data: function () {
-            return {
-                action_in_progress: ''
-            }
-        },
         computed: {
             orderItem: function () {
                 var vm = this;
@@ -330,7 +324,23 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         refundEdit: {
             mixins: [EntityEditMixin],
-            template: refundsEditTpl
+            template: refundsEditTpl,
+            computed: {
+                totalItemLabel: function () {
+                    var vm = this;
+                    return function (rItem) {
+                        var pItem = vm.orderItem(rItem);
+                        return pItem ? pItem.data_serialized.custom_label : 'Refunded Item';
+                    }
+                },
+                totalItemAmountPaid: function () {
+                    var vm = this;
+                    return function (rItem) {
+                        var pItem = vm.orderItem(rItem);
+                        return pItem ? pItem.amount : 0;
+                    }
+                }
+            }
         },
         
         returns: {
@@ -339,7 +349,72 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         returnAdd: {
             mixins: [EntityAddMixin],
-            template: returnsAddTpl
+            template: returnsAddTpl,
+            data: function () {
+                return {
+                    rma: {
+                        carrier_code: '',
+                        service_code: '',
+                        shipping_weight: '',
+                        shipping_size: '',
+                        carrier_price: 0
+                    }
+                }
+            },
+            computed: {
+                totalQtyToReturn: function () {
+                    var total = 0, i, l, item;
+                    for (i = 0, l = this.form.items_returnable.length; i < l; i++) {
+                        item = this.form.items_returnable[i];
+                        if (item.qty_to_return) {
+                            total += 1 * item.qty_to_return;
+                        }
+                    }
+                    return total;
+                },
+                shippingServices: function () {
+                    if (!this.rma.carrier_code) {
+                        return [];
+                    }
+                    var i, j, l, m, services = [];
+                    for (i = 0, l = this.form.shipping_methods.length; i < l; i++) {
+                        m = this.form.shipping_methods[i];
+                        if (m.id === this.rma.carrier_code) {
+                            for (j in m.services) {
+                                services.push({id: j, text: m.services[j]});
+                            }
+                            break;
+                        }
+                    }
+                    return services;
+                }
+            },
+            methods: {
+                toggleItem: function (item) {
+                    var id = item.id;
+                    Vue.set(this.items_selected, id, !this.items_selected[id]);
+                    Vue.set(item, 'qty_to_return', this.items_selected[id] ? item.qty_can_return : '');
+                },
+                submit: function () {
+                    var vm = this, i, l, item, postData = {
+                        order_id: this.form.order.id,
+                        'return': this.rma,
+                        qtys: {}
+                    };
+                    for (i = 0, l = this.form.items_returnable.length; i < l; i++) {
+                        item = this.form.items_returnable[i];
+                        postData.qtys[item.id] = item.qty_to_return;
+                    }
+                    this.sendRequest('POST', 'orders/return_add', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                        if (response.ok) {
+                            vm.$emit('action', {type: 'switch-entity', entity_type: 'return', entity_id: response.new_entity_id});
+                        }
+                    });
+                }
+            }
         },
         returnEdit: {
             mixins: [EntityEditMixin],
@@ -352,7 +427,50 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         },
         cancellationAdd: {
             mixins: [EntityAddMixin],
-            template: cancellationsAddTpl
+            template: cancellationsAddTpl,
+            data: function () {
+                return {
+                    cancel: {}
+                }
+            },
+            computed: {
+                totalQtyToCancel: function () {
+                    var total = 0, i, l, item;
+                    for (i = 0, l = this.form.items_cancellable.length; i < l; i++) {
+                        item = this.form.items_cancellable[i];
+                        if (item.qty_to_cancel) {
+                            total += 1 * item.qty_to_cancel;
+                        }
+                    }
+                    return total;
+                }
+            },
+            methods: {
+                toggleItem: function (item) {
+                    var id = item.id;
+                    Vue.set(this.items_selected, id, !this.items_selected[id]);
+                    Vue.set(item, 'qty_to_cancel', this.items_selected[id] ? item.qty_can_cancel : '');
+                },
+                submit: function () {
+                    var vm = this, i, l, item, postData = {
+                        order_id: this.form.order.id,
+                        cancel: this.cancel,
+                        qtys: {}
+                    };
+                    for (i = 0, l = this.form.items_cancellable.length; i < l; i++) {
+                        item = this.form.items_cancellable[i];
+                        postData.qtys[item.id] = item.qty_to_cancel;
+                    }
+                    this.sendRequest('POST', 'orders/cancellation_add', postData, function (response) {
+                        if (response.form) {
+                            vm.$emit('action', {type: 'update-form', form: response.form});
+                        }
+                        if (response.ok) {
+                            vm.$emit('action', {type: 'switch-entity', entity_type: 'cancellation', entity_id: response.new_entity_id});
+                        }
+                    });
+                }
+            }
         },
         cancellationEdit: {
             mixins: [EntityEditMixin],

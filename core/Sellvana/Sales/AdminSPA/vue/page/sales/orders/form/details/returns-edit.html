@@ -1,50 +1,92 @@
 <div class="details-additional-block">
     <div class="block-title">
-        <p>Existing Payments</p>
-        <span>Aug 22, 2016, 1:43:33 AM</span>
-        <select2>
-            <option>Shipped</option>
-            <option>Plain</option>
-            <option>Refunded</option>
-        </select2>
-        <label>
-            <input type="checkbox">
-            <span><i aria-hidden="true" class="fa fa-check"></i></span><span>Delete</span></label>
+        <p>{{'Existing Return:'|_}}</p>
+        <span>
+            <strong>{{entity.carrier_desc}} / {{entity.service_desc}}</strong>
+            {{'{cnt} item(s)'|_({cnt:entity.num_items})}}
+            ({{entity.state_overall}})
+            {{entity.create_at|date}}
+        </span>
     </div>
     <div class="scrollable-area">
         <table class="secondary-table">
             <thead>
             <tr>
-                <th>Method</th>
-                <th>Status</th>
-                <th>Amount Captured</th>
-                <th>Balance</th>
-                <th>Total Amount</th>
-                <th>Items</th>
+                <td>{{'Method'|_}}</td>
+                <td>{{'Status'|_}}</td>
+                <td>{{'Packages'|_}}</td>
+                <td>{{'Timeline'|_}}</td>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>Check/
-                    Money Order</td>
-                <td>Overall: <span>Pending</span>
-                    Processor:</td>
-                <td>$ 0.00</td>
-                <td>$1.707.60</td>
-                <td>$1.707.60</td>
-                <td>
-                    <p><span>Product 1: </span>$ 3,433.60</p>
-                    <p><span>Product 1: </span>$ 3,433.60</p>
-                    <p><span>Product 1: </span>$ 3,433.60</p>
-                    <p><span>Product 1: </span>$ 3,433.60</p>
+                <td>{{entity.carrier_desc}} / {{entity.service_desc}}</td>
+                <td>{{'Overall:'|_}} <span>{{entity.state_overall}}</span>
+                    <div>{{'Carrier:'|_}} <span>{{entity.state_carrier}}</span></div>
+                </td>
+                <td>{{'{cnt} item(s)'|_({cnt:entity.num_items})}}
+                    <div>{{'Shipping weight:'|_}} <span>{{entity.shipping_weight}}</span></div>
+                </td>
+                <td>{{'Created:'|_}} <span>{{entity.create_at|date}}</span>
+                    <div v-if="entity.shipped_at">{{'Shipped:|_'}} <span>{{entity.shipped_at|date}}</span></div>
+                    <div v-if="entity.delivered_at">{{'Delivered:|_'}} <span>{{entity.delivered_at|date}}</span></div>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
+    <!--
+    <div v-for="package in entity.packages">
+        <div class="block-title">
+            <p>{{'Package:'|_}}</p>
+            <span>
+            <strong>{{entity.carrier_desc}} / {{entity.service_desc}}</strong>
+            {{'{cnt} item(s)'|_({cnt:entity.num_items})}}
+            ({{entity.state_overall}})
+            {{entity.create_at|date}}
+        </span>
+            <label>{{'Tracking:'|_}} <input type="text" v-model="package.tracking_number" class="form-control"></label>
+        </div>
+        -->
+    <div>
+        <div class="block-title">
+            <p>{{'Package:'|_}}</p>
+        </div>
+        <div class="scrollable-area">
+            <table class="secondary-table combined-table">
+                <thead>
+                <tr>
+                    <td>{{'Thumbnail'|_}}</td>
+                    <td>{{'Product Info'|_}}</td>
+                    <td>{{'Returned'|_}}</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in entity.items">
+                    <td>
+                        <img :src="orderItem(item).thumb_url" :alt="orderItem(item).product_name">
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Name:'|_}}</th><td>{{orderItem(item).product_name}}</td></tr>
+                        <tr><th>{{'Qty:'|_}}</th><td>{{orderItem(item).qty_ordered}}</td></tr>
+                        <tr><th>{{'P.SKU:'|_}}</th><td>{{orderItem(item).product_sku}}</td></tr>
+                        <tr><th>{{'I.SKU:'|_}}</th><td>{{orderItem(item).inventory_sku}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Qty:'|_}}</th><td>{{item.qty}}</td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="control-buttons-block text-right">
-        <button type="button" class="button2" @click="$emit('action', {type:'delete', entity:entity})">{{'Delete Return'|_}}</button>
+        <button type="button" class="button12" @click="updateTracking()">{{'Update Tracking'|_}}</button>
+        <button type="button" class="button2" @click="$emit('action', {type:'delete', entity:entity})">{{'Delete Shipment'|_}}</button>
         <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
     </div>
-    {{entity}}
 </div>

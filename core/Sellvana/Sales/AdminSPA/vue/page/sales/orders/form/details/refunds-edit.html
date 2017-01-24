@@ -67,8 +67,23 @@
                 </td>
                 <td>
                     <table class="combined-columns"><tbody>
-                    <tr><th>{{'Paid by this payment:'|_}}</th><td>{{item.amount|currency}}</td></tr>
+                    <tr><th>{{'Refunded by this refund:'|_}}</th><td>{{item.amount|currency}}</td></tr>
                     </tbody></table>
+                </td>
+            </tr>
+            <tr v-for="item in entity.items" v-if="!item.order_item_id">
+                <td colspan="2" style="text-align:right">
+                    <strong>{{totalItemLabel(item)|_}}</strong>
+                </td>
+                <td>
+                    <table class="combined-columns">
+                        <tr><th>{{'Paid:'|_}}</th><td>{{totalItemAmountPaid(item)|currency}}</td></tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="combined-columns">
+                        <tr><th>{{'Refunded by this refund:'|_}}</th><td>{{item.amount|currency}}</td></tr>
+                    </table>
                 </td>
             </tr>
             </tbody>
@@ -78,5 +93,4 @@
         <button type="button" class="button2" @click="$emit('action', {type:'delete', entity:entity})">{{'Delete Refund'|_}}</button>
         <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
     </div>
-    <jsontree :json="entity"></jsontree>
 </div>
