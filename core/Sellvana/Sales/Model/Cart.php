@@ -424,7 +424,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (empty($params['show_separate'])) {
             $where = [
                 'cart_id' => $this->id(),
-                'product_id' => $productId,
+                'product_id' => $product->id(),
                 'show_separate' => 0,
             ];
             if (!empty($params['signature'])) {
