@@ -2,3 +2,30 @@ modules:
     FCom_AdminSPA:
         version: 0.6.0.0
         channel: alpha
+        require: { module: [ FCom_Core, FCom_LibScssPhp, FCom_LibTwig, FCom_Admin ] }
+
+        areas:
+            FCom_AdminSPA:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]
+                    - [ /header/.action, FCom_AdminSPA_AdminSPA_Controller_Header ]
+                    - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
+
+                    - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
+                    - [ /favorites/?.action, FCom_AdminSPA_AdminSPA_Controller_Favorites ]
+                    - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]
+                    - [ /users/?.action, FCom_AdminSPA_AdminSPA_Controller_Users ]
+
+                    - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
+                views:
+                    - [ app, FCom_AdminSPA_AdminSPA_View_App ]
+
+        default_config:
+            modules/FCom_AdminSPA/theme: FCom_AdminSPA_DefaultTheme
+
+        themes:
+            FCom_AdminSPA_DefaultTheme:
+                name: FCom_AdminSPA_DefaultTheme
+                area: FCom_AdminSPA
+                layout_before: AdminSPA/layout-before.yml

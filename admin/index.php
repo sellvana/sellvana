@@ -26,4 +26,6 @@ if (file_exists(__DIR__ . '/index.local.php')) {
 }
 #error_reporting(E_ALL | E_STRICT);
 
+#BClassRegistry::i()->setTraceMode();
+
 FCom_Core_Main::i()->run('FCom_Admin');

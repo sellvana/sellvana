@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        var SvAppData = ({{ data|json_encode|raw }});
+    </script>
+    {{ THIS.view('head') | raw }}
+    <script>
+        requirejs.config({
+            config: {
+                text: {
+                    onXhrComplete: function (xhr, url) {
+                        //console.log(xhr, url);
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+{% verbatim %}
+<div id="sv-app" @click="pageClick()" v-show="isLoaded">
+    <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
+    <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
+        <div class="f-admin-container">
+            <sv-comp-nav v-if="isLoggedIn"></sv-comp-nav>
+            <div class="f-admin-main-view ">
+                <router-view></router-view>
+            </div>
+        </div>
+    </main>
+    <sv-comp-messages></sv-comp-messages>
+</div>
+{% endverbatim %}
+</body>
+</html>

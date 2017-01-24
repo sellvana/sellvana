@@ -1,0 +1,86 @@
+<div class="details-additional-block">
+    <div class="block-title">
+        <p>{{'Existing Shipment:'|_}}</p>
+        <span>
+            <strong>{{entity.carrier_desc}} / {{entity.service_desc}}</strong>
+            {{'{cnt} item(s)'|_({cnt:entity.num_items})}}
+            ({{entity.state_overall}})
+            {{entity.create_at|date}}
+        </span>
+    </div>
+    <div class="scrollable-area">
+        <table class="secondary-table">
+            <thead>
+            <tr>
+                <td>Method</td>
+                <td>Status</td>
+                <td>Packages</td>
+                <td>Timeline</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{entity.carrier_desc}} / {{entity.service_desc}}</td>
+                <td>{{'Overall:'|_}} <span>{{entity.state_overall}}</span>
+                    <div>{{'Carrier:'|_}} <span>{{entity.state_carrier}}</span></div>
+                </td>
+                <td>{{'{cnt} item(s)'|_({cnt:entity.num_items})}}
+                    <div>{{'Shipping weight:'|_}} <span>{{entity.shipping_weight}}</span></div>
+                </td>
+                <td>{{'Created:'|_}} <span>{{entity.create_at|date}}</span>
+                    <div v-if="entity.shipped_at">{{'Shipped:|_'}} <span>{{entity.shipped_at|date}}</span></div>
+                    <div v-if="entity.delivered_at">{{'Delivered:|_'}} <span>{{entity.delivered_at|date}}</span></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div v-for="package in entity.packages">
+        <div class="block-title">
+            <p>{{'Package:'|_}}</p>
+            <span>
+            <strong>{{entity.carrier_desc}} / {{entity.service_desc}}</strong>
+            {{'{cnt} item(s)'|_({cnt:entity.num_items})}}
+            ({{entity.state_overall}})
+            {{entity.create_at|date}}
+        </span>
+            <label>{{'Tracking:'|_}} <input type="text" v-model="package.tracking_number" class="form-control"></label>
+        </div>
+        <div class="scrollable-area">
+            <table class="secondary-table combined-table">
+                <thead>
+                <tr>
+                    <td>{{'Thumbnail'|_}}</td>
+                    <td>{{'Product Info'|_}}</td>
+                    <td>{{'Shipped'|_}}</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in entity.items" v-if="item.package_id === package.id">
+                    <td>
+                        <img :src="orderItem(item).thumb_url" :alt="orderItem(item).product_name">
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Name:'|_}}</th><td>{{orderItem(item).product_name}}</td></tr>
+                        <tr><th>{{'Qty:'|_}}</th><td>{{orderItem(item).qty_ordered}}</td></tr>
+                        <tr><th>{{'P.SKU:'|_}}</th><td>{{orderItem(item).product_sku}}</td></tr>
+                        <tr><th>{{'I.SKU:'|_}}</th><td>{{orderItem(item).inventory_sku}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'Qty:'|_}}</th><td>{{item.qty}}</td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="control-buttons-block text-right">
+        <button type="button" class="button12" @click="updateTracking()">{{'Update Tracking'|_}}</button>
+        <button type="button" class="button2" @click="$emit('action', {type:'delete', entity:entity})">{{'Delete Shipment'|_}}</button>
+        <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+    </div>
+</div>

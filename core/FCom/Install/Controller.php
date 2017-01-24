@@ -23,9 +23,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             break;
 
         case 'POST':
-            $sData =& $this->BSession->dataToUpdate();
+            $sessW = $this->BSession->get('w');
             $w = $this->BRequest->post('w');
-            $sData['w'] = !empty($sData['w']) ? $this->BUtil->arrayMerge($sData['w'], $w) : $w;
+            $this->BSession->set('w', $sessW ? $this->BUtil->arrayMerge($sessW, $w) : $w);
             break;
         }
 
@@ -99,16 +99,16 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function action_step1()
     {
         $this->BLayout->applyLayout('/step1');
-        $sData =& $this->BSession->dataToUpdate();
-        if (empty($sData['w']['db'])) {
-            $sData['w']['db'] = [
+
+        if (!$this->BSession->get('w/db')) {
+            $this->BSession->set('w/db', [
                 'host'         => '127.0.0.1',
                 'port'         => '3306',
                 'dbname'       => 'sellvana',
                 'username'     => 'root',
                 'password'     => '',
                 'table_prefix' => ''
-            ];
+            ]);
         }
     }
 
@@ -136,8 +136,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             $this->BConfig->add(['db' => $w['db']], true);
             $this->BDb->connect(null, true);
             $this->BConfig->writeConfigFiles('db');
-            $sData =& $this->BSession->dataToUpdate();
-            unset($sData['w']['db']['password']);
+            $this->BSession->set('w/db/password', null);
             $this->BResponse->redirect('install/step2');
         } catch (Exception $e) {
             //print_r($e);
@@ -159,9 +158,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             $this->BMigrate->migrateModules(['FCom_Core', 'FCom_Admin'], true);
         }
         $this->BLayout->applyLayout('/step2');
-        $sData =& $this->BSession->dataToUpdate();
-        if (empty($sData['w']['admin'])) {
-            $sData['w']['admin'] = ['username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => ''];
+        if (!$this->BSession->get('w/admin')) {
+            $this->BSession->set('w/admin', ['username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => '']);
         }
     }
 

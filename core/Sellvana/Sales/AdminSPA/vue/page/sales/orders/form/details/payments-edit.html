@@ -1,0 +1,190 @@
+<div class="details-additional-block">
+	<div class="block-title">
+		<p>{{'Existing Payment:'|_}}</p>
+		<span>
+            <strong>{{paymentMethod.text}}</strong>
+            {{(entity.amount_captured + entity.amount_due)|currency}}
+            ({{entity.state_overall}})
+            {{entity.create_at|date}}
+        </span>
+	</div>
+
+	<div class="scrollable-area">
+		<table class="secondary-table">
+			<thead>
+				<tr>
+					<th>{{'Method'|_}}</th>
+					<th>{{'Status'|_}}</th>
+					<th>{{'Balace Due'|_}}</th>
+					<th>{{'Captured'|_}}</th>
+					<th>{{'Refunded'|_}}</th>
+					<th>{{'Total'|_}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{paymentMethod.text}}</td>
+					<td>{{'Overall:'|_}} <span>{{entity.state_overall}}</span></td>
+					<td>{{entity.amount_due|currency}}</td>
+					<td>{{entity.amount_captured|currency}}</td>
+					<td>{{entity.amount_refunded|currency}}</td>
+					<td>{{totalAmount|currency}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="block-title">
+		<p>{{'Items paid by this payment:'|_}}</p>
+	</div>
+	<div class="scrollable-area">
+		<table class="secondary-table combined-table">
+			<thead>
+				<tr>
+					<th>{{'Thumbnail'|_}}</th>
+					<th>{{'Product Info'|_}}</th>
+					<th>{{'Amounts'|_}}</th>
+					<th>{{'Paid'|_}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="item in entity.items" v-if="item.order_item_id">
+					<td>
+						<img :src="orderItem(item).thumb_url" :alt="orderItem(item).product_name">
+					</td>
+					<td>
+						<table class="combined-columns">
+							<tbody>
+								<tr>
+									<th>{{'Name:'|_}}</th>
+									<td>{{orderItem(item).product_name}}</td>
+								</tr>
+								<tr>
+									<th>{{'Qty:'|_}}</th>
+									<td>{{orderItem(item).qty_ordered}}</td>
+								</tr>
+								<tr>
+									<th>{{'P.SKU:'|_}}</th>
+									<td>{{orderItem(item).product_sku}}</td>
+								</tr>
+								<tr>
+									<th>{{'I.SKU:'|_}}</th>
+									<td>{{orderItem(item).inventory_sku}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+					<td>
+						<table class="combined-columns">
+							<tbody>
+								<tr>
+									<th>{{'Total:'|_}}</th>
+									<td>{{orderItem(item).row_total|currency}}</td>
+								</tr>
+								<tr>
+									<th>{{'Total Paid:'|_}}</th>
+									<td>{{orderItem(item).amount_paid|currency}}</td>
+								</tr>
+								<tr>
+									<th>{{'In Payments:'|_}}</th>
+									<td>{{orderItem(item).amount_in_payments|currency}}</td>
+								</tr>
+								<tr>
+									<th>{{'Amount Due:'|_}}</th>
+									<td>{{orderItem(item).amount_due|currency}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+					<td>
+						<table class="combined-columns">
+							<tbody>
+								<tr>
+									<th>{{'Paid by this payment:'|_}}</th>
+									<td>{{item.amount|currency}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div v-if="entity.transactions.length">
+		<div class="block-title">
+			<p>{{'Transactions in this payment:'|_}}</p>
+			<label><input type="checkbox" v-model="show_failed_transactions"><span><i aria-hidden="true" class="fa fa-check"></i></span><span>{{'Show failed transactions'|_}}</span></label>
+		</div>
+		<div class="scrollable-area">
+			<table class="secondary-table combined-table">
+				<thead>
+					<tr>
+						<th>{{ 'Timestamp'|_ }}</th>
+						<th>{{ 'Type'|_ }}</th>
+						<th>{{ 'Transaction ID'|_ }}</th>
+						<th>{{ 'Amount'|_ }}</th>
+						<th>{{ 'Actions'|_ }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="t in entity.transactions" v-if="t.transaction_status == 'completed' || t.transaction_status == 'void' || show_failed_transactions">
+						<td>
+							<strong>{{ t.create_at }}</strong>
+						</td>
+						<td>
+							<strong>{{ t.transaction_type }}</strong>
+							<div>
+								<a v-if="t.data_serialized.error" href="#" :title="t.data_serialized.error" @click.prevent>{{ transactionStatus(t) }}</a>
+								<span v-else>{{ transactionStatus(t)|_ }}</span>
+							</div>
+						</td>
+						<td>
+							<strong>{{ t.transaction_id }}</strong>
+							<div v-if="t.parent_transaction_id">{{'Parent:'|_}} {{t.parent_transaction_id}}</div>
+						</td>
+						<td>
+							<strong>{{ t.amount|currency }}</strong>
+							<div v-if="t.transaction_fee > 0">{{'Fee:'|_}} {{t.transaction_fee|currency}}</div>
+							<div v-if="t.amount_authorized > 0">{{'Authorized:'|_}} {{t.amount_authorized|currency}}</div>
+							<div v-if="t.amount_captured > 0">{{'Captured:'|_}} {{t.amount_captured|currency}}</div>
+							<div v-if="t.amount_refunded > 0">{{'Refunded:'|_}} {{t.amount_refunded|currency}}</div>
+						</td>
+						<td>
+							<div v-for="(actionData, action) in t.available_actions">
+								<button v-ladda="{on: action_in_progress === action + '-' + t.id}" :disabled="action_in_progress !== ''"
+										class="button button9" @click="doTransactionAction(t, action)">{{actionData.label|_}}</button>
+								<input v-if="actionData.partial" type="number" v-model="actionData.amount"
+									   class="form-control" @keyup.enter="doTransactionAction(t, action)" style="display:inline-block; width:80px">
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="control-buttons-block text-right">
+		<dropdown v-if="entity.is_manual_state_management_allowed && entity.state_overall_next_values" id="payment_change_overall_state" class="dropdown-buttons" :label="'Change Overall State'|_">
+			<ul class="dropdown-content">
+				<li v-for="(label, value) in entity.state_overall_next_values">
+					<a href="#" @click.prevent="changePaymentState('overall', value)">{{label|_}}</a>
+				</li>
+			</ul>
+		</dropdown>
+		<dropdown v-if="entity.state_custom_next_values" id="payment_change_custom_state" class="dropdown-buttons" :label="'Change Custom State'|_">
+			<ul class="dropdown-content">
+				<li v-for="(label, value) in entity.state_custom_next_values">
+					<a href="#" @click.prevent="changePaymentState('custom', value)">{{label|_}}</a>
+				</li>
+			</ul>
+		</dropdown>
+		<button v-if="entity.root_transaction_url && !entity.transactions.length" type="button" class="button9" @click="sendRootTransactionUrl()">{{'Send Root Transaction URL'|_}}</button>
+		<button type="button" class="button2" @click="$emit('action', {type:'delete', entity:entity})">{{'Delete Payment'|_}}</button>
+		<button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+	</div>
+
+	<div v-if="entity.root_transaction_url && !entity.transactions.length">
+		<a :href="entity.root_transaction_url" target="_blank">{{entity.root_transaction_url}}</a>
+	</div>
+</div>

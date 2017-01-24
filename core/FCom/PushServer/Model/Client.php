@@ -480,11 +480,12 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             $channel = $this->FCom_PushServer_Model_Channel->getChannel($channel, true, $isSessionClient);
         }
         if ($isSessionClient) {
-            $sessData =& $this->BSession->dataToUpdate();
-            if (!empty($sessData['pushserver']['subscribed'][$channel->channel_name])) {
+            $key = "pushserver/subscribed/{$channel->channel_name}";
+            $sessSubChannel = $this->BSession->get($key);
+            if ($sessSubChannel) {
                 return $this;
             } else {
-                $sessData['pushserver']['subscribed'][$channel->channel_name] = true;
+                $this->BSession->set($key, true);
             }
         }
         $hlp = $this->FCom_PushServer_Model_Subscriber;
@@ -514,9 +515,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $this->FCom_PushServer_Model_Subscriber->delete_many($data);
 
         if ($this->session_id === $this->BSession->sessionId()) {
-            $sessData =& $this->BSession->dataToUpdate();
-            unset($sessData['pushserver']['channels'][$channel->channel_name]);
-            unset($sessData['pushserver']['subscribed'][$channel->channel_name]);
+            $this->BSession->set("pushserver/channels/{$channel->channel_name}", null)
+                ->set("pushserver/subscribed/{$channel->channel_name}", null);
         }
         return $this;
     }

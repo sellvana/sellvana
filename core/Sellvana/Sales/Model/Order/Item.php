@@ -53,6 +53,25 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->_product;
     }
 
+    public function thumbUrl($w, $h = null, $full = false)
+    {
+        $product = $this->product();
+
+        if ($product) {
+            return $product->thumbUrl($w, $h, $full);
+        }
+
+        $default = $this->BConfig->get('modules/Sellvana_Catalog/default_image');
+        if ($default) {
+            if ($default[0] === '@') {
+                $default = $this->BApp->src($default, 'baseSrc', false);
+            }
+        } else {
+            $default = $this->BConfig->get('web/media_dir') . '/image-not-found.jpg';
+        }
+        return $this->FCom_Core_Main->resizeUrl($default, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
     /**
      * @param $orderId
      * @param $product_id
@@ -117,7 +136,7 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
      *
      * @return float
      */
-    public function getRefundableAmount()
+    public function getAmountRefundable()
     {
         return $this->get('amount_paid') - $this->get('amount_refunded');
     }
@@ -132,9 +151,28 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_in_payments');
     }
 
-    public function getBalanceAmount()
+    public function getAmountDue()
     {
         return $this->get('row_total') - $this->get('row_discount') - $this->get('amount_paid');
+    }
+
+    public function populateCalculatedValues()
+    {
+        $this->set([
+            'is_shippable' => $this->isShippable(),
+            'is_virtual' => $this->isVirtual(),
+            'calc_price' => $this->getCalcPrice(),
+            'qty_can_pay' => $this->getQtyCanPay(),
+            'qty_can_backorder' => $this->getQtyCanBackorder(),
+            'qty_can_ship' => $this->getQtyCanShip(),
+            'qty_can_cancel' => $this->getQtyCanCancel(),
+            'qty_can_return' => $this->getQtyCanReturn(),
+            'amount_can_refund' => $this->getAmountCanRefund(),
+            'amount_refundable' => $this->getAmountRefundable(),
+            'amount_can_pay' => $this->getAmountCanPay(),
+            'amount_due' => $this->getAmountDue(),
+        ]);
+        return $this;
     }
 
     /**
@@ -143,9 +181,9 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     public function markAsPaid($amount = null)
     {
         if ($amount === null) {
-            $amount = $this->getBalanceAmount();
+            $amount = $this->getAmountDue();
         } else {
-            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getBalanceAmount());
+            $amount = min((float)$this->get('amount_in_payments') + $amount, $this->getAmountDue());
         }
 
         $this->set('amount_in_payments', $amount);

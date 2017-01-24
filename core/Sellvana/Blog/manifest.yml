@@ -34,3 +34,6 @@ modules:
                         /blog/post/form:
                             POST/model/preview: "*"
                             POST/model/content: "*"
+
+            FCom_AdminSPA:
+                auto_use: [ layout ]

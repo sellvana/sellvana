@@ -1,0 +1,28 @@
+
+<div class="admin-main-content details-information">
+    <div class="block-title">
+        <p>{{'Refunds'|_}}</p>
+        <button type="button" class="button button4" @click="$emit('add', 'refund')">{{'Add'|_}}</button>
+    </div>
+    <div>
+        <table v-if="form.refunds.length">
+            <thead>
+            <tr>
+                <th>{{'Timeline'|_}}</th>
+                <th>{{'Total Amount'|_}}</th>
+                <th>{{'Method'|_}}</th>
+                <th>{{'Status'|_}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="r in form.refunds" @click="$emit('edit', 'refund', r)" :class="{active:entity===r}">
+                <td>{{r.create_at|date}}</td>
+                <td>{{r.amount|currency(form.order.store_currency_code)}}</td>
+                <td>{{r.method_desc}}</td>
+                <td :class="'status-' + r.state_overall">{{form.options.refund_state_overall[r.state_overall]}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <div v-else>{{'No refunds in this order'|_}}</div>
+    </div>
+</div>

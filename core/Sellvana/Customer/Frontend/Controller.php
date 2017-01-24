@@ -136,8 +136,7 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
     {
         $token = $this->BRequest->request('token');
         if ($token) {
-            $sessData =& $this->BSession->dataToUpdate();
-            $sessData['password_reset_token'] = $token;
+            $this->BSession->set('password_reset_token', $token);
             $this->BResponse->redirect('customer/password/reset');
             return;
         }
@@ -174,8 +173,7 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $this->BResponse->redirect($returnUrl);
             return;
         }
-        $sessData =& $this->BSession->dataToUpdate();
-        $sessData['password_reset_token'] = null;
+        $this->BSession->set('password_reset_token', null);
 
         $user->resetPassword($password);
 

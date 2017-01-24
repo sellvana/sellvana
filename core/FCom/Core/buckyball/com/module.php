@@ -1178,7 +1178,7 @@ if (!isset($o[0]) || !isset($o[1])) {
             } else {
                 $scheme .= ':';
             }
-            $src = $scheme . '//' . $r->httpHost() . $src;
+            $src = $scheme . '//' . $r->httpHost() . $src; // scheme? because of require.js "feature" to add .js
         }
         return $src;
     }

@@ -1,0 +1,90 @@
+/:
+    - view: head
+        do:
+            - [ requireJs, sv-page-catalog-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/index" ]
+            - [ requireJs, sv-page-catalog-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/index.html" ]
+            - [ requireJs, sv-page-catalog-products-grid-config, "~/products/grid_config" ]
+
+            - [ requireJs, sv-page-catalog-products-form, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form" ]
+            - [ requireJs, sv-page-catalog-products-form-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form.html" ]
+
+			- [ requireJs, sv-page-catalog-products-form-main, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/main" ]
+			- [ requireJs, sv-page-catalog-products-form-main-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/main.html" ]
+			- [ requireJs, sv-page-catalog-products-form-inventory, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/inventory" ]
+			- [ requireJs, sv-page-catalog-products-form-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/inventory.html" ]
+			- [ requireJs, sv-page-catalog-products-form-prices, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices" ]
+			- [ requireJs, sv-page-catalog-products-form-prices-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices.html" ]
+			- [ requireJs, sv-page-catalog-products-form-merchandizing, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing" ]
+			- [ requireJs, sv-page-catalog-products-form-merchandizing-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing.html" ]
+			- [ requireJs, sv-page-catalog-products-form-images, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/images" ]
+			- [ requireJs, sv-page-catalog-products-form-images-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/images.html" ]
+			- [ requireJs, sv-page-catalog-products-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/layout" ]
+			- [ requireJs, sv-page-catalog-products-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/layout.html" ]
+			- [ requireJs, sv-page-catalog-products-form-videos, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/videos" ]
+			- [ requireJs, sv-page-catalog-products-form-videos-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/videos.html" ]
+			- [ requireJs, sv-page-catalog-products-form-custom_views, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/custom_views" ]
+			- [ requireJs, sv-page-catalog-products-form-custom_views-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/custom_views.html" ]
+
+            - [ requireJs, sv-page-catalog-categories, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/index" ]
+            - [ requireJs, sv-page-catalog-categories-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/index.html" ]
+
+			- [ requireJs, sv-page-catalog-categories-form-main, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/main" ]
+			- [ requireJs, sv-page-catalog-categories-form-main-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/main.html" ]
+			- [ requireJs, sv-page-catalog-categories-form-content, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/content" ]
+			- [ requireJs, sv-page-catalog-categories-form-content-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/content.html" ]
+			- [ requireJs, sv-page-catalog-categories-form-images, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/images" ]
+			- [ requireJs, sv-page-catalog-categories-form-images-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/images.html" ]
+			- [ requireJs, sv-page-catalog-categories-form-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/products" ]
+			- [ requireJs, sv-page-catalog-categories-form-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/products.html" ]
+			- [ requireJs, sv-page-catalog-categories-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout" ]
+			- [ requireJs, sv-page-catalog-categories-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout.html" ]
+			
+			
+
+    - view: app
+        do:
+            - [ addNav, { path: /catalog, label: Catalog, icon_class: "fa fa-book", pos: 30 } ]
+            - [ addNav, { path: /catalog/categories, label: Navigation, link: /catalog/categories, pos: 10 } ]
+            - [ addNav, { path: /catalog/products, label: Products, link: /catalog/products, pos: 20 } ]
+            - [ addNav, { path: /catalog/inventory, label: Inventory, link: /catalog/inventory, pos: 30 } ]
+            - [ addNav, { path: /catalog/quick-add-products, label: Quick Add Products, link: /catalog/quick-add-products, pos: 40 } ]
+            - [ addNav, { path: /catalog/products-import, label: Products CSV Import, link: /catalog/product-import, pos: 50 } ]
+            - [ addNav, { path: /catalog/search-alias, label: Search Terms, link: /catalog/search-alias, pos: 60 } ]
+
+            - [ addNav, { path: /reports/catalog, label: Products and Inventory, pos: 30 } ]
+            - [ addNav, { path: /reports/catalog/search-terms, label: Search Terms, link: /catalog/reports/search-terms, pos: 10 } ]
+            - [ addNav, { path: /reports/catalog/wishlist-products, label: Products on Wishlists, link: /catalog/reports/wishlist-products, pos: 20 } ]
+            - [ addNav, { path: /reports/catalog/product-orders-history, label: Product Orders History, link: /catalog/reports/product-orders-history, pos: 30 } ]
+            - [ addNav, { path: /reports/catalog/low-inventory, label: Low Inventory Report, link: /catalog/reports/low-inventory, pos: 40 } ]
+
+            - [ addNav, { path: /reports/data-integrity, label: Data Integrity, pos: 40 } ]
+            - [ addNav, { path: /reports/data-integrity/products-no-images, label: Products with no Images, link: /catalog/reports/products-no-images, pos: 10 } ]
+            - [ addNav, { path: /reports/data-integrity/products-no-category, label: Products without a Category, link: /catalog/reports/products-no-category, pos: 20 } ]
+            - [ addNav, { path: /reports/data-integrity/categories-no-products, label: Categories without Products, link: /catalog/reports/categories-no-products, pos: 30 } ]
+
+            - [ addRoute, { path: /catalog/products, require: [ sv-page-catalog-products, text!sv-page-default-grid-tpl, json!sv-page-catalog-products-grid-config ] } ]
+            - [ addRoute, { path: /catalog/products/form, require: [ sv-page-catalog-products-form, text!sv-page-catalog-products-form-tpl ] } ]
+            - [ addRoute, { path: /catalog/categories, require: [ sv-page-catalog-categories, text!sv-page-catalog-categories-tpl ] } ]
+
+
+/catalog/products/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: prices, label: Prices, pos: 20 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: inventory, label: Inventory & Shipping, pos: 30 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: merchandizing, label: Merchandizing, pos: 40 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: images, label: Images, pos: 50 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: videos, label: Videos, pos: 60 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 70 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: custom_views, label: Custom Views, pos: 80 } ]
+
+
+/catalog/categories/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /catalog/categories/form, name: main, label: Category Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/categories/form, name: content, label: Page Content, pos: 20 } ]
+            - [ addFormTab, { path: /catalog/categories/form, name: images, label: Images, pos: 30 } ]
+            - [ addFormTab, { path: /catalog/categories/form, name: products, label: Products, pos: 40 } ]
+            - [ addFormTab, { path: /catalog/categories/form, name: layout, label: Layout, pos: 50 } ]

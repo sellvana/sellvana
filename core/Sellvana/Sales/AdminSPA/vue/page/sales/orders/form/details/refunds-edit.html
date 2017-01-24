@@ -1,0 +1,82 @@
+<div class="details-additional-block">
+    <div class="block-title">
+        <p>{{'Existing Refund:'|_}}</p>
+        <span>
+            <strong>{{entity.payment_method}}</strong>
+            {{(entity.amount_captured + entity.amount_due)|currency}}
+            ({{entity.state_overall}})
+            {{entity.create_at|date}}
+        </span>
+        <!--<select2>-->
+        <!--<option>Shipped</option>-->
+        <!--<option>Plain</option>-->
+        <!--<option>Refunded</option>-->
+        <!--</select2>-->
+        <!--<label>-->
+        <!--<input type="checkbox">-->
+        <!--<span><i aria-hidden="true" class="fa fa-check"></i></span><span>Delete</span></label>-->
+    </div>
+    <div class="scrollable-area">
+        <table class="secondary-table">
+            <thead>
+            <tr>
+                <td>Method</td>
+                <td>Status</td>
+                <td>Amount Refunded</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{entity.payment_method}}</td>
+                <td>{{'Overall:'|_}} <span>{{entity.state_overall}}</span></td>
+                <td>{{entity.amount|currency}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="scrollable-area">
+        <table class="secondary-table combined-table">
+            <thead>
+            <tr>
+                <td>{{'Thumbnail'|_}}</td>
+                <td>{{'Product Info'|_}}</td>
+                <td>{{'Amounts'|_}}</td>
+                <td>{{'Refunded'|_}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in entity.items" v-if="item.order_item_id">
+                <td>
+                    <img :src="orderItem(item).thumb_url" :alt="orderItem(item).product_name">
+                </td>
+                <td>
+                    <table class="combined-columns"><tbody>
+                    <tr><th>{{'Name:'|_}}</th><td>{{orderItem(item).product_name}}</td></tr>
+                    <tr><th>{{'Qty:'|_}}</th><td>{{orderItem(item).qty_ordered}}</td></tr>
+                    <tr><th>{{'P.SKU:'|_}}</th><td>{{orderItem(item).product_sku}}</td></tr>
+                    <tr><th>{{'I.SKU:'|_}}</th><td>{{orderItem(item).inventory_sku}}</td></tr>
+                    </tbody></table>
+                </td>
+                <td>
+                    <table class="combined-columns"><tbody>
+                    <tr><th>{{'Total:'|_}}</th><td>{{orderItem(item).row_total|currency}}</td></tr>
+                    <tr><th>{{'Total Paid:'|_}}</th><td>{{orderItem(item).amount_paid|currency}}</td></tr>
+                    <tr><th>{{'In Payments:'|_}}</th><td>{{orderItem(item).amount_in_payments|currency}}</td></tr>
+                    <tr><th>{{'Amount Due:'|_}}</th><td>{{orderItem(item).amount_due|currency}}</td></tr>
+                    </tbody></table>
+                </td>
+                <td>
+                    <table class="combined-columns"><tbody>
+                    <tr><th>{{'Paid by this payment:'|_}}</th><td>{{item.amount|currency}}</td></tr>
+                    </tbody></table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="control-buttons-block text-right">
+        <button type="button" class="button2" @click="$emit('action', {type:'delete', entity:entity})">{{'Delete Refund'|_}}</button>
+        <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+    </div>
+    <jsontree :json="entity"></jsontree>
+</div>

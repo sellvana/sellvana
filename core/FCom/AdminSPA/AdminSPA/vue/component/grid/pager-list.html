@@ -1,0 +1,14 @@
+<div class="pagination-block">
+    <ul class="pagination pagination-sm pagination-griddle pagesize">
+        <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}"><a href="#" @click.prevent="setPagesize(ps)" class="js-change-url page-size">{{ps}}</a></li>
+    </ul>
+
+    <ul class="pagination pagination-sm pagination-griddle page">
+        <li class="prev"><a href="#" @click.prevent="goPrevPage()">{{'Previous'|_}}</a></li>
+        <li class="page active">
+            <input type="number" min=1 step="1" v-model="curPage" @change="goPage()"/>
+        </li>
+        <li><span>{{'of'|_}}</span><span>{{numPages}}</span></li>
+        <li class="next"><a href="#" @click.prevent="goNextPage()">{{'Next'|_}}</a></li>
+    </ul>
+</div>

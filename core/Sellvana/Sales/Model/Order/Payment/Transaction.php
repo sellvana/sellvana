@@ -46,28 +46,27 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
 
     protected $_payment;
 
-    static protected $_actions = [
+    static protected $_availableActions = [
         self::ORDER => [
-            self::AUTHORIZATION,
+            self::AUTHORIZATION => true,
         ],
         self::AUTHORIZATION => [
-            self::REAUTHORIZATION,
-            self::CAPTURE,
-            self::VOID,
+            self::REAUTHORIZATION => false,
+            self::CAPTURE => true,
+            self::VOID => false,
         ],
         self::REAUTHORIZATION => [
-            self::REAUTHORIZATION,
-            self::CAPTURE,
-            self::VOID,
+            self::REAUTHORIZATION => false,
+            self::CAPTURE => true,
+            self::VOID => false,
         ],
         self::CAPTURE => [
-            self::REFUND
+            self::REFUND => true,
         ],
         self::SALE => [
-            self::REFUND
+            self::REFUND => true,
         ],
     ];
-
 
     /**
      * @return Sellvana_Sales_Model_Order_Payment
@@ -121,13 +120,17 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         return $this;
     }
 
-    public function complete()
+    public function complete($parent = null)
     {
         $payment = $this->payment();
         $order = $payment->order();
         $amount = $this->get('amount');
         switch ($this->get('transaction_type')) {
             case self::SALE:
+                if ($parent) {
+                    $parent->add('amount_captured', $amount);
+                }
+
                 $payment->add('amount_captured', $amount);
                 $payment->add('amount_due', -$amount);
                 $payment->state()->overall()->setPaid();
@@ -141,6 +144,10 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 break;
 
             case self::AUTHORIZATION:
+                if ($parent) {
+                    $parent->add('amount_authorized', $amount);
+                }
+
                 $payment->add('amount_authorized', $amount);
                 break;
 
@@ -148,11 +155,15 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 break;
 
             case self::CAPTURE:
+                if ($parent) {
+                    $parent->add('amount_captured', $amount);
+                }
+
                 $payment->add('amount_captured', $amount);
                 $payment->add('amount_authorized', -$amount);
 
                 $payment->add('amount_due', -$amount);
-                if ($payment->get('amount_due') == 0) {
+                if ($payment->get('amount_due') < .01) {
                     $payment->state()->overall()->setPaid();
                 } else {
                     $payment->state()->overall()->setPartialPaid();
@@ -160,7 +171,7 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
 
                 $order->add('amount_paid', $amount);
                 $order->add('amount_due', -$amount);
-                if ($order->get('amount_due') == 0) {
+                if ($order->get('amount_due') < .01) {
                     $order->state()->payment()->setPaid();
                 } else {
                     $order->state()->payment()->setPartialPaid();
@@ -172,15 +183,19 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 break;
 
             case self::REFUND:
+                if ($parent) {
+                    $parent->add('amount_refunded', $amount);
+                }
+
                 $payment->add('amount_refunded', $amount);
-                if ($payment->get('amount_refunded') == $payment->get('amount_captured')) {
+                if (abs($payment->get('amount_refunded') - $payment->get('amount_captured')) < .01) {
                     $payment->state()->overall()->setRefunded();
                 } else {
                     $payment->state()->overall()->setPartialRefunded();
                 }
 
                 $order->add('amount_refunded', $amount);
-                if ($order->get('amount_refunded') == $order->get('amount_paid')) {
+                if (abs($order->get('amount_refunded') - $order->get('amount_paid')) < .01) {
                     $order->state()->payment()->setRefunded();
                 } else {
                     $order->state()->payment()->setPartialRefunded();
@@ -188,6 +203,9 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
                 break;
         }
         $this->set('transaction_status', self::COMPLETED)->save();
+        if ($parent) {
+            $parent->save();
+        }
         $payment->save();
         $order->save();
         return $this;
@@ -208,70 +226,49 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
         return $this;
     }
 
-    /**
-     * Get maximum amount available for transaction type
-     *
-     * @param string $type
-     * @return mixed
-     */
-    protected function _getMaxAvailableAmountForAction($type)
-    {
-        $payment = $this->payment();
-
-        if (!in_array($type, [self::AUTHORIZATION, self::CAPTURE, self::REFUND])) {
-            return null;
-        }
-
-        if (!$payment->getMethodObject()->can($type . '_partial')) {
-            return null;
-        }
-
-        $transactions = $payment->findTransaction(
-            [$type], 'completed', null, true, $this->get('transaction_id')
-        );
-
-
-        $amount = $this->get('amount');
-        foreach ($transactions as $transaction) {
-            if ($transaction->id() == $this->id()) {
-                continue;
-            }
-
-            $amount -= $transaction->get('amount');
-        }
-
-        return $amount;
-    }
 
     public function getAvailableActions()
     {
-        $currentType = $this->get('transaction_type');
-        $newTypes = [];
-        if (array_key_exists($currentType, self::$_actions)) {
-            $newTypes = self::$_actions[$currentType];
+        if ($this->get('transaction_status') !== self::COMPLETED) {
+            return [];
+        }
+
+        $transType = $this->get('transaction_type');
+        $payment = $this->payment();
+        $types = [];
+        if (array_key_exists($transType, self::$_availableActions)) {
+            $types = self::$_availableActions[$transType];
         }
 
         $result = [];
-        foreach ($newTypes as $type) {
-            $typeLabels = self::$_fieldOptions['transaction_type'];
-            if (!array_key_exists($type, $typeLabels)) {
+        foreach ($types as $type => $partial) {
+            $typeLabels = $this->fieldOptions('transaction_type');
+            if (empty($typeLabels[$type])) {
                 continue;
             }
+            $paymentMethod = $payment->getMethodObject();
 
-            $types = [$type];
-            if (in_array($type, [self::REAUTHORIZATION, self::VOID])) {
-                $types = [self::CAPTURE];
-            }
-            $transactions = $this->payment()->findTransaction($types, 'completed', null, true, $this->get('transaction_id'));
-            $amount = $this->get('amount');
-            foreach ($transactions as $transaction) {
-                $amount -= $transaction->get('amount');
-            }
+            $partial = $partial && $paymentMethod && !empty($paymentMethod->can($type . '_partial'));
 
-            if (count($transactions) == 0 || $amount > 0) {
+            $curHlp     = $this->BCurrencyValue;
+            $maxAmount = $curHlp->create($this->get('amount'));
+            if ($partial) {
+                $map = [
+                    self::AUTHORIZATION => 'amount_authorized',
+                    self::CAPTURE => 'amount_captured',
+                    self::REFUND => 'amount_refunded',
+                ];
+                if (!empty($map[$type])) {
+                    $maxAmount->subtract($curHlp->create($this->get($map[$type])));
+                }
+            }
+            $maxAmount = $maxAmount->getAmount(true);
+
+            if (!$partial || $maxAmount > 0) {
                 $result[$type] = [
                     'label' => $typeLabels[$type],
-                    'maxAmount' => $this->_getMaxAvailableAmountForAction($type),
+                    'max_amount' => $maxAmount,
+                    'partial' => $partial,
                 ];
             }
         }

@@ -1,0 +1,53 @@
+.tree-block {
+	.control-buttons-block {
+		button {
+			padding: 6px;
+			vertical-align: middle;
+		}
+	}
+}
+.tree-node {
+	cursor: pointer;
+	&.open {
+		font-weight: bold;
+	}
+	.node-line {
+		.node-name {
+			display: inline-block;
+			width: 79%;
+			vertical-align: top;
+		}
+	}
+	.node-label {
+		padding: 6px 0;
+		display: inline-block;
+	}
+	& > ul {
+		padding-left: 1em;
+		line-height: 1.5em;
+		list-style-type: dot;
+	}
+	& > .node-line {
+		.add-child {
+			display: none;
+		}
+		&:hover .add-child {
+			display: inline-block;
+			width: 16px;
+		}
+		&.active .node-label {
+			font-weight: bold;
+			color: #000;
+		}
+	}
+	& * {
+		color: #595959;
+	}
+}
+
+.leaf-icon,
+.folder-icon {
+	display: inline-block;
+	width: 16px;
+	padding: 6px 4px 6px 0;
+}

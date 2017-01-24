@@ -1,0 +1,69 @@
+.f-grid-wrapper {
+	.status-processing, .status-placed, .status-shipped {
+		padding: 9px 8px;
+		width: 100px;
+		text-align: center;
+		display: inline-block;
+	}
+}
+
+.status-processing {
+	background: #fff; 
+	color: #00ceb4;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-placed {
+	background: #fff;
+	color: #f39b12;
+	font-weight: bold;
+	text-transform: capitalize;
+} 
+.status-shipped {
+	background: #fff;
+	color: #2fbdf2;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-canceled {
+	background: #fff;
+	color: #dd4b39;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-pending {
+	background: #fff;
+	color: #f39c12;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-unpaid {
+	background: #fff;
+	color: #00c0ef;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-paid {
+	background: #fff;
+	color: #dd4b39;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-re-stocked {
+	background: #fff;
+	color: #00ceb4;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-complete {
+	background: #fff;
+	color: #00ceb4;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.status-refunded {
+	background: #fff;
+	color: #1289f3;
+	font-weight: bold;
+	text-transform: capitalize;
+}

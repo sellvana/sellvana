@@ -12,8 +12,13 @@ modules:
                     - [ /customer-groups, Sellvana_CustomerGroups_Admin_Controller_CustomerGroups.index ]
                     - [ /customer-groups/.action, Sellvana_CustomerGroups_Admin_Controller_CustomerGroups ]
                     - [ /tier-prices/.action, Sellvana_CustomerGroups_Admin_Controller_TierPrices ]
+
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 auto_use: [ views, layout ]
+
         observe:
             - [ "Sellvana_Customer_Model_Customer::onBeforeSave", "Sellvana_CustomerGroups_Main::onCustomerBeforeSave" ]
 #            - [ "Sellvana_Catalog_Model_Product::onAfterSave", "Sellvana_CustomerGroups_Admin::onProductAfterSave" ]

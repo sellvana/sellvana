@@ -1,0 +1,7 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /seo, label: SEO, icon_class: "fa fa-window-maximize", pos: 60 } ]
+            - [ addNav, { path: /seo/url-alias, label: URL Aliases, link: /seo/url-alias, pos: 10 } ]
+
+

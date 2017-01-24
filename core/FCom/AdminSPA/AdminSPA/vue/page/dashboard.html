@@ -1,0 +1,123 @@
+<div>
+	<div class="row">
+		<div class="col-md-12 col-lg-7">
+			<div class="main-info-block">
+				<div class="total-sales">
+					<div class="icon"> <i class="fa fa-bar-chart" aria-hidden="true"></i></div>
+					<div class="data"> <span>232</span>
+						<p>{{'sales'|_}}</p>
+					</div>
+				</div>
+				<div class="total-users">
+					<div class="icon"> <i class="fa fa-user" aria-hidden="true"></i></div>
+					<div class="data"> <span>1,353</span>
+						<p>{{'total users'|_}}</p>
+					</div>
+				</div>
+				<div class="total-members">
+					<div class="icon"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+					<div class="data"> <span>+24%</span>
+						<p>{{'new members'|_}}</p>
+					</div>
+				</div>
+				<div class="total-revenue">
+					<div class="icon"><i class="fa fa-money" aria-hidden="true"></i></div>
+					<div class="data"> <span>$15,000</span>
+						<p>{{'revenue'|_}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12 col-lg-5">
+			<div class="control-buttons-block text-right"> 
+				<div class="row">
+					<div class="col-xs-6">
+						<select2 :params="{placeholder:'Date Range...'}">
+							<option>Today</option>
+							<option>Yeasterday</option>
+							<option>Last 7 Days</option>
+							<option>Last 30 Days</option>
+							<option>This Month</option>
+							<option>Last Month</option>
+							<option>Custom</option>
+						</select2>
+					</div>
+					<div class="col-xs-6">
+						<select2 :params="{placeholder:'Add a widget...'}">
+							<option>Latest Product Reviews</option>
+							<option>Latest Newsletter Subscriptions</option>
+							<option>Late Orders</option>
+							<option>Products With No Image</option>
+							<option>Order Totals</option>
+							<option>Latest Nes Products</option>
+						</select2>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" v-sortable="{handle: '.dashboard-title', onUpdate: sortingUpdate}">
+		<div class="col-md-5">
+			<div class="admin-main-content">
+				<div class="dashboard-title">
+					<p>{{'mountly recap report'|_}}</p>
+					<a href="#" class="roll-up"> <i class="fa fa-window-minimize"></i> </a>
+					<a href="#" class="delete"> <i class="fa fa-times"></i> </a>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="admin-main-content">
+				<div class="dashboard-title">
+					<p>{{'latest product reviews'|_}}</p>
+					<a href="#" class="roll-up"> <i class="fa fa-window-minimize"></i> </a>
+					<a href="#" class="delete"> <i class="fa fa-times"></i> </a>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="admin-main-content">
+				<div class="dashboard-title">   
+					<p>{{'latests newsletter subscription'|_}}</p>
+					<a href="#" class="roll-up"> <i class="fa fa-window-minimize"></i> </a>
+					<a href="#" class="delete"> <i class="fa fa-times"></i> </a>
+				</div>
+				<div class="dashboard-content">
+					<table>
+						<thead>
+							<tr>
+								<td>{{'Email'|_}}</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>matros_ny@yahoo.com </td>
+							</tr>
+							<tr>
+								<td>bohdan@mail.ua</td>
+							</tr>
+							<tr>
+								<td>nv@mail.ru </td>
+							</tr>
+							<tr>
+								<td>serhiy.osadchuk@gmail.com </td>
+							</tr>
+							<tr>
+								<td>bohdan@mffail.ua</td>
+							</tr>
+							<tr>
+								<td>so@doitua.com </td>
+							</tr>
+							<tr>
+								<td>a@mail.ru </td>
+							</tr>
+							<tr>
+								<td>nv@doitua.com</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

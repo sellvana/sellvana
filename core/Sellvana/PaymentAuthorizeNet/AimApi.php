@@ -68,7 +68,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
         $api = $this->getApi();
         $payment = $transaction->payment();
         $trId = $transaction->get('parent_transaction_id');
-        $parentTransactions = $payment->findTransaction('capture', 'completed', null, true);
+        $parentTransactions = $payment->findTransactions('capture', 'completed', null, true);
         $parentTransaction = null;
         foreach ($parentTransactions as $trans) {
             if ($trans->get('transaction_id') == $trId) {

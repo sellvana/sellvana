@@ -1,0 +1,211 @@
+/:
+    - { root: root }
+    - { hook: head, views: head }
+    - { hook: before_body_end, views: bottom_scripts }
+
+    - view: head
+        do:
+			- [ meta, Content-Type, "text/html; charset=UTF-8"]
+			- [ meta, viewport, "width=device-width, initial-scale=1"]
+
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/bootstrap.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/jquery-ui.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/select2.min.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/daterangepicker.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/codemirror.css" ]
+            - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
+
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.css" ]
+            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.js" ]
+
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda-themeless.css" ]
+            #- [ css, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda.min.css" ]
+
+            #- [ requireJs, bootstrap, "@FCom_AdminSPA/AdminSPA/js/lib/bootstrap", { deps: [ jquery ] } ]
+#            - [ requireJs, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-ui.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jquery.powerful-placeholder.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/daterangepicker.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jQuery.fixedTable.js" ]
+#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
+
+            #- [ js, "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" ]
+            #- [ js, "https://unpkg.com/requirejs/require.js" ]
+            #- [ requireJs, text, "@FCom_Core/js/lib/plugins/text" ]
+            #- [ requireJs, text, "https://unpkg.com/requirejs-text/text" ]
+            #- [ requireJs, babel, "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.19.0/babel.min" ]
+            #- [ requireJs, jquery, "https://unpkg.com/jquery/dist/jquery.min" ]
+
+            #- [ requireJs, vue, "https://unpkg.com/vue/dist/vue" ]
+            #- [ js, "https://unpkg.com/vue/dist/vue.min.js" ]
+            #- [ requireJs, vuex, "https://unpkg.com/vuex/dist/vuex" ]
+            #- [ requireJs, vue-router, "https://unpkg.com/vue-router/dist/vue-router" ]
+            #- [ requireJs, axios, "https://unpkg.com/axios/dist/axios" ]
+            #- [ requireJs, vue-axios, "https://unpkg.com/vue-axios/dist/vue-axios.min" ]
+            #- [ requireJs, vue-i18n, "https://unpkg.com/vue-i18n/dist/vue-i18n" ]
+            #- [ requireJs, vue-strap, "https://unpkg.com/vue-strap/dist/vue-strap" ]
+            #- [ requireJs, bootstrap-vue, "https://unpkg.com/bootstrap-vue/dist/bootstrapVue" ]
+
+            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/require-2.3.2.min.js" ]
+
+            - [ requireJs, text, "@FCom_AdminSPA/AdminSPA/js/lib/text-2.0.12" ]
+            - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
+            - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]
+            - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
+            - [ requireJs, spin, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/spin" ]
+            - [ requireJs, ladda, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda" ]
+
+            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8" ]
+            - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
+            - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]
+            #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-beta.13.min" ]
+            - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
+            - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
+            #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
+            - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
+            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2-4.0.3.min", { deps: [ jquery ] } ]
+            - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
+            - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
+            - [ requireJs, sortable, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
+            - [ requireJs, ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/ckeditor/ckeditor" ]
+            - [ requireJs, vue-ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-ckeditor" ]
+            - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select2" ]
+
+            - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
+            - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
+            - [ requireRun, sv-app ]
+
+            - [ requireJs, sv-comp-messages, "@FCom_AdminSPA/AdminSPA/vue/component/messages" ]
+
+            - [ requireJs, sv-comp-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
+            - [ requireJs, sv-comp-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
+            - [ requireJs, sv-comp-header-breadcrumbs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/breadcrumbs.html" ]
+            - [ requireJs, sv-comp-header-search-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/search.html" ]
+            - [ requireJs, sv-comp-header-favorites-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/favorites.html" ]
+            - [ requireJs, sv-comp-header-account-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/account.html" ]
+            - [ requireJs, sv-comp-header-chat-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/chat.html" ]
+            - [ requireJs, sv-comp-header-local-notifications-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications.html" ]
+
+            - [ requireJs, sv-comp-nav, "@FCom_AdminSPA/AdminSPA/vue/component/nav" ]
+            - [ requireJs, sv-comp-nav-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/nav.html" ]
+
+            - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
+            - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
+            - [ requireJs, sv-comp-grid-pager-list-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-list.html" ]
+            - [ requireJs, sv-comp-grid-pager-select-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-select.html" ]
+            - [ requireJs, sv-comp-grid-panel-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel.html" ]
+            - [ requireJs, sv-comp-grid-panel-columns-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-columns.html" ]
+            - [ requireJs, sv-comp-grid-panel-filters-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-filters.html" ]
+            - [ requireJs, sv-comp-grid-panel-export-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-export.html" ]
+            - [ requireJs, sv-comp-grid-bulk-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/bulk-actions.html" ]
+
+            #- [ requireJs, sv-comp-grid-header-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header-row.html" ]
+            #- [ requireJs, sv-comp-grid-data-row-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data-row.html" ]
+
+            - [ requireJs, sv-comp-grid-header-row, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/row" ]
+            - [ requireJs, sv-comp-grid-header-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-default" ]
+            - [ requireJs, sv-comp-grid-header-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-row-select" ]
+            - [ requireJs, sv-comp-grid-header-cell-row-select-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/header/cell-row-select.html" ]
+
+            - [ requireJs, sv-comp-grid-data-row, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/row" ]
+            - [ requireJs, sv-comp-grid-data-cell-default, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-default" ]
+            - [ requireJs, sv-comp-grid-data-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-row-select" ]
+            - [ requireJs, sv-comp-grid-data-cell-actions, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions" ]
+            - [ requireJs, sv-comp-grid-data-cell-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions.html" ]
+
+            - [ requireJs, sv-comp-tree, "@FCom_AdminSPA/AdminSPA/vue/component/tree" ]
+            - [ requireJs, sv-comp-tree-node-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/tree/node.html" ]
+			
+            - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
+            - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
+
+            - [ requireJs, sv-page-default-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/grid.html" ]
+            - [ requireJs, sv-page-default-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form.html" ]
+
+            - [ requireJs, sv-page-dashboard, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard" ]
+            - [ requireJs, sv-page-dashboard-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard.html" ]
+
+            - [ requireJs, sv-page-account-login, "@FCom_AdminSPA/AdminSPA/vue/page/account/login" ]
+            - [ requireJs, sv-page-account-login-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/login.html" ]
+			- [ requireJs, sv-page-account-password-recover, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-recover" ]
+			- [ requireJs, sv-page-account-password-recover-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-recover.html" ]
+			- [ requireJs, sv-page-account-password-reset, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-reset" ]
+			- [ requireJs, sv-page-account-password-reset-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-reset.html" ]
+            - [ requireJs, sv-page-account-profile, "@FCom_AdminSPA/AdminSPA/vue/page/account/profile" ]
+            - [ requireJs, sv-page-account-profile-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/profile.html" ]
+            - [ requireJs, sv-page-account-logout, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout" ]
+            - [ requireJs, sv-page-account-logout-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout.html" ]
+
+            - [ requireJs, sv-page-users, "@FCom_AdminSPA/AdminSPA/vue/page/users/index" ]
+            - [ requireJs, sv-page-users-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/index.html" ]
+            - [ requireJs, sv-page-users-grid-config, "~/users/grid_config" ]
+            - [ requireJs, sv-page-users-form, "@FCom_AdminSPA/AdminSPA/vue/page/users/form" ]
+            - [ requireJs, sv-page-users-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form.html" ]
+            - [ requireJs, sv-page-users-form-main, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main" ]
+            - [ requireJs, sv-page-users-form-main-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main.html" ]
+
+            - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]
+            - [ requireJs, sv-page-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main.html" ]
+            - [ requireJs, sv-page-settings-config, "~/settings/config" ]
+
+            - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
+            - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
+
+    - view: app
+        do:
+            - [ addModule, FCom_AdminSPA ]
+
+            - [ addNav, { label: Dashboard, path: /dashboard, link: /, icon_class: "fa fa-tachometer", pos: 10 }]
+
+            - [ addNav, { label: Reports, path: /reports, icon_class: "fa fa-filter", pos: 80 }]
+
+            - [ addNav, { label: Modules, path: /modules, icon_class: "fa fa-puzzle-piece", pos: 90 }]
+            - [ addNav, { label: Manage Modules, path: /modules/manage, link: /modules, pos: 10 }]
+
+            - [ addNav, { label: System, path: /system, icon_class: "fa fa-cog", pos: 100 }]
+            - [ addNav, { label: Users, path: /system/users, link: /users, pos: 10 }]
+            - [ addNav, { label: Roles & Permissions, path: /system/roles, link: /roles, pos: 20 }]
+            - [ addNav, { label: Global Import / Export, path: /system/import-export, link: /import-export, pos: 30 }]
+            - [ addNav, { label: Settings, path: /system/settings, link: /settings, pos: 100 }]
+            - [ addNav, { label: Media Library, path: /system/media-library, link: /media-library, pos: 110 }]
+
+            - [ addRoute, { path: /, require: [sv-page-dashboard, text!sv-page-dashboard-tpl ]}]
+            - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]
+            - [ addRoute, { path: /login, require: [sv-page-account-login, text!sv-page-account-login-tpl ]}]
+            - [ addRoute, { path: /logout, require: [sv-page-account-logout, text!sv-page-account-logout-tpl ]}]
+            - [ addRoute, { path: /password-recover, require: [sv-page-account-password-recover, text!sv-page-account-password-recover-tpl ]}]
+            - [ addRoute, { path: /password-reset, require: [sv-page-account-password-reset, text!sv-page-account-password-reset-tpl ]}]
+            - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
+            - [ addRoute, { path: /settings, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
+
+            - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-users-tpl, json!sv-page-users-grid-config ]}]
+            - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-users-form-tpl ]}]
+
+
+sv-app-setings-config:
+    - view: app
+        do:
+            - [ addNav, { path: /areas, label: Areas, pos: 10 }]
+            - [ addNav, { path: /areas/core, label: Core Settings, pos: 10 }]
+            # {FCom_AdminSPA}/AdminSPA/vue/page/settings/{areas/core/website}.(js|html)
+            - [ addNav, { path: /areas/core/website, label: Website, pos: 10, module: FCom_AdminSPA }]
+            - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20, module: FCom_AdminSPA }]
+            - [ addNav, { path: /areas/core/session, label: Session, pos: 30, module: FCom_AdminSPA }]
+
+            - [ addNav, { path: /areas/frontend, label: Frontend Settings, pos: 20 }]
+
+            - [ addNav, { path: /areas/admin, label: Admin Settings, pos: 30 }]
+
+            - [ addNav, { path: /themes, label: Themes, pos: 80 }]
+
+            - [ addNav, { path: /other, label: Other, pos: 90 }]
+
+/login:
+    - { include: / }
+
+
+/users/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /users/form, name: main, label: User Info, pos: 10 } ]

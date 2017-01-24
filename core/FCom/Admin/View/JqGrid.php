@@ -459,8 +459,7 @@ return [true, 'Testing error'];
         }
 
         if ($stateKey) {
-            $sess =& $this->BSession->dataToUpdate();
-            $sess['grid_state'][$stateKey] = $r;
+            $this->BSession->set('grid_state/' . $stateKey, $r);
         }
         if ($forceRequest) {
             $r = array_replace_recursive($r, $forceRequest);

@@ -1,0 +1,77 @@
+<div>
+	<div class="row">
+		<div class="col-md-12 col-lg-6 hidden-xs">
+			<div class="main-info-block">
+				<div class="total-info">
+					<div class="icon"> <i class="fa fa-money" aria-hidden="true"></i> </div>
+					<div class="data"> <span>{{'Grand Total:'|_}}</span>
+						<p>{{form.order.grand_total|currency(form.order.store_currency_code)}}</p>
+					</div>
+				</div>
+				<div class="overall-info">
+					<div class="icon"> <i class="fa fa-line-chart" aria-hidden="true"></i> </div>
+					<div class="data"> <span>{{'Overall Status'|_}}</span>
+						<p :class="'status-'+form.order.state_overall">{{getOption('order_state_overall', form.order.state_overall)}}</p>
+					</div>
+				</div>
+				<div class="payment-info">
+					<div class="icon"> <i class="fa fa-credit-card-alt" aria-hidden="true"></i> </div>
+					<div class="data"> <span>{{'Payment:'|_}}</span>
+						<p :class="'status-'+form.order.state_payment">{{getOption('order_state_payment', form.order.state_payment)}}</p>
+					</div>
+				</div>
+				<div class="delivery-info">
+					<div class="icon"> <i class="fa fa-truck" aria-hidden="true"></i> </div>
+					<div class="data"> <span>{{'Delivery:'|_}}</span>
+						<p :class="'status-'+form.order.state_delivery">{{getOption('order_state_delivery', form.order.state_delivery)}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12 col-lg-6 text-right">
+			<div class="tablet-panel hidden-lg">
+				<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+					<div class="dropdown-menu">
+						<ul class="dropdown-content">
+							<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="dropdown action dropdown-buttons" :class="{open:ddOpen('control-buttons')}">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
+					<div class="dropdown-menu">
+						<ul class="dropdown-content">
+							<li><a href="#" class="color10" @click="goBack()">{{'Back'|_}}</a></li>
+							<li><a href="#" class="color2" @click="doDelete() ">{{'Delete'|_}}</a></li>
+							<li><a href="#" class="color8" @click="shipAllItems()">{{'Ship All items'|_}}</a></li>
+							<li><a href="#" class="color8" @click="markAsPaid()">{{'Mark as Paid'|_}}</a></li>
+							<li><a href="#" class="color9" @click="save()">{{'Save'|_}}</a></li>
+							<li><a href="#" class="color9" @click="save(true)">{{'Save and Continue'|_}}</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="control-buttons-block visible-lg">
+				<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+				<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+				<button type="button" class="button button8" @click="shipAllItems()">{{'Ship All items'|_}}</button>
+				<button type="button" class="button button8" @click="markAsPaid()">{{'Mark as Paid'|_}}</button>
+				<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+				<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-2 visible-lg">
+			<div class='secondary-menu'>
+				<ul class="nav">
+					<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-12 col-lg-10">
+			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @action="doAction"></component>
+		</div>
+	</div>
+</div>

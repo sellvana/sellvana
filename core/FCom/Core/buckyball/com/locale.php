@@ -1583,7 +1583,7 @@ class BCurrencyValue extends BClass
      * @param string $currencyCode
      * @return $this
      */
-    public function create($amountValue, $currencyCode)
+    public function create($amountValue, $currencyCode = null)
     {
         $class = get_class($this);
         return new $class($amountValue, $currencyCode);
@@ -1642,6 +1642,11 @@ class BCurrencyValue extends BClass
             return $this->_amountValue;
         }
         return bcadd($this->_amountValue, 0, $this->_decimalScale);
+    }
+
+    public function __toString()
+    {
+        return (string)$this->getAmount(true);
     }
 
     /**

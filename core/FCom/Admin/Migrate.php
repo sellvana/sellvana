@@ -10,6 +10,7 @@
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Admin_Model_UserG2FA $FCom_Admin_Model_UserG2FA
+ * @property FCom_Admin_Model_Favorite FCom_Admin_Model_Favorite
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  */
 
@@ -413,6 +414,32 @@ class FCom_Admin_Migrate extends BClass
         $this->BDb->ddlTableDef($tUser, [
             BDb::COLUMNS => [
                 'password_hash' => 'varchar(255) default null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_4_0__0_6_5_0()
+    {
+        $tFavorite = $this->FCom_Admin_Model_Favorite->table();
+        $tUser = $this->FCom_Admin_Model_User->table();
+
+        $this->BDb->ddlTableDef($tFavorite, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'user_id' => 'int unsigned not null',
+                'link' => 'varchar(255)',
+                'label' => 'varchar(255)',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_user_link' => '(user_id, link)',
+                'IDX_user_created' => '(user_id, create_at)',
+            ],
+            BDb::CONSTRAINTS => [
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }

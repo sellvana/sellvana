@@ -342,7 +342,7 @@ class BApp extends BClass
             $folders = explode(',', $folders);
         }
         $modules = $this->BModuleRegistry;
-        foreach ($folders as $folder) {
+        foreach ((array)$folders as $folder) {
             $modules->scan($folder);
         }
         return $this;
@@ -997,6 +997,11 @@ class BClassRegistry extends BClass
      */
     static protected $_properties = [];
 
+    static protected $_traceMode = false;
+
+    static protected $_traceInstances = [];
+
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -1303,7 +1308,8 @@ class BClassRegistry extends BClass
         // here $class is the overriding object class, and config for methods
         // is keyed with overridden class name, so findMethodInfo will never return true, unless
         // overriding and overridden class are the same!
-        if (($info = static::findMethodInfo($class, $method, 0, 'override'))) {
+        $info = static::findMethodInfo($class, $method, 0, 'override');
+        if ($info) {
             $callback = $info['callback'];
             array_unshift($args, $origObject);
             $overridden = true;
@@ -1445,12 +1451,15 @@ class BClassRegistry extends BClass
      * @param string $class
      * @param mixed $args
      * @param bool $singleton
-     * @return object
+     * @return BClass
      */
     static public function instance($class, array $args = [], $singleton = false)
     {
         // if singleton is requested and already exists, return the singleton
         if ($singleton && !empty(static::$_singletons[$class])) {
+//            if (static::isTraceMode()) {
+//                return static::getTraceInstance(static::$_singletons[$class]);
+//            }
             return static::$_singletons[$class];
         }
 
@@ -1475,6 +1484,10 @@ class BClassRegistry extends BClass
         if ($singleton) {
             static::$_singletons[$class] = $instance;
         }
+
+//        if (static::isTraceMode()) {
+//            return static::getTraceInstance($instance);
+//        }
 
         return $instance;
     }
@@ -1518,6 +1531,194 @@ class BClassRegistry extends BClass
     public function unsetInstance()
     {
         static::$_instance = null;
+    }
+
+    static public function setTraceMode($mode = true)
+    {
+        static::$_traceMode = $mode;
+    }
+
+    static public function isTraceMode()
+    {
+        return static::$_traceMode;
+    }
+
+    static public function getTraceInstance($instance)
+    {
+        if ($instance instanceof BDebug) {
+            return $instance;
+        }
+        $hash = spl_object_hash($instance);
+        if (empty(static::$_traceInstances[$hash])) {
+            static::$_traceInstances[$hash] = new BClassTraceProxy($instance);
+        }
+        return static::$_traceInstances[$hash];
+    }
+}
+
+class BClassTraceProxy
+{
+    /**
+     * @var BDebug
+     */
+    static protected $_BDebug;
+
+    /**
+     * @var BClass
+     */
+    protected $_decoratedComponent;
+
+    protected $_className;
+
+    /**
+     * @var string
+     */
+    protected $_logName;
+
+    protected function _logCallEnter($method, $args)
+    {
+        $info = '[' . microtime(1) . '] ENTER ' . $this->_className . '::' . $method;
+        static::$_BDebug->log($info, $this->_logName);
+    }
+
+    protected function _logCallExit($method)
+    {
+        $info = '[' . microtime(1) . '] EXIT ' . $this->_className . '::' . $method;
+        static::$_BDebug->log($info, $this->_logName);
+    }
+
+    protected function _logSetProp($prop, $value)
+    {
+        $info = '[' . microtime(1) . '] SET ' . $this->_className . '->' . $prop;
+        static::$_BDebug->log($info, $this->_logName);
+    }
+
+    public function __construct($instance)
+    {
+        if (!static::$_BDebug) {
+            static::$_BDebug = BDebug::i();
+        }
+        $this->_decoratedComponent = $instance;
+        $this->_className = get_class($instance);
+        $this->_logName = 'trace/' . $_SERVER['REMOTE_ADDR'] . '.' . date('Y-m-d.H:i:s') . '.log';
+    }
+
+    public function __destruct()
+    {
+        unset($this->_decoratedComponent);
+    }
+
+    /**
+     * Method override facility
+     *
+     * @param string $name
+     * @param array $args
+     * @return mixed Result of callback
+     */
+    public function __call($name, array $args)
+    {
+        $this->_logCallEnter($name, $args);
+        $result = $this->_decoratedComponent->$name($args);
+        $this->_logCallExit($name);
+        return $result;
+    }
+
+    /**
+     * Proxy to set decorated component property or a setter
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set($name, $value)
+    {
+        $this->_logSetProp($name, $value);
+        $this->_decoratedComponent->$name = $value;
+    }
+
+    /**
+     * Proxy to get decorated component property or a getter
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->_decoratedComponent->$name;
+    }
+
+    /**
+     * Proxy to unset decorated component property
+     *
+     * @param string $name
+     */
+    public function __unset($name)
+    {
+        unset($this->_decoratedComponent->$name);
+    }
+
+    /**
+     * Proxy to check whether decorated component property is set
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function __isset($name)
+    {
+        return isset($this->_decoratedComponent->$name);
+    }
+
+    /**
+     * Proxy to return decorated component as string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->_decoratedComponent;
+    }
+
+    /**
+     * Proxy method to serialize decorated component
+     *
+     */
+    public function __sleep()
+    {
+        if (method_exists($this->_decoratedComponent, '__sleep')) {
+            return $this->_decoratedComponent->__sleep();
+        }
+        return [];
+    }
+
+    /**
+     * Proxy method to perform for decorated component on unserializing
+     *
+     */
+    public function __wakeup()
+    {
+        if (method_exists($this->_decoratedComponent, '__wakeup')) {
+            $this->_decoratedComponent->__wakeup();
+        }
+    }
+
+    /**
+     * Proxy method to invoke decorated component as a method if it is callable
+     *
+     */
+    public function __invoke()
+    {
+        if (is_callable($this->_decoratedComponent)) {
+            return $this->_decoratedComponent(func_get_args());
+        }
+        return null;
+    }
+
+    /**
+     * Return object of decorated class
+     * @return object
+     */
+    public function getDecoratedComponent()
+    {
+        return $this->_decoratedComponent;
     }
 }
 
@@ -2286,6 +2487,8 @@ class BSession extends BClass
         $domain = $this->BRequest->getCookieDomain();
         $https = $this->BRequest->https();
 
+        header_remove('Set-Cookie');
+
         session_set_cookie_params($ttl, $path, $domain, $https, true);
 
         session_start();
@@ -2305,8 +2508,8 @@ class BSession extends BClass
             $refresh = true;
         }
         if (!$refresh && !empty($this->_config['session_check_ip'])) {
-            if (!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip
-                || !empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent
+            if ((!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip)
+                || (!empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent)
             ) {
                 $refresh = true;
             }
@@ -2477,27 +2680,68 @@ class BSession extends BClass
         return $this;
     }
 
-    public function get($key, $default = null)
+    public function get($key = null, $default = null)
     {
         $this->open();
 
-        return isset($this->data[$key]) ? $this->data[$key] : $default;
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
+        if (!$_SESSION[$namespace]) {
+            return null;
+        }
+
+        $data = $_SESSION[$namespace];
+
+        if ($key === null) {
+            return $data;
+        }
+
+        if (strpos($key, '/') !== false) {
+            $pathArr = explode('/', trim($key, '/'));
+            foreach ($pathArr as $k) {
+                if (!isset($data[$k])) {
+                    return $default;
+                }
+                $data = $data[$k];
+            }
+            return $data;
+        }
+
+        return isset($data[$key]) ? $data[$key] : $default;
     }
 
-    public function set($key, $value = null)
+    public function set($key, $value = null, $merge = false)
     {
         $this->open();
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
 
+        if (true === $key) {
+            $_SESSION[$namespace] = $value;
+        }
         if (is_array($key)) {
             foreach ($key as $k => $v) {
                 $this->set($k, $v);
             }
             return $this;
         }
-        if (!isset($this->data[$key]) || $this->data[$key] !== $value) {
+
+        $node =& $_SESSION[$namespace];
+        if (strpos($key, '/') !== false) {
+            foreach (explode('/', trim($key, '/')) as $k) {
+                $node =& $node[$k];
+            }
+        } else {
+            $node =& $node[$key];
+        }
+
+        if ($node !== $value) {
             $this->setDirty();
         }
-        $this->data[$key] = $value;
+
+        if ($merge) {
+            $node = $this->BUtil->arrayMerge((array)$node, (array)$value);
+        } else {
+            $node = $value;
+        }
         return $this;
     }
 
@@ -2511,12 +2755,14 @@ class BSession extends BClass
     /**
      * Get reference to session data and set dirty flag true
      *
+     * @deprecated use BSession::set()
      * @return array
      */
     public function &dataToUpdate()
     {
         $this->setDirty();
-        return $this->data;
+        $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
+        return $_SESSION[$namespace];
     }
 
     /**
@@ -2526,6 +2772,9 @@ class BSession extends BClass
      */
     public function close()
     {
+        session_write_close();
+        return $this;
+
         if (!$this->_dirty/* || !empty( $_SESSION )*/) {
 #echo "<pre>"; var_dump($this->_dirty, $_SESSION); echo "</pre>";
             $this->_isOpen = false;
@@ -2609,8 +2858,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $message = ['type' => $type];
         if (is_array($msg) && !empty($msg[0])) {
             $msgs = [];
-            foreach ($msg as $m) {
-                if (is_string($m) || is_object($m) && method_exists($m, '__toString')) {
+            foreach ((array)$msg as $m) {
+                if (is_string($m) || (is_object($m) && method_exists($m, '__toString'))) {
                     $msgs[] = (string)$m;
                 } elseif (is_array($m)) {
                     $m['title'] = !empty($m['title']) ? (string)$m['title'] : null;
@@ -2666,9 +2915,10 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function csrfToken($validating = false, $hashReferrer = null)
     {
-        $data =& static::dataToUpdate();
-        if (empty($data['_csrf_token'])) {
-            $data['_csrf_token'] = $this->BUtil->randomString(32);
+        $csrfToken = $this->get('_csrf_token');
+        if (!$csrfToken) {
+            $csrfToken = $this->BUtil->randomString(32);
+            $this->set('_csrf_token', $csrfToken);
         }
         if (null === $hashReferrer) {
             $hashReferrer = $this->BConfig->get('web/csrf_check_method') === 'token+referrer';
@@ -2681,9 +2931,9 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
                 $url = $this->BRequest->currentUrl();
             }
             $url = rtrim(str_replace('/index.php', '', $url), '/?&#');
-            return sha1($data['_csrf_token'] . $url);
+            return sha1($csrfToken . $url);
         }
-        return $data['_csrf_token'];
+        return $csrfToken;
     }
 
     public function validateCsrfToken($token)

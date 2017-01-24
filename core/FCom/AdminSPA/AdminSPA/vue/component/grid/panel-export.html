@@ -1,0 +1,17 @@
+<div class="dropdown export last-dropdown" :class="{open:ddOpen(grid.id+'/panel-export')}">
+    <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.id+'/panel-export')"><span>{{'Export'|_}}</span><b class="caret"></b></a>
+    <div class="dropdown-menu" @click.stop>
+        <ol>
+            <li v-for="opt in formatOptions">
+                <label>
+                    <input type="radio" name="export" :value="opt.value" :checked="opt.value===type"/><span><i class="fa fa-circle" aria-hidden="true"></i></span><span>{{opt.label|_}}</span></label>
+            </li>
+        </ol>
+        <div class="control-buttons-block text-right">
+            <button class="button2" type="button" @click="submit()">{{'Export'|_}}</button>
+        </div>
+        <div v-show="false">
+            <iframe v-for="url in export_urls" :src="url"></iframe>
+        </div>
+    </div>
+</div>

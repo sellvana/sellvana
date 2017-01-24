@@ -123,8 +123,7 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
     {
         $token = $this->BRequest->request('token');
         if ($token) {
-            $sessData =& $this->BSession->dataToUpdate();
-            $sessData['g2fa_reset_token'] = $token;
+            $this->BSession->set('g2fa_reset_token', $token);
             $this->BResponse->redirect('g2fa/reset');
             return;
         }
@@ -163,8 +162,7 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
             $this->BResponse->redirect($returnUrl);
             return;
         }
-        $sessData =& $this->BSession->dataToUpdate();
-        $sessData['g2fa_reset_token'] = null;
+        $this->BSession->set('g2fa_reset_token', null);
 
         $user->resetG2FA();
 

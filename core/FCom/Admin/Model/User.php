@@ -108,7 +108,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $token = $this->BUtil->randomString(16);
         $this->set([
-            'password_hash' => password_hash($password),
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]),
             'password_session_token' => $token,
         ]);
         if ($this->id() === $this->sessionUserId()) {
@@ -139,7 +139,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $this->setPassword($this->get('password'));
         }
         if ($this->get('api_password')) {
-            $this->set('api_password_hash', password_hash($this->get('api_password')));
+            $this->set('api_password_hash', password_hash($this->get('api_password'), PASSWORD_DEFAULT, ['cost' => 12]));
         }
         if (!$this->get('role_id')) {
             $this->set('role_id', null);
@@ -209,7 +209,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
-            $this->set('password_hash', password_hash($password))->save();
+            $this->set('password_hash', password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]))->save();
         }
         return true;
     }
@@ -246,24 +246,25 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
-            $sessData =& $this->BSession->dataToUpdate();
-            if (empty($sessData['admin_user_id'])) {
+            $sess = $this->BSession;
+            $userId = $sess->get('admin_user_id');
+            if (!$userId) {
                 return false;
             }
-            $userId = $sessData['admin_user_id'];
-            $user = static::$_sessionUser = $this->load($userId);
+            static::$_sessionUser = $user = $this->load($userId);
             if (!$user) {
                 $this->logout();
                 return false;
             }
-            $token = $user->get('password_session_token');
-            if (!$token) {
-                $token = $this->BUtil->randomString(16);
-                $user->set('password_session_token', $token)->save();
+            $passToken = $user->get('password_session_token');
+            if (!$passToken) {
+                $passToken = $this->BUtil->randomString(16);
+                $user->set('password_session_token', $passToken)->save();
             }
-            if (empty($sessData['admin_user_password_token'])) {
-                $sessData['admin_user_password_token'] = $token;
-            } elseif ($sessData['admin_user_password_token'] !== $token) {
+            $sessToken = $sess->get('admin_user_password_token');
+            if (!$sessToken) {
+                $sess->set('admin_user_password_token', $passToken);
+            } elseif ($sessToken !== $passToken) {
                 $user->logout();
                 $this->BResponse->cookie('remember_me', 0);
                 $this->BResponse->redirect('');
@@ -361,8 +362,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         $this->BEvents->fire(__METHOD__);
         #$this->BSession->set('admin_user_id', null);
         #$this->BSession->set('admin_user_password_token', null);
-        $sessData =& $this->BSession->dataToUpdate();
-        $sessData = [];
+        $this->BSession->set(true, []);
 
         $this->BSession->regenerateId();
 

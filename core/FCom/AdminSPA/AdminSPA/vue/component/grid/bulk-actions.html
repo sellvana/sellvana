@@ -1,0 +1,7 @@
+<div class="dropdown action" :class="{open:ddOpen(grid.config.id+'/bulk-actions')}">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+       @click.prevent.stop="ddToggle(grid.config.id+'/bulk-actions')"><span>{{'Bulk Action'|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+    <ul class="dropdown-menu" @click.prevent>
+        <li v-for="act in actions"><a href="#" @click.prevent="bulkAction(act)">{{act.label|_}}</a></li>
+    </ul>
+</div>

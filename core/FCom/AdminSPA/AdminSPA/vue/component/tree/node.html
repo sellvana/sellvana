@@ -1,0 +1,13 @@
+<li>
+    <div class="node-line" :class="{open: node.open, active: isActive}" @dblclick="dblclick">
+        <a v-if="isFolder" class="folder-icon" href="#" @click.prevent="toggle"><i class="fa" :class="{'fa-folder':!node.open, 'fa-folder-open':node.open}"></i></a> 
+        <span v-else class="leaf-icon"><i class="fa fa-folder-o"></i></span>
+        <div class="node-name">
+			<a class="node-label" href="#" @click.prevent="select">{{node.label}}</a>
+			<a class="add-child" href="#" @click.prevent="addChild">+</a>
+		</div>
+    </div>
+    <ul v-show="node.open" v-if="isFolder" v-sortable="{group: treeId}">
+        <sv-comp-tree-node class="tree-node" v-for="child in node.children" :node="child" :tree-id="treeId" :cur-node="curNode" @event="proxyEvent"></sv-comp-tree-node>
+    </ul>
+</li>

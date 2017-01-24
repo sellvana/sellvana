@@ -1,0 +1,274 @@
+<div>
+	<div class="row">
+		<div class="col-sm-12 col-md-12 col-lg-8 ">
+			<div class="admin-main-content">
+				<div class="row">
+					<div class="col-xs-12 col-sm-4 col-md-4">
+						<div class="edited-block" :class="{on:editing.customer}">
+							<div class="block-title">
+								<p>{{'Customer'|_}}</p>
+								<a href="#" @click.prevent="toggleEditing('customer')">
+									<i class="fa fa-pencil editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
+								</a>
+							</div>
+							<div class="section-view">
+								<p>
+									<label>{{'Email:'|_}}</label> <strong>{{form.order.customer_email}}</strong>
+								</p>
+							</div>
+							<div class="section-edit">
+								<label>{{'Email:'|_}}</label>
+								<input type="text" class="form-control" v-model="form.order.customer_email" :placeholder="'Customer Email'|_">
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-4">
+						<div class="edited-block" :class="{on:editing.shipping}">
+							<div class="block-title">
+								<p>{{'Shipping'|_}}</p>
+								<a href="#" @click.prevent="toggleEditing('shipping')">
+									<i class="fa fa-pencil editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
+								</a>
+							</div>
+							<div class="section-view">
+								<p>{{form.order.shipping_firstname}} {{form.order.shipping_lastname}}</p>
+								<div class="adr">
+									<span class="street-address">{{form.order.shipping_street1}}</span>
+									<span class="street-address" v-if="form.order.shipping_street2">{{form.order.shipping_street2}}</span>
+									<span class="locality">{{form.order.shipping_city}}</span>
+									<span class="region">{{form.order.shipping_region}}</span>
+									<span class="postal-code">{{form.order.shipping_postcode}}</span>
+									<div class="country-name">{{dict.countries[form.order.shipping_country]}}</div>
+								</div>
+							</div>
+							<div class="section-edit">
+								<div class="row no-gutter">
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.shipping_firstname">
+									</div>
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.shipping_lastname">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-12">
+										<input type="text" class="form-control" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.shipping_street1">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-12">
+										<input type="text" class="form-control" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.shipping_street2">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.shipping_city">
+									</div>
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.shipping_postcode">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-6">
+										<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
+										<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+											<option></option>
+											<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
+										</select>
+									</div>
+									<div class="col-md-6">
+										<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+											<option></option>
+											<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-4">
+						<div class="edited-block" :class="{on:editing.billing}">
+							<div class="block-title">
+								<p>{{'Billing'|_}}</p>
+								<a href="#" @click.prevent="toggleEditing('billing')">
+									<i class="fa fa-pencil editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
+								</a>
+							</div>
+							<div class="section-view">
+								<p>{{form.order.billing_firstname}} {{form.order.billing_lastname}}</p>
+								<div class="adr">
+									<span class="street-address">{{form.order.billing_street1}}</span>
+									<span class="street-address" v-if="form.order.billing_street2">{{form.order.billing_street2}}</span>
+									<span class="locality">{{form.order.billing_city}}</span>
+									<span class="region">{{form.order.billing_region}}</span>
+									<span class="postal-code">{{form.order.billing_postcode}}</span>
+									<div class="country-name">{{dict.countries[form.order.billing_country]}}</div>
+								</div>
+							</div>
+							<div class="section-edit">
+								<div class="row no-gutter">
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.billing_firstname">
+									</div>
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.billing_lastname">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-12">
+										<input type="text" class="form-control" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.billing_street1">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-12">
+										<input type="text" class="form-control" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.billing_street2">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.billing_city">
+									</div>
+									<div class="col-md-6">
+										<input type="text" class="form-control" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.billing_postcode">
+									</div>
+								</div>
+								<div class="row no-gutter">
+									<div class="col-md-6">
+										<input type="text" class="geo-region form-control " :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.billing_region" v-if="!regionOptions('billing')">
+										<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.billing_region" v-if="regionOptions('billing')">
+											<option></option>
+											<option v-for="r in regionOptions('billing')" :value="r.id">{{r.text}}</option>
+										</select>
+									</div>
+									<div class="col-md-6">
+										<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.billing_country">
+											<option></option>
+											<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-sm-4 col-md-4">
+						<div class="edited-block" :class="{on:editing.order}">
+							<div class="block-title">
+								<p>{{'Order'|_}}</p>
+								<a href="#" @click.prevent="toggleEditing('order')">
+									<i class="fa fa-pencil editor" aria-hidden="true"></i>
+									<i class="fa fa-eye close-editor" aria-hidden="true"></i>
+								</a>
+							</div>
+							<div class="section-view">
+								<p v-if="form.order.state_custom" :class="'status-'+form.order.state_custom">{{form.options.order_state_custom[form.order.state_custom]}}</p>
+								<p>
+									<label>{{'Placed:'|_}}</label> <strong>{{form.order.create_at|date}}</strong></p>
+								<p>
+									<label>{{'Updated:'|_}}</label> <strong>{{form.order.update_at|date}}</strong></p>
+							</div>
+							<div class="section-edit">
+								<select class="form-control" v-model="form.order.state_custom">
+									<option v-if="form.options.order_state_custom|length"></option>
+									<option v-else value="" selected>{{'No Custom Order States Defined'|_}}</option>
+									<option v-for="k, v in form.options.order_state_custom" :value="k">{{v}}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-4">
+						<div class="edited-block">
+							<div class="block-title">
+								<p>{{'Delivery'|_}}</p>
+								<a href="#" @click.prevent="$emit('tab', 'details')">
+									<i class="fa fa-pencil editor" aria-hidden="true"></i>
+								</a>
+							</div>
+							<div v-for="s in form.shipments">
+								<strong>{{s.carrier_desc}} / {{s.service_desc}}</strong>
+								<span :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</span>
+							</div>
+							<div v-for="r in form.returns">
+								<strong>{{'RETURN'|_}}</strong>
+								<p :class="'status-' + r.state_overall">{{form.options.return_state_overall[r.state_overall]}}</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-4">
+						<div class="edited-block">
+							<div class="block-title">
+								<p>{{'Payment'|_}}</p>
+								<a href="#" @click.prevent="$emit('tab', 'details')">
+									<i class="fa fa-pencil editor" aria-hidden="true"></i>
+								</a>
+							</div>
+							<div v-for="p in form.payments">
+								<strong>{{p.payment_method}}</strong>
+								<span :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</span>
+								<span>{{p.amount_captured|currency(form.order.store_currency_code)}}</span>
+								<span>({{p.amount_due|currency(form.order.store_currency_code)}})</span>
+							</div>
+							<div v-for="r in form.refunds">
+								<strong>{{'REFUND: '|_}}</strong>
+								<span :class="'status-' + r.state_overall">{{form.options.refund_state_overall[r.state_overall]}}</span>
+								<span>{{r.amount|currency(form.order.store_currency_code)}}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-12 col-md-12 col-lg-4">
+			<div class="admin-main-content">
+				<div class="block-title">
+					<p>{{'Totals'|_}}</p>
+				</div>
+				<table class="striped-table">
+					<tr>
+						<th>{{'Subtotal'|_}}</th>
+						<td>{{form.order.subtotal|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Shipping & Handling'|_}}</th>
+						<td>{{form.order.shipping_price|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Discount'|_}}</th>
+						<td>{{form.order.discount_amount|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Tax'|_}}</th>
+						<td>{{form.order.tax_amount|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Grand Total'|_}}</th>
+						<td>{{form.order.grand_total|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Store Credit'|_}}</th>
+						<td>{{paidByStoreCredit|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Amount Captured'|_}}</th>
+						<td>{{form.order.amount_paid|currency(form.order.store_currency_code)}}</td>
+					</tr>
+					<tr>
+						<th>{{'Balance Due'|_}}</th>
+						<td>{{form.order.amount_due|currency(form.order.store_currency_code)}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class=" admin-main-content">
+				<sv-comp-grid :grid="itemsGrid"></sv-comp-grid>
+			</div>
+		</div>
+	</div>
+</div>

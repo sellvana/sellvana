@@ -30,6 +30,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_InventorySku Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
@@ -538,20 +539,24 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function getPaymentMethod()
     {
-        if (!$this->get('payment_method')) {
+        $pm = $this->get('payment_method');
+        if (!$pm) {
             return null;
         }
         $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
-        return $methods[$this->get('payment_method')];
+        return !empty($methods[$pm]) ? $methods[$pm] : false;
     }
 
-    public function loadItemsProducts()
+    public function loadItemsProducts($withInventory = false)
     {
         $pIds = [];
         foreach ($this->items() as $item) {
             $pIds[] = $item->get('product_id');
         }
         $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $pIds)->find_many_assoc();
+        if ($withInventory) {
+            $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($products);
+        }
         foreach ($this->items() as $item) {
             $pId = $item->get('product_id');
             if (!empty($products[$pId])) {
@@ -606,6 +611,11 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             $item->set($itemQtys);
         }
         return $this;
+    }
+
+    public function calcAllAmounts()
+    {
+        //TODO: implement
     }
 
      /**
@@ -663,23 +673,29 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->saveAllDetails();
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getShippableItems()
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
             if ($item->isShippable() && $item->getQtyCanShip()) {
-                $items[] = $item;
+                $items[] = $item->populateCalculatedValues();
             }
         }
         return $items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getPayableItems()
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
             if ($item->getQtyCanPay() && $item->getAmountCanPay()) {
-                $items[] = $item;
+                $items[] = $item->populateCalculatedValues();
             }
         }
         return $items;
@@ -693,7 +709,6 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 if ($pItem->get('order_item_id')) {
                     continue;
                 }
-
                 $totals[] = $pItem->getData('code');
             }
         }
@@ -701,77 +716,192 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $totals;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getCancelableItems()
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
             if ($item->getQtyCanCancel()) {
-                $items[] = $item;
+                $items[] = $item->populateCalculatedValues();
             }
         }
         return $items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getReturnableItems()
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
             if ($item->getQtyCanReturn()) {
-                $items[] = $item;
+                $items[] = $item->populateCalculatedValues();
             }
         }
         return $items;
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Item[]
+     */
     public function getRefundableItems()
     {
         $items = [];
         foreach ($this->items() as $i => $item) {
             if ($item->getAmountCanRefund() > 0) {
-                $items[] = $item;
+                $items[] = $item->populateCalculatedValues();
             }
         }
         return $items;
     }
 
-    public function getAllPayments()
+    /**
+     * @param bool $withItems
+     * @param bool $withTransactions
+     * @return Sellvana_Sales_Model_Order_Payment[]
+     */
+    public function getAllPayments($withItems = false, $withTransactions = false)
     {
-        return $this->Sellvana_Sales_Model_Order_Payment->orm()
+        $payments = $this->Sellvana_Sales_Model_Order_Payment->orm()
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
-            ->find_many();
+            ->find_many_assoc('id');
+        
+        if ($withItems) {
+            $items = $this->Sellvana_Sales_Model_Order_Payment_Item->orm()->where('order_id', $this->id())->find_many();
+            foreach ($items as $item) {
+                $tmpItems[$item->get('payment_id')][] = $item;
+            }
+            foreach ($payments as $id => $payment) {
+                if (!empty($tmpItems[$id])) {
+                    $payment->set('items', $tmpItems[$id]);
+                }
+            }
+        }
+
+        if ($withTransactions) {
+            /** @var Sellvana_Sales_Model_Order_Payment $payment */
+            foreach ($payments as $id => $payment) {
+                $payment->set('transactions', $payment->transactions());
+            }
+        }
+        
+        return array_values($payments);
     }
 
-    public function getAllShipments()
+    /**
+     * @param bool $withItems
+     * @param bool $withPackages
+     * @return Sellvana_Sales_Model_Order_Shipment[]
+     */
+    public function getAllShipments($withItems = false, $withPackages = false)
     {
-        return $this->Sellvana_Sales_Model_Order_Shipment->orm()
+        $shipments = $this->Sellvana_Sales_Model_Order_Shipment->orm()
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
-            ->find_many();
+            ->find_many_assoc('id');
+        
+        if ($withItems) {
+            $items = $this->Sellvana_Sales_Model_Order_Shipment_Item->orm()->where('order_id', $this->id())->find_many();
+            foreach ($items as $item) {
+                $tmpItems[$item->get('shipment_id')][] = $item;
+            }
+            foreach ($shipments as $id => $shipment) {
+                if (!empty($tmpItems[$id])) {
+                    $shipment->set('items', $tmpItems[$id]);
+                }
+            }
+        }
+
+        if ($withPackages) {
+            /** @var Sellvana_Sales_Model_Order_Shipment $shipment */
+            foreach ($shipments as $id => $shipment) {
+                $shipment->set('packages', $shipment->packages());
+            }
+        }
+        
+        return array_values($shipments);
     }
 
-    public function getAllReturns()
+    /**
+     * @param bool $withItems
+     * @return Sellvana_Sales_Model_Order_Return[]
+     */
+    public function getAllReturns($withItems = false)
     {
-        return $this->Sellvana_Sales_Model_Order_Return->orm()
+        $returns = $this->Sellvana_Sales_Model_Order_Return->orm()
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
-            ->find_many();
+            ->find_many_assoc('id');
+
+        if ($withItems) {
+            $items = $this->Sellvana_Sales_Model_Order_Return_Item->orm()->where('order_id', $this->id())->find_many();
+            foreach ($items as $item) {
+                $tmpItems[$item->get('return_id')][] = $item;
+            }
+            foreach ($returns as $id => $return) {
+                if (!empty($tmpItems[$id])) {
+                    $return->set('items', $tmpItems[$id]);
+                }
+            }
+        }
+
+        return array_values($returns);
     }
 
-    public function getAllRefunds()
+    /**
+     * @param bool $withItems
+     * @return Sellvana_Sales_Model_Order_Refund[]
+     */
+    public function getAllRefunds($withItems = false)
     {
-        return $this->Sellvana_Sales_Model_Order_Refund->orm()
+        $refunds = $this->Sellvana_Sales_Model_Order_Refund->orm()
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
-            ->find_many();
+            ->find_many_assoc('id');
+
+        if ($withItems) {
+            $items = $this->Sellvana_Sales_Model_Order_Refund_Item->orm()->where('order_id', $this->id())->find_many();
+            foreach ($items as $item) {
+                $tmpItems[$item->get('refund_id')][] = $item;
+            }
+            foreach ($refunds as $id => $refund) {
+                if (!empty($tmpItems[$id])) {
+                    $refund->set('items', $tmpItems[$id]);
+                }
+            }
+        }
+
+        return array_values($refunds);
     }
 
-    public function getAllCancellations()
+    /**
+     * @param bool $withItems
+     * @return Sellvana_Sales_Model_Order_Cancel[]
+     */
+    public function getAllCancellations($withItems = false)
     {
-        return $this->Sellvana_Sales_Model_Order_Cancel->orm()
+        $cancellations = $this->Sellvana_Sales_Model_Order_Cancel->orm()
             ->where('order_id', $this->id())
             ->order_by_asc('create_at')
-            ->find_many();
+            ->find_many_assoc('id');
+
+        if ($withItems) {
+            $items = $this->Sellvana_Sales_Model_Order_Cancel_Item->orm()->where('order_id', $this->id())->find_many();
+            foreach ($items as $item) {
+                $tmpItems[$item->get('cancel_id')][] = $item;
+            }
+            foreach ($cancellations as $id => $cancel) {
+                if (!empty($tmpItems[$id])) {
+                    $cancel->set('items', $tmpItems[$id]);
+                }
+            }
+        }
+
+        return array_values($cancellations);
     }
 
     public function getOrderCurrencyRate()

@@ -193,7 +193,7 @@ SET FOREIGN_KEY_CHECKS=1;
 
         $this->BDb->ddlTableDef($tPost, [
             BDb::COLUMNS => [
-                'views' => 'RENAME views_cnt int unsigned not null default 0',
+                'views' => 'RENAME views_cnt int unsigned null default 0',
             ],
             BDb::KEYS => [
                 'IDX_views_cnt' => '(views_cnt)',

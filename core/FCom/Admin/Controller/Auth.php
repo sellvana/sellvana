@@ -127,8 +127,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     {
         $token = $this->BRequest->request('token');
         if ($token) {
-            $sessData =& $this->BSession->dataToUpdate();
-            $sessData['password_reset_token'] = $token;
+            $this->BSession->set('password_reset_token', $token);
             $this->BResponse->redirect('password/reset');
             return;
         }
@@ -168,8 +167,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             $this->BResponse->redirect($returnUrl);
             return;
         }
-        $sessData =& $this->BSession->dataToUpdate();
-        $sessData['password_reset_token'] = null;
+        $this->BSession->set('password_reset_token', null);
 
         $user->resetPassword($password);
 

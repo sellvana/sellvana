@@ -53,9 +53,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         if (!empty(static::$_channelCache[$channelName])) {
             return static::$_channelCache[$channelName];
         }
-        $sessData =& $this->BSession->dataToUpdate();
-        if (!empty($sessData['pushserver']['channels'][$channelName])) {
-            $data = $sessData['pushserver']['channels'][$channelName];
+        $sessChannel = $this->BSession->get("pushserver/channels/{$channelName}");
+        if ($sessChannel) {
+            $data = $sessChannel;
             $data['from_session_cache'] = true;
             static::$_channelCache[$channelName] = $this->create($data, false);
             return static::$_channelCache[$channelName];
@@ -66,7 +66,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         }
         static::$_channelCache[$channelName] = $channel;
         if ($session) {
-            $sessData['pushserver']['channels'][$channelName] = $channel->as_array();
+            $this->BSession->set("pushserver/channels/{$channelName}", $channel->as_array());
         }
         return $channel;
     }
@@ -75,9 +75,10 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        $sessData =& $this->BSession->dataToUpdate();
-        if (!empty($sessData['pushserver']['channels'][$this->channel_name])) {
-            $sessData['pushserver']['channels'][$this->channel_name] = $this->as_array();
+        $key = "pushserver/channels/{$this->channel_name}";
+        $sessChannel = $this->BSession->get($key);
+        if ($sessChannel) {
+            $this->BSession->set($key, $this->as_array());
         }
     }
 

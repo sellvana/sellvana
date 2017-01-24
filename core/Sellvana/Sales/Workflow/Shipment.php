@@ -22,7 +22,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
             'carrier_code' => 'plain',
             'service_code' => 'plain',
         ]);
-        $qtys = isset($args['qtys']) ? $args['qtys'] : null;
+        $qtys = isset($args['qtys']) ? $args['qtys'] : [];
         foreach ($qtys as $id => $qty) {
             if ($qty < 1) {
                 unset($qtys[$id]);
@@ -31,7 +31,8 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         if (!$qtys) {
             throw new BException('Please add some items to create a shipment');
         }
-        $method = $order->get('shipping_method');
+        //$method = $order->get('shipping_method');
+        $method = $data['carrier_code'];
         $methodClass = $this->Sellvana_Sales_Main->getShippingMethodClassName($method);
         if (!$methodClass) {
             throw new BException('Invalid shipping method');
@@ -87,6 +88,8 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         $order->calcItemQuantities('shipments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
+
+        return ['new_shipment' => $shipment];
     }
 
     public function action_adminUpdatesShipment($args)

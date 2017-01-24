@@ -1,0 +1,224 @@
+aside {
+	position: fixed;
+	float: left;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	width: 240px;
+	background: #fff;
+	display: block;
+	top: 0;
+	bottom: 0;
+	z-index: 99999;
+	height: 100%;
+	padding: 68px 0 0 0;
+	overflow: auto;
+}
+#main-nav {
+	display: inline-block;
+	background: #ffffff;
+	width: 100%;
+	padding: 0;
+	* {
+		font-size: 13px;
+		vertical-align: middle;
+	}
+	a:hover, a:focus {
+		text-decoration: none;
+		span {
+			color: black;
+		}
+	}
+	.dropdown-collapse {
+		&.in {
+			span {
+				color: #000;
+			}
+			i {
+				color: #000;
+				&.fa-chevron-right {
+					transform: rotate(90deg);
+					transform-origin: top center;
+					width: 12px;
+					height: 12px;
+					text-align: center;
+				}
+			}
+		}
+	}
+	li.active {
+		font-weight: bold;
+	}
+	i {
+		font-size: 16px;
+		width: 18px;
+		text-align: center;
+		&:first-child {
+			margin-right: 10px;
+		}
+	}
+	.fa-chevron-right {
+		font-size: 12px;
+		position: absolute;
+		right: 10px;
+		top: 50%;
+		transform: translateY(-50%);			
+	}
+	.active {
+		span, i {
+			color: #000;
+		}
+		span {
+			font-weight: bold;
+		}
+	}
+}
+#main-nav.close {
+	width: 50px;
+	opacity: 1;
+	z-index: 5;
+	overflow: visible;
+	.nav.nav-stacked {
+		.fa-chevron-right {
+			display: none;
+		}
+		.nav.nav-stacked  {
+			position: absolute;
+			left: 50px;
+			background: #eaeaea;
+			z-index: 5;
+			top: 0;
+			width: 260px;
+			.fa-chevron-right {
+				display: inline-block;
+			}
+			.nav.nav-stacked  {
+				position: absolute;
+				left: 260px;
+				background: #eaeaea;
+				z-index: 5;
+				top: 0;
+				width: 260px;
+				a {
+					padding: 10px 15px 10px 30px;
+				}
+			}
+		
+		}
+		a:hover span {
+			color: black;
+		}
+	}
+	& > .navigation {
+		& > .nav-stacked > li > a > span {
+			font-size: 0;
+			display: none;
+		}
+		& > .nav-stacked > li:hover {
+			background-color: #eeeeee;
+			color: black;
+		}
+		& > .nav-stacked > li:hover > a {
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+		}
+		& > .nav-stacked > li:hover > .nav-stacked > li:hover {
+			& > a > span, & > a > i {
+				color: black;
+				
+			}
+		}
+	}
+}
+.nav.nav-stacked {
+	li {
+		.nav.nav-stacked {
+			li {
+				a {
+					padding: 10px 15px 10px 30px;
+				}
+				.nav.nav-stacked {
+					li {
+						a {
+							padding: 10px 15px 10px 50px;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#main-nav .navigation .nav.nav-stacked.in {
+	display: block;
+}
+
+@media (min-width: 1023px) {
+	#main-nav.close {
+		& > .navigation > .nav > li:hover > .nav-stacked {
+			display: block;
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+		}
+		& > .navigation > .nav > li:hover > .nav-stacked > li:hover > .nav-stacked {
+			display: block;
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+			
+		}
+		& > .navigation > .nav > li > a > i:last-child {
+			display: none;
+		}
+	}
+}
+
+.nav {
+	& > li {
+		& > a {
+			padding: 12px 15px;
+		}
+	}
+}
+.main-nav-closed {
+	aside {
+		width: 50px;
+		opacity: 1;
+		overflow: visible;
+	}
+}
+
+@media (max-width: 1365px) {
+	aside {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 224px;
+		padding: 126px 0 0 0;
+		overflow: auto;
+		.fa-chevron-right {
+			display: inline-block;;
+		}
+	}
+	#main-nav.close>.navigation>.nav-stacked>li>a>span {
+		font-size: inherit;
+		display: inline-block;
+	}
+	.main-nav-closed aside {
+		position: fixed;
+		left: -100%;
+		top: 0;
+	}
+	
+	#main-nav.close .nav.nav-stacked .nav.nav-stacked {
+		left: 0;
+		position: relative;
+	}
+	#main-nav.close .nav.nav-stacked .nav.nav-stacked {
+		width: 224px;
+	}
+	#main-nav.close .nav.nav-stacked .nav.nav-stacked .nav.nav-stacked {
+		position: relative;
+		left: 0px;
+		width: 224px;
+	}
+}
+@media (max-width: 767px) {
+	aside {
+		padding: 162px 0 0 0;
+	}
+}

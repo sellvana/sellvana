@@ -1,0 +1,39 @@
+<aside>
+    <nav id="main-nav" class="f-admin-nav navbar-collapse customScroll" :class="{close:!ui.mainNavOpen}">
+        <div class="navigation">
+            <ul class="nav nav-stacked">
+                <li v-for="l1 in $store.state.navTree">
+                    <router-link v-if="l1.link" :to="l1.link" :title="l1.label" :class="{in:inBreadcrumbs(l1)}">
+                        <i v-if="l1.icon_class" :class="l1.icon_class" aria-hidden="true"></i><span>{{l1.label}}</span>
+                    </router-link>
+                    <template v-if="l1.children">
+                        <a href="#" :title="l1.label" class="dropdown-collapse" :class="{in:navOpen(l1.path)}" @click.prevent="navToggle(l1.path)">
+                            <i v-if="l1.icon_class" :class="l1.icon_class" aria-hidden="true"></i><span>{{l1.label}}</span>
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                        <ul class="nav nav-stacked" :class="{in:navOpen(l1.path)}" v-show="1">
+                            <li v-for="l2 in l1.children">
+                                <router-link v-if="l2.link" :to="l2.link" :title="l2.label" :class="{in:inBreadcrumbs(l2)}">
+                                    <i v-if="l2.icon_class" :class="l2.icon_class" aria-hidden="true"></i><span>{{l2.label}}</span>
+                                </router-link>
+                                <template v-if="l2.children">
+                                    <a href="#" :title="l2.label" class="dropdown-collapse" :class="{in:navOpen(l2.path)}" @click.prevent="navToggle(l2.path)">
+                                        <i v-if="l2.icon_class" :class="l2.icon_class" aria-hidden="true"></i><span>{{l2.label}}</span>
+                                        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                    </a>
+                                    <ul class="nav nav-stacked" :class="{in:navOpen(l2.path)}">
+                                        <li v-for="l3 in l2.children">
+                                            <router-link :to="l3.link" :title="l3.label" :class="{in:inBreadcrumbs(l3)}">
+                                                <i v-if="l3.icon_class" :class="l3.icon_class" aria-hidden="true"></i><span>{{l3.label}}</span>
+                                            </router-link>
+                                        </li>
+                                    </ul>
+                                </template>
+                            </li>
+                        </ul>
+                    </template>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</aside>

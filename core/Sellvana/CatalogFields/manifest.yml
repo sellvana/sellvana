@@ -37,6 +37,9 @@ modules:
                         /catalog/products/form:
                             POST/custom_fields: "+"
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 auto_use: [ views ]
                 observe:

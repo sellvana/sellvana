@@ -87,6 +87,15 @@ modules:
                         filetype: jpeg,jpg,tiff,gif,png,bmp
                         folder: media/category/images
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+                routing:
+                    - [ /categories/?.action, Sellvana_Catalog_AdminSPA_Controller_Categories ]
+                    - [ /categories/products/?.action, Sellvana_Catalog_AdminSPA_Controller_Categories_Products ]
+                    - [ /products/?.action, Sellvana_Catalog_AdminSPA_Controller_Products ]
+                observe:
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Catalog_AdminSPA_Controller_Products.onHeaderSearch ]
+
             FCom_Frontend:
                 routing:
                     - [ /*category, Sellvana_Catalog_Frontend_Controller_Category.index ]

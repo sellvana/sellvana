@@ -13,6 +13,9 @@ modules:
                     - [ /salestax/zones/?.action, Sellvana_SalesTax_Admin_Controller_Zones ]
                     - [ /salestax/rules/?.action, Sellvana_SalesTax_Admin_Controller_Rules ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
         observe:
             - [ Sellvana_Sales_Model_Cart_Total_Tax::calculate, Sellvana_SalesTax_Main.onCartTaxCalculate ]
             - [ Sellvana_Catalog_Model_Product::onAfterSave, Sellvana_SalesTax_Main.onProductAfterSave ]

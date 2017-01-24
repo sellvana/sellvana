@@ -1,0 +1,117 @@
+.main-info-block {
+	display: flex;
+	justify-content: space-between;
+	padding: 15px 0;
+	flex-wrap: wrap;
+	.total-sales,
+	.total-users,
+	.total-members,
+	.total-revenue {
+		display: inline-block;
+		vertical-align: top;
+		font-size: 0;
+		margin-bottom: 25px;
+		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+		.icon {
+			padding: 8px 10px 8px 10px;
+			text-align: center;
+			display: inline-block;
+			vertical-align: top;
+			min-height: 42px;
+			min-width: 60px;
+		}
+		i {
+			color: #fff;
+			font-size: 22px;
+		}
+		span {
+			font-weight: bold;
+			font-size: 13px;
+			color: #000;
+		}
+		p {
+			display: block;
+			margin-bottom: 3px;
+			font-size: 11px;
+			color: #000;
+		}
+		.data {
+			display: inline-block;
+			vertical-align: middle;
+			height: 100%;
+			background: #fff;
+			padding: 5px 14px 5px 6px;
+			    min-width: 90px;
+		}
+	}
+	p {
+		color: #fff;
+	}
+	.number {
+		font-size: 26px;
+		font-weight: bold;
+	}
+	.title {
+		text-transform: uppercase;
+		font-size: 11px;
+	}
+}
+
+.total-sales {
+	.icon {
+		background: #06bfee;
+	}
+}
+
+.total-users {
+	.icon {
+		background: #dd4a39;
+	}
+}
+
+.total-members {
+	.icon {
+		background: #00a55b;
+	}
+}
+
+.total-revenue {
+	.icon {
+		background: #f29b19;
+	}
+}
+
+.dashboard-title {
+	position: relative;
+	background: #f4f4f4;
+	padding: 5px 50px 5px 5px;
+	margin-bottom: 20px;
+	p {
+		font-weight: bold;
+		font-size: 14px;
+		text-transform: uppercase;
+		color: #000;
+	}
+	.roll-up {
+		position: absolute;
+		right: 20px;
+		top: 0;
+		font-size: 14px;
+		padding: 5px 8px;
+	}
+	.delete {
+		position: absolute;
+		right: 0;
+		top: 0;
+		font-size: 15px;
+		padding: 5px 8px;
+	}
+}
+
+@media (max-width: 767px) {
+	.control-buttons .select2-container {
+		min-width: 100%;
+		text-align: left;
+		margin-bottom: 10px;
+	}
+}

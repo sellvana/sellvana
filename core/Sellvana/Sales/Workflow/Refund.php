@@ -70,6 +70,8 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         $order->calcItemQuantities('refunds');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
+
+        return ['new_refund' => $refund];
     }
 
     public function action_adminUpdatesRefund($args)

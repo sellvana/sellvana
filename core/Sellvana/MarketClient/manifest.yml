@@ -17,6 +17,8 @@ modules:
                     - [ "FCom_Admin_Controller_Modules::gridViewBefore", Sellvana_MarketClient_Admin.onModulesGridViewBefore ]
                     - [ "FCom_Admin_Controller_Modules::gridView", Sellvana_MarketClient_Admin.onModulesGridView ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
 
             FCom_Cron:
                 crontab:

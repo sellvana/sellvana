@@ -37,8 +37,7 @@ class Sellvana_PaymentIdeal_Frontend_Controller
             /* @var $paymentMethod Sellvana_PaymentIdeal_PaymentMethod */
             $paymentMethod = $this->Sellvana_PaymentIdeal_PaymentMethod;
             $order = $paymentMethod->loadOrderByTransactionId($transactionId);
-            $sData =& $this->BSession->dataToUpdate();
-            $sData['last_order']['id'] = $order ? $order->id : null;
+            $this->BSession('last_order/id', $order ? $order->id : null);
         }
         return $this->forward('success', 'Sellvana_Checkout_Frontend_Controller_Checkout'); // forward to success page
     }

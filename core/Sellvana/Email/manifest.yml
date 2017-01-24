@@ -24,6 +24,9 @@ modules:
                     - [ /subscriptions/.action, Sellvana_Email_Admin_Controller_Subscriptions ]
                     - [ /messages/.action, Sellvana_Email_Admin_Controller_Messages ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
             FCom_Frontend:
                 routing:
                     - [ /email/pref, Sellvana_Email_Frontend_Controller.pref ]

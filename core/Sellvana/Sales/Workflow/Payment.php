@@ -195,6 +195,8 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $order->calcItemQuantities('payments');
         $order->state()->calcAllStates();
         $order->saveAllDetails();
+
+        return ['new_payment' => $payment];
     }
 
     public function action_adminUpdatesPayment($args)
@@ -321,11 +323,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $order = $transaction->payment()->order();
         $amount = (float)$transaction->get('amount');
         foreach ($order->items() as $oItem) {
-            if ($oItem->getBalanceAmount() <= 0) {
+            if ($oItem->getAmountDue() <= 0) {
                 continue;
             }
 
-            $toPay = min($amount, $oItem->getBalanceAmount());
+            $toPay = min($amount, $oItem->getAmountDue());
             $oItem->add('amount_paid', $toPay);
             $oItem->save();
             $amount -= $toPay;

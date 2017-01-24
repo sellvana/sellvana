@@ -1,0 +1,9 @@
+/:
+    - view: app
+        do:
+            - [ addNav, { path: /sales/tax, label: Sales Tax, pos: 30 } ]
+            - [ addNav, { path: /sales/tax/customer-classes, label: Customer Classes, link: /sales/tax/customer-classes, pos: 10 } ]
+            - [ addNav, { path: /sales/tax/product-classes, label: Product Classes, link: /sales/tax/product-classes, pos: 20 } ]
+            - [ addNav, { path: /sales/tax/zones, label: Geographical Zones, link: /sales/tax/zones, pos: 30 } ]
+            - [ addNav, { path: /sales/tax/rules, label: Rules, link: /sales/tax/rules, pos: 40 } ]
+

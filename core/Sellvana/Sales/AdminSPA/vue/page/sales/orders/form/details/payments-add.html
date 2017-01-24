@@ -1,0 +1,104 @@
+<div class="details-additional-block">
+    <div class="block-title">
+        <p>{{'Add a new payment'|_}}</p>
+    </div>
+    <div v-if="form.items_payable">
+        <div class="scrollable-area">
+            <table class="secondary-table combined-table">
+                <thead>
+                <tr>
+                    <th>{{'Pay'|_}}</th>
+                    <th>{{'Thumbnail'|_}}</th>
+                    <th>{{'Product Info'|_}}</th>
+                    <th>{{'Amounts'|_}}</th>
+                    <th>{{'Payable'|_}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in form.items_payable" :class="{selected: isItemSelected(item)}">
+                    <th class="column-row-select">
+                        <label @click.prevent="toggleItem(item)"><input type="checkbox" :checked="isItemSelected(item)"/>
+                            <span><i class="fa fa-check" aria-hidden="true"></i></span></label>
+                    </th>
+                    <td>
+                        <img :src="item.thumb_url" :alt="item.product_name">
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                            <tr><th>{{'Name:'|_}}</th><td>{{item.product_name}}</td></tr>
+                            <tr><th>{{'Qty:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
+                            <tr><th>{{'P.SKU:'|_}}</th><td>{{item.product_sku}}</td></tr>
+                            <tr><th>{{'I.SKU:'|_}}</th><td>{{item.inventory_sku}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                            <tr><th>{{'Total:'|_}}</th><td>{{item.row_total|currency}}</td></tr>
+                            <tr><th>{{'Paid:'|_}}</th><td>{{item.amount_paid|currency}}</td></tr>
+                            <tr><th>{{'In Payments:'|_}}</th><td>{{item.amount_in_payments|currency}}</td></tr>
+                            <tr><th>{{'Due:'|_}}</th><td>{{item.amount_due|currency}}</td></tr>
+                        </tbody></table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                            <tr><th>{{'To Pay:'|_}}</th>
+                                <td><input type="number" class="form-control" v-model="item.amount_to_pay" :disabled="!isItemSelected(item)"></td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <tr v-for="total in form.totals" v-if="total.amount_due" :class="{selected: isItemSelected(total)}">
+                    <th class="column-row-select">
+                        <label @click.prevent="toggleItem(total)"><input type="checkbox" :checked="isItemSelected(total)"/>
+                            <span><i class="fa fa-check" aria-hidden="true"></i></span></label>
+                    </th>
+                    <td></td>
+                    <td>
+                        <strong>{{total.label|_}}</strong>
+                    </td>
+                    <td>
+                        <table class="combined-columns">
+                        <tr><th>{{'Total:'|_}}</th><td>{{total.value|currency}}</td></tr>
+                        <tr><th>{{'Due:'|_}}</th><td>{{total.amount_due|currency}}</td></tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="combined-columns"><tbody>
+                        <tr><th>{{'To Pay:'|_}}</th>
+                            <td><input type="text" class="form-control" v-model="total.amount_to_pay" :disabled="!isItemSelected(total)"></td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="total-amount">
+            <div class="total-amount-pay">
+                <p>{{'Total Amount to Pay'|_}}</p>
+				<span class="total-sum">{{totalAmountToPay|currency}}</span>
+            </div>
+			<div class="create-payment">
+				<p>{{'Payment Method'|_}}</p>
+				<select2 v-model="payment_method">
+                    <option></option>
+                    <option v-for="m in form.payment_methods" :value="m.id">{{m.text}}</option>
+				</select2>
+            </div>
+			<!--<div class="create-payment">
+				
+            </div>-->
+        </div>
+      <!--  <div class="">
+            
+        </div>-->
+        <div class="control-buttons-block text-right">
+            <button type="button" class="button button12" @click="submit()" :diabled="!totalAmountToPay">{{'Create and Save Payment'|_}}</button>
+            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+        </div>
+    </div>
+    <div v-else>
+        {{'No payable items found.'|_}}
+        <div class="control-buttons-block text-right">
+            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+        </div>
+    </div>
+</div>

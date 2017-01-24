@@ -62,11 +62,12 @@ class FCom_OAuth_Main extends BClass
         if (!$providerName) {
             $providerName = $this->getProvider();
         }
-        $sessData =& $this->BSession->dataToUpdate();
-        if (empty($sessData['oauth'][$providerName])) {
-            $sessData['oauth'][$providerName] = [];
+        $token = $this->BSession->get("oauth/{$providerName}");
+        if (!$token) {
+            $this->BSession->set("oauth/{$providerName}", []);
+            return [];
         }
-        return $sessData['oauth'][$providerName];
+        return $token;
     }
 
     public function setReturnUrl($url)

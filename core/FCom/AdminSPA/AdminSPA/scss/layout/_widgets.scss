@@ -1,0 +1,131 @@
+.widget-menu {
+	position: relative;
+	left: -15px;
+	li {
+		margin-bottom: 5px;
+	}
+	a {
+		padding: 10px;
+		display: inline-block;
+		background: #ededed;
+		width: 100%;
+		span {
+			font-size: 11px;
+			color: #000;
+			display: inline-block;
+			width: 80%;
+			vertical-align: middle;
+		}		
+	}
+	i {
+		font-size: 25px;
+		vertical-align: middle;
+		color: #000;
+		display: inline-block;
+	}
+	.fa-ellipsis-v {
+		font-size: 16px;
+		margin-right: 10px;		
+	}
+}
+.widget-block {
+	background: #fafafa;
+	margin-bottom: 20px;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	.dropdown.action {
+		width: 100px;
+		min-width: 100px;
+		position: absolute;
+		right: 10px;
+		top: 7px;
+	}
+	.dropdown.action .dropdown-toggle {
+		padding: 3px 20px;
+	}
+	.dropdown.action .dropdown-menu {
+		width: 100px;
+		min-width: 100px;
+	}
+	.dropdown.action.dropdown-buttons .caret-back {
+		right: 9px;
+		top: 3px;
+		width: auto;
+		height: auto;
+		padding: 0;
+	}
+	.dropdown.action .dropdown-menu a {
+		padding: 5px 10px;
+	}
+}
+.main-widget-block {
+	background: #dcdcdc; 
+}
+.widget-block-title {
+	padding: 3px 0 3px 12px;
+	background: #eee;
+	position: relative;
+	p {
+		text-transform: uppercase;
+		font-size: 15px;
+		padding: 4px 0 4px 0;
+		color: #000;
+		display: inline-block;
+		width: 49%;
+	}
+}
+.widget-block-content {
+	padding: 10px;
+}
+.widget {
+	padding: 5px;
+	border: 1px solid #dad6d6;
+	border-radius: 3px;
+	background: #f9f9f9;
+	margin-bottom: 10px;
+	.widget-title {
+		position: relative;
+		margin-bottom: 15px;
+		p {
+			text-transform: uppercase;
+			color: #000;
+			font-size: 14px;
+			font-weight: bold;
+		}
+	}
+	.delete {
+		position: absolute;
+		right: 0;
+		top: 0;
+		font-size: 15px;
+	}
+	input, textarea, .select2 {
+		width: 100%;
+	}
+	.widget-container {
+		min-height: 100px;
+		background: #fff;
+	}
+	.control-block {
+		padding: 5px 0;
+	}
+	.input-group {
+		margin: 5px 0;
+	}
+}
+
+@media (max-width: 767px) {
+	.widget-menu {
+		left: 0;
+		a {
+			span {
+				font-size: 9px;
+			}		
+		}
+	}
+	.widget {
+		.input-group-sm > .form-control, .input-group-sm > .input-group-addon, .input-group-sm > .input-group-btn > .btn {
+			padding: 5px 5px;
+		}
+	}
+}
+

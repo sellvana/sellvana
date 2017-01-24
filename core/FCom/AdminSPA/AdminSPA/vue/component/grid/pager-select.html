@@ -1,0 +1,17 @@
+<div>
+    <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(ddName)}">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(ddName)"
+           @click.prevent.stop="ddToggle(ddName)"><span>{{curPagesize}}</span><span class="caret-back"><b class="caret"></b></span></a>
+        <ul class="dropdown-menu">
+            <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}"><a href="#" @click.prevent="setPagesize(ps)" class="js-change-url page-size">{{ps}}</a></li>
+        </ul>
+    </div>
+    <ul class="pagination pagination-sm pagination-griddle page">
+        <li class="prev"><a href="#" @click.prevent="goPrevPage()">{{'Previous'|_}}</a></li>
+        <li class="page active">
+            <input type="number" min=1 step="1" v-model="curPage" @change="goPage()"/>
+        </li>
+        <li>{{'of'|_}}<span>{{numPages}}</span></li>
+        <li class="next"><a href="#" @click.prevent="goNextPage()">{{'Next'|_}}</a></li>
+    </ul>
+</div>

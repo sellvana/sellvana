@@ -35,6 +35,7 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         $viewName = $product->get('custom_details_view') ?: 'catalog/product/details';
         $layout->getView($viewName)->set('product', $product);
         $head = $layout->getView('head');
+        $layout->hookView('main', $viewName);
 
         $categoryPath = $this->BRequest->param('category');
         

@@ -1,0 +1,44 @@
+.secondary-menu {
+	background: #fff;
+	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	border-radius: 2px;
+	margin-bottom: 20px;
+	.nav a {
+		padding: 12px 15px;
+	}
+	.nav .active {
+		background: #eee;
+		&:focus {
+			background: #eee;
+		}
+		a {
+			color: #000;
+			background: #eee;
+		}
+	}
+	.dropdown-menu {
+		padding: 0;
+		a {
+			padding: 3px 20px;
+		}
+	}
+	.fa-warning, .fa-pencil {
+		float: right;
+		padding: 2px 7px;
+	}
+}
+.col-md-12.col-lg-2 .secondary-menu {
+	margin-top: 66px;
+}
+.col-md-12.col-lg-2 img ~ .secondary-menu {
+	margin-top: 20px;
+}
+.horizontal-menu {
+	display: inline-block;
+	li {
+		display: inline-block;
+	}
+	.dropdown li {
+		display: block;
+	}
+}

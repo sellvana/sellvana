@@ -621,6 +621,7 @@ class BRequest extends BClass
         if (empty($path)) {
             $path = $this->webRoot();
         }
+        $path = rtrim($path, '/') . '/';
         return $path;
     }
 
@@ -1418,11 +1419,27 @@ class BResponse extends BClass
 
     public function fileContentType($fileName)
     {
-        $type = 'application/octet-stream';
-        switch (strtolower(pathinfo($fileName, PATHINFO_EXTENSION))) {
-            case 'jpeg': case 'jpg': $type = 'image/jpg'; break;
-            case 'png': $type = 'image/png'; break;
-            case 'gif': $type = 'image/gif'; break;
+        if (file_exists($fileName)) {
+            $type = mime_content_type($fileName);
+        }
+
+        if (empty($type)) {
+            $type = 'application/octet-stream';
+            switch (strtolower(pathinfo($fileName, PATHINFO_EXTENSION))) {
+                case 'jpeg':
+                case 'jpg':
+                    $type = 'image/jpg';
+                    break;
+                case 'png':
+                    $type = 'image/png';
+                    break;
+                case 'gif':
+                    $type = 'image/gif';
+                    break;
+                case 'csv':
+                    $type = 'text/csv';
+                    break;
+            }
         }
         return $type;
     }
@@ -1460,7 +1477,7 @@ class BResponse extends BClass
             'Cache-Control: must-revalidate, post-check=0, pre-check=0',
             'Content-Length: ' . filesize($source),
             'Last-Modified: ' . date('r'),
-            'Content-Type: ' . $this->fileContentType($fileName),
+            'Content-Type: ' . $this->fileContentType($source),
             'Content-Disposition: ' . $disposition . '; filename=' . $fileName,
         ]);
 
@@ -2038,7 +2055,6 @@ class BRouting extends BClass
             $this->BDebug->debug('DIRECT ROUTE: ' . $requestRoute);
             return $this->_routes[$requestRoute];
         }
-
         $this->BDebug->debug('FIND ROUTE: ' . $requestRoute);
         foreach ($this->_routes as $routeName => $route) {
             if ($route->match($requestRoute)) {
@@ -2137,7 +2153,7 @@ class BRouting extends BClass
 #echo "<pre>"; print_r($this->_routes); exit;
         while (($attempts++ < 100) && (false === $forward || is_array($forward))) {
             $route = $this->findRoute($requestRoute);
-#echo "<pre>"; print_r($route); echo "</pre>";
+#echo "<pre>"; print_r($route); echo "</pre>"; exit;
             if (!$route) {
                 $route = $this->findRoute('_ /noroute');
             }
@@ -2365,7 +2381,7 @@ class BRouteNode extends BClass
         $attempts = 0;
         $observer = $this->validObserver();
         while ((++$attempts < 100) && $observer) {
-
+#print_r($observer); exit;
             $forward = $observer->dispatch();
             if (is_array($forward)) {
                 return $forward;

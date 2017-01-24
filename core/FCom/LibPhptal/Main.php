@@ -99,8 +99,9 @@ class FCom_LibPhptal_Main extends BClass
 
     public function onLayoutLoadThemeBefore($args)
     {
+        /** @var FCom_Core_View_Root $root */
         $root = $this->BLayout->getView('root');
-        if ($root) {
+        if ($root && $root instanceof FCom_Core_View_Root) {
             $root->xmlns('tal', 'http://xml.zope.org/namespaces/tal')
                 ->xmlns('metal', 'http://xml.zope.org/namespaces/metal')
                 ->xmlns('i18n', 'http://xml.zope.org/namespaces/i18n')

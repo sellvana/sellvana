@@ -1,0 +1,24 @@
+/:
+    - view: head
+        do:
+            - [ requireJs, sv-page-vendors, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/index" ]
+            - [ requireJs, sv-page-vendors-tpl, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/index.html" ]
+            - [ requireJs, sv-page-vendors-grid-config, "~/vendors/grid_config" ]
+
+            - [ requireJs, sv-page-vendors-form, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/form" ]
+            - [ requireJs, sv-page-vendors-form-tpl, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/form.html" ]
+
+            - [ requireJs, sv-page-vendors-form-main, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/form/main" ]
+            - [ requireJs, sv-page-vendors-form-main-tpl, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/form/main.html" ]
+
+    - view: app
+        do:
+            - [ addNav, { path: /catalog/vendors, label: Vendors, link: /vendors, pos: 60 } ]
+
+            - [ addRoute, { path: /vendors, require: [ sv-page-vendors, text!sv-page-vendors-tpl, json!sv-page-vendors-grid-config ] } ]
+            - [ addRoute, { path: /vendors/form, require: [ sv-page-vendors-form, text!sv-page-vendors-form-tpl ] } ]
+
+/vendors/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /vendors/form, name: main, label: Vendor Info, pos: 10 } ]

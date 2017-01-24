@@ -1,0 +1,74 @@
+define(['vue', 'sv-hlp'],
+    function (Vue, SvHlp) {
+
+        var defForm = {
+            options: {},
+            updates: {},
+            tabs: [],
+
+            customer: {}
+        };
+
+        return {
+            mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+            data: function () {
+                return {
+                    form: defForm
+                }
+            },
+            methods: {
+                buttonAction: function (act) {
+                    console.log(act);
+                },
+                updateBreadcrumbs: function (label) {
+                    this.$store.commit('setData', {curPage: {
+                        link: this.$router.currentRoute.fullPath,
+                        label: label,
+                        breadcrumbs: [
+                            {nav:'/customers', label:'Customers', icon_class:'fa fa-user'},
+                            {link:'/customers', label:'Customers'}
+                        ]
+                    }});
+                },
+                fetchData: function () {
+                    var custId = this.$router.currentRoute.query.id, vm = this;
+                    this.sendRequest('GET', 'customers/form_data', {id: custId}, function (response) {
+                        vm.processFormDataResponse(response);
+                        vm.updateBreadcrumbs(vm.form.customer.firstname + ' ' + vm.form.customer.lastname);
+                    });
+                },
+                doDelete: function () {
+                    if (!confirm(SvHlp._('Are you sure you want to delete this customer?'))) {
+                        return;
+                    }
+                    this.sendRequest('POST', 'customers/form_delete', {id: this.form.customer.id}, function (response) {
+                        if (!response.ok) {
+
+                        }
+                    });
+                },
+                save: function (stayOnPage) {
+                    var vm = this;
+                    this.sendRequest('POST', 'customers/form_data', this.form.updates, function (response) {
+                        if (!response._ok) {
+
+                        }
+                        for (var i in response.form) {
+                            Vue.set(vm.form, i, response.form[i]);
+                        }
+                        if (!vm.form.updates) {
+                            Vue.set(vm.form, 'updates', {});
+                        }
+                        if (!stayOnPage) {
+                            vm.$router.go(-1);
+                        }
+                    })
+                }
+            },
+            watch: {
+                'form.customer': function (customer) {
+
+                }
+            }
+        };
+    });

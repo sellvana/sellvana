@@ -2351,6 +2351,18 @@ class Sellvana_Sales_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_6_11_0__0_6_12_0()
+    {
+        $tTransaction = $this->Sellvana_Sales_Model_Order_Payment_Transaction->table();
+        $this->BDb->ddlTableDef($tTransaction, [
+            BDb::COLUMNS => [
+                'amount_in_refunds' => BDb::DROP,
+                'amount_authorized' => 'decimal(12,2) not null default 0',
+                'amount_captured' => 'decimal(12,2) not null default 0',
+            ],
+        ]);
+    }
 }
 
 /**
