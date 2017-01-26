@@ -330,7 +330,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                     var vm = this;
                     return function (rItem) {
                         var pItem = vm.orderItem(rItem);
-                        return pItem ? pItem.data_serialized.custom_label : 'Refunded Item';
+                        return pItem ? pItem.data_custom.custom_label : 'Refunded Item';
                     }
                 },
                 totalItemAmountPaid: function () {

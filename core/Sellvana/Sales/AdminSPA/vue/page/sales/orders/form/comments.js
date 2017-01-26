@@ -1,4 +1,6 @@
-define(['vue', 'text!sv-page-sales-orders-form-comments-tpl'], function (Vue, tabCommentsTpl) {
+define(['vue', 'text!sv-page-sales-orders-form-comments-tpl', 'text!sv-page-sales-orders-form-comments-comment-tpl',
+    'text!sv-page-sales-orders-form-comments-comment-add-tpl'
+    ], function (Vue, tabCommentsTpl, commentTpl, commentAddTpl) {
 
     var defForm = {
         options: {},
@@ -14,13 +16,46 @@ define(['vue', 'text!sv-page-sales-orders-form-comments-tpl'], function (Vue, ta
         cancellations: {}
     };
 
+    var Comment = {
+        props: ['form', 'comment'],
+        template: commentTpl
+    };
+
+    var CommentAdd = {
+        props: ['form'],
+        template: commentAddTpl
+    };
+
     return {
         props: {
-            form: {
-                default: defForm
+            form: {}
+        },
+        data: function () {
+            return {
+                show_add_comment: false,
+                sort_by: 'date',
+                sort_by_dir: 'desc',
+                sort_by_options: [{name: 'date', label: 'Date'}, {name: 'status', label: 'Status'}, {name: 'name', label: 'Name'}]
             }
         },
         template: tabCommentsTpl,
+        components: {
+            comment: Comment,
+            commentAdd: CommentAdd
+        },
+        methods: {
+            toggleSort: function (sortBy) {
+                if (sortBy === this.sort_by) {
+                    this.sort_by_dir = this.sort_by_dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.sort_by = sortBy;
+                    this.sort_by_dir = 'asc';
+                }
+            },
+            showAddComment: function () {
+                this.show_add_comment = true;
+            }
+        },
         created: function () {
             Vue.set(this.form, 'comments', [
                 {

@@ -67,50 +67,54 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         if (!$order) {
             throw new BException('Order not found');
         }
-        return [
-            'tabs' => $this->getFormTabs('/sales/orders/form'),
-            'details_sections' => $this->view('sales/orders/form')->getDetailsSections(),
+        $form = [];
 
-            'order' => $this->_getOrderData($order),
-            'items' => $this->_getOrderItems($order),
-            'totals' => $this->_getOrderTotals($order),
+        $form['tabs'] = $this->getFormTabs('/sales/orders/form');
+        $form['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
 
-            'shipments' => $this->_getShipments($order),
-            'returns' => $this->_getReturns($order),
-            'payments' => $this->_getPayments($order),
-            'refunds' => $this->_getRefunds($order),
-            'cancellations' => $this->_getCancellations($order),
+        $form['order'] = $this->_getOrderData($order);
+        if ($order->get('customer_id')) {
+            $form['customer'] = $this->_getOrderCustomer($order);
+        }
+        $form['items'] = $this->_getOrderItems($order);
+        $form['totals'] = $this->_getOrderTotals($order);
 
-            'items_payable' => $this->_getPayableItems($order),
-            'items_shippable' => $this->_getShippableItems($order),
-            'items_returnable' => $this->_getReturnableItems($order),
-            'items_refundable' => $this->_getRefundableItems($order),
-            'items_cancellable' => $this->_getCancellableItems($order),
+        $form['shipments'] = $this->_getShipments($order);
+        $form['returns'] = $this->_getReturns($order);
+        $form['payments'] = $this->_getPayments($order);
+        $form['refunds'] = $this->_getRefunds($order);
+        $form['cancellations'] = $this->_getCancellations($order);
 
-            'comments' => $this->_getComments($order),
+        $form['items_payable'] = $this->_getPayableItems($order);
+        $form['items_shippable'] = $this->_getShippableItems($order);
+        $form['items_returnable'] = $this->_getReturnableItems($order);
+        $form['items_refundable'] = $this->_getRefundableItems($order);
+        $form['items_cancellable'] = $this->_getCancellableItems($order);
 
-            'options' => [
-                'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
-                'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
-                'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
-                'order_state_custom' => $order->state()->custom()->getAllValueLabels(),
-                'item_state_overall' => $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels(),
-                'item_state_delivery' => $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels(),
-                'item_state_custom' => $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels(),
-                'shipment_state_overall' => $this->Sellvana_Sales_Model_Order_Shipment_State_Overall->getAllValueLabels(),
-                'payment_state_overall' => $this->Sellvana_Sales_Model_Order_Payment_State_Overall->getAllValueLabels(),
-                'return_state_overall' => $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels(),
-                'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
-                'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
-            ],
+        $form['comments'] = $this->_getComments($order);
 
-            'items_grid_config' => $this->applyGridPersonalization($this->normalizeGridConfig($this->getItemsGridConfig())),
-
-            'payment_methods' => $this->_getPaymentMethods(),
-            'shipping_methods' => $this->_getShippingMethods(),
-
-            'updates' => new stdClass,
+        $form['options'] = [
+            'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
+            'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
+            'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
+            'order_state_custom' => $order->state()->custom()->getAllValueLabels(),
+            'item_state_overall' => $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels(),
+            'item_state_delivery' => $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels(),
+            'item_state_custom' => $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels(),
+            'shipment_state_overall' => $this->Sellvana_Sales_Model_Order_Shipment_State_Overall->getAllValueLabels(),
+            'payment_state_overall' => $this->Sellvana_Sales_Model_Order_Payment_State_Overall->getAllValueLabels(),
+            'return_state_overall' => $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels(),
+            'refund_state_overall' => $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels(),
+            'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
         ];
+
+        $form['items_grid_config'] = $this->applyGridPersonalization($this->normalizeGridConfig($this->getItemsGridConfig()));
+        $form['payment_methods'] = $this->_getPaymentMethods();
+        $form['shipping_methods'] = $this->_getShippingMethods();
+
+        $form['updates'] = new stdClass;
+        
+        return $form;
     }
 
     public function action_form_data()
@@ -128,6 +132,16 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     protected function _getOrderData(Sellvana_Sales_Model_Order $order)
     {
         return $order->as_array();
+    }
+
+    protected function _getOrderCustomer(Sellvana_Sales_Model_Order $order)
+    {
+        $customer = $this->Sellvana_Customer_Model_Customer->load($order->get('customer_id'));
+        return [
+            'firstname' => $customer->get('firstname'),
+            'lastname' => $customer->get('lastname'),
+            'email' => $customer->get('email'),
+        ];
     }
 
     protected function _getOrderItems(Sellvana_Sales_Model_Order $order)
@@ -261,9 +275,17 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
     protected function _getComments($order)
     {
-        $comments = $this->Sellvana_Sales_Model_Order_Comment->orm()->where('order_id', $order->id())->find_many();
+        $rawComments = $this->Sellvana_Sales_Model_Order_Comment->orm('oc')
+            ->where('order_id', $order->id())
+            ->left_outer_join('FCom_Admin_Model_User', ['u.id', '=', 'oc.user_id'], 'u')
+            ->select('oc.*')
+            ->find_many();
+        $comments = [];
+        foreach ($rawComments as $c) {
+            $comment = $c->as_array();
+        }
 
-        return $this->BDb->many_as_array($comments);
+        return $comments;
     }
 
     protected function _getPaymentMethods()
@@ -287,7 +309,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             $result[] = [
                 'id' => $methodCode,
                 'text' => $method->getName(),
-                'services' => $method->getServices()
+                'services' => $method->getServices(['no_remote' => true]),
             ];
         }
         return $result;
@@ -328,8 +350,22 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     {
         $result = [];
         try {
-            //$orderId =
-            $this->ok()->addMessage('Order changes has been saved successfully', 'success');
+            $formData = (array)$this->BRequest->post('form');
+            $orderData = $formData['order'];
+            $orderId = $orderData['id'];
+            $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+            if (!$order) {
+                throw new BException('Invalid order ID');
+            }
+
+            foreach ($orderData as $k => $v) {
+                if (!in_array($k, ['customer_email', 'state_custom']) && !preg_match('#^(shipping|billing)_#', $k)) {
+                    unset($orderData[$k]);
+                }
+            }
+            $order->set($orderData)->save();
+
+            $this->ok()->addMessage('Order changes have been saved successfully', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
         }

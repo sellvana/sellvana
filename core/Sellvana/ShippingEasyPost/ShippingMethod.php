@@ -298,11 +298,11 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         return $cartRates;
     }
 
-    public function getServices()
+    public function getServices(array $args = [])
     {
         $config = $this->BConfig->get($this->_configPath);
         $services = [];
-        if (empty($config['access_key'])) {
+        if (empty($config['access_key']) || !empty($args['no_remote'])) {
             return [];
         }
 

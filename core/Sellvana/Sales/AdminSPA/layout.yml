@@ -51,6 +51,8 @@
 
 			- [ requireJs, sv-page-sales-orders-form-comments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments" ]
 			- [ requireJs, sv-page-sales-orders-form-comments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments.html" ]
+			- [ requireJs, sv-page-sales-orders-form-comments-comment-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment.html" ]
+			- [ requireJs, sv-page-sales-orders-form-comments-comment-add-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/comments/comment-add.html" ]
 
 			- [ requireJs, sv-page-sales-orders-form-history, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history" ]
 			- [ requireJs, sv-page-sales-orders-form-history-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history.html" ]

@@ -11,7 +11,7 @@
 										<label>
 											<p class="col-md-8 control-label">{{'Show Custom Content'|_}}</p>
 											<div class="col-md-4">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.show_content"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -19,7 +19,7 @@
 										<label>
 											<p class="col-md-8 control-label">{{'Show Sidebar'|_}}</p>
 											<div class="col-md-4">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.show_sidebar"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -27,7 +27,7 @@
 										<label>
 											<p class="col-md-8 control-label">{{'Show Block / Page'|_}}</p>
 											<div class="col-md-4">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.show_view"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -39,7 +39,7 @@
 										<label>
 											<p class="col-md-8 control-label">{{'Show Subcategories'|_}}</p>
 											<div class="col-md-4">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.show_sub_cat"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -47,7 +47,7 @@
 										<label>
 											<p class="col-md-8 control-label">{{'Show Products'|_}}</p>
 											<div class="col-md-4">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.show_products"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -89,7 +89,7 @@
 							<div class="form-group">
 								<label> <span class="col-md-3 control-label">{{'Custom Content'|_}}</span>
 									<div class="col-md-9">
-										<ckeditor></ckeditor>
+										<ckeditor v-model="form.category.content"></ckeditor>
 									</div>
 								</label>
 							</div>

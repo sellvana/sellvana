@@ -1,7 +1,11 @@
 define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
         'vue-ckeditor', 'vue-select2', 'spin', 'ladda', 'nprogress',
+        'sv-comp-form-layout', 'sv-comp-form-translations',
         'ckeditor', 'select2'],
-    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable, VueCkeditor, VueSelect2, Spin, Ladda, NProgress) {
+    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
+              VueCkeditor, VueSelect2, Spin, Ladda, NProgress,
+              SvCompFormLayout, SvCompFormTranslations
+    ) {
 
         Vue.use(VueRouter);
         Vue.use(Vuex);
@@ -563,6 +567,15 @@ console.log('onError', err.xhr);
                 }
             },
             formTab: {
+                components: {
+                    'sv-comp-form-layout': SvCompFormLayout,
+                    'sv-comp-form-translations': SvCompFormTranslations
+                },
+                data: function () {
+                    return {
+                        currentTranslation: false
+                    }
+                },
                 computed: {
                     fieldClass: function () {
                         var vm = this;
@@ -584,6 +597,14 @@ console.log('onError', err.xhr);
                                 break;
                             }
                         }
+                    },
+                    toggleTranslations: function (field) {
+                        this.currentTranslation = {
+                            field: field
+                        };
+                    },
+                    processTranslationsEvent: function (args) {
+                        console.log(args);
                     }
                 }
             }

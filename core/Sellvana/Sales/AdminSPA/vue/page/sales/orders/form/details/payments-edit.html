@@ -110,7 +110,7 @@
 
 				<tr v-for="item in entity.items" v-if="!item.order_item_id">
 					<td colspan="3" style="text-align:right">
-						<strong>{{item.data_serialized.custom_label|_}}</strong>
+						<strong>{{item.data_custom.custom_label|_}}</strong>
 					</td>
 					<td>
 						<table class="combined-columns">
@@ -147,7 +147,7 @@
 						<td>
 							<strong>{{ t.transaction_type }}</strong>
 							<div>
-								<a v-if="t.data_serialized.error" href="#" :title="t.data_serialized.error" @click.prevent>{{ transactionStatus(t) }}</a>
+								<a v-if="t.data_custom.error" href="#" :title="t.data_custom.error" @click.prevent>{{ transactionStatus(t) }}</a>
 								<span v-else>{{ transactionStatus(t)|_ }}</span>
 							</div>
 						</td>

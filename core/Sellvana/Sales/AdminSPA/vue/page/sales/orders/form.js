@@ -96,8 +96,12 @@ define(['vue', 'sv-hlp'],
                 });
 			},
 			save: function (stayOnPage) {
-				var vm = this;
-				this.sendRequest('POST', 'orders/form_data', this.form.updates, function (response) {
+				var vm = this, postData = {
+					form: {
+						order: this.form.order
+					}
+				};
+				this.sendRequest('POST', 'orders/form_data', postData, function (response) {
 					if (!response.ok) {
 
 					}
@@ -114,9 +118,7 @@ define(['vue', 'sv-hlp'],
 		    }
 		},
 		watch: {
-			'form.order': function (order) {
 
-			}
 		}
     };
 });

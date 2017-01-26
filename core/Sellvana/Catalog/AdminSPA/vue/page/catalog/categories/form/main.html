@@ -11,7 +11,7 @@
 										<label>
 											<p class="col-md-6 control-label">{{'Display in Navigation'|_}}</p>
 											<div class="col-md-6">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.is_top_menu"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -19,7 +19,7 @@
 										<label>
 											<p class="col-md-6 control-label">{{'Featured'|_}}</p>
 											<div class="col-md-6">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.is_featured"></checkbox>
 											</div>
 										</label>
 									</div>
@@ -27,26 +27,17 @@
 										<label>
 											<p class="col-md-6 control-label">{{'Enable'|_}}</p>
 											<div class="col-md-6">
-												<checkbox v-model="test"></checkbox>
+												<checkbox v-model="form.category.is_enabled"></checkbox>
 											</div>
 										</label>
 									</div>
 								</div>
 							</div>
-							<div class="form-group">
-								<label>
-									<p class="col-md-3 control-label">{{'ID:14'|_}}</p>
-									<div class="col-md-9">
-										<input class="form-control" type="text" />
-										<a href="#" class="translate-icon"><i class="fa fa-globe" aria-hidden="true"></i></a>
-									</div>
-								</label>
-							</div>
 							<div class="form-group required">
 								<label>
 									<p class="col-md-3 control-label">{{'Label'|_}}</p>
 									<div class="col-md-9">
-										<input class="form-control" type="text" />
+										<input class="form-control" type="text" v-model="form.category.node_name"/>
 									</div>
 								</label>
 							</div>
@@ -55,7 +46,7 @@
 									<p class="col-md-3 control-label">{{'URL Key '|_}}
 									</p>
 									<div class="col-md-9">
-										<input class="form-control" type="number" />
+										<input class="form-control" type="number" v-model="form.category.url_key"/>
 									</div>
 								</label>
 							</div>
@@ -63,7 +54,7 @@
 								<label>
 									<p class="col-md-3 control-label">{{'Nav Sort Order'|_}}</p>
 									<div class="col-md-9">
-										<input class="form-control" type="number" />
+										<input class="form-control" type="number" v-model="form.category.sort_order"/>
 									</div>
 								</label>
 							</div>
@@ -71,7 +62,7 @@
 								<label>
 									<p class="col-md-3 control-label">{{'Page Title'|_}}</p>
 									<div class="col-md-9">
-										<input class="form-control" type="text" />
+										<input class="form-control" type="text" v-model="form.category.page_title"/>
 									</div>
 								</label>
 							</div>
@@ -79,8 +70,8 @@
 								<label>
 									<p class="col-md-3 control-label">{{'Meta Title'|_}}</p>
 									<div class="col-md-9">
-										<input class="form-control" type="text" />
-										<a href="#" class="translate-icon"><i class="fa fa-globe" aria-hidden="true"></i></a>
+										<input class="form-control" type="text" v-model="form.category.meta_title"/>
+										<a href="#" class="translate-icon" @click.prevent="toggleTranslations('meta_title')"><i class="fa fa-globe" aria-hidden="true"></i></a>
 									</div>
 								</label>
 							</div>
@@ -88,7 +79,7 @@
 								<label>
 									<p class="col-md-3 control-label">{{'Meta Description'|_}}</p>
 									<div class="col-md-9">
-										<textarea class="form-control" rows="5"></textarea>
+										<textarea class="form-control" rows="5" v-model="form.category.meta_description"></textarea>
 									</div>
 								</label>
 							</div>
@@ -96,7 +87,7 @@
 								<label>
 									<p class="col-md-3 control-label">{{'Meta Keywords'|_}}</p>
 									<div class="col-md-9">
-										<textarea class="form-control" rows="5"></textarea>
+										<textarea class="form-control" rows="5" v-model="form.category.meta_keywords"></textarea>
 									</div>
 								</label>
 							</div>
@@ -107,36 +98,6 @@
 		</div>
 	</div>
 	<div class="col-md-12 col-lg-6">
-		<div class="admin-main-content">
-			<div class="multilanguage-block">
-				<div class="block-title">
-					<p>{{'Multi Language'|_}}</p>
-				</div>
-				<div>
-					<div class="row form-group">
-						<div class="col-xs-5">
-							<select2 class="form-control">
-								<option>Language1</option>
-								<option>Language2</option>
-							</select2>
-						</div>
-						<div class="col-xs-5">
-							<input class="form-control" type="text" />
-						</div>
-						<div class="col-xs-1">
-							<a href="#" class="delete"><i aria-hidden="true" class="fa fa-trash"></i></a>
-						</div>
-					</div>
-					<div class="row form-group">
-						<div class="col-xs-5">
-							<select2 class="form-control">
-								<option>Language1</option>
-								<option>Language2</option>
-							</select2>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<sv-comp-form-translations v-if="currentTranslation" :form="form" :current="currentTranslation" @event="processTranslationsEvent"></sv-comp-form-translations>
 	</div>
 </div>

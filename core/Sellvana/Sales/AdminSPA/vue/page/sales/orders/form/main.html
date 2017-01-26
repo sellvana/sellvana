@@ -13,9 +13,12 @@
 								</a>
 							</div>
 							<div class="section-view">
-								<p>
-									<label>{{'Email:'|_}}</label> <strong>{{form.order.customer_email}}</strong>
+								<p v-if="form.order.customer_id">
+									<a :href="'#/customers/form?id='+form.order.customer_id">
+										[{{form.order.customer_id}}] {{form.customer.firstname}} {{form.customer.lastname}} &lt;{{form.customer.email}}&gt;
+									</a>
 								</p>
+								<p><label>{{'Email:'|_}}</label> <strong>{{form.order.customer_email}}</strong></p>
 							</div>
 							<div class="section-edit">
 								<label>{{'Email:'|_}}</label>
@@ -193,8 +196,8 @@
 								<span :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</span>
 							</div>
 							<div v-for="r in form.returns">
-								<strong>{{'RETURN'|_}}</strong>
-								<p :class="'status-' + r.state_overall">{{form.options.return_state_overall[r.state_overall]}}</p>
+								<strong>{{'RETURN: '|_}}</strong>
+								<span :class="'status-' + r.state_overall">{{form.options.return_state_overall[r.state_overall]}}</span>
 							</div>
 						</div>
 					</div>
