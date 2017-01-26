@@ -1405,15 +1405,21 @@ class BUtil extends BClass
             if ($method === 'POST') {
                 $curlOpt += [
                     CURLOPT_POSTFIELDS => $postContent,
-                    CURLOPT_POST => 1,
+                    //CURLOPT_POST => 1,
                     CURLOPT_CUSTOMREQUEST => 'POST',
                 ];
+                if (empty($options['use_customrequest_only'])) {
+                    $curlOpt['CURLOPT_POST'] = 1;
+                }
             } elseif ($method === 'PUT') {
                 $curlOpt += [
                     CURLOPT_POSTFIELDS => $postContent,
-                    CURLOPT_PUT => 1,
+                    //CURLOPT_PUT => 1,
                     CURLOPT_CUSTOMREQUEST => 'PUT',
                 ];
+                if (empty($options['use_customrequest_only'])) {
+                    $curlOpt['CURLOPT_PUT'] = 1;
+                }
             } elseif ($method === 'DELETE') {
                 $curlOpt += [
                     CURLOPT_CUSTOMREQUEST => 'DELETE',
@@ -2819,12 +2825,18 @@ class BEmail extends BClass
      */
     public function defaultHandler(array $data)
     {
+        if (!empty($data['headers']) && is_array($data['headers'])) {
+            $data['headers'] = implode("\r\n", $data['headers']);
+        }
+        if (!empty($data['params']) && is_array($data['params'])) {
+            $data['params'] = implode(' ', $data['params']);
+        }
         return mail(
             $data['to'],
             $data['subject'],
             $data['body'],
-            explode("\r\n", $data['headers']),
-            explode(' ', $data['params'])
+            $data['headers'],
+            $data['params']
         );
     }
 }

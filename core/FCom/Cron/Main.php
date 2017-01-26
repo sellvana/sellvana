@@ -88,7 +88,7 @@ class FCom_Cron_Main extends BClass
             $date = getdate($time - $i * 60);
             foreach ($this->_tasks as $h => $task) {
                 // skip task if not one of the specified handles
-                if (null !== $handles && !isset($handles[$h])) {
+                if (!empty($handles) && !isset($handles[$h])) {
                     continue;
                 }
                 // check whether to skip already existing tasks
@@ -123,7 +123,7 @@ class FCom_Cron_Main extends BClass
         // 2. if previous task crashes, other tasks still will be ran on the next cron
         foreach ($dbTasks as $h => $dbTask) {
             // skip task if not one of the specified handles
-            if (null !== $handles && !isset($handles[$h])) {
+            if (!empty($handles) && !isset($handles[$h])) {
                 continue;
             }
             // skip not pending tasks
