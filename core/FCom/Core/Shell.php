@@ -243,7 +243,7 @@ class FCom_Core_Shell extends BClass
      */
     public function colorize($string)
     {
-        if (null !== static::$_colorsRegex){
+        if (null === static::$_colorsRegex){
             $this->initColors();
         }
         return preg_replace_callback(static::$_colorsRegex, function($m) {

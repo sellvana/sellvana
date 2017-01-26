@@ -14,6 +14,7 @@ class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Core_Shell_Abstract
 
     static protected $_availOptions = [
         'f' => 'force',
+        's!' => 'chunk-size',
     ];
 
     protected function _run()
@@ -22,14 +23,19 @@ class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Core_Shell_Abstract
 
         $this->println('Starting reindexing...');
 
+        $this->BCache->save('index_progress_total', 0);
+        $this->BCache->save('index_progress_reindexed', 0);
+        
+        $indexer = $this->Sellvana_CatalogIndex_Main->getIndexer();
+        
         if ($this->getOption('f')) {
             $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
         }
+        if ($this->getOption('s')) {
+            $indexer->setMaxChunkSize($this->getOption('s'));
+        }
 
-        $this->BCache->save('index_progress_total', 0);
-        $this->BCache->save('index_progress_reindexed', 0);
-
-        $this->Sellvana_CatalogIndex_Main->getIndexer()->indexPendingProducts()->indexGC();
+        $indexer->indexPendingProducts()->indexGC();
 
         $this->println('Reindexing complete');
     }
@@ -47,7 +53,10 @@ Reindex catalog
 
 Options:
     {white*}-f
-    --force{/}     Force reindex the whole catalog
+    --force{/}       Force reindex the whole catalog
+    
+    {white*}-s {green*}[size]{white*}
+    --chunk-size={green*}[size]{/}  Maximum chunk of data size ()default {white*}100{/})
 
 EOT;
     }

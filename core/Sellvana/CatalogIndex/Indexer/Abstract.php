@@ -26,6 +26,12 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
      * @var array
      */
     protected $_bus;
+    
+    public function setMaxChunkSize($size)
+    {
+        static::$_maxChunkSize = $size;
+        return $this;
+    }
 
     public function indexProducts($products)
     {
@@ -117,8 +123,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
     {
         $this->BEvents->fire($this->origClass() . '::onBeforeIndexPendingProducts', ['self' => $this]);
 
-        $orm = $this->getProductOrm();
-        $orm->where_null('idx.id');
+        $orm = $this->getProductOrm()->where_null('idx.id')->where('is_hidden', 0);
 
         $now = $this->BDb->now();
 
@@ -133,17 +138,15 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             #$start += static::$_maxChunkSize;
 
             $lostData = [];
+            /** @var Sellvana_Catalog_Model_Product $lostProduct */
             foreach ($lostProducts as $lostProduct) {
-                /** @var Sellvana_Catalog_Model_Product $lostProduct */
-                if ($lostProduct->isDisabled()){
-                    continue;
-                }
                 $lostData[] = [
                     'id' => $lostProduct->get('id'),
                     'last_indexed' => $now,
                     'flag_reindex' => 1
                 ];
             }
+
             if (!empty($lostData)){
                 $this->Sellvana_CatalogIndex_Model_Doc->create_many($lostData);
             }
