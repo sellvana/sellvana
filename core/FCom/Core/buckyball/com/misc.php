@@ -1409,7 +1409,7 @@ class BUtil extends BClass
                     CURLOPT_CUSTOMREQUEST => 'POST',
                 ];
                 if (empty($options['use_customrequest_only'])) {
-                    $curlOpt['CURLOPT_POST'] = 1;
+                    //$curlOpt[CURLOPT_POST] = 1;
                 }
             } elseif ($method === 'PUT') {
                 $curlOpt += [
@@ -1418,7 +1418,7 @@ class BUtil extends BClass
                     CURLOPT_CUSTOMREQUEST => 'PUT',
                 ];
                 if (empty($options['use_customrequest_only'])) {
-                    $curlOpt['CURLOPT_PUT'] = 1;
+                    //$curlOpt[CURLOPT_PUT] = 1;
                 }
             } elseif ($method === 'DELETE') {
                 $curlOpt += [
@@ -2825,10 +2825,10 @@ class BEmail extends BClass
      */
     public function defaultHandler(array $data)
     {
-        if (!empty($data['headers']) && is_array($data['headers'])) {
+        if (isset($data['headers']) && is_array($data['headers'])) {
             $data['headers'] = implode("\r\n", $data['headers']);
         }
-        if (!empty($data['params']) && is_array($data['params'])) {
+        if (isset($data['params']) && is_array($data['params'])) {
             $data['params'] = implode(' ', $data['params']);
         }
         return mail(
