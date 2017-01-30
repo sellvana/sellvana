@@ -93,7 +93,9 @@ class Sellvana_Customer_AdminSPA_Controller_Customers extends FCom_AdminSPA_Admi
                 throw new BException('Customer not found');
             }
             $result['form'] = [
-                'tabs' => $this->getFormTabs('/customers/form'),
+                'config' => [
+                    'tabs' => $this->getFormTabs('/customers/form'),
+                ],
                 'customer' => $customer->as_array(),
             ];
         } catch (Exception $e) {

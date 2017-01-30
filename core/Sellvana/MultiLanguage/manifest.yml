@@ -25,5 +25,8 @@ modules:
                 observe:
                     - [ "BActionController::onBeforeDispatch", Sellvana_MultiLanguage_Admin.userLocale ]
 
+            FCom_AdminSPA:
+                auto_use: [ layout ]
+
         default_config:
             modules/Sellvana_MultiLanguage/allowed_locales: [ en_US, fr_FR, de_DE, it_IT ]

@@ -3,7 +3,7 @@
 		<div class="col-md-12 col-lg-2">
 			<div class="secondary-menu">
 				<ul class="nav">
-					<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+					<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
 				</ul>
 			</div>
 		</div>
@@ -17,7 +17,7 @@
 						<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
 					</div>
 					<div class="admin-main-content">
-						<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+						<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
 					</div>
 				</div>
 			</div>

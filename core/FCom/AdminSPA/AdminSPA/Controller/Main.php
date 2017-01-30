@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Class FCom_AdminSPA_AdminSPA_Controller_Main
+ *
+ * @property FCom_Admin_Model_Favorite FCom_Admin_Model_Favorite
+ * @property Sellvana_MultiLanguage_Main Sellvana_MultiLanguage_Main
+ */
 class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstract
 {
     public function authenticate($args = [])
@@ -14,23 +20,38 @@ class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstr
         $this->layout('/');
         /** @var FCom_AdminSPA_AdminSPA_View_App $app */
         $app = $this->view('app');
+        $locales = $this->BLocale->getAvailableLocaleCodes();
         $countries = $this->BLocale->getAvailableCountries();
         $regions = $this->BLocale->getAvailableRegions();
         $user = $this->FCom_Admin_Model_User->sessionUser();
-        $this->view('root')->set(['data' => [
+
+        $data = [
             'modules' => $app->getModules(),
+
             'routes' => $app->getRoutes(),
             //'navs' => $app->getNavs(),
             'nav_tree' => $app->getNavTree(),
             'env' => $app->getEnv(),
+
             'user' => $user ? $user->as_array() : false,
+
             'favorites' => $this->FCom_Admin_Model_Favorite->getUserFavorites(),
+
             'countries' => $countries,
             'countries_seq' => $this->BUtil->arrayMapToSeq($countries),
+
             'regions' => $regions,
             'regions_seq' => $this->BUtil->arrayMapToSeq($regions),
+
             'csrf_token' => $this->BSession->csrfToken(),
-        ]]);
+        ];
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiLanguage')) {
+            $data['locales'] = $this->Sellvana_MultiLanguage_Main->getAllowedLocales();
+            $data['locales_seq'] = $this->BUtil->arrayMapToSeq($data['locales']);
+        }
+
+        $this->view('root')->set(['data' => $data]);
     }
 
     public function action_l10n()

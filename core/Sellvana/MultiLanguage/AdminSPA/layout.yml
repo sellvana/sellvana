@@ -1,0 +1,10 @@
+/:
+    - view: head
+        do:
+            - [ requireJs, sv-comp-form-translations, "@Sellvana_MultiLanguage/AdminSPA/vue/component/translations" ]
+            - [ requireJs, sv-comp-form-translations-tpl, "@Sellvana_MultiLanguage/AdminSPA/vue/component/translations.html" ]
+            - [ requireRun, sv-comp-form-translations ]
+
+    - view: app
+        do:
+            - [ addModule, Sellvana_MultiLanguage ]

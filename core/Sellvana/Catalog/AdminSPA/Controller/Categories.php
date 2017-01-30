@@ -23,14 +23,43 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
                 $result['tree'] = $this->_nodeChildren();
             }
             $cId = $this->BRequest->get('id') ?: 1;
-
             $category = $this->Sellvana_Catalog_Model_Category->load($cId);
             if (!$category) {
                 throw new BException('Category not found');
             }
-            $result['form']['tabs'] = $this->getFormTabs('/catalog/categories/form');
+
             $result['form']['category'] = $category->as_array();
+
+            $result['form']['config']['tabs'] = $this->getFormTabs('/catalog/categories/form');
+            $result['form']['config']['default_field'] = ['model' => 'category'];
+            $result['form']['config']['fields'] = [
+                ['name' => 'node_name', 'label' => 'Label', 'required' => true, 'i18n' => true],
+                ['name' => 'url_key', 'label' => 'URL Key'],
+                ['name' => 'sort_order', 'input_type' => 'number', 'label' => 'Nav Sort Order'],
+                ['name' => 'page_title', 'label' => 'Page Title', 'i18n' => true],
+                ['name' => 'meta_title', 'label' => 'Meta Title', 'i18n' => true],
+                ['name' => 'meta_description', 'type' => 'textarea', 'label' => 'Meta Description', 'i18n' => true],
+                ['name' => 'meta_keywords', 'type' => 'textarea', 'label' => 'Meta Keywords', 'i18n' => true],
+            ];
+            $result['form']['config']['validation'] = [
+                ['field' => 'node_name', 'required' => true],
+            ];
+
+            $result['form']['i18n'] = $this->getModelTranslations('category', $category->id());
+
             $this->ok();
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+        $this->respond($result);
+    }
+
+    public function action_form_data__POST()
+    {
+        $result = [];
+        try {
+            $data = $this->BRequest->post();
+            $this->ok()->addMessage('Category was saved successfully', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -62,17 +91,5 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
             ];
         }
         return $children;
-    }
-
-    public function action_form_data__POST()
-    {
-        $result = [];
-        try {
-            $data = $this->BRequest->post();
-            $this->ok()->addMessage('Category was saved successfully', 'success');
-        } catch (Exception $e) {
-            $this->addMessage($e);
-        }
-        $this->respond($result);
     }
 }

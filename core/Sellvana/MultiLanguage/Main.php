@@ -148,4 +148,35 @@ class Sellvana_MultiLanguage_Main extends BClass
 
         return true;
     }
+
+    public function getModelTranslations($type, $id)
+    {
+        $translations = [];
+        $raw = $this->Sellvana_MultiLanguage_Model_Translation->orm()
+            ->where('entity_type', $type)->where('entity_id', $id)->find_many();
+        foreach ((array)$raw as $t) {
+            $translations[$t->get('field')][$t->get('locale')] = $t->get('value');
+        }
+        return $translations;
+    }
+
+    public function loadTranslations($type, $collection, $idField = 'id')
+    {
+        $modelsById = [];
+        $translations = [];
+        foreach ($collection as $model) {
+            $modelsById[$model->get($idField)] = $model;
+        }
+        $this->Sellvana_MultiLanguage_Model_Translation->orm()
+            ->where('entity_type', $type)->where_in('entity_id', array_keys($modelsById))
+            ->iterate(function ($t) use ($translations) {
+                $translations[$t->get('entity_id')][$t->get('field')][$t->get('locale')] = $t->get('value');
+            });
+
+        foreach ($translations as $id => $t) {
+            $modelsById[$id]->set('i18n', $t);
+        }
+
+        return $this;
+    }
 }

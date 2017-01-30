@@ -124,11 +124,11 @@
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
 
+            - [ requireJs, sv-comp-form-field, "@FCom_AdminSPA/AdminSPA/vue/component/form/field" ]
+            - [ requireJs, sv-comp-form-field-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/field.html" ]
+
             - [ requireJs, sv-comp-form-layout, "@FCom_AdminSPA/AdminSPA/vue/component/form/layout" ]
             - [ requireJs, sv-comp-form-layout-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/layout.html" ]
-
-            - [ requireJs, sv-comp-form-translations, "@FCom_AdminSPA/AdminSPA/vue/component/form/translations" ]
-            - [ requireJs, sv-comp-form-translations-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/translations.html" ]
 
             - [ requireJs, sv-page-default-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/grid.html" ]
             - [ requireJs, sv-page-default-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form.html" ]

@@ -69,8 +69,9 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         }
         $form = [];
 
-        $form['tabs'] = $this->getFormTabs('/sales/orders/form');
-        $form['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
+        $form['config']['tabs'] = $this->getFormTabs('/sales/orders/form');
+
+        $form['config']['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
 
         $form['order'] = $this->_getOrderData($order);
         if ($order->get('customer_id')) {

@@ -23,8 +23,11 @@
 
 
 .multilanguage-block {
+	.locale {
+		width:70px;
+	}
 	.delete {
-		padding: 6px 0;
+		//padding: 6px 0;
 		display: inline-block;
 		i {
 			font-size: 16px;

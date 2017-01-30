@@ -47,7 +47,10 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
         /** @var FCom_Admin_Model_User $user */
         $user = $this->FCom_Admin_Model_User->load($userId);
         $formData = [
-            'tabs' => $this->getFormTabs('/users/form'),
+            'config' => [
+                'tabs' => $this->getFormTabs('/users/form'),
+                'fields' => [],
+            ],
             'user' => $user->as_array(),
             'avatar' => ['thumb_url' => $user->thumb(100)],
             'options' => [

@@ -517,8 +517,8 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         computed: {
             detailsSections: function () {
                 var sections = [], i, section;
-                for (i = 0, l = this.form.details_sections.length; i < l; i++) {
-                    section = this.form.details_sections[i];
+                for (i = 0, l = this.form.config.details_sections.length; i < l; i++) {
+                    section = this.form.config.details_sections[i];
                     if (!section.component) {
                         section.component = SectionComponents[section.name];
                     }

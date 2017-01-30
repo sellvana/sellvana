@@ -1,10 +1,10 @@
 define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
         'vue-ckeditor', 'vue-select2', 'spin', 'ladda', 'nprogress',
-        'sv-comp-form-layout', 'sv-comp-form-translations',
+        'sv-comp-form-field', 'sv-comp-form-layout',
         'ckeditor', 'select2'],
     function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
               VueCkeditor, VueSelect2, Spin, Ladda, NProgress,
-              SvCompFormLayout, SvCompFormTranslations
+              SvCompFormField, SvCompFormLayout
     ) {
 
         Vue.use(VueRouter);
@@ -498,12 +498,12 @@ console.log('onError', err.xhr);
                         }
                     },
                     formTabLabel: function () {
-                        if (!this.form || !this.form.tabs || _.isEmpty(this.form.tabs)) {
+                        if (!this.form || !this.form.config.tabs || _.isEmpty(this.form.config.tabs)) {
                             return '';
                         }
-                        for (var i = 0, l = this.form.tabs.length; i < l; i++) {
-                            if (this.form.tabs[i].name === this.tab) {
-                                return this.form.tabs[i].label;
+                        for (var i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                            if (this.form.config.tabs[i].name === this.tab) {
+                                return this.form.config.tabs[i].label;
                             }
                         }
                         return '';
@@ -528,21 +528,151 @@ console.log('onError', err.xhr);
                         if (!response.form.updates || _.isArrayLike(response.form.updates)) {
                             response.form.updates = {};
                         }
+                        if (!response.form.errors || _.isArrayLike(response.form.errors)) {
+                            response.form.errors = {};
+                        }
 
-                        var deps = [], i, l, vm = this;
-                        for (i = 0, l = response.form.tabs.length; i < l; i++) {
-                            deps.push(response.form.tabs[i].component);
+                        var deps = [], i, l, f, watchModels = {}, vm = this;
+
+                        for (i = 0, l = response.form.config.tabs.length; i < l; i++) {
+                            deps.push(response.form.config.tabs[i].component);
                         }
                         require(deps, function () {
-                            var tabs = response.form.tabs;
-                            for (i = 0, l = response.form.tabs.length; i < l; i++) {
-                                Vue.set(vm.form.tabs[i], 'component_config', arguments[i]);
+                            var tabs = response.form.config.tabs;
+                            for (i = 0, l = response.form.config.tabs.length; i < l; i++) {
+                                Vue.set(vm.form.config.tabs[i], 'component_config', arguments[i]);
                             }
                             if (!this.tab) {
-                                vm.switchTab(response.form.tabs[0].name);
+                                vm.switchTab(response.form.config.tabs[0].name);
                             }
                         });
                         Vue.set(this, 'form', response.form);
+
+                        for (i = 0, l = response.form.config.fields.length; i < l; i++) {
+                            f = response.form.config.fields[i];
+                            watchModels[f.model] = true;
+                        }
+                        for (i in watchModels) {
+                            Vue.set(this.form, i + '_old', response.form[i]);
+                            this.$watch('form.' + i, function () { vm.processModelDiff(i); }, {deep: true});
+                        }
+                    },
+                    processTabEvent: function (type, args) {
+                        switch (type) {
+                            case 'tab_switch': //TODO: F&R: $emit('tab'
+                                this.switchTab(args);
+                                break;
+
+                            case 'tab_edited':
+                                for (var i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                                    if (this.form.config.tabs[i].name === args) {
+                                        this.form.config.tabs[i].edited = true;
+                                    }
+                                }
+                                break;
+
+                        }
+                    },
+                    validateField: function (f, apply) {
+                        var i, l, r, v, a, e;
+                        if (_.isString(f)) {
+                            for (i = 0, l = this.form.config.fields.length; i < l; i++) {
+                                if (this.form.config.fields[i].name === f) {
+                                    f = this.form.config.fields[i];
+                                    apply = true;
+                                    break;
+                                }
+                            }
+                            if (!apply) { // field not found
+                                console.log('Field not found: ' + f);
+                                return null;
+                            }
+                        }
+                        r = f.validate;
+                        v = this.form[f.model][f.name];
+                        a = {field: f.label};
+                        e = {};
+
+                        if (v === null || v === '') {
+                            if (r.required) {
+                                e.required = r.message || translate('Field is required: {field}', a);
+                            }
+                        } else {
+                            if (r.pattern && !v.match(r.pattern)) {
+                                e.pattern = r.message || translate('Invalid field value: {field}', a);
+                            }
+                            if ((r.email || f.input_type === 'email') && !v.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+                                e.email = r.message || translate('Invalid email: {field}', a);
+                            }
+                            if ((r.url || f.input_type === 'url') && !v.match('/^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+(\/[^\s]*)?$/iS')) {
+                                e.url = r.message || translate('Invalid URL: {field}', a);
+                            }
+                        }
+                        if (apply) {
+                            var hasErrors = !_.isEmpty(e);
+                            if (hasErrors) {
+                                var errors = {};
+                                errors[f.model] = {};
+                                errors[f.model][f.name] = e;
+                                if (this.form.errors) {
+                                    errors = _.extend({}, this.form.errors, errors);
+                                }
+                                Vue.set(this.form, 'errors', errors);
+                            } else if (_.get(this.form, 'errors[' + f.model + '][' + f.name + ']')) {
+                                Vue.delete(this.form.errors[f.model], f.name);
+                            }
+                            for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                                if (this.form.config.tabs[i].name === f.tab) {
+                                    this.form.config.tabs[i].errors = hasErrors;
+                                    break;
+                                }
+                            }
+                        }
+                        return e;
+                    },
+                    validateForm: function () {
+                        if (!this.form.config.validation) {
+                            return true;
+                        }
+                        var i, l, f, tabErrors = {}, errors = {};
+
+                        for (i = 0, l = this.form.config.fields.length; i < l; i++) {
+                            f = this.form.config.fields[i];
+                            errors[f.name] = this.validateField(f);
+                            tabErrors[f.tab] = tabErrors[f.tab] || errors[f.name];
+                        }
+
+                        Vue.set(this.form, 'errors', errors);
+                        for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                            Vue.set(this.form.config.tabs[i], 'errors', !!tabErrors[this.form.config.tabs[i].name]);
+                        }
+
+                        return _.isEmpty(errors);
+                    },
+                    clearTabsFlags: function () {
+                        for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                            this.form.config.tabs[i].edited = false;
+                        }
+                    },
+                    processModelDiff: function (model) { // have to do all this because oldValues wasn't working
+                        var newModel = this.form[model], oldModel = this.form[model + '_old'];
+console.log(model);
+                        var i, l, f, tabs = {}, update = false;
+                        for (i in newModel) {
+                            if (newModel[i] != oldModel[i]) {
+                                f = this.form.config.fields[i];
+                                if (!f) {
+                                    continue;
+                                }
+                                tabs[f.tab] = true;
+                                update = true;
+                            }
+                        }
+                        if (update) {
+                            for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                                Vue.set(this.form.config.tabs[i], 'edited', tabs[this.form.config.tabs[i].name]);
+                            }
+                        }
                     }
                 },
                 watch: {
@@ -568,12 +698,12 @@ console.log('onError', err.xhr);
             },
             formTab: {
                 components: {
-                    'sv-comp-form-layout': SvCompFormLayout,
-                    'sv-comp-form-translations': SvCompFormTranslations
+                    'sv-comp-form-field': SvCompFormField,
+                    'sv-comp-form-layout': SvCompFormLayout
                 },
                 data: function () {
                     return {
-                        currentTranslation: false
+                        i18n_field: false
                     }
                 },
                 computed: {
@@ -582,29 +712,50 @@ console.log('onError', err.xhr);
                         return function (field) {
                             return {};
                         }
+                    },
+                    i18n_enabled: function () {
+                        return SvAppData.modules.hasOwnProperty('Sellvana_MultiLanguage');
                     }
                 },
                 methods: {
-                    validate: function (field, value) {
-                        var config = this.formValidationConfig;
+                    edited: function (field, value) {
+                        var config = this.form.config.validation;
                         if (!config.fields || !config.fields[field]) {
                             return;
                         }
                         var tab = config.fields[field].tab;
-                        for (var i = 0, l = this.form.tabs.length; i < l; i++) {
-                            if (this.form.tabs[i].name === tab) {
-                                Vue.set(this.form.tabs[i], 'edited', true);
+                        for (var i = 0, l = this.form.config.tabs.length; i < l; i++) {
+                            if (this.form.config.tabs[i].name === tab) {
+                                Vue.set(this.form.config.tabs[i], 'edited', true);
                                 break;
                             }
                         }
                     },
-                    toggleTranslations: function (field) {
-                        this.currentTranslation = {
-                            field: field
-                        };
+                    processFieldEvent: function (type, args) {
+                        switch (type) {
+                            case 'toggle_i18n':
+                                this.toggleTranslations(args);
+                                break;
+                        }
                     },
-                    processTranslationsEvent: function (args) {
-                        console.log(args);
+                    toggleTranslations: function (field) {
+                        if (this.i18n_field && this.i18n_field.name === name) {
+                            this.i18n_field = false;
+                        } else {
+                            this.i18n_field = field;
+                        }
+                    },
+                    processTranslationsEvent: function (type, args) {
+                        switch (type) {
+                            case 'update':
+                                // args: field, translations
+                                Vue.set(this.form.i18n, args.field.name, args.translations);
+                                break;
+
+                            case 'close':
+                                this.i18n_field = false;
+                                break;
+                        }
                     }
                 }
             }

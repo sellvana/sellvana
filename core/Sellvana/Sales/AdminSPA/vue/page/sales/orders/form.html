@@ -34,7 +34,7 @@
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{formTabLabel|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
 					<div class="dropdown-menu">
 						<ul class="dropdown-content">
-							<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+							<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
 						</ul>
 					</div>
 				</div>
@@ -66,12 +66,12 @@
 		<div class="col-lg-2 visible-lg">
 			<div class='secondary-menu'>
 				<ul class="nav">
-					<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+					<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
 				</ul>
 			</div>
 		</div>
 		<div class="col-md-12 col-lg-10">
-			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @action="doAction"></component>
+			<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @action="doAction"></component>
 		</div>
 	</div>
 </div>

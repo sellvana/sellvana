@@ -85,11 +85,36 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             if (!$product) {
                 throw new BException('Product not found');
             }
-            $result['form'] = [
-                'tabs' => $this->getFormTabs('/catalog/products/form'),
-                'product' => $product->as_array(),
-                'thumb' => ['thumb_url' => $product->thumbUrl(100)],
+
+            $allCategoriesFlat = [];
+
+            $result['form']['product'] = $product->as_array();
+            $result['form']['thumb'] = ['thumb_url' => $product->thumbUrl(100)];
+
+            $result['form']['config']['tabs'] = $this->getFormTabs('/catalog/products/form');
+            $result['form']['config']['default_field'] = ['model' => 'product'];
+            $result['form']['config']['fields'] = [
+                 ['name' => 'product_name', 'label' => 'Product Name', 'i18n' => true],
+                 ['name' => 'url_key', 'label' => 'URL Key (optional)'],
+                 ['name' => 'product_sku', 'label' => 'Product SKU'],
+                 ['name' => 'short_description', 'type' => 'textarea', 'label' => 'Short Description', 'i18n' => true],
+                 ['name' => 'description', 'type' => 'wysiwyg', 'label' => 'Long Description', 'i18n' => true],
+                 ['name' => 'is_hidden', 'label' => 'Hide Product', 'type' => 'checkbox'],
+                 ['name' => 'is_featured', 'label' => 'Featured Product', 'type' => 'checkbox'],
+                 ['name' => 'is_popular', 'label' => 'Popular Product', 'type' => 'checkbox'],
             ];
+
+            $result['form']['config']['validation'] = [
+                ['field' => 'product_name', 'required' => true, 'url' => true],
+                ['field' => 'url_key', 'pattern' => '/^[a-z0-9-]+$/'],
+                ['field' => 'product_sku', 'required' => true, 'email' => true],
+                ['field' => 'short_description', 'required' => true],
+                ['field' => 'description', 'required' => true],
+            ];
+
+            $result['form']['i18n'] = $this->getModelTranslations('product', $product->id());
+
+            $result = $this->normalizeFormConfig($result);
         } catch (Exception $e) {
             $this->addMessage($e);
         }

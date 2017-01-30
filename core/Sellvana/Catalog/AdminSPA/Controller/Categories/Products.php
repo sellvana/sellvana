@@ -19,7 +19,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories_Products extends FCom_Admi
                 ['type' => 'row-select', 'width' => 55],
                 ['type' => 'actions', 'actions' => [
                     ['type' => 'edit', 'link' => '/catalog/products/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-                    ['type' => 'delete', 'delete_url' => 'products/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
+                    ['type' => 'delete', 'delete_url' => 'categories/form/products/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
                 ]],
                 ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
                 ['name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
@@ -52,9 +52,6 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories_Products extends FCom_Admi
             ],
             'export' => true,
             'pager' => true,
-            'bulk_actions' => [
-                ['name' => 'custom_state', 'label' => 'Change Custom State'],
-            ],
         ];
     }
 
@@ -64,6 +61,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories_Products extends FCom_Admi
         return $this->Sellvana_Catalog_Model_Product->orm('p')
             ->select('p.*')
             ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
+            ->select('cp.position')
             ->where('cp.category_id', $catId);
     }
 

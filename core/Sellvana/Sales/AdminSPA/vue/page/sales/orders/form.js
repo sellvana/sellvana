@@ -47,7 +47,7 @@ define(['vue', 'sv-hlp'],
 				var vm = this;
 				switch (action.type) {
 					case 'update-form':
-						action.form.tabs = this.form.tabs;
+						action.form.config.tabs = this.form.config.tabs;
 						Vue.set(this, 'form', action.form);
 						break;
 
@@ -61,7 +61,7 @@ define(['vue', 'sv-hlp'],
 							entity_id: action.entity.id
 						};
 						this.sendRequest('POST', 'orders/entity_delete', postData, function (response) {
-                            response.form.tabs = vm.form.tabs;
+                            response.form.config.tabs = vm.form.config.tabs;
                             Vue.set(vm, 'form', response.form);
 						});
 						break;
@@ -81,7 +81,7 @@ define(['vue', 'sv-hlp'],
 				var vm = this, postData = {order_id: this.form.order.id};
 				this.sendRequest('POST', 'orders/ship_all_items', postData, function (response) {
 					if (response.form) {
-                        response.form.tabs = vm.form.tabs;
+                        response.form.config.tabs = vm.form.config.tabs;
                         Vue.set(vm, 'form', response.form);
 					}
 				});
@@ -90,7 +90,7 @@ define(['vue', 'sv-hlp'],
                 var vm = this, postData = {order_id: this.form.order.id};
                 this.sendRequest('POST', 'orders/mark_as_paid', postData, function (response) {
                     if (response.form) {
-                        response.form.tabs = vm.form.tabs;
+                        response.form.config.tabs = vm.form.config.tabs;
                         Vue.set(vm, 'form', response.form);
                     }
                 });
@@ -101,6 +101,9 @@ define(['vue', 'sv-hlp'],
 						order: this.form.order
 					}
 				};
+                if (!this.validateForm()) {
+                    return;
+                }
 				this.sendRequest('POST', 'orders/form_data', postData, function (response) {
 					if (!response.ok) {
 

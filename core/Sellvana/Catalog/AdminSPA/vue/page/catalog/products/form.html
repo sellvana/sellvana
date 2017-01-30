@@ -4,27 +4,19 @@
 			<img :src="thumbUrl" width="100" class="avatar-img">
 			<div class='secondary-menu'>
 				<ul class="nav">
-					<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">
+					<li v-for="t in formTabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">
                         {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i></a></li>
 				</ul>
 			</div>
 		</div>
+		<div class="control-buttons-block text-right">
+			<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+			<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+			<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+			<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
+		</div>
 		<div class="col-md-12 col-lg-10">
-			<div class="row">
-				<div class="col-sm-12 col-md-6">
-					<div class="control-buttons-block text-right">
-						<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
-						<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-						<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
-						<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
-					</div>
-					<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
-				</div>
-				<div class="col-sm-12 col-md-6">
-
-				</div>
-			</div>
-
+			<component v-for="t in formTabs" v-if="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
 		</div>
 	</div>
 </div>

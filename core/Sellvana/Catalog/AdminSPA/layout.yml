@@ -14,6 +14,9 @@
 			- [ requireJs, sv-page-catalog-products-form-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/inventory.html" ]
 			- [ requireJs, sv-page-catalog-products-form-prices, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices" ]
 			- [ requireJs, sv-page-catalog-products-form-prices-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices.html" ]
+			- [ requireJs, sv-page-catalog-products-form-categories, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/categories" ]
+			- [ requireJs, sv-page-catalog-products-form-categories-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/categories.html" ]
+			- [ requireJs, sv-page-catalog-products-form-categories-config, "~/products/form/categories/grid_config" ]
 			- [ requireJs, sv-page-catalog-products-form-merchandizing, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing" ]
 			- [ requireJs, sv-page-catalog-products-form-merchandizing-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing.html" ]
 			- [ requireJs, sv-page-catalog-products-form-images, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/images" ]
@@ -36,6 +39,7 @@
 			- [ requireJs, sv-page-catalog-categories-form-images-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/images.html" ]
 			- [ requireJs, sv-page-catalog-categories-form-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/products" ]
 			- [ requireJs, sv-page-catalog-categories-form-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/products.html" ]
+			- [ requireJs, sv-page-catalog-categories-form-products-config, "~/categories/form/products/grid_config" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout.html" ]
 			

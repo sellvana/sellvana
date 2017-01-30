@@ -1,0 +1,38 @@
+<div class="admin-main-content">
+    <div class="multilanguage-block">
+        <div class="block-title">
+            <p>{{field.label|_}}</p>
+        </div>
+        <div>
+            <div v-for="(v, locale) in translations" class="form-group row">
+                <div class="col-md-1">
+                    <label :for="field_id(locale)">{{locale}}</label>
+                </div>
+                <div class="col-md-10">
+                    <input v-if="field.type === 'input'" :id="field_id(locale)" class="form-control" type="text"
+                           v-model="form.i18n[field.name][locale]"/>
+
+                    <textarea v-else-if="field.type === 'textarea'" :id="field_id(locale)" class="form-control"
+                              v-model="form.i18n[field.name][locale]"></textarea>
+
+                    <ckeditor v-else-if="field.type === 'wysiwyg'" :id="field_id(locale)"
+                              v-model="form.i18n[field.name][locale]"></ckeditor>
+                </div>
+                <div class="col-md-1">
+                    <a class="delete" @click.prevent="removeTranslation(locale)"><i aria-hidden="true" class="fa fa-trash"></i></a>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-xs-5">
+                    <select class="form-control" v-model="new_locale">
+                        <option value="">{{'Add new translation'|_}}</option>
+                        <option v-for="l in avail_locales" :value="l.id">{{l.text}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="control-button-block text-right">
+            <button class="button button2" @click="close">{{'Close'|_}}</button>
+        </div>
+    </div>
+</div>

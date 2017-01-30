@@ -23,7 +23,7 @@
 				<div class="col-xs-12 col-md-12 col-lg-12">
 					<div class="secondary-menu horizontal-menu visible-md visible-lg">
 						<ul class="nav">
-							<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+							<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
 						</ul>
 					</div>
 					<div class="tablet-panel hidden-md hidden-lg">
@@ -31,7 +31,7 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{"active panel"|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
 							<div class="dropdown-menu">
 								<ul class="dropdown-content">
-									<li v-for="t in form.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+									<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
 								</ul>
 							</div>
 						</div>
@@ -50,7 +50,7 @@
 				</div>
 				
 			</div>
-			<component v-for="t in form.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+			<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
 				
 		</div>
 	</div>

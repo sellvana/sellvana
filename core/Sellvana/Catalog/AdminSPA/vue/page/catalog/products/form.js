@@ -20,7 +20,10 @@ define(['vue', 'sv-hlp'],
         computed: {
             thumbUrl: function () {
                 return this.form && this.form.thumb ? this.form.thumb.thumb_url : '';
-            }
+            },
+			formTabs: function () {
+            	return this.form && this.form.config && this.form.config.tabs ? this.form.config.tabs : [];
+			}
         },
 		methods: {
 			buttonAction: function (act) {
@@ -55,6 +58,9 @@ define(['vue', 'sv-hlp'],
 			},
 			save: function (stayOnPage) {
 				var vm = this;
+				if (!this.validateForm()) {
+					return;
+				}
 				this.sendRequest('POST', 'products/form_data', this.form.updates, function (response) {
 					if (!response._ok) {
 
