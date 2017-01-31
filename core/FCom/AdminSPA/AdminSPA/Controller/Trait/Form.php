@@ -14,6 +14,20 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         'field_container_class' => 'col-md-9',
     ];
 
+    //abstract public function getFormData();
+
+    public function action_form_data()
+    {
+        $result = [];
+        try {
+            $result = $this->getFormData();
+            $result = $this->normalizeFormConfig($result);
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+        $this->respond($result);
+    }
+
     public function getFormTabs($path)
     {
         $this->layout($path);
@@ -22,6 +36,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
 
     public function normalizeFormConfig($result)
     {
+        if (!empty($result['form']['config']['tabs']) && is_string($result['form']['config']['tabs'])) {
+            $result['form']['config']['tabs'] = $this->getFormTabs($result['form']['config']['tabs']);
+        }
+
         if (!empty($result['form']['config']['fields'])) {
             $def = !empty($result['form']['config']['default_field']) ? $result['form']['config']['default_field'] : [];
             $def = array_merge(static::$_defaultFieldConfig, $def);
@@ -30,6 +48,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
             unset($field);
         }
+
         if (!empty($result['form']['config']['actions'])) {
             if (true === $result['form']['config']['actions']) {
                 $result['form']['config']['actions'] = [

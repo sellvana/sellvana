@@ -47,9 +47,10 @@ define(['lodash', 'text!sv-comp-form-field-tpl'], function (_, fieldTpl) {
             },
             field_errors: function () {
                 if (this.form.errors && this.form.errors[this.field_config.model]) {
-                    return this.form.errors[this.field_config.model][this.field_config.name] || {};
+                    var errors = this.form.errors[this.field_config.model][this.field_config.name];
+                    return !_.isEmpty(errors) ? errors : false;
                 } else {
-                    return {};
+                    return false;
                 }
             },
             i18n_enabled: function () {

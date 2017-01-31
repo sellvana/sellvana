@@ -2,6 +2,12 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 
 	return {
 		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+		data: function () {
+			return {
+				product: {},
+				product_old: {}
+			}
+		},
 		methods: {
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {
@@ -35,18 +41,19 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 				this.action_in_progress = stayOnPage ? 'save-continue' : 'save';
 				
 				if (!this.validateForm()) {
+                    vm.action_in_progress = false;
 					return;
 				}
-				console.log(2);
-				this.sendRequest('POST', 'products/form_data', this.form.updates, function (response) {
-					if (!response._ok) {
-
+				this.sendRequest('POST', 'products/form_data?id=' + this.form.product.id, this.form.updates, function (response) {
+					if (response.form) {
+                        vm.processFormDataResponse(response);
+                        vm.updateBreadcrumbs(vm.form.product.product_name);
 					}
                     for (var i in response.form) {
-                        Vue.set(vm.form, i, response.form[i]);
+                        //Vue.set(vm.form, i, response.form[i]);
                     }
                     if (!vm.form.updates) {
-						Vue.set(vm.form, 'updates', {});
+						//Vue.set(vm.form, 'updates', {});
 					}
                     if (!stayOnPage) {
                         vm.$router.go(-1);

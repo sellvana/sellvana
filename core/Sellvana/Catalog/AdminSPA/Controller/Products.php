@@ -80,75 +80,62 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
     }
 
-    public function action_form_data()
+    public function getFormData()
     {
-        $result = [];
         $pId = $this->BRequest->get('id');
-        try {
-            $product = $this->Sellvana_Catalog_Model_Product->load($pId);
-            if (!$product) {
-                throw new BException('Product not found');
-            }
 
-            $allCategoriesFlat = [];
-
-            $result['form']['product'] = $product->as_array();
-            $result['form']['thumb'] = ['thumb_url' => $product->thumbUrl(100)];
-
-            $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
-            $result['form']['prices'] = $priceHlp->getProductPrices($product);
-            $result['form']['config']['options']['price_types'] = $this->BUtil->arrayMapToSeq($product->priceTypeOptions());
-            $result['form']['config']['options']['price_relations'] = $priceHlp->fieldOptions('price_relation_options');
-            $result['form']['config']['options']['price_operations'] = $priceHlp->fieldOptions('operation_options');
-            if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
-                $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;
-                if ($groups) {
-                    $result['form']['config']['options']['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
-                }
-            }
-            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
-                $sites = $this->Sellvana_MultiSite_Model_Site->siteOptions();
-                if ($sites) {
-                    $result['form']['config']['options']['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
-                }
-            }
-            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
-                $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
-                if ($currencies) {
-                    $result['form']['config']['options']['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
-                }
-            }
-
-            $result['form']['config']['actions'] = true;
-
-            $result['form']['config']['tabs'] = $this->getFormTabs('/catalog/products/form');
-            $result['form']['config']['default_field'] = ['model' => 'product'];
-            $result['form']['config']['fields'] = [
-                 ['name' => 'product_name', 'label' => 'Product Name', 'i18n' => true],
-                 ['name' => 'url_key', 'label' => 'URL Key (optional)'],
-                 ['name' => 'product_sku', 'label' => 'Product SKU'],
-                 ['name' => 'short_description', 'type' => 'textarea', 'label' => 'Short Description', 'i18n' => true],
-                 ['name' => 'description', 'type' => 'wysiwyg', 'label' => 'Long Description', 'i18n' => true],
-                 ['name' => 'is_hidden', 'label' => 'Hide Product', 'type' => 'checkbox'],
-                 ['name' => 'is_featured', 'label' => 'Featured Product', 'type' => 'checkbox'],
-                 ['name' => 'is_popular', 'label' => 'Popular Product', 'type' => 'checkbox'],
-            ];
-
-            $result['form']['config']['validation'] = [
-                ['field' => 'product_name', 'required' => true, 'url' => true],
-                ['field' => 'url_key', 'pattern' => '/^[a-z0-9-]+$/'],
-                ['field' => 'product_sku', 'required' => true, 'email' => true],
-                ['field' => 'short_description', 'required' => true],
-                ['field' => 'description', 'required' => true],
-            ];
-
-            $result['form']['i18n'] = 'product';
-
-            $result = $this->normalizeFormConfig($result);
-        } catch (Exception $e) {
-            $this->addMessage($e);
+        $product = $this->Sellvana_Catalog_Model_Product->load($pId);
+        if (!$product) {
+            throw new BException('Product not found');
         }
-        $this->respond($result);
+
+        $result = [];
+
+        $result['form']['product'] = $product->as_array();
+        $result['form']['thumb'] = ['thumb_url' => $product->thumbUrl(100)];
+
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        $result['form']['prices'] = $priceHlp->getProductPrices($product);
+        $result['form']['config']['options']['price_types'] = $this->BUtil->arrayMapToSeq($product->priceTypeOptions());
+        $result['form']['config']['options']['price_relations'] = $priceHlp->fieldOptions('price_relation_options');
+        $result['form']['config']['options']['price_operations'] = $priceHlp->fieldOptions('operation_options');
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
+            $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;
+            if ($groups) {
+                $result['form']['config']['options']['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
+            }
+        }
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            $sites = $this->Sellvana_MultiSite_Model_Site->siteOptions();
+            if ($sites) {
+                $result['form']['config']['options']['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
+            }
+        }
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
+            if ($currencies) {
+                $result['form']['config']['options']['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
+            }
+        }
+
+        $result['form']['config']['actions'] = true;
+
+        $result['form']['config']['tabs'] = '/catalog/products/form';
+        $result['form']['config']['default_field'] = ['model' => 'product'];
+        $result['form']['config']['fields'] = [
+            ['name' => 'product_name', 'label' => 'Product Name', 'i18n' => true, 'required' => true],
+            ['name' => 'url_key', 'label' => 'URL Key (optional)', 'validate' => ['pattern' => '/^[a-z0-9-]+$/']],
+            ['name' => 'product_sku', 'label' => 'Product SKU', 'required' => true],
+            ['name' => 'short_description', 'type' => 'textarea', 'label' => 'Short Description', 'i18n' => true, 'required' => true],
+            ['name' => 'description', 'type' => 'wysiwyg', 'label' => 'Long Description', 'i18n' => true, 'required' => true],
+            ['name' => 'is_hidden', 'label' => 'Hide Product', 'type' => 'checkbox'],
+            ['name' => 'is_featured', 'label' => 'Featured Product', 'type' => 'checkbox'],
+            ['name' => 'is_popular', 'label' => 'Popular Product', 'type' => 'checkbox'],
+        ];
+
+        $result['form']['i18n'] = 'product';
+
+        return $result;
     }
 
     public function action_form_data__POST()
@@ -156,6 +143,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $result = [];
         try {
             $data = $this->BRequest->post();
+            $result = $this->getFormData();
+            $result = $this->normalizeFormConfig($result);
             $this->ok()->addMessage('Product was saved successfully', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
