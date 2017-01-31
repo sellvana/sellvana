@@ -14,7 +14,7 @@
 						 <a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
 					</div>
 					<div>
-						<div class="input-group-btn dropdown" :class="{open:ddOpOpen(flt)}">
+						<div class="input-group-addon dropdown" :class="{open:ddOpOpen(flt)}">
 							<button class="button5 dropdown-toggle filter-text-sub" data-toggle="dropdown" :aria-expanded="ddOpOpen(flt)" @click.stop="ddOpToggle(flt)"><span>{{flt.config.ops[flt.op]}}</span><span class="caret"></span></button>
 							<ul class="dropdown-menu filter-sub">
 								<li v-for="(opLabel, op) in flt.config.ops"><a class="filter-op" href="#" @click.prevent="switchOp(flt, op)">{{opLabel|_}}</a></li>

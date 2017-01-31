@@ -273,6 +273,15 @@
 				&lt;span class="status-refunded"&gt;refunded&lt;/span&gt;
 			</div>
 		</div>
+		
+		<div class="row">
+			<div class="col-md-3">
+				<span class="status-approved">approved</span>
+			</div>
+			<div class="col-md-9">
+				&lt;span class="status-approved"&gt;approved&lt;/span&gt;
+			</div>
+		</div>
 
 		<h1 id="inputs">inputs</h1>
 		<div class="row">
@@ -299,19 +308,20 @@
 				&lt;textarea class="form-control" rows="5"&gt;&lt;textarea&gt;
 			</div>
 		</div>
+		<h3>Input-group-addon with dropdown without range</h3>
 		<div class="row">
 			<div class="col-md-3">
-				<div>
-					<div class="input-group-btn dropdown">
-						<button data-toggle="dropdown" class="button5 dropdown-toggle filter-text-sub"><span>contains</span><span class="caret"></span></button>
-						<ul class="dropdown-menu filter-sub">
-							<li><a href="#" class="filter-op">equals</a></li>
-							<li><a href="#" class="filter-op">contains</a></li>
-							<li><a href="#" class="filter-op">does not contain</a></li>
-							<li><a href="#" class="filter-op">starts with</a></li>
-							<li><a href="#" class="filter-op">ends with</a></li>
-							<li><a href="#" class="filter-op">is empty</a></li>
-						</ul>
+				<div class="input-group">
+					<div class="input-group-addon dropdown">
+							<button data-toggle="dropdown" class="button5 dropdown-toggle"><span>contains</span><span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="#">equals</a></li>
+								<li><a href="#">contains</a></li>
+								<li><a href="#">does not contain</a></li>
+								<li><a href="#">starts with</a></li>
+								<li><a href="#">ends with</a></li>
+								<li><a href="#">is empty</a></li>
+							</ul>
 					</div>
 					<div class="input-group-btn not-range">
 						<input type="text" placeholder="value" class="form-control">
@@ -319,7 +329,77 @@
 				</div>
 			</div>
 			<div class="col-md-9">
-				&lt;div&gt;&lt;div class="input-group-btn dropdown"&gt;&lt;button data-toggle="dropdown" class="button5 dropdown-toggle filter-text-sub"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul class="dropdown-menu filter-sub"&gt;&lt;li&gt;&lt;a href="#" class="filter-op"&gt;equals&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" class="filter-op"&gt;contains&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" class="filter-op"&gt;does not contain&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" class="filter-op"&gt;starts with&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" class="filter-op"&gt;ends with&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" class="filter-op"&gt;is empty&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt; &lt;div class="input-group-btn not-range"&gt;&lt;input type="text" placeholder="value" class="form-control"&gt;&lt;/div&gt; &lt;/div&gt;
+				&lt;div class="input-group"&gt;
+				&lt;div class="input-group-addon dropdown"&gt;
+				&lt;button data-toggle="dropdown" class="button5 dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt;
+				&lt;ul class="dropdown-menu"&gt;
+				&lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;is empty&lt;/a&gt;&lt;/li&gt;
+				&lt;/ul&gt;
+				&lt;/div&gt;
+				&lt;div class="input-group-btn not-range"&gt;
+				&lt;input type="text" placeholder="value" class="form-control"&gt;
+				&lt;/div&gt;
+				&lt;/div&gt;
+
+			</div>
+		</div>
+		<h3>Input-group-addon with dropdown with</h3>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="input-group">
+					<div class="input-group-addon dropdown">
+						<button data-toggle="dropdown" class="button5 dropdown-toggle"><span>contains</span><span class="caret"></span></button>
+						<ul class="dropdown-menu">
+							<li><a href="#">equals</a></li>
+							<li><a href="#">contains</a></li>
+							<li><a href="#">does not contain</a></li>
+							<li><a href="#">starts with</a></li>
+							<li><a href="#">ends with</a></li>
+							<li><a href="#">is empty</a></li>
+						</ul>
+					</div>
+					<div class="input-group-btn range"><input type="number" placeholder="number" class="form-control"> <input type="number" placeholder="number" class="form-control"> </div>
+				</div>
+			</div>
+			<div class="col-md-9">
+				&lt;div class="input-group"&gt;
+				&lt;div class="input-group-addon dropdown"&gt;
+				&lt;button data-toggle="dropdown" class="button5 dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt;
+				&lt;ul class="dropdown-menu"&gt;
+				&lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href="#"&gt;is empty&lt;/a&gt;&lt;/li&gt;
+				&lt;/ul&gt;
+				&lt;/div&gt;
+				&lt;div class="input-group-btn range"&gt;&lt;input type="number" placeholder="number" class="form-control"&gt; &lt;input type="number" placeholder="number" class="form-control"&gt; &lt;/div&gt;
+				&lt;/div&gt;
+			</div>
+		</div>
+		<h3>Input-group-addon without dropdown</h3>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="input-group">
+					<div class="input-group-addon">QTY</div>
+					<div class="input-group-btn not-range">
+						<input type="text" placeholder="value" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-9">
+				&lt;div class="input-group"&gt;
+				&lt;div class="input-group-addon"&gt;QTY&lt;/div&gt;
+				&lt;div class="input-group-btn not-range"&gt;
+				&lt;input type="text" placeholder="value" class="form-control"&gt;
+				&lt;/div&gt;
+				&lt;/div&gt;
 
 			</div>
 		</div>

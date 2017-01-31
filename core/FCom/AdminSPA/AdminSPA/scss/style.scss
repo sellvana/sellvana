@@ -1,18 +1,18 @@
-@import "base/normalize"; 
+@import "base/normalize";  
 
 @import "helpers/variables"; 
-@import "helpers/mixins";      
+@import "helpers/mixins";       
  
-@import "layout/fonts";    
-@import "layout/statuses";                                                                  
-@import "layout/scroll";                  
-@import "layout/header";                                                       
-@import "layout/sidebar";                                          
-@import "layout/table";                                                                               
-@import "layout/filter-panel";                                                                                                
-@import "layout/menu";                                                                                            
-@import "layout/elements";                                                                                                       
-@import "layout/footer";                            
+@import "layout/fonts";        
+@import "layout/statuses";                                                                   
+@import "layout/scroll";                            
+@import "layout/header";                                                           
+@import "layout/sidebar";                                               
+@import "layout/table";                                                                                       
+@import "layout/filter-panel";                                                                                                      
+@import "layout/menu";                                                                                               
+@import "layout/elements";                                                                                                        
+@import "layout/footer";                                   
 @import "layout/widgets";                             
    
 @import "components/buttons";                                               

@@ -43,6 +43,9 @@ input[type="checkbox"], input[type="radio"] {
 		visibility: visible;
 	}
 }
+textarea {
+	resize: vertical;
+}
 .pagination {
 	input {
 		border: 1px solid #eaeaea;
@@ -52,7 +55,24 @@ input[type="checkbox"], input[type="radio"] {
 		color: #474646;
 	}
 }
-
+.input-group-addon:first-child {
+	border-right: 1px solid #ebebeb; 
+}
+.input-group-addon:last-child {
+	border-left: 1px solid #ebebeb; 
+}
+.input-group-addon {
+	background-color: #f2f2f2;   
+	border: 1px solid #ebebeb;
+	border-right: 1px solid #ebebeb;
+	border-radius: 1px;
+	&:hover, &:focus, &:active {
+		background-color: #f2f2f2;
+		border: 1px solid #ebebeb;
+		border-radius: 1px;
+		border-right: 1px solid #ebebeb;
+	}
+} 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
@@ -63,6 +83,7 @@ input[type="text"], input[type="password"] {
 	border: 1px solid #ebebeb;
 	border-radius: 1px;
 	width: 100%;
+	font-size: 12px;
 }
 .login-container {
 	input[type="text"], input[type="password"] {
@@ -88,6 +109,7 @@ input[type="text"], input[type="password"] {
 .select2-container .select2-selection--multiple {
     min-height: auto;
 	padding: 0px 0 2px 0;
+	border-radius: 0;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -136,6 +158,9 @@ input[type="checkbox"]:checked + .checkbox-block {
 		border: 1px solid #fff;
 	}
 }
+fieldset {
+	border: 0;
+}
 
 .translate-icon {
 	position: absolute;
@@ -143,6 +168,58 @@ input[type="checkbox"]:checked + .checkbox-block {
 	top: 0;
 	font-size: 18px;
 	padding: 4px 5px;
+}
+.form-group {
+	label {
+		display: block;
+	}
+	.control-label {
+		display: inline-block;
+		font-weight: bold;
+		font-size: 12px;
+		color: #000;
+		cursor: pointer;
+	}
+	.error-message {
+		visibility: hidden;
+	}
+}
+
+.checkbox-block {
+	width: 48px;
+	height: 28px;
+	border-radius: 20px;
+	border: 1px solid #eee;
+	transition: 0.1s all ease-in; 
+	position: relative;
+	cursor: pointer; 
+	background: #fff;
+	.checkbox-elem {
+		width: 26px;
+		height: 26px;
+		border-radius: 100%;
+		background: #ffffff;
+		position: absolute;
+		left: -1px;
+		top: 0px;
+		transition: 0.2s all ease-in;
+		border: 1px solid #eee;
+		box-shadow: 2px 1px 3px 0px rgba(0, 0, 0, 0.06); 
+	}
+}
+
+.error-message {
+	color: darkred;
+	padding: 0 0 0 6px;
+	visibility: visible;
+}
+.error {
+	.error-message {
+		visibility: visible;
+	}
+	.form-control {
+		border: 1px solid darkred;
+	}
 }
 .required {
 	.control-label {

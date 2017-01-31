@@ -31,7 +31,7 @@
             <option v-for="o in field_options" :value="o.id">{{o.text}}</option>
         </select2>
 
-        <checkbox v-else-if="field_type === 'checkbox'" :id="field_id" class="form-control"
+        <checkbox v-else-if="field_type === 'checkbox'" :id="field_id" 
                   v-model="value_model"></checkbox>
 
         <textarea v-else-if="field_type === 'textarea'" :id="field_id" class="form-control"

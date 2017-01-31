@@ -22,7 +22,7 @@
 	.f-admin-main-view {
 		margin-top: 130px;
 	}
-	.main-nav-closed  .f-admin-main-view {
+	.main-nav-closed .f-admin-main-view {
 		margin-left: 17px;
 	}
 }
@@ -31,7 +31,7 @@
 	.f-admin-main-view {
 		min-height: 100%;
 		margin-right: 13px;
-		margin-left: 13px; 
+		margin-left: 13px;
 		min-width: 276px;
 		padding: 0px 0px 90px 0px;
 	}
@@ -41,6 +41,7 @@
 		}
 	}
 }
+
 @media (max-width: 767px) {
 	.f-admin-main-view {
 		min-height: 100%;

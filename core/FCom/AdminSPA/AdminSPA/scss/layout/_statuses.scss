@@ -1,5 +1,11 @@
+.status-processing, .status-placed, .status-shipped, .status-canceled, .status-pending, .status-unpaid, .status-paid, .status-re-stocked, .status-complete, .status-refunded, .status-approved  {
+	background: #fff; 
+	font-weight: bold;
+	text-transform: capitalize;
+}
+
 .f-grid-wrapper {
-	.status-processing, .status-placed, .status-shipped {
+	.status-processing, .status-placed, .status-shipped, .status-canceled, .status-pending, .status-unpaid, .status-paid, .status-re-stocked, .status-complete, .status-refunded, .status-approved  {
 		padding: 9px 8px;
 		width: 100px;
 		text-align: center;
@@ -8,62 +14,35 @@
 }
 
 .status-processing {
-	background: #fff; 
 	color: #00ceb4;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-placed {
-	background: #fff;
 	color: #f39b12;
-	font-weight: bold;
-	text-transform: capitalize;
 } 
 .status-shipped {
-	background: #fff;
 	color: #2fbdf2;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-canceled {
-	background: #fff;
-	color: #dd4b39;
-	font-weight: bold;
-	text-transform: capitalize;
+	color: #dd4b39;	
 }
 .status-pending {
-	background: #fff;
 	color: #f39c12;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-unpaid {
-	background: #fff;
 	color: #00c0ef;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-paid {
-	background: #fff;
 	color: #dd4b39;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-re-stocked {
-	background: #fff;
 	color: #00ceb4;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-complete {
-	background: #fff;
 	color: #00ceb4;
-	font-weight: bold;
-	text-transform: capitalize;
 }
 .status-refunded {
-	background: #fff;
 	color: #1289f3;
-	font-weight: bold;
-	text-transform: capitalize;
+}
+.status-approved {
+	color: #a60505;
 }

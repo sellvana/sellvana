@@ -98,28 +98,25 @@ button, .button {
 	}
 }
 .button5 {
-	background-color: #e5e5e5;
+	background-color: #f2f2f2;
 	border: 1px solid #e5e5e5;
-	padding: 8px 4px;
-	width: auto;
 	color: #454d54;	
 	span {
 		color: #454d54;	
 	}
 	&:focus {
-		background-color: #e5e5e5;
+		background-color: #f2f2f2;
 		border: 1px solid #e5e5e5;
-		padding: 8px 4px;
-		width: auto;
 	}
 	&:hover {
-		background-color: #e5e5e5;
-		color: #fff;
+		background-color: #f2f2f2;
+		color: #454d54;	
 		span {
-			color: #fff;
+			color: #454d54;	
 		}
 	}
 }
+
 .btn-sm, .btn-group-sm > .btn {
 	border-radius: 1px;
 }
@@ -130,10 +127,7 @@ button, .button {
 	background-color: #ff2b42;
 	font-weight: bold;
 	border: 1px solid #ff2b42;
-	padding: 6px 14px;
-	width: auto;
 	color: #fff;
-	transition: 0.1s all ease-in;
 	span {
 		color: #fff;
 	}
@@ -390,66 +384,114 @@ button, .button {
 	.color1 {
 		background-color: transparent;
 		color: #868a8a;
+		span {
+			color: #868a8a;
+		}
 	}
 	.color2 {
 		background-color: #514943;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color3 {
 		background-color: transparent;
 		color: #2d2d2d;
+		span {
+			color: #2d2d2d;
+		}
 	}
 	.color4 {
 		background-color: #3ec234;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color5 {
 		background-color: #e5e5e5;
-		color: #454d54;	
+		color: #454d54;
+		span {
+			color: #454d54;
+		}
 	}
 	.color6 {
 		background-color: #ff2b42;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color7 {
 		background-color: transparent;
 		color: #ff2d43;
+		span {
+			color: #ff2d43;
+		}
 	}
 	.color8 {
 		background-color: #00a65a;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color9 {
 		background-color: #00c0ef;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color10 {
 		background-color: transparent;
 		color: #000;
+		span {
+			color: #000;
+		}
 	}
 	.color11 {
 		background-color: transparent;
 		color: #4d4d4d;
+		span {
+			color: #4d4d4d;
+		}
 	}
 	.color12 {
 		background-color: #4c8cf6;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color13 {
 		background-color: #e1e1e1;
 		color: #000;
+		span {
+			color: #000;
+		}
 	}
 	.color14 {
 		background-color: #00c0ef;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color15 {
 		background-color: #00a65a;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 	.color16 {
 		background-color: #dac303;
 		color: #fff;
+		span {
+			color: #fff;
+		}
 	}
 }
 .btn .caret {
