@@ -33,6 +33,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 			save: function (stayOnPage) {
 				var vm = this;
 				this.action_in_progress = stayOnPage ? 'save-continue' : 'save';
+				
 				if (!this.validateForm()) {
 					return;
 				}

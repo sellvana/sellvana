@@ -104,6 +104,27 @@
 			vertical-align: middle;
 		}
 	}
+	.input-group {
+		.input-group-btn {
+			.dropdown-menu {
+				min-width: 100%;
+				padding: 0;
+				li {
+					border-top: 2px solid #fff;
+				}
+				a {
+					padding: 4px 10px 4px 10px;
+					background-color: #f7f7f7;
+					font-weight: bold;
+					color: #000;
+					&:hover {
+						background: #e5e5e5;
+						color: #000;
+					}
+				}
+			}
+		}	
+	}
 }
 
 .filter {
@@ -123,30 +144,18 @@
 		z-index: 5;
 	}
 	.ui-sortable {
-		font-size: 0;
 		.handle {
-			cursor: pointer;
 			padding: 0px 6px;
 		}
 	}
 	li {
-		margin-right: 5px;
-		padding: 6px 0;
-		white-space: nowrap;
 		& > * {
 			display: inline-block;
 			vertical-align: middle;
 		}
 	}
 }
-.ui-sortable {
-	font-size: 0;
-	li {
-		margin-right: 5px;
-		padding: 6px 0;
-		white-space: nowrap;
-	}
-}
+
 .export {
 	.dropdown-menu {
 		width: 222px;
@@ -159,9 +168,14 @@
 	background-color: #f2f2f2;
 	border: 1px solid #ebebeb;
 	border-radius: 1px;
-	//padding: 10px 12px;
 }
-
+.ui-sortable {
+	li {
+		padding: 6px 0;
+		white-space: nowrap;
+		cursor: pointer;
+	}
+}
 .select-filter {
 	position: relative;
 	.select2-container {
@@ -235,7 +249,7 @@
 			border-right: 1px solid #e5e5e5;
 			border-radius: 1px 0 0 1px;
 			z-index: 6;
-			padding: 7px 15px 7px 10px;
+			padding: 8px 15px 8px 10px; 
 			margin-right: -1px;
 			span {
 				color: #000;
@@ -253,25 +267,6 @@
 	}
 }
 
-.input-group {
-	.dropdown-menu {
-		min-width: 100%;
-		padding: 0;
-		li {
-			border-top: 2px solid #fff;
-		}
-		a {
-			padding: 4px 10px 4px 10px;
-			background-color: #f7f7f7;
-			font-weight: bold;
-			color: #000;
-			&:hover {
-				background: #e5e5e5;
-				color: #000;
-			}
-		}
-	}
-}
 
 .pagination {
 	vertical-align: middle;
@@ -366,9 +361,7 @@
 		}
 	}
 }
-.amount-rows {
-	padding: 8px 5px 8px 0;
-}
+
 .amount-rows,
 .pagination-block {
 	display: inline-block;

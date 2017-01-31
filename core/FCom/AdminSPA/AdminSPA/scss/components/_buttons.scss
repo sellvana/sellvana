@@ -19,32 +19,35 @@ button, .button {
 	display: inline-block;
 	font-size: 12px;
 	font-weight: bold;
-	span {
-		color: #fff;
-	}
-}
-.button1 {
-	background-color: transparent;
-	color: #868a8a;
-	border: 1px solid transparent;
-	&:focus {
-		background-color: transparent;
-		order: 1px solid transparent;
-		color: #868a8a;
-	}
-	&:hover {
-		border: 1px solid #868a8a;
-	}
 	&:active {
 		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
+.button1 {
+	background-color: transparent;
+	border: 1px solid transparent;
+	color: #868a8a;
+	span {
+		color: #868a8a;
+	}
+	&:focus {
+		background-color: transparent;
+		border: 1px solid transparent;
+		color: #868a8a;
+	}
+	&:hover {
+		border: 1px solid #868a8a;
+	}
+}
 .button2 {
 	background-color: #514943;
 	border: 1px solid #514943;
 	color: #fff;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #514943;
 		border: 1px solid #514943;
@@ -55,16 +58,14 @@ button, .button {
 		border: 1px solid #1b1b1b;
 		color: #fff;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button3 {
 	background-color: transparent;
-	color: #2d2d2d;
 	border: 1px solid #e5dfdf;
+	color: #2d2d2d;
+	span {
+		color: #2d2d2d;
+	}
 	&:focus {
 		background-color: transparent;
 		color: #2d2d2d;
@@ -73,17 +74,18 @@ button, .button {
 	&:hover {
 		background-color: #8b8b8b;
 		color: #fff;
-	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24); 
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		span {
+			color: #fff;
+		}
 	}
 }
 .button4 {
 	background-color: #3ec234;
-	color: #fff;
 	border: 1px solid #3ec234;
+	color: #fff;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #3ec234;
 		color: #fff;
@@ -94,17 +96,13 @@ button, .button {
 		color: #fff;
 		border: 1px solid #16870d;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button5 {
 	background-color: #e5e5e5;
 	border: 1px solid #e5e5e5;
 	padding: 8px 4px;
 	width: auto;
+	color: #454d54;	
 	span {
 		color: #454d54;	
 	}
@@ -117,11 +115,9 @@ button, .button {
 	&:hover {
 		background-color: #e5e5e5;
 		color: #fff;
-	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		span {
+			color: #fff;
+		}
 	}
 }
 .btn-sm, .btn-group-sm > .btn {
@@ -138,6 +134,9 @@ button, .button {
 	width: auto;
 	color: #fff;
 	transition: 0.1s all ease-in;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #ff2b42;
 		border: 1px solid #ff2b42;
@@ -148,16 +147,14 @@ button, .button {
 		border: 1px solid #d40017;
 		color: #fff;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button7 {
 	background-color: transparent;
 	color: #ff2d43;
 	border: 1px solid transparent;
+	span {
+		color: #ff2d43;
+	}
 	&:focus {
 		background-color: transparent;
 		border: 1px solid transparent;
@@ -169,19 +166,17 @@ button, .button {
 	&:hover {
 		border: 1px solid #ff2d43;
 		span {
-			color: #d40017;
+			color: #ff2d43;
 		}
-	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
 .button8 {
 	background-color: #00a65a;
 	color: #fff;
 	border: 1px solid #00a65a;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #00a65a;
 		color: #fff;
@@ -192,16 +187,14 @@ button, .button {
 		border: 1px solid #02894b;
 		color: #fff;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button9 {
 	background-color: #00c0ef;
 	color: #fff;
 	border: 1px solid #00c0ef;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #00c0ef;
 		color: #fff;
@@ -212,11 +205,6 @@ button, .button {
 		border: 1px solid #038fb1;
 		color: #fff;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button10 {
 	background-color: transparent;
@@ -225,6 +213,9 @@ button, .button {
 	width: auto;
 	color: #000;
 	transition: 0.1s all ease-in;
+	span {
+		color: #000;
+	}
 	&:focus {
 		background-color: transparent;
 		border: 1px solid transparent;
@@ -234,11 +225,6 @@ button, .button {
 		border: 1px solid #000;
 		color: #000;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button11 {
 	background-color: transparent;
@@ -247,6 +233,9 @@ button, .button {
 	width: auto;
 	color: #4d4d4d;
 	transition: 0.1s all ease-in;
+	span {
+		color: #4d4d4d;
+	}
 	&:focus {
 		background-color: transparent;
 		border: 1px solid #c9c9c9;
@@ -256,17 +245,18 @@ button, .button {
 		background: #514943;
 		color: #fff;
 		border: 1px solid #c9c9c9;
-	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		span {
+			color: #fff;
+		}
 	}
 }
 .button12 {
 	background-color: #4c8cf6;
 	border: 1px solid #4c8cf6;
 	color: #fff;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #4c8cf6;
 		border: 1px solid #4c8cf6;
@@ -277,16 +267,14 @@ button, .button {
 		color: #fff;
 		border: 1px solid #115dda;
 	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-	}
 }
 .button13 {
 	background-color: #e1e1e1;
 	border: 1px solid #e1e1e1;
 	color: #000;
+	span {
+		color: #000;
+	}
 	&:focus {
 		background-color: #e1e1e1;
 		border: 1px solid #e1e1e1;
@@ -296,11 +284,9 @@ button, .button {
 		background: #514943;
 		color: #fff;
 		border: 1px solid #514943;
-	}
-	&:active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
+		span {
+			color: #fff;
+		}
 	}
 }
 .button14 {
@@ -308,6 +294,9 @@ button, .button {
 	color: #fff;
 	border: 1px solid #00c0ef;
 	padding: 0px 6px;
+	span {
+		color: #fff;
+	}	
 	&:focus {
 		background-color: #038fb1;
 		border: 1px solid #038fb1;
@@ -319,9 +308,6 @@ button, .button {
 		border: 1px solid #038fb1;
 	}
 	&:active, &.active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 		background-color: #038fb1;
 		border: 1px solid #038fb1;
 	}
@@ -331,6 +317,9 @@ button, .button {
 	color: #fff;
 	border: 1px solid #00a65a;
 	padding: 0px 6px;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #02894b;
 		border: 1px solid #02894b;
@@ -342,9 +331,6 @@ button, .button {
 		border: 1px solid #02894b;
 	}
 	&:active, &.active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 		background-color: #02894b;
 		border: 1px solid #02894b;
 	}
@@ -354,6 +340,9 @@ button, .button {
 	border: 1px solid #dac303;
 	color: #fff;
 	padding: 0px 6px;
+	span {
+		color: #fff;
+	}
 	&:focus {
 		background-color: #cbb607;
 		border: 1px solid #cbb607;
@@ -365,9 +354,6 @@ button, .button {
 		border: 1px solid #cbb607;
 	}
 	&:active, .active {
-		-webkit-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
-		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 		background-color: #cbb607;
 		border: 1px solid #cbb607;
 	}

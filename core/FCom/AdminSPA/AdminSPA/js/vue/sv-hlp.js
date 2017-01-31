@@ -41,7 +41,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                 var $el = $(el);
                 $el.addClass('ladda-button').wrapInner('<span class="ladda-label"></span>');
                 if (!$el.attr('data-style')) {
-                    $el.attr('data-style', binding.value.style || 'zoom-out');
+					$el.attr('data-style', binding.value.style || 'expand-left');
                 }
                 if (!$el.attr('data-spinner-size')) {
                     $el.attr('data-spinner-size', binding.value.spinner_size || 20);
