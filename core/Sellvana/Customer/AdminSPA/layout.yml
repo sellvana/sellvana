@@ -23,7 +23,7 @@
             - [ addNav, { path: /reports/customers/order-history, label: Customer Order History, link: /customers/reports/order-history, pos: 30 } ]
 
             - [ addRoute, { path: /customers, require: [ sv-page-customers, text!sv-page-default-grid-tpl, json!sv-page-customers-grid-config ] } ]
-            - [ addRoute, { path: /customers/form, require: [ sv-page-customers-form, text!sv-page-customers-form-tpl ] } ]
+            - [ addRoute, { path: /customers/form, require: [ sv-page-customers-form ] } ]
 
 /customers/form:
     - view: app

@@ -1,3 +1,24 @@
-<div>
-    <sv-comp-form :form="form"></sv-comp-form>
+<div class="row">
+    <div class="col-md-2 col-sm-12">
+        <img v-if="thumbUrl" :src="thumbUrl" width="100" class="avatar-img">
+        <div class='secondary-menu'>
+            <ul class="nav">
+                <li v-for="t in formTabs" :class="{active:tab === t.name}">
+                    <a href="#" @click.prevent="switchTab(t.name)">
+                        {{t.label|_}}
+                        <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-10 col-sm-12">
+        <div class="control-buttons-block text-right">
+            <button v-for="a in form.config.actions" type="button" class="button" :class="a.class"
+                    @click="buttonAction(a)" v-ladda="{on:action_in_progress === a.name}">{{a.label|_}}</button>
+        </div>
+    </div>
+    <div class="col-md-10 col-sm-12">
+        <component v-for="t in formTabs" v-show="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+    </div>
 </div>

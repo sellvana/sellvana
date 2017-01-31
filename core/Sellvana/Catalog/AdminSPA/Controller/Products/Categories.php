@@ -14,7 +14,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products_Categories extends FCom_Admi
         $bool = [0 => 'no', 1 => 'Yes'];
         return [
             'id' => 'product_categories',
-            'data_url' => 'products/categories/grid_data?id=' . $prodId,
+            'data_url' => 'products/form/categories/grid_data?id=' . $prodId,
             'columns' => [
                 ['type' => 'row-select', 'width' => 55],
                 ['type' => 'actions', 'actions' => [

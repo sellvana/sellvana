@@ -1,5 +1,5 @@
 define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
-    return {
+    var SvCompNav = {
         store: SvHlp.store,
         data: function () {
             return {
@@ -45,5 +45,9 @@ define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
                 }
             }
         }
-    }
-})
+    };
+
+    Vue.component('sv-comp-nav', SvCompNav);
+
+    return SvCompNav;
+});

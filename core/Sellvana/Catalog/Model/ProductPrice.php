@@ -192,6 +192,10 @@ class Sellvana_Catalog_Model_ProductPrice
         //    }
         //}
 
+        if (!empty($priceModels[0])) {
+            $priceModels[0]->set('is_base_price', 1);
+        }
+
         $prices = $priceModels ? $this->BDb->many_as_array($priceModels) : [];
         return $prices;
     }

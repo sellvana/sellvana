@@ -1,4 +1,4 @@
-define(['jquery', 'lodash', 'select2'], function ($, _) {
+define(['jquery', 'lodash', 'vue', 'select2'], function ($, _, Vue) {
     function normalizeOptions(options) {
         if (_.isArrayLike(options)) {
             return options;
@@ -10,7 +10,7 @@ define(['jquery', 'lodash', 'select2'], function ($, _) {
         return result;
     }
 
-    return {
+    var VueSelect2 = {
         props: {
             value: {},
             options: {
@@ -69,4 +69,8 @@ define(['jquery', 'lodash', 'select2'], function ($, _) {
             $(this.$el).off().select2('destroy');
         }
     };
+
+    Vue.component('select2', VueSelect2);
+
+    return VueSelect2;
 });

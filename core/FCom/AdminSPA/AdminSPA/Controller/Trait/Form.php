@@ -30,6 +30,39 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
             unset($field);
         }
+        if (!empty($result['form']['config']['actions'])) {
+            if (true === $result['form']['config']['actions']) {
+                $result['form']['config']['actions'] = [
+                    ['name' => 'back', 'label' => 'Back', 'class' => 'button10'],
+                    ['name' => 'delete', 'label' => 'Delete', 'class' => 'button2'],
+                    ['name' => 'save', 'label' => 'Save', 'class' => 'button9'],
+                    ['name' => 'save-continue', 'label' => 'Save and Continue', 'class' => 'button9'],
+                ];
+            }
+            foreach ($result['form']['config']['actions'] as &$act) {
+                if ($act['name'] === 'back' && empty($act['method'])) {
+                    $act['method'] = 'goBack';
+                }
+                if ($act['name'] === 'delete' && empty($act['method'])) {
+                    $act['method'] = 'doDelete';
+                }
+                if ($act['name'] === 'save' && empty($act['method'])) {
+                    $act['method'] = 'save';
+                }
+                if ($act['name'] === 'save-continue' && empty($act['method'])) {
+                    $act['method'] = 'saveAndContinue';
+                }
+            }
+            unset($act);
+        }
+
+        if (!empty($result['form']['i18n']) && is_string($result['form']['i18n'])) {
+            $modelName = $result['form']['i18n'];
+            if (!empty($result['form'][$modelName]['id'])) {
+                $result['form']['i18n'] = $this->getModelTranslations($modelName, $result['form'][$modelName]['id']);
+            }
+        }
+
         return $result;
     }
 

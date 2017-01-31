@@ -5,6 +5,10 @@
  *
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_ProductMedia Sellvana_Catalog_Model_ProductMedia
+ * @property Sellvana_Catalog_Model_ProductPrice Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CustomerGroups_Model_Group Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_MultiSite_Model_Site Sellvana_MultiSite_Model_Site
+ * @property Sellvana_MultiCurrency_Main Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
@@ -91,6 +95,32 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             $result['form']['product'] = $product->as_array();
             $result['form']['thumb'] = ['thumb_url' => $product->thumbUrl(100)];
 
+            $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+            $result['form']['prices'] = $priceHlp->getProductPrices($product);
+            $result['form']['config']['options']['price_types'] = $this->BUtil->arrayMapToSeq($product->priceTypeOptions());
+            $result['form']['config']['options']['price_relations'] = $priceHlp->fieldOptions('price_relation_options');
+            $result['form']['config']['options']['price_operations'] = $priceHlp->fieldOptions('operation_options');
+            if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
+                $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;
+                if ($groups) {
+                    $result['form']['config']['options']['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
+                }
+            }
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+                $sites = $this->Sellvana_MultiSite_Model_Site->siteOptions();
+                if ($sites) {
+                    $result['form']['config']['options']['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
+                }
+            }
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+                $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
+                if ($currencies) {
+                    $result['form']['config']['options']['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
+                }
+            }
+
+            $result['form']['config']['actions'] = true;
+
             $result['form']['config']['tabs'] = $this->getFormTabs('/catalog/products/form');
             $result['form']['config']['default_field'] = ['model' => 'product'];
             $result['form']['config']['fields'] = [
@@ -112,7 +142,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
                 ['field' => 'description', 'required' => true],
             ];
 
-            $result['form']['i18n'] = $this->getModelTranslations('product', $product->id());
+            $result['form']['i18n'] = 'product';
 
             $result = $this->normalizeFormConfig($result);
         } catch (Exception $e) {

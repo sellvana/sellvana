@@ -47,6 +47,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
 
             $result['form']['i18n'] = $this->getModelTranslations('category', $category->id());
 
+            $result = $this->normalizeFormConfig($result);
+
             $this->ok();
         } catch (Exception $e) {
             $this->addMessage($e);

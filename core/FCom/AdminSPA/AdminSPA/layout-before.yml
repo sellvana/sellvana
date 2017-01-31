@@ -73,8 +73,9 @@
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
             - [ requireJs, sortable, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
             - [ requireJs, ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/ckeditor/ckeditor" ]
-            - [ requireJs, vue-ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-ckeditor" ]
-            - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select2" ]
+
+            - [ requireJs, vue-ckeditor, "@FCom_AdminSPA/AdminSPA/js/vue/vue-ckeditor" ]
+            - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/vue/vue-select2" ]
 
             - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]

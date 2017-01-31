@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tpl',
+define(['vue', 'sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tpl',
         'text!sv-comp-header-search-tpl', 'text!sv-comp-header-favorites-tpl', 'text!sv-comp-header-account-tpl',
         'text!sv-comp-header-chat-tpl', 'text!sv-comp-header-local-notifications-tpl'],
-    function(SvHlp, headerTpl, headerBreadcrumbsTpl, headerSearchTpl, headerFavoritesTpl, headerAccountTpl,
+    function(Vue, SvHlp, headerTpl, headerBreadcrumbsTpl, headerSearchTpl, headerFavoritesTpl, headerAccountTpl,
              headerChatTpl, headerLocalNotificationsTpl) {
         //var dropdowns = {};
 
@@ -150,7 +150,7 @@ define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
             store: SvHlp.store
         };
 
-        return {
+        var SvCompHeader = {
             mixins: [SvHlp.mixins.common],
             template: headerTpl,
             store: SvHlp.store,
@@ -171,4 +171,8 @@ define(['sv-hlp', 'text!sv-comp-header-tpl', 'text!sv-comp-header-breadcrumbs-tp
                 }
             }
         };
+
+        Vue.component('sv-comp-header', SvCompHeader);
+
+        return SvCompHeader;
 });

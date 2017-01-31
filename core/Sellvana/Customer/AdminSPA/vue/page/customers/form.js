@@ -1,25 +1,16 @@
 define(['vue', 'sv-hlp'],
     function (Vue, SvHlp) {
 
-        var defForm = {
-            options: {},
-            updates: {},
-            tabs: [],
-
-            customer: {}
-        };
-
         return {
             mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
             data: function () {
                 return {
-                    form: defForm
+                    form: {
+                        customer: {}
+                    }
                 }
             },
             methods: {
-                buttonAction: function (act) {
-                    console.log(act);
-                },
                 updateBreadcrumbs: function (label) {
                     this.$store.commit('setData', {curPage: {
                         link: this.$router.currentRoute.fullPath,
@@ -63,11 +54,6 @@ define(['vue', 'sv-hlp'],
                             vm.$router.go(-1);
                         }
                     })
-                }
-            },
-            watch: {
-                'form.customer': function (customer) {
-
                 }
             }
         };

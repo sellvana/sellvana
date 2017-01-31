@@ -37,7 +37,7 @@ define(['vue', 'text!sv-comp-tree-node-tpl'], function (Vue, treeNodeTpl) {
         }
     });
 
-    return {
+    var SvCompTree = {
         props: {
             tree: Object,
             curNode: Object,
@@ -49,5 +49,9 @@ define(['vue', 'text!sv-comp-tree-node-tpl'], function (Vue, treeNodeTpl) {
             }
         },
         template: '<ul><sv-comp-tree-node class="tree-root tree-node" :node="tree" :cur-node="curNode" :tree-id="treeId" @event="proxyEvent"></sv-comp-tree-node></ul>'
-    }
+    };
+
+    Vue.component('sv-comp-tree', SvCompTree);
+
+    return SvCompTree;
 });

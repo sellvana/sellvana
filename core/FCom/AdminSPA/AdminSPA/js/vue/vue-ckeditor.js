@@ -2,8 +2,8 @@
  * @see original: https://github.com/dangvanthanh/vue-ckeditor
  * @license MIT (C) Dang Van Tranh
  */
-define(['jquery', 'ckeditor'], function ($) {
-    return {
+define(['jquery', 'vue', 'ckeditor'], function ($, Vue) {
+    var VueCkeditor = {
         template: '<div class="ckeditor"><textarea :id="id" :value="value"></textarea></div>',
         props: {
             value: {
@@ -88,4 +88,7 @@ define(['jquery', 'ckeditor'], function ($) {
         }
     };
 
+    Vue.component('ckeditor', VueCkeditor);
+
+    return VueCkeditor;
 });

@@ -1,15 +1,12 @@
 define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-users-grid-config'], function (SvHlp, SvCompGrid, gridConfig) {
     return {
-        store: SvHlp.store,
+        mixins: [SvHlp.mixins.common, SvHlp.mixins.grid],
         data: function () {
             return {
                 grid: {
                     config: gridConfig
                 }
             };
-        },
-        components: {
-            'sv-comp-grid': SvCompGrid
         },
         created: function () {
             this.$store.commit('setData', {curPage: {

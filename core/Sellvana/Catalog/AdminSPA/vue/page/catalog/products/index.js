@@ -1,6 +1,6 @@
 define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-catalog-products-grid-config'], function (SvHlp, SvCompGrid, gridConfig) {
     return {
-        store: SvHlp.store,
+        mixins: [SvHlp.mixins.common, SvHlp.mixins.grid],
         data: function () {
             return {
                 grid: {

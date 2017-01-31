@@ -1,4 +1,5 @@
 define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+
     return {
         mixins: [SvHlp.mixins.common],
         props: ['grid', 'col'],

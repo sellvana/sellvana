@@ -18,7 +18,7 @@
 			</div>
 		</div>
 		<div class="col-md-10 col-sm-12">
-			<component v-for="t in formTabs" v-if="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+			<component v-for="t in formTabs" v-show="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
 		</div>
 	</div>
 </div>

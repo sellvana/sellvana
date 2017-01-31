@@ -1,5 +1,5 @@
-define(['sv-hlp'], function (SvHlp) {
-    return {
+define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+    var SvCompMessages = {
         mixins: [SvHlp.mixins.common],
         template: '<div class="messages-block"><div class="messages-container">'
             + '<div v-for="m in messages" class="message" :class="m.type + \'-message\'" @click="closeMessage(m)">'
@@ -16,5 +16,9 @@ define(['sv-hlp'], function (SvHlp) {
                 this.$store.commit('removeMessage', m);
             }
         }
-    }
+    };
+
+    Vue.component('sv-comp-messages', SvCompMessages);
+
+    return SvCompMessages;
 });

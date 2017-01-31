@@ -437,7 +437,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         };
 
-        return {
+        var SvCompGrid = {
             props: ['grid'],
             mixins: [SvHlp.mixins.common],
             data: function() {
@@ -538,4 +538,8 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             template: gridTpl
         };
+
+        Vue.component('sv-comp-grid', SvCompGrid);
+
+        return SvCompGrid;
 });

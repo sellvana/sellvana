@@ -1,11 +1,14 @@
-define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
-        'vue-ckeditor', 'vue-select2', 'spin', 'ladda', 'nprogress',
-        'sv-comp-form-field', 'sv-comp-form-layout',
-        'ckeditor', 'select2'],
-    function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
-              VueCkeditor, VueSelect2, Spin, Ladda, NProgress,
-              SvCompFormField, SvCompFormLayout
-    ) {
+define([
+    'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
+    'vue-ckeditor', 'vue-select2', 'spin', 'ladda', 'nprogress',
+    'sv-comp-form-field', 'sv-comp-form-layout',
+    'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
+],
+function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
+          VueCkeditor, VueSelect2, Spin, Ladda, NProgress,
+          SvCompFormField, SvCompFormLayout,
+          svPageDefaultGridTpl, svPageDefaultFormTpl
+) {
 
         Vue.use(VueRouter);
         Vue.use(Vuex);
@@ -57,10 +60,6 @@ define(['jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment',
                 }
             }
         });
-
-        Vue.component('ckeditor', VueCkeditor);
-
-        Vue.component('select2', VueSelect2);
 
         Vue.component('jsontree', {
             template: '<div></div>',
@@ -474,18 +473,35 @@ console.log('onError', err.xhr);
                     sendRequest: sendRequest
                 }
             },
+            grid: {
+                template: svPageDefaultGridTpl
+            },
             form: {
+                template: svPageDefaultFormTpl,
                 data: function () {
                     return {
                         tab: false,
+                        action_in_progress: null,
                         form: {
-                            options: {},
+                            config: {
+                                options: {},
+                                tabs: [],
+                                fields: []
+                            },
                             updates: {},
-                            tabs: []
+                            errors: {}
                         }
                     };
                 },
                 computed: {
+                    thumbUrl: function () {
+                        return this.form && this.form.thumb ? this.form.thumb.thumb_url : '';
+                    },
+
+                    formTabs: function () {
+                        return this.form && this.form.config && this.form.config.tabs ? this.form.config.tabs : [];
+                    },
+
                     getOption: function () {
                         return function (type, value) {
                             if (!this.form.options[type]) {
@@ -497,8 +513,9 @@ console.log('onError', err.xhr);
                             return this.form.options[type][value];
                         }
                     },
+
                     formTabLabel: function () {
-                        if (!this.form || !this.form.config.tabs || _.isEmpty(this.form.config.tabs)) {
+                        if (!this.form || !this.form.config || !this.form.config.tabs || _.isEmpty(this.form.config.tabs)) {
                             return '';
                         }
                         for (var i = 0, l = this.form.config.tabs.length; i < l; i++) {
@@ -510,16 +527,29 @@ console.log('onError', err.xhr);
                     }
                 },
                 methods: {
+                    buttonAction: function (act) {
+                        if (act.method) {
+                            this[act.method]();
+                        }
+                    },
+
+                    saveAndContinue: function () {
+                        this.save(true);
+                    },
+
                     switchTab: function (tab) {
                         this.tab = tab;
                         //this.$router.go({query: {tab: tab}});
                     },
+
                     goBack: function () {
                         this.$router.go(-1);
                     },
+
                     addUpdates: function (part) {
                         Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
                     },
+
                     processFormDataResponse: function (response) {
                         if (!response.form) {
                             console.log('No form object in response', response);
@@ -548,15 +578,18 @@ console.log('onError', err.xhr);
                         });
                         Vue.set(this, 'form', response.form);
 
-                        for (i = 0, l = response.form.config.fields.length; i < l; i++) {
-                            f = response.form.config.fields[i];
-                            watchModels[f.model] = true;
+                        if (response.form.config.fields) {
+                            for (i = 0, l = response.form.config.fields.length; i < l; i++) {
+                                f = response.form.config.fields[i];
+                                watchModels[f.model] = true;
+                            }
                         }
                         for (i in watchModels) {
                             Vue.set(this.form, i + '_old', response.form[i]);
                             this.$watch('form.' + i, function () { vm.processModelDiff(i); }, {deep: true});
                         }
                     },
+
                     processTabEvent: function (type, args) {
                         switch (type) {
                             case 'tab_switch': //TODO: F&R: $emit('tab'
@@ -573,6 +606,7 @@ console.log('onError', err.xhr);
 
                         }
                     },
+
                     validateField: function (f, apply) {
                         var i, l, r, v, a, e;
                         if (_.isString(f)) {
@@ -589,6 +623,9 @@ console.log('onError', err.xhr);
                             }
                         }
                         r = f.validate;
+                        if (!r) {
+                            return {};
+                        }
                         v = this.form[f.model][f.name];
                         a = {field: f.label};
                         e = {};
@@ -630,25 +667,26 @@ console.log('onError', err.xhr);
                         }
                         return e;
                     },
+
                     validateForm: function () {
-                        if (!this.form.config.validation) {
-                            return true;
-                        }
-                        var i, l, f, tabErrors = {}, errors = {};
+                        var i, l, f, e, tabErrors = {}, errors = {};
 
                         for (i = 0, l = this.form.config.fields.length; i < l; i++) {
                             f = this.form.config.fields[i];
-                            errors[f.name] = this.validateField(f);
-                            tabErrors[f.tab] = tabErrors[f.tab] || errors[f.name];
+                            e = this.validateField(f);
+                            if (!_.isEmpty(errors[f.name])) {
+                                errors[f.name] = e;
+                                tabErrors[f.tab] = true;
+                            }
                         }
 
                         Vue.set(this.form, 'errors', errors);
                         for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                            Vue.set(this.form.config.tabs[i], 'errors', !!tabErrors[this.form.config.tabs[i].name]);
+                            Vue.set(this.form.config.tabs[i], 'errors', tabErrors[this.form.config.tabs[i].name]);
                         }
-
                         return _.isEmpty(errors);
                     },
+
                     clearTabsFlags: function () {
                         for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
                             this.form.config.tabs[i].edited = false;

@@ -1,34 +1,8 @@
-define(['vue', 'sv-hlp'],
-	   function (Vue, SvHlp) {
-
-	var defForm = {
-        options: {},
-        updates: {},
-        tabs: [],
-		errors: {},
-
-        product: {}
-    };
+define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 
 	return {
 		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
-		data: function () {
-			return {
-				form: defForm
-			}
-		},
-        computed: {
-            thumbUrl: function () {
-                return this.form && this.form.thumb ? this.form.thumb.thumb_url : '';
-            },
-			formTabs: function () {
-            	return this.form && this.form.config && this.form.config.tabs ? this.form.config.tabs : [];
-			}
-        },
 		methods: {
-			buttonAction: function (act) {
-				console.log(act);
-			},
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
@@ -58,9 +32,11 @@ define(['vue', 'sv-hlp'],
 			},
 			save: function (stayOnPage) {
 				var vm = this;
+				this.action_in_progress = stayOnPage ? 'save-continue' : 'save';
 				if (!this.validateForm()) {
 					return;
 				}
+				console.log(2);
 				this.sendRequest('POST', 'products/form_data', this.form.updates, function (response) {
 					if (!response._ok) {
 
@@ -74,6 +50,7 @@ define(['vue', 'sv-hlp'],
                     if (!stayOnPage) {
                         vm.$router.go(-1);
                     }
+                    vm.action_in_progress = false;
 				})
 		    }
 		}

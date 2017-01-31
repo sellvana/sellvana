@@ -4,7 +4,9 @@ define(['lodash', 'sv-hlp', 'sv-comp-tree', 'sv-comp-grid'/*, 'json!sv-page-cata
     var defForm = {
         options: {},
         updates: {},
-        tabs: [],
+        config: {
+            tabs: []
+        },
 
         product: {}
     };

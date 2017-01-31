@@ -1,6 +1,9 @@
 /:
     - view: head
         do:
+            - [ requireJs, sv-comp-form-catalog-prices, "@Sellvana_Catalog/AdminSPA/vue/component/prices" ]
+            - [ requireJs, sv-comp-form-catalog-prices-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/prices.html" ]
+
             - [ requireJs, sv-page-catalog-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/index" ]
             - [ requireJs, sv-page-catalog-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/index.html" ]
             - [ requireJs, sv-page-catalog-products-grid-config, "~/products/grid_config" ]
@@ -66,8 +69,8 @@
             - [ addNav, { path: /reports/data-integrity/products-no-category, label: Products without a Category, link: /catalog/reports/products-no-category, pos: 20 } ]
             - [ addNav, { path: /reports/data-integrity/categories-no-products, label: Categories without Products, link: /catalog/reports/categories-no-products, pos: 30 } ]
 
-            - [ addRoute, { path: /catalog/products, require: [ sv-page-catalog-products, text!sv-page-default-grid-tpl, json!sv-page-catalog-products-grid-config ] } ]
-            - [ addRoute, { path: /catalog/products/form, require: [ sv-page-catalog-products-form, text!sv-page-catalog-products-form-tpl ] } ]
+            - [ addRoute, { path: /catalog/products, require: [ sv-page-catalog-products, '', json!sv-page-catalog-products-grid-config ] } ]
+            - [ addRoute, { path: /catalog/products/form, require: [ sv-page-catalog-products-form ] } ]
             - [ addRoute, { path: /catalog/categories, require: [ sv-page-catalog-categories, text!sv-page-catalog-categories-tpl ] } ]
 
 
@@ -76,12 +79,13 @@
         do:
             - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10 } ]
             - [ addFormTab, { path: /catalog/products/form, name: prices, label: Prices, pos: 20 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: inventory, label: Inventory & Shipping, pos: 30 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: merchandizing, label: Merchandizing, pos: 40 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: images, label: Images, pos: 50 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: videos, label: Videos, pos: 60 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 70 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: custom_views, label: Custom Views, pos: 80 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: categories, label: Categories, pos: 30 } ]
+#            - [ addFormTab, { path: /catalog/products/form, name: inventory, label: Inventory & Shipping, pos: 40 } ]
+#            - [ addFormTab, { path: /catalog/products/form, name: merchandizing, label: Merchandizing, pos: 50 } ]
+#            - [ addFormTab, { path: /catalog/products/form, name: images, label: Images, pos: 60 } ]
+#            - [ addFormTab, { path: /catalog/products/form, name: videos, label: Videos, pos: 70 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 80 } ]
+#            - [ addFormTab, { path: /catalog/products/form, name: custom_views, label: Custom Views, pos: 90 } ]
 
 
 /catalog/categories/form:
