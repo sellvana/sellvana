@@ -584,10 +584,14 @@ console.log('onError', err.xhr);
                                 watchModels[f.model] = true;
                             }
                         }
-                        for (i in watchModels) {
-                            Vue.set(this.form, i + '_old', response.form[i]);
-                            this.$watch('form.' + i, function () { vm.processModelDiff(i); }, {deep: true});
-                        }
+
+                        _.forEach(watchModels, function (flag, model) {
+                            Vue.set(vm.form, model + '_old', _.cloneDeep(response.form[model]));
+                            vm.$watch('form.' + model, function (n, o) {
+                                vm.processModelDiff(n, o, model);
+                                vm.validateForm();
+                            }, {deep: true});
+                        });
                     },
 
                     processTabEvent: function (type, args) {
@@ -623,7 +627,7 @@ console.log('onError', err.xhr);
                             }
                         }
                         r = f.validate;
-                        if (!r) {
+                        if (!r && !f.required) {
                             return {};
                         }
                         v = this.form[f.model][f.name];
@@ -631,20 +635,22 @@ console.log('onError', err.xhr);
                         e = {};
 
                         if (v === null || v === '') {
-                            if (r.required) {
-                                e.required = r.message || translate('Field is required: {field}', a);
+                            if (f.required) {
+                                e.required = f.required_message || translate('Field is required: {field}', a);
                             }
-                        } else {
-                            if (r.pattern && !v.match(r.pattern)) {
-                                e.pattern = r.message || translate('Invalid field value: {field}', a);
+                        } else if (r) {
+                            var regexp = new RegExp(r.pattern.replace(/^\/|\/$/g, ''));
+                            if (r.pattern && !v.match(regexp)) {
+                                e.pattern = r.pattern_message || translate('Invalid field value: {field}', a);
                             }
                             if ((r.email || f.input_type === 'email') && !v.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
-                                e.email = r.message || translate('Invalid email: {field}', a);
+                                e.email = r.email_message || translate('Invalid email: {field}', a);
                             }
                             if ((r.url || f.input_type === 'url') && !v.match('/^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+(\/[^\s]*)?$/iS')) {
-                                e.url = r.message || translate('Invalid URL: {field}', a);
+                                e.url = r.url_message || translate('Invalid URL: {field}', a);
                             }
                         }
+
                         if (apply) {
                             var hasErrors = !_.isEmpty(e);
                             if (hasErrors) {
@@ -674,8 +680,11 @@ console.log('onError', err.xhr);
                         for (i = 0, l = this.form.config.fields.length; i < l; i++) {
                             f = this.form.config.fields[i];
                             e = this.validateField(f);
-                            if (!_.isEmpty(errors[f.name])) {
-                                errors[f.name] = e;
+                            if (!_.isEmpty(e)) {
+                                if (!errors[f.model]) {
+                                    errors[f.model] = {};
+                                }
+                                errors[f.model][f.name] = e;
                                 tabErrors[f.tab] = true;
                             }
                         }
@@ -689,16 +698,22 @@ console.log('onError', err.xhr);
 
                     clearTabsFlags: function () {
                         for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                            this.form.config.tabs[i].edited = false;
+                            Vue.set(this.form.config.tabs[i], 'edited', false);
                         }
                     },
-                    processModelDiff: function (model) { // have to do all this because oldValues wasn't working
+                    processModelDiff: function (newModel, oldModel, model) {
+                        // have to do all this because oldModel isn't working
                         var newModel = this.form[model], oldModel = this.form[model + '_old'];
-console.log(model);
-                        var i, l, f, tabs = {}, update = false;
+                        var i, l, j, m = this.form.config.fields.length, f, tabs = {}, update = false;
                         for (i in newModel) {
                             if (newModel[i] != oldModel[i]) {
-                                f = this.form.config.fields[i];
+                                f = false;
+                                for (j = 0; j < m; j++) {
+                                    if (this.form.config.fields[j].name === i) {
+                                        f = this.form.config.fields[j];
+                                        break;
+                                    }
+                                }
                                 if (!f) {
                                     continue;
                                 }
@@ -706,6 +721,7 @@ console.log(model);
                                 update = true;
                             }
                         }
+
                         if (update) {
                             for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
                                 Vue.set(this.form.config.tabs[i], 'edited', tabs[this.form.config.tabs[i].name]);
@@ -757,7 +773,7 @@ console.log(model);
                 },
                 methods: {
                     edited: function (field, value) {
-                        var config = this.form.config.validation;
+                        var config = this.form.config;
                         if (!config.fields || !config.fields[field]) {
                             return;
                         }

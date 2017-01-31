@@ -1,4 +1,4 @@
-<div class="form-group row" :class="{required: field_config.required}">
+<div class="form-group row" :class="{required: field_config.required, error: field_errors}">
     <label v-if="field_config.label" :for="field_id" class="control-label" :class="field_config.label_class">
         {{field_config.label|_}}
     </label>
@@ -46,10 +46,6 @@
         <a v-if="i18n_enabled && field_config.i18n" href="#" class="translate-icon"
            @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
 
-        <div v-if="field_errors">
-            <ul>
-                <li v-for="e in field_errors">{{e}}</li>
-            </ul>
-        </div>
+        <span v-for="e in field_errors" class="error-message">{{e}}</span>
     </div>
 </div>
