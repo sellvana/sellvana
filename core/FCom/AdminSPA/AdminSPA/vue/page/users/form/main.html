@@ -1,6 +1,31 @@
 <div class="admin-main-content">
 	<form class="form-horizontal">
 		<div class="f-section">
+			<div class="form-group">
+				<p class="col-md-3"></p>
+				<div class="col-md-9">
+					<p class="param-block">If 
+						<span class="param-result">
+							<span class="param-options">
+								<select2 value="any">
+									<option>any</option>
+									<option>all</option>
+								</select2>
+							</span>
+						</span>
+						just another text
+						<span class="param-result" onclick="event.preventDefault(); $(this).toggleClass('edit'); $(this).find('input').focus();">
+							<a href="#" >any</a>
+							<span class="param-options">
+								<input type="text" class="form-control" value="any" onchange="var value=$(this).val(); $(this).parents('.param-result').find('a').text(value);"
+									   onkeyup="if (event.keyCode == 13) { $(this).parents('.param-result').removeClass('edit')}"
+								
+								/>
+							</span>
+						</span>
+					</p>
+				</div>
+			</div>
 			<div class="form-group error">
 				<label>
 					<p class="col-md-3 control-label">{{'Input'|_}}</p>

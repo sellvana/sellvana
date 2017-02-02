@@ -47,7 +47,7 @@
 	</style>
 </head>
 
-<body class="kit">
+<body class="kit" id="sv-app">
 	<div class="container-fluid">
 		<div class="row">
 			<nav id='kit-menu'>
@@ -56,7 +56,8 @@
 					<li><a href="#statuses">Statuses</a></li>
 					<li><a href="#inputs">Inputs</a></li>
 					<li><a href="#tables">Tables</a></li>
-					<li><a href="#another-elements">Another elements</a></li>
+					<li><a href="#dropdown">Edit text</a></li>
+					<li><a href="#another-elements">Another elements</a></li>		
 				</ul>
 			</nav>
 		</div>
@@ -316,20 +317,15 @@
 				<div class="form-group">
 					<label class="col-md-3 control-label" for="id3">Input</label>
 					<div class="col-md-9">
-						<input class="form-control" type="text" id="id3"/>
-					</div>					
+						<input class="form-control" type="text" id="id3" />
+					</div>
 				</div>
 			</div>
 			<div class="col-md-9">
-				&lt;div class="form-group"&gt;
-				&lt;label class="col-md-3 control-label" for="id3"&gt;Input&lt;/label&gt;
-				&lt;div class="col-md-9"&gt;
-				&lt;input class="form-control" type="text" id="id3"/&gt;
-				&lt;/div&gt;					
-				&lt;/div&gt;
+				&lt;div class="form-group"&gt; &lt;label class="col-md-3 control-label" for="id3"&gt;Input&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input class="form-control" type="text" id="id3"/&gt; &lt;/div&gt; &lt;/div&gt;
 			</div>
 		</div>
-		
+
 		<div class="row">
 			<div class="col-md-3">
 				<div class="form-group">
@@ -346,18 +342,7 @@
 				</div>
 			</div>
 			<div class="col-md-9">
-				&lt;div class="form-group"&gt;
-				&lt;div class="col-md-3 control-label"&gt;
-				&lt;label for="id5" class="control-label"&gt;en_US	&lt;/label&gt;
-				&lt;span class="icon-question-sign"&gt;
-				&lt;i class="fa fa-question-circle" aria-hidden="true"&gt;&lt;/i&gt;
-				&lt;span class="tooltip"&gt;Message&lt;/span&gt;
-				&lt;/span&gt;
-				&lt;/div&gt;
-				&lt;div class="col-md-9"&gt;
-				&lt;textarea class="form-control" rows="5" id="id5"&gt;&lt;/textarea&gt;
-				&lt;/div&gt;
-				&lt;/div&gt;
+				&lt;div class="form-group"&gt; &lt;div class="col-md-3 control-label"&gt; &lt;label for="id5" class="control-label"&gt;en_US &lt;/label&gt; &lt;span class="icon-question-sign"&gt; &lt;i class="fa fa-question-circle" aria-hidden="true"&gt;&lt;/i&gt; &lt;span class="tooltip"&gt;Message&lt;/span&gt; &lt;/span&gt; &lt;/div&gt; &lt;div class="col-md-9"&gt; &lt;textarea class="form-control" rows="5" id="id5"&gt;&lt;/textarea&gt; &lt;/div&gt; &lt;/div&gt;
 			</div>
 		</div>
 	</div>
@@ -369,288 +354,356 @@
 
 
 
-		<h3>Input-group-addon with dropdown without range</h3>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="input-group">
-					<div class="input-group-addon dropdown">
-						<button data-toggle="dropdown" class="button5 dropdown-toggle"><span>contains</span><span class="caret"></span></button>
-						<ul class="dropdown-menu">
-							<li><a href="#">equals</a></li>
-							<li><a href="#">contains</a></li>
-							<li><a href="#">does not contain</a></li>
-							<li><a href="#">starts with</a></li>
-							<li><a href="#">ends with</a></li>
-							<li><a href="#">is empty</a></li>
-						</ul>
-					</div>
-					<div class="input-group-btn not-range">
-						<input type="text" placeholder="value" class="form-control">
-					</div>
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="input-group"&gt; &lt;div class="input-group-addon dropdown"&gt; &lt;button data-toggle="dropdown" class="button5 dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul class="dropdown-menu"&gt; &lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;is empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class="input-group-btn not-range"&gt; &lt;input type="text" placeholder="value" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
-
-			</div>
-		</div>
-		<h3>Input-group-addon with dropdown with range</h3>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="input-group">
-					<div class="input-group-addon dropdown">
-						<button data-toggle="dropdown" class="button5 dropdown-toggle"><span>contains</span><span class="caret"></span></button>
-						<ul class="dropdown-menu">
-							<li><a href="#">equals</a></li>
-							<li><a href="#">contains</a></li>
-							<li><a href="#">does not contain</a></li>
-							<li><a href="#">starts with</a></li>
-							<li><a href="#">ends with</a></li>
-							<li><a href="#">is empty</a></li>
-						</ul>
-					</div>
-					<div class="input-group-btn range">
-						<input type="number" placeholder="number" class="form-control">
-						<input type="number" placeholder="number" class="form-control"> </div>
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="input-group"&gt; &lt;div class="input-group-addon dropdown"&gt; &lt;button data-toggle="dropdown" class="button5 dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul class="dropdown-menu"&gt; &lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;is empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class="input-group-btn range"&gt;&lt;input type="number" placeholder="number" class="form-control"&gt; &lt;input type="number" placeholder="number" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
-			</div>
-		</div>
-		<h3>Input-group-addon without dropdown</h3>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="input-group">
-					<div class="input-group-addon">QTY</div>
-					<div class="input-group-btn not-range">
-						<input type="text" placeholder="value" class="form-control">
-					</div>
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="input-group"&gt; &lt;div class="input-group-addon"&gt;QTY&lt;/div&gt; &lt;div class="input-group-btn not-range"&gt; &lt;input type="text" placeholder="value" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="input-group">
-					<input type="text" value="" placeholder="Param" class="form-control"> <span class="input-group-addon"> = </span>
-					<input type="text" value="" placeholder="Value" class="form-control"> <a href="#" class="input-group-addon"><i class="fa fa-times"></i></a></div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="input-group input-group-sm"&gt;&lt;input type="text" value="" placeholder="Param" class="form-control"&gt; &lt;span class="input-group-addon"&gt; = &lt;/span&gt; &lt;input type="text" value="" placeholder="Value" class="form-control"&gt; &lt;a href="#" class="input-group-addon"&gt;&lt;i class="fa fa-times"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;
-			</div>
-		</div>
-		<h3>Multilanguage</h3>
-		<div class="row">
-			<div class="col-md-3">
-
-				<div class="form-group">
-					<label class="col-md-3 control-label" for="id">
-						ID:14</label>
-					<div class="col-md-9">
-						<input type="text" class="form-control" id="id"> <a href="#" class="translate-icon"><i aria-hidden="true" class="fa fa-globe"></i></a></div>
-
-				</div>
-
-			</div>
-			<div class="col-md-9">
-				&lt;div class="form-group"&gt; &lt;label class="col-md-3 control-label" for="id"&gt; ID:14&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input type="text" class="form-control" id="id"&gt; &lt;a href="#" class="translate-icon"&gt;&lt;i aria-hidden="true" class="fa fa-globe"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt; &lt;/div&gt;
-			</div>
-		</div>
-		<h3>Required field</h3>
-		<div class="row">
-			<div class="col-md-3">
-
-				<div class="form-group required">
-					<label class="col-md-3 control-label" for="id1">ID:14</label>
-					<div class="col-md-9">
-						<input type="text" class="form-control" id="id1"> <a href="#" class="translate-icon"><i aria-hidden="true" class="fa fa-globe"></i></a></div>
-
-				</div>
-
-			</div>
-			<div class="col-md-9">
-				&lt;div class="form-group required"&gt; &lt;label class="col-md-3 control-label" for="id1"&gt;ID:14&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input type="text" class="form-control" id="id1"&gt; &lt;a href="#" class="translate-icon"&gt;&lt;i aria-hidden="true" class="fa fa-globe"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt; &lt;/div&gt;
-			</div>
-		</div>
-
-		<h3>Error field</h3>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="form-group error">
-					<label class="col-md-3 control-label" for='id3'>Input</label>
-					<div class="col-md-9">
-						<input type="text" class="form-control" id="id3"> <span class="error-message">Error description under the field</span></div>
-					</label>
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="form-group error"&gt; &lt;label class="col-md-3 control-label" for='id3'&gt;Input&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input type="text" class="form-control" id="id3"&gt; &lt;span class="error-message"&gt;Error description under the field&lt;/span&gt;&lt;/div&gt; &lt;/label&gt; &lt;/div&gt;
-			</div>
-		</div>
-
-
-
-		<h1 id="tables">tables</h1>
-		<div class="row">
-			<div class="col-md-3">
-				<table class="striped-table">
-					<tr>
-						<td>Subtotal</td>
-						<td>$250.00</td>
-					</tr>
-					<tr>
-						<td>Shipping &amp; Handling</td>
-						<td>$0.00</td>
-					</tr>
-					<tr>
-						<td>Discount</td>
-						<td>$0.00</td>
-					</tr>
-				</table>
-			</div>
-			<div class="col-md-9">
-				&lt;table class="striped-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<table class="secondary-table">
-					<tr>
-						<td>Subtotal</td>
-						<td>$250.00</td>
-					</tr>
-					<tr>
-						<td>Shipping &amp; Handling</td>
-						<td>$0.00</td>
-					</tr>
-					<tr>
-						<td>Discount</td>
-						<td>$0.00</td>
-					</tr>
-				</table>
-			</div>
-			<div class="col-md-9">
-				&lt;table class="secondary-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<table class="combined-table">
-					<tr>
-						<td>Subtotal</td>
-						<td>$250.00</td>
-					</tr>
-					<tr>
-						<td>Shipping &amp; Handling</td>
-						<td>$0.00</td>
-					</tr>
-					<tr>
-						<td>Discount</td>
-						<td>$0.00</td>
-					</tr>
-				</table>
-			</div>
-			<div class="col-md-9">
-				&lt;table class="combined-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<table class="secondary-table">
-					<thead>
-						<tr>
-							<th>column 1</th>
-							<th>column 2</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>0.00</td>
-							<td>$0.00</td>
-						</tr>
-						<tr>
-							<td>0.00</td>
-							<td>$0.00</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="col-md-9">
-				&lt;table class="secondary-table"&gt;&lt;thead&gt; &lt;tr&gt; &lt;th&gt;column1&lt;/th&gt; &lt;th&gt;column2&lt;/th&gt; &lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt; &lt;tr&gt; &lt;td&gt;0.00 &amp; 0.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;0.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt;&lt;/tbody&gt; &lt;/table&gt;
-			</div>
-		</div>
-
-		<h1 id="another-elements">another elements</h1>
-
-		<h3>Horizontal menu</h3>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="secondary-menu horizontal-menu">
-					<ul class="nav">
-						<li class="active"><a href="#">Category Info</a></li>
-						<li class=""><a href="#">Page Content</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="secondary-menu horizontal-menu"&gt; &lt;ul class="nav"&gt; &lt;li class="active"&gt;&lt;a href="#"&gt;Category Info&lt;/a&gt;&lt;/li&gt; &lt;li class=""&gt;&lt;a href="#"&gt;Page Content&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
-			</div>
-		</div>
-		<h3>Block with shadow</h3>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="admin-main-content">
-					This is standart block with shadow
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="admin-main-content"&gt; This is standart block with shadow &lt;/div&gt;
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="dropdown action open"><a href="#" data-toggle="dropdown" class="dropdown-toggle"><span>Bulk Action</span><span class="caret-back"><b class="caret"></b></span></a>
+	<h3>Input-group-addon with dropdown without range</h3>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="input-group">
+				<div class="input-group-addon dropdown">
+					<button data-toggle="dropdown" class="button5 dropdown-toggle"><span>contains</span><span class="caret"></span></button>
 					<ul class="dropdown-menu">
-						<li><a href="#">Delete Items</a></li>
+						<li><a href="#">equals</a></li>
+						<li><a href="#">contains</a></li>
+						<li><a href="#">does not contain</a></li>
+						<li><a href="#">starts with</a></li>
+						<li><a href="#">ends with</a></li>
+						<li><a href="#">is empty</a></li>
+					</ul>
+				</div>
+				<div class="input-group-btn not-range">
+					<input type="text" placeholder="value" class="form-control">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="input-group"&gt; &lt;div class="input-group-addon dropdown"&gt; &lt;button data-toggle="dropdown" class="button5 dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul class="dropdown-menu"&gt; &lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;is empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class="input-group-btn not-range"&gt; &lt;input type="text" placeholder="value" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
+
+		</div>
+	</div>
+	<h3>Input-group-addon with dropdown with range</h3>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="input-group">
+				<div class="input-group-addon dropdown">
+					<button data-toggle="dropdown" class="button5 dropdown-toggle"><span>contains</span><span class="caret"></span></button>
+					<ul class="dropdown-menu">
+						<li><a href="#">equals</a></li>
+						<li><a href="#">contains</a></li>
+						<li><a href="#">does not contain</a></li>
+						<li><a href="#">starts with</a></li>
+						<li><a href="#">ends with</a></li>
+						<li><a href="#">is empty</a></li>
+					</ul>
+				</div>
+				<div class="input-group-btn range">
+					<input type="number" placeholder="number" class="form-control">
+					<input type="number" placeholder="number" class="form-control"> </div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="input-group"&gt; &lt;div class="input-group-addon dropdown"&gt; &lt;button data-toggle="dropdown" class="button5 dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul class="dropdown-menu"&gt; &lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"&gt;is empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class="input-group-btn range"&gt;&lt;input type="number" placeholder="number" class="form-control"&gt; &lt;input type="number" placeholder="number" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
+		</div>
+	</div>
+	<h3>Input-group-addon without dropdown</h3>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="input-group">
+				<div class="input-group-addon">QTY</div>
+				<div class="input-group-btn not-range">
+					<input type="text" placeholder="value" class="form-control">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="input-group"&gt; &lt;div class="input-group-addon"&gt;QTY&lt;/div&gt; &lt;div class="input-group-btn not-range"&gt; &lt;input type="text" placeholder="value" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="input-group">
+				<input type="text" value="" placeholder="Param" class="form-control"> <span class="input-group-addon"> = </span>
+				<input type="text" value="" placeholder="Value" class="form-control"> <a href="#" class="input-group-addon"><i class="fa fa-times"></i></a></div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="input-group input-group-sm"&gt;&lt;input type="text" value="" placeholder="Param" class="form-control"&gt; &lt;span class="input-group-addon"&gt; = &lt;/span&gt; &lt;input type="text" value="" placeholder="Value" class="form-control"&gt; &lt;a href="#" class="input-group-addon"&gt;&lt;i class="fa fa-times"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;
+		</div>
+	</div>
+	<h3>Multilanguage</h3>
+	<div class="row">
+		<div class="col-md-3">
+
+			<div class="form-group">
+				<label class="col-md-3 control-label" for="id">
+					ID:14</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" id="id"> <a href="#" class="translate-icon"><i aria-hidden="true" class="fa fa-globe"></i></a></div>
+
+			</div>
+
+		</div>
+		<div class="col-md-9">
+			&lt;div class="form-group"&gt; &lt;label class="col-md-3 control-label" for="id"&gt; ID:14&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input type="text" class="form-control" id="id"&gt; &lt;a href="#" class="translate-icon"&gt;&lt;i aria-hidden="true" class="fa fa-globe"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt; &lt;/div&gt;
+		</div>
+	</div>
+	<h3>Required field</h3>
+	<div class="row">
+		<div class="col-md-3">
+
+			<div class="form-group required">
+				<label class="col-md-3 control-label" for="id1">ID:14</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" id="id1"> <a href="#" class="translate-icon"><i aria-hidden="true" class="fa fa-globe"></i></a></div>
+
+			</div>
+
+		</div>
+		<div class="col-md-9">
+			&lt;div class="form-group required"&gt; &lt;label class="col-md-3 control-label" for="id1"&gt;ID:14&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input type="text" class="form-control" id="id1"&gt; &lt;a href="#" class="translate-icon"&gt;&lt;i aria-hidden="true" class="fa fa-globe"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt; &lt;/div&gt;
+		</div>
+	</div>
+
+	<h3>Error field</h3>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="form-group error">
+				<label class="col-md-3 control-label" for='id3'>Input</label>
+				<div class="col-md-9">
+					<input type="text" class="form-control" id="id3"> <span class="error-message">Error description under the field</span></div>
+				</label>
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="form-group error"&gt; &lt;label class="col-md-3 control-label" for='id3'&gt;Input&lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;input type="text" class="form-control" id="id3"&gt; &lt;span class="error-message"&gt;Error description under the field&lt;/span&gt;&lt;/div&gt; &lt;/label&gt; &lt;/div&gt;
+		</div>
+	</div>
+
+
+
+	<h1 id="tables">tables</h1>
+	<div class="row">
+		<div class="col-md-3">
+			<table class="striped-table">
+				<tr>
+					<td>Subtotal</td>
+					<td>$250.00</td>
+				</tr>
+				<tr>
+					<td>Shipping &amp; Handling</td>
+					<td>$0.00</td>
+				</tr>
+				<tr>
+					<td>Discount</td>
+					<td>$0.00</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-md-9">
+			&lt;table class="striped-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<table class="secondary-table">
+				<tr>
+					<td>Subtotal</td>
+					<td>$250.00</td>
+				</tr>
+				<tr>
+					<td>Shipping &amp; Handling</td>
+					<td>$0.00</td>
+				</tr>
+				<tr>
+					<td>Discount</td>
+					<td>$0.00</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-md-9">
+			&lt;table class="secondary-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<table class="combined-table">
+				<tr>
+					<td>Subtotal</td>
+					<td>$250.00</td>
+				</tr>
+				<tr>
+					<td>Shipping &amp; Handling</td>
+					<td>$0.00</td>
+				</tr>
+				<tr>
+					<td>Discount</td>
+					<td>$0.00</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-md-9">
+			&lt;table class="combined-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<table class="secondary-table">
+				<thead>
+					<tr>
+						<th>column 1</th>
+						<th>column 2</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>0.00</td>
+						<td>$0.00</td>
+					</tr>
+					<tr>
+						<td>0.00</td>
+						<td>$0.00</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-md-9">
+			&lt;table class="secondary-table"&gt;&lt;thead&gt; &lt;tr&gt; &lt;th&gt;column1&lt;/th&gt; &lt;th&gt;column2&lt;/th&gt; &lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt; &lt;tr&gt; &lt;td&gt;0.00 &amp; 0.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;0.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt;&lt;/tbody&gt; &lt;/table&gt;
+		</div>
+	</div>
+
+
+<h1 id="dropdown">Edit text</h1>
+<h2>with select</h2>
+<div class="row">
+	<div class="col-md-3">
+		<p class="param-block">If 
+			<span class="param-result">
+				<span class="param-options">
+					<select2 value="any">
+						<option>any</option>
+						<option>all</option>
+					</select2>
+				</span>
+			</span>
+			just another text
+		</p>
+	</div>
+	<div class="col-md-9">
+		&lt;p class="param-block"&gt;If 
+		&lt;span class="param-result"&gt;
+		&lt;span class="param-options"&gt;
+		&lt;select2 value="any"&gt;
+		&lt;option&gt;any&lt;/option&gt;
+		&lt;option&gt;all&lt;/option&gt;
+		&lt;/select2&gt;
+		&lt;/span&gt;
+		&lt;/span&gt;
+		just another text
+		&lt;/p&gt;
+	</div>
+</div>
+<h2>with input</h2>
+<h3>to activate input just add class "edit" to class "param-result"</h3>
+<div class="row">
+	<div class="col-md-3">
+		<p class="param-block">If 
+			<span class="param-result">
+				<a href="#">any</a>
+				<span class="param-options">
+					<input type="text" class="form-control" value="any"/>
+				</span>
+			</span>
+			just another text	
+		</p>
+	</div>
+	<div class="col-md-9">
+		&lt;p class="param-block"&gt;If 
+		&lt;span class="param-result"&gt;
+		&lt;a href="#"&gt;any&lt;/a&gt;
+		&lt;span class="param-options"&gt;
+		&lt;input type="text" class="form-control" value="any"/&gt;
+		&lt;/span&gt;
+		&lt;/span&gt;
+		just another text	
+		&lt;/p&gt;
+	</div>
+</div>
+
+
+
+
+
+
+
+	<h1 id="another-elements">another elements</h1>
+
+	<h3>Horizontal menu</h3>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="secondary-menu horizontal-menu">
+				<ul class="nav">
+					<li class="active"><a href="#">Category Info</a></li>
+					<li class=""><a href="#">Page Content</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="secondary-menu horizontal-menu"&gt; &lt;ul class="nav"&gt; &lt;li class="active"&gt;&lt;a href="#"&gt;Category Info&lt;/a&gt;&lt;/li&gt; &lt;li class=""&gt;&lt;a href="#"&gt;Page Content&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
+		</div>
+	</div>
+	<h3>Block with shadow</h3>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="admin-main-content">
+				This is standart block with shadow
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="admin-main-content"&gt; This is standart block with shadow &lt;/div&gt;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="dropdown action open"><a href="#" data-toggle="dropdown" class="dropdown-toggle"><span>Bulk Action</span><span class="caret-back"><b class="caret"></b></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="#">Delete Items</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-9">
+			&lt;div class="dropdown action open">&lt;a href="#" data-toggle="dropdown" class="dropdown-toggle"&gt;&lt;span&gt;Bulk Action&lt;/span&gt;&lt;span class="caret-back"&gt;&lt;b class="caret"&gt;&lt;/b&gt;&lt;/span&gt;&lt;/a&gt; &lt;ul class="dropdown-menu"&gt; &lt;li>&lt;a href="#"&gt;Delete Items&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="dropdown action dropdown-buttons open"><a href="#" data-toggle="dropdown" class="dropdown-toggle"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
+				<div class="dropdown-menu">
+					<ul class="dropdown-content">
+						<li><a href="#" class="color1">Back</a></li>
+						<li><a href="#" class="color2">Delete</a></li>
+						<li><a href="#" class="color3">Ship All items</a></li>
+						<li><a href="#" class="color4">Mark as Paid</a></li>
+						<li><a href="#" class="color5">Save</a></li>
+						<li><a href="#" class="color6">Back</a></li>
+						<li><a href="#" class="color7">Save and Continue</a></li>
+						<li><a href="#" class="color8">Ship All items</a></li>
+						<li><a href="#" class="color9">Save and Continue</a></li>
+						<li><a href="#" class="color10">Save and Continue</a></li>
+						<li><a href="#" class="color11">Save</a></li>
+						<li><a href="#" class="color12">Save and Continue</a></li>
+						<li><a href="#" class="color13">Mark as Paid</a></li>
+						<li><a href="#" class="color14">Save</a></li>
+						<li><a href="#" class="color15">Save and Continue</a></li>
+						<li><a href="#" class="color16">Mark as Paid</a></li>
 					</ul>
 				</div>
 			</div>
-			<div class="col-md-9">
-				&lt;div class="dropdown action open">&lt;a href="#" data-toggle="dropdown" class="dropdown-toggle"&gt;&lt;span&gt;Bulk Action&lt;/span&gt;&lt;span class="caret-back"&gt;&lt;b class="caret"&gt;&lt;/b&gt;&lt;/span&gt;&lt;/a&gt; &lt;ul class="dropdown-menu"&gt; &lt;li>&lt;a href="#"&gt;Delete Items&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
-			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="dropdown action dropdown-buttons open"><a href="#" data-toggle="dropdown" class="dropdown-toggle"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
-					<div class="dropdown-menu">
-						<ul class="dropdown-content">
-							<li><a href="#" class="color1">Back</a></li>
-							<li><a href="#" class="color2">Delete</a></li>
-							<li><a href="#" class="color3">Ship All items</a></li>
-							<li><a href="#" class="color4">Mark as Paid</a></li>
-							<li><a href="#" class="color5">Save</a></li>
-							<li><a href="#" class="color6">Back</a></li>
-							<li><a href="#" class="color7">Save and Continue</a></li>
-							<li><a href="#" class="color8">Ship All items</a></li>
-							<li><a href="#" class="color9">Save and Continue</a></li>
-							<li><a href="#" class="color10">Save and Continue</a></li>
-							<li><a href="#" class="color11">Save</a></li>
-							<li><a href="#" class="color12">Save and Continue</a></li>
-							<li><a href="#" class="color13">Mark as Paid</a></li>
-							<li><a href="#" class="color14">Save</a></li>
-							<li><a href="#" class="color15">Save and Continue</a></li>
-							<li><a href="#" class="color16">Mark as Paid</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-9">
-				&lt;div class="dropdown action dropdown-buttons open"&gt;&lt;a href="#" data-toggle="dropdown" class="dropdown-toggle"&gt;&lt;span&gt;Actions menu&lt;/span&gt;&lt;span class="caret-back"&gt;&lt;b class="caret"&gt;&lt;/b&gt;&lt;/span&gt;&lt;/a&gt; &lt;div class="dropdown-menu"&gt; &lt;ul class="dropdown-content"&gt; &lt;li&gt;&lt;a href="#" class="color1"&gt;Back&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color2"&gt;Delete&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color3"&gt;Ship All items&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color4"&gt;Mark as Paid&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color5"&gt;Save&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color6"&gt;Back&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color7"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color8"&gt;Ship All items&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color9"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color10"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color11"&gt;Save&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color12"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color13"&gt;Mark as Paid&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color14"&gt;Save&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color15"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color16"&gt;Mark as Paid&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;/div&gt;
-			</div>
+		<div class="col-md-9">
+			&lt;div class="dropdown action dropdown-buttons open"&gt;&lt;a href="#" data-toggle="dropdown" class="dropdown-toggle"&gt;&lt;span&gt;Actions menu&lt;/span&gt;&lt;span class="caret-back"&gt;&lt;b class="caret"&gt;&lt;/b&gt;&lt;/span&gt;&lt;/a&gt; &lt;div class="dropdown-menu"&gt; &lt;ul class="dropdown-content"&gt; &lt;li&gt;&lt;a href="#" class="color1"&gt;Back&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color2"&gt;Delete&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color3"&gt;Ship All items&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color4"&gt;Mark as Paid&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color5"&gt;Save&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color6"&gt;Back&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color7"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color8"&gt;Ship All items&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color9"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color10"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color11"&gt;Save&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color12"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color13"&gt;Mark as Paid&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color14"&gt;Save&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color15"&gt;Save and Continue&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" class="color16"&gt;Mark as Paid&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;/div&gt;
 		</div>
+	</div>
+
+
+
+
 
 </body>
 
