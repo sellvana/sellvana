@@ -1916,10 +1916,19 @@ class BView extends BClass
                 foreach ($metaData as $k => $v) {
                     $k = strtolower($k);
                     switch ($k) {
-                    case 'title':
-                        $head->addTitle($v); break;
-                    case 'meta_title': case 'meta_description': case 'meta_keywords':
-                        $head->meta(str_replace('meta_', '', $k), $v); break;
+                        case 'title':
+                            $head->addTitle($v);
+                            break;
+                            
+                        case 'set_title':
+                            $head->setTitle($v);
+                            break;
+
+                        case 'meta_title': 
+                        case 'meta_description': 
+                        case 'meta_keywords':
+                            $head->meta(str_replace('meta_', '', $k), $v); 
+                            break;
                     }
                 }
             }
