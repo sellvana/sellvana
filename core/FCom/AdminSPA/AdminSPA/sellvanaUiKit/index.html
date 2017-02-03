@@ -8,6 +8,7 @@
 	<link href="scss/bootstrap.css" rel="stylesheet" type="text/css"></link>
 	<link href="scss/font-awesome.css" rel="stylesheet" type="text/css"></link>
 	<link href="../scss/style.build.css" rel="stylesheet" type="text/css"></link>
+<script type="text/javascript" charset="utf-8"  src="/sellvanaRepo/core/core/FCom/AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min.js"></script>
 	<style>
 		.row {
 			margin-bottom: 10px;
@@ -599,7 +600,7 @@
 		&lt;/p&gt;
 	</div>
 </div>
-<h2>with input</h2>
+<h1>Inline input</h1>
 <h3>to activate input just add class "edit" to class "param-result"</h3>
 <div class="row">
 	<div class="col-md-3">
@@ -623,6 +624,39 @@
 		&lt;/span&gt;
 		just another text	
 		&lt;/p&gt;
+	</div>
+</div>
+<h1>Inline dropdown without select</h1>
+<div class="row">
+	<div class="col-md-3">
+		<div class="param-block">If 
+			<span class="param-result">
+				<a href="#" onclick="event.preventDefault(); $(this).parent().toggleClass('open');">any</a>
+				<div class="param-options list">
+					<ul>
+						<li><a href="">one</a></li>
+						<li><a href="">two</a></li>
+						<li><a href="">three</a></li>
+					</ul>
+				</div>				
+			</span>
+			just another text
+		</div>
+	</div>
+	<div class="col-md-9">
+		&lt;div class="param-block"&gt;If 
+		&lt;span class="param-result"&gt;
+		&lt;a href="#" onclick="event.preventDefault(); $(this).parent().toggleClass('open');"&gt;any&lt;/a&gt;
+		&lt;div class="param-options list"&gt;
+		&lt;ul&gt;
+		&lt;li&gt;&lt;a href=""&gt;one&lt;/a&gt;&lt;/li&gt;
+		&lt;li&gt;&lt;a href=""&gt;two&lt;/a&gt;&lt;/li&gt;
+		&lt;li&gt;&lt;a href=""&gt;three&lt;/a&gt;&lt;/li&gt;
+		&lt;/ul&gt;
+		&lt;/div&gt;				
+		&lt;/span&gt;
+		just another text
+		&lt;/div&gt;
 	</div>
 </div>
 

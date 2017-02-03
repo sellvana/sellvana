@@ -52,6 +52,8 @@
 .param-block {
 	.param-result {
 		font-weight: bold;
+		position: relative; 
+		display: inline;
 		a {
 			border-bottom: 1px solid #868a8a;
 			color: #868a8a;
@@ -61,8 +63,19 @@
 				color: #000;
 			}
 		}
+		&.open {
+			.list {
+				display: inline;
+			}
+		}
 	}
 	.param-options {
+		&.list {
+			position: absolute;
+			left: 0;
+			top: 1.3em;
+			display: none;
+		}
 		.select2-container {
 			width: auto !important;
 			min-width: inherit;	
@@ -108,6 +121,29 @@
 			width: 100px;
 			background: transparent;
 			line-height: 1.25em;
+		}
+		ul {
+			width: auto;
+			border: 1px solid #eee;
+			display: inline-block;
+			li {
+				width: auto;
+				border-bottom: 1px solid #eee;
+				a {
+					width: 100%;
+					color: #868a8a;
+					border-bottom: 0;
+					font-weight: normal;
+					display: inline-block;
+					padding: 4px 20px 4px 10px;
+					background: #fff;
+					&:hover {
+						color: #000;
+						border-bottom: 0;
+						background: #eee;
+					}
+				}
+			}
 		}
 	}
 	

@@ -1,9 +1,13 @@
-&lt;p class="param-block"&gt;If 
+&lt;div class="param-block"&gt;If 
 	&lt;span class="param-result"&gt;
-		&lt;a href="#"&gt;any&lt;/a&gt;
-		&lt;span class="param-options"&gt;
-			&lt;input type="text" class="form-control" value="any"/&gt;
-		&lt;/span&gt;
+		&lt;a href="#" onclick="event.preventDefault(); $(this).parent().toggleClass('open');"&gt;any&lt;/a&gt;
+		&lt;div class="param-options list"&gt;
+			&lt;ul&gt;
+				&lt;li&gt;&lt;a href=""&gt;one&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href=""&gt;two&lt;/a&gt;&lt;/li&gt;
+				&lt;li&gt;&lt;a href=""&gt;three&lt;/a&gt;&lt;/li&gt;
+			&lt;/ul&gt;
+		&lt;/div&gt;				
 	&lt;/span&gt;
-	just another text	
-&lt;/p&gt;
+	just another text
+&lt;/div&gt;
