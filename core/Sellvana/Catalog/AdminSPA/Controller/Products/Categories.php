@@ -45,7 +45,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products_Categories extends FCom_Admi
         return $this->Sellvana_Catalog_Model_Category->orm('c')
             ->select('c.*')
             ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
-            ->select('cp.position')
+            ->select('cp.sort_order')
             ->where('cp.product_id', $prodId);
     }
 

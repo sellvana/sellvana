@@ -21,7 +21,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         $result = [];
         try {
             $result = $this->getFormData();
-            $result = $this->normalizeFormConfig($result);
+            $result['form'] = $this->normalizeFormConfig($result['form']);
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -34,31 +34,31 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         return $this->view('app')->getFormTabs($path);
     }
 
-    public function normalizeFormConfig($result)
+    public function normalizeFormConfig($form)
     {
-        if (!empty($result['form']['config']['tabs']) && is_string($result['form']['config']['tabs'])) {
-            $result['form']['config']['tabs'] = $this->getFormTabs($result['form']['config']['tabs']);
+        if (!empty($form['config']['tabs']) && is_string($form['config']['tabs'])) {
+            $form['config']['tabs'] = $this->getFormTabs($form['config']['tabs']);
         }
 
-        if (!empty($result['form']['config']['fields'])) {
-            $def = !empty($result['form']['config']['default_field']) ? $result['form']['config']['default_field'] : [];
+        if (!empty($form['config']['fields'])) {
+            $def = !empty($form['config']['default_field']) ? $form['config']['default_field'] : [];
             $def = array_merge(static::$_defaultFieldConfig, $def);
-            foreach ($result['form']['config']['fields'] as &$field) {
+            foreach ($form['config']['fields'] as &$field) {
                 $field = array_merge($def, $field);
             }
             unset($field);
         }
 
-        if (!empty($result['form']['config']['actions'])) {
-            if (true === $result['form']['config']['actions']) {
-                $result['form']['config']['actions'] = [
+        if (!empty($form['config']['actions'])) {
+            if (true === $form['config']['actions']) {
+                $form['config']['actions'] = [
                     ['name' => 'back', 'label' => 'Back', 'class' => 'button10'],
                     ['name' => 'delete', 'label' => 'Delete', 'class' => 'button2'],
                     ['name' => 'save', 'label' => 'Save', 'class' => 'button9'],
                     ['name' => 'save-continue', 'label' => 'Save and Continue', 'class' => 'button9'],
                 ];
             }
-            foreach ($result['form']['config']['actions'] as &$act) {
+            foreach ($form['config']['actions'] as &$act) {
                 if ($act['name'] === 'back' && empty($act['method'])) {
                     $act['method'] = 'goBack';
                 }
@@ -75,14 +75,14 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             unset($act);
         }
 
-        if (!empty($result['form']['i18n']) && is_string($result['form']['i18n'])) {
-            $modelName = $result['form']['i18n'];
-            if (!empty($result['form'][$modelName]['id'])) {
-                $result['form']['i18n'] = $this->getModelTranslations($modelName, $result['form'][$modelName]['id']);
+        if (!empty($form['i18n']) && is_string($form['i18n'])) {
+            $modelName = $form['i18n'];
+            if (!empty($form[$modelName]['id'])) {
+                $form['i18n'] = $this->getModelTranslations($modelName, $form[$modelName]['id']);
             }
         }
 
-        return $result;
+        return $form;
     }
 
     public function getModelTranslations($type, $id)

@@ -22,7 +22,7 @@
                     <a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
                 </div>
                 <div class="panel-container" v-if="panelsOpen[panel.path]">
-                    <component :is="panel.component" :settings="settings"></component>
+                    <component :is="panel.component" :settings="settings" :panel="panel"></component>
                 </div>
             </li>
         </ul>

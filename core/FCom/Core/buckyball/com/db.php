@@ -3254,6 +3254,8 @@ class BModel extends Model
                 foreach ($v as $k1 => $v1) {
                     $data[$k][$k1] = $v1->as_array($objHashes);
                 }
+            } elseif (is_numeric($v)) {
+                $data[$k] = (float)$v;
             }
         }
         if (!empty($data['data_serialized']) && empty($data['data_custom'])) {

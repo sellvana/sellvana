@@ -5,7 +5,9 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 		data: function () {
 			return {
 				product: {},
-				product_old: {}
+				product_old: {},
+				inventory: {},
+				inventory_old: {}
 			}
 		},
 		methods: {

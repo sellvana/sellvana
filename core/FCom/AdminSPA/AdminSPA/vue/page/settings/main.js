@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'json!sv-page-settings-config'], function (Vue, SvHlp, settingsConfig) {
+define(['vue', 'sv-hlp', 'json!sv-page-settings-config', 'sv-comp-form-field', 'sv-comp-form-ip-mode'], function (Vue, SvHlp, settingsConfig, SvCompFormField, SvCompFormIpMode) {
 
     return {
         store: SvHlp.store,
@@ -22,12 +22,19 @@ define(['vue', 'sv-hlp', 'json!sv-page-settings-config'], function (Vue, SvHlp, 
         methods: {
             fetchData: function () {
                 var vm = this;
-                this.sendRequest('GET', 'settings/data', {}, function (response) {
+                this.sendRequest('GET', 'settings/form_data', {}, function (response) {
                     Vue.set(vm.settings, 'data', response.data);
                 });
             },
             switchTab: function (tab) {
                 this.curTab = tab;
+                // this.$store.commit('setData', {curPage: {
+                //     label: tab.label,
+                //     breadcrumbs: [
+                //         {nav:'/system', label: 'System', icon_class:'fa fa-cog'},
+                //         {link:'/settings', label: 'Settings'}
+                //     ]
+                // }});
             },
             togglePanel: function (panel) {
                 Vue.set(this.panelsOpen, panel.path, !this.panelsOpen[panel.path]);

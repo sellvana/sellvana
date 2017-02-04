@@ -61,8 +61,8 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
                 $fsPath = $mod->root_dir . $relPath;
                 $webPath = /*$this->BRequest->scheme() . ':' . */$mod->baseSrc(false) . $relPath;
                 $nav['require'] = [
-                    file_exists($fsPath . '.js') ? $webPath . '.js' : '',
-                    file_exists($fsPath . '.html') ? 'text!' . $webPath . '.html' : '',
+                    file_exists($fsPath . '.js') ? $webPath . '.js' : 'sv-page-settings-default-section',
+                    file_exists($fsPath . '.html') ? 'text!' . $webPath . '.html' : 'text!sv-page-settings-default-section-tpl',
                 ];
             }
         }

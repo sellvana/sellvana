@@ -74,8 +74,14 @@
             - [ requireJs, sortable, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
             - [ requireJs, ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/ckeditor/ckeditor" ]
 
+            - [ requireJs, dropzone, "@FCom_AdminSPA/AdminSPA/js/lib/dropzone" ]
+            - [ requireJs, vue-dropzone, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue2-dropzone" ]
+
+            - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
+
             - [ requireJs, vue-ckeditor, "@FCom_AdminSPA/AdminSPA/js/vue/vue-ckeditor" ]
             - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/vue/vue-select2" ]
+            - [ requireJs, inline-param, "@FCom_AdminSPA/AdminSPA/js/vue/inline-param" ]
 
             - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
@@ -131,6 +137,12 @@
             - [ requireJs, sv-comp-form-layout, "@FCom_AdminSPA/AdminSPA/vue/component/form/layout" ]
             - [ requireJs, sv-comp-form-layout-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/layout.html" ]
 
+            - [ requireJs, sv-comp-form-media, "@FCom_AdminSPA/AdminSPA/vue/component/form/media" ]
+            - [ requireJs, sv-comp-form-media-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/media.html" ]
+
+            - [ requireJs, sv-comp-form-ip-mode, "@FCom_AdminSPA/AdminSPA/vue/component/form/ip-mode" ]
+            - [ requireJs, sv-comp-form-ip-mode-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/ip-mode.html" ]
+
             - [ requireJs, sv-page-default-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/grid.html" ]
             - [ requireJs, sv-page-default-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form.html" ]
 
@@ -159,6 +171,8 @@
             - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]
             - [ requireJs, sv-page-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main.html" ]
             - [ requireJs, sv-page-settings-config, "~/settings/config" ]
+            - [ requireJs, sv-page-settings-default-section, "@FCom_AdminSPA/AdminSPA/vue/page/settings/default-section" ]
+            - [ requireJs, sv-page-settings-default-section-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/default-section.html" ]
 
             - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
             - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
@@ -200,9 +214,14 @@ sv-app-setings-config:
             - [ addNav, { path: /areas, label: Areas, pos: 10 }]
             - [ addNav, { path: /areas/core, label: Core Settings, pos: 10 }]
             # {FCom_AdminSPA}/AdminSPA/vue/page/settings/{areas/core/website}.(js|html)
-            - [ addNav, { path: /areas/core/website, label: Website, pos: 10, module: FCom_AdminSPA }]
-            - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20, module: FCom_AdminSPA }]
-            - [ addNav, { path: /areas/core/session, label: Session, pos: 30, module: FCom_AdminSPA }]
+            - [ addNav, { path: /areas/core/website, label: Website, pos: 10, module: FCom_AdminSPA, data: modules/FCom_Core }]
+            - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20, module: FCom_AdminSPA, data: modules/FCom_Core }]
+            - [ addNav, { path: /areas/core/session, label: Session, pos: 30, module: FCom_AdminSPA, data: cookie }]
+            - [ addNav, { path: /areas/core/db, label: DB, pos: 40, module: FCom_AdminSPA, data: db }]
+            - [ addNav, { path: /areas/core/cache, label: Cache, pos: 50, module: FCom_AdminSPA, data: core/cache }]
+            - [ addNav, { path: /areas/core/dev, label: Developer, pos: 60, module: FCom_AdminSPA, data: core/dev }]
+            - [ addNav, { path: /areas/core/web, label: Web Settings, pos: 70, module: FCom_AdminSPA, data: web }]
+            - [ addNav, { path: /areas/core/staging, label: Staging, pos: 80, module: FCom_AdminSPA, data: staging }]
 
             - [ addNav, { path: /areas/frontend, label: Frontend Settings, pos: 20 }]
 

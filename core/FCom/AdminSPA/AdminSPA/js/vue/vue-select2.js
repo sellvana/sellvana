@@ -36,6 +36,9 @@ define(['jquery', 'lodash', 'vue', 'select2'], function ($, _, Vue) {
                 params.data = this.options;
             }
             params.data = normalizeOptions(params.data);
+            if (this.value === null) {
+                // this.value = '';
+            }
             $(this.$el).val(this.value).select2(params).on('change', function () {
                 var $el = $(vm.$el), val = $el.val();
                 vm.$emit('input', val);
@@ -47,6 +50,9 @@ define(['jquery', 'lodash', 'vue', 'select2'], function ($, _, Vue) {
         watch: {
             value: function (value) {
                 var $el = $(this.$el);
+                if (value === null) {
+                    // value = '';
+                }
                 if (!_.isEqual($el.val(), value)) {
                     $el.val(value).trigger('change.select2');
                 }

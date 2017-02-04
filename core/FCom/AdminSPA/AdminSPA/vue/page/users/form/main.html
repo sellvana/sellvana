@@ -4,25 +4,27 @@
 			<div class="form-group">
 				<p class="col-md-3"></p>
 				<div class="col-md-9">
-					<p class="param-block">If 
-						<span class="param-result">
-							<span class="param-options">
-								<select2 value="any">
-									<option>any</option>
-									<option>all</option>
-								</select2>
-							</span>
-						</span>
+					<p class="param-block">If
+						<!--<span class="param-result">-->
+							<!--<span class="param-options">-->
+								<!--<select2 value="any">-->
+									<!--<option>any</option>-->
+									<!--<option>all</option>-->
+								<!--</select2>-->
+							<!--</span>-->
+						<!--</span>-->
+						<inline-param v-model="test1" :options="[{id:'', text:'...'}, {id:'any',text:'ANY'},{id:'all',text:'ALL'}]"></inline-param>
 						just another text
-						<span class="param-result" onclick="event.preventDefault(); $(this).toggleClass('edit'); $(this).find('input').focus();">
-							<a href="#" >any</a>
-							<span class="param-options">
-								<input type="text" class="form-control" value="any" onchange="var value=$(this).val(); $(this).parents('.param-result').find('a').text(value);"
-									   onkeyup="if (event.keyCode == 13) { $(this).parents('.param-result').removeClass('edit')}"
-								
-								/>
-							</span>
-						</span>
+						<inline-param v-model="test"></inline-param>
+						<!--<span class="param-result" onclick="event.preventDefault(); $(this).toggleClass('edit'); $(this).find('input').focus();">-->
+							<!--<a href="#" >any</a>-->
+							<!--<span class="param-options">-->
+								<!--<input type="text" class="form-control" value="any" onchange="var value=$(this).val(); $(this).parents('.param-result').find('a').text(value);"-->
+									   <!--onkeyup="if (event.keyCode == 13) { $(this).parents('.param-result').removeClass('edit')}"-->
+								<!---->
+								<!--/>-->
+							<!--</span>-->
+						<!--</span>-->
 					</p>
 				</div>
 			</div>
@@ -30,7 +32,7 @@
 				<label>
 					<p class="col-md-3 control-label">{{'Input'|_}}</p>
 					<div class="col-md-9">
-						<input class="form-control" type="text" />
+						<input class="form-control" type="text" v-model="test"/>
 						<span class="error-message">Error description under the field</span>
 					</div>
 				</label>
@@ -96,55 +98,6 @@
 					</p>
 					<div class="col-md-9">
 						<textarea class="form-control" rows="5"></textarea>
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">
-						IP: mode
-					</p>
-					<div class="col-md-9">
-						<div class="row ip-mode">
-							<div class="col-xs-5 text-right">
-								<span>Default</span>
-							</div>
-							<div class="col-xs-5">
-								<select2 class="form-control">
-									<option value="DEBUG">DEBUG</option>
-									<option value="DEVELOPMENT">DEVELOPMENT</option>
-									<option value="STAGING">STAGING</option>
-									<option value="PRODUCTION">PRODUCTION</option>
-									<option value="RECOVERY">RECOVERY</option>
-									<option value="DISABLED">DISABLED</option>
-								</select2>
-							</div>
-							<div class="col-xs-2">
-								<a href="#" class="add-mode">
-									<i class="fa fa-plus" aria-hidden="true"></i>
-								</a>
-							</div>
-						</div>
-						<div class="row ip-mode">
-							<div class="col-xs-5 text-right">
-								<input type="text" class="form-control">
-							</div>
-							<div class="col-xs-5">
-								<select2 class="form-control">
-									<option value="DEBUG">DEBUG</option>
-									<option value="DEVELOPMENT">DEVELOPMENT</option>
-									<option value="STAGING">STAGING</option>
-									<option value="PRODUCTION">PRODUCTION</option>
-									<option value="RECOVERY">RECOVERY</option>
-									<option value="DISABLED">DISABLED</option>
-								</select2>
-							</div>
-							<div class="col-xs-2">
-								<a href="#" class="del-mode">
-									<i class="fa fa-times" aria-hidden="true"></i>
-								</a>
-							</div>
-						</div>
 					</div>
 				</label>
 			</div>

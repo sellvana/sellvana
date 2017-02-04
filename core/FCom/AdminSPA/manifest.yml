@@ -11,6 +11,7 @@ modules:
                     - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]
                     - [ /header/.action, FCom_AdminSPA_AdminSPA_Controller_Header ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
+                    - [ /media/.action, FCom_AdminSPA_AdminSPA_Controller_Media ]
 
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
                     - [ /favorites/?.action, FCom_AdminSPA_AdminSPA_Controller_Favorites ]
@@ -20,6 +21,8 @@ modules:
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                 views:
                     - [ app, FCom_AdminSPA_AdminSPA_View_App ]
+                observe:
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::action_config", "FCom_AdminSPA_AdminSPA.onSettingsConfig" ]
 
         default_config:
             modules/FCom_AdminSPA/theme: FCom_AdminSPA_DefaultTheme

@@ -1,11 +1,11 @@
 define([
     'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
-    'vue-ckeditor', 'vue-select2', 'spin', 'ladda', 'nprogress',
+    'vue-ckeditor', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress',
     'sv-comp-form-field', 'sv-comp-form-layout',
     'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
 ],
 function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
-          VueCkeditor, VueSelect2, Spin, Ladda, NProgress,
+          VueCkeditor, VueMultiselect, VueSelect2, Spin, Ladda, NProgress,
           SvCompFormField, SvCompFormLayout,
           svPageDefaultGridTpl, svPageDefaultFormTpl
 ) {
@@ -35,6 +35,8 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                 el.sortableInstance.destroy();
             }
         });
+
+        Vue.component('v-multiselect', VueMultiselect);
 
         Vue.directive('ladda', {
             bind: function (el, binding) {
@@ -724,7 +726,9 @@ console.log('onError', err.xhr);
 
                         if (update) {
                             for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                                Vue.set(this.form.config.tabs[i], 'edited', tabs[this.form.config.tabs[i].name]);
+                                if (tabs[this.form.config.tabs[i].name]) {
+                                    Vue.set(this.form.config.tabs[i], 'edited', true);
+                                }
                             }
                         }
                     }

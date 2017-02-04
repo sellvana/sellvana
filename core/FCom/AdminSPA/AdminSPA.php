@@ -127,4 +127,37 @@ class FCom_AdminSPA_AdminSPA extends BClass
         return $this->BSession->csrfToken();
     }
 
+    public function onSettingsConfig($args)
+    {
+        $args['sections'] = array_merge_recursive($args['sections'], [
+            '/areas/core/website' => [
+                'config' => [
+                    'default_field' => [
+                        'root' => 'modules/FCom_Core',
+                    ],
+                    'fields' => [
+                        ['name' => 'company_name', 'label' => 'Company Name'],
+                        ['name' => 'site_title', 'label' => 'Site Title'],
+                        ['name' => 'admin_email', 'label' => 'Admin Email', 'input_type' => 'email'],
+                        ['name' => 'sales_name', 'label' => 'Sales Name'],
+                        ['name' => 'sales_email', 'label' => 'Sales Email', 'input_type' => 'email'],
+                        ['name' => 'support_name', 'label' => 'Support Name'],
+                        ['name' => 'support_email', 'label' => 'Support Email', 'input_type' => 'email'],
+                        ['name' => 'copyright_message', 'label' => 'Copyright Message'],
+                       
+                    ],
+                ],
+            ],
+            '/areas/core/l10n' => [
+                'config' => [
+                    'default_field' => [
+                        'root' => 'modules/FCom_Core',
+                    ],
+                    'fields' => [
+                        ['name' => 'limit_countries', 'label' => 'Limit Countries', 'type' => 'checkbox'],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

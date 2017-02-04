@@ -94,6 +94,13 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $result['form']['product'] = $product->as_array();
         $result['form']['thumb'] = ['thumb_url' => $product->thumbUrl(100)];
 
+        $invModel = $product->getInventoryModel();
+        if ($invModel) {
+            $result['form']['inventory'] = $invModel->as_array();
+        }
+
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$product]);
+
         $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
         $result['form']['prices'] = $priceHlp->getProductPrices($product);
         $result['form']['config']['options']['price_types'] = $this->BUtil->arrayMapToSeq($product->priceTypeOptions());
@@ -131,6 +138,24 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             ['name' => 'is_hidden', 'label' => 'Hide Product', 'type' => 'checkbox'],
             ['name' => 'is_featured', 'label' => 'Featured Product', 'type' => 'checkbox'],
             ['name' => 'is_popular', 'label' => 'Popular Product', 'type' => 'checkbox'],
+
+            ['name' => 'manage_inventory', 'label' => 'Manage Inventory', 'tab' => 'inventory', 'type' => 'checkbox'],
+            ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'tab' => 'inventory', 'notes' => 'Leave empty to use Product SKU'],
+            ['name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'unit_cost', 'label' => 'Inventory Unit Cost', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'allow_backorder', 'label' => 'Allow Backorders', 'model' => 'inventory', 'tab' => 'inventory', 'type' => 'checkbox'],
+            ['name' => 'qty_warn_customer', 'label' => 'Minimal Qty to warn customer on frontend', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'qty_notify_admin', 'label' => 'Minimal Qty to notify admin', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'qty_cart_min', 'label' => 'Minimum Qty In Cart', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'qty_cart_max', 'label' => 'Maximum Qty In Cart', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'qty_cart_inc', 'label' => 'Qty In Cart Increment', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'qty_buffer', 'label' => 'Buffer Qty In Stock', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'pack_separate', 'label' => 'Pack Separately for Shipment', 'model' => 'inventory', 'tab' => 'inventory', 'type' => 'checkbox'],
+            ['name' => 'net_weight', 'label' => 'Net Weight', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'shipping_weight', 'label' => 'Shipping Weight', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'shipping_size', 'label' => 'Shipping Size', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'hs_tariff_number', 'label' => 'Harmonized Tariff Number', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'origin_country', 'label' => 'Country of Origin', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
         ];
 
         $result['form']['i18n'] = 'product';
@@ -144,7 +169,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         try {
             $data = $this->BRequest->post();
             $result = $this->getFormData();
-            $result = $this->normalizeFormConfig($result);
+            $result['form'] = $this->normalizeFormConfig($result['form']);
             $this->ok()->addMessage('Product was saved successfully', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);

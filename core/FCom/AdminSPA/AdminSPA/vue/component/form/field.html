@@ -43,8 +43,12 @@
 
         <ckeditor v-else-if="field_type === 'wysiwyg'" :id="field_id" v-model="value_model"></ckeditor>
 
+        <component v-else-if="field_type === 'component'" :is="field_config.component" :id="field_id" v-model="value_model"></component>
+
         <a v-if="i18n_enabled && field_config.i18n" href="#" class="translate-icon"
            @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
+
+        <span v-if="field_config.notes">{{field_config.notes|_}}</span>
 
         <span v-for="e in field_errors" class="error-message">{{e}}</span>
     </div>

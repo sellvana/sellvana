@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl'], function (_, Vue, pricesTpl) {
+define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl', 'inline-param'], function (_, Vue, pricesTpl) {
     var SvCompFormCatalogPrices = {
         template: pricesTpl,
         props: ['options', 'prices'],
@@ -13,7 +13,7 @@ define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl'], function (_, V
                 errors: []
             }
         },
-        methods: {
+        computed: {
             visiblePrices: function () {
                 var i, l, prices = [], p, f = this.filter;
                 if (f.customer_group_id === '' && f.site_id === '' && f.currency_code === '') {
@@ -27,13 +27,26 @@ define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl'], function (_, V
                 }
                 return prices;
             },
+            priceOperations: function () {
+                return [
+                    {id:'=$', text:'Equals amount', label:'Equals'},
+                    {id:'*$', text:'Multiply by amount', label:'Multiply'},
+                    {id:'+$', text:'Add amount to', label:'Add'},
+                    {id:'-$', text:'Subtract amount from', label:'Subtract'},
+                    {id:'=%', text:'Equals % of', label:'Equals'},
+                    {id:'+%', text:'Add % to', label:'Add'},
+                    {id:'-%', text:'Subtract % from', label:'Subtract'}
+                ];
+            }
+        },
+        methods: {
             availableBaseFields: function (p) {
                 var i, j, l = this.prices.length, pr, f, bfs = [];
                 for (j in this.options.price_relations[p.price_type]) {
                     pr = this.options.price_relations[p.price_type][j];
                     for (i = 0; i < l; i++) {
                         if (this.prices[i].price_type === pr.value) {
-                            bfs.push(pr);
+                            bfs.push({id: pr.value, text: pr.label});
                             break;
                         }
                     }
@@ -148,6 +161,33 @@ define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl'], function (_, V
                 if (!hasFixedPrice) {
                     this.errors.push('Need to have at least one fixed price');
                 }
+            },
+
+            isDefault: function (p) {
+                return !p.site_id && !p.customer_group_id && !p.currency_code;
+            },
+            inlineOptions: function (type) {
+                var i, l, options = [], o;
+                for (i = 0, l = this.options[type].length; i < l; i++) {
+                    o = this.options[type][i];
+                    options.push({
+                        id: o.id === '' ? '' : o.id,
+                        text: o.text === '' ? '...' : o.text
+                    });
+                }
+                return options;
+            },
+            textBetweenParams: function (p) {
+                var map = {
+                    '=$': '',
+                    '*$': 'times',
+                    '+$': 'to',
+                    '-$': 'from',
+                    '*%': '% of',
+                    '+%': '% to',
+                    '-%': '% from'
+                };
+                return map[p.operation] || '';
             }
         },
         watch: {
@@ -157,7 +197,8 @@ define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl'], function (_, V
                         site_id: null,
                         customer_group_id: null,
                         currency_code: null,
-                        price_type: new_price_type
+                        price_type: new_price_type,
+                        operation: '=$'
                     });
                     this.new_price_type = '';
                 }

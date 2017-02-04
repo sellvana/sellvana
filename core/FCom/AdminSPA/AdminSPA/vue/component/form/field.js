@@ -1,5 +1,5 @@
-define(['lodash', 'text!sv-comp-form-field-tpl'], function (_, fieldTpl) {
-    return {
+define(['lodash', 'vue', 'text!sv-comp-form-field-tpl'], function (_, Vue, fieldTpl) {
+    var SvCompFormField = {
         template: fieldTpl,
         props: ['form', 'field', 'value'],
         data: function () {
@@ -23,7 +23,7 @@ define(['lodash', 'text!sv-comp-form-field-tpl'], function (_, fieldTpl) {
             },
             field_id: function () {
                 var c = this.field_config;
-                return 'form-' + c.model + '-' + c.tab + '-' + c.name;
+                return c.id || ('form-' + c.model + '-' + c.tab + '-' + c.name);
             },
             field_type: function () {
                 return this.field_config.type || 'text';
@@ -65,5 +65,9 @@ define(['lodash', 'text!sv-comp-form-field-tpl'], function (_, fieldTpl) {
                 this.$emit('input', value);
             }
         }
-    }
+    };
+
+    Vue.component('sv-comp-form-field', SvCompFormField);
+
+    return SvCompFormField;
 });

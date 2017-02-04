@@ -4,7 +4,8 @@ define(['text!sv-page-users-form-main-tpl'], function (tabMainTpl) {
         template: tabMainTpl,
         data: function () {
             return {
-                test: false
+                test: '',
+                test1: ''
             }
         }
     }

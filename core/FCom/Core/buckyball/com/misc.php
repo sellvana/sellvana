@@ -553,7 +553,7 @@ class BUtil extends BClass
         if (is_array($arr)) {
             foreach ($arr as $k => $v) {
                 if (is_numeric($v)) {
-                    $res[$k] = intval($v);
+                    $res[$k] = (float)$v;
                 }
             }
         }

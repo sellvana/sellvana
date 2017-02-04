@@ -1,0 +1,12 @@
+<div class="admin-main-content">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>{{'Upload Images'|_}}</h2>
+            <dropzone :id="id" :url="uploadUrl" :useCustomDropzoneOptions="true" :dropzoneOptions="dropzoneOptions"
+                      @vdropzone-success="showSuccess"></dropzone>
+
+            <h2>{{'Add Images from Library'|_}}</h2>
+
+        </div>
+    </div>
+</div>

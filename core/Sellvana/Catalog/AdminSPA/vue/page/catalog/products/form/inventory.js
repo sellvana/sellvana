@@ -1,11 +1,7 @@
-define(['text!sv-page-catalog-products-form-inventory-tpl'], function (tabMainTpl) {
+define(['sv-hlp', 'text!sv-page-catalog-products-form-inventory-tpl'], function (SvHlp, tabTpl) {
     return {
-        template: tabMainTpl,
-        props: ['form'],
-        data: function () {
-            return {
-                dict: SvAppData
-            }
-        }
+        mixins: [SvHlp.mixins.formTab],
+        template: tabTpl,
+        props: ['form']
     }
 });
