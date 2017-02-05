@@ -8,22 +8,32 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
     {
         $result = [];
 
-        $this->layout('sv-app-setings-config');
-        /** @var FCom_AdminSPA_AdminSPA_View_App $appView */
-        $appView = $this->view('app');
+        $forms = $this->collectFormConfig();
 
-        //TODO: permissions
-        $navTree = $appView->normalizeSettingsNav()->getNavTree();
+        foreach ((array)$forms as $path => $form) {
+            $root = !empty($form['config']['default_field']['root']) ? $form['config']['default_field']['root'] : '';
+            $form['config']['default_field']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
+            $form['config']['default_field']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
+            $forms[$path] = $this->normalizeFormConfig($form);
+        }
 
-        $result['nav'] = $navTree;
-        $result['sections'] = [];
+        $result['forms'] = $forms;
+        $result['nav'] = $this->collectNavConfig();
 
-        $this->BEvents->fire(__METHOD__, ['nav' => &$result['nav'], 'sections' => &$result['sections']]);
-        foreach ((array)$result['sections'] as $path => $section) {
-            $root = !empty($section['config']['default_field']['root']) ? $section['config']['default_field']['root'] : '';
-            $section['config']['default_field']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
-            $section['config']['default_field']['tab'] = trim(str_replace(['.', '/'], '-', $path), '-');
-            $result['sections'][$path] = $this->normalizeFormConfig($section);
+        foreach ($result['nav'] as $l1 => $n1) {
+            if (empty($n1['children'])) {
+                continue;
+            }
+            foreach ($n1['children'] as $l2 => $n2) {
+                if (empty($n2['children'])) {
+                    continue;
+                }
+                foreach ($n2['children'] as $l3 => $n3) {
+                    if (empty($result['forms'][$n3['path']]['label'])) {
+                        $result['forms'][$n3['path']]['label'] = "{$n1['label']} > {$n2['label']} > {$n3['label']}";
+                    }
+                }
+            }
         }
 
         $this->respond($result);
@@ -31,31 +41,87 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
     public function action_form_data()
     {
-        $result = [
-            'data' => []
-        ];
+        $result = [];
 
-        $this->layout('sv-app-setings-config');
-        /** @var FCom_AdminSPA_AdminSPA_View_App $appView */
-        $appView = $this->view('app');
+        $forms = $this->collectFormConfig();
+        $result['data'] = $this->collectFormData($forms);
 
-        $confHlp = $this->BConfig;
+        $this->respond($result);
+    }
 
-        //TODO: permissions
-        foreach ($appView->getNavs() as $nav) {
-            if (!empty($nav['data'])) {
-                foreach ((array)$nav['data'] as $path) {
-                    $pathArr = explode('/', $path);
-                    $data =& $result['data'];
-                    foreach ($pathArr as $p) {
-                        $data =& $data[$p];
-                    }
-                    $data = $this->BUtil->arrayMerge($data, $confHlp->get($path));
-                    unset($data);
-                }
-            }
+    public function action_form_data__POST()
+    {
+        $result = [];
+
+        try {
+            $data = $this->BRequest->post('data');
+
+
+
+            $this->addMessage('Settings have been saved', 'success');
+        } catch (Exception $e) {
+            $this->addMessage($e);
         }
 
         $this->respond($result);
     }
+
+    public function collectNavConfig()
+    {
+        $this->layout('sv-app-setings-config');
+        /** @var FCom_AdminSPA_AdminSPA_View_App $appView */
+        $appView = $this->view('app');
+
+        //TODO: permissions
+        $navTree = $appView->normalizeSettingsNav()->getNavTree();
+
+        return $navTree;
+    }
+
+    public function collectFormConfig()
+    {
+        $forms = [];
+
+        $this->BEvents->fire(__METHOD__, ['forms' => &$forms]);
+
+        return $forms;
+    }
+
+    public function collectFormData($forms)
+    {
+        $confHlp = $this->BConfig;
+
+        $data = [];
+        $roots = [];
+
+        //TODO: permissions
+        foreach ($forms as $path => $form) {
+            if (empty($form['config']['fields'])) {
+                continue;
+            }
+            if (!empty($form['config']['default_field']['root'])) {
+                $roots[$form['config']['default_field']['root']] = true;
+            }
+            foreach ((array)$form['config']['fields'] as $field) {
+                if (!empty($field['root'])) {
+                    $roots[$field['root']] = true;
+                }
+            }
+        }
+
+        foreach ($roots as $path => $_) {
+            $pathArr = explode('/', $path);
+            $d =& $data;
+            foreach ($pathArr as $p) {
+                $d =& $d[$p];
+            }
+            $d = $this->BUtil->arrayMerge($d, $confHlp->get($path));
+            unset($d);
+        }
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['data' => &$data]);
+
+        return $data;
+    }
+
 }

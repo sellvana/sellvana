@@ -1,4 +1,12 @@
 <div>
+    <div class="control-buttons-block text-right">
+        <!--<v-select :debounce="500" :on-search="search" :options="search_options" :placeholder="'Search Settings...'|_"></v-select>-->
+        <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label"
+                       :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true"
+                       :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search"
+                       @input="searchSelect(arguments[0])"></v-multiselect>
+        <button type="button" class="button button9" @click="saveAll()">{{'Save All Settings'|_}}</button>
+    </div>
 	<div class="secondary-menu horizontal-menu">
         <nav class="navbar navbar-default">
             <ul class="nav">
@@ -17,14 +25,15 @@
 	<div class="admin-main-content">
 		<div class="block-title"><p>{{pageTitle}}</p></div>
         <ul>
-            <li v-for="panel in panels">
+            <li v-for="panel in panels" v-if="!(panel.hide_for_site && site.id)">
                 <div class="panel-header">
                     <a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
                 </div>
                 <div class="panel-container" v-if="panelsOpen[panel.path]">
-                    <component :is="panel.component" :settings="settings" :panel="panel"></component>
+                    <component :is="panel.component" :settings="settings" :panel="panel" :site="site"></component>
                 </div>
             </li>
         </ul>
     </div>
+    <jsontree :json="settings.data"></jsontree>
 </div>

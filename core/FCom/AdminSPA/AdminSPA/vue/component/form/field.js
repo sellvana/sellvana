@@ -4,7 +4,7 @@ define(['lodash', 'vue', 'text!sv-comp-form-field-tpl'], function (_, Vue, field
         props: ['form', 'field', 'value'],
         data: function () {
             return {
-                value_model: ''
+                value_model: null
             }
         },
         computed: {
@@ -57,10 +57,30 @@ define(['lodash', 'vue', 'text!sv-comp-form-field-tpl'], function (_, Vue, field
                 return SvAppData.modules.hasOwnProperty('Sellvana_MultiLanguage');
             }
         },
+        methods: {
+            parseValue: function (value) {
+                if (this.field_config.multiple && (typeof value === 'string' || typeof value === 'number') ) {
+                    value = [value];
+                }
+                this.value_model = value;
+            },
+            fieldConfig: function (key) {
+                if ((typeof this.field_config[key]) === 'undefined') {
+                    if (key.match(/^(multiple|required|readonly|disabled)$/)) {
+                        return false;
+                    }
+                }
+                return this.field_config[key];
+            }
+        },
         created: function () {
-            this.value_model = this.value;
+            this.parseValue(this.value);
+
         },
         watch: {
+            value: function (value) {
+                this.parseValue(value);
+            },
             value_model: function (value) {
                 this.$emit('input', value);
             }

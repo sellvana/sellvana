@@ -1,4 +1,4 @@
 <fieldset>
-    <sv-comp-form-field v-for="f in formFields" :form="form" :field="f.name"
+    <sv-comp-form-field v-for="f in formFields" v-show="showCond(f)" :form="form" :field="f.name"
                         v-model="fieldModel(f)[f.name]" @event="processFieldEvent"></sv-comp-form-field>
 </fieldset>

@@ -55,15 +55,22 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
     {
         $modRegHlp = $this->BModuleRegistry;
         foreach ($this->_navs as &$nav) {
-            if (empty($nav['require']) && !empty($nav['module'])) {
-                $mod = $modRegHlp->module($nav['module']);
-                $relPath = '/AdminSPA/vue/page/settings' . $nav['path'];
-                $fsPath = $mod->root_dir . $relPath;
-                $webPath = /*$this->BRequest->scheme() . ':' . */$mod->baseSrc(false) . $relPath;
-                $nav['require'] = [
-                    file_exists($fsPath . '.js') ? $webPath . '.js' : 'sv-page-settings-default-section',
-                    file_exists($fsPath . '.html') ? 'text!' . $webPath . '.html' : 'text!sv-page-settings-default-section-tpl',
-                ];
+            if (empty($nav['require'])) {
+                if (!empty($nav['module'])) {
+                    $mod     = $modRegHlp->module($nav['module']);
+                    $relPath = '/AdminSPA/vue/page/settings' . $nav['path'];
+                    $fsPath  = $mod->root_dir . $relPath;
+                    $webPath = /*$this->BRequest->scheme() . ':' . */$mod->baseSrc(false) . $relPath;
+                    $nav['require'] = [
+                        file_exists($fsPath . '.js') ? $webPath . '.js' : 'sv-page-settings-default-section',
+                        file_exists($fsPath . '.html') ? 'text!' . $webPath . '.html' : 'text!sv-page-settings-default-section-tpl',
+                    ];
+                } else {
+                    $nav['require'] = [
+                        'sv-page-settings-default-section',
+                        'text!sv-page-settings-default-section-tpl',
+                    ];
+                }
             }
         }
         unset($nav);

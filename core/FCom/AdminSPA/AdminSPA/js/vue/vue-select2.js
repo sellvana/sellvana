@@ -57,18 +57,24 @@ define(['jquery', 'lodash', 'vue', 'select2'], function ($, _, Vue) {
                     $el.val(value).trigger('change.select2');
                 }
             },
-            options: function (options) {
-                var $el = $(this.$el);
-                var options1 = normalizeOptions(options);
-                $el.empty().select2('data', options1);
-            },
-            params: function (params) {
-                var $el = $(this.$el);
-                if (this.options) {
-                    params = _.extend(params, {data: this.options});
+            options: {
+                deep: true,
+                handler: function (options) {
+                    var $el = $(this.$el);
+                    var options1 = normalizeOptions(options);
+                    $el.empty().select2('data', options1);
                 }
-                params.data = normalizeOptions(params.data);
-                $el.empty().select2(params);
+            },
+            params: {
+                deep: true,
+                handler: function (params) {
+                    var $el = $(this.$el);
+                    if (this.options) {
+                        params = _.extend(params, {data: this.options});
+                    }
+                    params.data = normalizeOptions(params.data);
+                    $el.empty().select2(params);
+                }
             }
         },
         destroyed: function () {

@@ -1,11 +1,11 @@
 define([
     'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
-    'vue-ckeditor', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress',
+    'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress',
     'sv-comp-form-field', 'sv-comp-form-layout',
     'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
 ],
 function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
-          VueCkeditor, VueMultiselect, VueSelect2, Spin, Ladda, NProgress,
+          VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress,
           SvCompFormField, SvCompFormLayout,
           svPageDefaultGridTpl, svPageDefaultFormTpl
 ) {
@@ -36,7 +36,8 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
             }
         });
 
-        Vue.component('v-multiselect', VueMultiselect);
+        Vue.component('v-multiselect', VueMultiselect.default);
+        Vue.component('v-select', VueSelect.default);
 
         Vue.directive('ladda', {
             bind: function (el, binding) {
@@ -705,7 +706,10 @@ console.log('onError', err.xhr);
                     },
                     processModelDiff: function (newModel, oldModel, model) {
                         // have to do all this because oldModel isn't working
-                        var newModel = this.form[model], oldModel = this.form[model + '_old'];
+                        if (model) {
+                            newModel = this.form[model];
+                            oldModel = this.form[model + '_old'];
+                        }
                         var i, l, j, m = this.form.config.fields.length, f, tabs = {}, update = false;
                         for (i in newModel) {
                             if (newModel[i] != oldModel[i]) {
@@ -731,13 +735,25 @@ console.log('onError', err.xhr);
                                 }
                             }
                         }
+                    },
+                    formFieldShowCond: function (f) {
+                        if (!f.if) {
+                            return true;
+                        }
+                        var cond = f.if;
+
+                        cond = cond.replace('@', 'this.fieldModel(f).');
+
+                        return eval(cond);
                     }
                 },
                 watch: {
                     '$route': 'fetchData'
                 },
                 created: function () {
-                    this.updateBreadcrumbs(translate('Loading data...'));
+                    if (this.updateBreadcrumbs) {
+                        this.updateBreadcrumbs(translate('Loading data...'));
+                    }
                     this.fetchData(this.$route);
                 },
                 beforeRouteLeave: function (to, from, next) {
@@ -814,6 +830,16 @@ console.log('onError', err.xhr);
                                 this.i18n_field = false;
                                 break;
                         }
+                    },
+                    formFieldShowCond: function (f) {
+                        if (!f.if) {
+                            return true;
+                        }
+                        var cond = f.if;
+
+                        cond = cond.replace('@', 'this.fieldModel(f).');
+
+                        return eval(cond);
                     }
                 }
             }

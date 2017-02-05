@@ -1,54 +1,115 @@
-<div class="form-group row" :class="{required: field_config.required, error: field_errors}">
-    <label v-if="field_config.label" :for="field_id" class="control-label" :class="field_config.label_class">
-        {{field_config.label|_}}
+<div class="form-group row" :class="{required: fieldConfig('required'), error: field_errors}">
+    <label v-if="fieldConfig('label')" :for="field_id" class="control-label" :class="fieldConfig('label_class')">
+        {{fieldConfig('label')|_}}
     </label>
 
-    <div :class="field_config.field_container_class">
+    <div :class="fieldConfig('field_container_class')">
 
-        <input v-if="field_type === 'input'" :id="field_id" class="form-control"
-               :class="field_config.input_class" :style="field_config.input_style"
-               :placeholder="field_config.placeholder"
-               :readonly="field_config.readonly" :disabled="field_config.disabled"
-               :required="field_config.required" :pattern="field_config.pattern"
-               :type="field_config.input_type || 'text'"
-               :value="value_model" @input="value_model = $event.target.value"/>
+        <input v-if="field_type === 'input'"
+               :value="value_model" @input="value_model = $event.target.value"
+               :id="field_id"
+               class="form-control"
+               :class="fieldConfig('input_class')"
+               :style="fieldConfig('input_style')"
+               :placeholder="fieldConfig('placeholder')"
+               :readonly="fieldConfig('readonly')"
+               :disabled="fieldConfig('disabled')"
+               :required="fieldConfig('required')"
+               :pattern="fieldConfig('pattern')"
+               :type="fieldConfig('input_type') || 'text'"/>
 
-        <select v-else-if="field_type === 'select'" :id="field_id" class="form-control"
-                :class="field_config.input_class" :style="field_config.input_style"
-                :placeholder="field_config.placeholder"
-                :readonly="field_config.readonly" :disabled="field_config.disabled"
-                :required="field_config.required"
-                :multiple="field_config.multiple" v-model="value_model">
+        <select v-if="field_type === 'select'"
+                v-model="value_model"
+                :id="field_id"
+                class="form-control"
+                :class="fieldConfig('input_class')"
+                :style="fieldConfig('input_style')"
+                :placeholder="fieldConfig('placeholder')"
+                :readonly="fieldConfig('readonly')"
+                :disabled="fieldConfig('disabled')"
+                :required="fieldConfig('required')"
+                :multiple="fieldConfig('multiple')">
             <option v-for="o in field_options" :value="o.id">{{o.text}}</option>
         </select>
 
-        <select2 v-else-if="field_type === 'select2'" :id="field_id" v-model="value_model"
-                 :class="field_config.input_class" :style="field_config.input_style"
-                 :placeholder="field_config.placeholder"
-                 :readonly="field_config.readonly" :disabled="field_config.disabled"
-                 :required="field_config.required"
-                 :multiple="field_config.multiple" :params="field_config.select2 || {}">
+        <select2 v-if="field_type === 'select2'"
+                 v-model="value_model"
+                 :id="field_id"
+                 :class="fieldConfig('input_class')"
+                 :style="fieldConfig('input_style')"
+                 :placeholder="fieldConfig('placeholder')"
+                 :readonly="fieldConfig('readonly')"
+                 :disabled="fieldConfig('disabled')"
+                 :required="fieldConfig('required')"
+                 :multiple="fieldConfig('multiple')"
+                 :options="field_options"
+                 :params="fieldConfig('select2') || {}">
             <option v-for="o in field_options" :value="o.id">{{o.text}}</option>
         </select2>
 
-        <checkbox v-else-if="field_type === 'checkbox'" :id="field_id" 
-                  v-model="value_model"></checkbox>
+        <v-multiselect v-if="field_type === 'v-multiselect'"
+                       v-model="value_model"
+                       :id="field_id"
+                       :options="field_options"
+                       track-by="id"
+                       label="text"
+                       :close-on-select="false"
+                       :class="fieldConfig('input_class')"
+                       :style="fieldConfig('input_style')"
+                       :placeholder="fieldConfig('placeholder')"
+                       :readonly="fieldConfig('readonly')"
+                       :disabled="fieldConfig('disabled')"
+                       :required="fieldConfig('required')"
+                       :searchable="true"
+                       :multiple="fieldConfig('multiple')">
+        </v-multiselect>
 
-        <textarea v-else-if="field_type === 'textarea'" :id="field_id" class="form-control"
-                  :class="field_config.input_class" :style="field_config.input_style"
-                  :placeholder="field_config.placeholder"
-                  :readonly="field_config.readonly" :disabled="field_config.disabled"
-                  :required="field_config.required"
-                  v-model="value_model"></textarea>
+        <v-select v-if="field_type === 'v-select'"
+                  v-model="value_model"
+                  :id="field_id"
+                  :options="field_options"
+                  track-by="id"
+                  label="text"
+                  :close-on-select="false"
+                  :class="fieldConfig('input_class')"
+                  :style="fieldConfig('input_style')"
+                  :placeholder="fieldConfig('placeholder')"
+                  :readonly="fieldConfig('readonly')"
+                  :disabled="fieldConfig('disabled')"
+                  :required="fieldConfig('required')"
+                  :searchable="true"
+                  :multiple="fieldConfig('multiple')">
+        </v-select>
 
-        <ckeditor v-else-if="field_type === 'wysiwyg'" :id="field_id" v-model="value_model"></ckeditor>
+        <checkbox v-if="field_type === 'checkbox'"
+                  v-model="value_model"
+                  :id="field_id"></checkbox>
 
-        <component v-else-if="field_type === 'component'" :is="field_config.component" :id="field_id" v-model="value_model"></component>
+        <textarea v-if="field_type === 'textarea'"
+                  v-model="value_model"
+                  :id="field_id"
+                  class="form-control"
+                  :class="fieldConfig('input_class')"
+                  :style="fieldConfig('input_style')"
+                  :placeholder="fieldConfig('placeholder')"
+                  :readonly="fieldConfig('readonly')"
+                  :disabled="fieldConfig('disabled')"
+                  :required="fieldConfig('required')"></textarea>
 
-        <a v-if="i18n_enabled && field_config.i18n" href="#" class="translate-icon"
+        <ckeditor v-if="field_type === 'wysiwyg'"
+                  v-model="value_model"
+                  :id="field_id"></ckeditor>
+
+        <component v-if="field_type === 'component'"
+                   v-model="value_model"
+                   :is="fieldConfig('component')"
+                   :id="field_id"></component>
+
+        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="translate-icon"
            @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
 
-        <span v-if="field_config.notes">{{field_config.notes|_}}</span>
+        <component v-if="fieldConfig('notes')" :form="form" :value="value"
+                   :is="{props:['form','value'], template:'<div>'+fieldConfig('notes')+'</div>'}"></component>
 
         <span v-for="e in field_errors" class="error-message">{{e}}</span>
     </div>

@@ -22,7 +22,8 @@ modules:
                 views:
                     - [ app, FCom_AdminSPA_AdminSPA_View_App ]
                 observe:
-                    - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::action_config", "FCom_AdminSPA_AdminSPA.onSettingsConfig" ]
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::collectFormConfig", "FCom_AdminSPA_AdminSPA.onSettingsConfig" ]
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::collectFormData:after", "FCom_AdminSPA_AdminSPA.onSettingsDataAfter" ]
 
         default_config:
             modules/FCom_AdminSPA/theme: FCom_AdminSPA_DefaultTheme

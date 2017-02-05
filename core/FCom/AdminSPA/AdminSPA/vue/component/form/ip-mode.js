@@ -1,7 +1,10 @@
-define(['vue', 'text!sv-comp-form-ip-mode-tpl'], function (Vue) {
+define(['vue', 'text!sv-comp-form-ip-mode-tpl'], function (Vue, ipModeTpl) {
     var IpMode = {
+        template: ipModeTpl,
+        props: ['value'],
         data: function () {
             return {
+                default_mode: '',
                 ipmodes_value: []
             }
         },
@@ -29,15 +32,43 @@ define(['vue', 'text!sv-comp-form-ip-mode-tpl'], function (Vue) {
                         break;
                     }
                 }
+            },
+            parseValue: function () {
+                var modes = this.value ? this.value.split("\n") : [], p;
+                this.default_mode = modes[0] || 'DEBUG';
+                this.ipmodes_value = [];
+                for (var i = 1; i < modes.length; i++) {
+                    p = modes[i].split(':');
+                    this.ipmodes_value.push({ip: p[0], mode: p[1]});
+                }
+            },
+            emitInput: function () {
+                var i, l, str = [this.default_mode], v;
+                for (i = 0, l = this.ipmodes_value.length; i < l; i++) {
+                    str.push(this.ipmodes_value[i].ip + ':' + this.ipmodes_value[i].mode);
+                }
+                v = str.join("\n");
+                this.$emit('input', v);
             }
         },
+        created: function () {
+            this.parseValue();
+        },
         watch: {
-            ipmodes_value: function (value) {
-                var i, l, str = [];
-                for (i = 0, l = value.length; i < l; i++) {
-                    str.push(value[i].ip + ':' + value[i].mode);
+            value: {
+                deep: true,
+                handler: function () {
+                    this.parseValue();
                 }
-                this.$emit('input', str.join("\n"));
+            },
+            default_mode: function () {
+                this.emitInput();
+            },
+            ipmodes_value: {
+                deep: true,
+                handler: function () {
+                    this.emitInput();
+                }
             }
         }
     };

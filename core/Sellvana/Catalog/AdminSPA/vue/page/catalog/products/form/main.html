@@ -5,8 +5,10 @@
 				<div class="col-md-12">
 					<div class="form-horizontal">
 						<div class="f-section">
-							<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='main'" :form="form" :field="f.name"
-												v-model="form[f.model][f.name]" @event="processFieldEvent"></sv-comp-form-field>
+							<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='main'"
+												v-show="formFieldShowCond(f)"
+												:form="form" :field="f.name" v-model="form[f.model][f.name]"
+												@event="processFieldEvent"></sv-comp-form-field>
 						</div>
 					</div>
 				</div>
