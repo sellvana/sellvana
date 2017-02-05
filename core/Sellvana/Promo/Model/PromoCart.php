@@ -25,7 +25,7 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
             return false;
         }
 
-        $matchType = $promo->getData('conditions/match');
+        $matchType = $promo->get('conditions_operator');
 
         if (!$matchType || $matchType === 'always') {
             $result['match'] = true;

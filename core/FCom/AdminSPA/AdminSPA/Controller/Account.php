@@ -9,10 +9,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
 {
     public function authenticate($args = [])
     {
-        if (in_array($this->_action, ['login', 'logout', 'password_recover', 'password_reset'], true)) {
-            return true;
-        }
-        return parent::authenticate($args);
+        return true;
     }
 
     public function action_login()

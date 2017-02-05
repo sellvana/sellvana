@@ -172,7 +172,6 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
                 'order' => $order,
                 'qtys' => $cancel,
             ]);
-            if ($result['errors'])
             $this->message('Items canceled successfully');
             $this->BResponse->redirect('orders');
         } catch (Exception $e) {
