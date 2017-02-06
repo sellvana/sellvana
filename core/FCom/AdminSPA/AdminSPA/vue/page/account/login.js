@@ -19,7 +19,7 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
                     }
                 };
                 this.logging_in = true;
-                this.sendRequest('POST', 'account/login', postData, function (response) {
+                this.sendRequest('POST', 'auth/login', postData, function (response) {
                     vm.logging_in = false;
                     if (response._redirect) {
                         SvHlp.router.push(response._redirect);
@@ -30,7 +30,7 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
         created: function () {
             if (this.$store.state.user && this.$store.state.user.id) {
                 var vm = this;
-                this.sendRequest('GET', 'account/login', {}, function (response) {
+                this.sendRequest('GET', 'auth/login', {}, function (response) {
                     console.log(response);
                     if (response.is_logged_in) {
                         vm.$router.push('/');
@@ -39,6 +39,12 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
                     }
                 });
             }
+        },
+        mounted: function () {
+            $('body').addClass('sv-login');
+        },
+        beforeDestroy: function () {
+            $('body').removeClass('sv-login');
         }
     }
 });

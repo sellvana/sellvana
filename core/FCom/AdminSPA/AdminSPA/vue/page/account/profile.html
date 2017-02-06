@@ -1,3 +1,50 @@
-<div class="admin-main-content">
-    ACCOUNT PROFILE
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="control-buttons-block text-right">
+                <button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+                <button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="admin-main-content">
+                <div class="block-title">
+                    <p>{{'Account Information'|_}}</p>
+                </div>
+
+                <div class="form-horizontal">
+                    <div class="f-section">
+                        <sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='account'"
+                                            v-show="formFieldShowCond(f)"
+                                            :form="form" :field="f.name" v-model="form[f.model][f.name]"
+                                            @event="processFieldEvent"></sv-comp-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="admin-main-content"></div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="admin-main-content">
+                <div class="block-title">
+                    <p>{{'Personal Information'|_}}</p>
+                </div>
+
+                <div class="form-horizontal">
+                    <div class="f-section">
+                        <sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='personal'"
+                                            v-show="formFieldShowCond(f)"
+                                            :form="form" :field="f.name" v-model="form[f.model][f.name]"
+                                            @event="processFieldEvent"></sv-comp-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

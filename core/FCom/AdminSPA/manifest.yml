@@ -13,6 +13,7 @@ modules:
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
                     - [ /media/.action, FCom_AdminSPA_AdminSPA_Controller_Media ]
 
+                    - [ /auth/?.action, FCom_AdminSPA_AdminSPA_Controller_Auth ]
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
                     - [ /favorites/?.action, FCom_AdminSPA_AdminSPA_Controller_Favorites ]
                     - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]

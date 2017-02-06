@@ -81,6 +81,8 @@
             - [ requireJs, vue-select, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select-2.1.8" ]
             - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
 
+            - [ requireJs, vue-password-strength-meter, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-password-strength-meter-0.1.1" ]
+
             - [ requireJs, vue-ckeditor, "@FCom_AdminSPA/AdminSPA/js/vue/vue-ckeditor" ]
             - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/vue/vue-select2" ]
             - [ requireJs, inline-param, "@FCom_AdminSPA/AdminSPA/js/vue/inline-param" ]
@@ -93,11 +95,17 @@
 
             - [ requireJs, sv-comp-header, "@FCom_AdminSPA/AdminSPA/vue/component/header" ]
             - [ requireJs, sv-comp-header-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header.html" ]
+            - [ requireJs, sv-comp-header-breadcrumbs, "@FCom_AdminSPA/AdminSPA/vue/component/header/breadcrumbs" ]
             - [ requireJs, sv-comp-header-breadcrumbs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/breadcrumbs.html" ]
+            - [ requireJs, sv-comp-header-search, "@FCom_AdminSPA/AdminSPA/vue/component/header/search" ]
             - [ requireJs, sv-comp-header-search-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/search.html" ]
+            - [ requireJs, sv-comp-header-favorites, "@FCom_AdminSPA/AdminSPA/vue/component/header/favorites" ]
             - [ requireJs, sv-comp-header-favorites-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/favorites.html" ]
+            - [ requireJs, sv-comp-header-account, "@FCom_AdminSPA/AdminSPA/vue/component/header/account" ]
             - [ requireJs, sv-comp-header-account-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/account.html" ]
+            - [ requireJs, sv-comp-header-chat, "@FCom_AdminSPA/AdminSPA/vue/component/header/chat" ]
             - [ requireJs, sv-comp-header-chat-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/chat.html" ]
+            - [ requireJs, sv-comp-header-local-notifications, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications" ]
             - [ requireJs, sv-comp-header-local-notifications-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications.html" ]
 
             - [ requireJs, sv-comp-nav, "@FCom_AdminSPA/AdminSPA/vue/component/nav" ]
@@ -159,6 +167,7 @@
 			- [ requireJs, sv-page-account-password-reset-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/password-reset.html" ]
             - [ requireJs, sv-page-account-profile, "@FCom_AdminSPA/AdminSPA/vue/page/account/profile" ]
             - [ requireJs, sv-page-account-profile-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/profile.html" ]
+            - [ requireJs, sv-page-account-profile-config, "~/account/profile_config" ]
             - [ requireJs, sv-page-account-logout, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout" ]
             - [ requireJs, sv-page-account-logout-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout.html" ]
 

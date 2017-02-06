@@ -7,73 +7,34 @@
  */
 class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_Controller_Abstract
 {
-    public function authenticate($args = [])
-    {
-        return true;
-    }
+    use FCom_AdminSPA_AdminSPA_Controller_Trait_Form;
 
-    public function action_login()
+    public function action_profile_config()
     {
-        $result = [
-            'is_logged_in' => $this->FCom_Admin_Model_User->isLoggedIn(),
+        $locales = $this->Sellvana_MultiLanguage_Main->getAllowedLocales();
+        $timezones = $this->BLocale->tzOptions();
+
+        $form = [];
+
+        $form['config']['tabs'] = '/catalog/products/form';
+        $form['config']['default_field'] = ['model' => 'user', 'tab' => 'account'];
+        $form['config']['fields'] = [
+            ['name' => 'username', 'label' => 'Username'],
+            ['name' => 'email', 'label' => 'Email'],
+            ['name' => 'current_password', 'label' => 'Current Password', 'input_type' => 'password'],
+            ['name' => 'change_password', 'label' => 'Change Password?', 'type' => 'checkbox'],
+            ['name' => 'new_password', 'label' => 'New Password', 'input_type' => 'password', 'if' => '{change_password}'],
+            ['name' => 'confirm_password', 'label' => 'Confirm Password', 'input_type' => 'password', 'if' => '{change_password}'],
+
+            ['name' => 'lastname', 'label' => 'Last Name', 'tab' => 'personal'],
+            ['name' => 'firstname', 'label' => 'First Name', 'tab' => 'personal'],
+            ['name' => 'bio', 'label' => 'Short Bio', 'tab' => 'personal'],
+            ['name' => 'locale', 'label' => 'Locale', 'tab' => 'personal', 'options' => $locales],
+            ['name' => 'tz', 'label' => 'Time Zone', 'tab' => 'personal', 'options' => $timezones],
         ];
-        $this->respond($result);
-    }
 
-    public function action_login__POST()
-    {
-        try {
-            $r = $this->BRequest->post('login');
-            if (empty($r['username']) || empty($r['password'])) {
-                throw new BException('Empty username or password');
-            }
+        $form = $this->normalizeFormConfig($form);
 
-            $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
-            if (!$user) {
-                throw new BException($this->_('Invalid user name or password.'));
-            }
-
-            if ($user->get('g2fa_status') == 9) {
-                $token = $this->BRequest->cookie('g2fa_token');
-                $rec = $this->FCom_Admin_Model_UserG2FA->verifyToken($user->id(), $token);
-                if (!$rec) {
-                    $this->BSession->set('g2fa_user_id', $user->id());
-                    $this->BResponse->redirect('g2fa/login');
-                    return;
-                }
-            }
-
-            $user->login();
-
-            if (!empty($r['remember_me'])) {
-                $days = $this->BConfig->get('cookie/remember_days');
-                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
-            }
-
-            $this->addResponses(['debug' => $_SESSION]);
-
-            $this->ok()->addResponses(['_user', '_permissions', '_personalize', '_local_notifications', '_csrf_token',
-                '_redirect' => '/',
-            ]);
-        } catch (Exception $e) {
-            $this->addMessage($e);
-        }
-        $this->respond();
-    }
-
-    public function action_logout__POST()
-    {
-        try {
-            $user = $this->FCom_Admin_Model_User->sessionUser();
-            if ($user) {
-                $user->logout();
-            }
-            $this->ok()->addResponses(['_user', '_permissions', '_personalize', '_local_notifications', '_csrf_token',
-                '_redirect' => '/login',
-            ]);
-        } catch (Exception $e) {
-            $this->addMessage($e);
-        }
-        $this->respond();
+        $this->respond($form['config']);
     }
 }

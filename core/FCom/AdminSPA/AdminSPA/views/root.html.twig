@@ -5,17 +5,6 @@
         var SvAppData = ({{ data|json_encode|raw }});
     </script>
     {{ THIS.view('head') | raw }}
-    <script>
-        requirejs.config({
-            config: {
-                text: {
-                    onXhrComplete: function (xhr, url) {
-                        //console.log(xhr, url);
-                    }
-                }
-            }
-        });
-    </script>
 </head>
 <body>
 {% verbatim %}

@@ -169,9 +169,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
      */
     public function as_array(array $objHashes = [])
     {
-        $data = parent::as_array();
-        #unset($data['password_hash']);
-        #unset($data['api_password_hash']);
+        $data = $this->BUtil->arrayMask(parent::as_array($objHashes), ['password_hash', 'token', 'token_at',
+            'api_username', 'api_password', 'api_password_hash', 'password_session_token',
+            'g2fa_secret', 'g2fa_token', 'g2fa_token_at',
+        ], true);
+        $data['thumb'] = $this->thumb(47);
         return $data;
     }
 

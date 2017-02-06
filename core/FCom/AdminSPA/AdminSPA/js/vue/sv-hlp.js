@@ -1,12 +1,12 @@
 define([
     'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
     'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress',
-    'sv-comp-form-field', 'sv-comp-form-layout',
+    'vue-password-strength-meter', 'sv-comp-form-field', 'sv-comp-form-layout',
     'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
 ],
 function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
           VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress,
-          SvCompFormField, SvCompFormLayout,
+          VuePassword, SvCompFormField, SvCompFormLayout,
           svPageDefaultGridTpl, svPageDefaultFormTpl
 ) {
 
@@ -37,7 +37,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
         });
 
         Vue.component('v-multiselect', VueMultiselect.default);
-        Vue.component('v-select', VueSelect.default);
+        Vue.component('vue-password', VuePassword.default);
 
         Vue.directive('ladda', {
             bind: function (el, binding) {
@@ -78,8 +78,9 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
         });
 
         Vue.component('checkbox', {
-            template: '<label><input type="checkbox" v-model="internal"><div class="checkbox-block" :style="blockStyle"><div class="checkbox-elem" :style="elemStyle"></div></div></label>',
-            props: ['value', 'height', 'width'],
+            template: '<label><input type="checkbox" :id="id" v-model="internal"><div class="checkbox-block" :style="blockStyle">' +
+                '<div class="checkbox-elem" :style="elemStyle"></div></div></label>',
+            props: ['value', 'height', 'width', 'id'],
             data: function () {
                 return {
                     internal: null
@@ -735,16 +736,6 @@ console.log('onError', err.xhr);
                                 }
                             }
                         }
-                    },
-                    formFieldShowCond: function (f) {
-                        if (!f.if) {
-                            return true;
-                        }
-                        var cond = f.if;
-
-                        cond = cond.replace('@', 'this.fieldModel(f).');
-
-                        return eval(cond);
                     }
                 },
                 watch: {
@@ -831,15 +822,29 @@ console.log('onError', err.xhr);
                                 break;
                         }
                     },
+                    fieldModel: function (field, root) {
+                        var model;
+                        if (root) {
+                            model = _.get(this.form, (root || field.root).replace('/', '.'), {});
+                        } else {
+                            model = this.form[field.model];
+                        }
+                        return model;
+                    },
                     formFieldShowCond: function (f) {
                         if (!f.if) {
                             return true;
                         }
-                        var cond = f.if;
+                        var vm = this, cond = f.if, result;
 
-                        cond = cond.replace('@', 'this.fieldModel(f).');
+                        // result = cond.replace(/\{(([a-z0-9_/]+)\/)?([a-z0-9_]+)\}/g, function (_, _, root, field) {
+                        //     return vm.fieldModel(f, root)[field];
+                        // });
 
-                        return eval(cond);
+                        cond = cond.replace(/\{(([a-z0-9_/]+)\/)?([a-z0-9_]+)\}/g, "this.fieldModel(f, '$2').$3");
+                        result = eval(cond);
+
+                        return result;
                     }
                 }
             }

@@ -46,19 +46,15 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
         $userId = $this->BRequest->get('id');
         /** @var FCom_Admin_Model_User $user */
         $user = $this->FCom_Admin_Model_User->load($userId);
-        $formData = [
-            'config' => [
-                'tabs' => $this->getFormTabs('/users/form'),
-                'fields' => [],
-            ],
-            'user' => $user->as_array(),
-            'avatar' => ['thumb_url' => $user->thumb(100)],
-            'options' => [
-            ],
+
+        $result = [];
+        $result['form']['config']['tabs'] = $this->getFormTabs('/users/form');
+        $result['form']['config']['fields'] = [
+
         ];
-        $result = [
-            'form' => $formData,
-        ];
+        $result['form']['user'] = $user->as_array();
+        $result['form']['avatar'] = ['thumb_url' => $user->thumb(100)];
+
         $this->respond($result);
     }
 

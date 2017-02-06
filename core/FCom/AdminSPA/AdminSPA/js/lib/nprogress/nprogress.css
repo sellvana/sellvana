@@ -8,11 +8,15 @@
 
     position: fixed;
     z-index: 99998;
-    top: 56px;
+    top: 56px; // custom
     left: 0;
 
     width: 100%;
     height: 2px;
+}
+
+.sv-login #nprogress .bar {
+    top: 0;
 }
 
 /* Fancy blur effect */

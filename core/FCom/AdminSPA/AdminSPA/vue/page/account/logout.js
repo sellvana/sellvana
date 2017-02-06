@@ -7,15 +7,21 @@ define(['sv-hlp'], function(SvHlp) {
                 return this.$store.state.user && this.$store.state.user.id;
             }
         },
-        mounted: function () {
+        created: function () {
             if (!this.$store.state.user) {
                 this.$router.push('/login');
             }
             var postData = {}, vm = this;
-            this.sendRequest('POST', 'account/logout', postData, function (response) {
+            this.sendRequest('POST', 'auth/logout', postData, function (response) {
                 SvHlp.processResponse(response);
                 vm.$router.push("/login");
             });
+        },
+        mounted: function () {
+            $('body').addClass('sv-login');
+        },
+        beforeDestroy: function () {
+            $('body').removeClass('sv-login');
         }
     }
 });

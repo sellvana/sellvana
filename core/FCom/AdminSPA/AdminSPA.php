@@ -79,8 +79,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
     public function responseCallback_user($data)
     {
         $user = $this->FCom_Admin_Model_User->sessionUser();
-        $result = $user ? $user->as_array() : false;
-        return $result;
+        return $user ? $user->as_array() : false;
     }
     
     public function responseCallback_permissions($data)
