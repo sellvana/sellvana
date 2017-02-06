@@ -168,6 +168,9 @@ define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl', 'inline-param']
             },
             inlineOptions: function (type) {
                 var i, l, options = [], o;
+                if (!this.options[type]) {
+                    return [];
+                }
                 for (i = 0, l = this.options[type].length; i < l; i++) {
                     o = this.options[type][i];
                     options.push({
