@@ -125,6 +125,25 @@ input::-webkit-inner-spin-button {
 	padding: 0px 0 2px 0;
 	border-radius: 0;
 }
+.form-control {
+	font-size: 12px;
+	padding: 7px 12px;
+	border-radius: 0;
+	box-shadow: none;
+	border: 1px solid #ebebeb;
+	height: auto;
+	min-width: 100px;
+	color: #474646;
+	&:hover,
+	&:focus,
+	&:active {
+		border: 1px solid #ebebeb;
+		box-shadow: none;
+	}
+	&:focus {
+		box-shadow: 0px 1px 6px 1px rgba(152, 167, 152, 0.3);
+	}
+}
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
 	input[type="date"].form-control,
