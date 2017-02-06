@@ -53,13 +53,13 @@
 }
 .del-mode {
 	background: #ff2b42;
-	&:hover {
+	&:hover, &:active, &:focus {
 		background: #d40017;
 	}
 }
 .add-mode {
 	background: #00c0ef;
-	&:hover {
+	&:hover, &:active, &:focus {
 		background: #038fb1;
 	}
 }

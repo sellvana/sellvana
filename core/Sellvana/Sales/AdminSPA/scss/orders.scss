@@ -34,6 +34,9 @@
 	}
 	p {
 		margin-bottom: 5px;
+		a {
+			color: #5f5f5f;
+		}
 	}
 	span {
 		margin-bottom: 5px;
@@ -343,7 +346,6 @@
 		font-size: 14px;
 		vertical-align: middle;
 		display: inline-block;
-		transition: 0.3s color ease-in;
 		&:hover {
 			color: #000;
 		}
@@ -370,7 +372,6 @@
 			padding: 0 10px;
 			vertical-align: middle;
 			display: inline-block;
-			transition: 0.3s color ease-in;
 			&:hover {
 				color: #000;
 			}
@@ -432,9 +433,6 @@
 		margin: 0;
 		input {
 			margin-bottom: 0;
-			position: absolute;
-			right: 0px;
-			bottom: 9px;
 		}
 	}
 	p,
@@ -453,7 +451,7 @@
 		resize: none;
 		width: 70%;
 		height: 140px;
-		color: #9e9e9e;
+		color: #474646;
 		padding: 10px;
 		margin-top: 10px;
 	}

@@ -4,6 +4,6 @@
         <span v-if="notifications.length" class="badge">{{notifications.length}}</span>
     </a>
     <ul class="dropdown-menu" @click.stop>
-        <li v-for="n in notifications" v-html="n.html"></li>
+		<li v-for="n in notifications" v-html="n.html"></li>
     </ul>
 </li>

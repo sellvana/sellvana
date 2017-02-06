@@ -5,6 +5,7 @@
 	margin-bottom: 20px;
 	.nav a {
 		padding: 12px 15px;
+		color: #5f5f5f;
 	}
 	.nav .active {
 		background: #eee;
@@ -35,6 +36,7 @@
 }
 .horizontal-menu {
 	display: inline-block;
+	margin: 15px 0;
 	li {
 		display: inline-block;
 	}

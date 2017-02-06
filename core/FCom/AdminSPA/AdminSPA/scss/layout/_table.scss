@@ -29,8 +29,14 @@ table {
 			font-weight: bold;
 			color: #000;
 		}
+		span, a {
+			color: #474646;
+		}
 	}
 	tbody {
+		tr, td, a {
+			color: #5f5f5f;
+		}
 		tr {
 			border-bottom: 1px solid #f8f8f8;
 		}
@@ -83,9 +89,6 @@ table {
 	}
 	thead {
 		border-bottom: 1px solid #000000;
-		span {
-			color: #474646;
-		}
 		td,
 		th {
 			padding: 0;

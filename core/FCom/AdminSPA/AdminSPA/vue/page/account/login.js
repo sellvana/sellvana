@@ -20,6 +20,7 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
                 };
                 this.logging_in = true;
                 this.sendRequest('POST', 'auth/login', postData, function (response) {
+					
                     vm.logging_in = false;
                     if (response._redirect) {
                         SvHlp.router.push(response._redirect);
