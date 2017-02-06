@@ -6,13 +6,13 @@
 			<div class="form-group">
 				<label>
 					<span>{{'Username'|_}}</span>
-					<input type="text" v-model="username" @keyup.enter="submit">
+					<input type="text" v-model="username" class="form-control" @keyup.enter="submit">
 				</label>
 			</div>
 			<div class="form-group">
 				<label>
 					<span>{{'Password'|_}}</span>
-					<input type="password" v-model="password" @keyup.enter="submit">
+					<input type="password" v-model="password" class="form-control" @keyup.enter="submit">
 				</label>
 			</div>
 			<div class="form-group">
@@ -25,7 +25,7 @@
 			</div>
 			<router-link to="/password-recover">{{'Forgot your password?'|_}}</router-link>
 			<div class="control-buttons-block text-right">
-				<input type="button" @click="submit" value="Sign in" class="button button6" v-ladda="{on:logging_in}">
+				<button @click="submit" class="button button6" v-ladda="{on:logging_in}">Sign in</button>
 			</div>
 		</form>
 	</div>

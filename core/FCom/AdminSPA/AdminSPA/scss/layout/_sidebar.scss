@@ -11,6 +11,9 @@ aside {
 	height: 100%;
 	padding: 68px 0 0 0;
 	overflow: auto;
+	span, a, i {
+		color: #474646;
+	}
 }
 #main-nav {
 	display: inline-block;

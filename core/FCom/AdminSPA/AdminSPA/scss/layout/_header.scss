@@ -87,7 +87,6 @@ textarea {
 	line-height: 1.25em;
 	font-family: "GothamProRegular", sans-serif;
 	box-sizing: border-box;
-	color: $t-main;
 }
 
 .medium * {
@@ -185,6 +184,9 @@ header {
 						color: #7d7a7a;
 					}
 				}
+				i {
+					color: #fff;
+				}
 			}
 			i {
 				font-size: 12px;
@@ -193,6 +195,9 @@ header {
 				a {
 					color: #000;
 				}
+			}
+			span, a, i {
+				color: #474646;
 			}
 		}
 	}
@@ -252,6 +257,10 @@ header {
 			a {
 				padding: 8px 28px 8px 10px;
 				display: block;
+				color: #5f5f5f;
+				&:hover {
+					color: #000;
+				}
 			}
 		}
 		li.active {
@@ -443,6 +452,9 @@ header {
 			padding: 5px 15px 5px;
 			width: 100%;
 			display: inline-block;
+			i {
+				color: #fff;
+			}
 		}
 		i {
 			border-radius: 16px;
@@ -537,6 +549,9 @@ header {
 	margin: 0px 0 0 121px;
 	padding: 17px 14px 19px;
 	border: 0;
+	i {
+		color: #474646;
+	}
 	&:hover {
 		background: #eeeeee;
 		border: 0;
@@ -547,6 +562,7 @@ header {
 		border: 0;
 		border-radius: 0;
 	}
+	
 }
 
 .f-admin-container {
@@ -574,13 +590,6 @@ header {
 
 .navigation > .nav > li .nav {
 	display: none;
-}
-
-i {
-	color: #868a8a;
-	&:hover {
-		color: #000;
-	}
 }
 .messages-block {
 	text-align: center;
@@ -617,6 +626,10 @@ i {
 		right: 0;
 		top: 0px;
 		padding: 2px 4px;
+		color: #474646;
+		&:hover {
+			color: #000;
+		}
 	}
 }
 @media (min-width: 768px) {
@@ -646,7 +659,7 @@ i {
 				padding: 0 6px;
 			}
 		}
-		li:last-child {
+		.last {
 			border-bottom: 0;
 			text-align: center;
 			padding: 0;
@@ -893,8 +906,9 @@ i {
 		a {
 			padding: 0 5px;
 			cursor: pointer;
+			color: #5f5f5f;
 			&:hover {
-				color: #676767;
+				color: #000;
 			}
 		}
 		.fa-pencil {

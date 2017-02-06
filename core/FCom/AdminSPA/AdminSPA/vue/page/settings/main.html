@@ -1,27 +1,38 @@
 <div>
-    <div class="control-buttons-block text-right">
+    <div class="row">
+    	<div class="col-lg-6">
+			<div class="secondary-menu horizontal-menu">
+				<nav class="navbar navbar-default">
+					<ul class="nav">
+						<li v-for="l1 in settings.config.nav" class="dropdown" :class="{open:ddOpen('settings/' + l1.path)}">
+							<a href="#" :title="l1.label" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">
+								{{l1.label}}
+								<i class="fa fa-caret-down" aria-hidden="true"></i>
+							</a>
+							<ul class="dropdown-menu">
+								<li v-for="l2 in l1.children"><a href="#" @click.prevent="switchTab(l2)">{{l2.label}}</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="control-buttons-block">
+				<v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label"
+							   :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true"
+							   :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search"
+							   @input="searchSelect(arguments[0])"></v-multiselect>
+			</div>
+		</div>
+		<div class="col-lg-3">
+			<div class="control-buttons-block text-right">
+				<button type="button" class="button button9" @click="saveAll()">{{'Save All Settings'|_}}</button>
+			</div>
+		</div>
+    </div>
         <!--<v-select :debounce="500" :on-search="search" :options="search_options" :placeholder="'Search Settings...'|_"></v-select>-->
-        <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label"
-                       :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true"
-                       :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search"
-                       @input="searchSelect(arguments[0])"></v-multiselect>
-        <button type="button" class="button button9" @click="saveAll()">{{'Save All Settings'|_}}</button>
-    </div>
-	<div class="secondary-menu horizontal-menu">
-        <nav class="navbar navbar-default">
-            <ul class="nav">
-                <li v-for="l1 in settings.config.nav" class="dropdown" :class="{open:ddOpen('settings/' + l1.path)}">
-                    <a href="#" :title="l1.label" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">
-						{{l1.label}}
-						<i class="fa fa-caret-down" aria-hidden="true"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li v-for="l2 in l1.children"><a href="#" @click.prevent="switchTab(l2)">{{l2.label}}</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    
 	<div class="admin-main-content">
 		<div class="block-title"><p>{{pageTitle}}</p></div>
         <ul>
