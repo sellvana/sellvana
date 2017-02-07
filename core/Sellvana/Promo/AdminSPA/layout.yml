@@ -1,13 +1,11 @@
 /:
-
 	- view: head
 		do:
-			- [ requireJs, sv-page-promotions, "@Sellvana_Promo/AdminSPA/vue/page/promotions/form" ]
-			- [ requireJs, sv-page-promotions-tpl, "@Sellvana_Promo/AdminSPA/vue/page/promotions/form.html" ]
-			
-
+			- [ requireJs, sv-page-promotions-form, "@Sellvana_Promo/AdminSPA/vue/page/promotions/form" ]
+			- [ requireJs, sv-page-promotions-form-tpl, "@Sellvana_Promo/AdminSPA/vue/page/promotions/form.html" ]
 
     - view: app
         do:
             - [ addNav, { path: /catalog/promos, label: Promotions, link: /catalog/promos, pos: 100 } ]
 
+			- [ addRoute, { path: /catalog/promos, require: [ sv-page-promotions-form, text!sv-page-promotions-form-tpl ] } ]
