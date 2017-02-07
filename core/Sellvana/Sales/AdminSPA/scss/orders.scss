@@ -332,55 +332,6 @@
 	}
 }
 
-.added-files {
-	position: relative;
-	i.fa-paperclip {
-		font-size: 20px;
-		vertical-align: middle;
-		display: inline-block;
-		position: absolute;
-		left: 14px;
-		top: 20px;
-	}
-	i.fa-times {
-		font-size: 14px;
-		vertical-align: middle;
-		display: inline-block;
-		&:hover {
-			color: #000;
-		}
-	}
-	.file {
-		margin: 0 10px 10px;
-		display: inline-block;
-		vertical-align: middle;
-		font-size: 0;
-		img {
-			height: 25px;
-			width: auto;
-		}
-		span {
-			display: inline-block;
-			font-weight: bold;
-			color: #000;
-			vertical-align: middle;
-			padding: 0 10px;
-		}
-		a {
-			font-size: 10px;
-			color: #b3b3b3;
-			padding: 0 10px;
-			vertical-align: middle;
-			display: inline-block;
-			&:hover {
-				color: #000;
-			}
-		}
-		.delete {
-			padding: 0;
-		}
-	}
-}
 
 .new-comment {
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);

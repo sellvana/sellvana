@@ -4,10 +4,20 @@
 .admin-main-content {
 	background: #fff;
 	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-	border-radius: 2px;
+	border-radius: 2px; 
 	margin-bottom: 20px;
 	padding: 15px;
 }
+.box-no-padding {
+	padding: 15px 0;
+}
+.line {
+	width: 80%;
+	margin: 0 auto 20px;
+	height: 2px;
+	background: #c7c7c7;
+}
+
 .scrollable-area {
 	width: 100%;
 	overflow: auto;
@@ -166,6 +176,57 @@
 		}
 	}
 }
+.added-files {
+	position: relative;
+	margin: 20px 0;
+	i.fa-paperclip {
+		font-size: 20px;
+		vertical-align: middle;
+		display: inline-block;
+		position: absolute;
+		left: 14px;
+		top: 20px;
+	}
+	i.fa-times {
+		font-size: 14px;
+		vertical-align: middle;
+		display: inline-block;
+		&:hover {
+			color: #000;
+		}
+	}
+	.file {
+		margin: 0 10px 10px;
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 0;
+		img {
+			height: 25px;
+			width: auto;
+		}
+		span {
+			display: inline-block;
+			font-weight: bold;
+			color: #000;
+			vertical-align: middle;
+			padding: 0 10px;
+		}
+		a {
+			font-size: 10px;
+			color: #b3b3b3;
+			padding: 0 10px;
+			vertical-align: middle;
+			display: inline-block;
+			&:hover {
+				color: #000;
+			}
+		}
+		.delete {
+			padding: 0;
+		}
+	}
+}
+
 @media (max-width: 767px) {
 	.secondary-control-block {
 		float: none;

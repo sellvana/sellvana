@@ -221,8 +221,16 @@ fieldset {
 	.error-message {
 		visibility: hidden;
 	}
+	.delete {
+		margin-left: 10px;
+	}
 }
-
+.param-block {
+	.delete {
+		margin-left: 0;
+		margin-right: 10px;
+	}
+}
 .checkbox-block {
 	width: 48px;
 	height: 28px;
