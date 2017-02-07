@@ -6,6 +6,6 @@
 
     - view: app
         do:
-            - [ addNav, { path: /catalog/promos, label: Promotions, link: /catalog/promos, pos: 100 } ]
+            - [ addNav, { path: /catalog/promos, label: Promotions, link: /promos, pos: 100 } ]
 
-			- [ addRoute, { path: /catalog/promos, require: [ sv-page-promotions-form, text!sv-page-promotions-form-tpl ] } ]
+			- [ addRoute, { path: /promos, require: [ sv-page-promotions-form, "text!sv-page-promotions-form-tpl" ] } ]
