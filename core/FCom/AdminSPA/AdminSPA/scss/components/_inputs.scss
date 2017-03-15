@@ -1,20 +1,26 @@
-input[type="checkbox"] + span {
-	width: 24px;
-	height: 24px;
-	background-color: rgba(255,255,255,1);
-	border: solid 1px #ebebeb;
-	display: inline-block;
-	text-align: center;
-	margin-right: 6px; 
-	border-radius: 2px;
-	padding: 3px 0;
-	cursor: pointer;
-	i {
+input[type="checkbox"] {
+	& + span {
+		width: 20px;
+		height: 20px;
+		border: solid 1px #d0dae3;
 		display: inline-block;
-		font-size: 14px;
-		opacity: 0;
-		visibility: hidden;
-		color: #868a8a;
+		text-align: center;
+		margin-right: 6px; 
+		border-radius: 3px;
+		padding: 3px 0;
+		cursor: pointer;
+		i {
+			display: inline-block;
+			font-size: 14px;
+			opacity: 0;
+			visibility: hidden;
+			color: #fff;
+		}
+	}
+	&:checked {
+		& + span {
+			background: #d8d8d8;
+		}
 	}
 }
 input[type="radio"] + span {

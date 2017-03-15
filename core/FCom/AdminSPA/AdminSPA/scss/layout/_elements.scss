@@ -3,10 +3,10 @@
 }
 .admin-main-content {
 	background: #fff;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-	border-radius: 2px; 
+	border-radius: 5px; 
 	margin-bottom: 20px;
-	padding: 15px;
+	padding: 0;
+	overflow: hidden;
 }
 .box-no-padding {
 	padding: 15px 0;
@@ -226,7 +226,32 @@
 		}
 	}
 }
-
+.params-left {
+	position: absolute;
+	left: -420px;
+	top: 23px;
+	width: 420px;
+	transition: 0.3s left linear;
+}
+.params-right {
+	position: absolute;
+	right: -380px;
+	top: 23px;
+	width: 380px;
+	transition: 0.3s right linear;
+	.temporary-icon {
+		left: -40px;
+		border-radius: 5px 0 0 5px;
+	}
+}
+.temporary-icon {
+	width: 40px;
+	height: 30px;
+	position: absolute;
+	top: 0;
+	border-radius: 0 5px 5px 0;
+	background-color: #dde4ea;
+}
 @media (max-width: 767px) {
 	.secondary-control-block {
 		float: none;

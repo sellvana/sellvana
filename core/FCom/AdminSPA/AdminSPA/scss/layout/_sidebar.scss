@@ -1,9 +1,8 @@
 aside {
 	position: fixed;
 	float: left;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 	width: 240px;
-	background: #fff;
+	background: #dde5ea;
 	display: block;
 	top: 0;
 	bottom: 0;
@@ -12,12 +11,11 @@ aside {
 	padding: 68px 0 0 0;
 	overflow: auto;
 	span, a, i {
-		color: #474646;
+		color: #2e4354;
 	}
 }
 #main-nav {
 	display: inline-block;
-	background: #ffffff;
 	width: 100%;
 	padding: 0;
 	* {
@@ -26,8 +24,14 @@ aside {
 	}
 	a:hover, a:focus {
 		text-decoration: none;
-		span {
-			color: black;
+	}
+	.nav-arrow {
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		svg {
+			fill: #86a6bd;
 		}
 	}
 	.dropdown-collapse {
@@ -37,18 +41,11 @@ aside {
 			}
 			i {
 				color: #000;
-				&.fa-chevron-right {
-					transform: rotate(90deg);
-					transform-origin: top center;
-					width: 12px;
-					height: 12px;
-					text-align: center;
-				}
 			}
 		}
 	}
 	li.active {
-		font-weight: bold;
+		font-weight: 500;
 	}
 	i {
 		font-size: 16px;
@@ -58,13 +55,7 @@ aside {
 			margin-right: 10px;
 		}
 	}
-	.fa-chevron-right {
-		font-size: 12px;
-		position: absolute;
-		right: 10px;
-		top: 50%;
-		transform: translateY(-50%);			
-	}
+	
 	.active {
 		span, i {
 			color: #000;
@@ -80,21 +71,26 @@ aside {
 	}
 	.nav.nav-stacked {
 		li {
+			margin-top: 0;
 			.nav.nav-stacked {
 				li {
 					a {
-						padding: 10px 15px 10px 30px;
+						padding: 10px 15px 10px 60px;
 					}
 					.nav.nav-stacked {
 						li {
 							a {
-								padding: 10px 15px 10px 50px;
+								padding: 10px 15px 10px 80px;
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+	.nav > li > a:hover, .nav > li > a:focus {
+		text-decoration: none;
+		background-color: inherit;
 	}
 }
 .nav {

@@ -1,14 +1,10 @@
 <div class="breadcrumb" :class="{'visible-lg':!mobile, 'visible-xs':!mobile}">
     <ul>
-        <li><router-link to="/"><i class="fa fa-home" aria-hidden="true"></i></router-link></li>
+     
         <li v-for="part in breadcrumbParts">
-            <router-link v-if="part.link" :to="part.link"><i v-if="part.icon_class" :class="part.icon_class" aria-hidden="true"></i>{{part.label|_}}</router-link>
-            <a v-else href="#" @click.prevent><i v-if="part.icon_class" :class="part.icon_class" aria-hidden="true"></i>{{part.label|_}}</a>
+            <router-link v-if="part.link" :to="part.link">{{part.label|_}}</router-link>
+            <a v-else href="#" @click.prevent>{{part.label|_}}</a>
         </li>
-<!--
-        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i>{{'Sales'|_}}</a></li>
-        <li><a href="#">{{'Orders'|_}}</a></li>
--->
         <li class="penultimate">
             <a href="#" @click.prevent><i v-if="curPage.icon_class" :class="curPage.icon_class" aria-hidden="true"></i>{{curPage.label|_}}</a>
         </li>

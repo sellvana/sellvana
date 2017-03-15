@@ -1,4 +1,5 @@
-<div class="dropdown filter" :class="{open:ddOpen(grid.config.id+'/panel-filters')}"> <a href="#" class="filter-toggle" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"><span>{{'Filter'|_}}</span><b class="caret"></b></a>
+<div class="dropdown filter params-left" :class="{open:ddOpen(grid.config.id+'/panel-filters')}">
+	<a href="#" class="filter-toggle temporary-icon" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"></a>
 	<div class="dropdown-menu" @click.stop="ddOpClear()">
 		<form class="select-filter">
 			<select2 v-model="filterToAdd" :params="addFilterSelect2Params" :options="availableFilters">
@@ -11,7 +12,7 @@
 				<div class="input-group" v-for="(flt, i) in addedFilters">
 					<div>
 						<label>{{flt.config.label|_}}</label>
-						 <a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
+						<a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
 					</div>
 					<div>
 						<div class="input-group-addon dropdown" :class="{open:ddOpOpen(flt)}">
@@ -35,14 +36,15 @@
 							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.from">
 							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="form-control" v-model="flt.to">
 							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="form-control" v-model="flt.to">
-							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.to"></div>
+							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="form-control" v-model="flt.to">
+						</div>
 					</div>
 				</div>
 			</li>
 		</ul>
 		<div class="control-buttons-block text-right">
-			<button class="button1" type="button" @click="resetFilters()">{{'Reset'|_}}</button>
-			<button class="button2" type="button" @click="applyFilters()">{{'Apply Filters'|_}}</button>
+			<button class="button2" type="button" @click="resetFilters()">{{'Reset'|_}}</button>
+			<button class="button1" type="button" @click="applyFilters()">{{'Apply Filters'|_}}</button>
 		</div>
 	</div>
 </div>

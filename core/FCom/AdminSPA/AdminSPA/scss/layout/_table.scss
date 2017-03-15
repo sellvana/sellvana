@@ -1,27 +1,19 @@
 table {
 	min-width: 100%;
-	td,
-	th {
-		position: relative;
-		padding: 7px 10px;
-	}
 	thead {
 		border-bottom: 1px solid #ebebeb;
-		.fa {
-			margin-right: 10px;
-		}
 		.fa-caret-up {
-			position: absolute;
-			left: 8px;
-			top: 16px;
+			left: 7.5px;
+			top: -3px;
+			position: relative;
 		}
 		.fa-caret-down {
-			position: absolute;
-			left: 8px;
-			top: 22px;
+			left: 0;
+			top: 4px;
+			position: relative;
 		}
 		a {
-			padding: 17px 0 17px 20px;
+			padding: 0 9px;
 			display: inline-block;
 			width: 100%;
 		}
@@ -30,7 +22,7 @@ table {
 			color: #000;
 		}
 		span, a {
-			color: #474646;
+			color: #85a5bd;
 		}
 	}
 	tbody {
@@ -48,72 +40,56 @@ table {
 			color: #dddddd;
 			margin: 0 2px;
 		}
-		a:hover {
-			i {
-				color: #000;
-			}
-		}
 	}
 	.sorted-up,
 	.sorted-down {
 		i {
-			color: #7379db;
-			top: 18px;
+			color: #0086c0;
+			top: 0px;
+			position: relative;
+			left: 4px;
 		}
-	}
-	.column-row-select {
-		width: 50px;
-		padding: 0;
-		min-width: auto;
-		text-align: left;
-	}
-	.column-actions {
-		width: 70px;
-		padding: 0;
-		min-width: auto;
-		text-align: left;
 	}
 	.selected {
 		background: #fdfcfc;
 	}
-	
 }
 
 .fixed-table {
-	border-bottom: 1px solid #000000;
-	td,
-	th {
-		white-space: nowrap;
-		height: 49px;
-		padding: 10px 0 10px 20px;
-	}
 	thead {
 		border-bottom: 1px solid #000000;
 		td,
 		th {
 			padding: 0;
+			a {
+				color: #85a5bd;
+				font-weight: bold;
+			}		
 		}
 	}
 	tbody {
+		td,
+		th {
+			white-space: nowrap;
+			height: 43px;
+			padding: 0 8px;
+			font-size: 13px;
+			border: 1px solid #f3f3f3;
+		}
 		tr {
 			border-bottom: 1px solid #f8f8f8;
 		}
-		tr:last-child {
-			border-bottom: 0;
+		.column-row-select {
+			border-right: 0;
 		}
-		tr:hover {
-			background: #fdfcfc;
-			td, a, i {
-				color: #000;
-			}
+		th:nth-child(2) {
+			border-left: 0;
+		}
+		tr:nth-child(odd) {
+			background-color: #fafafa;
 		}
 	}
-	.column-row-select {
-		width: 50px;
-		padding: 0 10px;
-		min-width: auto;
-		text-align: left;
-	}
+	
 	.column-actions {
 		width: 70px;
 		padding: 0 10px;
@@ -123,6 +99,7 @@ table {
 	.thumb_path {
 		padding: 10px 10px 10px 10px;
 	}
+
 }
 
 .striped-table {

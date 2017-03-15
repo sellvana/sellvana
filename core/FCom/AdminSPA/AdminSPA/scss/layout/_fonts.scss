@@ -1,161 +1,27 @@
 @font-face {
-	font-family: "GothamProRegular";
-	src: url("../fonts/GothamProRegular/GothamProRegular.eot");
-	src: url("../fonts/GothamProRegular/GothamProRegular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/GothamProRegular/GothamProRegular.woff") format("woff"),
-		url("../fonts/GothamProRegular/GothamProRegular.ttf") format("truetype");
+	font-family: "SFUIDisplayRegular";
+	src: url("../fonts/SFUIDisplayRegular/SFUIDisplayRegular.eot");
+	src: url("../fonts/SFUIDisplayRegular/SFUIDisplayRegular.eot?#iefix")format("embedded-opentype"),
+		url("../fonts/SFUIDisplayRegular/SFUIDisplayRegular.woff") format("woff"),
+		url("../fonts/SFUIDisplayRegular/SFUIDisplayRegular.ttf") format("truetype");
 	font-style: normal;
 	font-weight: normal;
 }
 @font-face {
-	font-family: "GothamProRegular";
-	src: url("../fonts/GothamProRegular/GothamProRegular.eot");
-	src: url("../fonts/GothamProRegular/GothamProRegular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/GothamProRegular/GothamProRegular.woff") format("woff"),
-		url("../fonts/GothamProRegular/GothamProRegular.ttf") format("truetype");
+	font-family: "SFUIDisplayRegular";
+	src: url("../fonts/SFUIDisplayMedium/SFUIDisplayMedium.eot");
+	src: url("../fonts/SFUIDisplayMedium/SFUIDisplayMedium.eot?#iefix")format("embedded-opentype"),
+		url("../fonts/SFUIDisplayMedium/SFUIDisplayMedium.woff") format("woff"),
+		url("../fonts/SFUIDisplayMedium/SFUIDisplayMedium.ttf") format("truetype");
 	font-style: normal;
-	font-weight: normal;
+	font-weight: 500;
 }
 @font-face {
-	font-family: "GothamProRegular";
-	src: url("../fonts/GothamProBold/GothamProBold.eot");
-	src: url("../fonts/GothamProBold/GothamProBold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/GothamProBold/GothamProBold.woff") format("woff"),
-		url("../fonts/GothamProBold/GothamProBold.ttf") format("truetype");
+	font-family: "SFUIDisplayRegular";
+	src: url("../fonts/SFUIDisplayBold/SFUIDisplayBold.eot");
+	src: url("../fonts/SFUIDisplayBold/SFUIDisplayBold.eot?#iefix")format("embedded-opentype"),
+		url("../fonts/SFUIDisplayBold/SFUIDisplayBold.woff") format("woff"),
+		url("../fonts/SFUIDisplayBold/SFUIDisplayBold.ttf") format("truetype");
 	font-style: normal;
 	font-weight: bold;
 }
-@font-face {
-	font-family: "GothamProMedium";
-	src: url("../fonts/GothamProMedium/GothamProMedium.eot");
-	src: url("../fonts/GothamProMedium/GothamProMedium.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/GothamProMedium/GothamProMedium.woff") format("woff"),
-		url("../fonts/GothamProMedium/GothamProMedium.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-@font-face {
-	font-family: "GothamProMedium";
-	src: url("../fonts/GothamProBold/GothamProBold.eot");
-	src: url("../fonts/GothamProBold/GothamProBold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/GothamProBold/GothamProBold.woff") format("woff"),
-		url("../fonts/GothamProBold/GothamProBold.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-
-@font-face {
-	font-family: "Avenir";
-	src: url("../fonts/Avenir/Avenir-Roman.eot");
-	src: url("../fonts/Avenir/Avenir-Roman.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Avenir/Avenir-Roman.woff") format("woff"),
-		url("../fonts/Avenir/Avenir-Roman.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-
-@font-face {
-	font-family: "Avenir";
-	src: url("../fonts/Avenir-Bold/Avenir-Bold.eot");
-	src: url("../fonts/Avenir-Bold/Avenir-Bold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Avenir-Bold/Avenir-Bold.woff") format("woff"),
-		url("../fonts/Avenir-Bold/Avenir-Bold.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-@font-face {
-	font-family: "HelveticaNeue";
-	src: url("../fonts/HelveticaNeue/HelveticaNeue.eot");
-	src: url("../fonts/HelveticaNeue/HelveticaNeue.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/HelveticaNeue/HelveticaNeue.woff") format("woff"),
-		url("../fonts/HelveticaNeue/HelveticaNeue.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-
-@font-face {
-	font-family: "HelveticaNeue";
-	src: url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.eot");
-	src: url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.woff") format("woff"),
-		url("../fonts/HelveticaNeue-Bold/HelveticaNeueCyr-Bold.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-@font-face {
-	font-family: "Proxima";
-	src: url("../fonts/Proxima/ProximaNova-Regular.eot");
-	src: url("../fonts/Proxima/ProximaNova-Regular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Proxima/ProximaNova-Regular.woff") format("woff"),
-		url("../fonts/Proxima/ProximaNova-Regular.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-@font-face {
-	font-family: "Proxima";
-	src: url("../fonts/Proxima-Bold/ProximaNova-Bold.eot");
-	src: url("../fonts/Proxima-Bold/ProximaNova-Bold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/Proxima-Bold/ProximaNova-Bold.woff") format("woff"),
-		url("../fonts/Proxima-Bold/ProximaNova-Bold.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-@font-face {
-	font-family: "Lato";
-	src: url("../fonts/LatoRegular/LatoRegular.eot");
-	src: url("../fonts/LatoRegular/LatoRegular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/LatoRegular/LatoRegular.woff") format("woff"),
-		url("../fonts/LatoRegular/LatoRegular.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-@font-face {
-	font-family: "Lato";
-	src: url("../fonts/LatoBold/LatoBold.eot");
-	src: url("../fonts/LatoBold/LatoBold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/LatoBold/LatoBold.woff") format("woff"),
-		url("../fonts/LatoBold/LatoBold.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-@font-face {
-	font-family: "Futura";
-	src: url("../fonts/FuturaRegular/FuturaRegular.eot");
-	src: url("../fonts/FuturaRegular/FuturaRegular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/FuturaRegular/FuturaRegular.woff") format("woff"),
-		url("../fonts/FuturaRegular/FuturaRegular.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-@font-face {
-	font-family: "Futura";
-	src: url("../fonts/FuturaBold/FuturaBold.eot");
-	src: url("../fonts/FuturaBold/FuturaBold.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/FuturaBold/FuturaBold.woff") format("woff"),
-		url("../fonts/FuturaBold/FuturaBold.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-@font-face {
-	font-family: "din";
-	src: url("../fonts/dinRegular/dinRegular.eot");
-	src: url("../fonts/dinRegular/dinRegular.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/dinRegular/dinRegular.woff") format("woff"),
-		url("../fonts/dinRegular/dinRegular.ttf") format("truetype");
-	font-style: normal;
-	font-weight: normal;
-}
-@font-face {
-	font-family: "din";
-	src: url("../fonts/dinMedium/dinMedium.eot");
-	src: url("../fonts/dinMedium/dinMedium.eot?#iefix")format("embedded-opentype"),
-		url("../fonts/dinMedium/dinMedium.woff") format("woff"),
-		url("../fonts/dinMedium/dinMedium.ttf") format("truetype");
-	font-style: normal;
-	font-weight: bold;
-}
-
-
-
-
-
