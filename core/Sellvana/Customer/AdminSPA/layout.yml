@@ -13,7 +13,7 @@
 			
     - view: app
         do:
-            - [ addNav, { path: /customers, label: Customers, icon_class: "fa fa-user", pos: 40 } ]
+            - [ addNav, { path: /customers, label: Customers, icon: "icon-customers", pos: 40 } ]
             - [ addNav, { path: /customers/customers, label: Customers, link: /customers, pos: 10 } ]
             - [ addNav, { path: /customers/customers-import, label: Customers CSV Import, link: /customers-import, pos: 20 } ]
 

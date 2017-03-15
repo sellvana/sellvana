@@ -28,8 +28,8 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 ['name' => 'id', 'label' => 'Internal ID'],
                 ['name' => 'unique_id', 'label' => 'Order ID'],
                 ['name' => 'state_overall', 'label' => 'Overall State', 'options' => $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels()],
-                ['name' => 'customer_firstname', 'label' => 'Last Name'],
-                ['name' => 'customer_lastname', 'label' => 'Last Name'],
+                ['name' => 'billing_firstname', 'label' => 'Last Name'],
+                ['name' => 'billing_lastname', 'label' => 'Last Name'],
                 ['name' => 'customer_email', 'label' => 'Email'],
                 ['name' => 'create_at', 'label' => 'Created', 'type' => 'date']
             ],

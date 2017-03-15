@@ -28,14 +28,14 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
             $this->forward(false);
             return $this;
         }
-        $this->layout('/catalog/product');
-        $this->BEvents->fire(__METHOD__ . ':product', ['product' => &$product]);
-        $this->BApp->set('current_product', $product);
-
         $viewName = $product->get('custom_details_view') ?: 'catalog/product/details';
         $layout->getView($viewName)->set('product', $product);
         $head = $layout->getView('head');
         $layout->hookView('main', $viewName);
+
+        $this->layout('/catalog/product');
+        $this->BEvents->fire(__METHOD__ . ':product', ['product' => &$product]);
+        $this->BApp->set('current_product', $product);
 
         $categoryPath = $this->BRequest->param('category');
         

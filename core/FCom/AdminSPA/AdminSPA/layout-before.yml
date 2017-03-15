@@ -192,14 +192,14 @@
         do:
             - [ addModule, FCom_AdminSPA ]
 
-            - [ addNav, { label: Dashboard, path: /dashboard, link: /, icon_class: "fa fa-tachometer", pos: 10 }]
+            - [ addNav, { label: Dashboard, path: /dashboard, link: /, icon: "icon-dashboard", pos: 10 }]
 
-            - [ addNav, { label: Reports, path: /reports, icon_class: "fa fa-filter", pos: 80 }]
+            - [ addNav, { label: Reports, path: /reports, icon: "icon-report", pos: 80 }]
 
-            - [ addNav, { label: Modules, path: /modules, icon_class: "fa fa-puzzle-piece", pos: 90 }]
+            - [ addNav, { label: Modules, path: /modules, icon: "icon-modules", pos: 90 }]
             - [ addNav, { label: Manage Modules, path: /modules/manage, link: /modules, pos: 10 }]
 
-            - [ addNav, { label: System, path: /system, icon_class: "fa fa-cog", pos: 100 }]
+            - [ addNav, { label: System, path: /system, icon: "icon-settings", pos: 100 }]
             - [ addNav, { label: Users, path: /system/users, link: /users, pos: 10 }]
             - [ addNav, { label: Roles & Permissions, path: /system/roles, link: /roles, pos: 20 }]
             - [ addNav, { label: Global Import / Export, path: /system/import-export, link: /import-export, pos: 30 }]

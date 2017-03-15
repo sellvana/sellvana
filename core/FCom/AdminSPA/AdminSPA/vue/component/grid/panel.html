@@ -19,7 +19,7 @@
 	
     
 	 <div class="filter-params params-right" :class="{open:ddOpen('columns-open')}">
-		 <div class="temporary-icon"  @click.prevent.stop="ddToggle('columns-open')"></div>
+		 <div class="temporary-icon"  @click="ddToggle('columns-open')"></div>
 		 <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
 		 <sv-comp-grid-panel-export v-if="grid.config && grid.config.export" :grid="grid"></sv-comp-grid-panel-export>
 	 </div>

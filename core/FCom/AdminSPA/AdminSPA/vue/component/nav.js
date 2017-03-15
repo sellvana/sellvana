@@ -1,5 +1,6 @@
 define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
     var SvCompNav = {
+        mixins: [SvHlp.mixins.common],
         store: SvHlp.store,
         data: function () {
             return {

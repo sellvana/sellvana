@@ -463,6 +463,12 @@ console.log('onError', err.xhr);
                                 return 1;
                             }
                         }
+                    },
+                    svgIconLink: function () {
+                        return function (icon) {
+                            return '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' +
+                                SvAppData.modules.FCom_AdminSPA.src_root + '/AdminSPA/img/icons.svg#' + icon + '"></use>';
+                        }
                     }
                 },
                 methods: {

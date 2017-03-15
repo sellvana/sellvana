@@ -50,7 +50,7 @@
 
     - view: app
         do:
-            - [ addNav, { path: /catalog, label: Catalog, icon_class: "fa fa-book", pos: 30 } ]
+            - [ addNav, { path: /catalog, label: Catalog, icon: "icon-catalog", pos: 30 } ]
             - [ addNav, { path: /catalog/categories, label: Navigation, link: /catalog/categories, pos: 10 } ]
             - [ addNav, { path: /catalog/products, label: Products, link: /catalog/products, pos: 20 } ]
             - [ addNav, { path: /catalog/inventory, label: Inventory, link: /catalog/inventory, pos: 30 } ]

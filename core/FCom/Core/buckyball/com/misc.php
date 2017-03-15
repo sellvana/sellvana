@@ -1270,6 +1270,22 @@ class BUtil extends BClass
         return base64_encode(pack('H*', hash('sha512', $str)));
     }
 
+    public function mergeHttpHeaders(array $headerSets)
+    {
+        $result = [];
+        foreach ($headerSets as $headers) {
+            foreach ($headers as $k => $h) {
+                if (is_numeric($k)) {
+                    $a = explode(':', $h, 2);
+                    $result[strtolower($a[0])] = $h;
+                } elseif (null !== $h) {
+                    $result[strtolower($k)] = $k . ': ' . $h;
+                }
+            }
+        }
+        return array_values($result);
+    }
+
     /**
      * @var
      */
@@ -1349,27 +1365,15 @@ class BUtil extends BClass
             }
         }
 
-        foreach ([
+        $headers = $this->mergeHttpHeaders([$headers, [
             'Expect' => '', //Fixes the HTTP/1.1 417 Expectation Failed
             'Referer' => $this->BRequest->currentUrl(),
             'Accept' => '*/*',
             'Content-Type' => $contentType,
             'Content-Length' => $postContent ? strlen($postContent) : null,
-        ] as $header => $value) {
-            $found = false;
-            foreach ($headers as $h) {
-                if (stripos($h, $header . ':') === 0) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found && $value !== null) {
-                $headers[] = $header . ': ' . $value;
-            }
-        }
+        ]]);
 
-
-        if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
+        if (($useCurl && function_exists('curl_init')) || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
