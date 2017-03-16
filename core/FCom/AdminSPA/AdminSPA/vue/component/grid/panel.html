@@ -1,8 +1,8 @@
- <div class="f-grid-filter-panel">
+<div class="f-grid-filter-panel">
 	<div class="paginations-block text-right">
 		<div class="visible-lg">
 			<span class="amount-rows"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
-		<!--	<sv-comp-grid-pager-list v-if="grid.config && grid.config.pager" :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>-->
+			<!--	<sv-comp-grid-pager-list v-if="grid.config && grid.config.pager" :grid="grid" @fetch-data="fetchData()"></sv-comp-grid-pager-list>-->
 		</div>
 		<div class="search-block">
 			<input type="text" :placeholder="'Search grid...'|_" v-model="quickSearch"/>
@@ -14,34 +14,34 @@
 			<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @bulk-action="bulkAction"></sv-comp-grid-bulk-actions>
 		</div>
 	</div>
-	
-		<sv-comp-grid-panel-filters v-if="grid.config && grid.config.filters" :grid="grid" @apply-filters="applyFilters"></sv-comp-grid-panel-filters>
-	
-    
-	 <div class="filter-params params-right" :class="{open:ddOpen('columns-open')}">
-		 <div class="temporary-icon"  @click.prevent.stop="ddToggle('columns-open')"></div>
-		 <sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
-		 <sv-comp-grid-panel-export v-if="grid.config && grid.config.export" :grid="grid"></sv-comp-grid-panel-export>
-	 </div>
-  
-    <div class="col-sm-12">
-        <div class="filter-tags">
-            <div class="filter-tag" v-for="(flt, i) in grid.filters">
-                {{flt.config.label|_}}
-                {{flt.config.ops[flt.op]}}
-               
-                    <template v-if="flt.config.type==='select' && flt.op.match(/^(in|not_in)$/)">
-                        <template v-for="(v, j) in flt.values"><span v-if="j">, </span><span>{{flt.config.options[v]}}</span></template>
-                    </template>
-                    <template v-else-if="flt.op.match(/^(between|not_between)$/)">
-                        {{'{from} and {to}'|_(flt)}}
-                    </template>
-                    <template v-else>
-                        {{flt.value}}
-                    </template>
-               
-                <a href="#" @click.prevent="removeFilter(i)"><i class="fa fa-times" aria-hidden="true"></i></a>
-            </div>
-        </div>
-    </div>
+
+	<sv-comp-grid-panel-filters v-if="grid.config && grid.config.filters" :grid="grid" @apply-filters="applyFilters"></sv-comp-grid-panel-filters>
+
+
+	<div class="filter-params params-right" :class="{open:ddOpen('columns-open')}">
+		<div class="temporary-icon"  @click="ddToggle('columns-open')"></div>
+		<sv-comp-grid-panel-columns :grid="grid"></sv-comp-grid-panel-columns>
+		<sv-comp-grid-panel-export v-if="grid.config && grid.config.export" :grid="grid"></sv-comp-grid-panel-export>
+	</div>
+
+	<div class="col-sm-12">
+		<div class="filter-tags">
+			<div class="filter-tag" v-for="(flt, i) in grid.filters">
+				{{flt.config.label|_}}
+				{{flt.config.ops[flt.op]}}
+
+				<template v-if="flt.config.type==='select' && flt.op.match(/^(in|not_in)$/)">
+					<template v-for="(v, j) in flt.values"><span v-if="j">, </span><span>{{flt.config.options[v]}}</span></template>
+				</template>
+				<template v-else-if="flt.op.match(/^(between|not_between)$/)">
+					{{'{from} and {to}'|_(flt)}}
+				</template>
+				<template v-else>
+					{{flt.value}}
+				</template>
+
+				<a href="#" @click.prevent="removeFilter(i)"><i class="fa fa-times" aria-hidden="true"></i></a>
+			</div>
+		</div>
+	</div>
 </div>
