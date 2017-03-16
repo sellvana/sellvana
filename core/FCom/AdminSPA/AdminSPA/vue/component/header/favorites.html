@@ -1,6 +1,6 @@
 <li class="dropdown favorites" :class="{open:ddOpen('header-favorites')}">
     <a href="#" :title="_('Favorites')" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-favorites')">
-        <i class="fa fa-star" aria-hidden="true"></i>
+		<svg width="20" height="19" v-html="svgIconLink('icon-star')"></svg>
     </a>
     <div class="dropdown-menu">
         <ul class="dropdown-content customScroll">

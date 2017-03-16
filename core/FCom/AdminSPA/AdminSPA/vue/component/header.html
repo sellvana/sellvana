@@ -13,9 +13,12 @@
             <nav class="navbar navbar-default">
                 <div class="logo-block">
                     <router-link class="navbar-brand  pull-left" to="/">
-                        <span class="logo"></span>
+                        
                     </router-link>
-                    <sv-comp-header-search :mobile="true"></sv-comp-header-search>
+					<span class="logo">
+						{{'ADMIN PANEL'|_}}
+					</span>
+                    <!--<sv-comp-header-search :mobile="true"></sv-comp-header-search>-->
                 </div>
                 <a class="navbar-toggle btn pull-left hidden-xs" href="#" @click.prevent="mainNavToggle()">
                     <i class="fa fa-bars" aria-hidden="true"></i>
@@ -38,15 +41,16 @@
                     <!--</select>-->
                     <sv-comp-header-search :mobile="false" class="hidden-xs"></sv-comp-header-search>
                     <ul class="nav">
-                        <li class="settings">
-                            <a href="#/settings" title="Settings" class="dropdown-collapse ">
-                                <i class="fa fa-cog" aria-hidden="true"></i>
-                            </a>
-                        </li>
+                        
                         <sv-comp-header-favorites></sv-comp-header-favorites>
-                        <sv-comp-header-account></sv-comp-header-account>
+						<li class="settings">
+							<a href="#/settings" title="Settings" class="dropdown-collapse ">
+								<svg width="20" height="19" v-html="svgIconLink('icon-columns')"></svg>
+							</a>
+						</li>
+                      <!--  <sv-comp-header-account></sv-comp-header-account>-->
                         <sv-comp-header-local-notifications></sv-comp-header-local-notifications>
-                        <sv-comp-header-chat></sv-comp-header-chat>
+                       <!-- <sv-comp-header-chat></sv-comp-header-chat>-->
                     </ul>
                 </div>
             </nav>

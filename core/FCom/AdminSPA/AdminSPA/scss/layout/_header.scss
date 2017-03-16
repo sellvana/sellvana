@@ -110,15 +110,19 @@ a:hover {
 	color: #000;
 }
 
-.nav > li > a:hover,
-.nav > li > a:focus {
-	text-decoration: none;
+.nav {
+	& > li {
+		& > a:hover, & > a:focus {
+			text-decoration: none;
+			background-color: #027eb3;
+		}
+	}
+	.open {
+		& > a:hover, & > a:focus, & > a {
+			background-color: #027eb3;
+		} 
+	}
 }
-
-.nav > li > a:focus {
-	background-color: #fff;
-}
-
 header {
 	position: fixed;
 	width: 100%;
@@ -133,8 +137,12 @@ header {
 		.favorites,
 		.chat {
 			a {
-				padding: 19px 12px 20px;
+				padding: 17px 12px 17px;
 				border: 0;
+			}
+			svg {
+				fill: #fff;
+				stroke: #fff;
 			}
 		}
 		.user-menu {
@@ -273,7 +281,7 @@ header {
 	float: left;
 	background-color: #0086c0;
 	margin-bottom: 0;
-	padding: 8px 0px;
+	padding: 0;
 	border-radius: 0;
 	margin-left: 25px;
 	white-space: nowrap;
@@ -293,22 +301,14 @@ header {
 		}
 	}
 	a {
-		padding: 10px 5px;
+		padding: 16px 5px 17px;
 		display: inline-block;
 		margin-right: 10px;
 		min-height: 40px;
 		font-size: 17px;
 		color: #fff;
 	}
-	i {
-		font-size: 18px;
-		margin-right: 10px;
-		vertical-align: middle;
-	}
-	span {
-		font-size: 13px;
-		color: #474646;
-	}
+	
 	li:nth-last-child(2), li:last-child {
 		&:after {
 			display: none;
@@ -325,21 +325,26 @@ header {
 			border-bottom: 1px solid #c5c5c5;
 		}
 	}
-	.fa-star {
-		display: none;
-		color: #efef08;
-	}
-	.on {
-		.fa-star {
-			display: block;
-		}
-		.fa-star-o {
-			display: none;
-		}
-	}
+	
 	.favorite {
-		&:hover i {
-			color: #efef08;
+		svg {
+			fill: transparent;
+			stroke: #fff;
+			stroke-width: 4px;
+		}
+		&:hover {
+			svg {
+				fill: #fff;
+				stroke: #fff;
+				stroke-width: 4px;
+			}
+		}
+		&.on {
+			svg {
+				fill: #fff;
+				stroke: #fff;
+				stroke-width: 4px;
+			}
 		}
 	}
 }
@@ -486,7 +491,7 @@ header {
 	}
 }
 
-.online i {
+/*.online i {
 	background: #7fba00;
 	border: 1px solid #7fba00;
 }
@@ -504,7 +509,7 @@ header {
 .offline i {
 	background: #fff;
 	border: 1px solid #7fba00;
-}
+}*/
 
 .badge {
 	font-size: 10px;
@@ -556,6 +561,14 @@ header {
 			text-indent: -999em;
 			margin: 10px 0 0 0px;
 		}
+	}
+	.logo {
+		position: absolute;
+		left: 0;
+		bottom: 9px;
+		text-transform: uppercase;
+		color: #fff;
+		font-size: 10px;
 	}
 }
 

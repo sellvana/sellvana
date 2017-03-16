@@ -8,7 +8,7 @@ aside {
 	bottom: 0;
 	z-index: 99999;
 	height: 100%;
-	padding: 68px 0 0 0;
+	padding: 57px 0 0 0;
 	overflow: auto;
 	span, a, i {
 		color: #2e4354;
@@ -64,15 +64,9 @@ aside {
 	li.active {
 		font-weight: 500;
 	}
-	i {
-		font-size: 16px;
-		width: 18px;
-		text-align: center;
-		&:first-child {
-			margin-right: 10px;
-		}
-	}
-	
+	.icon-block {
+		margin-right: 10px;
+	}	
 	.active {
 		span, i {
 			color: #000;
@@ -107,7 +101,7 @@ aside {
 	}
 	.nav > li > a:hover, .nav > li > a:focus {
 		text-decoration: none;
-		background-color: inherit;
+		background: #c3d2dd;
 	}
 }
 .nav {
@@ -135,10 +129,10 @@ aside {
 	opacity: 1;
 	z-index: 5;
 	overflow: visible;
+	.nav.nav-stacked li .nav.nav-stacked li a {
+		padding: 13px 15px 13px 60px;
+	}
 	.nav.nav-stacked {
-		.fa-chevron-right {
-			display: none;
-		}
 		.nav.nav-stacked  {
 			position: absolute;
 			left: 50px;
@@ -166,6 +160,13 @@ aside {
 			color: black;
 		}
 	}
+	li:hover > a > .nav-arrow {
+		transform: translateY(-50%) rotate(0deg);
+		svg {
+			fill: #ffa800;
+			stroke: #ffa800
+		}
+	}
 	& > .navigation {
 		& > .nav-stacked > li > a > span {
 			font-size: 0;
@@ -175,9 +176,12 @@ aside {
 			background-color: #eeeeee;
 			color: black;
 		}
-		& > .nav-stacked > li:hover > a {
-			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+		& > .nav > li > a > .nav-arrow {
+			display: none;
 		}
+		/*& > .nav-stacked > li:hover > a {
+			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+		}*/
 		& > .nav-stacked > li:hover > .nav-stacked > li:hover {
 			& > a > span, & > a > i {
 				color: black;
@@ -192,11 +196,11 @@ aside {
 	#main-nav.close {
 		& > .navigation > .nav > li:hover > .nav-stacked {
 			display: block;
-			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+			/*box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);*/
 		}
 		& > .navigation > .nav > li:hover > .nav-stacked > li:hover > .nav-stacked {
 			display: block;
-			box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);
+		/*	box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);*/
 			
 		}
 		& > .navigation > .nav > li > a > i:last-child {
