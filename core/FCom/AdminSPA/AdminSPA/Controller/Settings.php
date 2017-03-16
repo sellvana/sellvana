@@ -56,7 +56,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
         try {
             $data = $this->BRequest->post('data');
 
-
+            //TODO: validate for permissions and sanitize data before saving
 
             $this->addMessage('Settings have been saved', 'success');
         } catch (Exception $e) {
