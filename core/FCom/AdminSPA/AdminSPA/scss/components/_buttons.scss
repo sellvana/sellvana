@@ -30,7 +30,22 @@ button, .button {
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
 }
-
+.clear-filters {
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+	padding: 1px 10px;
+	background: #fff;
+	margin: 0px 10px 0 5px;
+	border-radius: 5px;
+	color: #2e4354;
+	border: solid 1px #979797;
+}
+.filter-tags {
+	.clear-filters {
+		padding: 5px 10px;
+	}
+}
 .button1 {
 	box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
 	background-color: #ff9000;
@@ -110,22 +125,19 @@ button, .button {
 }
 
 .button5 {
-	background-color: #f2f2f2;
-	border: 1px solid #e5e5e5;
-	color: #454d54;	
+	background-color: #dde4ea;
+	color: #2e4354;
+	font-weight: normal;
+	border-radius: 5px;
 	span {
-		color: #454d54;	
+		color: #2e4354;
 	}
-	&:focus {
+	&:active {
 		background-color: #f2f2f2;
-		border: 1px solid #e5e5e5;
+		box-shadow: inset 0 1px 3px 0 rgba(112, 112, 112, 0.5);
 	}
 	&:hover {
-		background-color: #f2f2f2;
-		color: #454d54;	
-		span {
-			color: #454d54;	
-		}
+		background-color: #b9c1c9;
 	}
 }
 

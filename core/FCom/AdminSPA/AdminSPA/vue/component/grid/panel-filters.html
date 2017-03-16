@@ -1,7 +1,10 @@
-<div class="dropdown filter params-left" :class="{open:ddOpen(grid.config.id+'/panel-filters')}">
-	<a href="#" class="filter-toggle temporary-icon" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')"></a>
-	<div class="dropdown-menu" @click.stop="ddOpClear()">
+<div class="filter params-left" :class="{open:ddOpen(grid.config.id+'/panel-filters')}">
+	<a href="#" class="filter-toggle temporary-icon" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')">
+		<svg width="21" height="21" v-html="svgIconLink('icon-filter')"></svg>
+	</a>
+	<div class="filter-option-block">
 		<form class="select-filter">
+			<label>{{'Choose field'|_}}</label>
 			<select2 v-model="filterToAdd" :params="addFilterSelect2Params" :options="availableFilters">
 				<!--<option v-for="flt in availableFilters" :value="flt.id">{{flt.text|_}}</option>-->
 			</select2>

@@ -106,12 +106,6 @@ body {
 	min-width: 317px;
 }
 
-a:focus {
-	color: inherit;
-	background-color: transparent;
-	border: 0;
-}
-
 a:hover {
 	color: #000;
 }
@@ -959,13 +953,13 @@ header {
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-	background-color: #f5f5f5;
-	color: #262626;
+	background-color: #f9f9f9;
+	color: #2e4354;
 }
 
 .select2-container--default .select2-results__option[aria-selected=true] {
 	background-color: #f5f5f5;
-	color: #262626;
+	color: #2e4354;
 }
 
 .select2-dropdown {
@@ -976,6 +970,7 @@ header {
 	border-top: none;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+	border-radius: 0 0 5px 5px;
 }
 
 @media (max-width: 1023px) {

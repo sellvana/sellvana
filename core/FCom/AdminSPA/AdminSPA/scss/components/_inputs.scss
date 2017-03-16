@@ -66,36 +66,34 @@ textarea {
 	}
 }
 .input-group-addon:first-child {
-	border-right: 1px solid #ebebeb; 
+	border-radius: 5px;
 }
 .input-group-addon:last-child {
 	border-left: 1px solid #ebebeb; 
 }
+.input-group .form-control:first-child, .input-group-addon:first-child, .input-group-btn:first-child > .btn, .input-group-btn:first-child > .btn-group > .btn, .input-group-btn:first-child > .dropdown-toggle, .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle), .input-group-btn:last-child > .btn-group:not(:last-child) > .btn {
+	border-left: 0;
+}
 .input-group-addon {
-	background-color: #f2f2f2;   
-	border: 1px solid #ebebeb;
-	border-right: 1px solid #ebebeb;
-	border-radius: 1px;
-	&:hover, &:focus, &:active {
-		background-color: #f2f2f2;
-		border: 1px solid #ebebeb;
-		border-radius: 1px;
-		border-right: 1px solid #ebebeb;
-	}
+	border: 0;
 	.filter-sub {
 		padding: 0;
 		width: auto;
 		min-width: 100%;
 		top: 30px;
+		box-shadow: none;
+		background-color: #dde4ea;
+		border-radius: 5px;
 	}
 	li {
-		border-bottom: 2px solid #fff;
+		border-bottom: 1px solid #fff;
+		a {
+			padding: 4px 10px 4px 10px;
+			color: #2e4354;
+		}
 	}
-	a {
-		padding: 4px 10px 4px 10px;
-		background-color: #f7f7f7;
-		font-family: "GothamProMedium";
-		color: #000;
+	.select2-container .select2-selection--multiple {
+		border-radius: 0 5px 5px 0;
 	}
 } 
 input::-webkit-outer-spin-button,
@@ -168,24 +166,24 @@ input::-webkit-inner-spin-button {
 	margin: 5px 3px 0px 0;
 }
 .select2-container .select2-selection--single {
-	height: 33px;
+	height: 34px;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
 	height: 100%;
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-	line-height: 33px;
+	line-height: 34px;
 }
 .f-section {
 	padding: 20px;
 }
 .select2-container--default .select2-selection--single {
-	border: 1px solid #ebebeb;
-	border-radius: 1px;
+	border: 1px solid #e8edf1;
+	border-radius: 5px;
 }
-.select2-container {
+/*.select2-container {
 	min-width: 100%;
-}
+}*/
 
 
 input[type="checkbox"]:focus + .checkbox-block {
@@ -304,6 +302,9 @@ fieldset {
 }
 .multiselect__select:before {
 	top: 54% !important;
+}
+.select2-results__option {
+	font-weight: 500;
 }
 @media (max-width: 767px) {
 	.translate-icon {

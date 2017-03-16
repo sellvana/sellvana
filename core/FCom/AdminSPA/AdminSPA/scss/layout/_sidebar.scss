@@ -27,11 +27,28 @@ aside {
 	}
 	.nav-arrow {
 		position: absolute;
-		right: 0;
+		right: 11px;
 		top: 50%;
-		transform: translateY(-50%);
+		transform: translateY(-50%) rotate(-90deg);
+		transform-origin: 50% 50%;
+		transition: 0.3s all linear;
 		svg {
-			fill: #86a6bd;
+			fill: transparent;
+			stroke: #86a6bd;
+			transition: 0.3s all linear;
+		}
+	}
+	.in {
+		background: #c3d2dd;
+		.router-link-active span {
+			font-weight: bold;
+		}
+		& > .nav-arrow {
+			transform: translateY(-50%) rotate(0deg);
+			svg {
+				fill: #ffa800;
+				stroke: #ffa800
+			}
 		}
 	}
 	.dropdown-collapse {
@@ -105,6 +122,12 @@ aside {
 		width: 50px;
 		opacity: 1;
 		overflow: visible;
+	}
+}
+.icon-block {
+	svg {
+		fill: #86a6bd;
+		stroke: #86a6bd;
 	}
 }
 #main-nav.close {
