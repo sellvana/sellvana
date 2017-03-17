@@ -135,6 +135,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     }
                 });
             }
+console.log(grid.components.datacell_columns);
         }
 
         function processDataResponse(response, grid) {
@@ -178,22 +179,22 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 setPagesize: function (ps) {
                     initGridState(this.grid);
                     Vue.set(this.grid.state, 'ps', ps);
-                    this.$emit('fetch-data');
+                    this.$emit('event', 'fetch-data');
                 },
                 goPage: function (p) {
                     initGridState(this.grid);
                     Vue.set(this.grid.state, 'p',  p);
-                    this.$emit('fetch-data');
+                    this.$emit('event', 'fetch-data');
                 },
                 goPrevPage: function () {
                     initGridState(this.grid);
                     Vue.set(this.grid.state, 'p', Math.max(this.grid.state.p * 1 - 1, 1));
-                    this.$emit('fetch-data');
+                    this.$emit('event', 'fetch-data');
                 },
                 goNextPage: function () {
                     initGridState(this.grid);
                     Vue.set(this.grid.state, 'p', Math.min(this.grid.state.p * 1 + 1, this.grid.state.mp));
-                    this.$emit('fetch-data');
+                    this.$emit('event', 'fetch-data');
                 }
             }
         };
@@ -320,7 +321,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 },
                 applyFilters: function () {
                     var filters = this.addedFilters;
-                    this.$emit('apply-filters', filters);
+                    this.$emit('event', 'apply-filters', filters);
                     this.resetFilters();
                     this.closeDropdown();
                 },
@@ -387,7 +388,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             methods: {
                 bulkAction: function (o) {
-                    this.$emit('bulk-action', o);
+                    this.$emit('event', 'bulk-action', o);
                 }
             }
         };
@@ -404,7 +405,8 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             },
             data: function() {
                 return {
-                    quickSearch: ''
+                    quickSearch: '',
+                    settingsTab: 'columns'
                 }
             },
             computed: {
@@ -413,20 +415,18 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 },
                 currentFilters: function () {
                     return _.get(this.grid, 'state.filters', []);
+                },
+                hasFilters: function () {
+                    return this.grid.filters && !_.isEmpty(this.grid.filters);
                 }
             },
             methods: {
-                fetchData: function () {
-                    this.$emit('fetch-data');
+                onEvent: function (event, arg) {
+                    this.$emit('event', event, arg);
                 },
-                applyFilters: function (filters) {
-                    this.$emit('apply-filters', filters);
-                },
-                removeFilter: function (flt) {
-                    this.$emit('remove-filter', flt);
-                },
-                bulkAction: function (act) {
-                    this.$emit('bulk-action', act);
+                setSettingsTab: function (tab) {
+console.log(tab);
+                    this.settingsTab = tab;
                 }
             },
             template: gridPanelTpl,
@@ -478,7 +478,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                                     break;
                                 }
                             } else {
-                                if ((_.isString(row[j]) || _.isNumber(row[j])) && row[j].match(q)) {
+                                if ((_.isString(row[j]) && row[j].match(q)) || (_.isNumber(row[j]) && row[j] == q)) {
                                     show = true;
                                     break;
                                 }
@@ -494,6 +494,15 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 }
             },
             methods: {
+                onEvent: function (event, arg) {
+                    switch (event) {
+                        case 'fetch-data': this.fetchData(arg); break;
+                        case 'apply-filters': this.applyFilters(arg); break;
+                        case 'remove-filter': this.removeFilter(arg); break;
+                        case 'remove-all-filters': this.removeAllFilters(arg); break;
+                        case 'bulk-action': this.bulkAction(arg); break;
+                    }
+                },
                 fetchData: function (grid) {
                     grid = grid || this.grid;
                     if (!grid.config) {
@@ -519,6 +528,13 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     }
                     this.grid.filters.splice(i, 1);
                     //Vue.set(this.grid, 'filters', filters);
+                    this.fetchData();
+                },
+                removeAllFilters: function () {
+                    if (!this.grid || !this.grid.filters) {
+                        return;
+                    }
+                    Vue.set(this.grid, 'filters', []);
                     this.fetchData();
                 },
                 bulkAction: function (act) {

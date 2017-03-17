@@ -7,7 +7,7 @@ define(['lodash', 'vue', 'sv-hlp', 'sv-comp-grid-header-cell-default', 'sv-comp-
     return {
         mixins: [SvHlp.mixins.common],
         props: ['grid'],
-        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :col="col" @fetch-data="$emit(\'fetch-data\')"></component></tr>',
+        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :col="col" @event="onEvent"></component></tr>',
         computed: {
             columns: function () {
                 return _.get(this.grid, 'config.columns', []);
@@ -20,6 +20,11 @@ define(['lodash', 'vue', 'sv-hlp', 'sv-comp-grid-header-cell-default', 'sv-comp-
                     }
                     return this.grid.components.header_columns[col.name];
                 }
+            }
+        },
+        methods: {
+            onEvent: function (event, arg) {
+                this.$emit('event', event, arg);
             }
         },
         components: {

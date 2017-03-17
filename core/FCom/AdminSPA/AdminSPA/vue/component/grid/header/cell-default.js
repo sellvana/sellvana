@@ -45,7 +45,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                 }
                 Vue.set(this.grid.state, 's', s);
                 Vue.set(this.grid.state, 'sd', sd);
-                this.$emit('fetch-data');
+                this.$emit('event', 'fetch-data');
             }
         }
     };

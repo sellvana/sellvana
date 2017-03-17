@@ -21,12 +21,12 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'data_url' => 'orders/grid_data',
             'columns' => [
                 ['type' => 'row-select'],
-                ['type' => 'actions', 'actions' => [
-                    ['type' => 'edit', 'link' => '/sales/orders/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-                    //['type' => 'delete', 'delete_url' => 'orders/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
-                ]],
+//                ['type' => 'actions', 'actions' => [
+//                    ['type' => 'edit', 'link' => '/sales/orders/form?id={id}', 'icon_class' => 'fa fa-pencil'],
+//                    //['type' => 'delete', 'delete_url' => 'orders/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
+//                ]],
                 ['name' => 'id', 'label' => 'Internal ID'],
-                ['name' => 'unique_id', 'label' => 'Order ID'],
+                ['name' => 'unique_id', 'label' => 'Order ID', 'datacell_template' => '<td><a :href="\'#/sales/orders/form?id=\'+row.id">{{row.unique_id}}</a></td>'],
                 ['name' => 'state_overall', 'label' => 'Overall State', 'options' => $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels()],
                 ['name' => 'billing_firstname', 'label' => 'Last Name'],
                 ['name' => 'billing_lastname', 'label' => 'Last Name'],
