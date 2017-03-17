@@ -31,19 +31,31 @@ button, .button {
 	}
 }
 .clear-filters {
+	background-color: #fff;
+	border: 1px solid #d67d0b;
+	color: #ff8f00;
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
 	padding: 1px 10px;
-	background: #fff;
-	margin: 0px 10px 0 5px;
+	margin: 0 5px 5px;
 	border-radius: 5px;
-	color: #2e4354;
-	border: solid 1px #979797;
+	box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
+	&:active {
+		background-color: #ff8f00;
+		box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5), inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
+	}
+	&:hover {
+		background-color: #ff8f00;
+	}
 }
 .filter-tags {
 	.clear-filters {
 		padding: 5px 10px;
+		color: #ff8f00;
+		&:hover {
+			color: #fff;
+		}
 	}
 }
 .button1 {
@@ -54,7 +66,7 @@ button, .button {
 	span {
 		color: #fff;
 	}
-	&:active, &:focus {
+	&:active {
 		background-color: #ca7302;
 		box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5), inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
 	}
@@ -71,7 +83,7 @@ button, .button {
 	span {
 		color: #ff8f00;
 	}
-	&:active, &:focus {
+	&:active {
 		background-color: #ff8f00;
 		border: solid 1px #d67d0b;
 		color: #fff;

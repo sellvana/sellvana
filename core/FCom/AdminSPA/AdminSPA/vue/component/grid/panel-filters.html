@@ -1,8 +1,8 @@
 <div class="filter params-left" :class="{open:ddOpen(grid.config.id+'/panel-filters')}">
-	<a href="#" class="filter-toggle temporary-icon" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')">
+	<a href="#" class="filter-open-button" @click.prevent.stop="ddToggle(grid.config.id+'/panel-filters')">
 		<svg width="21" height="21" v-html="svgIconLink(ddOpen(grid.config.id+'/panel-filters') ? 'icon-close' : 'icon-filter')"></svg>
 	</a>
-	<div class="filter-option-block" @click.stop>
+	<div class="filter-options-block" @click.stop>
 		<form class="select-filter">
 			<label>{{'Choose field'|_}}</label>
 			<select2 v-model="filterToAdd" :params="addFilterSelect2Params" :options="availableFilters">

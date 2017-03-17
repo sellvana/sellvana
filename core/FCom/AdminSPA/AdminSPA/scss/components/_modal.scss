@@ -12,6 +12,7 @@
 	}
 }
 
+/*
 @media (min-width: 1366px) {
 	.visible-lg {
 		display: inline-block !important;
@@ -20,11 +21,12 @@
 		display: block !important;
 	}
 }
+*/
 
 @media (max-width: 767px) {
-	.visible-xs {
+	/*.visible-xs {
 		display: inline-block !important;
-	}
+	}*/
 	.cke_reset_all {
 		.cke_dialog {
 			width: 80%;

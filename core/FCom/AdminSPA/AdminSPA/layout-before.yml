@@ -114,6 +114,7 @@
             - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
             - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
             - [ requireJs, sv-comp-grid-pager-list-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-list.html" ]
+            - [ requireJs, sv-comp-grid-pager-dropdown-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-dropdown.html" ]
             - [ requireJs, sv-comp-grid-pager-select-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-select.html" ]
             - [ requireJs, sv-comp-grid-panel-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel.html" ]
             - [ requireJs, sv-comp-grid-panel-columns-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/panel-columns.html" ]

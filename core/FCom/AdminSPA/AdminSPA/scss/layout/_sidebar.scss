@@ -25,6 +25,9 @@ aside {
 	a:hover, a:focus {
 		text-decoration: none;
 	}
+	a:hover {
+		background-color: #fefefe;
+	}
 	.nav-arrow {
 		position: absolute;
 		right: 11px;
@@ -42,17 +45,30 @@ aside {
 		background: #c3d2dd;
 		.router-link-active span {
 			font-weight: bold;
+			&:after {
+				content: '';
+				position: absolute;
+				right: 0;
+				top: 50%;
+				border: 10px solid transparent;
+				border-right: 10px solid #f1f1f1;
+				transform: translateY(-50%);
+			}
 		}
 		& > .nav-arrow {
 			transform: translateY(-50%) rotate(0deg);
-			svg {
+			/*svg {
 				fill: #ffa800;
 				stroke: #ffa800
-			}
+			}*/
 		}
+	}
+	& > .dropdown-collapse {
+		border-top: 1px solid #dde5ea;
 	}
 	.dropdown-collapse {
 		&.in {
+			border-top: 1px solid #d2d1d1;
 			span {
 				color: #000;
 			}
@@ -78,7 +94,11 @@ aside {
 	.navigation {
 		.nav.nav-stacked.in {
 			display: block;
+			border-bottom: solid 1px #d2d1d1;
 		}
+	}
+	.navigation > .nav > li .nav {
+		display: none;
 	}
 	.nav.nav-stacked {
 		li {

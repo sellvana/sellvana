@@ -2,7 +2,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
         'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
         'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-cell-row-select-tpl',
-        'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl',
+		'text!sv-comp-grid-pager-list-tpl', 'text!sv-comp-grid-pager-select-tpl', 'text!sv-comp-grid-pager-dropdown-tpl',
         'text!sv-comp-grid-panel-tpl',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
@@ -11,7 +11,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
              SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
              SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
              gridTpl, gridHeaderCellRowSelectTpl,
-             gridPagerListTpl, gridPagerSelectTpl,
+			 gridPagerListTpl, gridPagerSelectTpl, gridPagerDropdownTpl,
              gridPanelTpl,
              gridPanelColumnsTpl, gridPanelFiltersTpl,
              gridPanelExportTpl, gridBulkActionsTpl
@@ -200,6 +200,8 @@ console.log(grid.components.datacell_columns);
         };
 
         var SvCompGridPagerSelect = $.extend({}, SvCompGridPagerList, {template: gridPagerSelectTpl});
+	
+        var SvCompGridPagerDropdown = $.extend({}, SvCompGridPagerDropdown, {template: gridPagerDropdownTpl});
 
         var SvCompGridPanelColumns = {
             mixins: [SvHlp.mixins.common],
@@ -398,6 +400,7 @@ console.log(grid.components.datacell_columns);
             props: ['grid', 'cnt-visible'],
             components: {
                 'sv-comp-grid-pager-list': SvCompGridPagerList,
+				'sv-comp-grid-pager-dropdown': SvCompGridPagerDropdown,
                 'sv-comp-grid-panel-columns': SvCompGridPanelColumns,
                 'sv-comp-grid-panel-filters': SvCompGridPanelFilters,
                 'sv-comp-grid-panel-export': SvCompGridPanelExport,
@@ -550,7 +553,8 @@ console.log(tab);
                 'sv-comp-grid-header-row': SvCompGridHeaderRow,
                 'sv-comp-grid-data-row': SvCompGridDataRow,
                 'sv-comp-grid-panel': SvCompGridPanel,
-                'sv-comp-grid-pager-select': SvCompGridPagerSelect
+                'sv-comp-grid-pager-select': SvCompGridPagerSelect,
+				'sv-comp-grid-pager-dropdown': SvCompGridPagerDropdown
             },
             template: gridTpl
         };

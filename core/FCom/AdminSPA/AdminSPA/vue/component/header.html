@@ -12,22 +12,22 @@
         <div class="row">
             <nav class="navbar navbar-default">
                 <div class="logo-block">
-                    <router-link class="navbar-brand  pull-left" to="/">
-                        
+                    <router-link class="navbar-brand pull-left" to="/">
+						<span class="logo">
+							{{'ADMIN PANEL'|_}}
+						</span>
                     </router-link>
-					<span class="logo">
-						{{'ADMIN PANEL'|_}}
-					</span>
+					
                     <!--<sv-comp-header-search :mobile="true"></sv-comp-header-search>-->
                 </div>
-                <a class="navbar-toggle btn pull-left hidden-xs" href="#" @click.prevent="mainNavToggle()">
+                <a class="navbar-toggle btn pull-left" href="#" @click.prevent="mainNavToggle()">
                     <i class="fa fa-bars" aria-hidden="true"></i>
                 </a>
                 <sv-comp-header-breadcrumbs :mobile="false"></sv-comp-header-breadcrumbs>
                 <div class="navbar-right">
-                    <a class="navbar-toggle btn pull-left visible-xs" href="#" @click.prevent="mainNavToggle()">
+                  <!--  <a class="navbar-toggle btn pull-left visible-xs" href="#" @click.prevent="mainNavToggle()">
                         <i class="fa fa-bars" aria-hidden="true"></i>
-                    </a>
+                    </a>-->
                     <!--<select @change="changeBodyClass($event)">-->
                         <!--<option></option>-->
                         <!--<option>medium</option>-->
@@ -41,7 +41,6 @@
                     <!--</select>-->
                     <sv-comp-header-search :mobile="false" class="hidden-xs"></sv-comp-header-search>
                     <ul class="nav">
-                        
                         <sv-comp-header-favorites></sv-comp-header-favorites>
 						<li class="settings">
 							<a href="#/settings" title="Settings" class="dropdown-collapse ">
@@ -55,9 +54,9 @@
                 </div>
             </nav>
         </div>
-        <div class="row visible-sm visible-md">
+       <!-- <div class="row visible-sm visible-md">
             <sv-comp-header-breadcrumbs :mobile="true"></sv-comp-header-breadcrumbs>
-        </div>
+        </div>-->
     </div>
 </header>
 

@@ -1,14 +1,17 @@
-<div>
-    <ol>
-        <li v-for="opt in formatOptions">
-            <label>
-                <input type="radio" name="export" :value="opt.value" :checked="opt.value===type"/><span><i class="fa fa-circle" aria-hidden="true"></i></span><span>{{opt.label|_}}</span></label>
-        </li>
-    </ol>
-    <div class="control-buttons-block text-right">
-        <button class="button1" type="button" @click="submit()">{{'Export'|_}}</button>
-    </div>
-    <div v-show="false">
-        <iframe v-for="url in export_urls" :src="url"></iframe>
-    </div>
+<div class="option-box">
+	<ol>
+		<li v-for="opt in formatOptions">
+			<label>
+				<input type="radio" name="export" :value="opt.value" :checked="opt.value===type" />
+				<span><i class="fa fa-circle" aria-hidden="true"></i></span>
+				<span>{{opt.label|_}}</span>
+			</label>
+		</li>
+	</ol>
+	<div class="control-buttons-block text-right">
+		<button class="button1" type="button" @click="submit()">{{'Export'|_}}</button>
+	</div>
+	<div v-show="false">
+		<iframe v-for="url in export_urls" :src="url"></iframe>
+	</div>
 </div>

@@ -1,6 +1,6 @@
-<div class="breadcrumb" :class="{'visible-lg':!mobile, 'visible-xs':!mobile}">
+<div class="breadcrumb pull-left">
+	<!--:class="{'visible-lg':!mobile, 'visible-xs':!mobile}"-->
     <ul>
-     
         <li v-for="part in breadcrumbParts">
             <router-link v-if="part.link" :to="part.link">{{part.label|_}}</router-link>
             <a v-else href="#" @click.prevent>{{part.label|_}}</a>
@@ -9,6 +9,11 @@
             <a href="#" @click.prevent><i v-if="curPage.icon_class" :class="curPage.icon_class" aria-hidden="true"></i>{{curPage.label|_}}</a>
         </li>
 
-		<li><a href="#" class="favorite" :class="{on:isFavorite}" @click.prevent="toggleFavorite()"><svg width="20" height="19" v-html="svgIconLink('icon-star')"></svg></a></li>
+		<li>
+			<a href="#" class="favorite" :class="{on:isFavorite}" @click.prevent="toggleFavorite()">
+				<i class="fa fa-star-o" aria-hidden="true"></i>
+				<i class="fa fa-star" aria-hidden="true"></i>
+  	 		</a>
+  	 	</li>
     </ul>
 </div>
