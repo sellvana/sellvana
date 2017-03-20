@@ -187,6 +187,21 @@ header {
 			padding: 8px 10px 8px 10px;
 			border-radius: 5px;
 			background: transparent;
+
+			&::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+				color:    #fff;
+			}
+			&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+				color:    #fff;
+				opacity:  1;
+			}
+			&::-moz-placeholder { /* Mozilla Firefox 19+ */
+				color:    #fff;
+				opacity:  1;
+			}
+			&:-ms-input-placeholder { /* Internet Explorer 10-11 */
+				color:    #fff;
+			}
 		}
 	}
 }

@@ -135,7 +135,6 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     }
                 });
             }
-console.log(grid.components.datacell_columns);
         }
 
         function processDataResponse(response, grid) {
@@ -201,7 +200,7 @@ console.log(grid.components.datacell_columns);
 
         var SvCompGridPagerSelect = $.extend({}, SvCompGridPagerList, {template: gridPagerSelectTpl});
 	
-        var SvCompGridPagerDropdown = $.extend({}, SvCompGridPagerDropdown, {template: gridPagerDropdownTpl});
+        var SvCompGridPagerDropdown = $.extend({}, SvCompGridPagerList, {template: gridPagerDropdownTpl});
 
         var SvCompGridPanelColumns = {
             mixins: [SvHlp.mixins.common],

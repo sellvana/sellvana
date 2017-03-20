@@ -275,6 +275,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         if (!empty($config['filters'])) {
             $indexes = $this->BUtil->arraySeqToMap($config['filters'], 'field', 'index');
             $types = $this->BUtil->arraySeqToMap($config['filters'], 'field', 'type');
+
             foreach ($filters as $fId => &$f) {
                 if (is_array($f)) {
                     $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
@@ -291,6 +292,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 }
             }
             unset($f);
+
             foreach ($config['filters'] as $fId => $f) {
                 if ($fId === '_quick') {
                     if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
@@ -302,34 +304,34 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                     }
                     break;
                 } elseif (!empty($f['field'])) {
-                    $configFilterFields[$f['field']] = 1;
+                    $configFilterFields[$f['field']] = $fId;
                 }
             }
         }
         foreach ($filters as $fId => $f) {
             if ($fId === '_quick'
                 || !is_array($f)
+                || empty($f['field'])
                 || empty($f['type'])
-                || (!isset($f['val']) && !isset($f['from']) && !isset($f['to']))
-                || $f['val'] === ''
-                || (empty($f['val']) && $f['val'] !== 0 && $f['val'] !== '0')
-                || empty($configFilterFields[$f['field']])
+                || !isset($configFilterFields[$f['field']])
+                || ((!isset($f['val']) || $f['val'] === '') && (!isset($f['from']) || $f['from'] === '') && (!isset($f['to']) || $f['to'] === ''))
             ) {
                 continue;
             }
 
             $stop = false;
-            if (!empty($f['callback'])) {
+            $fieldConfig = $config['filters'][$configFilterFields[$f['field']]];
+            if (!empty($fieldConfig['callback'])) {
                 $gridId = $config['id'];
-                $stop = $this->{$gridId}->{$f['callback']}($f, $filters[$fId]['val'], $orm);
+                $stop = $this->{$gridId}->{$fieldConfig['callback']}($fieldConfig, $filters[$fId]['val'], $orm);
             }
             if (!$stop) {
-                $this->_defaultFilterCallback($f, $orm);
+                $this->_defaultFilterCallback($fieldConfig, $f, $orm);
             }
         }
     }
 
-    protected function _defaultFilterCallback($f, $orm)
+    protected function _defaultFilterCallback($fieldConfig, $f, $orm)
     {
         switch ($f['type']) {
             case 'text':
@@ -376,7 +378,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                     switch ($f['op']) {
                         case 'between':
                             $this->_processGridFiltersOne($f, 'gte', $from, $orm);
-                            if (isset($temp[1])) {
+                            if ($to) {
                                 $this->_processGridFiltersOne($f, 'lte', $to, $orm);
                             }
                             break;
