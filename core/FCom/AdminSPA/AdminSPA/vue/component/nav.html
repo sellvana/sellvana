@@ -31,9 +31,25 @@
                                 </template>
                             </li>
                         </ul>
+						
                     </template>
                 </li>
             </ul>
         </div>
     </nav>
+	<div class="account-menu">
+		<div class="dropdown user-menu" :class="{open: ddOpen('account')}">
+			<a href="#" title="Login menu" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('account')">
+				<img src="" class='img-circle' width="47" height="47"/>
+			{{'John'|_}} {{'Rich'|_}} <i class="fa fa-chevron-down" aria-hidden="true"></i>
+				
+			</a>
+			<ul class="dropdown-menu">
+				<li><router-link to="/profile"><i class="fa fa-user" aria-hidden="true"></i> Profile</router-link></li>
+				<li><router-link to="/calendar"><i class="fa fa-calendar" aria-hidden="true"></i> Calendar / To Do</router-link></li>
+				<li><router-link to="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i>Sign out</router-link></li>
+			</ul>
+
+		</div>
+	</div>
 </aside>

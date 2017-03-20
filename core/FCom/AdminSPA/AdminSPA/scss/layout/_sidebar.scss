@@ -9,15 +9,21 @@ aside {
 	z-index: 99999;
 	height: 100%;
 	padding: 57px 0 0 0;
-	overflow: auto;
 	span, a, i {
 		color: #2e4354;
 	}
+}
+.account-menu {
+	position: fixed;
+	left: 20px;
+	bottom: 20px;
 }
 #main-nav {
 	display: inline-block;
 	width: 100%;
 	padding: 0;
+	overflow: auto;
+	max-height: calc(100% - 90px);
 	* {
 		font-size: 13px;
 		vertical-align: middle;
@@ -119,9 +125,13 @@ aside {
 			}
 		}
 	}
-	.nav > li > a:hover, .nav > li > a:focus {
+	.nav > li > a:hover, .nav > li > a.in:focus {
 		text-decoration: none;
 		background: #c3d2dd;
+	}
+	.nav > li > a:focus {
+		text-decoration: none;
+		background: #dde5ea;
 	}
 }
 .nav {

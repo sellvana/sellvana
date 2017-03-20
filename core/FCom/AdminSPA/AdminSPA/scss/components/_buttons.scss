@@ -58,6 +58,28 @@ button, .button {
 		}
 	}
 }
+.action-button {
+	border-radius: 3px;
+	border: solid 1px #d0dae3;
+	display: inline-block;
+	width: 34px;
+	padding: 0 2px;
+	margin-bottom: 7px;
+	position: relative;
+	.caret-back {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+	.caret {
+		margin: 0;
+	}
+}
+.open {
+	.action-button {
+		border-radius: 3px 3px 0 0;
+	}	
+}
 .button1 {
 	box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
 	background-color: #ff9000;

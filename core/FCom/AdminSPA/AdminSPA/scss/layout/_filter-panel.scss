@@ -366,6 +366,12 @@
 			color: #a2aeb8;
 		}
 	}
+	.prev-page {
+		padding: 3px 0 3px 12px;
+	}
+	.next-page {
+		padding: 3px 12px 3px 0px;
+	}
 	.dropdown {
 		vertical-align: middle;
 		display: inline-block;
@@ -410,11 +416,6 @@
 			}
 			&:active {
 				box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5);
-			}
-		}
-		li:first-child {
-			a {
-				border-radius: 5px 5px 0 0;
 			}
 		}
 		li:last-child {
