@@ -14,28 +14,17 @@
         <li>{{'of'|_}}<span>{{numPages}}</span></li>
         <li class="next"><a href="#" @click.prevent="goNextPage()">{{'Next'|_}}</a></li>
     </ul>-->
-    <a href="#" class="prev-page">
+    <a href="#" class="prev-page" @click.prevent="goPrevPage()">
 		<i class="fa fa-caret-left" aria-hidden="true"></i>
     </a>
-	<div class="dropdown open">
-		<a href="#" data-toggle="dropdown" class="dropdown-toggle" >1
+	<div class="dropdown" :class="{open:ddOpen(ddName)}">
+		<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(ddName)">{{curPage}}
 			<span class="caret-back"><b class="caret"></b></span></a>
-    	<ul class="dropdown-menu">
-			<li><a href="#">1</a></li>
-			<li><a href="#">2</a></li>
-			<li><a href="#">3</a></li>
-			<li><a href="#">4</a></li>
-			<li><a href="#">5</a></li>
-			<li><a href="#">6</a></li>
-			<li><a href="#">7</a></li>
-			<li><a href="#">8</a></li>
-			<li><a href="#">9</a></li>
-			<li><a href="#">10</a></li>
-			<li><a href="#">11</a></li>
-			<li><a href="#">12</a></li>
+    	<ul class="dropdown-menu" @click.stop>
+			<li v-for="p in numPages"><a href="#" @click.prevent="goPage(p)">{{p}}</a></li>
     	</ul>
     </div>
-	<a href="#" class="next-page">
+	<a href="#" class="next-page" @click.prevent="goNextPage()">
 		<i class="fa fa-caret-right" aria-hidden="true"></i>
 	</a>
 </div>

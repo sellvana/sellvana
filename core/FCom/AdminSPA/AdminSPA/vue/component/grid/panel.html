@@ -41,7 +41,7 @@
 				<input type="text" :placeholder="'Search grid...'|_" v-model="quickSearch" />
 			</div>
 			<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @event="onEvent"></sv-comp-grid-bulk-actions>
-			<sv-comp-grid-pager-dropdown></sv-comp-grid-pager-dropdown>
+			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent"></sv-comp-grid-pager-dropdown>
 		</div>
 	</div>
 </div>

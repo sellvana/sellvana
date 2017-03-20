@@ -63,7 +63,6 @@
             - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8" ]
             - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
             - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]
-            #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-beta.13.min" ]
             - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
             - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
             #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
@@ -79,7 +78,9 @@
             - [ requireJs, vue-dropzone, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue2-dropzone" ]
 
             - [ requireJs, vue-select, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select-2.1.8" ]
-            - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
+            #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
+            - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-b15.min" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-b15.min.css" ]
 
             - [ requireJs, vue-password-strength-meter, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-password-strength-meter-0.1.1" ]
 
