@@ -13,7 +13,7 @@
 		</div>
 	</div>
 
-	<div class="col-sm-6">
+	<div class="col-lg-6">
 		<div class="filter-tags">
 			<div class="filter-tag" v-for="(flt, i) in grid.filters">
 				{{flt.config.label|_}} {{flt.config.ops[flt.op]}}
@@ -34,7 +34,7 @@
 		</div>
 	</div>
 
-	<div class="col-sm-6">
+	<div class="col-lg-6">
 		<div class="paginations-block text-right">
 			<span class="amount-rows"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
 			<div class="search-block">

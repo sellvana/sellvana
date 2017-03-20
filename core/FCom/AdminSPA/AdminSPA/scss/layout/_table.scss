@@ -44,10 +44,11 @@ table {
 	.sorted-up,
 	.sorted-down {
 		i {
-			color: #0086c0;
+			color: #0086c0 !important;
 			top: 0px;
 			position: relative;
-			left: 4px;
+			left: 7.5px;
+			font-size: 15px;
 		}
 	}
 	.selected {
@@ -66,6 +67,9 @@ table {
 				font-weight: bold;
 			}		
 		}
+		i {
+			color: #91afc6;
+		}
 	}
 	tbody {
 		td,
@@ -81,12 +85,21 @@ table {
 		}
 		.column-row-select {
 			border-right: 0;
+			width: 30px;
 		}
 		th:nth-child(2) {
 			border-left: 0;
 		}
 		tr:nth-child(odd) {
 			background-color: #fafafa;
+		}
+		a {
+			border-bottom: 1px solid #2e4354;
+			color: #2e4354;
+			&:hover {
+				color: #0086c0;
+				border-color: #0086c0;
+			}
 		}
 	}
 	

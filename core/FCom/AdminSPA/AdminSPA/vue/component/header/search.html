@@ -1,6 +1,6 @@
 <div class="search-block" :class="{'visible-xs':mobile}">
 	<div class="dropdown">
-		<button class="btn btn-link fa fa-search" name="button" type="button"></button>
+		<button class="btn btn-link" name="button" type="button"><svg width="20" height="19" v-html="svgIconLink('icon-search')"></svg></button>
 		<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch">
 		<!--<input type="text" :placeholder="'Search...'|_" class="dropdown-toggle" v-model="query" @keyup.enter="submitSearch">-->
 		<!--<div class="dropdown-menu">-->

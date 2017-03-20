@@ -124,7 +124,6 @@ header {
 	left: 0;
 	top: 0;
 	z-index: 999999;
-	background: #0086c0;
 	min-width: 317px;
 	.nav {
 		.notification,
@@ -203,6 +202,9 @@ header {
 				color:    #fff;
 			}
 		}
+	}
+	.container-fluid {
+		background: #0086c0;
 	}
 }
 
@@ -672,34 +674,17 @@ header {
 		}
 	}
 	button {
-		border: 1px solid #ebebeb;
-		background: #edf1f5;
-		padding: 9px 10px 10px;
+		padding: 8px 0px 3px;
 		position: absolute;
-		color: #656978;
 		right: 0;
 		top: 0;
 		z-index: 1;
 		text-shadow: none;
 		margin: 0;
-		display: none;
-		&:hover {
-			background: #dee5ec;
-			color: #373940;
-			text-decoration: none;
-		}
-		&:focus,
-		&:active,
-		&:active:focus {
-			outline: none;
-			text-decoration: none;
-			background: #edf1f5;
-			color: #656978;
-		}
-		&:active {
-			box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.125);
-			background: #dee5ec;
-			color: #373940;
+		width: 40px;
+		svg {
+			fill: #fff;
+			stroke: #fff;
 		}
 	}
 	.dropdown-menu {
@@ -980,15 +965,45 @@ header {
 	border-radius: 0 0 5px 5px;
 }
 
-@media (max-width: 1023px) {
-	.search-block {
-		button {
-			display: block;
+@media (max-width: 1365px) {
+	header {
+		.search-block {
+			input[type="text"] {
+				width: 216px;
+			}
+			button {
+				display: inline-block;
+				width: 35px;
+			}
 		}
+	}
+	.navbar-toggle.btn.pull-left {
+		margin: 0px 0 0 35px;
 	}
 	.messages-block {
 		top: 120px;
 	}
+	.breadcrumb {
+		background-color: transparent;
+		margin-left: 272px;
+		li:after {
+			color: #000;
+		}
+		a {
+			color: #000;
+		}
+		li.penultimate {
+			a {
+				color: #000;
+			}
+		}
+	}
+	.main-nav-closed {
+		.breadcrumb {
+			margin-left: 17px;
+		}
+	}
+	
 }
 @media (max-width: 767px) {
 	.f-admin-header {
@@ -996,31 +1011,17 @@ header {
 			.navbar-brand {
 				display: inline-block;
 				padding: 0 0 0px 0;
-				float: none !important;
 				height: 40px;
 				background-size: 102px;
 				background-position: top center;
 				vertical-align: middle;
 				margin: 10px 0 0 13px;
+				position: relative;
 			}
-		}
-		.navbar-right {
-			width: 100%;
-			display: inline-block;
-			text-align: center;
-		}
-		.logo-block {
-			width: 100%;
-			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		}
 	}
 	.logo-block {
-		position: relative;
-		.search-block {
-			position: absolute;
-			right: 13px;
-			top: 9px;
-		}
+		display: none;
 	}
 	header {
 		.row {
@@ -1037,14 +1038,7 @@ header {
 			padding: 0;
 		}
 	}
-	.navbar-toggle.btn.pull-left {
-		margin: 0px 0 0 0px;
-		padding: 17px 7px 19px;
-	}
 	.breadcrumb {
-		width: 100%;
-		margin-top: 5px;
-		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		margin-left: 20px;
 		z-index: 1;
 		position: relative;
@@ -1064,12 +1058,6 @@ header {
 			}
 		}
 	}
-	header .nav .notification a,
-	header .nav .settings a,
-	header .nav .favorites a,
-	header .nav .chat a {
-		padding: 20px 10px 20px;
-	}
 	.login-status {
 		right: 10px;
 		top: 61%;
@@ -1082,16 +1070,16 @@ header {
 			right: -27px;
 		}
 	}
-	.chat {
+	/*.chat {
 		.dropdown-menu {
 			right: 0;
 			left: inherit;
 		}
-	}
-	.login-status.open > .dropdown-menu {
+	}*/
+	/*.login-status.open > .dropdown-menu {
 		right: 0;
 		left: inherit;
-	}
+	}*/
 	.nav {
 		.favorites {
 			.dropdown-menu:before {

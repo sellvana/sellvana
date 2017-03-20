@@ -63,10 +63,6 @@ aside {
 		}
 		& > .nav-arrow {
 			transform: translateY(-50%) rotate(0deg);
-			/*svg {
-				fill: #ffa800;
-				stroke: #ffa800
-			}*/
 		}
 	}
 	& > .dropdown-collapse {
@@ -74,7 +70,7 @@ aside {
 	}
 	.dropdown-collapse {
 		&.in {
-			border-top: 1px solid #d2d1d1;
+			border-top: 1px solid #0086c0;
 			span {
 				color: #000;
 			}
@@ -100,7 +96,7 @@ aside {
 	.navigation {
 		.nav.nav-stacked.in {
 			display: block;
-			border-bottom: solid 1px #d2d1d1;
+			border-bottom: solid 1px #0086c0;
 		}
 	}
 	.navigation > .nav > li .nav {
@@ -147,6 +143,17 @@ aside {
 		opacity: 1;
 		overflow: visible;
 	}
+	.dropdown-collapse {
+		&.in {
+			border-top: 1px solid #c3d2dd;
+		}
+	}
+	.navigation {
+		.nav.nav-stacked.in {
+			display: block;
+			border-bottom: solid 1px #c3d2dd;
+		}
+	}
 }
 .icon-block {
 	svg {
@@ -192,10 +199,6 @@ aside {
 	}
 	li:hover > a > .nav-arrow {
 		transform: translateY(-50%) rotate(0deg);
-		svg {
-			fill: #ffa800;
-			stroke: #ffa800
-		}
 	}
 	& > .navigation {
 		& > .nav-stacked > li > a > span {
@@ -241,11 +244,8 @@ aside {
 
 @media (max-width: 1365px) {
 	aside {
-		position: fixed;
 		left: 0;
-		top: 0;
 		width: 224px;
-		padding: 126px 0 0 0;
 		overflow: auto;
 		.fa-chevron-right {
 			display: inline-block;
@@ -260,7 +260,5 @@ aside {
 	}
 }
 @media (max-width: 767px) {
-	aside {
-		padding: 162px 0 0 0;
-	}
+	
 }
