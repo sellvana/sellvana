@@ -154,6 +154,26 @@ aside {
 			border-bottom: solid 1px #c3d2dd;
 		}
 	}
+	.account-menu {
+		left: 1px;
+		.dropdown-toggle {
+			font-size: 0;
+		}
+		.caret-back {
+			display: none;
+		}
+		.open {
+			.caret-back {
+				display: none;
+			}
+		}
+		.user-menu {
+			.dropdown-menu {
+				left: 6px;
+				right: inherit;
+			}
+		}
+	}
 }
 .icon-block {
 	svg {
@@ -223,7 +243,43 @@ aside {
 		}
 	}
 }
-
+.user-menu {
+	.dropdown-menu {
+		top: -100%;
+		left: inherit;
+		float: none;
+		min-width: auto;
+		padding: 0;
+		margin: 0;
+		background-color: transparent;
+		border: 0;
+		border-radius: 0;
+		right: 0;
+		box-shadow: none;
+		a {
+			border-radius: 5px;
+			background: #fff;
+			margin-bottom: 2px;
+			&:hover {
+				background-color: #c6c1c1;
+			}
+		}
+	}
+	.caret-back {
+		transition: transform 0.3s linear;
+		transform-origin: 50% 50%;	
+	}
+	.caret {
+		margin: 7px;
+	}
+	&.open {
+		.caret-back {
+			transform: rotate(-180deg);
+			display: inline-block;	
+			transition: transform 0.3s linear;
+		}
+	}
+}
 
 @media (min-width: 1023px) {
 	#main-nav.close {
@@ -257,6 +313,11 @@ aside {
 			left: -100%;
 			top: 0;
 		}
+	}
+	.account-menu {
+		position: absolute;
+		left: 20px;
+		bottom: 20px;
 	}
 }
 @media (max-width: 767px) {

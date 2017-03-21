@@ -13,6 +13,7 @@
     <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
         <div class="f-admin-container">
             <sv-comp-nav v-if="isLoggedIn"></sv-comp-nav>
+			<sv-comp-header-breadcrumbs :mobile="true"></sv-comp-header-breadcrumbs>
             <div class="f-admin-main-view ">
 				<router-view></router-view>
             </div>

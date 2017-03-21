@@ -1,7 +1,7 @@
 <div class="search-block">
 	<div class="hidden-xs">
 		<div class="dropdown">
-			<button class="btn btn-link" name="button" type="button">
+			<button class="btn-link" name="button" type="button">
 				<svg width="20" height="19" v-html="svgIconLink('icon-search')"></svg>
 			</button>
 			<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch">

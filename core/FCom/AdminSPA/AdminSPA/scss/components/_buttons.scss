@@ -29,35 +29,31 @@ button, .button {
 		-moz-box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 		box-shadow: inset 0 7px 13px rgba(0,0,0,.24);
 	}
-}
-.clear-filters {
-	background-color: #fff;
-	border: 1px solid #d67d0b;
-	color: #ff8f00;
-	position: relative;
-	display: inline-block;
-	vertical-align: middle;
-	padding: 1px 10px;
-	margin: 0 5px 5px;
-	border-radius: 5px;
-	box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
-	&:active {
-		background-color: #ff8f00;
-		box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5), inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
-	}
-	&:hover {
-		background-color: #ff8f00;
+	&:focus {
+		outline: none;
 	}
 }
 .filter-tags {
 	.clear-filters {
+		border-radius: 5px;
+		background-color: #ffffff;
+		border: solid 1px #d0dae3;
+		color: #2e4354;
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
 		padding: 5px 10px;
-		color: #ff8f00;
+		margin: 0 5px 5px;
+		&:active {
+			background-color: #d0dae3;
+			box-shadow: inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
+		}
 		&:hover {
-			color: #fff;
+			background-color: #d0dae3;
 		}
 	}
 }
+
 .action-button {
 	border-radius: 3px;
 	border: solid 1px #d0dae3;

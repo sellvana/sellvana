@@ -41,13 +41,13 @@
 		<div class="dropdown user-menu" :class="{open: ddOpen('account')}">
 			<a href="#" title="Login menu" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('account')">
 				<img src="" class='img-circle' width="47" height="47"/>
-			{{'John'|_}} {{'Rich'|_}} <i class="fa fa-chevron-down" aria-hidden="true"></i>
+				{{'John'|_}} {{'Rich'|_}} <span class="caret-back"><b class="caret"></b></span>
 				
 			</a>
 			<ul class="dropdown-menu">
-				<li><router-link to="/profile"><i class="fa fa-user" aria-hidden="true"></i> Profile</router-link></li>
-				<li><router-link to="/calendar"><i class="fa fa-calendar" aria-hidden="true"></i> Calendar / To Do</router-link></li>
-				<li><router-link to="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i>Sign out</router-link></li>
+				<li><router-link to="/profile">Profile</router-link></li>
+				<!--<li><router-link to="/calendar"><i class="fa fa-calendar" aria-hidden="true"></i> Calendar / To Do</router-link></li>-->
+				<li><router-link to="/logout">Sign out</router-link></li>
 			</ul>
 
 		</div>
