@@ -41,6 +41,13 @@
 		.dropdown.action {
 			margin: 0 25px;
 		}
+		.search-block {
+			button {
+				padding: 4px 0 0;
+				border: 0;
+				border-radius: 0 5px 5px 0;
+			}
+		}
 	}
 	.filter-params {
 		.dropdown {
@@ -159,6 +166,7 @@
 	}
 	&.open {
 		left: 0;
+		z-index: 1002;
 		.filter-open-button {
 			background: #d0dae3;
 			svg {
@@ -204,6 +212,7 @@
 	}
 	&.open {
 		right: 0;
+		z-index: 1002;
 		.filter-open-button {
 			background: #d0dae3;
 			svg {
@@ -654,12 +663,14 @@
 	}
 }
 
-@media (min-width: 768px) and (max-width: 1365px) {
+@media (max-width: 1365px) {
 	.params-right {
 		right: -390px;
+		top: 1px;
 	}
 	.params-left {
 		left: -430px;
+		top: 1px;
 	}
 	.f-grid-filter-panel {
 		.col-sm-8 {
@@ -670,6 +681,16 @@
 		}
 		.input-group {
 			width: 100%;
+		}
+		.filter-tags {
+			padding: 0 15px;	
+			.filter-tag, .clear-filters {
+				margin: 0px 5px 16px;
+			}
+		}
+		.paginations-block {
+			padding: 0;
+			margin: 0px 0 16px;
 		}
 	}
 	.export {
@@ -701,32 +722,13 @@
 }
 
 @media (max-width: 767px) {
-	.f-grid-filter-panel {
-		.col-sm-8 {
-			position: relative;
-		}
+	.pagination-dropdown {
+		margin: 10px 17px 10px;
 		.dropdown-toggle {
-			padding: 6px 15px;
-			width: 100%;
+			padding: 8px 21px 8px 16px;
 		}
-		.filter-toggle {
-			padding: 6px 14px;
-		}
-		.hidden-lg {
-			position: relative;
-			width: 48%;
-			right: 0;
-			top: 0;
-			display: inline-block;
-			vertical-align: middle;
-			.dropdown.action {
-				width: 100%;
-			}
-			.dropdown-menu {
-				width: 100%;
-				min-width: auto;
-			}
-		}
+	}	
+	.f-grid-filter-panel {
 		.search-block {
 			width: 48%;
 			input[type="text"] {
@@ -735,6 +737,20 @@
 		}
 		.input-group {
 			width: 100%;
+		}
+		.paginations-block {
+			text-align: center;
+			margin: 0px 0px 16px;
+			padding: 0;
+			.dropdown.action {
+				margin: 0px;
+			}
+		}
+		.col-lg-6 {
+			padding: 0;
+		}
+		.filter-tags {
+			padding: 0 30px;
 		}
 	}
 	.notification {
@@ -747,10 +763,20 @@
 		}
 	}
 	.params-right {
-		right: -390px;
+		right: -250px;
+		width: 250px;
+		top: 10px;
+		.option-box {
+			padding: 15px 3px;
+		}
 	}
 	.params-left {
-		left: -430px;
+		left: -250px;
+		width: 250px;
+		top: 10px;
+		.filter-options-block {
+			padding: 20px 5px;
+		}
 	}
 /*	.export {
 		& > .dropdown-menu {
@@ -779,7 +805,9 @@
 		}
 	}*/
 	.dropdown.action {
-		min-width: 100%;
+		width: 48%;
+		min-width: inherit;
+		vertical-align: middle;
 		.dropdown-menu {
 			width: 100%;
 			min-width: inherit;
@@ -789,7 +817,6 @@
 		}
 	}
 	.pagination > li > a {
-		padding: 10px 5px;
-		font-size: 11px;
+		padding: 6px 10px;
 	}
 }

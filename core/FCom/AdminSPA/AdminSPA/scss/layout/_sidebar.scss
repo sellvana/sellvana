@@ -260,5 +260,9 @@ aside {
 	}
 }
 @media (max-width: 767px) {
-	
+	.account-menu {
+		position: absolute;
+		left: 20px;
+		bottom: 20px;
+	}
 }
