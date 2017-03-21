@@ -18,7 +18,7 @@
 		<i class="fa fa-caret-left" aria-hidden="true"></i>
     </a>
 	<div class="dropdown" :class="{open:ddOpen(ddName)}">
-		<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(ddName)">{{curPage}}
+		<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(ddName)">{{curPage}} {{'of'|_}} {{numPages}}
 			<span class="caret-back"><b class="caret"></b></span></a>
     	<ul class="dropdown-menu" @click.stop>
 			<li v-for="p in numPages"><a href="#" @click.prevent="goPage(p)">{{p}}</a></li>

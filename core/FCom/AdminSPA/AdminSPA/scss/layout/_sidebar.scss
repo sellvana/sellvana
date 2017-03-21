@@ -70,7 +70,7 @@ aside {
 	}
 	.dropdown-collapse {
 		&.in {
-			border-top: 1px solid #0086c0;
+			border-top: 1px solid hsla(205, 28%, 80%, 1);
 			span {
 				color: #000;
 			}
@@ -96,7 +96,7 @@ aside {
 	.navigation {
 		.nav.nav-stacked.in {
 			display: block;
-			border-bottom: solid 1px #0086c0;
+			border-bottom: solid 1px hsla(205, 28%, 80%, 1);
 		}
 	}
 	.navigation > .nav > li .nav {
