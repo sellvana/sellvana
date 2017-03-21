@@ -62,14 +62,14 @@ button, .button {
 	border-radius: 3px;
 	border: solid 1px #d0dae3;
 	display: inline-block;
-	width: 34px;
-	padding: 0 2px;
+	padding: 0px 14px 0 2px;
 	margin-bottom: 7px;
 	position: relative;
 	.caret-back {
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
+		right: 2px;
 	}
 	.caret {
 		margin: 0;
