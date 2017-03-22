@@ -1,25 +1,39 @@
 .secondary-menu {
-	background: #fff;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
-	border-radius: 2px;
-	margin-bottom: 20px;
-	.nav a {
-		padding: 12px 15px;
-		color: #474646;
-	}
-	.nav .active {
-		background: #eee;
-		a {
-			color: #000;
+	li {
+		display: inline-block;
+		vertical-align: bottom;
+		&.active {
 			background: #eee;
+			a {
+				border: solid 1px #fff;
+				background: #fff;
+				font-weight: bold;
+				padding: 12px 0px;
+				width: 161px;
+			}
 		}
 	}
-	.dropdown-menu {
+	.nav {
+		a {
+			color: #2e4354;
+			padding: 7px 0px;
+			width: 161px;
+			text-align: center;
+			border-radius: 5px 5px 0 0;
+			border: solid 1px #d9d9d9;
+			&:hover {
+				background: #fff;
+			}
+		}
+	}
+		
+	
+	/*.dropdown-menu {
 		padding: 0;
 		a {
 			padding: 3px 20px;
 		}
-	}
+	}*/
 	.fa-warning, .fa-pencil {
 		float: right;
 		padding: 2px 7px;

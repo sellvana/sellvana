@@ -8,6 +8,7 @@
 	padding: 0;
 	overflow: hidden;
 	min-height: 800px;
+	padding: 0 0 60px 0;
 }
 .box-no-padding {
 	padding: 15px 0;
@@ -20,8 +21,9 @@
 }
 
 .scrollable-area {
-	width: 99%;
+	width: 100%;
 	overflow: auto;
+	padding: 0;
 	table {
 		white-space: nowrap;
 	}
