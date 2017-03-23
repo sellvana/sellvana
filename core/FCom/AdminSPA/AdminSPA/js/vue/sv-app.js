@@ -1,5 +1,5 @@
-define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-messages', 'sv-comp-nav', 'text!sv-comp-header-tpl', 'text!sv-comp-nav-tpl'],
-    function (Vue, SvHlp, SvCompHeader, SvCompMessages, SvCompNav) {
+define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-header-breadcrumbs', 'sv-comp-messages', 'sv-comp-nav', 'text!sv-comp-header-tpl', 'text!sv-comp-nav-tpl'],
+    function (Vue, SvHlp, SvCompHeader, SvCompHeaderBreadcrumbs, SvCompMessages, SvCompNav) {
 
     var SvApp = {
         el: '#sv-app',
@@ -24,7 +24,8 @@ define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-messages', 'sv-comp-nav', 't
         components: {
             'sv-comp-header': SvCompHeader,
             'sv-comp-messages': SvCompMessages,
-            'sv-comp-nav': SvCompNav
+            'sv-comp-nav': SvCompNav,
+            'sv-comp-header-breadcrumbs': SvCompHeaderBreadcrumbs,
         },
         created: function () {
             if (!this.isLoggedIn) {
