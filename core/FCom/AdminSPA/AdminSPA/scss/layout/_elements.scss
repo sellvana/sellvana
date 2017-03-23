@@ -226,7 +226,14 @@
 		}
 	}
 }
-
+.tab-counter {
+	color: #979797;
+	border-radius: 5px;
+	border: solid 1px #979797;
+	font-size: 11px;
+	padding: 0 0;
+	display: inline-block;
+}
 @media (max-width: 767px) {
 	.secondary-control-block {
 		float: none;

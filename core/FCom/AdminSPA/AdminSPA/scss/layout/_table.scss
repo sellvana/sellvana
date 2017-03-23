@@ -120,7 +120,7 @@ table {
 		background: #f8f8f8;
 	}
 	th {
-		font-weight: bold;
+		font-weight: normal;
 		color: #2d2d2d;
 		padding: 10px 0 10px 15px;
 	}
@@ -133,7 +133,12 @@ table {
 		min-width: 70px;
 	}
 }
-
+.total-table {
+	text-align: left;
+	td {
+		font-weight: bold;
+	}
+}
 .secondary-table {
 	border-bottom: 0;
 	thead {

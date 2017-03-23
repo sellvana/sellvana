@@ -58,7 +58,11 @@
 		<div class="col-lg-12">
 			<div class='secondary-menu'>
 				<ul class="nav">
-					<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+					<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)"><span>{{t.label|_}}<span class="tab-counter">1</span></span></a></li>
+					<li><a href="#"></a></li>
+					<li><a href="#"></a></li>
+					<li><a href="#"></a></li>
+					<li><a href="#"></a></li>
 				</ul>
 			</div>
 		</div>
