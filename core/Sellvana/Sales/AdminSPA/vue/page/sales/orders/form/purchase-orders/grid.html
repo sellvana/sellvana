@@ -1,0 +1,15 @@
+<div class="admin-main-content">
+	<div class="control-buttons-block text-right">
+		<button type="button" class="button button1">{{'Create New PO'|_}}</button>
+	</div>
+	<div class="information-block grid-block" :class="{open:ddOpen('info-block2')}">
+		<a href="#" class="information-block-toggle" @click.prevent.stop="ddToggle('info-block2')">{{'Items'|_}}
+			<div class=nav-arrow>
+				<svg width="10" height="10" v-html="svgIconLink('nav-arrow')"></svg>
+			</div>
+		</a>
+		<div class="information-block-content">
+			<sv-comp-grid :grid="itemsGrid"></sv-comp-grid>
+		</div>
+	</div>
+</div>

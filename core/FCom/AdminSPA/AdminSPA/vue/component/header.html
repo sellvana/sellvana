@@ -8,7 +8,7 @@
 <img :src="svAsset('FCom_AdminSPA', 'img/profile.png')" alt="" class='img-circle'/>
 -->
 
-    <div class="container-fluid">
+    <div class="container-fluid"> 
         <div class="row">
             <nav class="navbar navbar-default">
                 <div class="logo-block">
@@ -19,7 +19,7 @@
                     </router-link>
 					<!--<sv-comp-header-search :mobile="true"></sv-comp-header-search>-->
                 </div>
-				<a class="navbar-toggle btn pull-left" href="#" @click.prevent="mainNavToggle()">
+				<a class="navbar-toggle btn pull-left" href="#" :class="{open:ddOpen('bar')}" @click.prevent="mainNavToggle()" @click.prevent.stop="ddToggle('bar')"   >
                     <svg class="icon-bar" width="24" height="24" v-html="svgIconLink('icon-bar')"></svg>
                     <svg class="icon-close" width="24" height="24" v-html="svgIconLink('icon-close')"></svg>
                 </a>

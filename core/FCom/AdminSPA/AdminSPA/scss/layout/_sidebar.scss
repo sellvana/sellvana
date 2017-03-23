@@ -22,8 +22,11 @@ aside {
 	display: inline-block;
 	width: 100%;
 	padding: 0;
-	overflow: auto;
+	overflow: hidden;
 	max-height: calc(100% - 90px);
+	&:hover {
+		overflow: auto;
+	}
 	* {
 		font-size: 13px;
 		vertical-align: middle;

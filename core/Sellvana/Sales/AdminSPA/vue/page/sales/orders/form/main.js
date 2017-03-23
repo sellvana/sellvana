@@ -1,7 +1,7 @@
 define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
     function (_, SvHlp, SvCompGrid, tabMainTpl) {
 
-    var defForm = {
+	var defForm = {
         options: {},
         updates: {},
         tabs: [],
@@ -22,7 +22,7 @@ define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main
             form: {
                 default: defForm
             }
-        },
+		},
         data: function () {
             return {
                 editing: {customer: false, shipping: false, billing: false, order: false},

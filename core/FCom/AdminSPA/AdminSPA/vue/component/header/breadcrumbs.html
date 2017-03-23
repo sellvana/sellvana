@@ -1,4 +1,4 @@
-<div class="breadcrumb pull-left" :class="{'visible-lg':!mobile, 'visible-md':mobile}">
+<div class="breadcrumb" :class="{'visible-lg  pull-left':!mobile, 'hidden-lg':mobile}">
 	<ul>
         <li v-for="part in breadcrumbParts">
             <router-link v-if="part.link" :to="part.link">{{part.label|_}}</router-link>

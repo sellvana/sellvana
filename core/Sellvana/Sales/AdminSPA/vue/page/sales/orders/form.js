@@ -2,7 +2,7 @@ define(['vue', 'sv-hlp'],
 	   function (Vue, SvHlp) {
 
 	var defForm = {
-        options: {},
+		options: {},
         updates: {},
         tabs: [],
 

@@ -57,6 +57,12 @@
 			- [ requireJs, sv-page-sales-orders-form-history, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history" ]
 			- [ requireJs, sv-page-sales-orders-form-history-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/history.html" ]
 			- [ requireJs, sv-page-sales-orders-form-history-config, "~/orders/form/history/grid_config" ]
+			
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders" ]
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders.html" ]
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders-grid, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/grid.html" ]
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders-new, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/new.html" ]
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/edit.html" ]
 
     - view: app
         do:
@@ -87,7 +93,7 @@
     - view: app
         do:
             - [ addFormTab, { path: /sales/orders/form, name: main, label: Sales order, pos: 10 } ]
-			- [ addFormTab, { path: /sales/orders/form, name: details, label: Purchase Orders, pos: 20 } ]
+			- [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 20 } ]
             - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30 } ]
             - [ addFormTab, { path: /sales/orders/form, name: history, label: History, pos: 40 } ]
 

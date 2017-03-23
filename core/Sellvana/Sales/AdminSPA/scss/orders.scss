@@ -1,5 +1,29 @@
 .information-block {
 	padding: 0 30px;
+	&.grid-block {
+		padding: 0;
+	}
+}
+.information-block-toggle {
+	display: none;
+	position: relative;
+	padding: 16px;
+	background-color: #dde4ea;
+	border-radius: 5px;
+	font-weight: bold;
+	color: #2e4354;
+	.nav-arrow {
+		position: absolute;
+		right: 13px;
+		top: 50%;
+		transform: translateY(-50%) rotate(0deg);
+		transform-origin: 50% 50%;
+		transition: 0.2s transform ease-in;
+		svg {
+			fill: transparent;
+			stroke: #2e4354;
+		}
+	}
 }
 .text-justify {
 	&:after {
@@ -14,21 +38,20 @@
 .block-for-table {
 	border: solid 1px #e5e3e3;
 	border-radius: 5px;
-	width: 25%;
-	max-width: 356px;
+	width: 356px;
 	position: relative;
 	padding: 20px 0;
 	display: inline-block;
 	.block-title {
 		position: absolute;
-		top: -14px;
+		top: -10px;
 		background: #fff;
 		padding: 0;
 		width: auto;
 		left: 14px;
 		p {
 			font-size: 14px;
-			padding: 5px 12px;
+			padding: 0px 12px;
 		}
 	}	
 }
@@ -41,8 +64,16 @@
 	width: 18%;
 	vertical-align: top; 
 	position: relative;
-	min-height: 174px;
+	min-height: 180px;
 	max-width: 285px;
+	.no-gutter {
+		margin-right: 0;
+		margin-left: 0;
+	}
+	.no-gutter [class*="col-"] {
+		padding-right: 0;
+		padding-left: 0;
+	}
 	.block-title {
 		position: absolute;
 		top: -14px;
@@ -59,6 +90,20 @@
 	}
 	.section-edit {
 		display: none;
+	}
+	&.on {
+		.editor {
+			display: none;
+		}
+		.close-editor {
+			display: inline-block;
+		}
+		.section-edit {
+			display: block;
+		}
+		.section-view {
+			display: none;
+		}
 	}
 	strong {
 		font-weight: bold;
@@ -82,22 +127,21 @@
 			display: block;
 		}
 	}
-	&.on {
-		.editor {
-			display: none;
-		}
-		.close-editor {
-			display: inline-block;
-		}
-		.section-edit {
-			display: block;
-		}
-		.section-view {
-			display: none;
-		}
+}
+.editable {
+	/*	.editor {
+	display: none;
+}
+	.close-editor {
+	display: inline-block;
+}*/
+	.section-edit {
+		display: block;
+	}
+	.section-view {
+		display: none;
 	}
 }
-
 .payment-info,
 .total-info,
 .delivery-info,
@@ -658,6 +702,10 @@
 		margin-bottom: 10px;
 		padding: 10px;
 	}
+	.edited-block {
+		margin: 0 0 16px 0;
+		width: 33%;
+	}
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -766,5 +814,44 @@
 				margin-left: 10px;
 			}
 		}
+	}
+	.edited-block {
+		margin: 0 0 25px 0;
+		width: 100%;
+		max-width: 100%;
+		min-height: 120px;
+	}
+	.information-block {
+		padding: 0 6px;
+		.information-block-toggle {
+			text-align: left;
+		}
+		&.grid-block {
+			margin: 0 6px;
+			.params-right {
+				right: -256px;
+			}
+		}
+	}
+	.information-block-toggle  {
+		display: block;
+		margin-bottom: 7px;
+	}
+	.information-block-content {
+		display: none;
+	}
+	.information-block {
+		&.open {
+			.information-block-content {
+				display: block;
+				padding: 20px 0;
+			}
+			.nav-arrow {
+				transform: translateY(-50%) rotate(90deg);
+			}
+		}
+	}
+	.block-for-table {
+		width: 100%;
 	}
 }
