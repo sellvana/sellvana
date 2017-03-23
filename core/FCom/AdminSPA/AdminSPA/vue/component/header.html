@@ -20,7 +20,8 @@
 					<!--<sv-comp-header-search :mobile="true"></sv-comp-header-search>-->
                 </div>
 				<a class="navbar-toggle btn pull-left" href="#" @click.prevent="mainNavToggle()">
-					<svg width="24" height="24" v-html="svgIconLink('icon-bar')"></svg>
+                    <svg class="icon-bar" width="24" height="24" v-html="svgIconLink('icon-bar')"></svg>
+                    <svg class="icon-close" width="24" height="24" v-html="svgIconLink('icon-close')"></svg>
                 </a>
 				<sv-comp-header-breadcrumbs :mobile="false"></sv-comp-header-breadcrumbs>
                 <div class="navbar-right text-right">
