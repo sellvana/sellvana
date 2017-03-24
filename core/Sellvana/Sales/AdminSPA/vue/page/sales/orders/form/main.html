@@ -10,7 +10,7 @@
 					<svg width="10" height="10" v-html="svgIconLink('nav-arrow')"></svg>
 				</div>
 			</a>
-			<div class="information-block-content">
+			<div class="information-block-content" :class="{'visible-lg':!mobile, 'hidden-lg':mobile}">
 				<div class="edited-block" :class="{on:editing.customer}">
 					<div class="block-title">
 						<p>{{'Order'|_}}</p>

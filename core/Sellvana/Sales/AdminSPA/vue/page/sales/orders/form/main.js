@@ -1,6 +1,7 @@
 define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
     function (_, SvHlp, SvCompGrid, tabMainTpl) {
 
+
 	var defForm = {
         options: {},
         updates: {},
@@ -15,7 +16,9 @@ define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main
         cancellations: {}
     };
 
+
     return {
+
         mixins: [SvHlp.mixins.common],
         template: tabMainTpl,
         props: {

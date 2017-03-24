@@ -50,4 +50,5 @@ define(['sv-hlp', 'text!sv-comp-header-breadcrumbs-tpl'], function (SvHlp, heade
     };
 
     return SvCompHeaderBreadcrumbs;
+
 });
