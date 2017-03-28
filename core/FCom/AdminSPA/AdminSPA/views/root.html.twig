@@ -10,7 +10,7 @@
 {% verbatim %}
 <div id="sv-app" @click="pageClick()" v-show="isLoaded">
     <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
-    <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
+    <main :class="{'main-nav-opened':$store.state.ui.windowWidth>=1024, 'main-nav-closed':$store.state.ui.windowWidth<1024}">
         <div class="f-admin-container">
             <sv-comp-nav v-if="isLoggedIn"></sv-comp-nav>
 			

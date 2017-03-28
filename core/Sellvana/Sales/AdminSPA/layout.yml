@@ -106,14 +106,6 @@
    #     	- [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 30 } ]
    #        - [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30 } ]
 
-
-
-
-
-
-
-
-
     - view: sales/orders/form
         do:
             - [ addDetailsSection, { name: payments, pos: 10 } ]

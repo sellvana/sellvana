@@ -240,6 +240,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
             state: {
                 ddCurrent: false,
                 mainNavOpen: true,
+                windowWidth: null,
                 pageClickCounter: 0
             },
             mutations: {
@@ -253,6 +254,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                     state.pageClickCounter++;
                 },
                 windowResize: function (state, width) {
+                    state.windowWidth = width;
                     state.mainNavOpen = width > 1024;
                 }
             }
@@ -859,6 +861,7 @@ console.log('onError', err.xhr);
         $(window).resize(function (ev) {
             store.commit('windowResize', $(window).width());
         });
+        store.commit('windowResize', $(window).width());
 
         Vue.component('dropdown', {
             mixins: [mixins.common],
