@@ -1,16 +1,17 @@
 define(['vue', 'sv-hlp', 'text!sv-comp-header-tpl',
         'sv-comp-header-breadcrumbs', 'sv-comp-header-search', 'sv-comp-header-favorites', 'sv-comp-header-account',
-        'sv-comp-header-local-notifications', 'sv-comp-header-chat',
+        'sv-comp-header-local-notifications', 'sv-comp-header-chat', 'sv-comp-header-setup',
 
         'text!sv-comp-header-breadcrumbs-tpl', 'text!sv-comp-header-search-tpl', 'text!sv-comp-header-favorites-tpl',
-        'text!sv-comp-header-account-tpl', 'text!sv-comp-header-chat-tpl', 'text!sv-comp-header-local-notifications-tpl'
+        'text!sv-comp-header-account-tpl', 'text!sv-comp-header-chat-tpl', 'text!sv-comp-header-local-notifications-tpl',
+        'text!sv-comp-header-setup-tpl'
     ],
     function(Vue, SvHlp, headerTpl,
              SvCompHeaderBreadcrumbs, SvCompHeaderSearch, SvCompHeaderFavorites, SvCompHeaderAccount,
-             SvCompHeaderLocalNotifications, SvCompHeaderChat,
+             SvCompHeaderLocalNotifications, SvCompHeaderChat, SvCompHeaderSetup,
 
              headerBreadcrumbsTpl, headerSearchTpl, headerFavoritesTpl,
-             headerAccountTpl, headerChatTpl, headerLocalNotificationsTpl
+             headerAccountTpl, headerChatTpl, headerLocalNotificationsTpl, headerSetupTpl
     ) {
 
         var SvCompHeader = {
@@ -19,6 +20,7 @@ define(['vue', 'sv-hlp', 'text!sv-comp-header-tpl',
             components: {
                 'sv-comp-header-breadcrumbs': SvCompHeaderBreadcrumbs,
                 'sv-comp-header-search': SvCompHeaderSearch,
+                'sv-comp-header-setup': SvCompHeaderSetup,
                 'sv-comp-header-favorites': SvCompHeaderFavorites,
                 'sv-comp-header-account': SvCompHeaderAccount,
                 'sv-comp-header-local-notifications': SvCompHeaderLocalNotifications,

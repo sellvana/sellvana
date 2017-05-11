@@ -128,7 +128,7 @@ header {
 	.nav {
 		.notification,
 		.settings,
-		.favorites	{
+		.favorites {
 			a {
 				padding: 17px 12px 17px;
 				border: 0;
@@ -136,6 +136,29 @@ header {
 			svg {
 				fill: #fff;
 				stroke: #fff;
+			}
+		}
+		.header-setup {
+			a {
+				color: #fff;
+				padding: 0 5px;
+				border: 0;
+				font-size: 1.05em;
+				.setup-progress-label {
+					margin-bottom: 2px;
+				}
+				.setup-progress-container {
+					width: 120px;
+					height: 14px;
+					border: 1px solid rgba(0,0,0,.25);
+					border-radius: 15px;
+					background: rgba(0,0,0,.15);
+				}
+				.setup-progress-bar {
+					background: #69B221;
+					height: 100%;
+					border-radius: 15px 0 0 15px;
+				}
 			}
 		}
 		/*.user-menu {
@@ -272,6 +295,50 @@ header {
 				background: #f5f5f5;
 				i {
 					color: #000;
+				}
+			}
+		}
+	}
+	.header-setup {
+		.dropdown-content {
+			width: auto;
+			max-height: 500px;
+			overflow-y: auto;
+		}
+		li {
+			position: relative;
+			white-space: nowrap;
+			background: #fff;
+			a {
+				padding: 8px 28px 8px 10px;
+				display: block;
+				color: #5f5f5f;
+				font-weight:bold;
+				&:hover {
+					color: #000;
+				}
+			}
+		}
+		li.done {
+			a {
+				color: #888;
+				font-weight:normal;
+				background: #fff;
+			}
+		}
+		.done-icon {
+			position: absolute;
+			z-index: 2;
+			right: 0px;
+			top: 0px;
+			padding: 8px;
+			i {
+				color: #0c8a00;
+			}
+			&:hover {
+				background: #f5f5f5;
+				i {
+					color: #06c700;
 				}
 			}
 		}
@@ -675,7 +742,7 @@ header {
 	vertical-align: middle;
 	position: relative;
 	input[type="text"] {
-		border: 1px solid #d0dae3; 
+		border: 1px solid #d0dae3;
 		padding: 5px 40px 5px 10px;
 		border-radius: 5px;
 		&:active + .dropdown-menu,
@@ -708,6 +775,11 @@ header {
 			}
 		}
 	}
+}
+.setup-block {
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
 }
 
 /*
@@ -1083,7 +1155,9 @@ header {
 		top: 61%;
 		padding: 0;
 	}*/
-	.notification, .favorites {
+	.notification,
+	.favorites,
+	.header-setup {
 		.dropdown-menu {
 			position: absolute;
 			top: 57px;
@@ -1114,12 +1188,11 @@ header {
 			}
 			.notification,
 			.settings,
-			.favorites	{
+			.favorites,
+			.header-setup {
 				& > a {
 					padding: 17px 20px;
 				}
-			}
-			.favorites {
 				.dropdown-menu:before {
 					right: 142px;
 				}

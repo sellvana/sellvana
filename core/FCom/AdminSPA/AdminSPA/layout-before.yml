@@ -79,8 +79,8 @@
 
             - [ requireJs, vue-select, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select-2.1.8" ]
             #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
-            - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-b15.min" ]
-            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect-2.0.0-b15.min.css" ]
+            - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect.min" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect.min.css" ]
 
             - [ requireJs, vue-password-strength-meter, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-password-strength-meter-0.1.1" ]
 
@@ -108,6 +108,8 @@
             - [ requireJs, sv-comp-header-chat-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/chat.html" ]
             - [ requireJs, sv-comp-header-local-notifications, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications" ]
             - [ requireJs, sv-comp-header-local-notifications-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/local-notifications.html" ]
+            - [ requireJs, sv-comp-header-setup, "@FCom_AdminSPA/AdminSPA/vue/component/header/setup" ]
+            - [ requireJs, sv-comp-header-setup-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/header/setup.html" ]
 
             - [ requireJs, sv-comp-nav, "@FCom_AdminSPA/AdminSPA/vue/component/nav" ]
             - [ requireJs, sv-comp-nav-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/nav.html" ]
