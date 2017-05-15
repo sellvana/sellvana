@@ -60,7 +60,7 @@ input[type="checkbox"] {
 		top: 21px;
 		left: 9px;
 		border: solid 1px #d0dae3;
-		border-radius: 0px 3px 3px 3px;
+		border-radius: 0 3px 3px 3px;
 		& > li > a {
 			border-bottom: solid 1px #d0dae3;
 			padding: 0;
@@ -97,7 +97,7 @@ input[type="radio"] + span {
 	border: solid 1px #ccd1d9;
 	display: inline-block;
 	text-align: center;
-	padding: 1px 0px;
+	padding: 1px 0;
 	margin-right: 6px; 
 	vertical-align: middle;
 	cursor: pointer;
@@ -126,7 +126,7 @@ textarea {
 	input {
 		border: 1px solid #eaeaea;
 		width: 30px;
-		padding: 8px 0px;
+		padding: 8px 0;
 		text-align: center;
 		color: #474646;
 	}
@@ -178,7 +178,7 @@ input::-webkit-inner-spin-button {
 .select2-container--default.select2-container--focus .select2-selection--multiple {
 	border: solid #ebebeb 1px;
 	border-radius: 5px;
-	padding: 0px 0 2px; 
+	padding: 0 0 2px;
 }
 .select2-container--default .select2-selection--multiple {
 	border: 1px solid #ebebeb;
@@ -191,8 +191,8 @@ input::-webkit-inner-spin-button {
 	padding: 2px 7px 1px;
 }
 .select2-container .select2-selection--multiple {
-	min-height: auto;
-	padding: 0px 0 2px 0;
+	min-height: inherit;
+	padding: 0 0 2px 0;
 	border-radius: 0;
 }
 .form-control {
@@ -229,7 +229,7 @@ input::-webkit-inner-spin-button {
 	border-radius: 5px;
 	color: #868a8a;
 	padding: 2px 8px;
-	margin: 5px 3px 0px 0;
+	margin: 5px 3px 0 0;
 }
 .select2-container .select2-selection--single {
 	height: 34px;
@@ -247,13 +247,9 @@ input::-webkit-inner-spin-button {
 	border: 1px solid #e8edf1;
 	border-radius: 5px;
 }
-/*.select2-container {
-	min-width: 100%;
-}*/
-
 
 input[type="checkbox"]:focus + .checkbox-block {
-	box-shadow: 0px 1px 6px 1px rgba(15, 84, 17, 0.3);
+	box-shadow: 0 1px 6px 1px rgba(15, 84, 17, 0.3);
 }
 input[type="checkbox"]:checked + .checkbox-block {
 	background: #4dd865;
@@ -317,10 +313,10 @@ fieldset {
 		background: #ffffff;
 		position: absolute;
 		left: -1px;
-		top: 0px;
+		top: 0;
 		transition: 0.2s all ease-in;
 		border: 1px solid #eee;
-		box-shadow: 2px 1px 3px 0px rgba(0, 0, 0, 0.06); 
+		box-shadow: 2px 1px 3px 0 rgba(0, 0, 0, 0.06);
 	}
 }
 

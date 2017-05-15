@@ -454,7 +454,7 @@
 		margin: 0 10px 0 0;
 		cursor: pointer;
 	}
-	.control-buttons-block {
+	.buttons-block {
 		display: inline-block;
 		width: 100%;
 		padding: 0;
@@ -563,7 +563,7 @@
 }
 
 .details-additional-block {
-	.control-buttons-block {
+	.buttons-block {
 		input {
 			width: 180px;
 			vertical-align: middle;
@@ -644,7 +644,7 @@
 	text-align: right;
 	margin: 10px 0;
 	.order-menu,
-	.control-buttons-block {
+	.buttons-block {
 		display: inline-block;
 		vertical-align: middle;
 	}
@@ -652,7 +652,7 @@
 		min-width: 160px;
 		text-align: left;
 	}
-	.control-buttons-block {
+	.buttons-block {
 		margin: 0 0 0 10px;
 		.dropdown {
 			box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
@@ -799,7 +799,7 @@
 		}
 	}
 	.details-additional-block {
-		.control-buttons-block {
+		.buttons-block {
 			input {
 				margin: 0 0 0 0px;
 			}

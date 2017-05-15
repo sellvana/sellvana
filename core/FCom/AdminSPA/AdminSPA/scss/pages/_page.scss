@@ -1,20 +1,11 @@
-
 .f-admin-container {
 	min-height: 100%;
 }
-
 .f-admin-main-view {
 	min-height: 100%;
-	margin: 0;
-	margin-left: 272px;
-	margin-top: 118px;
+	margin: 118px 0 0 272px;
 	min-width: 276px;
-	padding: 0px 15px 80px 0px;
-	.nav {
-		a:hover {
-			color: #000;
-		}
-	}
+	padding: 0 15px 80px 0;
 }
 
 .main-nav-closed {
@@ -35,11 +26,9 @@
 @media (min-width: 768px) and (max-width: 1023px) {
 	.f-admin-main-view {
 		min-height: 100%;
-		margin-right: 13px;
-		margin-left: 13px;
-		margin-top: 59px;
+		margin: 59px 13px 0 13px;
 		min-width: 276px;
-		padding: 0px 0px 90px 0px;
+		padding: 0 0 90px 0;
 	}
 	.main-nav-closed {
 		.f-admin-main-view {
@@ -55,7 +44,7 @@
 		margin-left: 13px;
 		margin-top: 59px;
 		min-width: 276px;
-		padding: 0px 0px 90px 0px;
+		padding: 0 0 90px 0;
 	}
 	.main-nav-closed {
 		.f-admin-main-view {

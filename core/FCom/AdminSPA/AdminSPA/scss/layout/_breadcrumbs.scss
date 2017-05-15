@@ -1,0 +1,100 @@
+.breadcrumb {
+      background-color: #0086c0;
+      margin-bottom: 0;
+      padding: 0;
+      border-radius: 0;
+      margin-left: 29px;
+      white-space: nowrap;
+      li:nth-last-child(2), li:last-child {
+            &:after {
+                  display: none;
+            }
+      }
+}
+.breadcrumb__link {
+      padding: 18px 5px 18px;
+      display: inline-block;
+      margin-right: 10px;
+      font-size: 17px;
+      color: #fff;
+      &:hover {
+            color: #fff;
+      }
+}
+.breadcrumb__penultimate {
+      vertical-align: middle;
+      &:before {
+            display: none;
+      }
+}
+.breadcrumb__item {
+      display: inline-block;
+      vertical-align: middle;
+      position: relative;
+      &:after {
+            content: '/';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            font-size: 17px;
+            transform: translateY(-10px);
+            color: #fff;
+      }
+      &:before {
+            display: none;
+      }
+}
+
+.breadcrumb__item-favorite__link {
+      font-size: 17px;
+      color: #fff;
+      &:focus {
+            color: #fff;
+      }
+      .fa-star {
+            display: none;
+      }
+      &:hover {
+            color: #fff;
+            .fa-star-o {
+                  display: none;
+            }
+            .fa-star {
+                  display: inline-block;
+            }
+      }
+      &.on {
+            .fa-star-o {
+                  display: none;
+            }
+            .fa-star {
+                  display: inline-block;
+            }
+      }
+}
+
+@media (max-width: 1365px) {
+      .breadcrumb {
+            background-color: transparent;
+            margin-left: 0px;
+            li:after {
+                  color: #000;
+            }
+            a {
+                  color: #000;
+            }
+            li.penultimate {
+                  a {
+                        color: #000;
+                  }
+            }
+      }
+      .breadcrumb__item-favorite__link {
+            &:focus {
+                  color: #000;
+            }
+            &:hover {
+                  color: #000;
+            }
+      }
+}

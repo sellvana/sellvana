@@ -1,4 +1,4 @@
-aside {
+.sidebar-nav {
 	position: fixed;
 	float: left;
 	width: 240px;
@@ -24,11 +24,11 @@ aside {
 	padding: 0;
 	overflow: hidden;
 	max-height: calc(100% - 90px);
+	font-size: 13px;
 	&:hover {
 		overflow: auto;
 	}
 	* {
-		font-size: 13px;
 		vertical-align: middle;
 	}
 	a:hover, a:focus {
@@ -85,9 +85,6 @@ aside {
 	li.active {
 		font-weight: 500;
 	}
-	.icon-block {
-		margin-right: 10px;
-	}	
 	.active {
 		span, i {
 			color: #000;
@@ -96,13 +93,13 @@ aside {
 			font-weight: bold;
 		}
 	}
-	.navigation {
+	/*.navigation {*/
 		.nav.nav-stacked.in {
 			display: block;
 			border-bottom: solid 1px hsla(205, 28%, 80%, 1);
 		}
-	}
-	.navigation > .nav > li .nav {
+	/*}*/
+	/*.navigation >*/ .nav > li .nav {
 		display: none;
 	}
 	.nav.nav-stacked {
@@ -140,8 +137,15 @@ aside {
 		}
 	}
 }
+.nav__icon {
+	margin-right: 10px;
+	svg {
+		fill: #86a6bd;
+		stroke: #86a6bd;
+	}
+}
 .main-nav-closed {
-	aside {
+	.sidebar-nav {
 		width: 50px;
 		opacity: 1;
 		overflow: visible;
@@ -178,12 +182,7 @@ aside {
 		}
 	}
 }
-.icon-block {
-	svg {
-		fill: #86a6bd;
-		stroke: #86a6bd;
-	}
-}
+
 #main-nav.close {
 	width: 50px;
 	opacity: 1;
@@ -241,7 +240,6 @@ aside {
 		& > .nav-stacked > li:hover > .nav-stacked > li:hover {
 			& > a > span, & > a > i {
 				color: black;
-				
 			}
 		}
 	}
@@ -251,7 +249,7 @@ aside {
 		top: -100%;
 		left: inherit;
 		float: none;
-		min-width: auto;
+		min-width: initial;
 		padding: 0;
 		margin: 0;
 		background-color: transparent;
@@ -302,7 +300,7 @@ aside {
 }
 
 @media (max-width: 1365px) {
-	aside {
+	.sidebar-nav {
 		left: 0;
 		width: 224px;
 		overflow: auto;
@@ -311,7 +309,7 @@ aside {
 		}
 	}
 	.main-nav-closed {
-		aside {
+		.sidebar-nav {
 			position: fixed;
 			left: -100%;
 			top: 0;

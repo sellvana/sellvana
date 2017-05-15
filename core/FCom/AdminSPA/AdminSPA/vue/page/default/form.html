@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="col-md-10 col-sm-12">
-        <div class="control-buttons-block text-right">
+        <div class="buttons-block text-right">
             <button v-for="a in form.config.actions" type="button" class="button" :class="a.class"
                     @click="buttonAction(a)" v-ladda="{on:action_in_progress === a.name}">{{a.label|_}}</button>
         </div>

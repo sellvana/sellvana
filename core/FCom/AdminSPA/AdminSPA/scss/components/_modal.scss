@@ -4,36 +4,22 @@
 		min-width: 600px;
 		margin: 0 auto;
 		table {
-			min-width: auto;
+			min-width: inherit;
 		}
 	}
 	table {
-		min-width: auto;
+		min-width: inherit;
 	}
 }
-
-/*
-@media (min-width: 1366px) {
-	.visible-lg {
-		display: inline-block !important;
-	}
-	.control-buttons-block.visible-md.visible-lg {
-		display: block !important;
-	}
-}
-*/
 
 @media (max-width: 767px) {
-	/*.visible-xs {
-		display: inline-block !important;
-	}*/
 	.cke_reset_all {
 		.cke_dialog {
 			width: 80%;
 			min-width: 200px;
 		}
 		table {
-			min-width: auto;
+			min-width: inherit;
 		}
 	}
 }

@@ -1,87 +1,53 @@
-table {
+.main-grid {
 	min-width: calc(100% - 1px);
 	thead {
-		border-bottom: 1px solid #ebebeb;
+		.sorted-up,
+		.sorted-down {
+			i {
+				color: #0086c0;
+				top: 0;
+				left: 7.5px;
+				position: relative;
+			}
+		}
+		.fa {
+			font-size: 15px;
+			margin: 0 2px;
+			position: relative;
+		}
 		.fa-caret-up {
 			left: 7.5px;
 			top: -3px;
-			position: relative;
+			color: #dddddd;
 		}
 		.fa-caret-down {
-			left: 0;
+			left: -5px;
 			top: 4px;
-			position: relative;
+			color: #dddddd;
+		}
+		td,
+		th {
+			padding: 0 7px;
+			color: #85a5bd;
 		}
 		a {
-			padding: 0 9px;
-			display: inline-block;
-			width: 100%;
-		}
-		td {
-			font-weight: bold;
-			color: #000;
-		}
-		span, a {
+			padding: 0 7px;
+			display: block;
 			color: #85a5bd;
+			font-weight: bold;
 		}
 	}
 	tbody {
-		tr, td, a {
-			color: #5f5f5f;
-		}
 		tr {
 			border-bottom: 1px solid #f8f8f8;
 		}
-		tr:last-child {
-			border-bottom: 0;
-		}
-		.fa {
-			font-size: 16px;
-			color: #dddddd;
-			margin: 0 2px;
-		}
-	}
-	.sorted-up,
-	.sorted-down {
-		i {
-			color: #0086c0 !important;
-			top: 0px;
-			position: relative;
-			left: 7.5px;
-			font-size: 15px;
-		}
-	}
-	.selected {
-		background: #fdfcfc;
-	}
-}
-
-.fixed-table {
-	thead {
-		border-bottom: 1px solid #000000;
-		td,
-		th {
-			padding: 0;
-			a {
-				color: #85a5bd;
-				font-weight: bold;
-			}		
-		}
-		i {
-			color: #E8E8E8;
-		}
-	}
-	tbody {
 		td,
 		th {
 			white-space: nowrap;
-			height: 43px;
+			min-height: 43px;
 			padding: 0 8px;
 			font-size: 13px;
 			border: 1px solid #f3f3f3;
-		}
-		tr {
-			border-bottom: 1px solid #f8f8f8;
 		}
 		.column-row-select {
 			border-right: 0;
@@ -97,27 +63,21 @@ table {
 			border-bottom: 1px solid #2e4354;
 			color: #2e4354;
 			&:hover {
-				color: #0086c0;
-				border-color: #0086c0;
+				color: #000;
 			}
 		}
+		tr, td, a {
+			color: #5f5f5f;
+		}
 	}
-	
-	.column-actions {
-		width: 70px;
-		padding: 0 10px;
-		min-width: auto;
-		text-align: left;
-	}
-	.thumb_path {
-		padding: 10px 10px 10px 10px;
-	}
-
 }
 
 .striped-table {
-	tr:nth-child(odd) {
-		background: #f8f8f8;
+	width: 100%;
+	td,
+	th {
+		height: auto;
+		min-width: 70px;
 	}
 	th {
 		font-weight: normal;
@@ -127,12 +87,11 @@ table {
 	td {
 		color: #2d2d2d;
 	}
-	td,
-	th {
-		height: auto;
-		min-width: 70px;
+	tr:nth-child(odd) {
+		background: #f8f8f8;
 	}
 }
+
 .total-table {
 	text-align: left;
 	td {
