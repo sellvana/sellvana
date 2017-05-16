@@ -3,16 +3,16 @@
 @import "helpers/variables";
 @import "helpers/mixins";        
   
-@import "layout/fonts";                      
+@import "layout/fonts";
 @import "layout/statuses";                                                                                  
-@import "layout/scroll";                                                       
+@import "layout/scroll";
 @import "layout/header";
 @import "layout/sidebar";
 @import "layout/table";
 @import "layout/filter-panel";
-@import "layout/menu";                                                                                                                                                                        
-@import "layout/elements";                                                                                                                                                       
-@import "layout/footer";                                                            
+@import "layout/menu";
+@import "layout/elements";
+@import "layout/footer";
 @import "layout/widgets";
 @import "layout/breadcrumbs";
 
@@ -21,7 +21,8 @@
 @import "components/inputs";                          
 @import "components/modal";                 
 @import "components/tree";                
- 
+@import "components/custom-select2";
+
 @import "pages/login";                          
 @import "pages/settings";                                              
 @import "pages/dashboard";      

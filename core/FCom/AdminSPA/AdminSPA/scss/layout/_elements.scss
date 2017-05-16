@@ -1,6 +1,18 @@
 .secondary-control-block {
 	float: right;
 }
+
+.badge {
+	font-size: 10px;
+	background-color: #ff2626;
+	position: absolute;
+	right: 2px;
+	top: 12px;
+	width: 13px;
+	height: 13px;
+	border-radius: 13px;
+	padding: 2px 0;
+}
 .admin-main-content {
 	background: #fff;
 	border-radius: 5px; 

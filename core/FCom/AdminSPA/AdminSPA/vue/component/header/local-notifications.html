@@ -1,9 +1,11 @@
-<li class="dropdown notification" :class="{open:ddOpen('header-local-notifications')}">
-    <a href="#" title="Status menu" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-local-notifications')">
+<li class="header__navbar__item custom-dropdown header__notification-block" :class="{open:ddOpen('header-local-notifications')}">
+    <a href="#" title="Status menu" class="custom-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-local-notifications')">
 		<svg width="20" height="19" v-html="svgIconLink('icon-notification')"></svg>
         <!--<span v-if="notifications.length" class="badge">{{notifications.length}}</span>-->
     </a>
-    <ul class="dropdown-menu" @click.stop>
-		<li v-for="n in notifications" v-html="n.html"></li>
-    </ul>
+      <div class="custom-dropdown__menu">
+            <ul class="custom-dropdown__content" @click.stop>
+                  <li v-for="n in notifications" v-html="n.html"></li>
+            </ul>
+      </div>
 </li>

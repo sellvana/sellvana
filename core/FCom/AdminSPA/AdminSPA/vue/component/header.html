@@ -1,60 +1,64 @@
 <header class="f-admin-header">
-    <!--
-<ul>
-    <li v-for="nav in navs">
-        <router-link :to="nav.path" v-text="nav.label"></router-link>
-    </li>
-</ul>
-<img :src="svAsset('FCom_AdminSPA', 'img/profile.png')" alt="" class='img-circle'/>
--->
-
-    <div class="container-fluid"> 
-        <div class="row">
-            <nav class="navbar navbar-default">
-                <div class="logo-block">
-                    <router-link class="navbar-brand pull-left" to="/">
-						<span class="logo">
+      <!--
+  <ul>
+      <li v-for="nav in navs">
+          <router-link :to="nav.path" v-text="nav.label"></router-link>
+      </li>
+  </ul>
+  <img :src="svAsset('FCom_AdminSPA', 'img/profile.png')" alt="" class='img-circle'/>
+  -->
+      <div class="container-fluid">
+            <div class="row">
+                  <div class="col-sm-12">
+                        <!--  <nav class="navbar navbar-default">-->
+                        <div class="logo header__logo">
+                              <router-link class="logo__img" to="/">
+						<span class="logo__text">
 							{{'ADMIN PANEL'|_}}
 						</span>
-                    </router-link>
-					<!--<sv-comp-header-search :mobile="true"></sv-comp-header-search>-->
-                </div>
-				<a class="navbar-toggle btn pull-left" href="#" :class="{open:$store.state.ui.mainNavOpen}" @click.prevent="mainNavToggle()">
-                    <svg class="icon-bar" width="24" height="24" v-html="svgIconLink('icon-bar')"></svg>
-                    <svg class="icon-close" width="24" height="24" v-html="svgIconLink('icon-close')"></svg>
-                </a>
-				<sv-comp-header-breadcrumbs :mobile="false"></sv-comp-header-breadcrumbs>
-                <div class="navbar-right text-right">
-                  <!--  <a class="navbar-toggle btn pull-left visible-xs" href="#" @click.prevent="mainNavToggle()">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </a>-->
-                    <!--<select @change="changeBodyClass($event)">-->
-                        <!--<option></option>-->
-                        <!--<option>medium</option>-->
-                        <!--<option>mediumBlack</option>-->
-                        <!--<option>proxima</option>-->
-                        <!--<option>helvetica</option>-->
-                        <!--<option>avenir</option>-->
-                        <!--<option>lato</option>-->
-                        <!--<option>futura</option>-->
-                        <!--<option>din</option>-->
-                    <!--</select>-->
-                    <sv-comp-header-search></sv-comp-header-search>
-                    <ul class="nav">
-                        <sv-comp-header-setup></sv-comp-header-setup>
-                        <sv-comp-header-favorites></sv-comp-header-favorites>
-						<li class="settings">
-							<a href="#/settings" title="Settings" class="dropdown-collapse ">
-								<svg width="20" height="19" v-html="svgIconLink('icon-columns')"></svg>
-							</a>
-						</li>
-                      <!--  <sv-comp-header-account></sv-comp-header-account>-->
-                        <sv-comp-header-local-notifications></sv-comp-header-local-notifications>
-                       <!-- <sv-comp-header-chat></sv-comp-header-chat>-->
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </div>
+                              </router-link>
+                              <!--<sv-comp-header-search :mobile="true"></sv-comp-header-search>-->
+                        </div>
+                        <a class="header__navbar-toggle pull-left" href="#" :class="{open:$store.state.ui.mainNavOpen}"
+                           @click.prevent="mainNavToggle()">
+                              <svg class="icon-bar" width="24" height="24" v-html="svgIconLink('icon-bar')"></svg>
+                              <svg class="icon-close" width="24" height="24" v-html="svgIconLink('icon-close')"></svg>
+                        </a>
+                        <sv-comp-header-breadcrumbs :mobile="false"></sv-comp-header-breadcrumbs>
+                        <div class="text-right">
+                              <!--  <a class="navbar-toggle btn pull-left visible-xs" href="#" @click.prevent="mainNavToggle()">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </a>-->
+                              <!--<select @change="changeBodyClass($event)">-->
+                              <!--<option></option>-->
+                              <!--<option>medium</option>-->
+                              <!--<option>mediumBlack</option>-->
+                              <!--<option>proxima</option>-->
+                              <!--<option>helvetica</option>-->
+                              <!--<option>avenir</option>-->
+                              <!--<option>lato</option>-->
+                              <!--<option>futura</option>-->
+                              <!--<option>din</option>-->
+                              <!--</select>-->
+                              <sv-comp-header-search></sv-comp-header-search>
+                              <ul class="header__navbar">
+                                    <sv-comp-header-setup></sv-comp-header-setup>
+                                    <sv-comp-header-favorites></sv-comp-header-favorites>
+                                    <li class="header__navbar__item header__settings-block">
+                                          <a href="#/settings" title="Settings" class="dropdown-collapse ">
+                                                <svg width="20" height="19" v-html="svgIconLink('icon-columns')"></svg>
+                                          </a>
+                                    </li>
+                                    <!--  <sv-comp-header-account></sv-comp-header-account>-->
+                                    <sv-comp-header-local-notifications></sv-comp-header-local-notifications>
+                                    <!-- <sv-comp-header-chat></sv-comp-header-chat>-->
+                              </ul>
+                        </div>
+                        <!--</nav>-->
+                  </div>
+            </div>
+      </div>
+
 </header>
+
 

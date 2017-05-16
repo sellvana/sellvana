@@ -1,9 +1,9 @@
-<li class="dropdown header-setup" :class="{open:ddOpen('header-setup')}">
-    <a href="#" :title="'Setup Progress: {percent}%'|_({percent:setup.progress})" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-setup')">
+<li class="header__navbar__item custom-dropdown header__setup-block" :class="{open:ddOpen('header__setup-block')}">
+    <a href="#" :title="'Setup Progress: {percent}%'|_({percent:setup.progress})" class="custom-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header__setup-block')">
         <div class="setup-progress-label">{{ 'Setup Progress: {percent}%'|_({percent:setup.progress}) }}</div>
         <div class="setup-progress-container"><div class="setup-progress-bar" :style="{width:setup.progress+'%'}"></div></div>
     </a>
-    <ul class="dropdown-menu">
+    <ul class="custom-dropdown__menu">
         <li v-for="step in setup.steps" :class="{done: step.done}">
             <router-link :to="step.link"><i :class="step.icon_class" aria-hidden="true"></i> {{step.label}}</router-link>
             <a v-if="step.done" href="#" @click.prevent.stop class="done-icon"><i class="fa fa-check"></i></a>

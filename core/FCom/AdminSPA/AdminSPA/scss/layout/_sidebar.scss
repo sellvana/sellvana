@@ -155,12 +155,12 @@
 			border-top: 1px solid #c3d2dd;
 		}
 	}
-	.navigation {
+	/*.navigation {*/
 		.nav.nav-stacked.in {
 			display: block;
 			border-bottom: solid 1px #c3d2dd;
 		}
-	}
+	/*}*/
 	.account-menu {
 		left: 1px;
 		.dropdown-toggle {
@@ -222,7 +222,7 @@
 	li:hover > a > .nav-arrow {
 		transform: translateY(-50%) rotate(0deg);
 	}
-	& > .navigation {
+/*	& > .navigation {*/
 		& > .nav-stacked > li > a > span {
 			font-size: 0;
 			display: none;
@@ -242,7 +242,7 @@
 				color: black;
 			}
 		}
-	}
+	/*}*/
 }
 .user-menu {
 	.dropdown-menu {
@@ -284,16 +284,16 @@
 
 @media (min-width: 1023px) {
 	#main-nav.close {
-		& > .navigation > .nav > li:hover > .nav-stacked {
+		& > /*.navigation >*/ .nav > li:hover > .nav-stacked {
 			display: block;
 			/*box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);*/
 		}
-		& > .navigation > .nav > li:hover > .nav-stacked > li:hover > .nav-stacked {
+		& > /*.navigation >*/ .nav > li:hover > .nav-stacked > li:hover > .nav-stacked {
 			display: block;
 		/*	box-shadow: 3px 2px 16px 1px rgba(0, 0, 0, 0.4);*/
 			
 		}
-		& > .navigation > .nav > li > a > i:last-child {
+		& >/* .navigation >*/ .nav > li > a > i:last-child {
 			display: none;
 		}
 	}
