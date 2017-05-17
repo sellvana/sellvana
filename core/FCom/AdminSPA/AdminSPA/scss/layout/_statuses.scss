@@ -1,18 +1,18 @@
-.status-processing, .status-placed, .status-shipped, .status-canceled, .status-pending, .status-unpaid, .status-paid, .status-re-stocked, .status-complete, .status-refunded, .status-approved  {
+/*.status-processing, .status-placed, .status-shipped, .status-canceled, .status-pending, .status-unpaid, .status-paid, .status-re-stocked, .status-complete, .status-refunded, .status-approved  {
 	background: #fff; 
 	font-weight: bold;
 	text-transform: capitalize;
-}
+}*/
 
 .f-grid-wrapper {
 	padding: 0;
 	margin-bottom: 46px;
-	.status-processing, .status-placed, .status-shipped, .status-canceled, .status-pending, .status-unpaid, .status-paid, .status-re-stocked, .status-complete, .status-refunded, .status-approved  {
+	/*.status-processing, .status-placed, .status-shipped, .status-canceled, .status-pending, .status-unpaid, .status-paid, .status-re-stocked, .status-complete, .status-refunded, .status-approved  {
 		padding: 9px 8px;
 		width: 100px;
 		text-align: center;
 		display: inline-block;
-	}
+	}*/
 }
 
 .status-processing {

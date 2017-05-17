@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col-md-2 col-sm-12">
         <img v-if="thumbUrl" :src="thumbUrl" width="100" class="avatar-img">
-        <div class='secondary-menu'>
+        <div class='f-horizontal-menu'>
             <ul class="nav">
-                <li v-for="t in formTabs" :class="{active:tab === t.name}">
-                    <a href="#" @click.prevent="switchTab(t.name)">
+                <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                    <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">
                         {{t.label|_}}
                         <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
                     </a>
@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="col-md-10 col-sm-12">
-        <div class="buttons-block text-right">
+        <div class="f-buttons-block text-right">
             <button v-for="a in form.config.actions" type="button" class="button" :class="a.class"
                     @click="buttonAction(a)" v-ladda="{on:action_in_progress === a.name}">{{a.label|_}}</button>
         </div>

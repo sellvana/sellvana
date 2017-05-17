@@ -1,103 +1,19 @@
-html,
-body,
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video,
-input,
-textarea {
+html {
+      height: 100%;
+      width: 100%;
+      /*min-width: 317px;*/
+}
+
+body {
       margin: 0;
       padding: 0;
+      min-height: 100%;
+      min-width: 310px;
       font-size: 13px;
       line-height: 1.25em;
       font-family: "SFUIDisplayRegular", sans-serif;
       box-sizing: border-box;
-}
-
-html {
-      height: 100%;
-      width: 100%;
-      min-width: 317px;
-}
-
-body {
       background: #f1f1f1;
-      min-height: 100%;
-      min-width: 317px;
 }
 
 .f-admin-header {
@@ -173,16 +89,17 @@ body {
 
 /*Custom dropdown block*/
 
-.custom-dropdown {
+.f-dropdown {
       position: relative;
       &.open {
-            .custom-dropdown__menu {
+            .f-dropdown__menu {
                   display: block;
             }
       }
 }
 
-.custom-dropdown__menu {
+.f-dropdown__menu {
+      padding: 0;
       position: absolute;
       top: 100%;
       z-index: 1000;
@@ -215,6 +132,9 @@ body {
       }
 }
 
+.f-dropdown__content {
+      padding: 0;
+}
 
 /*Header navbar's blocks*/
 
@@ -235,9 +155,9 @@ body {
 
 .header__navbar {
       display: inline-block;
-      font-size: 0;
       vertical-align: middle;
-      .custom-dropdown__menu {
+      margin: 0;
+      .f-dropdown__menu {
             right: 0;
             &:before {
                   content: '';
@@ -268,7 +188,7 @@ body {
       a {
             padding: 17px 12px 17px;
       }
-      .custom-dropdown__menu {
+      .f-dropdown__menu {
             width: 300px;
             padding-bottom: 0;
             * {
@@ -322,7 +242,7 @@ body {
       a {
             padding: 17px 12px 17px;
       }
-      .custom-dropdown-menu {
+      .f-dropdown-menu {
             width: auto;
             max-height: 500px;
             overflow-y: auto;
@@ -383,10 +303,10 @@ body {
                   border-radius: 15px 0 0 15px;
             }
       }
-      .custom-dropdown__menu {
+      .f-dropdown__menu {
             font-size: 14px;
       }
-      .custom-dropdown__content {
+      .f-dropdown__content {
             width: auto;
             max-height: 500px;
             overflow-y: auto;
@@ -461,7 +381,7 @@ body {
 
 /*Notifications block and messages*/
 
-.notification-block {
+.notifications-block {
       text-align: center;
       position: fixed;
       width: 50%;
@@ -470,11 +390,11 @@ body {
       z-index: 1;
 }
 
-.notification-block__container {
+.notifications-block__container {
       display: inline-block;
 }
 
-.notification-block__text {
+.notifications-block__text {
       width: 100%;
       padding: 15px 40px 15px 40px;
       color: #4a5629;
@@ -483,7 +403,7 @@ body {
       box-shadow: 7px 7px 5px 0 rgba(0, 0, 0, 0.11);
 }
 
-.notification-block__remove {
+.notifications-block__remove {
       position: absolute;
       right: 0;
       top: 0;
@@ -510,7 +430,9 @@ body {
       background: #d2e3f5;
 }
 
-
+.icon-close {
+      display: none;
+}
 
 @media (min-width: 768px) {
       .navbar-toggle {

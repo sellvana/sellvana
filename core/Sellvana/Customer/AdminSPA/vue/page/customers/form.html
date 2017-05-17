@@ -16,7 +16,7 @@
 						<button type="button" class="button button9" @click="save()">{{'Save'|_}}</button>
 						<button type="button" class="button button9" @click="save(true)">{{'Save and Continue'|_}}</button>
 					</div>
-					<div class="admin-main-content">
+					<div class="f-content-block">
 						<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
 					</div>
 				</div>

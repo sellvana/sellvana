@@ -1,7 +1,3 @@
-.secondary-control-block {
-	float: right;
-}
-
 .badge {
 	font-size: 10px;
 	background-color: #ff2626;
@@ -13,14 +9,13 @@
 	border-radius: 13px;
 	padding: 2px 0;
 }
-.admin-main-content {
+.f-filter-block {
+	overflow: hidden;
+}
+.f-content-block {
 	background: #fff;
 	border-radius: 5px; 
-	margin-bottom: 20px;
-	padding: 0;
-	overflow: hidden;
-	/*min-height: 800px;*/
-	padding: 0 0 60px 0;
+	padding: 10px;
 }
 .box-no-padding {
 	padding: 15px 0;
@@ -54,19 +49,16 @@
 		}
 	}			
 }
-.block-title {
-	margin-bottom: 10px;
+.f-block-title {
+
+}
+.f-block-title__text {
+	color: #2d2d2d;
+	font-weight: bold;
+	font-size: 16px;
+	padding: 8px 0;
 	display: inline-block;
-	padding: 0 0 0 16px;
-	width: 100%;
-	p {
-		color: #2d2d2d;
-		font-weight: bold;
-		font-size: 16px;
-		padding: 8px 0;
-		display: inline-block;
-		margin-right: 5px;
-	}
+	margin-right: 5px;
 }
 .param-block {
 	.param-result {
@@ -264,7 +256,7 @@
 			font-size: 14px;
 		}
 	}
-	/*.admin-main-content {
+	/*.f-content-block {
 		padding: 10px;
 	}*/
 }

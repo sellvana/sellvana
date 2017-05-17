@@ -4,7 +4,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
         template: '<div class="notifications-block"><div class="notifications-block__container">'
             + '<div v-for="m in messages" class="notifications-block__text" :class="m.type + \'-notification\'" @click="closeMessage(m)">'
                 + '<span v-html="m.text"></span>'
-                + '<a href="#" class="notification-block__remove" @click.prevent="closeMessage(m)"><i class="fa fa-times"></i></a>'
+                + '<a href="#" class="notifications-block__remove" @click.prevent="closeMessage(m)"><i class="fa fa-times"></i></a>'
             + '</div></div></div>',
         computed: {
             messages: function () {

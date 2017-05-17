@@ -1,5 +1,5 @@
-<div class="form-group row" :class="{required: fieldConfig('required'), error: field_errors}">
-    <label v-if="fieldConfig('label')" :for="field_id" class="control-label" :class="fieldConfig('label_class')">
+<div class="f-form-group row" :class="{required: fieldConfig('required'), error: field_errors}">
+    <label v-if="fieldConfig('label')" :for="field_id" class="f-form-label" :class="fieldConfig('label_class')">
         {{fieldConfig('label')|_}}
     </label>
 
@@ -8,7 +8,7 @@
         <input v-if="field_type === 'input'"
                :value="value_model" @input="value_model = $event.target.value"
                :id="field_id"
-               class="form-control"
+               class="f-input"
                :class="fieldConfig('input_class')"
                :style="fieldConfig('input_style')"
                :placeholder="fieldConfig('placeholder')"
@@ -21,7 +21,7 @@
         <select v-if="field_type === 'select'"
                 v-model="value_model"
                 :id="field_id"
-                class="form-control"
+                class="f-input"
                 :class="fieldConfig('input_class')"
                 :style="fieldConfig('input_style')"
                 :placeholder="fieldConfig('placeholder')"
@@ -88,7 +88,7 @@
         <textarea v-if="field_type === 'textarea'"
                   v-model="value_model"
                   :id="field_id"
-                  class="form-control"
+                  class="f-textarea"
                   :class="fieldConfig('input_class')"
                   :style="fieldConfig('input_style')"
                   :placeholder="fieldConfig('placeholder')"
