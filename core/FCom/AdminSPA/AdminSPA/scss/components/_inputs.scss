@@ -37,6 +37,25 @@
 		border-color: #b1bec8;
 	}
 }
+.f-input-number {
+	font-size: 12px;
+	padding: 7px 12px;
+	border-radius: 5px;
+	box-shadow: none;
+	border: 1px solid #ebebeb;
+	height: auto;
+	width: 100%;
+	color: #474646;
+	&:hover,
+	&:focus,
+	&:active {
+		border: 1px solid #ebebeb;
+		box-shadow: none;
+	}
+	&:focus {
+		border-color: #b1bec8;
+	}
+}
 .f-textarea {
 	font-size: 12px;
 	padding: 7px 12px;
@@ -48,7 +67,9 @@
 	width: 100%;
 	color: #474646;
 }
-.checkbox-block {
+
+/*Checkbox block*/
+.f-checkbox-block {
 	width: 48px;
 	height: 28px;
 	border-radius: 20px;
@@ -57,23 +78,30 @@
 	position: relative;
 	cursor: pointer;
 	background: #fff;
-	.checkbox-elem {
-		width: 26px;
-		height: 26px;
-		border-radius: 100%;
-		background: #ffffff;
-		position: absolute;
-		left: -1px;
-		top: 0;
-		transition: 0.2s all ease-in;
-		border: 1px solid #eee;
-		box-shadow: 2px 1px 3px 0 rgba(0, 0, 0, 0.06);
-	}
 }
+.f-checkbox-block__elem {
+	width: 26px;
+	height: 26px;
+	border-radius: 100%;
+	background: #ffffff;
+	position: absolute;
+	left: -1px;
+	top: 0;
+	transition: 0.2s all ease-in;
+	border: 1px solid #eee;
+	box-shadow: 2px 1px 3px 0 rgba(0, 0, 0, 0.06);
+}
+
+
+
+
 /*.delete {
 	margin-left: 10px;
 }*/
-input[type="checkbox"] {
+
+
+
+.f-input-checkbox-b {
 	& + span {
 		width: 20px;
 		height: 20px;
@@ -98,30 +126,23 @@ input[type="checkbox"] {
 		}
 	}
 }
-.selector-dropdown {
-	label {
-		color: #2e4354;
-		font-weight: normal;
+
+.f-input-checkbox-s {
+	& + span {
+		width: 12px;
+		height: 12px;
+		border-radius: 3px;
+		padding: 0;
+		position: relative;
+		margin-right: 2px;
 		display: inline-block;
-		padding: 3px 9px;
-		width: 100%;
-		cursor: pointer;
-	}
-	input[type="checkbox"] {
-		& + span {
-			width: 12px;
-			height: 12px;
-			border-radius: 3px;
-			padding: 0;
-			position: relative;
-			margin-right: 2px;
-			i {
-				font-size: 9px;
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-			}
+		border: solid 1px #d0dae3;
+		i {
+			font-size: 9px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 		}
 		&:checked {
 			& + span {
@@ -129,10 +150,25 @@ input[type="checkbox"] {
 			}
 		}
 	}
-	.dropdown-menu {
+}
+.f-selector-dropdown {
+	.f-action-button-s {
+		margin-bottom: 5px;
+		position: relative;
+		padding: 5px 15px 2px 9px;
+	}
+}
+.f-selector-dropdown__label {
+	color: #2e4354;
+	font-weight: normal;
+	display: inline-block;
+	padding: 0;
+	cursor: pointer;
+	margin-bottom: 0;
+	.f-dropdown__menu {
 		margin: 0;
 		padding: 0;
-		top: 21px;
+		top: 100%;
 		left: 9px;
 		border: solid 1px #d0dae3;
 		border-radius: 0 3px 3px 3px;
@@ -141,29 +177,29 @@ input[type="checkbox"] {
 			padding: 0;
 			&:hover {
 				background-color: #d0dae3;
-				input[type="checkbox"] + span { 
+				.f-input-checkbox + span {
 					border: solid 1px #2e4354;
 				}
 			}
 			&:active {
 				box-shadow: inset 0 1px 3px 0 rgba(112, 112, 112, 0.5);
-				input[type="checkbox"] + span { 
+				.f-input-checkbox + span {
 					border: solid 1px #2e4354;
 				}
 			}
 		}
-		
 		& > li:last-child a {
 			border: 0;
-		} 
+		}
 	}
 	.action-button {
 		label {
 			padding: 0;
 			width: initial;
-		}	
+		}
 	}
 }
+
 input[type="radio"] + span {
 	width: 21px;
 	height: 21px;
@@ -182,11 +218,15 @@ input[type="radio"] + span {
 		color: #ccd1d9;
 	}
 }
+
+
 label {
-	input[type="checkbox"], input[type="radio"] {
+	.f-input-checkbox, input[type="radio"] {
 		height: 0;
 		width: 0;
 		display: block;
+		margin: 0;
+		padding: 0;
 		&:checked + span i {
 			display: inline-block;
 			opacity: 1;
@@ -195,15 +235,7 @@ label {
 	}
 }
 
-.pagination {
-	input {
-		border: 1px solid #eaeaea;
-		width: 30px;
-		padding: 8px 0;
-		text-align: center;
-		color: #474646;
-	}
-}
+
 .input-group-addon:first-child {
 	border-radius: 5px;
 }
@@ -259,16 +291,17 @@ input::-webkit-inner-spin-button {
 	}
 }
 
-
-input[type="checkbox"]:focus + .checkbox-block {
-	box-shadow: 0 1px 6px 1px rgba(15, 84, 17, 0.3);
-}
-input[type="checkbox"]:checked + .checkbox-block {
-	background: #4dd865;
-	border: 1px solid #4dd865;
-	.checkbox-elem {
-		left: 20px;
-		border: 1px solid #fff;
+.f-input-checkbox {
+	&:checked + .f-checkbox-block {
+		background: #4dd865;
+		border: 1px solid #4dd865;
+		.f-checkbox-block__elem {
+			left: 20px;
+			border: 1px solid #fff;
+		}
+	}
+	&:focus + .f-checkbox-block {
+		box-shadow: 0 1px 6px 1px rgba(15, 84, 17, 0.3);
 	}
 }
 

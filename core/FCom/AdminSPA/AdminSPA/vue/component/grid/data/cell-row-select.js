@@ -2,7 +2,7 @@ define(['vue'], function (Vue) {
     return {
         props: ['grid', 'row', 'col'],
         template: '<th class="column-row-select">'
-            + '<label @click.prevent="selectRow(col)"><input type="checkbox" :checked="isRowSelected(col)"/>'
+            + '<label @click.prevent="selectRow(col)"><input type="checkbox" :checked="isRowSelected(col)" class="f-input-checkbox f-input-checkbox-b"/>'
             + '<span><i class="fa fa-check" aria-hidden="true"></i></span></label>'
             + '</th>',
 

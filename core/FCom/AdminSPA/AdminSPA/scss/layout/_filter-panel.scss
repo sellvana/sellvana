@@ -1,9 +1,12 @@
-.dropdown.open {
-	& > .dropdown-menu {
-		display: block;
+.pagination {
+	input {
+		border: 1px solid #eaeaea;
+		width: 30px;
+		padding: 8px 0;
+		text-align: center;
+		color: #474646;
 	}
 }
-
 .f-grid-filter-panel {
 	position: relative;
 	margin: 0 15px;
@@ -355,10 +358,7 @@
 		width: 100% !important;
 	}
 }
-.input-group .form-control:last-child, .input-group-addon:last-child, .input-group-btn:last-child > .btn, .input-group-btn:last-child > .btn-group > .btn, .input-group-btn:last-child > .dropdown-toggle, .input-group-btn:first-child > .btn:not(:first-child), .input-group-btn:first-child > .btn-group:not(:first-child) > .btn {
-	border-bottom-right-radius: 5px;
-	border-top-right-radius: 5px;
-}
+
 .pagination-block {
 	text-align: center;
 	padding: 5px 0;

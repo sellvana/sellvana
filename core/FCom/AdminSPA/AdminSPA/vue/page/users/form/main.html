@@ -1,7 +1,6 @@
 <div class="f-content-block">
-	<form class="form-horizontal">
-		<div class="f-section">
-			<div class="form-group">
+	<fieldset class="f-form-container">
+		<div class="f-form-group row ">
 				<p class="col-md-3"></p>
 				<div class="col-md-9">
 					<p class="param-block">If
@@ -28,79 +27,62 @@
 					</p>
 				</div>
 			</div>
-			<div class="form-group error">
-				<label>
-					<p class="col-md-3 control-label">{{'Input'|_}}</p>
-					<div class="col-md-9">
-						<input class="form-control" type="text" v-model="test"/>
-						<span class="error-message">Error description under the field</span>
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">{{'Textarea'|_}}</p>
-					<div class="col-md-9">
-						<textarea class="form-control" rows="5"></textarea>
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">{{'Select'|_}}</p>
-					<div class="col-md-9">
-						<select2 class="form-control">
-							<option>Option1</option>
-							<option>Option2</option>
-							<option>Option3</option>
-							<option>Option4</option>
-						</select2>
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">{{'Select multiple'|_}}</p>
-					<div class="col-md-9">
-						<select2 multiple="" aria-multiselectable="true" class="form-control select2-hidden-accessible" tabindex="-1" aria-hidden="true">
-							<option>Option1</option>
-							<option>Option2</option>
-							<option>Option3</option>
-							<option>Option4</option>
-						</select2>
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">{{'Checkbox'|_}}</p>
-					<div class="col-md-9">
-						<checkbox v-model="test"></checkbox>
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">{{'Number input'|_}}</p>
-					<div class="col-md-9">
-						<input class="form-control" type="number" />
-					</div>
-				</label>
-			</div>
-			<div class="form-group">
-				<label>
-					<p class="col-md-3 control-label">
-						en_US
-						<span class="icon-question-sign">
-							<i class="fa fa-question-circle" aria-hidden="true"></i>
-							<span class="tooltip">Message</span>
-						</span>
-					</p>
-					<div class="col-md-9">
-						<textarea class="form-control" rows="5"></textarea>
-					</div>
-				</label>
+		<div class="f-form-group row error">
+			<label class="f-form-label col-md-3">{{'Input'|_}}</label>
+			<div class="col-md-9">
+				<input class="f-input" type="text" v-model="test"/>
+				<span class="error-message">Error description under the field</span>
 			</div>
 		</div>
-	</form>
+		<div class="f-form-group row ">
+			<label class="f-form-label col-md-3">{{'Textarea'|_}}</label>
+			<div class="col-md-9">
+				<textarea class="f-textarea" rows="5"></textarea>
+			</div>
+		</div>
+		<div class="f-form-group row ">
+			<label class="f-form-label col-md-3">{{'Select'|_}}</label>
+			<div class="col-md-9">
+				<select2 class="form-control">
+					<option>Option1</option>
+					<option>Option2</option>
+					<option>Option3</option>
+					<option>Option4</option>
+				</select2>
+			</div>
+		</div>
+		<div class="f-form-group row">
+			<label class="f-form-label col-md-3">{{'Select multiple'|_}}</label>
+			<div class="col-md-9">
+				<select2 multiple="" aria-multiselectable="true" class="form-control select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+					<option>Option1</option>
+					<option>Option2</option>
+					<option>Option3</option>
+					<option>Option4</option>
+				</select2>
+			</div>
+		</div>
+		<div class="f-form-group row">
+			<label class="f-form-label col-md-3">{{'Checkbox'|_}}</label>
+			<div class="col-md-9">
+				<checkbox v-model="test"></checkbox>
+			</div>
+		<div class="f-form-group row">
+			<label class="f-form-label col-md-3">{{'Number input'|_}}</label>
+			<div class="col-md-9">
+				<input class="f-input-number " type="number" />
+			</div>
+		</div>
+		<div class="f-form-group row">
+			<label class="f-form-label col-md-3">en_US
+				<span class="icon-question-sign">
+					<i class="fa fa-question-circle" aria-hidden="true"></i>
+					<span class="tooltip">Message</span>
+				</span>
+			</label>
+			<div class="col-md-9">
+				<textarea class="f-textarea" rows="5"></textarea>
+			</div>
+		</div>
+	</fieldset>
 </div>

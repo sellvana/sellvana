@@ -1,7 +1,7 @@
 .f-grid-wrapper {
 	overflow: hidden;
 }
-.main-grid {
+.f-main-grid {
 	min-width: calc(100% - 1px);
 	thead {
 		.sorted-up,
@@ -13,17 +13,17 @@
 				position: relative;
 			}
 		}
-		.fa {
+		.f-sorted {
 			font-size: 15px;
 			margin: 0 2px;
 			position: relative;
 		}
-		.fa-caret-up {
+		.f-sorted-up {
 			left: 7.5px;
 			top: -3px;
 			color: #dddddd;
 		}
-		.fa-caret-down {
+		.f-sorted-down {
 			left: -5px;
 			top: 4px;
 			color: #dddddd;
@@ -32,12 +32,6 @@
 		th {
 			padding: 0 7px;
 			color: #85a5bd;
-		}
-		a {
-			padding: 0 7px;
-			display: block;
-			color: #85a5bd;
-			font-weight: bold;
 		}
 	}
 	tbody {
@@ -74,7 +68,12 @@
 		}
 	}
 }
-
+.f-main-grid__header-link {
+	padding: 0 7px;
+	display: block;
+	color: #85a5bd;
+	font-weight: bold;
+}
 .striped-table {
 	width: 100%;
 	td,

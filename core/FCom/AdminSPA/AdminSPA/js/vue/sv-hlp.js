@@ -78,8 +78,8 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
         });
 
         Vue.component('checkbox', {
-            template: '<label><input type="checkbox" :id="id" v-model="internal"><div class="checkbox-block" :style="blockStyle">' +
-                '<div class="checkbox-elem" :style="elemStyle"></div></div></label>',
+            template: '<label><input type="checkbox" :id="id" v-model="internal" class="f-input-checkbox"><div class="f-checkbox-block" :style="blockStyle">' +
+                '<div class="f-checkbox-block__elem" :style="elemStyle"></div></div></label>',
             props: ['value', 'height', 'width', 'id'],
             data: function () {
                 return {

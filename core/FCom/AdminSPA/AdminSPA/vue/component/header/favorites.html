@@ -1,11 +1,11 @@
 <li class="header__navbar__item f-dropdown header__favorites-block" :class="{open:ddOpen('header-favorites')}">
-	<a href="#" :title="_('Favorites')" class="f-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-favorites')">
+	<a href="#" :title="_('Favorites')" class="f-dropdown__toggle header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-favorites')">
 		<svg width="20" height="19" v-html="svgIconLink('icon-star')"></svg>
 	</a>
 	<ul class="f-dropdown__menu">
-		<li v-for="fav in favorites" :class="{active: isActive(fav)}">
-			<router-link :to="fav.link"><i :class="fav.icon_class" aria-hidden="true"></i> {{fav.label}}</router-link>
-			<a href="#" @click.prevent.stop="removeFavorite(fav)" class="remove"><i class="fa fa-times"></i></a>
+		<li v-for="fav in favorites" :class="{active: isActive(fav)}" class="f-dropdown__menu__item">
+			<router-link :to="fav.link" class="f-dropdown__menu__link"><i :class="fav.icon_class" aria-hidden="true"></i> {{fav.label}}</router-link>
+			<a href="#" @click.prevent.stop="removeFavorite(fav)" class="f-dropdown__item__act"><i class="fa fa-times"></i></a>
 		</li>
 	</ul>
 </li>

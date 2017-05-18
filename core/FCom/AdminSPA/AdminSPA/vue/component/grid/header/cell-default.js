@@ -4,9 +4,9 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
         mixins: [SvHlp.mixins.common],
         props: ['grid', 'col'],
         template: '<th>'
-		+ '<a v-if="col.sortable" href="#" :class="anchorClass" @click.prevent="toggleSort()">{{col.label|_}}'
-            + '<i class="fa fa-caret-up" aria-hidden="true" v-if="sorted(\'up\', 1)"></i>'
-            + '<i class="fa fa-caret-down" aria-hidden="true" v-if="sorted(\'down\', 1)"></i></a>'
+		+ '<a v-if="col.sortable" href="#" :class="anchorClass" @click.prevent="toggleSort()" class="f-main-grid__header-link">{{col.label|_}}'
+            + '<i class="fa fa-caret-up f-sorted f-sorted-up" aria-hidden="true" v-if="sorted(\'up\', 1)"></i>'
+            + '<i class="fa fa-caret-down f-sorted f-sorted-down" aria-hidden="true" v-if="sorted(\'down\', 1)"></i></a>'
             + '<span v-else>{{col.label|_}}</span>'
             + '</th>',
         computed: {
