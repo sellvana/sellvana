@@ -35,17 +35,21 @@
 	</div>
 
 	<div class="col-lg-6">
-		<div class="paginations-block text-right">
+		<div class="f-grid-panel text-right">
 			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="visible-xs text-center"></sv-comp-grid-pager-dropdown>
-			<span class="amount-rows hidden-xs"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
-			<div class="search-block">
-				<input type="text" :placeholder="'Search grid...'|_" v-model="quickSearch" />
+			<span class="amount-rows f-filter__elem"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
+			<div class="f-search-block f-filter__elem">
+				<input type="text" :placeholder="'Search grid...'|_" v-model="quickSearch" class="f-input" />
 				<button class="visible-xs" name="button" type="button">
 					<svg width="20" height="19" v-html="svgIconLink('icon-search')"></svg>
 				</button>
 			</div>
-			<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @event="onEvent"></sv-comp-grid-bulk-actions>
-			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="hidden-xs"></sv-comp-grid-pager-dropdown>
+			<div class="f-filter__elem">
+				<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @event="onEvent"></sv-comp-grid-bulk-actions>
+			</div>
+			<div class="f-filter__elem">
+				<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="hidden-xs"></sv-comp-grid-pager-dropdown>
+			</div>
 		</div>
 	</div>
 </div>

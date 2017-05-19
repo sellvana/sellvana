@@ -80,14 +80,14 @@
                 <input type="number" v-model="rma.carrier_price" class="form-control">
             </div>
         </div>
-        <div class="control-buttons-block text-right">
+        <div class="f-button-block text-right">
             <button type="button" class="button button12" @click="submit()" :diabled="!totalQtyToReturn">{{'Create and Save Return'|_}}</button>
             <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
     </div>
     <div v-else>
         {{'No returnable items found.'|_}}
-        <div class="control-buttons-block text-right">
+        <div class="f-button-block text-right">
             <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
     </div>

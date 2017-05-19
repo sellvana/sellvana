@@ -1,15 +1,20 @@
 <div class="row">
 	<div class="col-md-12 col-lg-6">
 		<div class="f-content-block">
-			<div class="row">
-				<div class="col-md-12">
+			<fieldset class="f-form-container">
+
+
+			</fieldset>
 					<div class="form-horizontal">
 						<div class="f-section">
+
+
+
 							<div class="form-group">
 								<div class="row">
 									<div class="col-sm-5">
 										<label>
-											<p class="col-md-6 control-label">{{'Display in Navigation'|_}}</p>
+											<p class="col-md-6 f-form-label">{{'Display in Navigation'|_}}</p>
 											<div class="col-md-6">
 												<checkbox v-model="form.category.is_top_menu"></checkbox>
 											</div>
@@ -37,8 +42,7 @@
 												v-model="form.category[f.name]" @event="processFieldEvent"></sv-comp-form-field>
 						</div>
 					</div>
-				</div>
-			</div>
+
 		</div>
 	</div>
 	<div class="col-md-12 col-lg-6">

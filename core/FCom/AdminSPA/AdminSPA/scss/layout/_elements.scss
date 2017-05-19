@@ -1,3 +1,12 @@
+.f-filter-block {
+	overflow: hidden;
+}
+.f-content-block {
+	background: #fff;
+	border-radius: 5px;
+	padding: 15px;
+}
+
 .badge {
 	font-size: 10px;
 	background-color: #ff2626;
@@ -9,14 +18,7 @@
 	border-radius: 13px;
 	padding: 2px 0;
 }
-.f-filter-block {
-	overflow: hidden;
-}
-.f-content-block {
-	background: #fff;
-	border-radius: 5px; 
-	padding: 10px;
-}
+
 .box-no-padding {
 	padding: 15px 0;
 }
@@ -68,7 +70,7 @@
 		a {
 			border-bottom: 1px solid #474646;
 			color: #474646;
-			padding: 0px 0 1px 0;
+			padding: 0 0 1px 0;
 			&:hover {
 				border-bottom: 1px solid #000;
 				color: #000;

@@ -1,7 +1,7 @@
-<div class="f-dropdown action" :class="{open:ddOpen(grid.config.id+'/bulk-actions')}">
-    <a href="#" class="f-dropdown__toggle" data-toggle="dropdown"
-       @click.prevent.stop="ddToggle(grid.config.id+'/bulk-actions')"><span>{{'Bulk Action'|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
-    <ul class="f-dropdown__menu" @click.prevent>
-        <li v-for="act in actions" class="f-dropdown__menu__item"><a href="#" @click.prevent="bulkAction(act)" class="f-dropdown__menu__link">{{act.label|_}}</a></li>
+<div class="f-action-button-b" :class="{open:ddOpen(grid.config.id+'/bulk-actions')}">
+    <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown"
+       @click.prevent.stop="ddToggle(grid.config.id+'/bulk-actions')">{{'Bulk Action'|_}}<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+    <ul class="f-action-button-b__menu" @click.prevent>
+        <li v-for="act in actions" class="f-action-button-b__item"><a href="#" @click.prevent="bulkAction(act)" class="f-action-button-b__link">{{act.label|_}}</a></li>
     </ul>
 </div>

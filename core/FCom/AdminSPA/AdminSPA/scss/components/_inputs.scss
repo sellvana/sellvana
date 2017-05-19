@@ -1,3 +1,5 @@
+/*Main forms styles*/
+
 .f-form-container {
 	padding: 20px 0;
 	.f-form-group {
@@ -7,20 +9,23 @@
 		}
 	}
 }
+
 .f-form-group {
 	.error-message {
 		visibility: hidden;
 	}
 }
+
 .f-form-label {
 	color: #000;
 	cursor: pointer;
 	text-align: right;
 	padding-top: 7px;
 }
+
 .f-input {
 	font-size: 12px;
-	padding: 7px 12px;
+	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: 1px solid #ebebeb;
@@ -36,15 +41,19 @@
 	&:focus {
 		border-color: #b1bec8;
 	}
+}
+
+.f-translate-block__input, .f-translate-block__textarea, .f-translate-block__number {
+	width: calc(100% - 40px);
 }
 .f-input-number {
 	font-size: 12px;
-	padding: 7px 12px;
+	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: 1px solid #ebebeb;
 	height: auto;
-	width: 100%;
+	width: calc(100% - 40px);
 	color: #474646;
 	&:hover,
 	&:focus,
@@ -56,9 +65,10 @@
 		border-color: #b1bec8;
 	}
 }
+
 .f-textarea {
 	font-size: 12px;
-	padding: 7px 12px;
+	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: 1px solid #ebebeb;
@@ -68,7 +78,9 @@
 	color: #474646;
 }
 
+
 /*Checkbox block*/
+
 .f-checkbox-block {
 	width: 48px;
 	height: 28px;
@@ -79,6 +91,7 @@
 	cursor: pointer;
 	background: #fff;
 }
+
 .f-checkbox-block__elem {
 	width: 26px;
 	height: 26px;
@@ -91,15 +104,6 @@
 	border: 1px solid #eee;
 	box-shadow: 2px 1px 3px 0 rgba(0, 0, 0, 0.06);
 }
-
-
-
-
-/*.delete {
-	margin-left: 10px;
-}*/
-
-
 
 .f-input-checkbox-b {
 	& + span {
@@ -151,6 +155,7 @@
 		}
 	}
 }
+
 .f-selector-dropdown {
 	.f-action-button-s {
 		margin-bottom: 5px;
@@ -158,6 +163,7 @@
 		padding: 5px 15px 2px 9px;
 	}
 }
+
 .f-selector-dropdown__label {
 	color: #2e4354;
 	font-weight: normal;
@@ -307,14 +313,17 @@ input::-webkit-inner-spin-button {
 
 
 .translate-icon {
-	position: absolute;
-	right: -13px;
-	top: 0;
 	font-size: 18px;
 	padding: 4px 5px;
 	color: #5f5f5f;
+	vertical-align: top;
+	display: inline-block;
 }
-
+.ckeditor {
+	width: calc(100% - 40px);
+	display: inline-block;
+	vertical-align: top;
+}
 .param-block {
 	.delete {
 		margin-left: 0;
@@ -351,16 +360,5 @@ input::-webkit-inner-spin-button {
 }
 
 @media (max-width: 767px) {
-	.translate-icon {
-		position: absolute;
-		right: 15px;
-		top: 0;
-		font-size: 18px;
-		padding: 4px 5px;
-	}
-	.required {
-		.control-label {
-			padding-top: 7px;
-		}
-	}
+
 }
