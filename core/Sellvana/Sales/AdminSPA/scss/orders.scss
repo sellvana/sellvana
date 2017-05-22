@@ -1,10 +1,7 @@
-.information-block {
-	padding: 0 30px;
-	&.grid-block {
-		padding: 0;
-	}
+.f-information-block {
+	margin: 20px 0;
 }
-.information-block-toggle {
+.f-information-block__toggle   {
 	display: none;
 	position: relative;
 	padding: 16px;
@@ -64,7 +61,7 @@
 	width: 18%;
 	vertical-align: top; 
 	position: relative;
-	min-height: 180px;
+	min-height: 200px;
 	max-width: 285px;
 	.no-gutter {
 		margin-right: 0;
@@ -83,6 +80,7 @@
 		p {
 			font-size: 14px;
 			padding: 5px 12px;
+			font-weight: bold;
 		}
 	}	
 	.close-editor {
@@ -816,35 +814,33 @@
 		}
 	}
 	.edited-block {
-		margin: 0 0 25px 0;
+		margin: 10px 0 10px 0;
 		width: 100%;
 		max-width: 100%;
 		min-height: 120px;
 	}
-	.information-block {
-		padding: 0 6px;
-		.information-block-toggle {
+	.f-information-block {
+		.f-information-block__toggle   {
 			text-align: left;
 		}
 		&.grid-block {
-			margin: 0 6px;
 			.params-right {
-				right: -256px;
+				right: -265px;
 			}
 		}
 	}
-	.information-block-toggle  {
+	.f-information-block__toggle    {
 		display: block;
 		margin-bottom: 7px;
 	}
-	.information-block-content {
+	.f-information-block__content  {
 		display: none;
 	}
-	.information-block {
+	.f-information-block {
 		&.open {
-			.information-block-content {
+			.f-information-block__content  {
 				display: block;
-				padding: 20px 0;
+				padding: 5px 0;
 			}
 			.nav-arrow {
 				transform: translateY(-50%) rotate(90deg);

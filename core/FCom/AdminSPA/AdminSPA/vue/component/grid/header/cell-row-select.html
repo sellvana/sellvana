@@ -12,9 +12,9 @@
 			</div>
 		</a>
 		<ul class="f-dropdown__menu" :class="{open:ddOpen(grid.config.id+'/row-select-header')}">
-			<li v-if="hasUnselectedOnPage" class="f-dropdown__menu__item"><a href="#" @click.prevent="selectVisible" class="f-dropdown__menu__link"><label><input type="checkbox" checked class="f-input-checkbox f-input-checkbox-b"><span><i aria-hidden="true" class="fa fa-check"></i></span>{{'Select Visible'|_}}</label></a></li>
-			<li v-if="hasSelectedOnPage" class="f-dropdown__menu__item"><a href="#" @click.prevent="unselectVisible" class="f-dropdown__menu__item"><label><input type="checkbox" class="f-input-checkbox f-input-checkbox-b"><span><i aria-hidden="true" class="fa fa-check"></i></span>{{'Unselect Visible'|_}}</label></a></li>
-			<li v-if="selectedCnt" class="f-dropdown__menu__item"><a href="#" @click.prevent="unselectAll" class="f-dropdown__menu__item"><label><input type="checkbox" class="f-input-checkbox f-input-checkbox-b"><span><i aria-hidden="true" class="fa fa-check"></i></span>{{'Unselect All'|_}}</label></a></li>
+			<li v-if="hasUnselectedOnPage" class="f-dropdown__menu__item"><a href="#" @click.prevent="selectVisible" class="f-dropdown__menu__link"><label><input type="checkbox" checked class="f-input-checkbox f-input-checkbox-s"><span><i aria-hidden="true" class="fa fa-check"></i></span>{{'Select Visible'|_}}</label></a></li>
+			<li v-if="hasSelectedOnPage" class="f-dropdown__menu__item"><a href="#" @click.prevent="unselectVisible" class="f-dropdown__menu__link"><label><input type="checkbox" class="f-input-checkbox f-input-checkbox-s"><span><i aria-hidden="true" class="fa fa-check"></i></span>{{'Unselect Visible'|_}}</label></a></li>
+			<li v-if="selectedCnt" class="f-dropdown__menu__item"><a href="#" @click.prevent="unselectAll" class="f-dropdown__menu__link"><label><input type="checkbox" class="f-input-checkbox f-input-checkbox-s"><span><i aria-hidden="true" class="fa fa-check"></i></span>{{'Unselect All'|_}}</label></a></li>
 			<!--<li><a href="#" @click.prevent="viewAll"><label>{{'View All'|_}}</label></a></li>-->
 			<!--<li><a href="#" @click.prevent="viewSelected"><label>{{'View Selected'|_}}</label></a></li>-->
 		</ul>

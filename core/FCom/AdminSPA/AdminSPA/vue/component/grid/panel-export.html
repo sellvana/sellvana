@@ -1,8 +1,8 @@
 <div class="option-box">
 	<ol>
 		<li v-for="opt in formatOptions">
-			<label>
-				<input type="radio" name="export" :value="opt.value" :checked="opt.value===type" />
+			<label class="f-radio-block">
+				<input type="radio" name="export" :value="opt.value" :checked="opt.value===type" class="f-input-radio"/>
 				<span><i class="fa fa-circle" aria-hidden="true"></i></span>
 				<span>{{opt.label|_}}</span>
 			</label>

@@ -1,16 +1,16 @@
 <div class="">
-	<div class="f-content-block" :class="{editable:ddOpen('editable')}">
-		<div class="f-buttons-block">
+	<div class="f-content-block  f-grid-wrapper" :class="{editable:ddOpen('editable')}">
+		<div class="f-buttons-block text-right">
 			<button type="button" class="button button2">{{'Generate POs'|_}}</button>
 			<button type="button" class="button button1" @click.prevent.stop="ddToggle('editable')">{{'Edit'|_}}</button>
 		</div>
-		<div class="information-block" :class="{open:ddOpen('info-block1')}">
-			<a href="#" class="information-block-toggle" @click.prevent.stop="ddToggle('info-block1')">{{'Details'|_}}
+		<div class="f-information-block" :class="{open:ddOpen('info-block1')}">
+			<a href="#" class="f-information-block__toggle" @click.prevent.stop="ddToggle('info-block1')">{{'Details'|_}}
 				<div class=nav-arrow>
 					<svg width="10" height="10" v-html="svgIconLink('nav-arrow')"></svg>
 				</div>
 			</a>
-			<div class="information-block-content" :class="{'visible-lg':!mobile, 'hidden-lg':mobile}">
+			<div class="f-information-block__content" @click.stop>
 				<div class="edited-block" :class="{on:editing.customer}">
 					<div class="block-title">
 						<p>{{'Order'|_}}</p>
@@ -212,23 +212,23 @@
 				</div>
 			</div>
 		</div>
-		<div class="information-block grid-block" :class="{open:ddOpen('info-block2')}">
-			<a href="#" class="information-block-toggle" @click.prevent.stop="ddToggle('info-block2')">{{'Items'|_}}
+		<div class="f-information-block grid-block" :class="{open:ddOpen('info-block2')}">
+			<a href="#" class="f-information-block__toggle" @click.prevent.stop="ddToggle('info-block2')">{{'Items'|_}}
 				<div class=nav-arrow>
 					<svg width="10" height="10" v-html="svgIconLink('nav-arrow')"></svg>
 				</div>
 			</a>
-			<div class="information-block-content">
+			<div class="f-information-block__content" @click.stop>
 				<sv-comp-grid :grid="itemsGrid"></sv-comp-grid>
 			</div>
 		</div>
-		<div class="information-block text-right" :class="{open:ddOpen('info-block3')}">
-			<a href="#" class="information-block-toggle" @click.prevent.stop="ddToggle('info-block3')">{{'Totals'|_}}
+		<div class="f-information-block text-right" :class="{open:ddOpen('info-block3')}">
+			<a href="#" class="f-information-block__toggle" @click.prevent.stop="ddToggle('info-block3')">{{'Totals'|_}}
 				<div class=nav-arrow>
 					<svg width="10" height="10" v-html="svgIconLink('nav-arrow')"></svg>
 				</div>
 			</a>
-			<div class="information-block-content">
+			<div class="f-information-block__content" @click.stop>
 				<div class="block-for-table">
 				<div class="block-title">
 					<p>{{'Totals'|_}}</p>

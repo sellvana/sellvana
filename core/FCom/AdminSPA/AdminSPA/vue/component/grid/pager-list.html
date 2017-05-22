@@ -1,6 +1,6 @@
-<div class="pagination-block">
-    <ul class="pagination">
-        <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}"><a href="#" @click.prevent="setPagesize(ps)" class="js-change-url page-size">{{ps}}</a></li>
+<div class="f-pagination-block">
+    <ul class="f-list-pagination">
+        <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}" class="f-list-pagination__item"><a href="#" @click.prevent="setPagesize(ps)" class="f-list-pagination__link">{{ps}}</a></li>
     </ul>
 
   <!--  <ul class="pagination pagination-sm pagination-griddle page">

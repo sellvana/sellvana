@@ -1,4 +1,4 @@
-<div class='pagination-dropdown'>
+<div class='f-pagination f-filter__elem'>
    <!-- <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(ddName)}">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(ddName)"
            @click.prevent.stop="ddToggle(ddName)"><span>{{curPagesize}}</span><span class="caret-back"><b class="caret"></b></span></a>
@@ -14,17 +14,17 @@
         <li>{{'of'|_}}<span>{{numPages}}</span></li>
         <li class="next"><a href="#" @click.prevent="goNextPage()">{{'Next'|_}}</a></li>
     </ul>-->
-    <a href="#" class="prev-page" @click.prevent="goPrevPage()">
+    <a href="#" class="f-pagination__prev-page" @click.prevent="goPrevPage()">
 		<i class="fa fa-caret-left" aria-hidden="true"></i>
     </a>
-	<div class="dropdown" :class="{open:ddOpen(ddName)}">
-		<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(ddName)">{{curPage}} {{'of'|_}} {{numPages}}
+	<div class="f-pagination__dropdown" :class="{open:ddOpen(ddName)}">
+		<a href="#" class="f-pagination__toggle" @click.prevent.stop="ddToggle(ddName)">{{curPage}} {{'of'|_}} {{numPages}}
 			<span class="caret-back"><b class="caret"></b></span></a>
-    	<ul class="dropdown-menu" @click.stop>
-			<li v-for="p in numPages"><a href="#" @click.prevent="goPage(p)">{{p}}</a></li>
+    	<ul class="f-pagination__menu" @click.stop>
+			<li v-for="p in numPages" class="f-pagination__item"><a href="#" @click.prevent="goPage(p)" class="f-pagination__link">{{p}}</a></li>
     	</ul>
     </div>
-	<a href="#" class="next-page" @click.prevent="goNextPage()">
+	<a href="#" class="f-pagination__next-page" @click.prevent="goNextPage()">
 		<i class="fa fa-caret-right" aria-hidden="true"></i>
 	</a>
 </div>
