@@ -30,6 +30,11 @@ input::-webkit-inner-spin-button {
 	.error-message {
 		visibility: hidden;
 	}
+	.translate-icon {
+		position: absolute;
+		right: 20px;
+		top: 4px;
+	}
 }
 
 .f-form-label {
@@ -124,7 +129,7 @@ input::-webkit-inner-spin-button {
 	box-shadow: 2px 1px 3px 0 rgba(0, 0, 0, 0.06);
 }
 
-.f-input-checkbox-b, .f-input-checkbox-s, .f-input-radio { /*"Display: none" was not used so that you can switch using "tab"*/
+.f-input-checkbox-b, .f-input-checkbox-s, .f-input-radio, .f-input-checkbox { /*"Display: none" was not used so that you can switch using "tab"*/
 	height: 0  !important;
 	width: 0  !important;
 	display: block  !important;

@@ -2,47 +2,35 @@
 	<div class="col-md-12 col-lg-6">
 		<div class="f-content-block">
 			<fieldset class="f-form-container">
-
-
-			</fieldset>
-					<div class="form-horizontal">
-						<div class="f-section">
-
-
-
-							<div class="form-group">
-								<div class="row">
-									<div class="col-sm-5">
-										<label>
-											<p class="col-md-6 f-form-label">{{'Display in Navigation'|_}}</p>
-											<div class="col-md-6">
-												<checkbox v-model="form.category.is_top_menu"></checkbox>
-											</div>
-										</label>
-									</div>
-									<div class="col-sm-3">
-										<label>
-											<p class="col-md-6 control-label">{{'Featured'|_}}</p>
-											<div class="col-md-6">
-												<checkbox v-model="form.category.is_featured"></checkbox>
-											</div>
-										</label>
-									</div>
-									<div class="col-sm-3">
-										<label>
-											<p class="col-md-6 control-label">{{'Enable'|_}}</p>
-											<div class="col-md-6">
-												<checkbox v-model="form.category.is_enabled"></checkbox>
-											</div>
-										</label>
-									</div>
-								</div>
+				<div class="f-form-group row">
+					<div class="col-sm-5">
+						<label>
+							<p class="col-md-6 f-form-label">{{'Display in Navigation'|_}}</p>
+							<div class="col-md-6">
+								<checkbox v-model="form.category.is_top_menu"></checkbox>
 							</div>
-							<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='main'" :form="form" :field="f.name"
-												v-model="form.category[f.name]" @event="processFieldEvent"></sv-comp-form-field>
-						</div>
+						</label>
 					</div>
-
+					<div class="col-sm-3">
+						<label>
+							<p class="col-md-6 control-label">{{'Featured'|_}}</p>
+							<div class="col-md-6">
+								<checkbox v-model="form.category.is_featured"></checkbox>
+							</div>
+						</label>
+					</div>
+					<div class="col-sm-3">
+						<label>
+							<p class="col-md-6 control-label">{{'Enable'|_}}</p>
+							<div class="col-md-6">
+								<checkbox v-model="form.category.is_enabled"></checkbox>
+							</div>
+						</label>
+					</div>
+				</div>
+				<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='main'" :form="form" :field="f.name"
+							  v-model="form.category[f.name]" @event="processFieldEvent"></sv-comp-form-field>
+			</fieldset>
 		</div>
 	</div>
 	<div class="col-md-12 col-lg-6">
