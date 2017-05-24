@@ -1,13 +1,13 @@
-<ul class="breadcrumb" :class="{'visible-lg  pull-left':!mobile, 'hidden-lg':mobile}">
-      <li v-for="part in breadcrumbParts" class="breadcrumb__item">
-            <router-link v-if="part.link" :to="part.link" class="breadcrumb__link">{{part.label|_}}</router-link>
-            <a v-else href="#" @click.prevent class="breadcrumb__link"  >{{part.label|_}}</a>
+<ul class="f-breadcrumb f-header-breadcrumb" :class="{'visible-lg  pull-left':!mobile, 'hidden-lg':mobile}">
+      <li v-for="part in breadcrumbParts" class="f-breadcrumb__item">
+            <router-link v-if="part.link" :to="part.link" class="f-breadcrumb__link">{{part.label|_}}</router-link>
+            <a v-else href="#" @click.prevent class="f-breadcrumb__link"  >{{part.label|_}}</a>
       </li>
-      <li class="breadcrumb__penultimate">
-            <a href="#" @click.prevent class="breadcrumb__link"><i v-if="curPage.icon_class" :class="curPage.icon_class" aria-hidden="true"></i>{{curPage.label|_}}</a>
+      <li class="f-breadcrumb__penultimate">
+            <a href="#" @click.prevent class="f-breadcrumb__link"><i v-if="curPage.icon_class" :class="curPage.icon_class" aria-hidden="true"></i>{{curPage.label|_}}</a>
       </li>
-      <li class="breadcrumb__item">
-            <a href="#" class="breadcrumb__item-favorite__link" :class="{on:isFavorite}" @click.prevent="toggleFavorite()">
+      <li class="f-breadcrumb__item">
+            <a href="#" class="f-breadcrumb__item-favorite__link" :class="{on:isFavorite}" @click.prevent="toggleFavorite()">
                   <i class="fa fa-star-o" aria-hidden="true"></i>
                   <i class="fa fa-star" aria-hidden="true"></i>
             </a>

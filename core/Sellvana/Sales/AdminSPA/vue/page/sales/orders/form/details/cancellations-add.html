@@ -53,14 +53,14 @@
                 <span class="total-sum">{{totalQtyToCancel}}</span>
             </div>
         </div>
-        <div class="f-button-block text-right">
+        <div class="f-buttons-block text-right">
             <button type="button" class="button button12" @click="submit()" :diabled="!totalQtyToCancel">{{'Create and Save Cancellation'|_}}</button>
             <button type="button" class="button13" @click="$emit('action', 'close')">{{'Close'|_}}</button>
         </div>
     </div>
     <div v-else>
         {{'No cancellable items found.'|_}}
-        <div class="f-button-block text-right">
+        <div class="f-buttons-block text-right">
             <button type="button" class="button13" @click="$emit('action', 'close')">{{'Close'|_}}</button>
         </div>
     </div>

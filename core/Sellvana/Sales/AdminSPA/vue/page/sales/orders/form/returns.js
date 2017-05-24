@@ -1,17 +1,17 @@
 /*
- define(['sv-hlp', 'text!sv-page-sales-orders-form-vendor-tpl'],
- function (SvHlp, tabReturnsTpl) {
+define(['sv-hlp', 'text!sv-page-sales-orders-form-vendor-tpl'],
+    function (SvHlp, tabReturnsTpl) {
 
- return {
- props: {
- form: {
- type: Object
- }
- },
- template: tabReturnsTpl
+        return {
+            props: {
+                form: {
+                    type: Object
+                }
+            },
+            template: tabReturnsTpl
 
- };
- });*/
+        };
+    });*/
 
 define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     // 'sv-page-sales-orders-form-details-payment-add',

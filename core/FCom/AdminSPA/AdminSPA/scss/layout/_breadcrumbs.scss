@@ -1,9 +1,7 @@
-.breadcrumb {
-      background-color: #0086c0;
-      margin-bottom: 0;
+.f-header-breadcrumb {
+      margin: 0;
       padding: 0;
-      border-radius: 0;
-      margin-left: 29px;
+      margin-left: 30px;
       white-space: nowrap;
       li:nth-last-child(2), li:last-child {
             &:after {
@@ -11,13 +9,25 @@
             }
       }
 }
-.breadcrumb__penultimate {
+.f-header-breadcrumb {
+      margin: 0;
+      padding: 0;
+      margin-left: 30px;
+      white-space: nowrap;
+      li:nth-last-child(2), li:last-child {
+            &:after {
+                  display: none;
+            }
+      }
+}
+.f-breadcrumb__penultimate {
       vertical-align: middle;
+      display: inline-block;
       &:before {
             display: none;
       }
 }
-.breadcrumb__item {
+.f-breadcrumb__item {
       display: inline-block;
       vertical-align: middle;
       position: relative;
@@ -34,7 +44,7 @@
             display: none;
       }
 }
-.breadcrumb__link {
+.f-breadcrumb__link {
       padding: 18px 5px 18px;
       display: inline-block;
       margin-right: 10px;
@@ -44,7 +54,10 @@
             color: #fff;
       }
 }
-.breadcrumb__item-favorite__link {
+.f-breadcrumb-header__link  {
+      color: #fff;
+}
+.f-breadcrumb__item-favorite__link {
       font-size: 17px;
       color: #fff;
       &:focus {
@@ -73,28 +86,28 @@
 }
 
 @media (max-width: 1365px) {
-      .breadcrumb {
+      .f-breadcrumb {
             background-color: transparent;
             margin-left: 0;
       }
-      .breadcrumb__item {
+      .f-breadcrumb__item {
             &:after {
                   color: #000;
             }
       }
-      .breadcrumb__link {
+      .f-breadcrumb__link {
             color: #000;
             &:hover {
                   color: #000;
                   text-decoration: underline;
             }
       }
-      .breadcrumb__penultimate {
+      .f-breadcrumb__penultimate {
             a {
                   color: #000;
             }
       }
-      .breadcrumb__item-favorite__link {
+      .f-breadcrumb__item-favorite__link {
             color: #000;
             &:focus {
                   color: #000;

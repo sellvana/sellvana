@@ -70,32 +70,12 @@
 }
 
 @media (max-width: 1365px) {
-	.f-horizontal-menu__link {
-		.nav {
-			a {
-				width: 100%;
-			}
-		}
-		li {
-
-
-		}
-	}
 	.f-horizontal-menu__item {
 		width: 25%;
+		margin-right: 1px;
 		&.active {
-			a {
+			.f-horizontal-menu__link {
 				padding: 7px 0px;
-			}
-		}
-		&:nth-child(8), &:nth-child(5), &:nth-child(6), &:nth-child(7) {
-			a {
-				border-radius: 0;
-			}
-		}
-		&:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(4) {
-			a {
-				border-bottom: 0;
 			}
 		}
 	}

@@ -13,13 +13,13 @@
 	</div>
 	<div class="visible-xs">
 		<div class="f-dropdown" :class="{open:ddOpen('header-mobile-search')}">
-			<a href="#" class="f-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-mobile-search')">
+			<a href="#" class="f-dropdown__toggle header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-mobile-search')">
 				<svg width="20" height="19" v-html="svgIconLink('icon-search')"></svg>
 			</a>
 			<div class="f-dropdown__menu" @click.stop>
-				<div class="input-group">
-					<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch" class='input-group-btn f-admin-header__search-block__input' />
-					<button class="btn btn-link" name="button" type="button" class="input-group-btn f-admin-header__search-block__button">Search</button>
+				<div class="f-input-group">
+						<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch" class='f-input f-admin-header__search-block__input' />
+						<button class="btn btn-link" name="button" type="button" class="button button1 f-input-group-btn f-admin-header__search-block__button">Search</button>
 				</div>
 			</div>
 			<!--<input type="text" :placeholder="'Search...'|_" class="dropdown-toggle" v-model="query" @keyup.enter="submitSearch">-->

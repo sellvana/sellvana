@@ -1,7 +1,6 @@
 html {
       height: 100%;
       width: 100%;
-      /*min-width: 317px;*/
 }
 
 body {
@@ -302,13 +301,7 @@ body {
 
 /*Logo block*/
 
-.header__logo {
-      display: inline-block;
-      float: left;
-      position: relative;
-}
-
-.logo__img {
+.f-logo__img {
       width: 102px;
       height: 40px;
       display: inline-block;
@@ -317,7 +310,7 @@ body {
       background-size: contain;
 }
 
-.logo__text {
+.f-logo__text {
       position: absolute;
       left: 0;
       bottom: 0;
@@ -326,6 +319,11 @@ body {
       font-size: 10px;
 }
 
+.f-header__logo {
+      display: inline-block;
+      float: left;
+      position: relative;
+}
 
 /*Notifications block and messages*/
 
@@ -383,15 +381,7 @@ body {
 }
 
 @media (max-width: 1365px) {
-      .f-admin-header__search-block {
-            input[type="text"] {
-                  width: 216px;
-            }
-            button {
-                  display: inline-block;
-                  width: 35px;
-            }
-      }
+
       .header__navbar-toggle {
             margin: 0px 0 0 35px;
             z-index: 4;
@@ -411,26 +401,42 @@ body {
 
 @media (max-width: 767px) {
       .f-admin-header {
+            padding:  0;
             .f-dropdown__menu {
                   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+                  position: absolute;
+                  top: 57px;
+                  left: 0;
+                  width: 100%;
+                  text-align: left;
+                  padding: 9px 18px;
+                  z-index: 5;
+                  min-width: 317px;
+                  &:before {
+                        right: 205px;
+                  }
             }
             .f-dropdown__menu:before {
                   right: 142px;
             }
+            .f-dropdown {
+                  position: static;
+            }
       }
-
-      .logo  {
+      .f-header__logo  {
             display: none;
       }
       .header__navbar-toggle {
             margin: 0;
-            padding: 14px 20px;
+            padding: 14px 6px;
       }
       .header__navbar__item {
             border-left: solid 1px rgba(255, 255, 255, 0.14);
+            position: static;
       }
       .header__navbar__link  {
-            padding: 17px 20px;
+            padding: 17px 6px;
+            border-left: solid 1px rgba(255, 255, 255, 0.14);
       }
 
       .header__notification-block,
@@ -459,9 +465,11 @@ body {
       }
 
       .f-admin-header__search-block {
-            position: static;
-            .input-group {
-                  width: 100%;
+           .header__navbar__link {
+                  svg {
+                        fill: #fff;
+                        stroke: #fff;
+                  }
             }
       }
 
@@ -470,26 +478,11 @@ body {
             color: #747373
       }
 
-      .f-dropdown__toggle {
-            padding: 17px 20px;
-            display: inline-block;
+      .header-navbar-link {
+            padding: 14px 5px;
             border-left: solid 1px rgba(255, 255, 255, 0.14);
       }
-
-      .f-dropdown__menu {
-            position: absolute;
-            top: 57px;
-            left: 0;
-            background: transparent;
-            width: 100%;
-            text-align: left;
-            padding: 9px 18px;
-            z-index: 5;
-            min-width: 317px;
-            &:before {
-                  right: 205px;
-            }
-      }
+      .
 
       .f-admin-header__search-block__button {
             font-size: 16px;
@@ -511,11 +504,6 @@ body {
 
       .f-admin-header__search-block {
             position: static;
-            .f-dropdown__toggle {
-                  padding: 17px 20px;
-                  display: inline-block;
-                  border-left: solid 1px rgba(255, 255, 255, 0.14);
-            }
             .f-dropdown__menu {
                   position: absolute;
                   top: 57px;
@@ -533,5 +521,15 @@ body {
       }
       .notifications-block {
             top: 60px;
+      }
+
+      .header__setup-block {
+            .header__navbar__link {
+                  font-size: 12px;
+                  .setup-progress-container {
+                        width: 70px;
+                        margin: 0 auto;
+                  }
+            }
       }
 }
