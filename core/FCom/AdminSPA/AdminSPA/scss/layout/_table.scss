@@ -12,6 +12,7 @@
 				top: 0;
 				left: 7.5px;
 				position: relative;
+				width: 21px;
 			}
 		}
 		.f-sorted {
@@ -74,6 +75,12 @@
 	display: block;
 	color: #85a5bd;
 	font-weight: bold;
+}
+.f-price-table {
+	width: 100%;
+	th, td {
+		padding: 5px 3px;
+	}
 }
 .striped-table {
 	width: 100%;

@@ -144,6 +144,7 @@ a:focus {
 			width: auto;
 			border: 1px solid #eee;
 			display: inline-block;
+			padding: 0;
 			li {
 				width: auto;
 				border-bottom: 1px solid #eee;
@@ -264,5 +265,8 @@ a:focus {
 	}
 	.f-content-block {
 		padding: 5px;
+	}
+	.f-grid-wrapper {
+		padding: 0;
 	}
 }

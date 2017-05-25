@@ -1,6 +1,7 @@
 define(['lodash', 'vue', 'text!sv-comp-form-field-tpl'], function (_, Vue, fieldTpl) {
 
-    var SvCompFormField = {
+    var SvCompFormField;
+    SvCompFormField = {
         template: fieldTpl,
         props: ['form', 'field', 'value'],
         data: function () {
@@ -60,14 +61,14 @@ define(['lodash', 'vue', 'text!sv-comp-form-field-tpl'], function (_, Vue, field
         },
         methods: {
             parseValue: function (value) {
-                if (this.field_config.multiple && (typeof value === 'string' || typeof value === 'number') ) {
+                if (this.field_config.multiple && (typeof value === 'string' || typeof value === 'number')) {
                     value = [value];
                 }
                 this.value_model = value;
             },
             fieldConfig: function (key) {
                 if ((typeof this.field_config[key]) === 'undefined') {
-                    if (key.match(/^(multiple|required|readonly|disabled)$/)) {
+                    if (key.match(/^(multiple|required|readonly|disabled|translating)$/)) {
                         return false;
                     }
                 }

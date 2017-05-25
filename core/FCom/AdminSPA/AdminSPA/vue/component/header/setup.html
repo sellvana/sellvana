@@ -1,5 +1,5 @@
-<li class="header__navbar__item f-dropdown header__setup-block" :class="{open:ddOpen('header__setup-block')}">
-    <a href="#" :title="'Setup Progress: {percent}%'|_({percent:setup.progress})" class="f-dropdown__toggle header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header__setup-block')">
+<li class="f-header__navbar__item f-dropdown f-header__setup-block" :class="{open:ddOpen('header__setup-block')}">
+    <a href="#" :title="'Setup Progress: {percent}%'|_({percent:setup.progress})" class="f-dropdown__toggle f-header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header__setup-block')">
         <div class="setup-progress-label">{{ 'Setup Progress: {percent}%'|_({percent:setup.progress}) }}</div>
         <div class="setup-progress-container"><div class="setup-progress-bar" :style="{width:setup.progress+'%'}"></div></div>
     </a>

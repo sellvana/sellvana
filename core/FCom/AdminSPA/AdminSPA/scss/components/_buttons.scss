@@ -129,8 +129,8 @@
       }
 }
 
-.filter-tags {
-      .clear-filters {
+
+      .f-filter-tags__clear-button {
             border-radius: 5px;
             background-color: #ffffff;
             border: solid 1px #d0dae3;
@@ -138,7 +138,7 @@
             position: relative;
             display: inline-block;
             vertical-align: middle;
-            padding: 5px 10px;
+            padding: 8px 10px;
             margin: 0 5px 5px;
             &:active {
                   background-color: #d0dae3;
@@ -148,15 +148,9 @@
                   background-color: #d0dae3;
             }
       }
-}
 
-.f-filter__elem {
-      display: inline-block;
-      vertical-align: middle;
-      margin: 0 5px 5px;
-      z-index: 1;
-      position: relative;
-}
+
+
 
 /*Big action button*/
 .f-action-button-b {
@@ -181,7 +175,7 @@
 
 .f-action-button-b__toggle {
       border-radius: 5px;
-      border: solid 1px #d0d6db;
+      border: solid 1px #d0dae3;
       display: inline-block;
       padding: 8px 14px 8px 7px;
       position: relative;
@@ -202,7 +196,7 @@
       list-style: none;
       text-align: left;
       background-color: #fff;
-      border: solid 1px #d0d6db;
+      border: solid 1px #d0dae3;
       border-top: 0;
       border-radius: 5px;
       width: 100%;
@@ -212,7 +206,7 @@
       white-space: nowrap;
       position: relative;
       color: #5f5f5f;
-      border-bottom: solid 1px #d0d6db;
+      border-bottom:  solid 1px #d0dae3;
       &.active {
             color: #020202;
             font-weight: bold;
@@ -227,7 +221,7 @@
 
 .f-action-button-b__link {
       display: block;
-      padding: 5px 20px 5px 10px;
+      padding: 5px 20px 5px 7px;
       clear: both;
       font-weight: normal;
       line-height: 1.42857143;
@@ -245,7 +239,7 @@
 
 .f-action-button-s {
       border-radius: 3px;
-      border: solid 1px #d0dae3;
+      border:  solid 1px #d0dae3;
       .caret-back {
             position: absolute;
             top: 50%;
@@ -307,121 +301,6 @@
       }
 }
 
-/*.dropdown.action.dropdown-buttons {
-      .color1 {
-            background-color: transparent;
-            color: #868a8a;
-            span {
-                  color: #868a8a;
-            }
-      }
-      .color2 {
-            background-color: #514943;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color3 {
-            background-color: transparent;
-            color: #2d2d2d;
-            span {
-                  color: #2d2d2d;
-            }
-      }
-      .color4 {
-            background-color: #3ec234;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color5 {
-            background-color: #e5e5e5;
-            color: #454d54;
-            span {
-                  color: #454d54;
-            }
-      }
-      .color6 {
-            background-color: #ff2b42;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color7 {
-            background-color: transparent;
-            color: #ff2d43;
-            span {
-                  color: #ff2d43;
-            }
-      }
-      .color8 {
-            background-color: #00a65a;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color9 {
-            background-color: #00c0ef;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color10 {
-            background-color: transparent;
-            color: #000;
-            span {
-                  color: #000;
-            }
-      }
-      .color11 {
-            background-color: transparent;
-            color: #4d4d4d;
-            span {
-                  color: #4d4d4d;
-            }
-      }
-      .color12 {
-            background-color: #4c8cf6;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color13 {
-            background-color: #e1e1e1;
-            color: #000;
-            span {
-                  color: #000;
-            }
-      }
-      .color14 {
-            background-color: #00c0ef;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color15 {
-            background-color: #00a65a;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-      .color16 {
-            background-color: #dac303;
-            color: #fff;
-            span {
-                  color: #fff;
-            }
-      }
-}*/
-
 .f-caret {
       position: absolute;
       top: 50%;
@@ -447,27 +326,33 @@
       font-size: 18px;
       padding: 4px 5px;
       color: #5f5f5f;
+      &:hover {
+            color: #000;
+      }
 }
 @media (max-width: 767px) {
-     /* .buttons-block {
-            margin: 16px 0 11px 0;
-            text-align: center;
-            button, a, input {
-                  margin-bottom: 5px;
-            }
-            .select2-container {
-                  min-width: 120px;
-                  width: 100% !important;
-            }
-      }*/
       .button {
-            min-width: 116px;
-            padding: 8px 0;
+            min-width: 108px;
+            padding: 6px 0;
+            font-size: 12px;
       }
       .f-grid-filter-panel {
             .f-action-button-b {
                   min-width: inherit;
-                  width: 41%;
+                  width: 49%;
+                  margin: 0 0 5px;
             }
+      }
+      .f-filter-tags__clear-button {
+            padding: 4px 10px;
+      }
+      .f-action-button-b__toggle {
+            font-size: 12px;
+      }
+      .f-action-button-b__link {
+            font-size: 12px;
+      }
+      .f-buttons-block {
+            padding: 10px;
       }
 }

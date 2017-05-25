@@ -14,8 +14,8 @@
 	</div>
 
 	<div class="col-lg-6">
-		<div class="filter-tags">
-			<div class="filter-tag" v-for="(flt, i) in grid.filters">
+		<div class="f-filter-tags">
+			<div class="f-filter-tags__tag" v-for="(flt, i) in grid.filters">
 				{{flt.config.label|_}} {{flt.config.ops[flt.op]}}
 
 				<template v-if="flt.config.type==='select' && flt.op.match(/^(in|not_in)$/)">
@@ -28,9 +28,9 @@
 					{{flt.value}}
 				</template>
 
-				<a href="#" @click.prevent="$emit('event', 'remove-filter', i)"><i class="fa fa-times" aria-hidden="true"></i></a>
+				<a href="#" @click.prevent="$emit('event', 'remove-filter', i)" class="f-tags__remove"><i class="fa fa-times" aria-hidden="true"></i></a>
 			</div>
-			<a v-if="hasFilters" href="#" class="clear-filters" @click.prevent="$emit('event', 'remove-all-filters')">{{'Clear all filters'|_}}</a>
+			<a v-if="hasFilters" href="#" class="f-filter-tags__clear-button" @click.prevent="$emit('event', 'remove-all-filters')">{{'Clear all filters'|_}}</a>
 		</div>
 	</div>
 

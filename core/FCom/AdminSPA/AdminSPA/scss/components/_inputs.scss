@@ -44,12 +44,12 @@ input::-webkit-inner-spin-button {
 	padding: 9px 10px;
 	position: relative;
 	white-space: nowrap;
-	background-color: #dde4ea;
+	background-color: #d0dae3;
 	box-shadow: none !important;
 	border: 0;
-	border-left: 1px solid #e5e5e5;
-	border-top: 1px solid #e5e5e5;
-	border-right: 1px solid #e5e5e5;
+	border-left: 1px solid #d0dae3;
+	border-top: 1px solid #d0dae3;
+	border-right: 1px solid #d0dae3;
 	border-radius: 5px 0 0 5px;
 	max-height: 34px;
 	span {
@@ -63,7 +63,7 @@ input::-webkit-inner-spin-button {
 	min-width: 100%;
 	top: 34px;
 	box-shadow: none;
-	background-color: #dde4ea;
+	background-color: #d0dae3;
 	border-radius: 5px;
 	display: none;
 	position: absolute;
@@ -107,7 +107,7 @@ input::-webkit-inner-spin-button {
 	}
 	.f-input:last-child, .f-input-number:last-child {
 		border-radius: 0 5px 5px 0;
-		border: 1px solid #ebebeb;
+		border: 1px solid #d0dae3;
 	}
 }
 
@@ -160,18 +160,17 @@ input::-webkit-inner-spin-button {
 	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
-	border: 1px solid #ebebeb;
+	border: solid 1px #d0dae3;
 	height: auto;
 	width: 100%;
 	color: #474646;
 	&:hover,
 	&:focus,
 	&:active {
-		border: 1px solid #ebebeb;
-		box-shadow: none;
+		border: 1px solid #abb7c1;
 	}
 	&:focus {
-		border-color: #b1bec8;
+		border-color: #9eaab3;
 	}
 }
 
@@ -184,18 +183,17 @@ input::-webkit-inner-spin-button {
 	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
-	border: 1px solid #ebebeb;
+	border: solid 1px #d0dae3;
 	height: auto;
 	width: 100%;
 	color: #474646;
 	&:hover,
 	&:focus,
 	&:active {
-		border: 1px solid #ebebeb;
-		box-shadow: none;
+		border: 1px solid #abb7c1;
 	}
 	&:focus {
-		border-color: #b1bec8;
+		border-color: #9eaab3;
 	}
 }
 
@@ -204,11 +202,19 @@ input::-webkit-inner-spin-button {
 	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
-	border: 1px solid #ebebeb;
+	border: solid 1px #d0dae3;
 	min-height: 300px;
 	resize: vertical;
 	width: 100%;
 	color: #474646;
+	&:hover,
+	&:focus,
+	&:active {
+		border: 1px solid #abb7c1;
+	}
+	&:focus {
+		border-color: #9eaab3;
+	}
 }
 
 
@@ -449,7 +455,7 @@ input::-webkit-inner-spin-button {
 
 /*Editor block*/
 .ckeditor {
-	width: calc(100% - 40px);
+	width: 100%;
 	display: inline-block;
 	vertical-align: top;
 }
@@ -489,6 +495,11 @@ input::-webkit-inner-spin-button {
 	}
 }
 
+.translating {
+	.f-input, .f-textarea, .f-input-number, .ckeditor {
+		width: calc(100% - 40px);
+	}
+}
 @media (max-width: 767px) {
 
 }

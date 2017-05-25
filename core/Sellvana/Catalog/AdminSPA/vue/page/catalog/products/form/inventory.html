@@ -1,19 +1,21 @@
 <div class="row">
-	<div class="col-md-12 col-lg-6">
-		<div class="f-content-block">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="form-horizontal">
-						<div class="f-section">
-							<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='inventory'" :form="form" :field="f.name"
-												v-model="form[f.model][f.name]" @event="processFieldEvent"></sv-comp-form-field>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-12 col-lg-6">
+      <div class="col-md-12 col-lg-6">
+            <div class="f-content-block">
+                  <div class="row">
+                        <div class="col-md-12">
+                              <fieldset class="f-section">
+                                    <sv-comp-form-field
+                                          v-for="f in form.config.fields"
+                                          v-if="f.tab==='inventory'"
+                                          :form="form" :field="f.name"
+                                          v-model="form[f.model][f.name]"
+                                          @event="processFieldEvent"></sv-comp-form-field>
+                              </fieldset>
+                        </div>
+                  </div>
+            </div>
+      </div>
+      <div class="col-md-12 col-lg-6">
 
-	</div>
+      </div>
 </div>

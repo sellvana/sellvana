@@ -1,4 +1,4 @@
-<div class="f-form-group row" :class="{required: fieldConfig('required'), error: field_errors}">
+<div class="f-form-group row" :class="{required: fieldConfig('required'), error: field_errors, translating:  i18n_enabled}">
     <label v-if="fieldConfig('label')" :for="field_id" class="f-form-label" :class="fieldConfig('label_class')">
         {{fieldConfig('label')|_}}
     </label>

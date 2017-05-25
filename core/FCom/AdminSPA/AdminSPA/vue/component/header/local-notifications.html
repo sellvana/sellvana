@@ -1,5 +1,5 @@
-<li class="header__navbar__item f-dropdown header__notification-block" :class="{open:ddOpen('header-local-notifications')}">
-    <a href="#" title="Status menu" class="f-dropdown__toggle header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-local-notifications')">
+<li class="f-header__navbar__item f-dropdown f-header__notification-block" :class="{open:ddOpen('header-local-notifications')}">
+    <a href="#" title="Status menu" class="f-dropdown__toggle f-header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header-local-notifications')">
 		<svg width="20" height="19" v-html="svgIconLink('icon-notification')"></svg>
         <!--<span v-if="notifications.length" class="badge">{{notifications.length}}</span>-->
     </a>
