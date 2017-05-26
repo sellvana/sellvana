@@ -61,10 +61,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         if (!empty($form['config']['actions'])) {
             if (true === $form['config']['actions']) {
                 $form['config']['actions'] = [
-                    ['name' => 'back', 'label' => 'Back', 'class' => 'button10'],
+                    ['name' => 'back', 'label' => 'Back', 'class' => 'button2'],
                     ['name' => 'delete', 'label' => 'Delete', 'class' => 'button2'],
-                    ['name' => 'save', 'label' => 'Save', 'class' => 'button9'],
-                    ['name' => 'save-continue', 'label' => 'Save and Continue', 'class' => 'button9'],
+                    ['name' => 'save', 'label' => 'Save', 'class' => 'button1'],
+                    ['name' => 'save-continue', 'label' => 'Save and Continue', 'class' => 'button1'],
                 ];
             }
             foreach ($form['config']['actions'] as &$act) {

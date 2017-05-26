@@ -4,28 +4,22 @@
 			<fieldset class="f-form-container">
 				<div class="f-form-group row">
 					<div class="col-sm-5">
-						<label>
-							<p class="col-md-6 f-form-label">{{'Display in Navigation'|_}}</p>
+							<label class="col-md-6 f-form-label">{{'Display in Navigation'|_}}</label>
 							<div class="col-md-6">
 								<checkbox v-model="form.category.is_top_menu"></checkbox>
 							</div>
-						</label>
 					</div>
 					<div class="col-sm-3">
-						<label>
-							<p class="col-md-6 control-label">{{'Featured'|_}}</p>
+							<label class="col-md-6 control-label">{{'Featured'|_}}</label>
 							<div class="col-md-6">
 								<checkbox v-model="form.category.is_featured"></checkbox>
 							</div>
-						</label>
 					</div>
 					<div class="col-sm-3">
-						<label>
-							<p class="col-md-6 control-label">{{'Enable'|_}}</p>
+							<label class="col-md-6 control-label">{{'Enable'|_}}</label>
 							<div class="col-md-6">
 								<checkbox v-model="form.category.is_enabled"></checkbox>
 							</div>
-						</label>
 					</div>
 				</div>
 				<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='main'" :form="form" :field="f.name"

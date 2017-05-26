@@ -1,102 +1,117 @@
 <div class="row">
-	<div class="col-md-12 col-lg-6">
-		<div class="f-content-block">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="form-horizontal">
-						<div class="f-section">
-							<div class="form-group">
-								<div class="row">
-									<div class="col-md-4">
-										<label>
-											<p class="col-md-8 control-label">{{'Show Custom Content'|_}}</p>
-											<div class="col-md-4">
-												<checkbox v-model="form.category.show_content"></checkbox>
-											</div>
-										</label>
-									</div>
-									<div class="col-md-3">
-										<label>
-											<p class="col-md-8 control-label">{{'Show Sidebar'|_}}</p>
-											<div class="col-md-4">
-												<checkbox v-model="form.category.show_sidebar"></checkbox>
-											</div>
-										</label>
-									</div>
-									<div class="col-md-5">
-										<label>
-											<p class="col-md-8 control-label">{{'Show Block / Page'|_}}</p>
-											<div class="col-md-4">
-												<checkbox v-model="form.category.show_view"></checkbox>
-											</div>
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="row">
-									<div class="col-md-4">
-										<label>
-											<p class="col-md-8 control-label">{{'Show Subcategories'|_}}</p>
-											<div class="col-md-4">
-												<checkbox v-model="form.category.show_sub_cat"></checkbox>
-											</div>
-										</label>
-									</div>
-									<div class="col-md-3">
-										<label>
-											<p class="col-md-8 control-label">{{'Show Products'|_}}</p>
-											<div class="col-md-4">
-												<checkbox v-model="form.category.show_products"></checkbox>
-											</div>
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="row">
-									<label>
-										<p class="col-md-3 control-label"></p>
-										<div class="col-md-7">
-											<select2>
-												<option>Option1</option>
-												<option>Option2</option>
-												<option>Option3</option>
-											</select2>
-										</div>
-									</label>
-								</div>
-							</div>
-							<div class="form-group">
-								<span class="col-md-3 control-label">{{'Show Order'|_}}</span>
-								<div class="col-md-9">
-									<ol class="ui-sortable" v-sortable="{onUpdate:sortingUpdate}">
-										<li>
-											<i class="handle fa fa-ellipsis-v" aria-hidden="true"></i>
-											<span>{{'1'|_}}</span>
-										</li>
-										<li>
-											<i class="handle fa fa-ellipsis-v" aria-hidden="true"></i>
-											<span>{{'2'|_}}</span>
-										</li>
-										<li>
-											<i class="handle fa fa-ellipsis-v" aria-hidden="true"></i>
-											<span>{{'3'|_}}</span>
-										</li>
-									</ol>
-								</div>
-							</div>
-							<div class="form-group">
-								<label> <span class="col-md-3 control-label">{{'Custom Content'|_}}</span>
-									<div class="col-md-9">
-										<ckeditor v-model="form.category.content"></ckeditor>
-									</div>
-								</label>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+      <div class="col-md-12 col-lg-6">
+            <div class="f-content-block">
+                  <div class="row">
+                        <div class="col-md-12">
+                              <fieldset class="f-form-container">
+                                    <div class="f-form-group row">
+                                          <div class="col-md-4">
+                                                <label class="col-md-8 f-control-label">                     {{'Show Custom                                                       Content'|_}}</label>
+                                                <div class="col-md-4">
+                                                      <checkbox
+                                                            v-model="form.category.show_content"></checkbox>
+                                                </div>
+
+                                          </div>
+                                          <div class="col-md-3">
+
+                                                <label
+                                                      class="col-md-8 f-control-label">{{'Show                                                       Sidebar'|_}}</label>
+                                                <div class="col-md-4">
+                                                      <checkbox
+                                                            v-model="form.category.show_sidebar"></checkbox>
+                                                </div>
+
+                                          </div>
+                                          <div class="col-md-5">
+
+                                                <label
+                                                      class="col-md-8 f-control-label">{{'Show                                                       Block / Page'|_}}</label>
+                                                <div class="col-md-4">
+                                                      <checkbox
+                                                            v-model="form.category.show_view"></checkbox>
+                                                </div>
+
+                                          </div>
+
+                                    </div>
+                                    <div class="f-form-group row">
+
+                                          <div class="col-md-4">
+
+                                                <label
+                                                      class="col-md-8 f-control-label">{{'Show                                                       Subcategories'|_}}</label>
+                                                <div class="col-md-4">
+                                                      <checkbox
+                                                            v-model="form.category.show_sub_cat"></checkbox>
+                                                </div>
+
+                                          </div>
+                                          <div class="col-md-3">
+
+                                                <label
+                                                      class="col-md-8 f-control-label">{{'Show                                                       Products'|_}}</label>
+                                                <div class="col-md-4">
+                                                      <checkbox
+                                                            v-model="form.category.show_products"></checkbox>
+                                                </div>
+
+                                          </div>
+
+                                    </div>
+                                    <div class="f-form-group row">
+
+
+                                          <label
+                                                class="col-md-3 f-control-label"></label>
+                                          <div class="col-md-7">
+                                                <select2>
+                                                      <option>Option1</option>
+                                                      <option>Option2</option>
+                                                      <option>Option3</option>
+                                                </select2>
+                                          </div>
+
+
+                                    </div>
+                                    <div class="f-form-group row">
+                                          <label
+                                                class="col-md-3 f-control-label">{{'Show                                                 Order'|_}}</label>
+                                          <div class="col-md-9">
+                                                <ol class="ui-sortable"
+                                                    v-sortable="{onUpdate:sortingUpdate}">
+                                                      <li>
+                                                            <i class="handle fa fa-ellipsis-v"
+                                                               aria-hidden="true"></i>
+                                                            <span>{{'1'|_}}</span>
+                                                      </li>
+                                                      <li>
+                                                            <i class="handle fa fa-ellipsis-v"
+                                                               aria-hidden="true"></i>
+                                                            <span>{{'2'|_}}</span>
+                                                      </li>
+                                                      <li>
+                                                            <i class="handle fa fa-ellipsis-v"
+                                                               aria-hidden="true"></i>
+                                                            <span>{{'3'|_}}</span>
+                                                      </li>
+                                                </ol>
+                                          </div>
+                                    </div>
+                                    <div class="f-form-group row">
+                                          <label
+                                                class="col-md-3 f-control-label">{{'Custom                                                 Content'|_}}</label>
+                                          <div class="col-md-9">
+                                                <ckeditor
+                                                      v-model="form.category.content"
+                                                      class="ckeditor"></ckeditor>
+                                          </div>
+
+                                    </div>
+
+                              </fieldset>
+                        </div>
+                  </div>
+            </div>
+      </div>
 </div>

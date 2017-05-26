@@ -1,7 +1,10 @@
 .f-grid-wrapper {
 	overflow: hidden;
-	min-height: 100vh;
+	min-height: 50vh;
+	padding: 0;
+	margin-bottom: 46px;
 }
+
 .f-main-grid {
 	min-width: calc(100% - 1px);
 	thead {

@@ -15,6 +15,9 @@
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/codemirror.css" ]
             - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/scss/perfect-scrollbar.min.css" ]
+            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/perfect-scrollbar.min.js" ]
+
 
             - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.css" ]
             - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.js" ]

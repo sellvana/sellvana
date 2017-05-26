@@ -20,16 +20,20 @@
       background-color: #ff9000;
       border: 1px solid #d67d0b;
       color: #fff;
-
       span {
             color: #fff;
       }
       &:active {
             background-color: #ca7302;
             box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5), inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
+            color: #fff;
       }
       &:hover {
             background: #ca7302;
+            color: #fff;
+            span {
+                  color: #fff;
+            }
       }
 }
 
@@ -50,6 +54,9 @@
             background-color: #ff8f00;
             border: solid 1px #d67d0b;
             color: #fff;
+            span {
+                  color: #fff;
+            }
       }
 }
 

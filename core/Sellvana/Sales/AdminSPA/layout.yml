@@ -65,8 +65,8 @@
 			- [ requireJs, sv-page-sales-orders-form-purchase-orders, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders" ]
 			- [ requireJs, sv-page-sales-orders-form-purchase-orders-grid-config, "~/orders/form/purchase_orders/grid_config" ]
 			- [ requireJs, sv-page-sales-orders-form-purchase-orders-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders.html" ]
-			- [ requireJs, sv-page-sales-orders-form-purchase-orders-new, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/new.html" ]
-			- [ requireJs, sv-page-sales-orders-form-purchase-orders-edit, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/edit.html" ]
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders-new-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/new.html" ]
+			- [ requireJs, sv-page-sales-orders-form-purchase-orders-edit-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/purchase-orders/edit.html" ]
 
 			#- [ requireJs, sv-page-sales-orders-form-payments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/payments" ]
             #- [ requireJs, sv-page-sales-orders-form-payments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/payments.html" ]
@@ -122,6 +122,10 @@
          	- [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 90 } ]
             #- [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30 } ]
 
+            - [ addRoute, { path: /purchase-orders/new, require: [sv-page-sales-orders-form-purchase-orders-new, text!sv-page-sales-orders-form-purchase-orders-new-tpl ]}]
+
+
+
     - view: sales/orders/form
         do:
             - [ addDetailsSection, { name: payments, pos: 10 } ]
@@ -129,3 +133,5 @@
             - [ addDetailsSection, { name: refunds, pos: 30 } ]
             - [ addDetailsSection, { name: returns, pos: 40 } ]
             - [ addDetailsSection, { name: cancellations, pos: 50 } ]
+
+

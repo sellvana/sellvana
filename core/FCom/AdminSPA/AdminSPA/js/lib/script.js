@@ -1,3 +1,4 @@
+/*
 $(document).ready(function() {
 	$(function() {
 		$('#daterange1').daterangepicker({
@@ -47,3 +48,4 @@ $(document).ready(function() {
 	});
 });
 
+*/

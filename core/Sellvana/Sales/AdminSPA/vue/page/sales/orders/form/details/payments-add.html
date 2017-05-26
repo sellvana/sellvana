@@ -91,14 +91,14 @@
             
         </div>-->
         <div class="f-buttons-block text-right">
-            <button type="button" class="button button12" @click="submit()" :diabled="!totalAmountToPay">{{'Create and Save Payment'|_}}</button>
-            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+            <button type="button" class="button button1" @click="submit()" :diabled="!totalAmountToPay">{{'Create and Save Payment'|_}}</button>
+            <button type="button" class="button2" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
     </div>
     <div v-else>
         {{'No payable items found.'|_}}
         <div class="f-buttons-block text-right">
-            <button type="button" class="button13" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
+            <button type="button" class="button1" @click="$emit('action', 'close')">{{'Cancel'|_}}</button>
         </div>
     </div>
 </div>

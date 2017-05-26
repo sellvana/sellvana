@@ -32,10 +32,10 @@
 								</ul>
 							</div>
 						</div>
-						<div class="dropdown action" :class="{open:ddOpen('control-buttons')}">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
-							<div class="dropdown-menu">
-								<ul class="dropdown-content">
+						<div class="f-dropdown action" :class="{open:ddOpen('control-buttons')}">
+							<a href="#" class="f-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>Actions menu</span><span class="caret-back"><b class="caret"></b></span></a>
+							<div class="f-dropdown__menu">
+								<ul class="f-dropdown__content">
 									<li><a href="#" @click="goBack()">{{'Back'|_}}</a></li>
 									<li><a href="#" @click="doDelete() ">{{'Delete'|_}}</a></li>
 									<li><a href="#" @click="save()">{{'Save'|_}}</a></li>
@@ -47,7 +47,6 @@
 				</div>
 			</div>
 			<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
-				
 		</div>
 	</div>
 </div>
