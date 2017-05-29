@@ -15,12 +15,19 @@ define(['sv-hlp', 'sv-comp-grid',  'text!sv-page-sales-orders-form-purchase-orde
             return {
                 grid: {
                     config: poGridConfig
-                }
+                },
+                poEditMode: false
             }
         },
         methods: {
             toggleEditing: function(type) {
                 this.editing[type] = !this.editing[type];
+            },
+            switchToPoEdit: function (poId) {
+                this.poEditMode = true;
+            },
+            switchToPoGrid: function () {
+                this.poEditMode = false;
             }
         },
         template: tabPurchaseOrdersTpl,

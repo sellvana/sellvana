@@ -1,6 +1,6 @@
 modules:
     Sellvana_MultiVendor:
-        version: 0.6.0.0
+        version: 0.6.1.0
         channel: beta
         require: { module: { Sellvana_Catalog: 0.2.0 } }
         auto_use: [ views ]

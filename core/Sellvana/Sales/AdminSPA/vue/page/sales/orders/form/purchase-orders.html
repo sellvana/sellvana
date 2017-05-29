@@ -1,6 +1,10 @@
 <div class="f-content-block f-grid-wrapper">
     <div class="f-buttons-block text-right">
-        <router-link class="button button1" to="/purchase-orders/new">{{'Create New PO'|_}}</router-link>
+        <button type="button" class="button button1" @click="switchToPoEdit()">{{'Create New PO'|_}}</button>
     </div>
-    <sv-comp-grid :grid="grid"></sv-comp-grid>
+    <sv-comp-grid v-if="!poEditMode" :grid="grid"></sv-comp-grid>
+    <div v-if="poEditMode">
+        PO EDIT FORM HERE
+        <a href="#" @click.stop.prevent="switchToPoGrid()">{{'Back to grid...'|_}}</a>
+    </div>
 </div>
