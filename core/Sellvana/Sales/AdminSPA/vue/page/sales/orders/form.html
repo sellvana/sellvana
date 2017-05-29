@@ -31,7 +31,7 @@
 		<div class="col-md-12 col-lg-6 text-right">
 			<!--<div class="tablet-panel hidden-lg">
 				<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{formTabLabel|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{formTabLabel|_}}</span><span class="f-caret"><b class="caret"></b></span></a>
 					<div class="dropdown-menu">
 						<ul class="dropdown-content">
 							<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
@@ -39,7 +39,7 @@
 					</div>
 				</div>-->
 				<!--<div class="dropdown action dropdown-buttons" :class="{open:ddOpen('control-buttons')}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>{{'Actions'|_}}</span><span class="caret-back"><b class="caret"></b></span></a>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>{{'Actions'|_}}</span><span class="f-caret"><b class="caret"></b></span></a>
 					<div class="dropdown-menu">
 						<ul class="dropdown-content">
 							<li><a href="#" class="color10" @click="goBack()">{{'Back'|_}}</a></li>

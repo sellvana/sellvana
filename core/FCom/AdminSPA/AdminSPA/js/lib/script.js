@@ -49,3 +49,8 @@ $(document).ready(function() {
 });
 
 */
+
+/*
+$('.f-scroll').perfectScrollbar();
+console.log('есть скролл');
+*/

@@ -1,5 +1,5 @@
 <aside class="sidebar-nav">
-      <nav id="main-nav" class="navbar-collapse f-scroll" :class="{close:!ui.mainNavOpen}">
+      <nav id="main-nav" class="navbar-collapse custom-scroll" :class="{close:!ui.mainNavOpen}">
             <!--<div class="navigation">-->
                   <ul class="nav nav-stacked">
                         <li v-for="l1 in $store.state.navTree">
@@ -59,7 +59,7 @@
                   <a href="#" title="Login menu" class="dropdown-toggle" data-toggle="dropdown"
                      @click.prevent.stop="ddToggle('account')">
                         <img src="" class='img-circle' width="47" height="47"/>
-                        {{'John'|_}} {{'Rich'|_}} <span class="caret-back"><b class="caret"></b></span>
+                        {{'John'|_}} {{'Rich'|_}} <span class="f-caret"><b class="caret"></b></span>
                   </a>
                   <ul class="dropdown-menu">
                         <li>

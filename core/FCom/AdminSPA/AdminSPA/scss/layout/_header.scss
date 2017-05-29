@@ -103,7 +103,7 @@ body {
       z-index: 1000;
       display: none;
       min-width: 160px;
-      margin: 2px 0 0;
+      margin: -1px 0 0;
       list-style: none;
       text-align: left;
       background-color: #ffffff;
@@ -513,7 +513,7 @@ body {
             width: 70px;
             margin: 0 auto;
       }
-      .button.button1.f-input-group-btn.f-header__search-block__button {
+      .button.button1.f-form-group-btn.f-header__search-block__button {
             position: absolute;
             right: 0;
             top: 0;

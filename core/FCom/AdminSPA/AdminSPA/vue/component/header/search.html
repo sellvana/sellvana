@@ -17,9 +17,9 @@
 				<svg width="20" height="19" v-html="svgIconLink('icon-search')"></svg>
 			</a>
 			<div class="f-dropdown__menu" @click.stop>
-				<div class="f-input-group">
-					<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch" class='f-input-group__addon f-input f-header__search-block__input' />
-					<button name="button" type="button" class="button button1 f-input-group-btn f-header__search-block__button">Search</button>
+				<div class="f-form-group">
+					<input type="text" :placeholder="'Search...'|_" v-model="query" @keyup.enter="submitSearch" class='f-form-group__addon f-input f-header__search-block__input' />
+					<button name="button" type="button" class="button button1 f-form-group-btn f-header__search-block__button">Search</button>
 				</div>
 			</div>
 			<!--<input type="text" :placeholder="'Search...'|_" class="dropdown-toggle" v-model="query" @keyup.enter="submitSearch">-->

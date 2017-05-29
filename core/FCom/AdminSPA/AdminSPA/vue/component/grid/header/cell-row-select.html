@@ -8,7 +8,7 @@
 			<div class="f-action-button-s">
 				<label class="f-selector-dropdown__label"><input type="checkbox" :checked="selectedCnt" class="f-input-checkbox f-input-checkbox-s"><span><i aria-hidden="true" class="fa fa-check"></i></span></label>
 				<span v-if="selectedCnt">{{selectedCnt}}</span>
-				<span class="caret-back"><b class="caret"></b></span>
+				<span class="f-caret"><b class="f-caret__elem"></b></span>
 			</div>
 		</a>
 		<ul class="f-dropdown__menu" :class="{open:ddOpen(grid.config.id+'/row-select-header')}">

@@ -12,28 +12,28 @@
 		</form>
 		<ul class="f-filter-box">
 			<li>
-				<div class="f-input-group" v-for="(flt, i) in addedFilters">
-					<div class="f-input-group__label">
+				<div class="f-form-group" v-for="(flt, i) in addedFilters">
+					<div class="f-form-group__label">
 						<label>{{flt.config.label|_}}</label>
 						<a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
 					</div>
 					<div>
-						<div class="f-input-group__addon" :class="{open:ddOpOpen(flt)}">
-							<button class="button5 f-input-group__addon-toggle" data-toggle="dropdown" :aria-expanded="ddOpOpen(flt)" @click.stop="ddOpToggle(flt)"><span>{{flt.config.ops[flt.op]}}</span><span class="caret"></span></button>
-							<ul class="f-input-group__addon-menu">
-								<li v-for="(opLabel, op) in flt.config.ops" class="f-input-group__addon-item"><a class="f-input-group__addon-link" href="#" @click.prevent="switchOp(flt, op)">{{opLabel|_}}</a></li>
+						<div class="f-form-group__addon" :class="{open:ddOpOpen(flt)}">
+							<button class="button5 f-form-group__addon-toggle" data-toggle="dropdown" :aria-expanded="ddOpOpen(flt)" @click.stop="ddOpToggle(flt)"><span>{{flt.config.ops[flt.op]}}</span><span class="f-caret__elem"></span></button>
+							<ul class="f-form-group__addon-menu">
+								<li v-for="(opLabel, op) in flt.config.ops" class="f-form-group__addon-item"><a class="f-form-group__addon-link" href="#" @click.prevent="switchOp(flt, op)">{{opLabel|_}}</a></li>
 							</ul>
 						</div>
-						<div v-if="flt.op.match(/^(equals|starts|ends|lt|lte|gt|gte)$/)" class="f-input-group-btn not-range">
+						<div v-if="flt.op.match(/^(equals|starts|ends|lt|lte|gt|gte)$/)" class="f-form-group-btn not-range">
 							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="f-input" v-model="flt.value">
 							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="f-input-number" v-model="flt.value">
 							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="f-input" v-model="flt.value"> </div>
-						<div v-if="flt.op.match(/^(contains|not_contains)$/)" class="f-input-group-btn not-range">
+						<div v-if="flt.op.match(/^(contains|not_contains)$/)" class="f-form-group-btn not-range">
 							<input type="text" :placeholder="'value'|_" class="f-input" v-model="flt.value"> </div>
-						<div v-if="flt.op.match(/^(in|not_in)$/)" class="f-input-group-btn not-range">
+						<div v-if="flt.op.match(/^(in|not_in)$/)" class="f-form-group-btn not-range">
 							<select2 class="f-input" v-model="flt.values" multiple aria-multiselectable="true" :options="select2Options(flt.config.options)"></select2>
 						</div>
-						<div v-if="flt.op.match(/^(between|not_between)$/)" class="f-input-group-btn range">
+						<div v-if="flt.op.match(/^(between|not_between)$/)" class="f-form-group-btn range">
 							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="f-input" v-model="flt.from">
 							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="f-input-number" v-model="flt.from">
 							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="f-input" v-model="flt.from">

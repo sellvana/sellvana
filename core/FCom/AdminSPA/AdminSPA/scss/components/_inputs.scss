@@ -15,31 +15,44 @@ input::-webkit-inner-spin-button {
 
 /*Inputs group*/
 
-.f-input-group {
+.f-form-group {
 	position: relative;
 	display: table;
 	border-collapse: separate;
 	width: 100%;
+	input[type="date"] {
+		padding: 6px 12px;
+		height: 34px;
+	}
+	.f-input, .f-input-number, .f-textarea {
+		display: table-cell;
+	}
 }
 
-.f-input-group__addon {
+.f-form-group__addon {
 	display: table-cell;
 	vertical-align: middle;
 	position: relative;
+	font-size: 12px;
+	font-weight: normal;
+	text-align: center;
+	box-sizing: border-box;
+	width: 1%;
+	white-space: nowrap;
 	&.open {
-		.f-input-group__addon-menu {
+		.f-form-group__addon-menu {
 			display: block;
 			z-index: 99;
 			white-space: nowrap;
 			border-radius: 0 5px 5px 5px;
 		}
-		.f-input-group__addon-toggle {
+		.f-form-group__addon-toggle {
 			border-radius: 5px 0 0 0px;
 		}
 	}
 }
 
-.f-input-group__addon-toggle {
+.f-form-group__addon-toggle {
 	display: inline-block;
 	padding: 9px 10px;
 	position: relative;
@@ -47,17 +60,14 @@ input::-webkit-inner-spin-button {
 	background-color: #d0dae3;
 	box-shadow: none !important;
 	border: 0;
-	border-left: 1px solid #d0dae3;
-	border-top: 1px solid #d0dae3;
-	border-right: 1px solid #d0dae3;
-	border-radius: 5px 0 0 5px;
-	max-height: 34px;
+	border-radius: 5px;
+
 	span {
 		color: #000;
 	}
 }
 
-.f-input-group__addon-menu {
+.f-form-group__addon-menu {
 	padding: 0;
 	width: auto;
 	min-width: 100%;
@@ -70,11 +80,11 @@ input::-webkit-inner-spin-button {
 	left: 0;
 }
 
-.f-input-group__addon-item {
+.f-form-group__addon-item {
 	border-bottom: 1px solid #fff;
 }
 
-.f-input-group__addon-link {
+.f-form-group__addon-link {
 	padding: 6px 10px 6px 10px;
 	color: #2e4354;
 	display: inline-block;
@@ -84,12 +94,13 @@ input::-webkit-inner-spin-button {
 	}
 }
 
-.f-input-group-btn {
+.f-form-group-btn {
 	display: table-cell;
 	position: relative;
 	font-size: 0;
 	white-space: nowrap;
 	vertical-align: middle;
+	width: 1%;
 	&.not-range {
 		width: 100%;
 	}
@@ -111,7 +122,7 @@ input::-webkit-inner-spin-button {
 	}
 }
 
-.f-input-group__label {
+.f-form-group__label {
 	width: 100%;
 	cursor: pointer;
 	font-weight: 500;
@@ -204,7 +215,6 @@ input::-webkit-inner-spin-button {
 	border-radius: 5px;
 	box-shadow: none;
 	border: solid 1px #d0dae3;
-	min-height: 300px;
 	resize: vertical;
 	width: 100%;
 	color: #474646;
@@ -461,14 +471,6 @@ input::-webkit-inner-spin-button {
 	vertical-align: top;
 }
 
-.param-block {
-	.delete {
-		margin-left: 0;
-		margin-right: 10px;
-	}
-}
-
-
 .error-message {
 	color: darkred;
 	padding: 0 0 0 6px;
@@ -483,7 +485,7 @@ input::-webkit-inner-spin-button {
 	}
 }
 .required {
-	.control-label {
+	.f-form-label {
 		position: relative;
 		padding-right: 2em;
 		&:after {

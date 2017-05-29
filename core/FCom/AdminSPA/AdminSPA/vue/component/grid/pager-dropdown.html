@@ -1,7 +1,7 @@
 <div class='f-pagination f-filter__elem'>
    <!-- <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(ddName)}">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(ddName)"
-           @click.prevent.stop="ddToggle(ddName)"><span>{{curPagesize}}</span><span class="caret-back"><b class="caret"></b></span></a>
+           @click.prevent.stop="ddToggle(ddName)"><span>{{curPagesize}}</span><span class="f-caret"><b class="caret"></b></span></a>
         <ul class="dropdown-menu">
             <li v-for="ps in pagesizeOptions" :class="{active: ps == curPagesize}"><a href="#" @click.prevent="setPagesize(ps)" class="js-change-url page-size">{{ps}}</a></li>
         </ul>
@@ -19,7 +19,7 @@
     </a>
 	<div class="f-pagination__dropdown" :class="{open:ddOpen(ddName)}">
 		<a href="#" class="f-pagination__toggle" @click.prevent.stop="ddToggle(ddName)">{{curPage}} {{'of'|_}} {{numPages}}
-			<span class="caret-back"><b class="caret"></b></span></a>
+			<span class="f-caret"><b class="f-caret__elem"></b></span></a>
     	<ul class="f-pagination__menu" @click.stop>
 			<li v-for="p in numPages" class="f-pagination__item"><a href="#" @click.prevent="goPage(p)" class="f-pagination__link">{{p}}</a></li>
     	</ul>

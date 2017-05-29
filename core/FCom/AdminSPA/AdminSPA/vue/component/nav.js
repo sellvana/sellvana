@@ -46,6 +46,7 @@ define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
                 }
             }
         }
+
     };
 
     Vue.component('sv-comp-nav', SvCompNav);

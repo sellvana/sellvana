@@ -868,7 +868,7 @@ console.log('onError', err.xhr);
             props: ['id', 'label'],
             template: '<div class="dropdown action" :class="{open:ddOpen(id)}">' +
                 '<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(id)">' +
-                    '<span>{{label}}</span><span class="caret-back"><b class="caret"></b></span></a>' +
+                    '<span>{{label}}</span><span class="f-caret"><b class="caret"></b></span></a>' +
                 '<div class="dropdown-menu" @click.stop><slot></slot></div></div>'
         });
 

@@ -16,7 +16,7 @@
             - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/font-awesome.css" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/perfect-scrollbar.min.css" ]
-            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/perfect-scrollbar.min.js" ]
+
 
 
             - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/jsontree/jsontree.css" ]
@@ -31,7 +31,7 @@
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/daterangepicker.js" ]
 #            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/jQuery.fixedTable.js" ]
-#            - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
+#           - [ js, "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
 
             #- [ js, "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" ]
             #- [ js, "https://unpkg.com/requirejs/require.js" ]
@@ -56,6 +56,9 @@
             - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
             - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
+
+            - [ requireJs, scrollbar, "@FCom_AdminSPA/AdminSPA/js/lib/perfect-scrollbar.jquery.min.js" ]
+   #         - [ js,  "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
 
             - [ requireJs, spin, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/spin" ]
             - [ requireJs, ladda, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/ladda" ]
