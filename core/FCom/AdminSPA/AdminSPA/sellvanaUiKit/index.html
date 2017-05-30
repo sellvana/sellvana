@@ -469,11 +469,10 @@
       </div>
 
 
-      <h3>Input-group-addon with dropdown without range</h3>
+      <h3>Form-group-addon with dropdown without range</h3>
       <div class="row">
             <div class="col-md-3">
                   <div class="f-form-group">
-                        <div>
                               <div class="f-form-group__addon open">
                                     <button data-toggle="dropdown"
                                             class="button5 f-form-group__addon-toggle">
@@ -489,36 +488,37 @@
                                     </ul>
                               </div>
                               <div class="f-form-group-btn not-range"><input type="text" placeholder="value" class="f-input"></div>
-                        </div>
                   </div>
             </div>
              <div class="col-md-9">
-                       &lt;div class="input-group"&gt; &lt;div
-                        class="input-group-addon
-                        dropdown"&gt; &lt;button data-toggle="dropdown" class="button5
-                        dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span
-                        class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul
-                        class="dropdown-menu"&gt; &lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt;
-                        &lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                        href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                        href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                        href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                        href="#"&gt;is
-                        empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div
-                        class="input-group-btn not-range"&gt; &lt;input type="text"
-                        placeholder="value" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
-
+                   &lt;div class="f-form-group"&gt;
+                   &lt;div class="f-form-group__addon open"&gt;
+                   &lt;button data-toggle="dropdown"
+                   class="button5 f-form-group__addon-toggle"&gt;
+                   &lt;span&gt;contains&lt;/span&gt;&lt;span class="f-caret__elem"&gt;&lt;/span&gt;
+                   &lt;/button&gt;
+                   &lt;ul class="f-form-group__addon-menu"&gt;
+                   &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;equals&lt;/a&gt;&lt;/li&gt;
+                   &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;contains&lt;/a&gt;&lt;/li&gt;
+                   &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;does  not contain&lt;/a&gt;&lt;/li&gt;
+                   &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;starts with&lt;/a&gt;&lt;/li&gt;
+                   &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;ends with&lt;/a&gt;&lt;/li&gt;
+                   &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;is empty&lt;/a&gt;&lt;/li&gt;
+                   &lt;/ul&gt;
+                   &lt;/div&gt;
+                   &lt;div class="f-form-group-btn not-range"&gt;&lt;input type="text" placeholder="value" class="f-input"&gt;&lt;/div&gt;
+                   &lt;/div&gt;
              </div>
       </div>
       <div class="margin">1</div>
       <div class="margin">1</div>
 
-      <h3>Input-group-addon with dropdown, with range, with label</h3>
+      <h3>Form-group-addon with dropdown, with label</h3>
       <div class="row">
       <div class="col-md-3">
             <div class="f-form-group">
                   <div class="f-form-group__label"><label>Order ID</label> <a href="#"
-                                                                               class="delete"><i
+                                                                               class="f-delete"><i
                         class="fa fa-trash"></i></a></div>
                   <div>
                         <div class="f-form-group__addon">
@@ -545,7 +545,7 @@
                                                                              class="f-form-group__addon-link">is
                                           empty</a></li>
                               </ul>
-                        </div> <!---->
+                        </div>
                         <div class="f-form-group-btn not-range"><input type="text"
                                                                         placeholder="value"
                                                                         class="f-input">
@@ -553,14 +553,48 @@
             </div>
       </div>
       <div class="col-md-9">
+            &lt;div class="f-form-group"&gt;
+            &lt;div class="f-form-group__label"&gt;&lt;label&gt;Order ID&lt;/label&gt; &lt;a href="#"
+            class="f-delete"&gt;&lt;i
+            class="fa fa-trash"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;
+            &lt;div&gt;
+            &lt;div class="f-form-group__addon"&gt;
+            &lt;button data-toggle="dropdown"
+            class="button5 f-form-group__addon-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span
+            class="caret"&gt;&lt;/span&gt;&lt;/button&gt;
+            &lt;ul class="f-form-group__addon-menu"&gt;
+            &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
+            class="f-form-group__addon-link"&gt;equals&lt;/a&gt;
+            &lt;/li&gt;
+            &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
+            class="f-form-group__addon-link"&gt;contains&lt;/a&gt;
+            &lt;/li&gt;
+            &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
+            class="f-form-group__addon-link"&gt;does
+            not contain&lt;/a&gt;&lt;/li&gt;
+            &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
+            class="f-form-group__addon-link"&gt;starts
+            with&lt;/a&gt;&lt;/li&gt;
+            &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
+            class="f-form-group__addon-link"&gt;ends
+            with&lt;/a&gt;&lt;/li&gt;
+            &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
+            class="f-form-group__addon-link"&gt;is
+            empty&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;/div&gt;
+            &lt;div class="f-form-group-btn not-range"&gt;&lt;input type="text"
+            placeholder="value"
+            class="f-input"&gt;
+            &lt;/div&gt; &lt;/div&gt;
+            &lt;/div&gt;
       </div>
 </div>
 
-      <h3>Input-group-addon with dropdown with range</h3>
+      <h3>Form-group-addon with dropdown, with range</h3>
       <div class="row">
             <div class="col-md-3">
                   <div class="f-form-group">
-                        <div>
                               <div class="f-form-group__addon open">
                                     <button data-toggle="dropdown" class="button5 f-form-group__addon-toggle">
                                           <span>between</span>
@@ -581,25 +615,30 @@
                                     <input type="number" placeholder="number" class="f-input-number">
                                     <input type="number" placeholder="number" class="f-input-number">
                               </div>
-                        </div>
+
                   </div>
             </div>
             <div class="col-md-9">
-                  &lt;div class="input-group"&gt; &lt;div
-                  class="input-group-addon
-                  dropdown"&gt; &lt;button data-toggle="dropdown" class="button5
-                  dropdown-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span
-                  class="caret"&gt;&lt;/span&gt;&lt;/button&gt; &lt;ul
-                  class="dropdown-menu"&gt; &lt;li&gt;&lt;a href="#"&gt;equals&lt;/a&gt;&lt;/li&gt;
-                  &lt;li&gt;&lt;a href="#"&gt;contains&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                  href="#"&gt;does not contain&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                  href="#"&gt;starts with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                  href="#"&gt;ends with&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a
-                  href="#"&gt;is
-                  empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div
-                  class="input-group-btn range"&gt;&lt;input type="number"
-                  placeholder="number" class="form-control"&gt; &lt;input
-                  type="number" placeholder="number" class="form-control"&gt;
+                  &lt;div class="f-form-group"&gt;
+                  &lt;div class="f-form-group__addon open"&gt;
+                  &lt;button data-toggle="dropdown" class="button5 f-form-group__addon-toggle"&gt;
+                  &lt;span&gt;between&lt;/span&gt;
+                  &lt;span class="caret"&gt;&lt;/span&gt;
+                  &lt;/button&gt;
+                  &lt;ul class="f-form-group__addon-menu"&gt;
+                  &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;equals&lt;/a&gt;
+                  &lt;/li&gt;
+                  &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;is  one of&lt;/a&gt;&lt;/li&gt;
+                  &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;is  not one of&lt;/a&gt;&lt;/li&gt;
+                  &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;between&lt;/a&gt;
+                  &lt;/li&gt;
+                  &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;not between&lt;/a&gt;&lt;/li&gt;
+                  &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;less  than&lt;/a&gt;&lt;/li&gt;
+                  &lt;/ul&gt;
+                  &lt;/div&gt;
+                  &lt;div class="f-form-group-btn range"&gt;
+                  &lt;input type="number" placeholder="number" class="f-input-number"&gt;
+                  &lt;input type="number" placeholder="number" class="f-input-number"&gt;
                   &lt;/div&gt;
                   &lt;/div&gt;
             </div>
@@ -610,41 +649,34 @@
       <h3>Input-group-addon without dropdown</h3>
       <div class="row">
             <div class="col-md-3">
-                  <div class="f-form-group">
-                        <div class="f-form-group__addon">QTY</div>
-                        <div class="f-form-group-btn not-range">
-                              <input type="text" placeholder="value"
-                                     class="f-input">
-                        </div>
+                  <div class="f-input-group">
+                        <span class="f-input-group__addon">QTY</span>
+                        <input type="text" placeholder="value" class="f-input">
                   </div>
             </div>
             <div class="col-md-9">
-                  &lt;div class="input-group"&gt; &lt;div
-                  class="input-group-addon"&gt;QTY&lt;/div&gt;
-                  &lt;div class="input-group-btn not-range"&gt; &lt;input
-                  type="text"
-                  placeholder="value" class="form-control"&gt; &lt;/div&gt; &lt;/div&gt;
+                  &lt;div class="f-input-group"&gt;
+                  &lt;span class="f-input-group__addon"&gt;QTY&lt;/span&gt;
+                  &lt;input type="text" placeholder="value" class="f-input"&gt;
+                  &lt;/div&gt;
             </div>
       </div>
       <div class="row">
             <div class="col-md-3">
-                  <div class="f-form-group">
-                        <input type="text" value="" placeholder="Param"
-                               class="f-input">
-                        <span class="input-group-addon"> = </span>
+                  <div class="f-input-group">
+                        <input type="text" value="" placeholder="Param" class="f-input">
+                        <span class="f-input-group__addon"> = </span>
                         <input type="text" value="" placeholder="Value" class="f-input">
-                        <a href="#" class="input-group-addon"><i
-                        class="fa fa-times"></i></a></div>
+                        <a href="#" class="f-input-group__addon"><i
+                              class="fa fa-times"></i></a></div>
             </div>
             <div class="col-md-9">
-                  &lt;div class="input-group input-group-sm"&gt;&lt;input
-                  type="text"
-                  value="" placeholder="Param" class="form-control"&gt; &lt;span
-                  class="input-group-addon"&gt; = &lt;/span&gt; &lt;input
-                  type="text"
-                  value="" placeholder="Value" class="form-control"&gt; &lt;a
-                  href="#"
-                  class="input-group-addon"&gt;&lt;i class="fa fa-times"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;
+                  &lt;div class="f-input-group"&gt;
+                  &lt;input type="text" value="" placeholder="Param" class="f-input"&gt;
+                  &lt;span class="f-input-group__addon"&gt; = &lt;/span&gt;
+                  &lt;input type="text" value="" placeholder="Value" class="f-input"&gt;
+                  &lt;a href="#" class="f-input-group__addon"&gt;&lt;i
+                  class="fa fa-times"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;
             </div>
       </div>
 
@@ -668,16 +700,25 @@
                   </table>
             </div>
             <div class="col-md-9">
-                  &lt;table class="striped-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt;
-                  &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping
-                  &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt;
-                  &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
-                  &lt;/tr&gt; &lt;/table&gt;
+                  &lt;table class="f-main-grid"&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Subtotal&lt;/td&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Shipping &amp; Handling&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Discount&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/table&gt;
             </div>
       </div>
       <div class="row">
             <div class="col-md-3">
-                  <table class="striped-table">
+                  <table class="f-striped-table">
                         <tr>
                               <td>Subtotal</td>
                               <td>$250.00</td>
@@ -693,39 +734,257 @@
                   </table>
             </div>
             <div class="col-md-9">
-                  &lt;table class="secondary-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt;
-                  &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping
-                  &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt;
-                  &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
-                  &lt;/tr&gt; &lt;/table&gt;
+                  &lt;table class="f-striped-table"&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Subtotal&lt;/td&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Shipping &amp; Handling&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Discount&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/table&gt;
             </div>
       </div>
       <div class="row">
             <div class="col-md-3">
-                  <table class="total-table">
+                  <table class="f-total-table">
                         <tr>
-                              <td>Subtotal</td>
+                              <th>Subtotal</th>
                               <td>$250.00</td>
                         </tr>
                         <tr>
-                              <td>Shipping &amp; Handling</td>
+                              <th>Shipping &amp; Handling</th>
                               <td>$0.00</td>
                         </tr>
                         <tr>
-                              <td>Discount</td>
+                              <th>Discount</th>
                               <td>$0.00</td>
                         </tr>
                   </table>
             </div>
             <div class="col-md-9">
-                  &lt;table class="combined-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt;
-                  &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping
-                  &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt;
-                  &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
-                  &lt;/tr&gt; &lt;/table&gt;
+                  &lt;table class="f-total-table"&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Subtotal&lt;/th&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Shipping &amp; Handling&lt;/th&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Discount&lt;/th&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/table&gt;
+            </div>
+      </div>
+      <div class="row">
+            <div class="col-md-3">
+                  <table class="f-secondary-table">
+                        <thead>
+                              <tr>
+                                    <th>Subtotal</th>
+                                    <th>Shipping &amp; Handling</th>
+                                    <th>Discount</th>
+                              </tr>
+                        </thead>
+                        <tbody>
+                              <tr>
+                                    <td>$250.00</td>
+                                    <td>$0.00</td>
+                                    <td>$0.00</td>
+                              </tr>
+                              <tr>
+                                    <td>$0.00</td>
+                                    <td>$0.00</td>
+                                    <td>$250.00</td>
+                              </tr>
+                        </tbody>
+                  </table>
+            </div>
+            <div class="col-md-9">
+                  &lt;table class="f-secondary-table"&gt;
+                  &lt;thead&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Subtotal&lt;/th&gt;
+                  &lt;th&gt;Shipping &amp; Handling&lt;/th&gt;
+                  &lt;th&gt;Discount&lt;/th&gt;
+                  &lt;/tr&gt;
+                  &lt;/thead&gt;
+                  &lt;tbody&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/tbody&gt;
+                  &lt;/table&gt;
+            </div>
+      </div>
+      <div class="row">
+            <div class="col-md-3">
+                  <table class="f-standart-table">
+                        <thead>
+                        <tr>
+                              <th>Subtotal</th>
+                              <th>Shipping &amp; Handling</th>
+                              <th>Discount</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                              <td>$250.00</td>
+                              <td>$0.00</td>
+                              <td>$0.00</td>
+                        </tr>
+                        <tr>
+                              <td>$0.00</td>
+                              <td>$0.00</td>
+                              <td>$250.00</td>
+                        </tr>
+                        </tbody>
+                  </table>
+            </div>
+            <div class="col-md-9">
+                  &lt;table class="f-standart-table"&gt;
+                  &lt;thead&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Subtotal&lt;/th&gt;
+                  &lt;th&gt;Shipping &amp; Handling&lt;/th&gt;
+                  &lt;th&gt;Discount&lt;/th&gt;
+                  &lt;/tr&gt;
+                  &lt;/thead&gt;
+                  &lt;tbody&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;td&gt;$0.00&lt;/td&gt;
+                  &lt;td&gt;$250.00&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/tbody&gt;
+                  &lt;/table&gt;
+            </div>
+      </div>
+      <div class="row">
+            <div class="col-md-3">
+                  <table class="f-combined-table">
+                        <thead>
+                        <tr>
+                              <td>Thumbnail</td>
+                              <td>Product Info</td>
+                              <td>Shipped</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                              <tr>
+                                    <td>
+                                          Describe
+                                    </td>
+                                    <td>
+                                          Test
+                                    </td>
+                                    <td>
+                                        <ul style="padding: 0;">
+                                              <li>1</li>
+                                              <li>2</li>
+                                              <li>3</li>
+                                        </ul>
+                                    </td>
+                              </tr>
+                        </tbody>
+                  </table>
+            </div>
+            <div class="col-md-9">
+                  &lt;table class="f-combined-table"&gt;
+                  &lt;thead&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;Thumbnail&lt;/td&gt;
+                  &lt;td&gt;Product Info&lt;/td&gt;
+                  &lt;td&gt;Shipped&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/thead&gt;
+                  &lt;tbody&gt;
+                  &lt;tr&gt;
+                  &lt;td&gt;
+                  Describe
+                  &lt;/td&gt;
+                  &lt;td&gt;
+                  Test
+                  &lt;/td&gt;
+                  &lt;td&gt;
+                  &lt;ul&gt;
+                  &lt;li&gt;1&lt;/li&gt;
+                  &lt;li&gt;2&lt;/li&gt;
+                  &lt;li&gt;3&lt;/li&gt;
+                  &lt;/ul&gt;
+                  &lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/tbody&gt;
+                  &lt;/table&gt;
             </div>
       </div>
 
+      <div class="row">
+            <div class="col-md-3">
+                  <table class="f-combined-columns">
+                        <tbody>
+                              <tr>
+                                    <th>Name:</th>
+                                    <td>orderItem</td>
+                              </tr>
+                              <tr>
+                                    <th>Qty:</th>
+                                    <td>orderItem</td>
+                              </tr>
+                              <tr>
+                                    <th>P.SKU:</th>
+                                    <td>product_sku</td>
+                              </tr>
+                              <tr>
+                                    <th>I.SKU:</th>
+                                    <td>inventory</td>
+                              </tr>
+                        </tbody>
+                  </table>
+            </div>
+            <div class="col-md-9">
+                  &lt;table class="f-combined-columns"&gt;
+                  &lt;tbody&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Name:&lt;/th&gt;
+                  &lt;td&gt;orderItem&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;Qty:&lt;/th&gt;
+                  &lt;td&gt;orderItem&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;P.SKU:&lt;/th&gt;
+                  &lt;td&gt;product_sku&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;tr&gt;
+                  &lt;th&gt;I.SKU:&lt;/th&gt;
+                  &lt;td&gt;inventory&lt;/td&gt;
+                  &lt;/tr&gt;
+                  &lt;/tbody&gt;
+                  &lt;/table&gt;
+            </div>
+      </div>
 
 
       <h1 id="dropdown">Edit text</h1>

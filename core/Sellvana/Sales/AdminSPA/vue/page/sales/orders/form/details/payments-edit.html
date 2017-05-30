@@ -10,7 +10,7 @@
 	</div>
 
 	<div class="scrollable-area">
-		<table class="secondary-table">
+		<table class="f-secondary-table">
 			<thead>
 				<tr>
 					<th>{{'Method'|_}}</th>
@@ -38,7 +38,7 @@
 		<p>{{'Items paid by this payment:'|_}}</p>
 	</div>
 	<div class="scrollable-area">
-		<table class="secondary-table combined-table">
+		<table class="f-secondary-table f-combined-table">
 			<thead>
 				<tr>
 					<th>{{'Thumbnail'|_}}</th>
@@ -53,7 +53,7 @@
 						<img :src="orderItem(item).thumb_url" :alt="orderItem(item).product_name">
 					</td>
 					<td>
-						<table class="combined-columns">
+						<table class="f-combined-columns">
 							<tbody>
 								<tr>
 									<th>{{'Name:'|_}}</th>
@@ -75,7 +75,7 @@
 						</table>
 					</td>
 					<td>
-						<table class="combined-columns">
+						<table class="f-combined-columns">
 							<tbody>
 								<tr>
 									<th>{{'Total:'|_}}</th>
@@ -97,7 +97,7 @@
 						</table>
 					</td>
 					<td>
-						<table class="combined-columns">
+						<table class="f-combined-columns">
 							<tbody>
 								<tr>
 									<th>{{'Paid by this payment:'|_}}</th>
@@ -113,7 +113,7 @@
 						<strong>{{item.data_custom.custom_label|_}}</strong>
 					</td>
 					<td>
-						<table class="combined-columns">
+						<table class="f-combined-columns">
 							<tr><th>{{'Paid:'|_}}</th><td>{{item.amount|currency}}</td></tr>
 							<tr v-if="item.amount_refunded"><th>{{'Refunded:'|_}}</th><td>{{item.amount_refunded|currency}}</td></tr>
 						</table>
@@ -129,7 +129,7 @@
 			<label><input type="checkbox" v-model="show_failed_transactions" class="f-input-checkbox"><span><i aria-hidden="true" class="fa fa-check"></i></span><span>{{'Show failed transactions'|_}}</span></label>
 		</div>
 		<div class="scrollable-area">
-			<table class="secondary-table combined-table">
+			<table class="f-secondary-table f-combined-table">
 				<thead>
 					<tr>
 						<th>{{ 'Timestamp'|_ }}</th>

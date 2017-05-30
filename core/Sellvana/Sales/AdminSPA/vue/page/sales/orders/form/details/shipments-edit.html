@@ -9,7 +9,7 @@
         </span>
     </div>
     <div class="scrollable-area">
-        <table class="secondary-table">
+        <table class="f-secondary-table">
             <thead>
             <tr>
                 <td>{{'Method'|_}}</td>
@@ -47,7 +47,7 @@
             <label>{{'Tracking:'|_}} <input type="text" v-model="package.tracking_number" class="form-control"></label>
         </div>
         <div class="scrollable-area">
-            <table class="secondary-table combined-table">
+            <table class="f-secondary-table f-combined-table">
                 <thead>
                 <tr>
                     <td>{{'Thumbnail'|_}}</td>
@@ -61,7 +61,7 @@
                         <img :src="orderItem(item).thumb_url" :alt="orderItem(item).product_name">
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                         <tr><th>{{'Name:'|_}}</th><td>{{orderItem(item).product_name}}</td></tr>
                         <tr><th>{{'Qty:'|_}}</th><td>{{orderItem(item).qty_ordered}}</td></tr>
                         <tr><th>{{'P.SKU:'|_}}</th><td>{{orderItem(item).product_sku}}</td></tr>
@@ -69,7 +69,7 @@
                         </tbody></table>
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                         <tr><th>{{'Qty:'|_}}</th><td>{{item.qty}}</td></tr>
                         </tbody></table>
                     </td>

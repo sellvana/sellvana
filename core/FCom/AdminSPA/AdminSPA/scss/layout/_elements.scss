@@ -153,6 +153,7 @@ a:focus {
 			li {
 				width: auto;
 				border-bottom: 1px solid #eee;
+				line-height: normal;
 				a {
 					width: 100%;
 					color: #868a8a;
@@ -162,6 +163,7 @@ a:focus {
 					padding: 4px 20px 4px 10px;
 					background: #fff;
 					white-space: nowrap;
+					line-height: normal;
 					&:hover {
 						color: #000;
 						border-bottom: 0;

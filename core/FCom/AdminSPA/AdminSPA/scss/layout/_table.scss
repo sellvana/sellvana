@@ -79,6 +79,7 @@
 	color: #85a5bd;
 	font-weight: bold;
 }
+
 .f-price-table {
 	width: 100%;
 	th, td {
@@ -86,62 +87,73 @@
 	}
 	.select2-container {
 		width: 100% !important;
+		min-width: 100px;
 	}
 }
-.striped-table {
+.f-striped-table {
 	width: 100%;
-	td,
-	th {
-		height: auto;
-		min-width: 70px;
-	}
-	th {
-		font-weight: normal;
-		color: #2d2d2d;
-		padding: 10px 0 10px 15px;
-	}
-	td {
-		color: #2d2d2d;
-	}
 	tr:nth-child(odd) {
 		background: #f8f8f8;
 	}
+	th, td {
+		height: 30px;
+		padding: 0 8px;
+	}
 }
 
-.total-table {
+.f-total-table {
+	width: 100%;
 	text-align: left;
-	td {
+	th {
 		font-weight: bold;
 	}
-}
-.secondary-table {
-	border-bottom: 0;
-	thead {
-		border-bottom: 1px solid #ebebeb;
-		td {
-			font-size: 12px;
-			font-weight: bold;
-			padding: 5px;
-		}
-	}
-	td {
-		text-align: left;
-		padding: 10px 5px;
+	th, td {
+		height: 30px;
+		padding: 0 8px;
 	}
 }
 
-.combined-table {
+.f-secondary-table {
+	width: 100%;
+	thead {
+		border-bottom: 1px solid #000000;
+	}
+	th {
+		font-weight: bold;
+	}
+	th, td {
+		height: 30px;
+		padding: 0 8px;
+	}
+}
+
+.f-standart-table {
+	width: 100%;
+	th, td {
+		height: 30px;
+		padding: 0 8px;
+		border: 1px solid #eee;
+	}
+}
+
+.f-combined-table {
+	width: 100%;
 	& > tbody {
 		& > tr {
 			border-bottom: 1px solid #ebebeb;
+			& > td, & > th {
+				vertical-align: top;
+			}
 		}
-		& > td {
-			vertical-align: top;
-		}
+	}
+	th, td {
+		height: 30px;
+		padding: 0 8px;
 	}
 }
 
-.combined-columns {
+.f-combined-columns {
+	width: 100%;
 	tr {
 		border: none;
 	}

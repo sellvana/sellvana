@@ -4,7 +4,7 @@
     </div>
     <div v-if="form.items_payable.length">
         <div class="scrollable-area">
-            <table class="secondary-table combined-table">
+            <table class="f-secondary-table f-combined-table">
                 <thead>
                 <tr>
                     <th>{{'Pay'|_}}</th>
@@ -24,7 +24,7 @@
                         <img :src="item.thumb_url" :alt="item.product_name">
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                             <tr><th>{{'Name:'|_}}</th><td>{{item.product_name}}</td></tr>
                             <tr><th>{{'Qty:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
                             <tr><th>{{'P.SKU:'|_}}</th><td>{{item.product_sku}}</td></tr>
@@ -32,7 +32,7 @@
                         </tbody></table>
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                             <tr><th>{{'Total:'|_}}</th><td>{{item.row_total|currency}}</td></tr>
                             <tr><th>{{'Paid:'|_}}</th><td>{{item.amount_paid|currency}}</td></tr>
                             <tr><th>{{'In Payments:'|_}}</th><td>{{item.amount_in_payments|currency}}</td></tr>
@@ -40,7 +40,7 @@
                         </tbody></table>
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                             <tr><th>{{'To Pay:'|_}}</th>
                                 <td><input type="number" class="form-control" v-model="item.amount_to_pay" :disabled="!isItemSelected(item)"></td></tr>
                         </tbody></table>
@@ -56,13 +56,13 @@
                         <strong>{{total.label|_}}</strong>
                     </td>
                     <td>
-                        <table class="combined-columns">
+                        <table class="f-combined-columns">
                         <tr><th>{{'Total:'|_}}</th><td>{{total.value|currency}}</td></tr>
                         <tr><th>{{'Due:'|_}}</th><td>{{total.amount_due|currency}}</td></tr>
                         </table>
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                         <tr><th>{{'To Pay:'|_}}</th>
                             <td><input type="text" class="form-control" v-model="total.amount_to_pay" :disabled="!isItemSelected(total)"></td></tr>
                         </tbody></table>

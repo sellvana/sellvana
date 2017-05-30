@@ -4,7 +4,7 @@
     </div>
     <div v-if="form.items_shippable.length">
         <div class="scrollable-area">
-            <table class="secondary-table combined-table">
+            <table class="f-secondary-table f-combined-table">
                 <thead>
                 <tr>
                     <td>{{'Ship'|_}}</td>
@@ -24,7 +24,7 @@
                         <img :src="item.thumb_url" :alt="item.product_name">
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                         <tr><th>{{'Name:'|_}}</th><td>{{item.product_name}}</td></tr>
                         <tr><th>{{'Qty:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
                         <tr><th>{{'P.SKU:'|_}}</th><td>{{item.product_sku}}</td></tr>
@@ -32,7 +32,7 @@
                         </tbody></table>
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                         <tr><th>{{'Ordered:'|_}}</th><td>{{item.qty_ordered}}</td></tr>
                         <tr><th>{{'Shipped:'|_}}</th><td>{{item.qty_shipped}}</td></tr>
                         <tr><th>{{'In Shipments:'|_}}</th><td>{{item.qty_in_shipments}}</td></tr>
@@ -40,7 +40,7 @@
                         </tbody></table>
                     </td>
                     <td>
-                        <table class="combined-columns"><tbody>
+                        <table class="f-combined-columns"><tbody>
                         <tr><th>{{'To Ship:'|_}}</th><td><input type="number" class="form-control" v-model="item.qty_to_ship" :disabled="!isItemSelected(item)"></td></tr>
                         </tbody></table>
                     </td>

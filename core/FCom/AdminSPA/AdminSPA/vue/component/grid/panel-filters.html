@@ -15,7 +15,7 @@
 				<div class="f-form-group" v-for="(flt, i) in addedFilters">
 					<div class="f-form-group__label">
 						<label>{{flt.config.label|_}}</label>
-						<a href="#" @click.prevent="removeFilter(i)" class="delete"><i class="fa fa-trash"></i></a>
+						<a href="#" @click.prevent="removeFilter(i)" class="f-delete"><i class="fa fa-trash"></i></a>
 					</div>
 					<div>
 						<div class="f-form-group__addon" :class="{open:ddOpOpen(flt)}">

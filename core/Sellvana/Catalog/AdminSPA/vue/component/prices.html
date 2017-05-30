@@ -41,7 +41,7 @@
         <tbody>
         <tr v-for="price in visiblePrices">
             <td>
-                <a v-if="!price.is_base_price" href="#" @click.prevent="removePrice(price)"><i class="fa fa-trash"></i></a>
+                <a v-if="!price.is_base_price" href="#" @click.prevent="removePrice(price)" class="f-delete"><i class="fa fa-trash"></i></a>
             </td>
             <td v-if="options.customer_groups">
                 <select2 class="form-control" v-model="price.customer_group_id" :disabled="price.is_base_price">
@@ -85,13 +85,13 @@
                 </div>
             </td>
             <td>
-                <div v-if="price.price_type === 'sale' || price.price_type === 'promo'" class="f-form-group">
+                <div v-if="price.price_type === 'sale' || price.price_type === 'promo'" class="f-input-group">
                     <input type="date" v-model="price.valid_from" class="f-input">
-                    <span class="f-form-group__addon-toggle">-</span>
+                    <span class="f-input-group__addon">-</span>
                     <input type="date" v-model="price.valid_to" class="f-input">
                 </div>
-                <div v-if="price.price_type === 'tier'" class="input-group">
-                    <span class="f-form-group__addon-toggle">{{'Qty'|_}}</span>
+                <div v-if="price.price_type === 'tier'" class="f-input-group">
+                    <span class="f-input-group__addon">{{'Qty'|_}}</span>
                     <input v-model="price.qty" class="f-input">
                 </div>
             </td>
@@ -143,7 +143,7 @@
             {{'or more'|_}}
         </span>
         (<strong>{{pricePreview(price) | currency}}</strong>)
-        <a v-if="!price.is_base_price" href="#" @click.prevent="removePrice(price)"><i class="fa fa-trash"></i></a>
+        <a v-if="!price.is_base_price" href="#" @click.prevent="removePrice(price)" class="f-delete"><i class="fa fa-trash"></i></a>
     </div>
     <div class="param-block">
         {{'Add'|_}}

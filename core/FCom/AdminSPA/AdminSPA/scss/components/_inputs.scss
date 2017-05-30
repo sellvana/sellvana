@@ -53,15 +53,14 @@ input::-webkit-inner-spin-button {
 }
 
 .f-form-group__addon-toggle {
-	display: inline-block;
-	padding: 9px 10px;
+	display: table-cell;
+	padding: 9px 13px;
 	position: relative;
 	white-space: nowrap;
 	background-color: #d0dae3;
 	box-shadow: none !important;
 	border: 0;
 	border-radius: 5px;
-
 	span {
 		color: #000;
 	}
@@ -73,7 +72,7 @@ input::-webkit-inner-spin-button {
 	min-width: 100%;
 	top: 34px;
 	box-shadow: none;
-	background-color: #d0dae3;
+	background-color: #dde4ea;
 	border-radius: 5px;
 	display: none;
 	position: absolute;
@@ -82,6 +81,9 @@ input::-webkit-inner-spin-button {
 
 .f-form-group__addon-item {
 	border-bottom: 1px solid #fff;
+	&:last-child {
+		border-radius: 0 0 5px 5px;
+	}
 }
 
 .f-form-group__addon-link {
@@ -128,14 +130,51 @@ input::-webkit-inner-spin-button {
 	font-weight: 500;
 	padding: 0 0 0 10px;
 	margin-bottom: 5px;
-	& > * {
-		display: inline-block;
-		vertical-align: middle;
-		margin-bottom: 0;
+}
+.f-delete {
+	color: #474646;
+	display: inline-block;
+	vertical-align: middle;
+	&:hover {
+		color: #000;
+
 	}
 }
 
+.f-input-group {
+	display: table;
+	white-space: nowrap;
+	width: 100%;
+	& > * {
+		border-radius: 0;
+	}
+	.f-input {
+		border-radius: 0;
+	}
+	& :first-child {
+		border-radius: 5px 0 0 5px;
+	}
+	& :last-child {
+		border-radius: 0 5px 5px 0;
+	}
+}
 
+.f-input-group__addon {
+	padding: 6px 12px;
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 1;
+	color: #555555;
+	text-align: center;
+	background-color: #dde4ea;
+	display: table-cell;
+}
+.f-price-table {
+	input[type="date"].f-input {
+		padding: 6px 12px;
+		height: 34px;
+	}
+}
 /*Main forms styles*/
 
 .f-form-container {
