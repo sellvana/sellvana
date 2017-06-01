@@ -92,8 +92,10 @@
 }
 .f-striped-table {
 	width: 100%;
-	tr:nth-child(odd) {
-		background: #f8f8f8;
+	tbody {
+		tr:nth-child(odd) {
+			background: #f8f8f8;
+		}
 	}
 	th, td {
 		height: 30px;

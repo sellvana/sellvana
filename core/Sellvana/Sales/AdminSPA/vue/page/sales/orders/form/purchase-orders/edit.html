@@ -12,7 +12,7 @@
 			</div>
 		</a>
 		<div class="information-block-content">
-			<div class="edited-block" :class="{on:editing.customer}">
+			<div class="f-edited-block" :class="{on:editing.customer}">
 				<div class="block-title">
 					<p>{{'Order'|_}}</p>
 					<!--<a href="#" @click.prevent="toggleEditing('customer')">
@@ -39,7 +39,7 @@
 					<input type="text" class="form-control" v-model="form.order.customer_email" :placeholder="'Customer Email'|_">
 				</div>
 			</div>
-			<div class="edited-block">
+			<div class="f-edited-block">
 				<div class="block-title">
 					<p>{{'Shipping'|_}}</p>
 					<!--<a href="#" @click.prevent="toggleEditing('customer')">
@@ -66,7 +66,7 @@
 
 				</div>
 			</div>
-			<div class="edited-block" :class="{on:editing.shipping}">
+			<div class="f-edited-block" :class="{on:editing.shipping}">
 				<div class="block-title">
 					<p>{{'Shipping Addres'|_}}</p>
 					<!--<a href="#" @click.prevent="toggleEditing('shipping')">
@@ -115,21 +115,21 @@
 					<div class="row no-gutter">
 						<div class="col-md-6">
 							<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
-							<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+							<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 								<option></option>
 								<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
-							</select>
+							</select2>
 						</div>
 						<div class="col-md-6">
-							<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+							<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 								<option></option>
 								<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
-							</select>
+							</select2>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="edited-block" :class="{on:editing.billing}">
+			<div class="f-edited-block" :class="{on:editing.billing}">
 				<div class="block-title">
 					<p>{{'Billing'|_}}</p>
 					<!--<a href="#" @click.prevent="toggleEditing('billing')">
@@ -178,21 +178,21 @@
 					<div class="row no-gutter">
 						<div class="col-md-6">
 							<input type="text" class="geo-region form-control " :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.billing_region" v-if="!regionOptions('billing')">
-							<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.billing_region" v-if="regionOptions('billing')">
+							<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.billing_region" v-if="regionOptions('billing')">
 								<option></option>
 								<option v-for="r in regionOptions('billing')" :value="r.id">{{r.text}}</option>
-							</select>
+							</select2>
 						</div>
 						<div class="col-md-6">
-							<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.billing_country">
+							<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.billing_country">
 								<option></option>
 								<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
-							</select>
+							</select2>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="edited-block">
+			<div class="f-edited-block">
 				<div class="block-title">
 					<p>{{'Payment'|_}}</p>
 					<!--<a href="#" @click.prevent="$emit('tab', 'details')">
@@ -230,8 +230,8 @@
 			</div>
 		</a>
 		<div class="information-block-content">
-			<div class="block-for-table">
-				<div class="block-title">
+			<div class="f-totals-table-block">
+				<div class="f-bordered-block__title">
 					<p>{{'Totals'|_}}</p>
 				</div>
 				<table class="f-striped-table f-total-table">

@@ -11,8 +11,8 @@
 				</div>
 			</a>
 			<div class="f-information-block__content" @click.stop>
-				<div class="edited-block" :class="{on:editing.customer}">
-					<div class="block-title">
+				<div class="f-edited-block f-bordered-block" :class="{on:editing.customer}">
+					<div class="f-bordered-block__title">
 						<p>{{'Order'|_}}</p>
 						<!--<a href="#" @click.prevent="toggleEditing('customer')">
 							<i class="fa fa-pencil editor" aria-hidden="true"></i>
@@ -38,8 +38,8 @@
 						<input type="text" class="form-control" v-model="form.order.customer_email" :placeholder="'Customer Email'|_">
 					</div>
 				</div>
-				<div class="edited-block">
-					<div class="block-title">
+				<div class="f-edited-block f-bordered-block">
+					<div class="f-bordered-block__title">
 						<p>{{'Shipping'|_}}</p>
 						<!--<a href="#" @click.prevent="toggleEditing('customer')">
 	<i class="fa fa-pencil editor" aria-hidden="true"></i>
@@ -65,8 +65,8 @@
 
 					</div>
 				</div>
-				<div class="edited-block" :class="{on:editing.shipping}">
-					<div class="block-title">
+				<div class="f-edited-block f-bordered-block" :class="{on:editing.shipping}">
+					<div class="f-bordered-block__title">
 						<p>{{'Shipping Addres'|_}}</p>
 						<!--<a href="#" @click.prevent="toggleEditing('shipping')">
 							<i class="fa fa-pencil editor" aria-hidden="true"></i>
@@ -114,22 +114,22 @@
 						<div class="row no-gutter">
 							<div class="col-md-6">
 								<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
-								<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+								<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 									<option></option>
 									<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
-								</select>
+								</select2>
 							</div>
 							<div class="col-md-6">
-								<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+								<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 									<option></option>
 									<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
-								</select>
+								</select2>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="edited-block" :class="{on:editing.billing}">
-					<div class="block-title">
+				<div class="f-edited-block f-bordered-block" :class="{on:editing.billing}">
+					<div class="f-bordered-block__title">
 						<p>{{'Billing'|_}}</p>
 						<!--<a href="#" @click.prevent="toggleEditing('billing')">
 							<i class="fa fa-pencil editor" aria-hidden="true"></i>
@@ -177,22 +177,22 @@
 						<div class="row no-gutter">
 							<div class="col-md-6">
 								<input type="text" class="geo-region form-control " :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.billing_region" v-if="!regionOptions('billing')">
-								<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.billing_region" v-if="regionOptions('billing')">
+								<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.billing_region" v-if="regionOptions('billing')">
 									<option></option>
 									<option v-for="r in regionOptions('billing')" :value="r.id">{{r.text}}</option>
-								</select>
+								</select2>
 							</div>
 							<div class="col-md-6">
-								<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.billing_country">
+								<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.billing_country">
 									<option></option>
 									<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
-								</select>
+								</select2>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="edited-block">
-					<div class="block-title">
+				<div class="f-edited-block f-bordered-block">
+					<div class="f-bordered-block__title">
 						<p>{{'Payment'|_}}</p>
 						<!--<a href="#" @click.prevent="$emit('tab', 'details')">
 							<i class="fa fa-pencil editor" aria-hidden="true"></i>
@@ -229,43 +229,45 @@
 				</div>
 			</a>
 			<div class="f-information-block__content" @click.stop>
-				<div class="block-for-table">
-				<div class="block-title">
+				<div class="f-totals-table-block f-bordered-block">
+					<div class="f-bordered-block__title">
 					<p>{{'Totals'|_}}</p>
 				</div>
 				<table class="f-striped-table f-total-table">
-					<tr>
-						<th>{{'Subtotal'|_}}</th>
-						<td>{{form.order.subtotal|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Shipping & Handling'|_}}</th>
-						<td>{{form.order.shipping_price|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Discount'|_}}</th>
-						<td>{{form.order.discount_amount|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Tax'|_}}</th>
-						<td>{{form.order.tax_amount|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Grand Total'|_}}</th>
-						<td>{{form.order.grand_total|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Store Credit'|_}}</th>
-						<td>{{paidByStoreCredit|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Amount Captured'|_}}</th>
-						<td>{{form.order.amount_paid|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Balance Due'|_}}</th>
-						<td>{{form.order.amount_due|currency(form.order.store_currency_code)}}</td>
-					</tr>
+					<tbody>
+						<tr>
+							<th>{{'Subtotal'|_}}</th>
+							<td>{{form.order.subtotal|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Shipping & Handling'|_}}</th>
+							<td>{{form.order.shipping_price|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Discount'|_}}</th>
+							<td>{{form.order.discount_amount|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Tax'|_}}</th>
+							<td>{{form.order.tax_amount|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Grand Total'|_}}</th>
+							<td>{{form.order.grand_total|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Store Credit'|_}}</th>
+							<td>{{paidByStoreCredit|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Amount Captured'|_}}</th>
+							<td>{{form.order.amount_paid|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Balance Due'|_}}</th>
+							<td>{{form.order.amount_due|currency(form.order.store_currency_code)}}</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 			</div>
@@ -273,7 +275,7 @@
 	</div>
 
 	<!--<div class="col-xs-12 col-sm-4 col-md-4">
-					<div class="edited-block" :class="{on:editing.order}">
+					<div class="f-edited-block" :class="{on:editing.order}">
 						<div class="block-title">
 							<p>{{'Order'|_}}</p>
 							<a href="#" @click.prevent="toggleEditing('order')">
@@ -289,16 +291,16 @@
 								<label>{{'Updated:'|_}}</label> <strong>{{form.order.update_at|date}}</strong></p>
 						</div>
 						<div class="section-edit">
-							<select class="form-control" v-model="form.order.state_custom">
+							<select2 class="form-control" v-model="form.order.state_custom">
 								<option v-if="form.options.order_state_custom|length"></option>
 								<option v-else value="" selected>{{'No Custom Order States Defined'|_}}</option>
 								<option v-for="k, v in form.options.order_state_custom" :value="k">{{v}}</option>
-							</select>
+							</select2>
 						</div>
 					</div>
 				</div>-->
 	<!--<div class="col-xs-12 col-sm-4 col-md-4">
-					<div class="edited-block">
+					<div class="f-edited-block">
 						<div class="block-title">
 							<p>{{'Delivery'|_}}</p>
 							<a href="#" @click.prevent="$emit('tab', 'details')">

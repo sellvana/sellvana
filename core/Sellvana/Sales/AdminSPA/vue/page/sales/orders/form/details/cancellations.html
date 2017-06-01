@@ -1,10 +1,10 @@
 <div class="f-content-block details-information">
     <div class="block-title">
         <p>{{'Cancellations'|_}}</p>
-        <button type="button" class="button button4" @click="$emit('add', 'cancellation')">{{'Add'|_}}</button>
+        <button type="button" class="button-small button1" @click="$emit('add', 'cancellation')">{{'Add'|_}}</button>
     </div>
     <div>
-        <table v-if="form.cancellations.length">
+        <table v-if="form.cancellations.length" class="f-secondary-table">
             <thead>
             <tr>
                 <th>{{'Timeline'|_}}</th>

@@ -9,8 +9,8 @@
 			</div>
 		</a>
 		<div class="information-block-content">
-			<div class="edited-block">
-				<div class="block-title">
+			<div class="f-edited-block f-bordered-block">
+				<div class="f-bordered-block__title">
 					<p>{{'Vendor Info'|_}}</p>
 				</div>
 				<div class="section-view">
@@ -19,12 +19,12 @@
 					</p>
 				</div>
 			</div>
-			<div class="edited-block" :class="{on:editing.address}">
+			<div class="f-edited-block f-bordered-block" :class="{on:editing.address}">
 				<a href="#" @click.prevent="toggleEditing('address')">
 					<i class="fa fa-pencil editor" aria-hidden="true"></i>
 					<i class="fa fa-eye close-editor" aria-hidden="true"></i>
 				</a>
-				<div class="block-title">
+				<div class="f-bordered-block__title">
 					<p>{{'Origin Adress'|_}}</p>
 				</div>
 				<div class="section-view">
@@ -65,26 +65,26 @@
 					<div class="row no-gutter">
 						<div class="col-md-6">
 							<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
-							<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+							<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 								<option></option>
 								<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
-							</select>
+							</select2>
 						</div>
 						<div class="col-md-6">
-							<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+							<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 								<option></option>
 								<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
-							</select>
+							</select2>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="edited-block" :class="{on:editing.shipping}">
+			<div class="f-edited-block f-bordered-block" :class="{on:editing.shipping}">
 				<a href="#" @click.prevent="toggleEditing('shipping')">
 					<i class="fa fa-pencil editor" aria-hidden="true"></i>
 					<i class="fa fa-eye close-editor" aria-hidden="true"></i>
 				</a>
-				<div class="block-title">
+				<div class="f-bordered-block__title">
 					<p>{{'Shipping Address'|_}}</p>
 				</div>
 				<div class="section-view">
@@ -128,22 +128,22 @@
 					<div class="row no-gutter">
 						<div class="col-md-6">
 							<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
-							<select class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+							<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 								<option></option>
 								<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
-							</select>
+							</select2>
 						</div>
 						<div class="col-md-6">
-							<select class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+							<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 								<option></option>
 								<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
-							</select>
+							</select2>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="edited-block">
-				<div class="block-title">
+			<div class="f-edited-block f-bordered-block">
+				<div class="f-bordered-block__title">
 					<p>{{'Shipping'|_}}</p>
 				</div>
 				<div class="section-view">
@@ -151,8 +151,8 @@
 					<select2></select2>
 				</div>
 			</div>
-			<div class="edited-block">
-				<div class="block-title">
+			<div class="f-edited-block f-bordered-block">
+				<div class="f-bordered-block__title">
 					<p>{{'Commission'|_}}</p>
 				</div>
 				<p>Transaction Fee</p>
@@ -178,43 +178,45 @@
 			</div>
 		</a>
 		<div class="information-block-content">
-			<div class="block-for-table">
-				<div class="block-title">
+			<div class="f-totals-table-block f-bordered-block">
+				<div class="f-bordered-block__title">
 					<p>{{'Totals'|_}}</p>
 				</div>
 				<table class="f-striped-table f-total-table">
-					<tr>
-						<th>{{'Subtotal'|_}}</th>
-						<td>{{form.order.subtotal|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Shipping & Handling'|_}}</th>
-						<td>{{form.order.shipping_price|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Discount'|_}}</th>
-						<td>{{form.order.discount_amount|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Tax'|_}}</th>
-						<td>{{form.order.tax_amount|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Grand Total'|_}}</th>
-						<td>{{form.order.grand_total|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Store Credit'|_}}</th>
-						<td>{{paidByStoreCredit|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Amount Captured'|_}}</th>
-						<td>{{form.order.amount_paid|currency(form.order.store_currency_code)}}</td>
-					</tr>
-					<tr>
-						<th>{{'Balance Due'|_}}</th>
-						<td>{{form.order.amount_due|currency(form.order.store_currency_code)}}</td>
-					</tr>
+					<tbody>
+						<tr>
+							<th>{{'Subtotal'|_}}</th>
+							<td>{{form.order.subtotal|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Shipping & Handling'|_}}</th>
+							<td>{{form.order.shipping_price|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Discount'|_}}</th>
+							<td>{{form.order.discount_amount|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Tax'|_}}</th>
+							<td>{{form.order.tax_amount|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Grand Total'|_}}</th>
+							<td>{{form.order.grand_total|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Store Credit'|_}}</th>
+							<td>{{paidByStoreCredit|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Amount Captured'|_}}</th>
+							<td>{{form.order.amount_paid|currency(form.order.store_currency_code)}}</td>
+						</tr>
+						<tr>
+							<th>{{'Balance Due'|_}}</th>
+							<td>{{form.order.amount_due|currency(form.order.store_currency_code)}}</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 		</div>

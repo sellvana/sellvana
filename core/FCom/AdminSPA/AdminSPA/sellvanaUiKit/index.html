@@ -6,12 +6,9 @@
       <title>Untitled Document</title>
       <meta content="width=device-width, initial-scale=1" name="viewport">
       <link href="scss/bootstrap.css" rel="stylesheet" type="text/css"></link>
-      <link href="scss/font-awesome.css" rel="stylesheet"
-            type="text/css"></link>
-      <link href="../scss/style.build.css" rel="stylesheet"
-            type="text/css"></link>
-      <script type="text/javascript" charset="utf-8"
-              src="/sellvanaRepo/core/core/FCom/AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min.js"></script>
+      <link href="scss/font-awesome.css" rel="stylesheet" type="text/css"></link>
+      <link href="../scss/style.build.css" rel="stylesheet" type="text/css"></link>
+      <script type="text/javascript" charset="utf-8" src="/sellvanaRepo/core/core/FCom/AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min.js"></script>
       <style>
             .row {
                   margin-bottom: 10px;
@@ -299,7 +296,7 @@
       <h3>Inputs without label</h3>
       <div class="row">
             <div class="col-md-3">
-                  <input class="f-input" type="text"/>
+                  <input class="f-input" type="text" title=""/>
             </div>
             <div class="col-md-9">
                   &lt;input class="f-input" type="text" /&gt;
@@ -307,7 +304,7 @@
       </div>
       <div class="row">
             <div class="col-md-3">
-                  <input class="f-input-number" type="number"/>
+                  <input class="f-input-number" type="number" title=""/>
             </div>
             <div class="col-md-9">
                   &lt;input class="f-input-number" type="number" /&gt;
@@ -315,7 +312,7 @@
       </div>
       <div class="row">
             <div class="col-md-3">
-                  <textarea class="f-textarea" rows="5"></textarea>
+                  <textarea class="f-textarea" rows="5" title=""></textarea>
             </div>
             <div class="col-md-9">
                   &lt;textarea class="f-textarea" rows="5"&gt;&lt;textarea&gt;
@@ -453,7 +450,6 @@
                               <input type="text" class="f-input" id="id3"> <span
                               class="error-message">Error description under the field</span>
                         </div>
-                        </label>
                   </div>
             </div>
             <div class="col-md-9">
@@ -716,6 +712,7 @@
                   &lt;/table&gt;
             </div>
       </div>
+      <p>Styles for tables can be combined.</p>
       <div class="row">
             <div class="col-md-3">
                   <table class="f-striped-table">
@@ -753,18 +750,20 @@
       <div class="row">
             <div class="col-md-3">
                   <table class="f-total-table">
-                        <tr>
-                              <th>Subtotal</th>
-                              <td>$250.00</td>
-                        </tr>
-                        <tr>
-                              <th>Shipping &amp; Handling</th>
-                              <td>$0.00</td>
-                        </tr>
-                        <tr>
-                              <th>Discount</th>
-                              <td>$0.00</td>
-                        </tr>
+                        <tbody>
+                              <tr>
+                                    <th>Subtotal</th>
+                                    <td>$250.00</td>
+                              </tr>
+                              <tr>
+                                    <th>Shipping &amp; Handling</th>
+                                    <td>$0.00</td>
+                              </tr>
+                              <tr>
+                                    <th>Discount</th>
+                                    <td>$0.00</td>
+                              </tr>
+                        </tbody>
                   </table>
             </div>
             <div class="col-md-9">
@@ -987,7 +986,7 @@
       </div>
 
 
-      <h1 id="dropdown">Edit text</h1>
+<!--      <h1 id="dropdown">Edit text</h1>
       <h2>with select</h2>
       <div class="row">
             <div class="col-md-3">
@@ -1016,7 +1015,27 @@
                   just another text
                   &lt;/p&gt;
             </div>
-      </div>
+      </div>-->
+
+      <h1>Dropdowns</h1>
+      <h3>Dropdown without select</h3>
+      <div class="row">
+            <div class="f-dropdown open">
+                  <a href="#" data-toggle="dropdown" class="f-dropdown__toggle">Toggle</a>
+                  <ul class="f-dropdown__menu">
+                        <li class="f-dropdown__menu__item done">
+                              <a href="#/profile" class="f-dropdown__menu__link">Basic Information</a>
+                        </li>
+                        <li class="f-dropdown__menu__item done">
+                              <a href="#/users/form?id=1" class="f-dropdown__menu__link">Company Profile</a>
+                        </li>
+                        <li class="f-dropdown__menu__item">
+                              <a href="#/settings" class="f-dropdown__menu__link">Global Configuration</a>
+                        </li>
+                  </ul>
+            </div>
+
+      <h3>Dropdown with select</h3>
       <h1>Inline input</h1>
       <h3>to activate input just add class "edit" to class "param-result"</h3>
       <div class="row">
