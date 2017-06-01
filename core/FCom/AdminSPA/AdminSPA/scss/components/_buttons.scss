@@ -1,6 +1,7 @@
 .f-buttons-block {
       padding: 5px 0 1px;
 }
+
 .button {
       min-width: 133px;
       text-align: center;
@@ -139,8 +140,7 @@
       }
 }
 
-
-      .f-filter-tags__clear-button {
+.f-filter-tags__clear-button {
             border-radius: 5px;
             background-color: #ffffff;
             border: solid 1px #d0dae3;
@@ -158,8 +158,6 @@
                   background-color: #d0dae3;
             }
       }
-
-
 
 
 /*Big action button*/
@@ -331,7 +329,6 @@
       border-left: 4px solid transparent;
 }
 
-
 .translate-icon {
       font-size: 18px;
       padding: 4px 5px;
@@ -340,6 +337,7 @@
             color: #000;
       }
 }
+
 @media (max-width: 767px) {
       .button {
             min-width: 108px;

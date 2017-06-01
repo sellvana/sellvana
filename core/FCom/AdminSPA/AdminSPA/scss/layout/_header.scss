@@ -153,7 +153,7 @@ body {
       i {
             color: #868a8a;
       }
-      a&:hover {
+      a:hover {
             i {
                   color: #000;
             }
@@ -381,7 +381,7 @@ body {
 
 @media (max-width: 1365px) {
       .f-header__navbar-toggle {
-            margin: 0px 0 0 35px;
+            margin: 0 0 0 35px;
             z-index: 4;
             &.open {
                   .icon-bar {

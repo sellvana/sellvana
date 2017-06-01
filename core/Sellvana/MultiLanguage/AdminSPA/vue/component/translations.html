@@ -9,10 +9,10 @@
                     <label :for="field_id(locale)">{{locale}}</label>
                 </div>
                 <div class="col-md-10">
-                    <input v-if="field.type === 'input'" :id="field_id(locale)" class="form-control" type="text"
+                    <input v-if="field.type === 'input'" :id="field_id(locale)" class="f-input" type="text"
                            v-model="form.i18n[field.name][locale]"/>
 
-                    <textarea v-else-if="field.type === 'textarea'" :id="field_id(locale)" class="form-control"
+                    <textarea v-else-if="field.type === 'textarea'" :id="field_id(locale)" class="f-textarea"
                               v-model="form.i18n[field.name][locale]"></textarea>
 
                     <ckeditor v-else-if="field.type === 'wysiwyg'" :id="field_id(locale)"

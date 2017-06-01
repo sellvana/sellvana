@@ -48,7 +48,7 @@
 		left: 14px;
 		p {
 			font-size: 14px;
-			padding: 0px 12px;
+			padding: 0 12px;
 		}
 	}	
 }
@@ -118,7 +118,7 @@
 		}
 	}
 	
-	span {
+	.f-edited-block__info {
 		margin-bottom: 5px;
 		margin-right: 10px;
 		display: inline-block;
@@ -128,14 +128,20 @@
 			display: block;
 		}
 	}
+	.select2-container--default .select2-selection--single {
+		width: 100%;
+	}
+	.section-edit {
+		.select2-container {
+			width: 100% !important;
+			position: relative;
+		}
+	}
+	.select2-container--default .select2-selection--single .select2-selection__arrow {
+		height: 34px;
+	}
 }
 .editable {
-	/*	.editor {
-	display: none;
-}
-	.close-editor {
-	display: inline-block;
-}*/
 	.section-edit {
 		display: block;
 	}
@@ -286,10 +292,10 @@
 	border-radius: 1px;
 	background: #fff;
 	margin: 10px 0;
-	padding: 26px 0px 26px 0px;
+	padding: 26px 0 26px 0;
 	position: relative;
 	.added-files {
-		padding: 20px 30px 0px 30px;
+		padding: 20px 30px 0 30px;
 		margin: 0 27px;
 		border-top: 1px solid #d9d9d9;
 	}
@@ -345,16 +351,6 @@
 		p {
 			padding: 6px 14px;
 			font-size: 10px;
-		}
-		&:before {
-			content: '';
-			width: 14px;
-			height: 10px;
-			background: url(../img/angle.png) no-repeat 0px 0px;
-			position: absolute;
-			left: 14px;
-			bottom: -9px;
-			transform: rotate(180deg);
 		}
 	}
 	&:hover {
@@ -491,8 +487,7 @@
 		display: inline-block;
 		vertical-align: middle;
 		min-width: 176px;
-		margin-bottom: 20px;
-		margin: 10px 0 10px 0px;
+		margin: 10px 0 20px 0;
 		span {
 			color: #000;
 		}
@@ -517,7 +512,7 @@
 		button {
 			position: absolute;
 			right: 0;
-			top: 0px;
+			top: 0;
 		}
 	}
 	td {
@@ -594,7 +589,7 @@
 			text-align: right;
 			.select2-container {
 				max-width: 160px;
-				margin: 0 0px 0 20px;
+				margin: 0 0 0 20px;
 				padding: 6px 0;
 				text-align: left;
 				display: inline-block;
@@ -624,7 +619,7 @@
 	padding: 20px 0;
 	.select2-container {
 		max-width: 160px; 
-		min-width: auto;
+		min-width: inherit;
 		display: inline-block;
 		vertical-align: middle;
 	}
@@ -635,7 +630,7 @@
 	.form-control {
 		width: 160px;
 		max-width: 160px;
-		margin: 0 0px 0 20px;
+		margin: 0 0 0 20px;
 		text-align: left;
 		display: inline-block;
 	}
@@ -671,7 +666,7 @@
 		p {
 			width: 100%;
 			text-align: left;
-			padding: 0 0px 0 0;
+			padding: 0 0 0 0;
 		}
 		textarea {
 			width: 100%;
@@ -766,7 +761,7 @@
 			width: auto;
 		}
 		.block-title {
-			padding: 0 0px 0 10px;
+			padding: 0 0 0 10px;
 			p {
 				width: 100%;
 			}
@@ -802,13 +797,13 @@
 	.details-additional-block {
 		.buttons-block {
 			input {
-				margin: 0 0 0 0px;
+				margin: 0 0 0 0;
 			}
 		}
 		.total-amount {
 			div {
 				width: 100%;
-				min-width: auto;
+				min-width: inherit;
 				text-align: center;
 			}
 			span {
@@ -821,16 +816,6 @@
 		width: 100%;
 		max-width: 100%;
 		min-height: 120px;
-		.select2-container--default .select2-selection--single {
-			width: 100%;
-		}
-		.select2-container {
-			width: 100% !important;
-			position: relative;
-		}
-		.select2-container--default .select2-selection--single .select2-selection__arrow {
-			height: 34px;
-		}
 	}
 	.f-information-block {
 		.f-information-block__toggle   {

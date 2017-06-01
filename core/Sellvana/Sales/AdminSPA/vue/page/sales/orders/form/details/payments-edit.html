@@ -167,7 +167,7 @@
 								<button v-ladda="{on: action_in_progress === action + '-' + t.id}" :disabled="action_in_progress !== ''"
 										class="button button9" @click="doTransactionAction(t, action)">{{actionData.label|_}}</button>
 								<input v-if="actionData.partial" type="number" v-model="actionData.amount"
-									   class="form-control" @keyup.enter="doTransactionAction(t, action)" style="display:inline-block; width:80px">
+									   class="f-input-number" @keyup.enter="doTransactionAction(t, action)" style="display:inline-block; width:80px">
 							</div>
 						</td>
 					</tr>

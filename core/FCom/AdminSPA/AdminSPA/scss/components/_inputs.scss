@@ -131,6 +131,7 @@ input::-webkit-inner-spin-button {
 	padding: 0 0 0 10px;
 	margin-bottom: 5px;
 }
+
 .f-delete {
 	color: #474646;
 	display: inline-block;
@@ -169,12 +170,15 @@ input::-webkit-inner-spin-button {
 	background-color: #dde4ea;
 	display: table-cell;
 }
+
 .f-price-table {
 	input[type="date"].f-input {
 		padding: 6px 12px;
 		height: 34px;
 	}
 }
+
+
 /*Main forms styles*/
 
 .f-form-container {
@@ -266,8 +270,6 @@ input::-webkit-inner-spin-button {
 		border-color: #9eaab3;
 	}
 }
-
-
 
 
 /*Checkbox block*/
@@ -542,6 +544,7 @@ input::-webkit-inner-spin-button {
 		width: calc(100% - 40px);
 	}
 }
+
 @media (max-width: 767px) {
 
 }

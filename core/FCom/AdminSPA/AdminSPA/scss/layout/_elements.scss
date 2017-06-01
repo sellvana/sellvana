@@ -1,13 +1,28 @@
 .f-filter-block {
 	overflow: hidden;
 }
-a:focus {
-	color: #000;
+
+.f-block-title {
+
 }
+
+.f-block-title__text {
+	color: #2d2d2d;
+	font-weight: bold;
+	font-size: 16px;
+	padding: 8px 0;
+	display: inline-block;
+	margin-right: 5px;
+}
+
 .f-content-block {
 	background: #fff;
 	border-radius: 5px;
 	padding: 15px;
+}
+
+a:focus {
+	color: #000;
 }
 
 .badge {
@@ -54,17 +69,6 @@ a:focus {
 			font-size: 16px;
 		}
 	}			
-}
-.f-block-title {
-
-}
-.f-block-title__text {
-	color: #2d2d2d;
-	font-weight: bold;
-	font-size: 16px;
-	padding: 8px 0;
-	display: inline-block;
-	margin-right: 5px;
 }
 
 .param-block {

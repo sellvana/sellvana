@@ -35,7 +35,7 @@
 					</div>
 					<div class="section-edit">
 						<label>{{'Email:'|_}}</label>
-						<input type="text" class="form-control" v-model="form.order.customer_email" :placeholder="'Customer Email'|_">
+						<input type="text" class="f-input" v-model="form.order.customer_email" :placeholder="'Customer Email'|_">
 					</div>
 				</div>
 				<div class="f-edited-block f-bordered-block">
@@ -49,9 +49,9 @@
 					<div class="section-view">
 						<div>
 							<strong>{{'Status:'|_}}</strong>
-							<span>Pending</span>
-							<span>Plain</span>
-							<span>Shipping</span>
+							<span class="f-edited-block__info">Pending</span>
+							<span class="f-edited-block__info">Plain</span>
+							<span class="f-edited-block__info">Shipping</span>
 						</div>
 						<!--<p>
 	<label>{{'Email:'|_}}</label> 
@@ -87,33 +87,33 @@
 					<div class="section-edit">
 						<div class="row no-gutter">
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.shipping_firstname">
+								<input type="text" class="f-input" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.shipping_firstname">
 							</div>
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.shipping_lastname">
+								<input type="text" class="f-input" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.shipping_lastname">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-12">
-								<input type="text" class="form-control" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.shipping_street1">
+								<input type="text" class="f-input" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.shipping_street1">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-12">
-								<input type="text" class="form-control" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.shipping_street2">
+								<input type="text" class="f-input" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.shipping_street2">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.shipping_city">
+								<input type="text" class="f-input" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.shipping_city">
 							</div>
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.shipping_postcode">
+								<input type="text" class="f-input" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.shipping_postcode">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-6">
-								<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
+								<input type="text" class="geo-region f-input" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
 								<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 									<option></option>
 									<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
@@ -139,44 +139,44 @@
 					<div class="section-view">
 						<p>{{form.order.billing_firstname}} {{form.order.billing_lastname}}</p>
 						<div class="adr">
-							<span class="street-address">{{form.order.billing_street1}}</span>
-							<span class="street-address" v-if="form.order.billing_street2">{{form.order.billing_street2}}</span>
-							<span class="locality">{{form.order.billing_city}}</span>
-							<span class="region">{{form.order.billing_region}}</span>
-							<span class="postal-code">{{form.order.billing_postcode}}</span>
+							<span class="street-address f-edited-block__info">{{form.order.billing_street1}}</span>
+							<span class="street-address f-edited-block__info" v-if="form.order.billing_street2">{{form.order.billing_street2}}</span>
+							<span class="locality f-edited-block__info">{{form.order.billing_city}}</span>
+							<span class="region f-edited-block__info">{{form.order.billing_region}}</span>
+							<span class="postal-code f-edited-block__info">{{form.order.billing_postcode}}</span>
 							<div class="country-name">{{dict.countries[form.order.billing_country]}}</div>
 						</div>
 					</div>
 					<div class="section-edit">
 						<div class="row no-gutter">
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.billing_firstname">
+								<input type="text" class="f-input" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.billing_firstname">
 							</div>
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.billing_lastname">
+								<input type="text" class="f-input" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.billing_lastname">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-12">
-								<input type="text" class="form-control" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.billing_street1">
+								<input type="text" class="f-input" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.billing_street1">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-12">
-								<input type="text" class="form-control" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.billing_street2">
+								<input type="text" class="f-input" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.billing_street2">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.billing_city">
+								<input type="text" class="f-input" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.billing_city">
 							</div>
 							<div class="col-md-6">
-								<input type="text" class="form-control" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.billing_postcode">
+								<input type="text" class="f-input" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.billing_postcode">
 							</div>
 						</div>
 						<div class="row no-gutter">
 							<div class="col-md-6">
-								<input type="text" class="geo-region form-control " :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.billing_region" v-if="!regionOptions('billing')">
+								<input type="text" class="geo-region f-input " :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.billing_region" v-if="!regionOptions('billing')">
 								<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.billing_region" v-if="regionOptions('billing')">
 									<option></option>
 									<option v-for="r in regionOptions('billing')" :value="r.id">{{r.text}}</option>
@@ -200,14 +200,14 @@
 					</div>
 					<div v-for="p in form.payments">
 						<strong>{{p.payment_method}}</strong>
-						<span :class="'status-' + p.state_overall">{{form.options.payment_state_overall[p.state_overall]}}</span>
-						<span>{{p.amount_captured|currency(form.order.store_currency_code)}}</span>
-						<span>({{p.amount_due|currency(form.order.store_currency_code)}})</span>
+						<span :class="'status-' + p.state_overall" class="f-edited-block__info">{{form.options.payment_state_overall[p.state_overall]}}</span>
+						<span class="f-edited-block__info">{{p.amount_captured|currency(form.order.store_currency_code)}}</span>
+						<span class="f-edited-block__info">({{p.amount_due|currency(form.order.store_currency_code)}})</span>
 					</div>
 					<div v-for="r in form.refunds">
 						<strong>{{'REFUND: '|_}}</strong>
-						<span :class="'status-' + r.state_overall">{{form.options.refund_state_overall[r.state_overall]}}</span>
-						<span>{{r.amount|currency(form.order.store_currency_code)}}</span>
+						<span :class="'status-' + r.state_overall" class="f-edited-block__info">{{form.options.refund_state_overall[r.state_overall]}}</span>
+						<span class="f-edited-block__info">{{r.amount|currency(form.order.store_currency_code)}}</span>
 					</div>
 				</div>
 			</div>

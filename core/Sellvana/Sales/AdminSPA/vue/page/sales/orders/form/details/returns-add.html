@@ -41,7 +41,7 @@
                     </td>
                     <td>
                         <table class="f-combined-columns"><tbody>
-                        <tr><th>{{'To Return:'|_}}</th><td><input type="number" class="form-control" v-model="item.qty_to_return" :disabled="!isItemSelected(item)"></td></tr>
+                        <tr><th>{{'To Return:'|_}}</th><td><input type="number" class="f-input-number" v-model="item.qty_to_return" :disabled="!isItemSelected(item)"></td></tr>
                         </tbody></table>
                     </td>
                 </tr>
@@ -69,15 +69,15 @@
             </div>
             <div class="create-payment">
                 <p>{{'Shipping Weight'|_}}</p>
-                <input type="number" v-model="rma.shipping_weight" class="form-control">
+                <input type="number" v-model="rma.shipping_weight" class="f-input-number">
             </div>
             <div class="create-payment">
                 <p>{{'Shipping Size'|_}}</p>
-                <input type="text" v-model="rma.shipping_size" class="form-control">
+                <input type="text" v-model="rma.shipping_size" class="f-input">
             </div>
             <div class="create-payment">
                 <p>{{'Carrier Price'|_}}</p>
-                <input type="number" v-model="rma.carrier_price" class="form-control">
+                <input type="number" v-model="rma.carrier_price" class="f-input-number">
             </div>
         </div>
         <div class="f-buttons-block text-right">
