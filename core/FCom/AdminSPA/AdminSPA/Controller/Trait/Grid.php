@@ -51,11 +51,6 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
      */
     abstract public function getGridConfig();
 
-    /**
-     * @return BORM
-     */
-    abstract public function getGridOrm();
-
     public function action_grid_config()
     {
         $config = $this->getGridConfig();

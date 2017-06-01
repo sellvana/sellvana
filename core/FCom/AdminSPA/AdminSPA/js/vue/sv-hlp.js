@@ -1,11 +1,11 @@
 define([
     'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
-    'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress',
+    'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress', 'perfect-scrollbar',
     'vue-password-strength-meter', 'sv-comp-form-field', 'sv-comp-form-layout',
     'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
 ],
 function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
-          VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress,
+          VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress, PerfectScrollbar,
           VuePassword, SvCompFormField, SvCompFormLayout,
           svPageDefaultGridTpl, svPageDefaultFormTpl
 ) {
@@ -33,6 +33,18 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
             },
             unbind: function (el) {
                 el.sortableInstance.destroy();
+            }
+        });
+
+        Vue.directive('scrollbar', {
+            bind: function (el) {
+                PerfectScrollbar.initialize(el);
+                $(el).on('resize', function () {
+                    PerfectScrollbar.update(el);
+                });
+            },
+            unbind: function (el) {
+                PerfectScrollbar.destroy(el);
             }
         });
 

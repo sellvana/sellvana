@@ -512,12 +512,21 @@ console.log(tab);
                     }
                     var url = grid.config.data_url;
                     if (!url) { // local data
+                        this.fetchLocalData(grid);
                         return;
                     }
                     var params = prepareDataRequest(grid);
                     this.sendRequest('GET', url, params, function (response) {
                         processDataResponse(response, grid);
                     });
+                },
+                fetchLocalData: function (grid)
+                {
+                    var data = grid.config.data, state = {};
+
+                    //Vue.set(grid, 'state', state);
+                    Vue.set(grid, 'rows', data);
+                    initGridState(grid);
                 },
                 applyFilters: function (filters) {
                     var oldFilters = this.grid.filters || [];

@@ -57,7 +57,7 @@
             - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
 
-            - [ requireJs, scrollbar, "@FCom_AdminSPA/AdminSPA/js/lib/perfect-scrollbar.jquery.min.js" ]
+            - [ requireJs, perfect-scrollbar, "@FCom_AdminSPA/AdminSPA/js/lib/perfect-scrollbar.min" ]
    #         - [ js,  "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]
 
             - [ requireJs, spin, "@FCom_AdminSPA/AdminSPA/js/lib/ladda/spin" ]
@@ -189,6 +189,10 @@
             - [ requireJs, sv-page-users-form-main, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main" ]
             - [ requireJs, sv-page-users-form-main-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main.html" ]
 
+            - [ requireJs, sv-page-modules, "@FCom_AdminSPA/AdminSPA/vue/page/modules/index" ]
+            - [ requireJs, sv-page-modules-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/modules/index.html" ]
+            - [ requireJs, sv-page-modules-grid-config, "~/modules/grid_config" ]
+
             - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]
             - [ requireJs, sv-page-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main.html" ]
             - [ requireJs, sv-page-settings-config, "~/settings/config" ]
@@ -224,6 +228,8 @@
             - [ addRoute, { path: /password-reset, require: [sv-page-account-password-reset, text!sv-page-account-password-reset-tpl ]}]
             - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
             - [ addRoute, { path: /settings, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
+
+            - [ addRoute, { path: /modules, require: [sv-page-modules, text!sv-page-modules-tpl, json!sv-page-modules-grid-config ]}]
 
             - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-users-tpl, json!sv-page-users-grid-config ]}]
             - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-users-form-tpl ]}]

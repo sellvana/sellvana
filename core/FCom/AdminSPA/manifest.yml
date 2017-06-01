@@ -17,6 +17,7 @@ modules:
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]
                     - [ /favorites/?.action, FCom_AdminSPA_AdminSPA_Controller_Favorites ]
                     - [ /settings/?.action, FCom_AdminSPA_AdminSPA_Controller_Settings ]
+                    - [ /modules/?.action, FCom_AdminSPA_AdminSPA_Controller_Modules ]
                     - [ /users/?.action, FCom_AdminSPA_AdminSPA_Controller_Users ]
 
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
