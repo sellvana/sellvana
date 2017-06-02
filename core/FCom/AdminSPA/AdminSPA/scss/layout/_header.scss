@@ -31,6 +31,7 @@ body {
       display: inline-block;
       vertical-align: middle;
       position: relative;
+      width: 250px;
       .f-dropdown__menu {
             a {
                   padding: 8px 20px;
@@ -62,7 +63,7 @@ body {
 }
 
 .f-header__search-block__input {
-      width: 250px;
+      width: 100%;
       font-size: 16px;
       color: #fff;
       background: transparent;
@@ -191,7 +192,7 @@ body {
 
 .f-header__navbar-toggle {
       margin: 0 0 0 94px;
-      padding: 14px 0;
+      padding: 16px 0 12px;
       svg {
             stroke: #fff;
             fill: #fff;
@@ -322,6 +323,7 @@ body {
       display: inline-block;
       float: left;
       position: relative;
+      margin-top: 3px;
 }
 
 /*Notifications block and messages*/
@@ -395,8 +397,22 @@ body {
       .notifications-block {
             top: 60px;
       }
+      .f-header__search-block {
+            width: 100px;
+      }
 }
-
+@media (max-width: 1279px) {
+      .f-header__setup-block {
+            .f-header__navbar__link {
+                  .setup-progress-label {
+                        font-size: 12px;
+                  }
+                  .setup-progress-container {
+                        width: 100px;
+                  }
+            }
+      }
+}
 @media (max-width: 767px) {
       .f-admin-header {
             padding: 0;
@@ -455,7 +471,7 @@ body {
                   }
             }
             .f-header__navbar__link {
-                  padding: 12px 8px;
+                  padding: 12px 8px 13px;
                   font-size: 12px;
             }
       }
@@ -469,6 +485,7 @@ body {
 
       .f-header__search-block {
             position: static;
+            width: initial;
             .f-dropdown__menu {
                   &:before {
                         content: '';

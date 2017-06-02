@@ -1,5 +1,12 @@
 .f-buttons-block {
       padding: 5px 0 1px;
+      .f-dropdown {
+            display: inline-block;
+      }
+      .f-dropdown__menu {
+            background-color: transparent;
+            border: 0;
+      }
 }
 
 .button {

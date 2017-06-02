@@ -1,24 +1,48 @@
-<div>
-	<div class="row">
-		<div class="col-md-2 col-sm-12">
-			<img :src="thumbUrl" width="100" class="avatar-img">
-			<div class='secondary-menu'>
-				<ul class="nav">
-					<li v-for="t in formTabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">
-                        {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i></a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="col-md-10 col-sm-12">
-			<div class="f-buttons-block text-right">
-				<button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
-				<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-				<button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
-				<button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
-			</div>
-		</div>
-		<div class="col-md-10 col-sm-12">
-			<component v-for="t in formTabs" v-show="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
-		</div>
-	</div>
+<div class="row">
+      <div class="col-md-12 col-sm-12">
+            <div class="f-form-title">
+                  <img v-if="thumbUrl" :src="thumbUrl" width="80" class="f-thumb-img">
+                  <p class="f-form-title__text hidden-xs">{{'Form name'|_}}</p>
+            </div>
+      </div>
+    <!--  <div class="col-md-12 col-sm-12">
+            <div class="row">-->
+                  <div class="col-md-6">
+                        <div class='f-horizontal-menu'>
+                              <div class="f-horizontal-menu__dropdown">Tabs</div>
+                              <ul class="f-horizontal-menu__dropdown-menu">
+                                    <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                                          <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
+                                          </a>
+                                    </li>
+                              </ul>
+                        </div>
+                        <div class='f-horizontal-menu f-dropdown'>
+                              <ul>
+                                    <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                                          <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
+                                          </a>
+                                    </li>
+                              </ul>
+                        </div>
+                  </div>
+                  <div class="col-md-6">
+                        <div class="f-buttons-block text-right">
+                              <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
+                              <div class="f-dropdown">
+                                    <div class="button button1">Actions</div>
+                                    <div class="f-dropdown-menu">
+                                          <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                                          <button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
+                                    </div>
+                              </div>
+                              <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
+                        </div>
+                  </div>
+           <!-- </div>
+
+      </div>-->
+      <div class="col-md-6 col-sm-12">
+            <component v-for="t in formTabs" v-show="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+      </div>
 </div>

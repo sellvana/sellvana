@@ -1,15 +1,17 @@
 <div>
 	<div>
-		<ul class="f-horizontal-menu">
-			<li v-for="l1 in settings.config.nav" class="f-dropdown f-horizontal-menu__item" :class="{open:ddOpen('settings/' + l1.path)}">
-				<a href="#" :title="l1.label" class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">{{l1.label}}
-					<!--<i class="fa fa-caret-down f-horizontal-menu__icon" aria-hidden="true"></i>-->
-				</a>
-				<ul class="f-horizontal-menu__dropdown-menu">
-					<li v-for="l2 in l1.children" ><a href="#" @click.prevent="switchTab(l2)" class="f-horizontal-menu__link">{{l2.label}}</a></li>
-				</ul>
-			</li>
-		</ul>
+		<div class="f-horizontal-menu">
+			<ul>
+				<li v-for="l1 in settings.config.nav" class="f-dropdown f-horizontal-menu__item" :class="{open:ddOpen('settings/' + l1.path)}">
+					<a href="#" :title="l1.label" class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">{{l1.label}}
+						<!--<i class="fa fa-caret-down f-horizontal-menu__icon" aria-hidden="true"></i>-->
+					</a>
+					<ul class="f-horizontal-menu__dropdown-menu">
+						<li v-for="l2 in l1.children" ><a href="#" @click.prevent="switchTab(l2)" class="f-horizontal-menu__link">{{l2.label}}</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
 	</div>
 	<!--<v-select :debounce="500" :on-search="search" :options="search_options" :placeholder="'Search Settings...'|_"></v-select>-->
 	<div class="f-content-block">

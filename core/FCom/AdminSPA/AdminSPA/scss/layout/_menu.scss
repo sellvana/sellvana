@@ -1,6 +1,39 @@
 .f-horizontal-menu {
 	margin: 0;
 	padding: 0;
+	.f-horizontal-menu__dropdown-menu {
+		display: none;
+		padding: 0;
+	}
+	.f-dropdown__toggle {
+		display: none;
+	}
+	&.f-dropdown {
+		.f-dropdown__toggle {
+			display: inline-block;
+		}
+		.f-horizontal-menu__dropdown-menu {
+			display: none;
+			.f-horizontal-menu__item {
+				display: block;
+			}
+		}
+		&.open {
+			.f-horizontal-menu__dropdown-menu {
+				display: block;
+			}
+		}
+		.f-horizontal-menu__item.active .f-horizontal-menu__link {
+			border: solid 1px #d9d9d9;
+			background: #fff;
+			font-weight: bold;
+			padding: 8px 0 8px 0;
+		}
+		.f-dropdown__toggle {
+			padding: 8px 30px;
+		}
+
+	}
 }
 .f-horizontal-menu__link {
 	color: #2e4354;
@@ -44,22 +77,25 @@
 	float: right;
 	padding: 2px 7px;
 }
-.f-horizontal-menu__dropdown-menu {
-	display: none;
-	position: absolute;
-	left: 0;
-	top: 100%;
-	padding: 0;
-	width: 100%;
-	background: #f1f1f1;
-	z-index: 99;
-	a {
-		border-radius: 0;
-		&:hover {
-			background: #fff;
+.f-dropdown {
+	.f-horizontal-menu__dropdown-menu {
+		display: none;
+		position: absolute;
+		left: 0;
+		top: 100%;
+		padding: 0;
+		width: 100%;
+		background: #f1f1f1;
+		z-index: 99;
+		a {
+			border-radius: 0;
+			&:hover {
+				background: #fff;
+			}
 		}
 	}
 }
+
 
 
 /*indent a menu with the avatar and without*/

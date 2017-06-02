@@ -1,6 +1,6 @@
 <li>
     <div class="node-line" :class="{open: node.open, active: isActive}" @dblclick="dblclick">
-        <a v-if="isFolder" class="folder-icon" href="#" @click.prevent="toggle"><i class="fa" :class="{'fa-folder':!node.open, 'fa-folder-open':node.open}"></i></a> 
+        <a v-if="isFolder" class="folder-icon" href="#" @click.prevent="toggle"><i class="fa fa-plus f-closed-line-link" aria-hidden="true"></i><i class="fa fa-minus f-opened-line-link" aria-hidden="true"></i><i class="fa" :class="{'fa-folder':!node.open, 'fa-folder-open':node.open}"></i></a>
         <span v-else class="leaf-icon"><i class="fa fa-folder-o"></i></span>
         <div class="node-name">
 			<a class="node-label" href="#" @click.prevent="select">{{node.label}}</a>

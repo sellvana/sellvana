@@ -1,7 +1,7 @@
 <div>
     <div class="row">
         <div class="col-md-12 col-lg-2">
-            <img :src="avatarUrl" width="100" class="avatar-img">
+            <img :src="avatarUrl" width="80" class="f-thumb-img">
             <div>
                 <ul class='f-secondary-menu'>
                     <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class='f-secondary-menu__item'><a href="#" @click.prevent="switchTab(t.name)" class='f-secondary-menu__link'>{{t.label|_}}</a></li>

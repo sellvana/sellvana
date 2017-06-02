@@ -5,6 +5,9 @@
 }
 .tree-node {
 	cursor: pointer;
+	.f-opened-line-link {
+		display: none;
+	}
 	&.open {
 		font-weight: bold;
 	}
@@ -13,6 +16,14 @@
 			display: inline-block;
 			width: 79%;
 			vertical-align: top;
+		}
+		&.open {
+			.f-closed-line-link {
+				display: none;
+			}
+			.f-opened-line-link {
+				display: inline-block;
+			}
 		}
 	}
 	.node-label {
@@ -42,10 +53,12 @@
 	}
 
 }
-
+.f-closed-line-link, .f-opened-line-link {
+	margin-right: 2px;
+}
 .leaf-icon,
 .folder-icon {
 	display: inline-block;
-	width: 16px;
+	width: 32px;
 	padding: 6px 4px 6px 0;
 }
