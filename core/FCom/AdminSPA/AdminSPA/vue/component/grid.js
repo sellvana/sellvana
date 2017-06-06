@@ -137,6 +137,17 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             }
         }
 
+        function initGridConfig(grid)
+        {
+            var cols = {}, i, l, c;
+
+            for (i = 0, l = grid.config.columns.length; i < l; i++) {
+                c = grid.config.columns[i];
+                cols[c.name] = c;
+            }
+            Vue.set(grid.config, 'columns_by_name', cols);
+        }
+
         function processDataResponse(response, grid) {
             if (response.config) {
                 Vue.set(grid, 'config', response.config);
@@ -427,7 +438,6 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     this.$emit('event', event, arg);
                 },
                 setSettingsTab: function (tab) {
-console.log(tab);
                     this.settingsTab = tab;
                 }
             },
@@ -554,6 +564,7 @@ console.log(tab);
             },
             created: function () {
                 initGridState(this.grid);
+                initGridConfig(this.grid);
                 initGridComponents(this.grid);
                 this.fetchData();
             },
