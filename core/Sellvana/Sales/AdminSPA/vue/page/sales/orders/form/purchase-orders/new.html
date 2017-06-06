@@ -65,13 +65,13 @@
 					<div class="row no-gutter">
 						<div class="col-md-6">
 							<input type="text" class="geo-region f-input" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
-							<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+							<select2 class="geo-region" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 								<option></option>
 								<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
 							</select2>
 						</div>
 						<div class="col-md-6">
-							<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+							<select2 class="geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 								<option></option>
 								<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
 							</select2>
@@ -101,40 +101,40 @@
 				<div class="section-edit">
 					<div class="row no-gutter">
 						<div class="col-md-6">
-							<input type="text" class="form-control" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.shipping_firstname">
+							<input type="text" class="f-input" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.shipping_firstname">
 						</div>
 						<div class="col-md-6">
-							<input type="text" class="form-control" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.shipping_lastname">
+							<input type="text" class="f-input" :title="'Last Name'|_" :placeholder="'Last Name'|_" v-model="form.order.shipping_lastname">
 						</div>
 					</div>
 					<div class="row no-gutter">
 						<div class="col-md-12">
-							<input type="text" class="form-control" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.shipping_street1">
+							<input type="text" class="f-input" :title="'Street Line 1'|_" :placeholder="'Street Line 1'|_" v-model="form.order.shipping_street1">
 						</div>
 					</div>
 					<div class="row no-gutter">
 						<div class="col-md-12">
-							<input type="text" class="form-control" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.shipping_street2">
+							<input type="text" class="f-input" :title="'Street Line 2'|_" :placeholder="'Street Line 2'|_" v-model="form.order.shipping_street2">
 						</div>
 					</div>
 					<div class="row no-gutter">
 						<div class="col-md-6">
-							<input type="text" class="form-control" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.shipping_city">
+							<input type="text" class="f-input" :title="'City'|_" :placeholder="'City'|_" v-model="form.order.shipping_city">
 						</div>
 						<div class="col-md-6">
-							<input type="text" class="form-control" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.shipping_postcode">
+							<input type="text" class="f-input" :title="'Zip/Postal Code'|_" :placeholder="'Zip/Postal Code'|_" v-model="form.order.shipping_postcode">
 						</div>
 					</div>
 					<div class="row no-gutter">
 						<div class="col-md-6">
-							<input type="text" class="geo-region form-control" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
-							<select2 class="geo-region form-control" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
+							<input type="text" class="geo-region f-input" :title="'State/Region'|_" :placeholder="'State/Region'|_" v-model="form.order.shipping_region" v-if="!regionOptions('shipping')">
+							<select2 class="geo-region" style="" :title="'State/Region'|_" v-model="form.order.shipping_region" v-if="regionOptions('shipping')">
 								<option></option>
 								<option v-for="r in regionOptions('shipping')" :value="r.id">{{r.text}}</option>
 							</select2>
 						</div>
 						<div class="col-md-6">
-							<select2 class="form-control geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
+							<select2 class="geo-country" :title="'Country'|_" v-model="form.order.shipping_country">
 								<option></option>
 								<option v-for="c in dict.countries_seq" :value="c.id">{{c.text}}</option>
 							</select2>

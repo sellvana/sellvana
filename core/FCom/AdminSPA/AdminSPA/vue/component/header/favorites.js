@@ -23,6 +23,5 @@ define(['sv-hlp', 'text!sv-comp-header-favorites-tpl'], function (SvHlp, headerF
             }
         }
     };
-
     return SvCompHeaderFavorites;
 });

@@ -130,6 +130,9 @@ input::-webkit-inner-spin-button {
 	font-weight: 500;
 	padding: 0 0 0 10px;
 	margin-bottom: 5px;
+	label {
+		margin-bottom: 0;
+	}
 }
 
 .f-delete {
@@ -516,6 +519,7 @@ input::-webkit-inner-spin-button {
 	color: darkred;
 	padding: 0 0 0 6px;
 	visibility: visible;
+	display: block;
 }
 .error {
 	.error-message {

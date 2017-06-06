@@ -1,395 +1,399 @@
 <div class="row">
-    <div class="col-md-12">
-        <div class="block-title">
-            <p>{{'Widget Library'|_}}</p>
-        </div>
-    </div>
-    <div class="col-md-3 col-lg-2">
-        <div>
-            <ul class="widget-menu row">
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Text'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Widget'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Template'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Split 2 Columns'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Split 3 Columns'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'CMS Block'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Products Carousel'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Remove View'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Video Embed (YouTube)'|_}}</span></a></li>
-                <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Insert Media'|_}}</span></a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="col-md-9 col-lg-10">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="widget-block">
-                    <div class="widget-block-title">
-                        <p>{{'Header'|_}}</p>
-                        <div class="dropdown action dropdown-buttons open">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                            <div class="dropdown-menu">
-                                <ul class="dropdown-content">
-                                    <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                    <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                    <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="widget-block-content">
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'CMS Block'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <select2>
-                                    <option>Option1</option>
-                                    <option>Option2</option>
-                                </select2>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="f-input" value="" placeholder="Param">
-                                    <span class="input-group-addon"> = </span>
-                                    <input type="text" class="f-input" value="" placeholder="Value">
-                                    <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
-                                </div>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="f-input" value="" placeholder="Param">
-                                    <span class="input-group-addon"> = </span>
-                                    <input type="text" class="f-input" value="" placeholder="Value">
-                                    <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
-                                </div>
-                                <div class="control-block">
-                                    <button class="button button2">{{'Add custom param'|_}}</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Products Carousel'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <form class="form-horizontal">
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Product SKUs'|_}}</p>
-                                            <div class="col-md-9">
-                                                <select2 class="form-control">
-                                                    <option>Option1</option>
-                                                    <option>Option2</option>
-                                                    <option>Option3</option>
-                                                    <option>Option4</option>
-                                                </select2>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Carousel Height'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input-number" type="number" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Carousel Speed'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input-number" type="number" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Pause Carousel on Hover'|_}}</p>
-                                            <div class="col-md-9">
-                                                <checkbox ></checkbox>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Allow Carousel to React to Keyboard'|_}}</p>
-                                            <div class="col-md-9">
-                                                <checkbox ></checkbox>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div class="col-md-12">
+            <div class="f-block-title">
+                  <p class="f-block-title__text">{{'Widget Library'|_}}</p>
             </div>
-            <div class="col-md-12 col-lg-3">
-                <div class="widget-block">
-                    <div class="widget-block-title">
-                        <p>{{'Left column'|_}}</p>
-                        <div class="dropdown action dropdown-buttons open">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                            <div class="dropdown-menu">
-                                <ul class="dropdown-content">
-                                    <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                    <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                    <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="widget-block-content">
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Split 2 Columns'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="widget-container">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="widget-container">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Split 3 Columns'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="widget-container">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="widget-container">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="widget-container">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      </div>
+      <div class="col-md-3 col-lg-2">
+            <div>
+                  <ul class="widget-menu row">
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Text'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Widget'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Template'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Split 2 Columns'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Split 3 Columns'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'CMS Block'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Products Carousel'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Remove View'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Video Embed (YouTube)'|_}}</span></a>
+                        </li>
+                        <li class="col-md-12 col-sm-3 col-xs-6"><a href="#"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i><span>{{'Insert Media'|_}}</span></a>
+                        </li>
+                  </ul>
             </div>
-            <div class="col-md-12 col-lg-6">
-                <div class="widget-block main-widget-block">
-                    <div class="widget-block-title">
-                        <p>{{'Main'|_}}</p>
-                        <div class="dropdown action dropdown-buttons open">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                            <div class="dropdown-menu">
-                                <ul class="dropdown-content">
-                                    <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                    <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                    <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="widget-block-content">
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Text'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <div class="form-horizontal">
-                                    <div class="form-group">
-                                        <div class="col-md-12">
-                                            <textarea class="f-textarea" rows="5"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Widget'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <select2>
-                                    <option>Option1</option>
-                                    <option>Option2</option>
-                                </select2>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="f-input" value="" placeholder="Param">
-                                    <span class="input-group-addon"> = </span>
-                                    <input type="text" class="f-input" value="" placeholder="Value">
-                                    <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
-                                </div>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="f-input" value="" placeholder="Param">
-                                    <span class="input-group-addon"> = </span>
-                                    <input type="text" class="f-input" value="" placeholder="Value">
-                                    <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
-                                </div>
-                                <div class="control-block">
-                                    <button class="button button2">{{'Add custom param'|_}}</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12 col-lg-3">
-                <div class="widget-block">
-                    <div class="widget-block-title">
-                        <p>{{'Right column'|_}}</p>
-                        <div class="dropdown action dropdown-buttons open">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                            <div class="dropdown-menu">
-                                <ul class="dropdown-content">
-                                    <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                    <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                    <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="widget-block-content">
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Remove view'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <div class="form-horizontal">
-                                    <div class="form-group">
-                                        <div class="col-md-12">
-                                            <input class="f-input" type="text" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="widget-block">
-                    <div class="widget-block-title">
-                        <p>{{'Footer'|_}}</p>
-                        <div class="dropdown action dropdown-buttons open">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                            <div class="dropdown-menu">
-                                <ul class="dropdown-content">
-                                    <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                    <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                    <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="widget-block-content">
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Video Embed (YouTube)'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <form class="form-horizontal">
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Embed URL'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input" type="text" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Width'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input-number" type="number" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Height'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input-number" type="number" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Embed using iFrame'|_}}</p>
-                                            <div class="col-md-9">
-                                                <checkbox ></checkbox>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" class="f-input" value="" placeholder="Param">
-                                        <span class="input-group-addon"> = </span>
-                                        <input type="text" class="f-input" value="" placeholder="Value">
-                                        <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
-                                    </div>
-                                    <div class="control-block">
-                                        <button class="button button2">{{'Add custom param'|_}}</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="widget">
-                            <div class="widget-title">
-                                <p>{{'Insert media'|_}}</p>
-                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                            </div>
-                            <div class="widget-content">
-                                <form class="form-horizontal">
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Width'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input-number" type="number" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <p class="col-md-3 control-label">{{'Height'|_}}</p>
-                                            <div class="col-md-9">
-                                                <input class="f-input-number" type="number" />
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-3 control-label">
-                                            <button class="button button4">{{'Select image'|_}}</button>
-                                        </div>
-                                        <div class="col-md-9">
+      </div>
+      <div class="col-md-9 col-lg-10">
+            <div class="row">
+                  <div class="col-md-12">
+                        <div class="widget-block">
+                              <div class="widget-block-title">
+                                    <p>{{'Header'|_}}</p>
+                                    <div class="f-action-button-b pull-right" <!--:class="{open:ddOpen('widget-menu')}"-->>
+                                          <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown" <!--@click.prevent.stop="ddToggle('widget-menu')"-->><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                                          <ul class="f-action-button-b__menu">
+                                                <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
+                                                <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
+                                                <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
 
-                                        </div>
+                                          </ul>
                                     </div>
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" class="f-input" value="" placeholder="Param">
-                                        <span class="input-group-addon"> = </span>
-                                        <input type="text" class="f-input" value="" placeholder="Value">
-                                        <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                              </div>
+                              <div class="widget-block-content">
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'CMS Block'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <select2>
+                                                      <option>Option1</option>
+                                                      <option>Option2</option>
+                                                </select2>
+                                                <div class="input-group input-group-sm">
+                                                      <input type="text" class="f-input" value="" placeholder="Param">
+                                                      <span class="input-group-addon"> = </span>
+                                                      <input type="text" class="f-input" value="" placeholder="Value">
+                                                      <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                                                </div>
+                                                <div class="input-group input-group-sm">
+                                                      <input type="text" class="f-input" value="" placeholder="Param">
+                                                      <span class="input-group-addon"> = </span>
+                                                      <input type="text" class="f-input" value="" placeholder="Value">
+                                                      <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                                                </div>
+                                                <div class="control-block">
+                                                      <button class="button button2">{{'Add custom param'|_}}</button>
+                                                </div>
+                                          </div>
                                     </div>
-                                    <div class="control-block">
-                                        <button class="button button2">{{'Add custom param'|_}}</button>
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Products Carousel'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <form class="form-horizontal">
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Product SKUs'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <select2>
+                                                                              <option>Option1</option>
+                                                                              <option>Option2</option>
+                                                                              <option>Option3</option>
+                                                                              <option>Option4</option>
+                                                                        </select2>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Carousel Height'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input-number" type="number"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Carousel Speed'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input-number" type="number"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Pause Carousel on Hover'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <checkbox></checkbox>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Allow Carousel to React to Keyboard'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <checkbox></checkbox>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                </form>
+                                          </div>
                                     </div>
-                                </form>
-                            </div>
+                              </div>
                         </div>
-                    </div>
-                </div>
+                  </div>
+                  <div class="col-md-12 col-lg-3">
+                        <div class="widget-block">
+                              <div class="widget-block-title">
+                                    <p>{{'Left column'|_}}</p>
+                                    <div class="dropdown action dropdown-buttons open">
+                                          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                                          <div class="dropdown-menu">
+                                                <ul class="dropdown-content">
+                                                      <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
+                                                      <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
+                                                      <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                                </ul>
+                                          </div>
+                                    </div>
+                              </div>
+                              <div class="widget-block-content">
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Split 2 Columns'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <div class="row">
+                                                      <div class="col-md-6">
+                                                            <div class="widget-container"></div>
+                                                      </div>
+                                                      <div class="col-md-6">
+                                                            <div class="widget-container"></div>
+                                                      </div>
+                                                </div>
+                                          </div>
+                                    </div>
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Split 3 Columns'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <div class="row">
+                                                      <div class="col-md-4">
+                                                            <div class="widget-container"></div>
+                                                      </div>
+                                                      <div class="col-md-4">
+                                                            <div class="widget-container"></div>
+                                                      </div>
+                                                      <div class="col-md-4">
+                                                            <div class="widget-container"></div>
+                                                      </div>
+                                                </div>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                        <div class="widget-block main-widget-block">
+                              <div class="widget-block-title">
+                                    <p>{{'Main'|_}}</p>
+                                    <div class="dropdown action dropdown-buttons open">
+                                          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                                          <div class="dropdown-menu">
+                                                <ul class="dropdown-content">
+                                                      <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
+                                                      <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
+                                                      <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                                </ul>
+                                          </div>
+                                    </div>
+                              </div>
+                              <div class="widget-block-content">
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Text'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <fieldset class="f-form-container">
+                                                      <div class="f-form-group row">
+                                                            <div class="col-md-12">
+                                                                  <textarea class="f-textarea" rows="5"></textarea>
+                                                            </div>
+                                                      </div>
+                                                </fieldset>
+                                          </div>
+                                    </div>
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Widget'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <select2>
+                                                      <option>Option1</option>
+                                                      <option>Option2</option>
+                                                </select2>
+                                                <div class="input-group input-group-sm">
+                                                      <input type="text" class="f-input" value="" placeholder="Param">
+                                                      <span class="input-group-addon"> = </span>
+                                                      <input type="text" class="f-input" value="" placeholder="Value">
+                                                      <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                                                </div>
+                                                <div class="input-group input-group-sm">
+                                                      <input type="text" class="f-input" value="" placeholder="Param">
+                                                      <span class="input-group-addon"> = </span>
+                                                      <input type="text" class="f-input" value="" placeholder="Value">
+                                                      <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                                                </div>
+                                                <div class="control-block">
+                                                      <button class="button button2">{{'Add custom param'|_}}</button>
+                                                </div>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+                  <div class="col-md-12 col-lg-3">
+                        <div class="widget-block">
+                              <div class="widget-block-title">
+                                    <p>{{'Right column'|_}}</p>
+                                    <div class="dropdown action dropdown-buttons open">
+                                          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                                          <div class="dropdown-menu">
+                                                <ul class="dropdown-content">
+                                                      <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
+                                                      <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
+                                                      <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                                </ul>
+                                          </div>
+                                    </div>
+                              </div>
+                              <div class="widget-block-content">
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Remove view'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <div class="form-horizontal">
+                                                      <div class="form-group">
+                                                            <div class="col-md-12">
+                                                                  <input class="f-input" type="text"/>
+                                                            </div>
+                                                      </div>
+                                                </div>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+                  <div class="col-md-12">
+                        <div class="widget-block">
+                              <div class="widget-block-title">
+                                    <p>{{'Footer'|_}}</p>
+                                    <div class="dropdown action dropdown-buttons open">
+                                          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                                          <div class="dropdown-menu">
+                                                <ul class="dropdown-content">
+                                                      <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
+                                                      <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
+                                                      <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                                </ul>
+                                          </div>
+                                    </div>
+                              </div>
+                              <div class="widget-block-content">
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Video Embed (YouTube)'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <form class="form-horizontal">
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Embed URL'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input" type="text"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Width'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input-number" type="number"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Height'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input-number" type="number"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Embed using iFrame'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <checkbox></checkbox>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="input-group input-group-sm">
+                                                            <input type="text" class="f-input" value="" placeholder="Param">
+                                                            <span class="input-group-addon"> = </span>
+                                                            <input type="text" class="f-input" value="" placeholder="Value">
+                                                            <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                                                      </div>
+                                                      <div class="control-block">
+                                                            <button class="button button2">{{'Add custom param'|_}}</button>
+                                                      </div>
+                                                </form>
+                                          </div>
+                                    </div>
+                                    <div class="widget">
+                                          <div class="widget-title">
+                                                <p>{{'Insert media'|_}}</p>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-content">
+                                                <form class="form-horizontal">
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Width'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input-number" type="number"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <label>
+                                                                  <p class="col-md-3 control-label">{{'Height'|_}}</p>
+                                                                  <div class="col-md-9">
+                                                                        <input class="f-input-number" type="number"/>
+                                                                  </div>
+                                                            </label>
+                                                      </div>
+                                                      <div class="form-group">
+                                                            <div class="col-md-3 control-label">
+                                                                  <button class="button button4">{{'Select image'|_}}</button>
+                                                            </div>
+                                                            <div class="col-md-9">
+
+                                                            </div>
+                                                      </div>
+                                                      <div class="input-group input-group-sm">
+                                                            <input type="text" class="f-input" value="" placeholder="Param">
+                                                            <span class="input-group-addon"> = </span>
+                                                            <input type="text" class="f-input" value="" placeholder="Value">
+                                                            <a class="js-widget-custom-param-remove input-group-addon" href="#" draggable="false"><i class="fa fa-times"></i></a>
+                                                      </div>
+                                                      <div class="control-block">
+                                                            <button class="button button2">{{'Add custom param'|_}}</button>
+                                                      </div>
+                                                </form>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
             </div>
-        </div>
-    </div>
+      </div>
 </div>

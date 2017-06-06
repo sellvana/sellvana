@@ -18,7 +18,7 @@
 						<!--<span class="param-result" onclick="event.preventDefault(); $(this).toggleClass('edit'); $(this).find('input').focus();">-->
 							<!--<a href="#" >any</a>-->
 							<!--<span class="param-options">-->
-								<!--<input type="text" class="form-control" value="any" onchange="var value=$(this).val(); $(this).parents('.param-result').find('a').text(value);"-->
+								<!--<input type="text" class="f-input" value="any" onchange="var value=$(this).val(); $(this).parents('.param-result').find('a').text(value);"-->
 									   <!--onkeyup="if (event.keyCode == 13) { $(this).parents('.param-result').removeClass('edit')}"-->
 								<!---->
 								<!--/>-->
@@ -43,7 +43,7 @@
 		<div class="f-form-group row ">
 			<label class="f-form-label col-md-3">{{'Select'|_}}</label>
 			<div class="col-md-9">
-				<select2 class="form-control">
+				<select2>
 					<option>Option1</option>
 					<option>Option2</option>
 					<option>Option3</option>
@@ -54,7 +54,7 @@
 		<div class="f-form-group row">
 			<label class="f-form-label col-md-3">{{'Select multiple'|_}}</label>
 			<div class="col-md-9">
-				<select2 multiple="" aria-multiselectable="true" class="form-control select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+				<select2 multiple="" aria-multiselectable="true" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
 					<option>Option1</option>
 					<option>Option2</option>
 					<option>Option3</option>

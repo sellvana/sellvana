@@ -55,14 +55,14 @@
             </div>
             <div class="create-payment">
                 <p>{{'Shipping Method'|_}}</p>
-                <select2 v-model="shipment.carrier_code" class="form-control">
+                <select2 v-model="shipment.carrier_code">
                     <option></option>
                     <option v-for="m in form.shipping_methods" :value="m.id">{{m.text}}</option>
                 </select2>
             </div>
             <div class="create-payment" v-if="shipment.carrier_code">
                 <p>{{'Shipping Service'|_}}</p>
-                <select2 v-model="shipment.service_code" class="form-control">
+                <select2 v-model="shipment.service_code">
                     <option></option>
                     <option v-for="s in shippingServices" :value="s.id">{{s.text}}</option>
                 </select2>

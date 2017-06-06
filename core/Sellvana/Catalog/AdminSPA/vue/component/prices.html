@@ -16,25 +16,25 @@
         <!--<tr>-->
             <!--<td></td>-->
             <!--<td v-if="options.customer_groups">-->
-                <!--<select class="form-control" v-model="filter.customer_group_id">-->
+                <!--<select2 v-model="filter.customer_group_id">-->
                     <!--<option value="">{{'Show all'|_}}</option>-->
                     <!--&lt;!&ndash;<option :value="null">{{'Default'|_}}</option>&ndash;&gt;-->
                     <!--<option v-for="o in options.customer_groups" :value="o.id">{{o.text}}</option>-->
-                <!--</select>-->
+                <!--</select2>-->
             <!--</td>-->
             <!--<td v-if="options.multi_site">-->
-                <!--<select class="form-control" v-model="filter.site_id">-->
+                <!--<select2 v-model="filter.site_id">-->
                     <!--<option value="">{{'Show all'|_}}</option>-->
                     <!--&lt;!&ndash;<option :value="null">{{'Default'|_}}</option>&ndash;&gt;-->
                     <!--<option v-for="o in options.multi_site" :value="o.id">{{o.text}}</option>-->
-                <!--</select>-->
+                <!--</select2>-->
             <!--</td>-->
             <!--<td v-if="options.multi_currency">-->
-                <!--<select class="form-control" v-model="filter.currency_code">-->
+                <!--<select2 v-model="filter.currency_code">-->
                     <!--<option value="">{{'Show all'|_}}</option>-->
                     <!--&lt;!&ndash;<option :value="null">{{'Default'|_}}</option>&ndash;&gt;-->
                     <!--<option v-for="o in options.multi_currency" :value="o.id">{{o.text}}</option>-->
-                <!--</select>-->
+                <!--</select2>-->
             <!--</td>-->
         <!--</tr>-->
         </thead>
@@ -44,25 +44,25 @@
                 <a v-if="!price.is_base_price" href="#" @click.prevent="removePrice(price)" class="f-delete"><i class="fa fa-trash"></i></a>
             </td>
             <td v-if="options.customer_groups">
-                <select2 class="form-control" v-model="price.customer_group_id" :disabled="price.is_base_price">
+                <select2 v-model="price.customer_group_id" :disabled="price.is_base_price">
                     <option :value="null">{{'Default'|_}}</option>
                     <option v-for="o in options.customer_groups" :value="o.id">{{o.text}}</option>
                 </select2>
             </td>
             <td v-if="options.multi_site">
-                <select2 class="form-control" v-model="price.site_id" :disabled="price.is_base_price">
+                <select2 v-model="price.site_id" :disabled="price.is_base_price">
                     <option :value="null">{{'Default'|_}}</option>
                     <option v-for="o in options.multi_site" :value="o.id">{{o.text}}</option>
                 </select2>
             </td>
             <td v-if="options.multi_currency">
-                <select2 class="form-control" v-model="price.currency_code" :disabled="price.is_base_price">
+                <select2 v-model="price.currency_code" :disabled="price.is_base_price">
                     <option :value="null">{{'Default'|_}}</option>
                     <option v-for="o in options.multi_currency" :value="o.id">{{o.text}}</option>
                 </select2>
             </td>
             <td>
-                <select2 class="form-control" v-model="price.price_type" :disabled="price.is_base_price">
+                <select2 v-model="price.price_type" :disabled="price.is_base_price">
                     <option v-for="o in options.price_types" :value="o.id">{{o.text|_}}</option>
                 </select2>
             </td>
@@ -73,12 +73,12 @@
             <td>
                 <div class="f-form-group input-group-sm">
                     <span class="f-form-group-btn">
-                        <select2 v-model="price.operation" class="form-control" style="min-width: 100px;">
+                        <select2 v-model="price.operation" style="min-width: 100px;">
                             <option v-for="o in priceOperations" :value="o.id">{{o.text|_}}</option>
                         </select2>
                     </span>
                     <span class="f-form-group-btn">
-                        <select2 v-if="price.operation !== '=$'" v-model="price.base_field" class="form-control" style="min-width: 100px;">
+                        <select2 v-if="price.operation !== '=$'" v-model="price.base_field" style="min-width: 100px;">
                             <option v-for="o in availableBaseFields(price)" :value="o.id">{{o.text|_}}</option>
                         </select2>
                     </span>
@@ -107,7 +107,7 @@
             <td v-if="options.multi_site"></td>
             <td v-if="options.multi_currency"></td>
             <td>
-                <select2 class="form-control" v-model="new_price_type">
+                <select2 v-model="new_price_type">
                     <option value="">{{'Add Price...'|_}}</option>
                     <option v-for="o in options.price_types" :value="o.id">{{o.text}}</option>
                 </select2>

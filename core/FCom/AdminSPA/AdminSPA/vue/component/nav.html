@@ -55,11 +55,10 @@
            <!-- </div>-->
       </nav>
       <div class="account-menu">
-            <div class="dropdown user-menu" :class="{open: ddOpen('account')}">
-                  <a href="#" title="Login menu" class="dropdown-toggle" data-toggle="dropdown"
-                     @click.prevent.stop="ddToggle('account')">
+            <div class="f-dropdown user-menu" :class="{open: ddOpen('account')}">
+                  <a href="#" title="Login menu" class="f-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('account')">
                         <img src="" class='img-circle' width="47" height="47"/>
-                        {{'John'|_}} {{'Rich'|_}} <span class="f-caret"><b class="caret"></b></span>
+                        {{'John'|_}} {{'Rich'|_}} <span class="f-caret"><b class="f-caret__elem"></b></span>
                   </a>
                   <ul class="dropdown-menu">
                         <li>
