@@ -190,6 +190,28 @@
                   &lt;/div&gt;
             </div>
       </div>
+      <div class="row margin">
+            <div class="col-md-3">
+                  <div class="f-dropdown  f-actions-dropdown open" :class="{open:ddOpen('actions-open')}">
+                        <button type="button" class="button button1" @click="goBack()">Save</button>
+                        <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
+                        <div class="f-dropdown__menu">
+                              <button type="button" class="button button2" @click="doDelete()">Delete</button>
+                              <button type="button" class="button button1" @click="save()">Save</button>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-9">
+                  &lt;div class="f-dropdown  f-actions-dropdown open" :class="{open:ddOpen('actions-open')}"&gt;
+                  &lt;button type="button" class="button button1" @click="goBack()"&gt;Save&lt;/button&gt;
+                  &lt;a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"&gt;&lt;b class="f-caret__elem"&gt;&lt;/b&gt;&lt;/a&gt;
+                  &lt;div class="f-dropdown__menu"&gt;
+                  &lt;button type="button" class="button button2" @click="doDelete()"&gt;Delete&lt;/button&gt;
+                  &lt;button type="button" class="button button1" @click="save()"&gt;Save&lt;/button&gt;
+                  &lt;/div&gt;
+                  &lt;/div&gt;
+            </div>
+      </div>
       <!--<div class="row">
             <div class="col-md-3">
                   <button class="button button16">Add Files</button>

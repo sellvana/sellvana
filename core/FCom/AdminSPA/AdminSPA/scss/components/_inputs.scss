@@ -47,7 +47,7 @@ input::-webkit-inner-spin-button {
 			border-radius: 0 5px 5px 5px;
 		}
 		.f-form-group__addon-toggle {
-			border-radius: 5px 0 0 0px;
+			border-radius: 5px 0 0 0;
 		}
 	}
 }
@@ -105,6 +105,9 @@ input::-webkit-inner-spin-button {
 	width: 1%;
 	&.not-range {
 		width: 100%;
+		.select2-container .select2-selection--multiple {
+			border-radius: 0 5px 5px 0;
+		}
 	}
 	&.range {
 		width: 100%;
@@ -186,11 +189,8 @@ input::-webkit-inner-spin-button {
 
 .f-form-container {
 	padding: 20px 0;
-	.f-form-group {
+	.row {
 		margin-bottom: 20px;
-		&:last-child {
-			margin-bottom: 0;
-		}
 	}
 }
 
@@ -550,5 +550,7 @@ input::-webkit-inner-spin-button {
 }
 
 @media (max-width: 767px) {
-
+	.f-form-label {
+		text-align: left;
+	}
 }

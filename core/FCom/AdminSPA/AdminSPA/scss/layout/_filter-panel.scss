@@ -46,7 +46,7 @@
 
 .params-left {
       position: absolute;
-      left: -435px;
+      left: -420px;
       top: 10px;
       transition: 0.3s left ease-in;
       width: 420px;
@@ -62,7 +62,7 @@
             padding: 6px 10px;
       }
       &.open {
-            left: -15px;
+            left: 0px;
             z-index: 1002;
             .filter-open-button {
                   background: #d0dae3;
@@ -83,7 +83,7 @@
 
 .params-right {
       position: absolute;
-      right: -395px;
+      right: -380px;
       top: 10px;
       width: 380px;
       transition: 0.3s right ease-in;
@@ -104,7 +104,7 @@
             padding: 7px 11px;
       }
       &.open {
-            right: -15px;
+            right: 0px;
             z-index: 1002;
             .filter-open-button {
                   background: #d0dae3;
@@ -373,7 +373,7 @@
 /*Filter tags*/
 
 .f-filter-tags {
-
+      padding: 10px 0 5px 0;
 }
 
 .f-filter-tags__tag {
@@ -382,7 +382,7 @@
       vertical-align: middle;
       padding: 9px 20px 9px 10px;
       background: #e3e3e3;
-      margin: 10px 5px 10px;
+      margin: 0 5px 5px;
       border-radius: 5px;
       color: #2e4354;
 }
@@ -400,12 +400,12 @@
 }
 
 @media (max-width: 1365px) {
-      .params-right {
+     /* .params-right {
             right: -395px;
       }
       .params-left {
             left: -435px;
-      }
+      }*/
       .f-grid-filter-panel {
 
       }
@@ -443,7 +443,7 @@
             width: 244px;
             top: 10px;
             &.open {
-                  right: 0px;
+                  right: 0;
             }
             .option-box {
                   padding: 15px 3px;
@@ -464,9 +464,9 @@
                   padding: 7px 0;
             }
       }
-      .f-content-block {
+      /*.f-content-block {
             padding: 5px;
-      }
+      }*/
       .f-grid-filter-panel {
             padding: 0 5px;
             .col-lg-6 {

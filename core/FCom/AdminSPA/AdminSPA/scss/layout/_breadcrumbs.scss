@@ -2,20 +2,8 @@
       display: inline-block;
 }
 .f-header-breadcrumb {
-      margin: 0;
+      margin: 0 0 0 30px;
       padding: 0;
-      margin-left: 30px;
-      white-space: nowrap;
-      li:nth-last-child(2), li:last-child {
-            &:after {
-                  display: none;
-            }
-      }
-}
-.f-header-breadcrumb {
-      margin: 0;
-      padding: 0;
-      margin-left: 30px;
       white-space: nowrap;
       li:nth-last-child(2), li:last-child {
             &:after {

@@ -3,16 +3,23 @@
       .f-dropdown {
             display: inline-block;
       }
-      .f-dropdown__menu {
-            background-color: transparent;
-            border: 0;
+      .button-lock {
+            vertical-align: middle;
+      }
+      .button, .small-button {
+            margin-bottom: 4px;
+            margin-left: 6px;
+      }
+      .select2-container {
+            min-width: 250px;
+            text-align: left;
       }
 }
 
 .button {
-      min-width: 133px;
+      /*min-width: 133px;*/
       text-align: center;
-      padding: 8px 8px;
+      padding: 8px 20px;
       transition: 0.1s all ease-in;
       display: inline-block;
       font-size: 13px;
@@ -21,6 +28,23 @@
       font-weight: bold;
       &:active {
               box-shadow: inset 0 7px 13px rgba(0, 0, 0, .24);
+      }
+      &:focus {
+            outline: none;
+      }
+}
+.small-button {
+      /*min-width: 133px;*/
+      text-align: center;
+      padding: 5px 4%;
+      transition: 0.1s all ease-in;
+      display: inline-block;
+      font-size: 13px;
+      border-radius: 5px;
+      box-shadow: 1px 2px 0 0 rgba(211,111,23,0.5);
+      font-weight: bold;
+      &:active {
+            box-shadow: inset 0 7px 13px rgba(0, 0, 0, .24);
       }
       &:focus {
             outline: none;
@@ -125,21 +149,7 @@
       }
 }
 
-.f-buttons-block {
-      .button {
-            margin-bottom: 4px;
-            margin-left: 6px;
-      }
-      .select2-container {
-            min-width: 250px;
-            text-align: left;
-      }
-}
-
 .f-grid-filter-panel {
-      .f-buttons-block {
-            margin: 15px 0 15px;
-      }
       .f-action-button-b {
             min-width: 160px;
             display: inline-block;
@@ -156,7 +166,7 @@
             display: inline-block;
             vertical-align: middle;
             padding: 8px 10px;
-            margin: 10px 5px;
+            margin: 0px 5px 5px;
             &:active {
                   background-color: #d0dae3;
                   box-shadow: inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
@@ -171,6 +181,7 @@
 .f-action-button-b {
       position: relative;
       text-align: left;
+      display: inline-block;
       &.open {
             .f-action-button-b__menu {
                   display: block;
@@ -205,16 +216,16 @@
 .f-action-button-b__menu {
       padding: 0;
       position: absolute;
-      top: 100%;
+      top: calc(100% - 1px);
       z-index: 1000;
       display: none;
       list-style: none;
       text-align: left;
       background-color: #fff;
       border: solid 1px #d0dae3;
-      border-top: 0;
       border-radius: 5px;
       width: 100%;
+      min-width: 160px;
 }
 
 .f-action-button-b__item {
@@ -270,7 +281,48 @@
             }
       }
 }
-
+.f-actions-dropdown {
+      display: inline-block;
+      margin-bottom: 4px;
+      margin-left: 4px;
+      .f-caret__elem {
+            border-top: 4px solid #fff;
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+            margin: 0;
+      }
+      .f-caret {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #d67d0b;
+            text-align: center;
+            top: 0;
+            transform: translate(0%);
+            right: 0;
+            &:hover {
+                  background: rgba(0, 0, 0, 0.1);
+            }
+            &:active {
+                  background: rgba(0, 0, 0, 0.2);
+            }
+      }
+      .button {
+            padding: 8px 50px 8px 20px;
+            text-align: left;
+            margin-left: 0;
+            white-space: nowrap;
+      }
+      .f-dropdown__menu {
+            background-color: transparent;
+            border: 0;
+            top: 100%;
+            .button {
+                 width: 100%;
+                  margin-bottom: 4px;
+                  margin-left: 0;
+            }
+      }
+}
 .button3 {
       background-color: transparent;
       border: 1px solid #e5dfdf;
@@ -318,18 +370,17 @@
 
 .f-caret {
       position: absolute;
-      top: 50%;
+      top: 43%;
       transform: translateY(-50%);
       right: 2px;
 
 }
 
 .f-caret__elem {
-      margin: 0;
+      margin: 0 0 0 2px;
       display: inline-block;
       width: 0;
       height: 0;
-      margin-left: 2px;
       vertical-align: middle;
       border-top: 4px solid #2e4354;
       border-right: 4px solid transparent;
@@ -348,7 +399,7 @@
 @media (max-width: 767px) {
       .button {
             min-width: 108px;
-            padding: 6px 0;
+            padding: 6px 10px;
             font-size: 12px;
       }
       .f-grid-filter-panel {
@@ -369,5 +420,13 @@
       }
       .f-buttons-block {
             padding: 10px;
+      }
+      .f-mobile-action-button {
+            .f-dropdown__menu {
+                  right: 0;
+            }
+      }
+      .small-button {
+            font-size: 12px;
       }
 }

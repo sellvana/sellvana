@@ -1,4 +1,4 @@
-<div class="f-content-block f-grid-wrapper">
+<div class="f-content-block box-no-padding f-grid-wrapper">
       <div class="container-fluid">
             <div class="row">
                   <div class="col-md-12">
@@ -8,28 +8,29 @@
                   </div>
             </div>
             <div class="row">
-              <sv-comp-grid-panel :grid="grid" :cnt-visible="cntVisible" @event="onEvent"></sv-comp-grid-panel>
-          </div>
-                  <div class="scrollable-area" id="">
-                      <table class="f-main-grid">
-                          <colgroup>
+                  <sv-comp-grid-panel :grid="grid" :cnt-visible="cntVisible" @event="onEvent"></sv-comp-grid-panel>
+            </div>
+            <div class="scrollable-area" id="">
+                  <table class="f-main-grid">
+                        <colgroup>
                               <col v-for="col in columns" :width="col.width">
-                          </colgroup>
-                          <thead>
-                          <sv-comp-grid-header-row :grid="grid" @event="onEvent"></sv-comp-grid-header-row>
-                          </thead>
-                          <tbody>
-                          <sv-comp-grid-data-row v-for="row in visibleRows" :grid="grid" :row="row" @event="onEvent"></sv-comp-grid-data-row>
-                          </tbody>
-                      </table>
-                  </div>
+                        </colgroup>
+                        <thead>
+                        <sv-comp-grid-header-row :grid="grid" @event="onEvent"></sv-comp-grid-header-row>
+                        </thead>
+                        <tbody>
+                        <sv-comp-grid-data-row v-for="row in visibleRows" :grid="grid" :row="row" @event="onEvent"></sv-comp-grid-data-row>
+                        </tbody>
+                  </table>
+            </div>
 
-         <!-- <div class="row">
-              <div class="col-md-12">
-                  <div class="hidden-lg text-right">
-                      <sv-comp-grid-pager-select :grid="grid" @event="onEvent"></sv-comp-grid-pager-select>
-                  </div>
-              </div>
-          </div>-->
+            <!-- <div class="row">
+                 <div class="col-md-12">
+                     <div class="hidden-lg text-right">
+                         <sv-comp-grid-pager-select :grid="grid" @event="onEvent"></sv-comp-grid-pager-select>
+                     </div>
+                 </div>
+             </div>-->
       </div>
 </div>
+

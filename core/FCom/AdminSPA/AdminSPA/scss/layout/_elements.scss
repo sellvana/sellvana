@@ -15,7 +15,7 @@
 .f-form-title__text {
 	font-size: 20px;
 	font-weight: bold;
-	padding: 20px 10px 17px 30px;
+	padding: 20px 10px 17px 15px;
 	margin: 0;
 	display: inline-block;
 }
@@ -53,6 +53,9 @@ a:focus {
 
 .box-no-padding {
 	padding: 15px 0;
+	.f-buttons-block {
+		padding: 0 15px;
+	}
 }
 .line {
 	width: 80%;
@@ -292,9 +295,9 @@ a:focus {
 			font-size: 14px;
 		}
 	}
-	.f-content-block {
+	/*.f-content-block {
 		padding: 5px;
-	}
+	}*/
 	.f-grid-wrapper {
 		padding: 0;
 	}

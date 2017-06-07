@@ -1,6 +1,12 @@
 .f-information-block {
 	margin: 20px 0;
 }
+.f-information-block__content {
+	padding: 0 15px;
+	&.box-no-padding {
+		padding: 15px 0;
+	}
+}
 .f-information-block__toggle   {
 	display: none;
 	position: relative;
@@ -817,11 +823,11 @@
 		.f-information-block__toggle   {
 			text-align: left;
 		}
-		&.grid-block {
+		/*&.grid-block {
 			.params-right {
 				right: -265px;
 			}
-		}
+		}*/
 	}
 	.f-information-block__toggle    {
 		display: block;
