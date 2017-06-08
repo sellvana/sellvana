@@ -292,6 +292,9 @@
       &:hover {
             color: #a2aeb8;
       }
+      &:focus {
+            color: #2a6496;
+      }
 }
 
 .f-pagination__prev-page {
@@ -304,6 +307,9 @@
       }
       &:hover {
             color: #a2aeb8;
+      }
+      &:focus {
+            color: #2a6496;
       }
 }
 
@@ -373,7 +379,7 @@
 /*Filter tags*/
 
 .f-filter-tags {
-      padding: 10px 0 5px 0;
+     /* padding: 10px 10px 5px 10px;*/
 }
 
 .f-filter-tags__tag {
@@ -382,7 +388,7 @@
       vertical-align: middle;
       padding: 9px 20px 9px 10px;
       background: #e3e3e3;
-      margin: 0 5px 5px;
+      margin: 10px 5px 5px;
       border-radius: 5px;
       color: #2e4354;
 }
@@ -499,5 +505,13 @@
       }
       .f-tags__remove {
             padding: 5px 6px;
+      }
+      .f-pagination__prev-page {
+            width: 35%;
+            text-align: right;
+      }
+      .f-pagination__next-page {
+            width: 35%;
+            text-align: left;
       }
 }

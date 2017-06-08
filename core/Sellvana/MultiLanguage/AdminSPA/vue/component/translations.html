@@ -1,38 +1,37 @@
-<div class="f-content-block">
-      <div class="multilanguage-block">
-            <div class="f-block-title">
-                  <p class="f-block-title__text">{{field.label|_}}</p>
-            </div>
-            <div>
-                  <fieldset class="f-form-container">
-                        <div v-for="(v, locale) in translations" class="f-form-group row">
-                              <div class="col-md-1">
-                                    <label :for="field_id(locale)">{{locale}}</label>
-                              </div>
-                              <div class="col-md-10">
-                                    <input v-if="field.type === 'input'" :id="field_id(locale)" class="f-input" type="text" v-model="form.i18n[field.name][locale]"/>
-
-                                    <textarea v-else-if="field.type === 'textarea'" :id="field_id(locale)" class="f-textarea" v-model="form.i18n[field.name][locale]"></textarea>
-
-                                    <ckeditor v-else-if="field.type === 'wysiwyg'" :id="field_id(locale)" v-model="form.i18n[field.name][locale]"></ckeditor>
-                              </div>
-                              <div class="col-md-1">
-                                    <a class="f-delete" @click.prevent="removeTranslation(locale)"><i aria-hidden="true" class="fa fa-trash"></i></a>
-                              </div>
-                        </div>
-                        <div class="row f-form-group">
-                              <div class="col-md-1"></div>
-                              <div class="col-md-10">
-                                    <select2 v-model="new_locale">
-                                          <option value="">{{'Add new translation'|_}}</option>
-                                          <option v-for="l in avail_locales" :value="l.id">{{l.text}}</option>
-                                    </select2>
-                              </div>
-                        </div>
-                  </fieldset>
-            </div>
-            <div class="f-buttons-block text-right">
-                  <button class="button button2" @click="close">{{'Close'|_}}</button>
-            </div>
+<div class="f-multilanguage-block">
+      <div class="f-block-title">
+            <p class="f-block-title__text">{{field.label|_}}</p>
+            <button class="f-delete" draggable="false" @click="close"><i class="fa fa-times"></i></button>
       </div>
+      <div>
+            <fieldset class="f-form-container">
+                  <div v-for="(v, locale) in translations" class="f-form-group row">
+                        <div class="col-xs-1">
+                              <label :for="field_id(locale)">{{locale}}</label>
+                        </div>
+                        <div class="col-xs-10">
+                              <input v-if="field.type === 'input'" :id="field_id(locale)" class="f-input" type="text" v-model="form.i18n[field.name][locale]"/>
+
+                              <textarea v-else-if="field.type === 'textarea'" :id="field_id(locale)" class="f-textarea" v-model="form.i18n[field.name][locale]"></textarea>
+
+                              <ckeditor v-else-if="field.type === 'wysiwyg'" :id="field_id(locale)" v-model="form.i18n[field.name][locale]"></ckeditor>
+                        </div>
+                        <div class="col-xs-1">
+                              <a class="f-delete" @click.prevent="removeTranslation(locale)"><i aria-hidden="true" class="fa fa-trash"></i></a>
+                        </div>
+                  </div>
+                  <div class="row f-form-group">
+                        <div class="col-xs-1"></div>
+                        <div class="col-xs-10">
+                              <select2 v-model="new_locale">
+                                    <option value="">{{'Add new translation'|_}}</option>
+                                    <option v-for="l in avail_locales" :value="l.id">{{l.text}}</option>
+                              </select2>
+                        </div>
+                  </div>
+            </fieldset>
+      </div>
+      <!--<div class="f-buttons-block text-right">
+            <button class="button button2" @click="close">{{'Close'|_}}</button>
+      </div>-->
 </div>

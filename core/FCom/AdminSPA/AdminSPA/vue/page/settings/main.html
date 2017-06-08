@@ -1,6 +1,6 @@
 <div>
-	<div>
-
+	<div class="row">
+		<div class="col-md-4">
 			<ul class="f-horizontal-menu f-dropdown">
 				<li v-for="l1 in settings.config.nav" class="f-dropdown f-horizontal-menu__item" :class="{open:ddOpen('settings/' + l1.path)}">
 					<a href="#" :title="l1.label" class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">{{l1.label}}
@@ -11,41 +11,37 @@
 					</ul>
 				</li>
 			</ul>
-
+		</div>
+		<div class="col-md-4">
+			<div class="f-buttons-block">
+				<v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label"
+						   :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true"
+						   :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search"
+						   @input="searchSelect(arguments[0])"></v-multiselect>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="f-buttons-block text-right">
+				<button type="button" class="button button1" @click="saveAll()">{{'Save All Settings'|_}}</button>
+			</div>
+		</div>
 	</div>
 	<!--<v-select :debounce="500" :on-search="search" :options="search_options" :placeholder="'Search Settings...'|_"></v-select>-->
 	<div class="f-content-block">
-		<div class="row">
-			<div class="col-lg-6">
-				<div class="f-buttons-block">
-					<v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label"
-						   :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true"
-								   :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search"
-									   @input="searchSelect(arguments[0])"></v-multiselect>
-				</div>
-			</div>
-			<div class="col-lg-6">
-				<div class="f-buttons-block text-right">
-					<button type="button" class="button button1" @click="saveAll()">{{'Save All Settings'|_}}</button>
-				</div>
-			</div>
+		<div class="f-block-title">
+			<p class="f-block-title__text">{{pageTitle}}</p>
 		</div>
-			<div>
-				<div class="f-block-title">
-					<p class="f-block-title__text">{{pageTitle}}</p>
+		<ul class="f-settings-block">
+			<li v-for="panel in panels" v-if="!(panel.hide_for_site && site.id)">
+				<div class="f-settings-block__title">
+					<a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
 				</div>
-				<ul class="f-settings-block">
-					<li v-for="panel in panels" v-if="!(panel.hide_for_site && site.id)">
-						<div class="f-settings-block__title">
-							<a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
-						</div>
-						<div class="f-settings-block__content" v-if="panelsOpen[panel.path]">
-							<component :is="panel.component" :settings="settings" :panel="panel" :site="site"></component>
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<!--<jsontree :json="settings.data"></jsontree>-->
+				<div class="f-settings-block__content" v-if="panelsOpen[panel.path]">
+					<component :is="panel.component" :settings="settings" :panel="panel" :site="site"></component>
+				</div>
+			</li>
+		</ul>
 	</div>
+	<!--<jsontree :json="settings.data"></jsontree>-->
+</div>
 </div>

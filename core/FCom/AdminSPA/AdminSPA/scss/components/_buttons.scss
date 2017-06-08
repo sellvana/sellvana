@@ -14,6 +14,10 @@
             min-width: 250px;
             text-align: left;
       }
+      .f-icon-button {
+            vertical-align: middle;
+            margin: 0 10px;
+      }
 }
 
 .button {
@@ -166,7 +170,7 @@
             display: inline-block;
             vertical-align: middle;
             padding: 8px 10px;
-            margin: 0px 5px 5px;
+            margin: 10px 5px 5px;
             &:active {
                   background-color: #d0dae3;
                   box-shadow: inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
@@ -307,6 +311,48 @@
             }
       }
       .button {
+            padding: 8px 10px 8px 10px;
+            text-align: center;
+            margin-left: 0;
+            white-space: nowrap;
+      }
+      .f-dropdown__menu {
+            background-color: transparent;
+            border: 0;
+            top: 100%;
+            .button {
+                 width: 100%;
+                  margin-bottom: 4px;
+                  margin-left: 0;
+            }
+      }
+}
+.f-actions-dropdown-arrow {
+      display: inline-block;
+      margin-bottom: 4px;
+      margin-left: 4px;
+      .f-caret__elem {
+            border-top: 4px solid #fff;
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+            margin: 0;
+      }
+      .f-caret {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #d67d0b;
+            text-align: center;
+            top: 0;
+            transform: translate(0%);
+            right: 0;
+            &:hover {
+                  background: rgba(0, 0, 0, 0.1);
+            }
+            &:active {
+                  background: rgba(0, 0, 0, 0.2);
+            }
+      }
+      .button {
             padding: 8px 50px 8px 20px;
             text-align: left;
             margin-left: 0;
@@ -317,7 +363,7 @@
             border: 0;
             top: 100%;
             .button {
-                 width: 100%;
+                  width: 100%;
                   margin-bottom: 4px;
                   margin-left: 0;
             }
@@ -347,6 +393,9 @@
 .button-lock {
       border: 0;
       background: none;
+      padding: 8px 7px;
+      width: 40px;
+      height: 40px;
       .fa {
             font-size: 22px;
       }
@@ -365,6 +414,20 @@
             .fa-unlock {
                   display: inline-block;
             }
+      }
+}
+.f-icon-button {
+      border: 2px solid #d67d0b;
+      border-radius: 5px;
+      padding: 8px 7px;
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      &:hover {
+            background-color: rgba(255, 143, 0, 0.1);
+      }
+      &:active {
+            box-shadow: inset 0 7px 13px rgba(0, 0, 0, .24);
       }
 }
 
@@ -396,10 +459,19 @@
       }
 }
 
+@media (max-width: 1023px) {
+      .f-mobile-button {
+            .f-actions-dropdown .button {
+                  min-width: 160px;
+            }
+            .f-action-button-b {
+                  min-width: 160px;
+            }
+      }
+}
 @media (max-width: 767px) {
       .button {
             min-width: 108px;
-            padding: 6px 10px;
             font-size: 12px;
       }
       .f-grid-filter-panel {
@@ -421,9 +493,15 @@
       .f-buttons-block {
             padding: 10px;
       }
-      .f-mobile-action-button {
+      .f-mobile-button {
             .f-dropdown__menu {
                   right: 0;
+            }
+            .f-actions-dropdown .button {
+                  min-width: 100px;
+            }
+            .f-action-button-b {
+                  min-width: 100px;
             }
       }
       .small-button {

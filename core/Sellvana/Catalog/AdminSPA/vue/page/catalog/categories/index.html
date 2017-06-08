@@ -1,9 +1,13 @@
 <div class="row">
       <div class="col-sm-12 col-md-4 col-lg-2">
             <div class="f-content-block tree-block">
-                  <div class="f-buttons-block">
-                        <button class="small-button button1" @click="expandAll()">Expand All</button>
-                        <button class="small-button button1" @click="collapseAll()">Collapse All</button>
+                  <div class="f-buttons-block text-center">
+                        <button class="f-icon-button" @click="expandAll()">
+                              <svg width="20" height="19" v-html="svgIconLink('icon-expand')"></svg>
+                        </button>
+                        <button class="f-icon-button" @click="collapseAll()">
+                              <svg width="20" height="19" v-html="svgIconLink('icon-collapse')"></svg>
+                        </button>
                         <button class="button-lock" :class="{open:ddOpen('root-lock')}" @click.prevent.stop="ddToggle('root-lock')">
                               <i class="fa fa-lock" aria-hidden="true"></i><i class="fa fa-unlock" aria-hidden="true"></i></button>
                   </div>
@@ -17,7 +21,7 @@
                               <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
                                     <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">{{t.label|_}}</a></li>
                         </ul>
-                        <div class="f-buttons-block text-center hidden-md hidden-lg">
+                        <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
                               <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
                                     <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
                                           menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
@@ -34,13 +38,15 @@
                               <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
                               <button type="button" class="button button1" @click="save()">{{'Save Category Changes'|_}}</button>
                         </div>
-                        <div class="f-buttons-block text-center f-mobile-action-button hidden-md hidden-lg">
-                              <div class="f-dropdown f-actions-dropdown " :class="{open:ddOpen('actions-open')}">
-                                    <button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
-                                    <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
+                        <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+                              <div class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open')}">
+                                    <button type="button" class="button button1 f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')">
+                                          {{'Actions'|_}}
+                                    </button>
                                     <ul class="f-dropdown__menu">
                                           <li><a href="#" @click="goBack()" class="button button2">{{'Back'|_}}</a></li>
                                           <li><a href="#" @click="doDelete()" class="button button2">{{'Delete'|_}}</a></li>
+                                          <li><a href="#" @click="save()" class="button button1">{{'Save'|_}}</a></li>
                                           <li><a href="#" @click="save(true)" class="button button1">{{'Save and Continue'|_}}</a></li>
                                     </ul>
                               </div>

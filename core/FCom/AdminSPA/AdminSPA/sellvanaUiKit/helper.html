@@ -1,8 +1,11 @@
-&lt;div class="f-dropdown  f-actions-dropdown open" :class="{open:ddOpen('actions-open')}"&gt;
-      &lt;button type="button" class="button button1" @click="goBack()"&gt;Save&lt;/button&gt;
-      &lt;a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"&gt;&lt;b class="f-caret__elem"&gt;&lt;/b&gt;&lt;/a&gt;
-      &lt;div class="f-dropdown__menu"&gt;
-            &lt;button type="button" class="button button2" @click="doDelete()"&gt;Delete&lt;/button&gt;
-            &lt;button type="button" class="button button1" @click="save()"&gt;Save&lt;/button&gt;
-      &lt;/div&gt;
+&lt;div class="f-dropdown f-actions-dropdown"&gt;
+      &lt;button type="button" class="button button1 f-dropdown__toggle"&gt;
+            {{'Actions'|_}}
+      &lt;/button&gt;
+      &lt;ul class="f-dropdown__menu"&gt;
+            &lt;li&gt;&lt;a href="#" @click="goBack()" class="button button2"&gt;{{'Back'|_}}&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" @click="doDelete()" class="button button2"&gt;{{'Delete'|_}}&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" @click="save()" class="button button1"&gt;{{'Save'|_}}&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" @click="save(true)" class="button button1"&gt;{{'Save and Continue'|_}}&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
 &lt;/div&gt;

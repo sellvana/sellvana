@@ -192,7 +192,38 @@
       </div>
       <div class="row margin">
             <div class="col-md-3">
-                  <div class="f-dropdown  f-actions-dropdown open" :class="{open:ddOpen('actions-open')}">
+                  <div class="f-dropdown f-actions-dropdown open">
+                        <button type="button" class="button button1 f-dropdown__toggle">
+                              {{'Actions'|_}}
+                        </button>
+                        <ul class="f-dropdown__menu">
+                              <li><a href="#" @click="goBack()" class="button button2">{{'Back'|_}}</a></li>
+                              <li><a href="#" @click="doDelete()" class="button button2">{{'Delete'|_}}</a></li>
+                              <li><a href="#" @click="save()" class="button button1">{{'Save'|_}}</a></li>
+                              <li><a href="#" @click="save(true)" class="button button1">{{'Save and Continue'|_}}</a></li>
+                        </ul>
+                  </div>
+            </div>
+            <div class="col-md-9">
+                  &lt;div class="f-dropdown f-actions-dropdown"&gt;
+                  &lt;button type="button" class="button button1 f-dropdown__toggle"&gt;
+                  {{'Actions'|_}}
+                  &lt;/button&gt;
+                  &lt;ul class="f-dropdown__menu"&gt;
+                  &lt;li&gt;&lt;a href="#" @click="goBack()" class="button button2"&gt;{{'Back'|_}}&lt;/a&gt;&lt;/li&gt;
+                  &lt;li&gt;&lt;a href="#" @click="doDelete()" class="button button2"&gt;{{'Delete'|_}}&lt;/a&gt;&lt;/li&gt;
+                  &lt;li&gt;&lt;a href="#" @click="save()" class="button button1"&gt;{{'Save'|_}}&lt;/a&gt;&lt;/li&gt;
+                  &lt;li&gt;&lt;a href="#" @click="save(true)" class="button button1"&gt;{{'Save and Continue'|_}}&lt;/a&gt;&lt;/li&gt;
+                  &lt;/ul&gt;
+                  &lt;/div&gt;
+            </div>
+      </div>
+      <div class="row margin"></div>
+      <div class="row margin"></div>
+      <div class="row margin"></div>
+      <div class="row margin">
+            <div class="col-md-3">
+                  <div class="f-dropdown  f-actions-dropdown-arrow open" :class="{open:ddOpen('actions-open')}">
                         <button type="button" class="button button1" @click="goBack()">Save</button>
                         <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
                         <div class="f-dropdown__menu">
@@ -202,7 +233,7 @@
                   </div>
             </div>
             <div class="col-md-9">
-                  &lt;div class="f-dropdown  f-actions-dropdown open" :class="{open:ddOpen('actions-open')}"&gt;
+                  &lt;div class="f-dropdown  f-actions-dropdown-arrow open" :class="{open:ddOpen('actions-open')}"&gt;
                   &lt;button type="button" class="button button1" @click="goBack()"&gt;Save&lt;/button&gt;
                   &lt;a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"&gt;&lt;b class="f-caret__elem"&gt;&lt;/b&gt;&lt;/a&gt;
                   &lt;div class="f-dropdown__menu"&gt;

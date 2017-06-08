@@ -12,10 +12,12 @@
 		font-weight: bold;
 	}
 	.node-line {
+		white-space: nowrap;
 		.node-name {
 			display: inline-block;
-			width: 79%;
+			width: 72%;
 			vertical-align: top;
+			white-space: normal;
 		}
 		&.open {
 			.f-closed-line-link {
@@ -33,7 +35,10 @@
 	& > ul {
 		padding-left: 1em;
 		line-height: 1.5em;
-		list-style-type: dot;
+	}
+	.tree-node .tree-node .tree-node .node-line {
+		padding-left: 2em;
+		line-height: 1.5em;
 	}
 	& > .node-line {
 		.add-child {
