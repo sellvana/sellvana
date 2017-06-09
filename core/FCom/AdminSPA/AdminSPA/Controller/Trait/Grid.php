@@ -113,12 +113,16 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             if (!isset($col['sortable'])) {
                 $col['sortable'] = true;
             }
+            /** @deprecated TODO: one convention */
             if (empty($col['field']) && !empty($col['name'])) {
                 $col['field'] = $col['name'];
+            } elseif (!empty($col['field']) && empty($col['name'])) {
+                $col['name'] = $col['field'];
             }
             if (!empty($col['type'])) {
                 switch ($col['type']) {
                     case 'row-select':
+                    case 'row_select':
                         if (empty($col['header_component'])) {
                             $col['header_component'] = 'sv-comp-grid-header-cell-row-select';
                         }
@@ -137,6 +141,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         break;
 
                     case 'actions':
+                    case 'btn_group':
                         if (empty($col['header_component'])) {
                             //$col['header_component'] = 'sv-comp-grid-header-cell-actions';
                         }
@@ -190,10 +195,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 }
             }
             foreach ($config['filters'] as &$flt) {
-                if (empty($flt['field'])) {
-                    if (!empty($flt['name'])) {
-                        $flt['field'] = $flt['name'];
-                    }
+                /** @deprecated TODO: one convention */
+                if (empty($flt['field']) && !empty($flt['name'])) {
+                    $flt['field'] = $flt['name'];
+                } elseif (!empty($flt['field']) && empty($flt['name'])) {
+                    $flt['name'] = $flt['field'];
                 }
                 $col = !empty($colsByName[$flt['name']]) ? $colsByName[$flt['name']] : [];
 

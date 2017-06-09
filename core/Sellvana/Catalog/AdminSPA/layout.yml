@@ -8,6 +8,10 @@
             - [ requireJs, sv-page-catalog-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/index.html" ]
             - [ requireJs, sv-page-catalog-products-grid-config, "~/products/grid_config" ]
 
+            - [ requireJs, sv-page-catalog-inventory, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/index" ]
+            - [ requireJs, sv-page-catalog-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/index.html" ]
+            - [ requireJs, sv-page-catalog-inventory-grid-config, "~/inventory/grid_config" ]
+
             - [ requireJs, sv-page-catalog-products-form, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form" ]
             - [ requireJs, sv-page-catalog-products-form-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form.html" ]
 
@@ -72,6 +76,7 @@
             - [ addRoute, { path: /catalog/products, require: [ sv-page-catalog-products, '', json!sv-page-catalog-products-grid-config ] } ]
             - [ addRoute, { path: /catalog/products/form, require: [ sv-page-catalog-products-form ] } ]
             - [ addRoute, { path: /catalog/categories, require: [ sv-page-catalog-categories, text!sv-page-catalog-categories-tpl ] } ]
+            - [ addRoute, { path: /catalog/inventory, require: [ sv-page-catalog-inventory, '', json!sv-page-catalog-inventory-grid-config ] } ]
 
 
 /catalog/products/form:

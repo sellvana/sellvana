@@ -94,6 +94,7 @@ modules:
                     - [ /categories/form/products/?.action, Sellvana_Catalog_AdminSPA_Controller_Categories_Products ]
                     - [ /products/?.action, Sellvana_Catalog_AdminSPA_Controller_Products ]
                     - [ /products/form/categories/?.action, Sellvana_Catalog_AdminSPA_Controller_Products_Categories ]
+                    - [ /inventory/?.action, Sellvana_Catalog_AdminSPA_Controller_Inventory ]
                 observe:
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Catalog_AdminSPA_Controller_Products.onHeaderSearch ]
 
