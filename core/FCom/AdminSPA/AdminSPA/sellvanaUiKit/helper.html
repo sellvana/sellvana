@@ -1,26 +1,11 @@
-&lt;table class="f-combined-table"&gt;
-      &lt;thead&gt;
-      &lt;tr&gt;
-            &lt;td&gt;Thumbnail&lt;/td&gt;
-            &lt;td&gt;Product Info&lt;/td&gt;
-            &lt;td&gt;Shipped&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;/thead&gt;
-      &lt;tbody&gt;
-      &lt;tr&gt;
-            &lt;td&gt;
-                  Describe
-            &lt;/td&gt;
-            &lt;td&gt;
-                  Test
-            &lt;/td&gt;
-            &lt;td&gt;
-                  &lt;ul&gt;
-                        &lt;li&gt;1&lt;/li&gt;
-                        &lt;li&gt;2&lt;/li&gt;
-                        &lt;li&gt;3&lt;/li&gt;
-                  &lt;/ul&gt;
-            &lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;div class="f-dropdown f-actions-dropdown"&gt;
+      &lt;button type="button" class="button button1 f-dropdown__toggle"&gt;
+            {{'Actions'|_}}
+      &lt;/button&gt;
+      &lt;ul class="f-dropdown__menu"&gt;
+            &lt;li&gt;&lt;a href="#" @click="goBack()" class="button button2"&gt;{{'Back'|_}}&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" @click="doDelete()" class="button button2"&gt;{{'Delete'|_}}&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" @click="save()" class="button button1"&gt;{{'Save'|_}}&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#" @click="save(true)" class="button button1"&gt;{{'Save and Continue'|_}}&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+&lt;/div&gt;

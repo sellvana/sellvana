@@ -20,9 +20,12 @@ body {
       width: 100%;
       left: 0;
       top: 0;
-      z-index: 999999;
+      z-index: 99;
       min-width: 317px;
       background: #0086c0;
+      .f-dropdown__menu {
+            top: 57px;
+      }
 }
 
 /*Header search block*/
@@ -46,7 +49,7 @@ body {
 }
 
 .f-header__search-block__button {
-      padding: 8px 0px 3px;
+      padding: 8px 0 3px;
       position: absolute;
       right: 0;
       top: 0;
@@ -99,6 +102,7 @@ body {
 .f-dropdown__toggle {
       color: #000;
       padding-right: 20px;
+      display: inline-block;
 }
 .f-dropdown__menu {
       padding: 0;
@@ -494,7 +498,7 @@ body {
                         top: -20px;
                         border: 10px solid transparent;
                         border-bottom: 10px solid #fff;
-                        right: 274px;
+                        right: 250px;
                   }
             }
             .f-input {
@@ -537,5 +541,6 @@ body {
             position: absolute;
             right: 0;
             top: 0;
+            font-size: 13px;
       }
 }

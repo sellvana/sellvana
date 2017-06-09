@@ -6,7 +6,6 @@
             </div>
       </div>
       <div class="col-md-6 col-sm-12">
-
                   <div class='f-horizontal-menu' :class="{open:ddOpen('menu-open')}" >
                         <ul>
                               <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
@@ -41,21 +40,20 @@
                               </li>
                         </ul>
                   </div>
-
       </div>
       <div class="col-md-6 col-sm-12">
-            <div class="f-buttons-block text-right">
+            <!--<div class="f-buttons-block text-right">
                   <button v-for="a in form.config.actions" type="button" class="button" :class="a.class" @click="buttonAction(a)" v-ladda="{on:action_in_progress === a.name}">
                         {{a.label|_}}
                   </button>
-            </div>
+            </div>-->
             <div class="f-buttons-block text-right">
                   <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
-                  <div class="f-dropdown" :class="{open:ddOpen('open-buttons')}">
-                        <div class="button button1" @click.prevent.stop="ddToggle('open-buttons')">Actions</div>
+                  <div class="f-dropdown  f-actions-dropdown-arrow" :class="{open:ddOpen('actions-open')}">
+                        <button type="button" class="button button1" @click="goBack()">{{'Save'|_}}</button>
+                        <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
                         <div class="f-dropdown__menu">
                               <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-                              <button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
                         </div>
                   </div>
                   <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>

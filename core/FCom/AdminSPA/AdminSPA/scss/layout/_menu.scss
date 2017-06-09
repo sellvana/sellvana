@@ -27,7 +27,7 @@
 			border: solid 1px #d9d9d9;
 			background: #fff;
 			font-weight: bold;
-			padding: 8px 0 8px 0;
+			padding: 8px 20px;
 		}
 		.f-dropdown__toggle {
 			padding: 8px 30px;
@@ -57,10 +57,9 @@
 	&.active {
 		background: #eee;
 		.f-horizontal-menu__link {
-			border: solid 1px #fff;
 			background: #fff;
 			font-weight: bold;
-			padding: 12px 20px;
+			padding: 8px 20px;
 		}
 		.f-horizontal-menu__dropdown {
 			display: block;
@@ -109,10 +108,10 @@
 @media (max-width: 1365px) {
 	.f-horizontal-menu__item {
 		width: 25%;
-		margin-right: 0px;
+		margin-right: 0;
 		&.active {
 			.f-horizontal-menu__link {
-				padding: 7px 0px;
+				padding: 7px 0;
 			}
 		}
 	}
@@ -129,7 +128,7 @@
 		&.active {
 			.f-horizontal-menu__link {
 				border-bottom: 0;
-				padding: 8px 0 8px 0;
+				padding: 8px 20px;
 			}
 		}
 
