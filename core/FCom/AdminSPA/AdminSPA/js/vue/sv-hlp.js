@@ -383,7 +383,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
         }
 
         requirejs.onError = function (err) {
-console.log('onError', err.xhr);
+            console.log('onError', err.xhr);
             if (err.xhr) {
                 if (err.xhr.status === 401) {
                     router.push('/login');
