@@ -5,49 +5,59 @@
                   <p class="f-form-title__text hidden-xs">{{'Form name'|_}}</p>
             </div>
       </div>
-      <div class="col-md-6 col-sm-12">
-                  <div class='f-horizontal-menu' :class="{open:ddOpen('menu-open')}" >
-                        <ul>
-                              <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
-                                    <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                                    </a>
-                              </li>
-                              <li class="f-horizontal-menu__item f-dropdown">
-                                    <div class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('menu-open')">Tabs</div>
-                                    <ul class="f-horizontal-menu__dropdown-menu">
-                                          <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
-                                                <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                                                </a>
-                                          </li>
-                                    </ul>
-                              </li>
+      <div class="col-xs-6">
+            <div class='f-horizontal-menu visible-lg visible-md' :class="{open:ddOpen('menu-open')}">
+                  <ul>
+                        <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                              <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}}
+                                    <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                        </li>
+                        <li class="f-horizontal-menu__item f-dropdown">
+                              <div class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('menu-open')">
+                                    Tabs
+                              </div>
+                              <ul class="f-horizontal-menu__dropdown-menu">
+                                    <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                                          <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}}
+                                                <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                                    </li>
+                              </ul>
+                        </li>
+                  </ul>
+            </div>
+            <div class='f-horizontal-menu f-dropdown visible-lg visible-md' :class="{open:ddOpen('menu-open')}">
+                  <ul>
+                        <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                              <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}}
+                                    <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                        </li>
+                        <li class="f-horizontal-menu__item f-dropdown">
+                              <div class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('menu-open')">
+                                    Tabs
+                              </div>
+                              <ul class="f-horizontal-menu__dropdown-menu">
+                                    <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                                          <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}}
+                                                <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                                    </li>
+                              </ul>
+                        </li>
+                  </ul>
+            </div>
+            <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+                  <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+                        <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
+                              menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                        <ul class="f-action-button-b__menu">
+                              <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
+                                    <a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link"> {{t.label|_}}
+                                          <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
                         </ul>
                   </div>
-                  <div class='f-horizontal-menu f-dropdown' :class="{open:ddOpen('menu-open')}">
-                       <ul>
-                             <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
-                                   <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                                   </a>
-                             </li>
-                              <li class="f-horizontal-menu__item f-dropdown" >
-                                   <div class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('menu-open')">Tabs</div>
-                                   <ul class="f-horizontal-menu__dropdown-menu">
-                                         <li v-for="t in formTabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
-                                               <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link"> {{t.label|_}} <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                                               </a>
-                                         </li>
-                                   </ul>
-                              </li>
-                        </ul>
-                  </div>
+            </div>
       </div>
-      <div class="col-md-6 col-sm-12">
-            <!--<div class="f-buttons-block text-right">
-                  <button v-for="a in form.config.actions" type="button" class="button" :class="a.class" @click="buttonAction(a)" v-ladda="{on:action_in_progress === a.name}">
-                        {{a.label|_}}
-                  </button>
-            </div>-->
-            <div class="f-buttons-block text-right">
+      <div class="col-xs-6">
+            <div class="f-buttons-block text-right visible-lg visible-md">
                   <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
                   <div class="f-dropdown  f-actions-dropdown-arrow" :class="{open:ddOpen('actions-open')}">
                         <button type="button" class="button button1" @click="goBack()">{{'Save'|_}}</button>
@@ -58,8 +68,29 @@
                   </div>
                   <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
             </div>
+            <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+                  <div class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open')}">
+                        <button type="button" class="button button1 f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')">
+                              {{'Actions'|_}}
+                        </button>
+                        <ul class="f-dropdown__menu">
+                              <li>
+                                    <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button1" @click="goBack()">{{'Save'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
+                              </li>
+                        </ul>
+                  </div>
+            </div>
       </div>
-      <div class="col-md-12 col-sm-12">
+      <div class="col-xs-12">
             <component v-for="t in formTabs" v-show="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
       </div>
 </div>

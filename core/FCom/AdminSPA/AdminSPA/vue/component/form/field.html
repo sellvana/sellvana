@@ -106,7 +106,7 @@
                    :id="field_id"></component>
 
         <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="translate-icon"
-           @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
+           @click.prevent="$emit('event', 'toggle_i18n', field_config)" id="translate"><i class="fa fa-globe" aria-hidden="true"></i></a>
 
         <component v-if="fieldConfig('notes')" :form="form" :value="value"
                    :is="{props:['form','value'], template:'<div>'+fieldConfig('notes')+'</div>'}"></component>

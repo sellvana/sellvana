@@ -1,7 +1,7 @@
 <div>
 	<div class="row">
-		<div class="col-md-4">
-			<ul class="f-horizontal-menu f-dropdown">
+		<div class="col-md-4 col-xs-12">
+			<ul class="f-horizontal-menu f-dropdown visible-lg visible-md">
 				<li v-for="l1 in settings.config.nav" class="f-dropdown f-horizontal-menu__item" :class="{open:ddOpen('settings/' + l1.path)}">
 					<a href="#" :title="l1.label" class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">{{l1.label}}
 						<!--<i class="fa fa-caret-down f-horizontal-menu__icon" aria-hidden="true"></i>-->
@@ -11,8 +11,30 @@
 					</ul>
 				</li>
 			</ul>
+			<div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+				<div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+					<a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
+						menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+					<ul class="f-action-button-b__menu">
+						<li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
+							<a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link"> {{t.label|_}}
+								<i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+					</ul>
+				</div>
+			</div>
+			<div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+				<div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+					<a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
+						menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+					<ul class="f-action-button-b__menu">
+						<li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
+							<a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link"> {{t.label|_}}
+								<i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+					</ul>
+				</div>
+			</div>
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-4 col-xs-12">
 			<div class="f-buttons-block">
 				<v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label"
 						   :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true"

@@ -50,7 +50,7 @@
       top: 10px;
       transition: 0.3s left ease-in;
       width: 420px;
-      z-index: 1001;
+      z-index: 8;
       .filter-options-block {
             border: 1px solid #d0dae3;
             border-left: 0;
@@ -63,7 +63,7 @@
       }
       &.open {
             left: 0px;
-            z-index: 1002;
+            z-index: 8;
             .filter-open-button {
                   background: #d0dae3;
                   svg {
@@ -87,7 +87,7 @@
       top: 10px;
       width: 380px;
       transition: 0.3s right ease-in;
-      z-index: 1001;
+      z-index: 8;
       label {
             cursor: pointer;
       }
@@ -105,7 +105,7 @@
       }
       &.open {
             right: 0px;
-            z-index: 1002;
+            z-index: 8;
             .filter-open-button {
                   background: #d0dae3;
                   svg {
@@ -406,12 +406,6 @@
 }
 
 @media (max-width: 1365px) {
-     /* .params-right {
-            right: -395px;
-      }
-      .params-left {
-            left: -435px;
-      }*/
       .f-grid-filter-panel {
 
       }

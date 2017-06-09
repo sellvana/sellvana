@@ -2,10 +2,10 @@
       <div class="col-sm-12 col-md-4 col-lg-2">
             <div class="f-content-block tree-block">
                   <div class="f-buttons-block text-center">
-                        <button class="f-icon-button" @click="expandAll()">
+                        <button class="f-icon-button" @click="expandAll()" title="expand all">
                               <svg width="20" height="19" v-html="svgIconLink('icon-expand')"></svg>
                         </button>
-                        <button class="f-icon-button" @click="collapseAll()">
+                        <button class="f-icon-button" @click="collapseAll()" title="collapse all">
                               <svg width="20" height="19" v-html="svgIconLink('icon-collapse')"></svg>
                         </button>
                         <button class="button-lock" :class="{open:ddOpen('root-lock')}" @click.prevent.stop="ddToggle('root-lock')">

@@ -27,6 +27,9 @@
 			stroke: #2e4354;
 		}
 	}
+	&:hover {
+		color: #000;
+	}
 }
 .text-justify {
 	&:after {
@@ -822,6 +825,7 @@
 	.f-information-block {
 		.f-information-block__toggle   {
 			text-align: left;
+			margin: 0 10px 15px;
 		}
 		/*&.grid-block {
 			.params-right {
@@ -831,7 +835,7 @@
 	}
 	.f-information-block__toggle    {
 		display: block;
-		margin-bottom: 7px;
+		margin-bottom: 15px;
 	}
 	.f-information-block__content  {
 		display: none;
@@ -840,7 +844,10 @@
 		&.open {
 			.f-information-block__content  {
 				display: block;
-				padding: 5px 0;
+				padding: 5px 10px;
+				&.box-no-padding {
+					padding: 15px 0;
+				}
 			}
 			.nav-arrow {
 				transform: translateY(-50%) rotate(90deg);

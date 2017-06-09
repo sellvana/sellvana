@@ -56,10 +56,20 @@
 	</div>
 	<div class="row">
 		<div class="col-lg-12">
-			<ul class='f-horizontal-menu'>
+
+			<ul class='f-horizontal-menu visible-lg visible-md'>
 								<li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item"><a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a></li>
 
 						</ul>
+			<div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+				<div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+					<a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
+						menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+					<ul class="f-action-button-b__menu">
+						<li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item"><a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a></li>
+					</ul>
+				</div>
+			</div>
 		</div>
 		<div class="col-lg-12 ">
 			<!--<div class="f-buttons-block text-right">
@@ -71,6 +81,7 @@
 				<button type="button" class="button button9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</button>
 			</div>-->
 			<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @action="doAction"></component>
+
 		</div>
 	</div>
 </div>
