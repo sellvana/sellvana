@@ -83,36 +83,33 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
             throw new BException('Inventory not found');
         }
 
+        $countries = $this->BLocale->getAvailableCountries();
+
         $result = [];
 
         $result['form']['inventory'] = $inventory->as_array();
-
-        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
-            $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;
-            if ($groups) {
-                $result['form']['config']['options']['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
-            }
-        }
-        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
-            $sites = $this->Sellvana_MultiSite_Model_Site->siteOptions();
-            if ($sites) {
-                $result['form']['config']['options']['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
-            }
-        }
-        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
-            $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
-            if ($currencies) {
-                $result['form']['config']['options']['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
-            }
-        }
 
         $result['form']['config']['actions'] = true;
 
         $result['form']['config']['tabs'] = '/catalog/inventory/form';
         $result['form']['config']['default_field'] = ['model' => 'inventory'];
         $result['form']['config']['fields'] = [
-            ['name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'inventory_sku', 'label' => 'SKU', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'model' => 'inventory', 'tab' => 'main', 'required' => true],
+            ['name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'unit_cost', 'label' => 'Inventory Unit Cost', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'text'],
+            ['name' => 'allow_backorder', 'label' => 'Allow Backorders', 'model' => 'inventory', 'tab' => 'main', 'type' => 'checkbox'],
+            ['name' => 'qty_warn_customer', 'label' => 'Minimal Qty to warn customer on frontend', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'qty_notify_admin', 'label' => 'Minimal Qty to notify admin', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'qty_cart_min', 'label' => 'Minimal Qty in Cart', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'qty_cart_max', 'label' => 'Maximum Qty in Cart', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'qty_cart_inc', 'label' => 'Qty in Cart Increment', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'qty_buffer', 'label' => 'Buffer Qty In Stock', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'pack_separate', 'label' => 'Pack Separately for Shipment', 'model' => 'inventory', 'tab' => 'main', 'type' => 'checkbox'],
+            ['name' => 'net_weight', 'label' => 'Net Weight', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'shipping_weight', 'label' => 'Shipping Weight', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'shipping_size', 'label' => 'Shipping Size (WxDxH)', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'hs_tariff_number', 'label' => 'Harmonized Tariff Number', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number'],
+            ['name' => 'origin_country', 'label' => 'Country of Origin', 'model' => 'inventory', 'tab' => 'main', 'input_type' => 'number', 'options' => $countries],
         ];
 
         $result['form']['i18n'] = 'inventory';
