@@ -73,4 +73,51 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
     {
         return $this->Sellvana_Catalog_Model_InventorySku->orm('p');
     }
+
+    public function getFormData()
+    {
+        $pId = $this->BRequest->get('id');
+
+        $inventory = $this->Sellvana_Catalog_Model_InventorySku->load($pId);
+        if (!$inventory) {
+            throw new BException('Inventory not found');
+        }
+
+        $result = [];
+
+        $result['form']['inventory'] = $inventory->as_array();
+        $result['form']['thumb'] = ['thumb_url' => $inventory->thumbUrl(100)];
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
+            $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;
+            if ($groups) {
+                $result['form']['config']['options']['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
+            }
+        }
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            $sites = $this->Sellvana_MultiSite_Model_Site->siteOptions();
+            if ($sites) {
+                $result['form']['config']['options']['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
+            }
+        }
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
+            if ($currencies) {
+                $result['form']['config']['options']['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
+            }
+        }
+
+        $result['form']['config']['actions'] = true;
+
+        $result['form']['config']['tabs'] = '/catalog/inventory/form';
+        $result['form']['config']['default_field'] = ['model' => 'inventory'];
+        $result['form']['config']['fields'] = [
+            ['name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            ['name' => 'inventory_sku', 'label' => 'SKU', 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+        ];
+
+        $result['form']['i18n'] = 'inventory';
+
+        return $result;
+    }
 }
