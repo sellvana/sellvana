@@ -96,45 +96,10 @@
 	}
 }
 
-
-
-/*indent a menu with the avatar and without*/
-/*.col-md-12.col-lg-2 .secondary-menu {
-	margin-top: 66px;
-}
-.col-md-12.col-lg-2 img ~ .secondary-menu {
-	margin-top: 20px;
-}*/
-
 @media (max-width: 1365px) {
-	.f-horizontal-menu__item {
-		width: 25%;
-		margin-right: 0;
-		&.active {
-			.f-horizontal-menu__link {
-				padding: 7px 0;
-			}
-		}
-	}
+
 }
 
 @media (max-width: 767px) {
-	.f-horizontal-menu {
-		font-size: 0;
-	}
-	.f-horizontal-menu__item {
-		width: 50%;
-		min-width: inherit;
-		margin: 0;
-		&.active {
-			.f-horizontal-menu__link {
-				border-bottom: 0;
-				padding: 8px 20px;
-			}
-		}
 
-	}
-	.f-horizontal-menu__link {
-		border-radius: 0;
-	}
 }

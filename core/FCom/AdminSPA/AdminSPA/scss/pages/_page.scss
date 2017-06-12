@@ -1,16 +1,18 @@
 .f-admin-container {
 	min-height: 100%;
+	padding: 67px 0 0 0;
 }
 .f-admin-main-view {
 	min-height: 100%;
-	margin: 67px 0 0 272px;
+	margin: 0 0 0 260px;
 	min-width: 276px;
 	padding: 0 15px 80px 0;
 }
-
-.main-nav-closed {
-	.f-admin-main-view {
-		margin-left: 67px;
+@media (min-width: 1024px) {
+	.main-nav-closed {
+		.f-admin-main-view {
+			margin-left: 70px;
+		}
 	}
 }
 
@@ -21,25 +23,30 @@
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
+	.f-admin-container {
+		padding: 59px 13px 0 13px;
+	}
 	.f-admin-main-view {
 		min-height: 100%;
-		margin: 59px 13px 0 13px;
 		min-width: 276px;
 		padding: 0 0 90px 0;
+		margin: 0 0 0 247px;
 	}
 	.main-nav-closed {
 		.f-admin-main-view {
-			margin-left: 13px;
+			margin-left: 0;
 		}
 	}
 }
 
 @media (max-width: 767px) {
+	.f-admin-container {
+		padding: 59px 0 0 0;
+	}
 	.f-admin-main-view {
 		min-height: 100%;
 		margin-right: 13px;
 		margin-left: 13px;
-		margin-top: 59px;
 		min-width: 276px;
 		padding: 0 0 90px 0;
 	}
