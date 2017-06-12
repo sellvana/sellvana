@@ -61,7 +61,11 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
                 ['field' => 'pack_separate', 'type' => 'multiselect'],
             ],
             'export' => true,
-            'pager' => true
+            'pager' => true,
+            'bulk_actions' => [
+                ['name' => 'edit', 'label' => 'Edit'],
+                ['name' => 'delete', 'label' => 'Delete']
+            ]
         ];
     }
 
