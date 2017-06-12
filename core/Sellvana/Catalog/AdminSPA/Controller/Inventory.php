@@ -86,7 +86,6 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
         $result = [];
 
         $result['form']['inventory'] = $inventory->as_array();
-        $result['form']['thumb'] = ['thumb_url' => $inventory->thumbUrl(100)];
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
             $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;

@@ -24,9 +24,8 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 			fetchData: function () {
                 var orderId = this.$router.currentRoute.query.id, vm = this;
                 this.sendRequest('GET', 'inventory/form_data', {id: orderId}, function (response) {
-                	console.log(vm.form);
                     vm.processFormDataResponse(response);
-                    vm.updateBreadcrumbs(vm.form.product.product_name);
+                    vm.updateBreadcrumbs(vm.form.inventory.inventory_sku);
                 });
 			}
 		}
