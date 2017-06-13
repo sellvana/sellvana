@@ -2271,13 +2271,6 @@ class BEvents extends BClass
 class BSession extends BClass
 {
     /**
-     * Session data, specific to the application namespace
-     *
-     * @var array
-     */
-    public $data = null;
-
-    /**
      * Is abstract session open
      *
      * @var boolean
@@ -2508,9 +2501,12 @@ class BSession extends BClass
             $refresh = true;
         }
         if (!$refresh && !empty($this->_config['session_check_ip'])) {
-            if ((!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip)
-                || (!empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent)
-            ) {
+            if ((!empty($_SESSION['_ip']) && $_SESSION['_ip'] !== $ip)) {
+                $refresh = true;
+            }
+        }
+        if (!$refresh && !empty($this->_config['session_check_agent'])) {
+            if (!empty($_SESSION['_agent']) && $_SESSION['_agent'] !== $agent) {
                 $refresh = true;
             }
         }
@@ -2539,25 +2535,25 @@ class BSession extends BClass
         if (empty($_SESSION[$namespace])) {
             $_SESSION[$namespace] = [];
         }
-        $this->data =& $_SESSION[$namespace];
-        $this->data['_'] = time();
+        $nsData =& $_SESSION[$namespace];
+        $nsData['_'] = time();
 
-        if (empty($this->data['current_language'])) {
+        if (empty($nsData['current_language'])) {
             $lang = $this->BRequest->language(true);
             if (!empty($lang)) {
-                $this->data['current_language'] = $lang;
+                $nsData['current_language'] = $lang;
             }
         }
 
-        #$this->data['_locale'] = $this->BConfig->get('locale');
+        #$nsData['_locale'] = $this->BConfig->get('locale');
         /*
-        if (!empty($this->data['_locale'])) {
-            if (is_array($this->data['_locale'])) {
-                foreach ($this->data['_locale'] as $c => $l) {
+        if (!empty($nsData['_locale'])) {
+            if (is_array($nsData['_locale'])) {
+                foreach ($nsData['_locale'] as $c => $l) {
                     setlocale($c, $l);
                 }
-            } elseif (is_string($this->data['_locale'])) {
-                setlocale(LC_ALL, $this->data['_locale']);
+            } elseif (is_string($nsData['_locale'])) {
+                setlocale(LC_ALL, $nsData['_locale']);
             }
         } else {
             setLocale(LC_ALL, 'en_US.UTF-8');
@@ -2565,8 +2561,8 @@ class BSession extends BClass
         */
         setLocale(LC_ALL, 'en_US.UTF-8');
 
-        if (!empty($this->data['_timezone'])) {
-            date_default_timezone_set($this->data['_timezone']);
+        if (!empty($nsData['_timezone'])) {
+            date_default_timezone_set($nsData['_timezone']);
         }
     }
 
@@ -2774,56 +2770,6 @@ class BSession extends BClass
     {
         session_write_close();
         return $this;
-
-        if (!$this->_dirty/* || !empty( $_SESSION )*/) {
-#echo "<pre>"; var_dump($this->_dirty, $_SESSION); echo "</pre>";
-            $this->_isOpen = false;
-            return;
-        }
-#BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
-#ob_start(); debug_print_backtrace(); BDebug::debug(nl2br(ob_get_clean()));
-        if (!$this->_phpSessionOpen) {
-            if (headers_sent()) {
-                BDebug::info("Headers already sent, can't start session");
-            } else {
-                session_start();
-            }
-            $namespace = !empty($this->_config['session_namespace']) ? $this->_config['session_namespace'] : 'default';
-            $_SESSION[$namespace] = $this->data;
-        }
-        // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
-
-        BDebug::debug(__METHOD__, 1);
-        session_write_close();
-        $this->_phpSessionOpen = false;
-        /*
-                if ($this->get('_regenerate_id')) {
-                    #session_regenerate_id(true);
-                    session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
-                    $this->set('_regenerate_id', 0);
-                }
-        */
-        /*
-echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
-        $sessionCookie = null;
-        $otherCookies = [];
-        foreach (headers_list() as $header) {
-            if (preg_match('/^set-cookie: (' . preg_quote(session_name()) . '=)?(.*)$/i', $header, $m)) {
-                if ($m[1]) { // not session cookie
-                    $sessionCookie = $m[0];
-                } else {
-                    $otherCookies[] = $m[0];
-                }
-            }
-        }
-        header($sessionCookie, true);
-        foreach ($otherCookies as $cookie) {
-            header($cookie, false);
-        }
-        */
-        //$this->setDirty();
-        $this->_isOpen = false;
-        return $this;
     }
 
     public function destroy()
@@ -2880,7 +2826,11 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         if (null === $tag) {
             $tag = '_';
         }
-        $this->data['_messages'][$tag][] = $message;
+
+        $messages = $this->get('_messages');
+        $messages[$tag][] = $message;
+        $this->set('_messages', $messages);
+
         return $this;
     }
 
@@ -2894,22 +2844,24 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     {
         $this->open();
 
-        if (empty($this->data['_messages'])) {
+        $messages = $this->get('_messages');
+        if (empty($messages)) {
             return [];
         }
         $tags = explode(',', $tags);
         $msgs = [];
         foreach ($tags as $tag) {
-            if (empty($this->data['_messages'][$tag])) {
+            if (empty($messages[$tag])) {
                 continue;
             }
 
-            foreach ($this->data['_messages'][$tag] as $i => $m) {
+            foreach ($messages[$tag] as $i => $m) {
                 $msgs[] = $m;
-                unset($this->data['_messages'][$tag][$i]);
+                unset($messages[$tag][$i]);
                 $this->setDirty();
             }
         }
+        $this->set('_messages', $messages);
         return $msgs;
     }
 
