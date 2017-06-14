@@ -196,6 +196,25 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $this->respond($result);
     }
 
+    public function action_form_delete__POST()
+    {
+        try {
+            $data = $this->BRequest->post();
+            $id = $data['id'];
+            $model = $this->Sellvana_Catalog_Model_Product->load($id);
+            if (!$model) {
+                throw new BException("This item does not exist");
+            }
+
+            $model->delete();
+            $this->ok()->addMessage('Product was deleted successfully', 'success');
+            $result = ['status' => true];
+            $this->respond($result);
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+    }
+
     public function onHeaderSearch($args)
     {
         $q = $this->BRequest->get('q');
