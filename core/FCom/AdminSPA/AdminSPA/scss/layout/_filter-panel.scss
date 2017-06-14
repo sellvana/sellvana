@@ -2,48 +2,50 @@
       margin: 0;
       position: relative;
       padding: 0 20px;
-      .filter-options-block {
-            background: #fff;
-            padding: 20px;
+}
+
+/*Filter options windows*/
+
+.filter-options-block {
+      background: #fff;
+      padding: 20px;
+}
+.option-box {
+      padding: 20px;
+      ol {
+            padding: 0;
       }
-      .option-box {
-            padding: 20px;
-            ol {
-                  padding: 0;
-            }
+}
+.filter-open-button {
+      position: absolute;
+      top: 0;
+      padding: 6px 9px 2px;
+      border: 1px solid #d0dae3;
+      background: #fff;
+      line-height: 0;
+      height: 34px;
+      width: 41px;
+      text-align: center;
+      svg {
+            stroke: #d0dae3;
+            fill: #d0dae3;
       }
-      .filter-open-button {
-            position: absolute;
-            top: 0;
-            padding: 6px 9px 2px;
-            border: 1px solid #d0dae3;
-            background: #fff;
-            line-height: 0;
-            height: 34px;
-            width: 41px;
-            text-align: center;
+      &:hover {
+            background: #d0dae3;
             svg {
-                  stroke: #d0dae3;
-                  fill: #d0dae3;
+                  stroke: #fff;
+                  fill: #fff;
             }
-            &:hover {
-                  background: #d0dae3;
-                  svg {
-                        stroke: #fff;
-                        fill: #fff;
-                  }
-            }
-            &:active {
-                  background-color: #b9c1c9;
-                  box-shadow: inset 0 1px 3px 0 rgba(112, 112, 112, 0.5);
-                  svg {
-                        stroke: #fff;
-                        fill: #fff;
-                  }
+      }
+      &:active {
+            background-color: #b9c1c9;
+            box-shadow: inset 0 1px 3px 0 rgba(112, 112, 112, 0.5);
+            svg {
+                  stroke: #fff;
+                  fill: #fff;
             }
       }
 }
-
 .params-left {
       position: absolute;
       left: -420px;
@@ -232,6 +234,7 @@
 }
 
 /*Pagination dropdown block*/
+
 .f-pagination__dropdown {
       position: relative;
       display: inline-block;

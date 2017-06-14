@@ -73,6 +73,10 @@
 		width: 49%;
 	}
 }
+.f-widget__actions-button {
+	position: absolute !important;
+	right: 12px;
+}
 .widget-block-content {
 	padding: 10px;
 }
@@ -99,7 +103,7 @@
 		font-size: 15px;
 	}
 	input, textarea, .select2 {
-		width: 100%;
+		width: 100% !important;
 	}
 	.widget-container {
 		min-height: 100px;

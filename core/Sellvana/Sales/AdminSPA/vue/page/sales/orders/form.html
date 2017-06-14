@@ -1,87 +1,88 @@
 <div>
-	<div class="row">
-		<!--<div class="col-md-12 col-lg-6 hidden-xs">
-			<div class="main-info-block">
-				<div class="total-info">
-					<div class="icon"> <i class="fa fa-money" aria-hidden="true"></i> </div>
-					<div class="data"> <span>{{'Grand Total:'|_}}</span>
-						<p>{{form.order.grand_total|currency(form.order.store_currency_code)}}</p>
-					</div>
-				</div>
-				<div class="overall-info">
-					<div class="icon"> <i class="fa fa-line-chart" aria-hidden="true"></i> </div>
-					<div class="data"> <span>{{'Overall Status'|_}}</span>
-						<p :class="'status-'+form.order.state_overall">{{getOption('order_state_overall', form.order.state_overall)}}</p>
-					</div>
-				</div>
-				<div class="payment-info">
-					<div class="icon"> <i class="fa fa-credit-card-alt" aria-hidden="true"></i> </div>
-					<div class="data"> <span>{{'Payment:'|_}}</span>
-						<p :class="'status-'+form.order.state_payment">{{getOption('order_state_payment', form.order.state_payment)}}</p>
-					</div>
-				</div>
-				<div class="delivery-info">
-					<div class="icon"> <i class="fa fa-truck" aria-hidden="true"></i> </div>
-					<div class="data"> <span>{{'Delivery:'|_}}</span>
-						<p :class="'status-'+form.order.state_delivery">{{getOption('order_state_delivery', form.order.state_delivery)}}</p>
-					</div>
-				</div>
-			</div>
-		</div>-->
-		<div class="col-md-12 col-lg-6 text-right">
-			<!--<div class="tablet-panel hidden-lg">
-				<div class="dropdown action" :class="{open:ddOpen('user-menu')}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{formTabLabel|_}}</span><span class="f-caret"><b class="caret"></b></span></a>
-					<div class="dropdown-menu">
-						<ul class="dropdown-content">
-							<li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
-						</ul>
-					</div>
-				</div>-->
-				<!--<div class="dropdown action dropdown-buttons" :class="{open:ddOpen('control-buttons')}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>{{'Actions'|_}}</span><span class="f-caret"><b class="caret"></b></span></a>
-					<div class="dropdown-menu">
-						<ul class="dropdown-content">
-							<li><a href="#" class="color10" @click="goBack()">{{'Back'|_}}</a></li>
-							<li><a href="#" class="color2" @click="doDelete()" v-ladda="{on:action_in_progress==='delete'}">{{'Delete'|_}}</a></li>
-							<li><a href="#" class="color8" @click="shipAllItems()" v-ladda="{on:action_in_progress==='ship_all_items'}">{{'Ship All items'|_}}</a></li>
-							<li><a href="#" class="color8" @click="markAsPaid()" v-ladda="{on:action_in_progress==='mark_as_paid'}">{{'Mark as Paid'|_}}</a></li>
-							<li><a href="#" class="color9" @click="save()" v-ladda="{on:action_in_progress==='save'}">{{'Save'|_}}</a></li>
-							<li><a href="#" class="color9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</a></li>
-						</ul>
-					</div>
-				</div>-->
-			<!--</div>-->
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-12">
-
-			<ul class='f-horizontal-menu visible-lg visible-md'>
-								<li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item"><a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a></li>
-
-						</ul>
-			<div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
-				<div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
-					<a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
-						menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
-					<ul class="f-action-button-b__menu">
-						<li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item"><a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-		<div class="col-lg-12 ">
-			<!--<div class="f-buttons-block text-right">
-				<button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
-				<button type="button" class="button button2" @click="doDelete()" v-ladda="{on:action_in_progress==='delete'}">{{'Delete'|_}}</button>
-				<button type="button" class="button button8" @click="shipAllItems()" v-ladda="{on:action_in_progress==='ship_all_items'}">{{'Ship All items'|_}}</button>
-				<button type="button" class="button button8" @click="markAsPaid()" v-ladda="{on:action_in_progress==='mark_as_paid'}">{{'Mark as Paid'|_}}</button>
-				<button type="button" class="button button9" @click="save()" v-ladda="{on:action_in_progress==='save'}">{{'Save'|_}}</button>
-				<button type="button" class="button button9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</button>
-			</div>-->
-			<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @action="doAction"></component>
-
-		</div>
-	</div>
+      <div class="row">
+            <!--<div class="col-md-12 col-lg-6 hidden-xs">
+                  <div class="main-info-block">
+                        <div class="total-info">
+                              <div class="icon"> <i class="fa fa-money" aria-hidden="true"></i> </div>
+                              <div class="data"> <span>{{'Grand Total:'|_}}</span>
+                                    <p>{{form.order.grand_total|currency(form.order.store_currency_code)}}</p>
+                              </div>
+                        </div>
+                        <div class="overall-info">
+                              <div class="icon"> <i class="fa fa-line-chart" aria-hidden="true"></i> </div>
+                              <div class="data"> <span>{{'Overall Status'|_}}</span>
+                                    <p :class="'status-'+form.order.state_overall">{{getOption('order_state_overall', form.order.state_overall)}}</p>
+                              </div>
+                        </div>
+                        <div class="payment-info">
+                              <div class="icon"> <i class="fa fa-credit-card-alt" aria-hidden="true"></i> </div>
+                              <div class="data"> <span>{{'Payment:'|_}}</span>
+                                    <p :class="'status-'+form.order.state_payment">{{getOption('order_state_payment', form.order.state_payment)}}</p>
+                              </div>
+                        </div>
+                        <div class="delivery-info">
+                              <div class="icon"> <i class="fa fa-truck" aria-hidden="true"></i> </div>
+                              <div class="data"> <span>{{'Delivery:'|_}}</span>
+                                    <p :class="'status-'+form.order.state_delivery">{{getOption('order_state_delivery', form.order.state_delivery)}}</p>
+                              </div>
+                        </div>
+                  </div>
+            </div>-->
+            <div class="col-md-12 col-lg-6 text-right">
+                  <!--<div class="tablet-panel hidden-lg">
+                        <div class="dropdown action" :class="{open:ddOpen('user-menu')}">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('user-menu')"><span>{{formTabLabel|_}}</span><span class="f-caret"><b class="caret"></b></span></a>
+                              <div class="dropdown-menu">
+                                    <ul class="dropdown-content">
+                                          <li v-for="t in form.config.tabs" :class="{active:tab === t.name}"><a href="#" @click.prevent="switchTab(t.name)">{{t.label|_}}</a></li>
+                                    </ul>
+                              </div>
+                        </div>-->
+                  <!--<div class="dropdown action dropdown-buttons" :class="{open:ddOpen('control-buttons')}">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('control-buttons')"><span>{{'Actions'|_}}</span><span class="f-caret"><b class="caret"></b></span></a>
+                        <div class="dropdown-menu">
+                              <ul class="dropdown-content">
+                                    <li><a href="#" class="color10" @click="goBack()">{{'Back'|_}}</a></li>
+                                    <li><a href="#" class="color2" @click="doDelete()" v-ladda="{on:action_in_progress==='delete'}">{{'Delete'|_}}</a></li>
+                                    <li><a href="#" class="color8" @click="shipAllItems()" v-ladda="{on:action_in_progress==='ship_all_items'}">{{'Ship All items'|_}}</a></li>
+                                    <li><a href="#" class="color8" @click="markAsPaid()" v-ladda="{on:action_in_progress==='mark_as_paid'}">{{'Mark as Paid'|_}}</a></li>
+                                    <li><a href="#" class="color9" @click="save()" v-ladda="{on:action_in_progress==='save'}">{{'Save'|_}}</a></li>
+                                    <li><a href="#" class="color9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</a></li>
+                              </ul>
+                        </div>
+                  </div>-->
+                  <!--</div>-->
+            </div>
+      </div>
+      <div class="row">
+            <div class="col-lg-12">
+                  <ul class='f-horizontal-menu visible-lg visible-md'>
+                        <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
+                              <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a>
+                        </li>
+                  </ul>
+                  <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+                        <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+                              <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
+                                    menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                              <ul class="f-action-button-b__menu">
+                                    <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
+                                          <a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a>
+                                    </li>
+                              </ul>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-lg-12 ">
+                  <!--<div class="f-buttons-block text-right">
+                        <button type="button" class="button button10" @click="goBack()">{{'Back'|_}}</button>
+                        <button type="button" class="button button2" @click="doDelete()" v-ladda="{on:action_in_progress==='delete'}">{{'Delete'|_}}</button>
+                        <button type="button" class="button button8" @click="shipAllItems()" v-ladda="{on:action_in_progress==='ship_all_items'}">{{'Ship All items'|_}}</button>
+                        <button type="button" class="button button8" @click="markAsPaid()" v-ladda="{on:action_in_progress==='mark_as_paid'}">{{'Mark as Paid'|_}}</button>
+                        <button type="button" class="button button9" @click="save()" v-ladda="{on:action_in_progress==='save'}">{{'Save'|_}}</button>
+                        <button type="button" class="button button9" @click="save(true)" v-ladda="{on:action_in_progress==='save_continue'}">{{'Save and Continue'|_}}</button>
+                  </div>-->
+                  <component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @action="doAction"></component>
+            </div>
+      </div>
 </div>

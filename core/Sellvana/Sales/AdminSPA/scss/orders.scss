@@ -46,7 +46,6 @@
 	border-radius: 5px;
 	width: 356px;
 	position: relative;
-	padding: 20px 0;
 	display: inline-block;
 	.block-title {
 		position: absolute;
@@ -61,24 +60,7 @@
 		}
 	}	
 }
-.f-bordered-block {
-	padding: 20px;
-	border: solid 1px #e5e3e3;
-	border-radius: 5px;
-}
 
-.f-bordered-block__title {
-	position: absolute;
-	top: -14px;
-	background: #fff;
-	padding: 0;
-	width: auto;
-	p {
-		font-size: 14px;
-		padding: 5px 12px;
-		font-weight: bold;
-	}
-}
 .f-edited-block {
 	margin: 0;
 	display: inline-block;

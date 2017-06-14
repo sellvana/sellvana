@@ -102,6 +102,7 @@ a:focus {
 
 .param-block {
 	height: 17px;
+	margin: 15px 0;
 	.f-input {
 		border-radius: 0;
 	}
@@ -317,6 +318,24 @@ a:focus {
 }*/
 .select2-dropdown {
 	z-index: 8;
+}
+.f-bordered-block {
+	padding: 20px;
+	border: solid 1px #e5e3e3;
+	border-radius: 5px;
+}
+
+.f-bordered-block__title {
+	position: absolute;
+	top: -9px;
+	background: #fff;
+	padding: 0;
+	width: auto;
+	p {
+		font-size: 14px;
+		padding: 0 12px;
+		font-weight: bold;
+	}
 }
 @media (max-width: 1365px) {
 	.f-multilanguage-block {
