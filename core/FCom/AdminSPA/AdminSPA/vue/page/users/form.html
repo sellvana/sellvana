@@ -1,28 +1,61 @@
-<div>
-    <div class="row">
-        <div class="col-md-12 col-lg-2">
-            <img :src="avatarUrl" width="80" class="f-thumb-img">
-            <div>
-                <ul class='f-secondary-menu'>
-                    <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class='f-secondary-menu__item'><a href="#" @click.prevent="switchTab(t.name)" class='f-secondary-menu__link'>{{t.label|_}}</a></li>
-                </ul>
+<div class="row">
+      <div class="col-xs-12">
+            <div class="f-form-title">
+                  <img :src="avatarUrl" width="80" class="f-thumb-img">
+                  <p class="f-form-title__text hidden-xs">{{'Form name'|_}}</p>
             </div>
-        </div>
-        <div class="col-md-12 col-lg-10">
-        	<div class="row">
-        		<div class="col-sm-12 col-md-6">
-					<div class="f-buttons-block text-right">
-						<button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
-						<button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-						<button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
-						<button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
-					</div>
-					<component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
-        		</div>
-			<div class="col-sm-12 col-md-6">
-
-			</div>
-        	</div>
-        </div>
-    </div>
+      </div>
+      <div class="col-xs-6">
+            <ul class='f-horizontal-menu visible-lg visible-md'>
+                  <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class='f-horizontal-menu__item'>
+                        <a href="#" @click.prevent="switchTab(t.name)" class='f-horizontal-menu__link'>{{t.label|_}}</a></li>
+            </ul>
+            <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+                  <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+                        <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
+                              menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                        <ul class="f-action-button-b__menu">
+                              <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
+                                    <a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link">{{t.label|_}}</a></li>
+                        </ul>
+                  </div>
+            </div>
+      </div>
+      <div class="col-xs-6">
+            <div class="f-buttons-block text-right visible-lg visible-md">
+                  <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
+                  <div class="f-dropdown f-actions-dropdown-arrow" :class="{open:ddOpen('actions-open')}">
+                        <button type="button" class="button button1" @click="goBack()">{{'Save'|_}}</button>
+                        <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
+                        <div class="f-dropdown__menu">
+                              <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                        </div>
+                  </div>
+                  <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
+            </div>
+            <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+                  <div class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open2')}">
+                        <button type="button" class="button button1 f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open2')">
+                              {{'Actions'|_}}
+                        </button>
+                        <ul class="f-dropdown__menu">
+                              <li>
+                                    <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
+                              </li>
+                        </ul>
+                  </div>
+            </div>
+      </div>
+      <div class="col-xs-12">
+            <component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+      </div>
 </div>

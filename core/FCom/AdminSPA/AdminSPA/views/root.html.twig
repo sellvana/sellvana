@@ -8,16 +8,18 @@
 </head>
 <body>
 {% verbatim %}
-<div id="sv-app" @click="pageClick()" v-show="isLoaded">
-    <sv-comp-header v-if="isLoggedIn"></sv-comp-header>
-    <main :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
+<div id="sv-app" @click="pageClick()" v-show="isLoaded" :class="{'main-nav-opened':ui.mainNavOpen, 'main-nav-closed':!ui.mainNavOpen}">
+    <sv-comp-header v-if="isLoggedIn" ></sv-comp-header>
+    <sv-comp-nav v-if="isLoggedIn"></sv-comp-nav>
+    <main>
+
         <div class="f-admin-container">
-            <sv-comp-nav v-if="isLoggedIn"></sv-comp-nav>
-			
+
             <div class="f-admin-main-view ">
 				<sv-comp-header-breadcrumbs :mobile="true"></sv-comp-header-breadcrumbs>
 				 <router-view></router-view>
             </div>
+
         </div>
     </main>
     <sv-comp-messages></sv-comp-messages>

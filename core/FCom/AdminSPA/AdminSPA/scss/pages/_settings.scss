@@ -74,3 +74,13 @@
             }
       }
 }
+
+@media (max-width: 767px) {
+      .f-settings-block__content {
+            padding: 0;
+            .f-multiple-form {
+                  margin-bottom: 10px;
+            }
+      }
+
+}

@@ -5,15 +5,13 @@
                   <p class="f-form-title__text hidden-xs">{{'Form name'|_}}</p>
             </div>
       </div>
-      <!--  <div class="col-md-12 col-sm-12">
-              <div class="row">-->
       <div class="col-md-6">
             <div class="f-buttons-block text-right visible-lg visible-md">
                   <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
-                  <div class="f-dropdown">
+                  <div class="f-dropdown f-actions-dropdown-arrow" :class="{open:ddOpen('actions-open')}">
                         <button type="button" class="button button2" @click="goBack()">{{'Save'|_}}</button>
-                        <a href="" class="f-caret f-dropdown__toggle"><b class="f-caret__elem"></b></a>
-                        <div class="f-dropdown-menu">
+                        <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
+                        <div class="f-dropdown__menu">
                               <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
                         </div>
                   </div>
@@ -25,17 +23,22 @@
                               {{'Actions'|_}}
                         </button>
                         <ul class="f-dropdown__menu">
-                              <li><button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button></li>
-                              <li><button type="button" class="button button2" @click="goBack()">{{'Save'|_}}</button></li>
-                              <li> <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button></li>
-                              <li><button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button></li>
+                              <li>
+                                    <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button2" @click="goBack()">{{'Save'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
+                              </li>
+                              <li>
+                                    <button type="button" class="button button1" @click="save(true)">{{'Save and Continue'|_}}</button>
+                              </li>
                         </ul>
                   </div>
             </div>
       </div>
-      <!-- </div>
-
- </div>-->
       <div class="col-md-6 col-sm-12">
             <component v-for="t in formTabs" v-show="tab === t.name" :is="t.component_config" :form="form" @event="processTabEvent"></component>
       </div>

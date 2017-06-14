@@ -1,16 +1,19 @@
 .sidebar-nav {
 	position: fixed;
-	float: left;
 	width: 240px;
 	background: #dde5ea;
 	display: block;
 	top: 0;
 	bottom: 0;
+	left: 0;
 	z-index: 9;
 	height: 100%;
 	padding: 57px 0 0 0;
 	span, a, i {
 		color: #2e4354;
+	}
+	.ps__scrollbar-y-rail {
+		display: none;
 	}
 }
 .account-menu {
@@ -18,24 +21,15 @@
 	left: 20px;
 	bottom: 20px;
 }
-.custom-scroll {
+.navbar-collapse {
 	display: inline-block;
 	width: 100%;
 	padding: 0;
-	overflow: hidden;
+	overflow: auto;
 	height: calc(100% - 90px);
 	font-size: 13px;
 }
 #main-nav {
-	/*display: inline-block;
-	width: 100%;
-	padding: 0;
-	overflow: auto;
-	max-height: calc(100% - 90px);
-	font-size: 13px;*/
-/*	&:hover {
-		overflow: auto;
-	}*/
 	* {
 		vertical-align: middle;
 	}
@@ -310,8 +304,8 @@
 @media (max-width: 1365px) {
 	.sidebar-nav {
 		left: 0;
-		width: 224px;
-		overflow: auto;
+		height: 100%;
+		padding-bottom: 90px;
 		.fa-chevron-right {
 			display: inline-block;
 		}
@@ -327,6 +321,9 @@
 		position: absolute;
 		left: 20px;
 		bottom: 20px;
+	}
+	.navbar-collapse {
+		height: 100%;
 	}
 }
 @media (max-width: 767px) {

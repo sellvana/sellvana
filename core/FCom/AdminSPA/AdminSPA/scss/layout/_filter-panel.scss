@@ -489,6 +489,9 @@
             &.f-search-block {
                   width: 49%;
                   margin: 0 0 5px;
+                  .f-input {
+                        padding-right: 36px;
+                  }
             }
       }
       .f-filter-tags {

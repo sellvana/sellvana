@@ -350,9 +350,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->get('locale')) {
             setlocale(LC_ALL, $this->get('locale'));
         }
-        if ($this->get('timezone')) {
-            date_default_timezone_set($this->get('timezone'));
-            $this->BSession->set('_timezone', $this->get('timezone'));
+        if ($this->get('tz')) {
+            date_default_timezone_set($this->get('tz'));
+            $this->BSession->set('_timezone', $this->get('tz'));
         }
         $this->BEvents->fire('FCom_Admin_Model_User::login:after', ['user' => $this]);
 
