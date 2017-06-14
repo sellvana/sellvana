@@ -163,14 +163,56 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
     {
         $result = [];
         try {
-            $data = $this->BRequest->post();
-            $result = $this->getFormData();
-            $result['form'] = $this->normalizeFormConfig($result['form']);
-            $this->ok()->addMessage('Product was saved successfully', 'success');
+            $r = $this->BRequest;
+            $data = $r->post();
+            $id = $r->param('id', true);
+            $model = $this->Sellvana_Catalog_Model_Product->load($id);
+            if (!$model) {
+                throw new BException("This item does not exist");
+            }
+            if ($data) {
+                $model->set($data);
+            }
+
+            $origModelData = $modelData = $model->as_array();
+            $validated = $model->validate($modelData, [], 'product');
+            if ($modelData !== $origModelData) {
+                $model->set($modelData);
+            }
+
+            if ($validated) {
+                $model->save();
+                $result = $this->getFormData();
+                $result['form'] = $this->normalizeFormConfig($result['form']);
+                $this->ok()->addMessage('Product was saved successfully', 'success');
+            } else {
+                $result = ['status' => 'error'];
+                $this->error()->addMessage('Cannot save data, please fix above errors', 'error');
+            }
+
         } catch (Exception $e) {
             $this->addMessage($e);
         }
         $this->respond($result);
+    }
+
+    public function action_form_delete__POST()
+    {
+        try {
+            $data = $this->BRequest->post();
+            $id = $data['id'];
+            $model = $this->Sellvana_Catalog_Model_Product->load($id);
+            if (!$model) {
+                throw new BException("This item does not exist");
+            }
+
+            $model->delete();
+            $this->ok()->addMessage('Product was deleted successfully', 'success');
+            $result = ['status' => true];
+            $this->respond($result);
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
     }
 
     public function onHeaderSearch($args)
