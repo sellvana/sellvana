@@ -2,23 +2,17 @@
       <div class="row">
             <div class="col-md-12">
                   <div class="f-buttons-block text-right">
-                        <button type="button" class="button button2"
-                                @click="goBack()">{{'Back'|_}}
-                        </button>
-                        <button type="button" class="button button1"
-                                @click="save()">{{'Save'|_}}
-                        </button>
+                        <button type="button" class="button button1" @click="save()">{{'Save'|_}}</button>
                   </div>
             </div>
             <div class="col-md-6">
                   <div class="f-content-block">
                         <div class="f-block-title">
-                              <p class="f-block-title__text">{{'Account
-                                    Information'|_}}</p>
+                              <p class="f-block-title__text">{{'Account Information'|_}}</p>
                         </div>
                         <fieldset class="f-form-container">
                               <sv-comp-form-field
-                                    v-for="f in form.config.fields"
+                                    v-for="f in form.config.fields" :key="f.name"
                                     v-if="f.tab==='account'"
                                     v-show="formFieldShowCond(f)"
                                     :form="form" :field="f.name"
@@ -35,12 +29,11 @@
             <div class="col-md-6">
                   <div class="f-content-block">
                         <div class="f-block-title">
-                              <p class="f-block-title__text">{{'Personal
-                                    Information'|_}}</p>
+                              <p class="f-block-title__text">{{'Personal Information'|_}}</p>
                         </div>
                         <fieldset class="f-form-container">
                               <sv-comp-form-field
-                                    v-for="f in form.config.fields"
+                                    v-for="f in form.config.fields" :key="f.name"
                                     v-if="f.tab==='personal'"
                                     v-show="formFieldShowCond(f)"
                                     :form="form" :field="f.name"

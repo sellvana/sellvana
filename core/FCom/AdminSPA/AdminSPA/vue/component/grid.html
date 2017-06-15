@@ -1,9 +1,9 @@
 <div class="f-content-block box-no-padding f-grid-wrapper">
       <div class="container-fluid">
-            <div class="row">
+            <div v-if="false && gridTitle" class="row">
                   <div class="col-md-12">
                         <div class="f-grid-title">
-                              <p class="f-grid-title__text">{{'Grid title'|_}}</p>
+                              <p class="f-grid-title__text">{{gridTitle|_}}</p>
                         </div>
                   </div>
             </div>
@@ -19,7 +19,7 @@
                         <sv-comp-grid-header-row :grid="grid" @event="onEvent"></sv-comp-grid-header-row>
                         </thead>
                         <tbody>
-                        <sv-comp-grid-data-row v-for="row in visibleRows" :grid="grid" :row="row" @event="onEvent"></sv-comp-grid-data-row>
+                        <sv-comp-grid-data-row v-for="row in visibleRows" :key="row.id" :grid="grid" :row="row" @event="onEvent"></sv-comp-grid-data-row>
                         </tbody>
                   </table>
             </div>

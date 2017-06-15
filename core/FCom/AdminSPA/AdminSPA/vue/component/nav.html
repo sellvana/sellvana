@@ -2,7 +2,7 @@
       <nav v-scrollbar id="main-nav" class="navbar-collapse" :class="{close:!ui.mainNavOpen}">
             <ul class="nav nav-stacked">
                   <li v-for="l1 in $store.state.navTree">
-                        <router-link v-if="l1.link" :to="l1.link" :title="l1.label" :class="{in:inBreadcrumbs(l1)}">
+                        <router-link v-if="l1.link" :to="l1.link" :title="l1.label" :class="{in:inBreadcrumbs(l1)}" @click.native="clickRouterLink(l1)">
                               <i v-if="l1.icon" class='nav__icon'>
                                     <svg width="18" height="18" v-html="svgIconLink(l1.icon)"></svg>
                               </i><span>{{l1.label}}</span>
@@ -18,7 +18,7 @@
                               </a>
                               <ul class="nav nav-stacked" :class="{in:navOpen(l1.path)}" v-show="1">
                                     <li v-for="l2 in l1.children">
-                                          <router-link v-if="l2.link" :to="l2.link" :title="l2.label" :class="{in:inBreadcrumbs(l2)}">
+                                          <router-link v-if="l2.link" :to="l2.link" :title="l2.label" :class="{in:inBreadcrumbs(l2)}" @click.native="clickRouterLink(l2)">
                                                 <i v-if="l2.icon_class" :class="l2.icon_class" aria-hidden="true"></i><span>{{l2.label}}</span>
                                           </router-link>
                                           <template v-if="l2.children">
@@ -30,7 +30,7 @@
                                                 </a>
                                                 <ul class="nav nav-stacked" :class="{in:navOpen(l2.path)}">
                                                       <li v-for="l3 in l2.children">
-                                                            <router-link :to="l3.link" :title="l3.label" :class="{in:inBreadcrumbs(l3)}">
+                                                            <router-link :to="l3.link" :title="l3.label" :class="{in:inBreadcrumbs(l3)}" @click.native="clickRouterLink(l3)">
                                                                   <i v-if="l3.icon_class" :class="l3.icon_class" aria-hidden="true"></i><span>{{l3.label}}</span>
                                                             </router-link>
                                                       </li>
@@ -45,15 +45,15 @@
       <div class="account-menu">
             <div class="f-dropdown user-menu" :class="{open: ddOpen('account')}">
                   <a href="#" title="Login menu" class="f-dropdown__toggle" data-toggle="dropdown" @click.prevent.stop="ddToggle('account')">
-                        <img src="" class='img-circle' width="47" height="47"/> {{'John'|_}} {{'Rich'|_}}
+                        <img :src="getUser.thumb" class='img-circle' width="47" height="47"/> {{ getUser.firstname + ' ' + getUser.lastname }}
                         <span class="f-caret"><b class="f-caret__elem"></b></span> </a>
                   <ul class="dropdown-menu">
                         <li>
-                              <router-link to="/profile">Profile</router-link>
+                              <router-link to="/profile">{{'Profile'|_}}</router-link>
                         </li>
                         <!--<li><router-link to="/calendar"><i class="fa fa-calendar" aria-hidden="true"></i> Calendar / To Do</router-link></li>-->
                         <li>
-                              <router-link to="/logout">Sign out</router-link>
+                              <router-link to="/logout">{{'Sign out'|_}}</router-link>
                         </li>
                   </ul>
             </div>

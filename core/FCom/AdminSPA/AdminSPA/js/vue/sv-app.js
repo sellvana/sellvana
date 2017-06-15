@@ -1,4 +1,6 @@
-define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-header-breadcrumbs', 'sv-comp-messages', 'sv-comp-nav', 'text!sv-comp-header-tpl', 'text!sv-comp-nav-tpl'],
+define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-header-breadcrumbs', 'sv-comp-messages', 'sv-comp-nav',
+        'sv-comp-form-actions', 'sv-comp-form-tabs',
+        'text!sv-comp-header-tpl', 'text!sv-comp-nav-tpl'],
     function (Vue, SvHlp, SvCompHeader, SvCompHeaderBreadcrumbs, SvCompMessages, SvCompNav) {
 
     var SvApp = {

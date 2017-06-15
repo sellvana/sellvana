@@ -1,6 +1,6 @@
 <div>
-    <div class="f-form-title">
-        <p class="f-form-title__text hidden-xs">{{'Form title'|_}}</p>
+    <div v-if="grid && grid.config && grid.config.title" class="f-form-title">
+        <p class="f-form-title__text hidden-xs">{{grid.config.title|_}}</p>
     </div>
     <sv-comp-grid :grid="grid"></sv-comp-grid>
 </div>

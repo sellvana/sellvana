@@ -13,6 +13,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         'label_class' => 'col-md-3',
         'field_container_class' => 'col-md-9',
     ];
+    
+    static protected $_defaultActionConfig = [
+        'mobile_group' => 'actions',
+    ];
 
     //abstract public function getFormData();
 
@@ -39,7 +43,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         if (!empty($form['config']['tabs']) && is_string($form['config']['tabs'])) {
             $form['config']['tabs'] = $this->getFormTabs($form['config']['tabs']);
         }
-
+        
         if (!empty($form['config']['fields'])) {
             $def = !empty($form['config']['default_field']) ? $form['config']['default_field'] : [];
             $def = array_merge(static::$_defaultFieldConfig, $def);
@@ -61,27 +65,31 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         if (!empty($form['config']['actions'])) {
             if (true === $form['config']['actions']) {
                 $form['config']['actions'] = [
-                    ['name' => 'back', 'label' => 'Back', 'class' => 'button2'],
-                    ['name' => 'delete', 'label' => 'Delete', 'class' => 'button2'],
-                    ['name' => 'save', 'label' => 'Save', 'class' => 'button1'],
-                    ['name' => 'save-continue', 'label' => 'Save and Continue', 'class' => 'button1'],
+                    ['name' => 'actions', 'label' => 'Actions'],
+                    ['name' => 'back', 'label' => 'Back', 'desktop_group' => 'back', 'button_class' => 'button2'],
+                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button6'],
+                    ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
+                    ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
                 ];
             }
+            $actionGroups = [];
+            $def = !empty($form['config']['default_action']) ? $form['config']['default_action'] : [];
+            $def = array_merge(static::$_defaultActionConfig, $def);
             foreach ($form['config']['actions'] as &$act) {
-                if ($act['name'] === 'back' && empty($act['method'])) {
-                    $act['method'] = 'goBack';
-                }
-                if ($act['name'] === 'delete' && empty($act['method'])) {
-                    $act['method'] = 'doDelete';
-                }
-                if ($act['name'] === 'save' && empty($act['method'])) {
-                    $act['method'] = 'save';
-                }
-                if ($act['name'] === 'save-continue' && empty($act['method'])) {
-                    $act['method'] = 'saveAndContinue';
+                $act = array_merge($def, $act);
+                foreach (['desktop_group', 'mobile_group'] as $g) {
+                    if (!empty($act[$g])) {
+                        if (empty($actionGroups[$g][$act[$g]])) {
+                            $actionGroups[$g][$act[$g]] = $act;
+                        } else {
+                            $actionGroups[$g][$act[$g]]['children'][] = $act;
+                        }
+                    }
                 }
             }
             unset($act);
+            $form['config']['action_desktop_groups'] = array_values($actionGroups['desktop_group']);
+            $form['config']['action_mobile_groups'] = array_values($actionGroups['mobile_group']);
         }
 
         if (!empty($form['i18n']) && is_string($form['i18n'])) {

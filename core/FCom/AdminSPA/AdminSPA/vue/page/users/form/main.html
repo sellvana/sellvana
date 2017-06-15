@@ -1,32 +1,5 @@
 <div class="f-content-block">
 	<fieldset class="f-form-container">
-		<div class="f-form-group row">
-				<p class="col-md-3"></p>
-				<div class="col-md-9">
-					<p class="param-block">If
-						<!--<span class="param-result">-->
-							<!--<span class="param-options">-->
-								<!--<select2 value="any">-->
-									<!--<option>any</option>-->
-									<!--<option>all</option>-->
-								<!--</select2>-->
-							<!--</span>-->
-						<!--</span>-->
-						<inline-param v-model="test1" :options="[{id:'', text:'...'}, {id:'any',text:'ANY'},{id:'all',text:'ALL'}]"></inline-param>
-						just another text
-						<inline-param v-model="test"></inline-param>
-						<!--<span class="param-result" onclick="event.preventDefault(); $(this).toggleClass('edit'); $(this).find('input').focus();">-->
-							<!--<a href="#" >any</a>-->
-							<!--<span class="param-options">-->
-								<!--<input type="text" class="f-input" value="any" onchange="var value=$(this).val(); $(this).parents('.param-result').find('a').text(value);"-->
-									   <!--onkeyup="if (event.keyCode == 13) { $(this).parents('.param-result').removeClass('edit')}"-->
-								<!---->
-								<!--/>-->
-							<!--</span>-->
-						<!--</span>-->
-					</p>
-				</div>
-			</div>
 		<div class="f-form-group row error">
 			<label class="f-form-label col-md-3">{{'Input'|_}}</label>
 			<div class="col-md-9">

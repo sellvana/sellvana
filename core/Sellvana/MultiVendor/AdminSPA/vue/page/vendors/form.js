@@ -18,7 +18,7 @@ define(['vue', 'sv-hlp'],
                 }
             },
             methods: {
-                buttonAction: function (act) {
+                doFormAction: function (act) {
                     console.log(act);
                 },
                 updateBreadcrumbs: function (label) {

@@ -458,6 +458,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 }
             },
             computed: {
+                gridTitle: function () {
+                    return _.get(this.grid, 'config.title', 'Grid Title Not Set');
+                },
                 columns: function () {
                     return _.get(this.grid, 'config.columns', []);
                 },

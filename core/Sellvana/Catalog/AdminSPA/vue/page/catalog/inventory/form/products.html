@@ -2,7 +2,7 @@
       <div class="col-md-12 col-lg-6">
             <div class="f-content-block">
                   <fieldset class="f-form-container">
-                        <sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='products'" v-show="formFieldShowCond(f)" :form="form" :field="f.name" v-model="form[f.model][f.name]" @event="processFieldEvent"></sv-comp-form-field>
+                        <sv-comp-form-field v-for="f in form.config.fields" :key="f.name" v-if="f.tab==='products'" v-show="formFieldShowCond(f)" :form="form" :field="f.name" v-model="form[f.model][f.name]" @event="processFieldEvent"></sv-comp-form-field>
                   </fieldset>
             </div>
       </div>

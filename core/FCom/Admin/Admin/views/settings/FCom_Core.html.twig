@@ -35,7 +35,8 @@
         {{ forms.input(fieldData,   { field:'domain', label:'Cookie Domain'|_ }) }}
         {{ forms.input(fieldData,   { field:'path', label:'Cookie Path'|_ }) }}
         {{ forms.input(fieldData,   { field:'session_namespace', label:'Cookie Namespace'|_ }) }}
-        {{ forms.boolean(fieldData, { field:'session_check_ip', label:'Verify Session IP and User Agent'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'session_check_ip', label:'Verify Session IP'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'session_check_agent', label:'Verify Session User Agent'|_ }) }}
         {#{{ forms.input(fieldData, { field:'referer_check', label:'Referer Check String'|_,#}
             {#help_block_text:'<a href="https://secure.php.net/manual/en/session.configuration.php#ini.session.referer-check" target="_blank">Details</a>'|_ }) }}#}
         {{ forms.boolean(fieldData, { field:'use_strict_mode', label:'Use Cookie Strict Mode'|_,

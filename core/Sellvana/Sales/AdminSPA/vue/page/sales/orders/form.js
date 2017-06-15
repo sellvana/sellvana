@@ -25,9 +25,6 @@ define(['vue', 'sv-hlp'],
 			}
 		},
 		methods: {
-			buttonAction: function (act) {
-				console.log(act);
-			},
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
@@ -45,9 +42,9 @@ define(['vue', 'sv-hlp'],
                     vm.updateBreadcrumbs(SvHlp._('Order #' + vm.form.order.unique_id));
                 });
 			},
-			doAction: function (action) {
+			doFormAction: function (action) {
 				var vm = this;
-				switch (action.type) {
+				switch (action.name) {
 					case 'update-form':
 						action.form.config.tabs = this.form.config.tabs;
 						Vue.set(this, 'form', action.form);

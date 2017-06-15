@@ -9,7 +9,6 @@
             - [ requireJs, sv-page-catalog-products-grid-config, "~/products/grid_config" ]
 
             - [ requireJs, sv-page-catalog-products-form, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form" ]
-            - [ requireJs, sv-page-catalog-products-form-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form.html" ]
 
 			- [ requireJs, sv-page-catalog-products-form-main, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/main" ]
 			- [ requireJs, sv-page-catalog-products-form-main-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/main.html" ]
@@ -36,7 +35,6 @@
             - [ requireJs, sv-page-catalog-inventory-grid-config, "~/inventory/grid_config" ]
 
             - [ requireJs, sv-page-catalog-inventory-form, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form" ]
-            - [ requireJs, sv-page-catalog-inventory-form-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form.html" ]
 
             - [ requireJs, sv-page-catalog-inventory-form-main, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form/main" ]
             - [ requireJs, sv-page-catalog-inventory-form-main-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form/main.html" ]
@@ -81,11 +79,11 @@
             - [ addNav, { path: /reports/data-integrity/products-no-category, label: Products without a Category, link: /catalog/reports/products-no-category, pos: 20 } ]
             - [ addNav, { path: /reports/data-integrity/categories-no-products, label: Categories without Products, link: /catalog/reports/categories-no-products, pos: 30 } ]
 
-            - [ addRoute, { path: /catalog/products, require: [ sv-page-catalog-products, '', json!sv-page-catalog-products-grid-config ] } ]
-            - [ addRoute, { path: /catalog/products/form, require: [ sv-page-catalog-products-form ] } ]
+            - [ addRoute, { path: /catalog/products, require: [ sv-page-catalog-products, text!sv-page-default-grid-tpl, json!sv-page-catalog-products-grid-config ] } ]
+            - [ addRoute, { path: /catalog/products/form, require: [ sv-page-catalog-products-form, text!sv-page-default-form-tpl ] } ]
             - [ addRoute, { path: /catalog/categories, require: [ sv-page-catalog-categories, text!sv-page-catalog-categories-tpl ] } ]
-            - [ addRoute, { path: /catalog/inventory, require: [ sv-page-catalog-inventory, '', json!sv-page-catalog-inventory-grid-config ] } ]
-            - [ addRoute, { path: /catalog/inventory/form, require: [ sv-page-catalog-inventory-form ] } ]
+            - [ addRoute, { path: /catalog/inventory, require: [ sv-page-catalog-inventory, text!sv-page-default-grid-tpl, json!sv-page-catalog-inventory-grid-config ] } ]
+            - [ addRoute, { path: /catalog/inventory/form, require: [ sv-page-catalog-inventory-form, text!sv-page-default-form-tpl ] } ]
 
 
 /catalog/products/form:

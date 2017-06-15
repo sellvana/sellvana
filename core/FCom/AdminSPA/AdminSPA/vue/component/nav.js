@@ -31,11 +31,19 @@ define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
             },
             mainNavOpen: function () {
                 return this.$store.state.ui.mainNavOpen;
+            },
+            getUser: function () {
+                return this.$store.state.user;
             }
         },
         methods: {
             navToggle: function (path) {
                 Vue.set(this.navTreeOpen, path, !this.navTreeOpen[path]);
+            },
+            clickRouterLink: function(node) {
+                if (this.$store.state.ui.windowWidth <= 1024) {
+                    this.$store.commit('mainNavToggle');
+                }
             }
         },
         template: navTpl,

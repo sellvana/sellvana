@@ -17,6 +17,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $bool = [0 => 'no', 1 => 'Yes'];
         return [
             'id' => 'products',
+            'title' => 'Products',
             'data_url' => 'products/grid_data',
             'columns' => [
                 ['type' => 'row-select', 'width' => 55],
@@ -88,7 +89,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $result = [];
 
         $result['form']['product'] = $product->as_array();
-        $result['form']['thumb'] = ['thumb_url' => $product->thumbUrl(100)];
+        $result['form']['config']['title'] = $product->get('product_name');
+        $result['form']['config']['thumb_url'] = $product->thumbUrl(100);
 
         $invModel = $product->getInventoryModel();
         if ($invModel) {

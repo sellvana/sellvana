@@ -8,7 +8,8 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
     return {
         //mixins: [SvHlp.mixins.common],
         props: ['grid', 'row'],
-        template: '<tr><component v-for="col in columns" v-if="!col.hidden" :is="cellComponent(col)" :name="col.name" :grid="grid" :row="row" :col="col" @event="onEvent"></component></tr>',
+        template: '<tr><component v-for="col in columns" :key="col.name" v-if="!col.hidden" :is="cellComponent(col)" '
+            + ':name="col.name" :grid="grid" :row="row" :col="col" @event="onEvent"></component></tr>',
         computed: {
             columns: function () {
                 return _.get(this.grid, 'config.columns', []);

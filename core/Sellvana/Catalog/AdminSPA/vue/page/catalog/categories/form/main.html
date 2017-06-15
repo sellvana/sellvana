@@ -22,7 +22,7 @@
 							</div>
 					</div>
 				</div>
-				<sv-comp-form-field v-for="f in form.config.fields" v-if="f.tab==='main'" :form="form" :field="f.name"
+				<sv-comp-form-field v-for="f in form.config.fields" :key="f.name" v-if="f.tab==='main'" :form="form" :field="f.name"
 							  v-model="form.category[f.name]" @event="processFieldEvent"></sv-comp-form-field>
 			</fieldset>
 		</div>

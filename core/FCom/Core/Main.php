@@ -9,6 +9,7 @@ require_once __DIR__ . '/buckyball/buckyball.php';
 /**
  * Class FCom_Core_Main
  *
+ * @property FCom_Core_Shell FCom_Core_Shell
  * @property FCom_Core_Model_ExternalConfig $FCom_Core_Model_ExternalConfig
  */
 class FCom_Core_Main extends BClass
@@ -32,7 +33,6 @@ class FCom_Core_Main extends BClass
             $this->initConfig($area);
             $this->initDebug();
             $this->initModules();
-
         } catch (Exception $e) {
             $this->BDebug->dumpLog();
             $this->BDebug->exceptionHandler($e);
@@ -211,11 +211,23 @@ class FCom_Core_Main extends BClass
         }
 
         if ($errors) {
-            $this->BLayout
-                ->addView('core/errors', ['template' => __DIR__ . '/views/core/errors.php'])
-                ->setRootView('core/errors');
-            $this->BLayout->getView('core/errors')->set('errors', $errors);
-            $this->BResponse->output();
+            if (PHP_SAPI === 'cli') {
+                $output = "{.red*}ERRORS: \n";
+                if (!empty($errors['phpext'])) {
+                    $output .= "{.}Missing PHP extensions: " . join("{.}, {.red}", $errors['phpext']) . '{.}.';
+                }
+                if (!empty($errors['permissions'])) {
+                    $output .= "{.}Before proceeding, please make sure that the following folders are writable for web service:\n"
+                        . join("{.},\n\t{.red}", $errors['permissions']) . '{.}.';
+                }
+                echo $this->FCom_Core_Shell->colorize($output);
+            } else {
+                $this->BLayout
+                    ->addView('core/errors', ['template' => __DIR__ . '/views/core/errors.php'])
+                    ->setRootView('core/errors');
+                $this->BLayout->getView('core/errors')->set('errors', $errors);
+                $this->BResponse->output();
+            }
             exit;
         }
 

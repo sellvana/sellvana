@@ -66,9 +66,10 @@
             - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/nprogress/nprogress.css" ]
             - [ requireJs, nprogress, "@FCom_AdminSPA/AdminSPA/js/lib/nprogress/nprogress" ]
 
-            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.1.8" ]
-            - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.1.1" ]
-            - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.1.1" ]
+            - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.3.3" ]
+            - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.3.1" ]
+            - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.5.3" ]
+
             - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
             - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
             #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
@@ -150,6 +151,12 @@
 			
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
+
+            - [ requireJs, sv-comp-form-tabs, "@FCom_AdminSPA/AdminSPA/vue/component/form/tabs" ]
+            - [ requireJs, sv-comp-form-tabs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/tabs.html" ]
+
+            - [ requireJs, sv-comp-form-actions, "@FCom_AdminSPA/AdminSPA/vue/component/form/actions" ]
+            - [ requireJs, sv-comp-form-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/actions.html" ]
 
             - [ requireJs, sv-comp-form-field, "@FCom_AdminSPA/AdminSPA/vue/component/form/field" ]
             - [ requireJs, sv-comp-form-field-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/field.html" ]

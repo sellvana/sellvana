@@ -518,12 +518,14 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                     };
                 },
                 computed: {
-                    thumbUrl: function () {
-                        return this.form && this.form.thumb ? this.form.thumb.thumb_url : '';
+                    formTitle: function () {
+                        return this.form && this.form.config && this.form.config.title || '';
                     },
-
+                    thumbUrl: function () {
+                        return this.form && this.form.config && this.form.config.thumb_url || '';
+                    },
                     formTabs: function () {
-                        return this.form && this.form.config && this.form.config.tabs ? this.form.config.tabs : [];
+                        return this.form && this.form.config && this.form.config.tabs || [];
                     },
 
                     getOption: function () {
@@ -551,9 +553,17 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                     }
                 },
                 methods: {
-                    buttonAction: function (act) {
+                    doFormAction: function (act) {
                         if (act.method) {
                             this[act.method]();
+                            return;
+                        }
+                        switch (act.name) {
+                            case 'save': this.save(); break;
+                            case 'save-continue': this.saveAndContinue(); break;
+                            case 'delete': this.doDelete(); break;
+                            case 'back': this.goBack(); break;
+                            default: console.log('Invalid action: ', act);
                         }
                     },
 
@@ -561,7 +571,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                         this.save(true);
                     },
 
-                    switchTab: function (tab) {
+                    switchTab: function (tab) { // tab: object
                         this.tab = tab;
                         //this.$router.go({query: {tab: tab}});
                     },
@@ -597,7 +607,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                                 Vue.set(vm.form.config.tabs[i], 'component_config', arguments[i]);
                             }
                             if (!this.tab) {
-                                vm.switchTab(response.form.config.tabs[0].name);
+                                vm.switchTab(response.form.config.tabs[0]);
                             }
                         });
                         Vue.set(this, 'form', response.form);
@@ -626,12 +636,19 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
 
                             case 'tab_edited':
                                 for (var i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                                    if (this.form.config.tabs[i].name === args) {
+                                    if (this.form.config.tabs[i].name === args.name) {
                                         this.form.config.tabs[i].edited = true;
                                     }
                                 }
                                 break;
 
+                        }
+                    },
+                    processActionEvent: function (type, args) {
+                        switch (type) {
+                            case 'do_action':
+                                this.doFormAction(args);
+                                break;
                         }
                     },
 
