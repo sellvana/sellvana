@@ -8,7 +8,7 @@
                         <button class="f-icon-button" @click="collapseAll()" title="collapse all">
                               <svg width="20" height="19" v-html="svgIconLink('icon-collapse')"></svg>
                         </button>
-                        <button class="button-lock" :class="{open:ddOpen('root-lock')}" @click.prevent.stop="ddToggle('root-lock')">
+                        <button class="f-icon-button" :class="{open:ddOpen('root-lock')}" @click.prevent.stop="ddToggle('root-lock')" title="lock tree">
                               <i class="fa fa-lock" aria-hidden="true"></i><i class="fa fa-unlock" aria-hidden="true"></i></button>
                   </div>
                   <sv-comp-tree :tree="tree" :cur-node="curNode" tree-id="categories" @event="treeEvent"></sv-comp-tree>

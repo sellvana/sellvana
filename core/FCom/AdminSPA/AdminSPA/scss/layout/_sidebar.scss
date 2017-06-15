@@ -245,7 +245,10 @@
 			}
 		}
 	/*}*/
-
+	.nav__icon {
+		margin-top: 1px;
+		display: inline-block;
+	}
 }
 .main-nav-closed {
 	.account-menu {
