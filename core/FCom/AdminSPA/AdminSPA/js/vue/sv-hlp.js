@@ -649,6 +649,9 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                             case 'do_action':
                                 this.doFormAction(args);
                                 break;
+                            case 'form_action':
+                                this.doFormAction(args);
+                                break;
                         }
                     },
 
