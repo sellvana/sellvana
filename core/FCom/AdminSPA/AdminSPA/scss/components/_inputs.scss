@@ -35,6 +35,9 @@ input[type=number] {
 	.f-input, .f-input-number, .f-textarea {
 		display: table-cell;
 	}
+	.select2-container {
+		width: 100% !important;
+	}
 }
 
 .f-form-group__addon {
@@ -71,6 +74,7 @@ input[type=number] {
 	border-radius: 5px 0 0 5px;
 	span {
 		color: #000;
+		font-size: 13px;
 	}
 }
 
@@ -99,10 +103,13 @@ input[type=number] {
 	color: #2e4354;
 	display: inline-block;
 	width: 100%;
+	font-size: 13px;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
 	&:hover {
 		color: #000;
 	}
 }
+
 
 .f-form-group-btn {
 	display: table-cell;
@@ -222,14 +229,16 @@ input[type=number] {
 }
 
 .f-input {
-	font-size: 12px;
+	font-size: 13px;
 	padding: 9px 12px;
+	max-height: 34px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: solid 1px #d0dae3;
 	height: auto;
 	width: 100%;
-	color: #474646;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	color: #333;
 	&:hover,
 	&:focus,
 	&:active {
@@ -239,20 +248,25 @@ input[type=number] {
 		border-color: #9eaab3;
 	}
 }
-
 .f-translate-block__input, .f-translate-block__textarea, .f-translate-block__number {
 	width: calc(100% - 40px);
 }
-
+.f-date {
+	font-size: 13px;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	color: #333;
+}
 .f-input-number {
-	font-size: 12px;
+	font-size: 13px;
 	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: solid 1px #d0dae3;
 	height: auto;
 	width: 100%;
-	color: #474646;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	color: #333;
+	max-height: 34px;
 	&:hover,
 	&:focus,
 	&:active {
@@ -264,14 +278,15 @@ input[type=number] {
 }
 
 .f-textarea {
-	font-size: 12px;
+	font-size: 13px !important;
 	padding: 9px 12px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: solid 1px #d0dae3;
 	resize: vertical;
 	width: 100%;
-	color: #474646;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	color: #333;
 	&:hover,
 	&:focus,
 	&:active {
@@ -403,7 +418,8 @@ input[type=number] {
 }
 
 .f-selector-dropdown__label {
-	color: #2e4354;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
+	color: #333;
 	font-weight: normal;
 	display: inline-block;
 	padding: 0;
@@ -450,6 +466,7 @@ input[type=number] {
 		margin-bottom: 0;
 		clear: both;
 		line-height: 1.42857;
+		font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
 		color: #333;
 		white-space: nowrap;
 		font-size: 13px;
