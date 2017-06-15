@@ -28,11 +28,7 @@
       display: inline-block;
       font-size: 13px;
       border-radius: 5px;
-      box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
       font-weight: bold;
-      &:active {
-              box-shadow: inset 0 7px 13px rgba(0, 0, 0, .24);
-      }
       &:focus {
             outline: none;
       }
@@ -58,6 +54,7 @@
 .button1 {
       background-color: #ff9000;
       border: 1px solid #d67d0b;
+      box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
       color: #fff;
       span {
             color: #fff;
@@ -79,6 +76,7 @@
 .button2 {
       background-color: #fff;
       border: solid 1px #d67d0b;
+      box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
       color: #ff8f00;
       span {
             color: #ff8f00;
@@ -99,10 +97,34 @@
       }
 }
 
+.button4 {
+      background-color: rgba(255, 255, 255, 1);
+      border: 1px solid #aba7a7;
+      color: #6a6c6d;
+      box-shadow: 1px 2px 0 0 rgba(177, 175, 174, 0.5);
+      span {
+            color: #6a6c6d;
+      }
+      &:active {
+            background-color: #d40017;
+            border: 1px solid #ff2b42;
+            color: #fff;
+            box-shadow: 1px 2px 0 0 rgba(177, 175, 174, 0.5), inset 2px 2px 3px 0 rgba(44, 42, 42, 0.5);
+      }
+      &:hover {
+            background-color: #ff2b42;
+            border: 1px solid #da1429;
+            color: #fff;
+      }
+}
+
+
+
 .button5 {
       background-color: #dde4ea;
       color: #2e4354;
       font-weight: normal;
+      box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
       border-radius: 5px;
       span {
             color: #2e4354;
@@ -120,6 +142,7 @@
       background-color: #ff2b42;
       font-weight: bold;
       border: 1px solid #ff2b42;
+      box-shadow: 1px 2px 0 0 rgba(211, 111, 23, 0.5);
       color: #fff;
       span {
             color: #fff;
@@ -390,7 +413,7 @@
       }
 }
 
-.button-lock {
+/*.button-lock {
       border: 0;
       background: none;
       padding: 8px 7px;
@@ -415,7 +438,7 @@
                   display: inline-block;
             }
       }
-}
+}*/
 .f-icon-button {
       border: 2px solid #d67d0b;
       border-radius: 5px;
@@ -428,6 +451,24 @@
       }
       &:active {
             box-shadow: inset 0 7px 13px rgba(0, 0, 0, .24);
+      }
+      .fa-lock {
+            display: inline-block;
+            color: #ff9000;
+            font-size: 22px;
+      }
+      .fa-unlock {
+            display: none;
+            color: #ff9000;
+            font-size: 22px;
+      }
+      &.open {
+            .fa-lock {
+                  display: none;
+            }
+            .fa-unlock {
+                  display: inline-block;
+            }
       }
 }
 
