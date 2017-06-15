@@ -27,7 +27,43 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                     vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(vm.form.inventory.inventory_sku);
                 });
-			}
+			},
+            doDelete: function () {
+                var vm = this;
+                if (!confirm(SvHlp._('Are you sure you want to delete this inventory?'))) {
+                    return;
+                }
+                this.sendRequest('POST', 'inventory/form_delete', {id: this.form.inventory.id}, function (response) {
+                    if (response.status) {
+                        vm.$router.go(-1);
+                    }
+                });
+            },
+            save: function (stayOnPage) {
+                var vm = this;
+                this.action_in_progress = stayOnPage ? 'save-continue' : 'save';
+
+                if (!this.validateForm()) {
+                    vm.action_in_progress = false;
+                    return;
+                }
+                this.sendRequest('POST', 'inventory/form_data?id=' + this.form.inventory.id, this.form.inventory, function (response) {
+                    if (response.form) {
+                        vm.processFormDataResponse(response);
+                        vm.updateBreadcrumbs(vm.form.inventory.inventory_sku);
+                    }
+                    for (var i in response.form) {
+                        //Vue.set(vm.form, i, response.form[i]);
+                    }
+                    if (!vm.form.updates) {
+                        //Vue.set(vm.form, 'updates', {});
+                    }
+                    if (!stayOnPage) {
+                        vm.$router.go(-1);
+                    }
+                    vm.action_in_progress = false;
+                })
+            }
 		}
     };
 });

@@ -191,7 +191,7 @@
 	z-index: 5;
 	overflow: visible;
 	.nav.nav-stacked li .nav.nav-stacked li a {
-		padding: 13px 15px 13px 60px;
+		padding: 14px 15px 14px 60px;
 	}
 	.nav.nav-stacked {
 		.nav.nav-stacked  {
@@ -245,7 +245,17 @@
 			}
 		}
 	/*}*/
+
 }
+.main-nav-closed {
+	.account-menu {
+		.f-dropdown__toggle {
+			font-size: 0;
+		}
+	}
+}
+
+
 .user-menu {
 	.dropdown-menu {
 		top: -100%;

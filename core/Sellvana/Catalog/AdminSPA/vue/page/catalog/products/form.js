@@ -29,12 +29,13 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                 });
 			},
 			doDelete: function () {
+                var vm = this;
 				if (!confirm(SvHlp._('Are you sure you want to delete this product?'))) {
 					return;
 				}
 				this.sendRequest('POST', 'products/form_delete', {id: this.form.product.id}, function (response) {
-					if (!response.ok) {
-
+					if (response.status) {
+                        vm.$router.go(-1);
 					}
 				});
 			},
@@ -46,7 +47,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                     vm.action_in_progress = false;
 					return;
 				}
-				this.sendRequest('POST', 'products/form_data?id=' + this.form.product.id, this.form.updates, function (response) {
+				this.sendRequest('POST', 'products/form_data?id=' + this.form.product.id, this.form.product, function (response) {
 					if (response.form) {
                         vm.processFormDataResponse(response);
                         vm.updateBreadcrumbs(vm.form.product.product_name);
