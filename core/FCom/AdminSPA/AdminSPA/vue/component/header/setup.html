@@ -1,12 +1,15 @@
 <li class="f-header__navbar__item f-dropdown f-header__setup-block" :class="{open:ddOpen('header__setup-block')}">
-    <a href="#" :title="'Setup Progress: {percent}%'|_({percent:setup.progress})" class="f-dropdown__toggle f-header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header__setup-block')">
-        <div class="setup-progress-label">{{ 'Setup Progress: {percent}%'|_({percent:setup.progress}) }}</div>
-        <div class="setup-progress-container"><div class="setup-progress-bar" :style="{width:setup.progress+'%'}"></div></div>
-    </a>
-    <ul class="f-dropdown__menu">
-        <li v-for="step in setup.steps" :class="{done: step.done}" class="f-dropdown__menu__item">
-            <router-link :to="step.link" class="f-dropdown__menu__link"><i :class="step.icon_class" aria-hidden="true"></i> {{step.label}}</router-link>
-            <a v-if="step.done" href="#" @click.prevent.stop class="f-dropdown__item__act"><i class="fa fa-check"></i></a>
-        </li>
-    </ul>
+           <a href="#" :title="'Setup Progress: {percent}%'|_({percent:setup.progress})" class="f-dropdown__toggle f-header__navbar__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('header__setup-block')">
+            <div class="setup-progress-label" class="hidden-xs">{{ 'Setup Progress: {percent}%'|_({percent:setup.progress}) }}</div>
+            <div class="setup-progress-container"><div class="setup-progress-bar" :style="{width:setup.progress+'%'}"></div></div>
+            <div class="f-header__navbar__link-icon">
+               <svg width="20" height="19" v-html="svgIconLink('icon-progress')" class="visible-xs"></svg>
+            </div>
+        </a>
+        <ul class="f-dropdown__menu">
+            <li v-for="step in setup.steps" :class="{done: step.done}" class="f-dropdown__menu__item">
+                <router-link :to="step.link" class="f-dropdown__menu__link"><i :class="step.icon_class" aria-hidden="true"></i> {{step.label}}</router-link>
+                <a v-if="step.done" href="#" @click.prevent.stop class="f-dropdown__item__act"><i class="fa fa-check"></i></a>
+            </li>
+        </ul>
 </li>

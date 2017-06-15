@@ -55,8 +55,8 @@
             </div>
       </div>
       <div class="row">
-            <div class="col-lg-12">
-                  <ul class='f-horizontal-menu visible-lg visible-md'>
+            <!--<div class="col-lg-12">
+                &lt;!&ndash;  <ul class='f-horizontal-menu visible-lg visible-md'>
                         <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
                               <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a>
                         </li>
@@ -65,13 +65,18 @@
                         <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
                               <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
                                     menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                              <ul class="f-action-button-b__menu">
+                              <ul class="f-action-button-b__menu f-menu_right">
                                     <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
                                           <a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link">{{t.label|_}}<span v-if="t.counter" class="tab-counter">{{t.counter}}</span></a>
                                     </li>
                               </ul>
                         </div>
-                  </div>
+                  </div>&ndash;&gt;
+            </div>-->
+            <div class="col-lg-12">
+                  <sv-comp-form-tabs :form="form" :tab="tab" container-class="col-xs-6" @event="processTabEvent"></sv-comp-form-tabs>
+
+                  <sv-comp-form-actions :form="form" container-class="col-xs-6" @event="processActionEvent"></sv-comp-form-actions>
             </div>
             <div class="col-lg-12 ">
                   <!--<div class="f-buttons-block text-right">

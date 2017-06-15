@@ -24,13 +24,12 @@
                         <svg class="icon-close" width="24" height="24"
                              v-html="svgIconLink('icon-close')"></svg>
                   </a>
-                  <div class="f-breadcrumbs-block">
-                        <sv-comp-header-breadcrumbs
-                        :mobile="false"></sv-comp-header-breadcrumbs>
+                  <div class="f-breadcrumbs-block hidden-xs">
+                        <sv-comp-header-breadcrumbs :mobile="false"></sv-comp-header-breadcrumbs>
                   </div>
-                  <div class="pull-right">
-                        <sv-comp-header-search></sv-comp-header-search>
+                  <div class="f-main-menu">
                         <ul class="f-header__navbar">
+                              <li class="f-header__navbar__item"> <sv-comp-header-search></sv-comp-header-search></li>
                               <sv-comp-header-setup></sv-comp-header-setup>
                               <sv-comp-header-favorites></sv-comp-header-favorites>
                               <li class="f-header__navbar__item f-header__settings-block">

@@ -16,43 +16,18 @@
       </div>
       <div class="col-sm-12 col-md-8 col-lg-10">
             <div class="row">
-                  <div class="col-xs-6">
-                        <ul class="f-horizontal-menu visible-lg visible-md">
-                              <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-horizontal-menu__item">
-                                    <a href="#" @click.prevent="switchTab(t.name)" class="f-horizontal-menu__link">{{t.label|_}}</a></li>
-                        </ul>
-                        <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
-                              <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
-                                    <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
-                                          menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
-                                    <ul class="f-action-button-b__menu">
-                                          <li v-for="t in form.config.tabs" :class="{active:tab === t.name}" class="f-action-button-b__item">
-                                                <a href="#" @click.prevent="switchTab(t.name)" class="f-action-button-b__link">{{t.label|_}}</a></li>
-                                    </ul>
-                              </div>
-                        </div>
-                  </div>
-                  <div class="col-xs-6">
-                        <div class="f-buttons-block text-right visible-lg visible-md">
-                              <button type="button" class="button button2" @click="goBack()">{{'Back'|_}}</button>
-                              <button type="button" class="button button2" @click="doDelete()">{{'Delete'|_}}</button>
-                              <button type="button" class="button button1" @click="save()">{{'Save Category Changes'|_}}</button>
-                        </div>
-                        <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
-                              <div class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open')}">
-                                    <button type="button" class="button button1 f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')">
-                                          {{'Actions'|_}}
-                                    </button>
-                                    <ul class="f-dropdown__menu">
-                                          <li><a href="#" @click="goBack()" class="button button2">{{'Back'|_}}</a></li>
-                                          <li><a href="#" @click="doDelete()" class="button button2">{{'Delete'|_}}</a></li>
-                                          <li><a href="#" @click="save()" class="button button1">{{'Save'|_}}</a></li>
-                                          <li><a href="#" @click="save(true)" class="button button1">{{'Save and Continue'|_}}</a></li>
-                                    </ul>
-                              </div>
-                        </div>
+                  <div class="col-xs-12">
+                       <sv-comp-form-tabs :form="form" :tab="tab" container-class="col-xs-6" @event="processTabEvent"></sv-comp-form-tabs>
+                       <sv-comp-form-actions :form="form" container-class="col-xs-6" @event="processActionEvent"></sv-comp-form-actions>
                   </div>
             </div>
-            <component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>
+
+
+            <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+
+       <!--     <component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>-->
+
+
+          <!--  <component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab" @event="processTabEvent"></component>-->
       </div>
 </div>
