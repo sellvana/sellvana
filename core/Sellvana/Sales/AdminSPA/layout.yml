@@ -105,7 +105,7 @@
             - [ addNav, { path: /reports/sales/product-history, label: Product History, link: /sales/reports/product-history, pos: 130 } ]
 
             - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl, json!sv-page-sales-orders-grid-config ] } ]
-            - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-sales-orders-form-tpl ] } ]
+            - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-default-form-tpl ] } ]
 
 
 /sales/orders/form:
