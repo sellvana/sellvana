@@ -45,6 +45,7 @@ define(['lodash', 'vue', 'text!sv-comp-form-translations-tpl'], function (_, Vue
             },
             close: function () {
                 this.$emit('event', 'close');
+                this.$store.commit('overlay', false);
             }
         },
         created: function () {
@@ -69,6 +70,11 @@ define(['lodash', 'vue', 'text!sv-comp-form-translations-tpl'], function (_, Vue
                     this.$emit('event', 'update', {field: this.field, translations: translations});
                 },
                 deep: true
+            },
+            '$store.state.ui.overlayActive': function (overlayActive) {
+                if (!overlayActive) {
+                    this.$emit('event', 'close');
+                }
             }
         }
     };
