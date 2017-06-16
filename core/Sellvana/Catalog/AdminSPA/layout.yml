@@ -40,6 +40,7 @@
             - [ requireJs, sv-page-catalog-inventory-form-main-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form/main.html" ]
             - [ requireJs, sv-page-catalog-inventory-form-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form/products" ]
             - [ requireJs, sv-page-catalog-inventory-form-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/form/products.html" ]
+            - [ requireJs, sv-page-catalog-inventory-form-products-config, "~/inventory/form/products/grid_config" ]
 
             - [ requireJs, sv-page-catalog-categories, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/index" ]
             - [ requireJs, sv-page-catalog-categories-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/index.html" ]
@@ -103,7 +104,7 @@
     - view: app
         do:
             - [ addFormTab, { path: /catalog/inventory/form, name: main, label: SKU Information, pos: 10 } ]
-            - [ addFormTab, { path: /catalog/inventory/form, name: products, label: Products, pos: 20 } ]
+            - [ addFormTab, { path: /catalog/inventory/form, name: products, label: Products SKU, pos: 20 } ]
 
 
 /catalog/categories/form:
