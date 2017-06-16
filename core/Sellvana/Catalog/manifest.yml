@@ -46,7 +46,8 @@ modules:
                     - [ /catalog/searchalias, Sellvana_Catalog_Admin_Controller_SearchAlias.index ]
                     - [ /catalog/searchalias/.action, Sellvana_Catalog_Admin_Controller_SearchAlias ]
 
-                    - [ "/catalog/inventory/?.action", Sellvana_Catalog_Admin_Controller_Inventory ]
+                    - [ /catalog/inventory, Sellvana_Catalog_Admin_Controller_Inventory.index ]
+                    - [ /catalog/inventory/?.action, Sellvana_Catalog_Admin_Controller_Inventory ]
 
                     - [ /catalog/report/inventory/search_terms/?.action, Sellvana_Catalog_Admin_Controller_Report_SearchTerms ]
                     - [ /catalog/report/inventory/product_orders_history/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory ]
@@ -95,6 +96,7 @@ modules:
                     - [ /products/?.action, Sellvana_Catalog_AdminSPA_Controller_Products ]
                     - [ /products/form/categories/?.action, Sellvana_Catalog_AdminSPA_Controller_Products_Categories ]
                     - [ /inventory/?.action, Sellvana_Catalog_AdminSPA_Controller_Inventory ]
+                    - [ /inventory/form/products/?.action, Sellvana_Catalog_AdminSPA_Controller_Inventory_Products ]
                 observe:
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Catalog_AdminSPA_Controller_Products.onHeaderSearch ]
 

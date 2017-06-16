@@ -10,9 +10,9 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
     public function getGridConfig()
     {
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
-        $bool = [0 => 'no', 1 => 'Yes'];
         $backorderOptions = $invHlp->fieldOptions('allow_backorder');
         $packOptions = $invHlp->fieldOptions('pack_separate');
+
         return [
             'id' => 'inventory',
             'data_url' => 'inventory/grid_data',
@@ -78,6 +78,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
     public function getFormData()
     {
         $pId = $this->BRequest->get('id');
+        $bool = [0 => 'no', 1 => 'Yes'];
 
         $inventory = $this->Sellvana_Catalog_Model_InventorySku->load($pId);
         if (!$inventory) {
@@ -129,6 +130,9 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
             if (!$model) {
                 throw new BException("This item does not exist");
             }
+
+            var_dump($data);
+
             if ($data) {
                 $model->set($data);
             }
@@ -136,8 +140,10 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
             $origModelData = $modelData = $model->as_array();
             $validated = $model->validate($modelData, [], 'product');
             if ($modelData !== $origModelData) {
+                var_dump($modelData);
                 $model->set($modelData);
             }
+
 
             if ($validated) {
                 $model->save();
