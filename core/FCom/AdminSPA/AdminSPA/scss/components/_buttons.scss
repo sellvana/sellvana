@@ -310,8 +310,6 @@
 }
 .f-actions-dropdown {
       display: inline-block;
-      margin-bottom: 4px;
-      margin-left: 4px;
       .f-caret__elem {
             border-top: 4px solid #fff;
             border-right: 4px solid transparent;
@@ -352,8 +350,6 @@
 }
 .f-actions-dropdown-arrow {
       display: inline-block;
-      margin-bottom: 4px;
-      margin-left: 4px;
       .f-caret__elem {
             border-top: 4px solid #fff;
             border-right: 4px solid transparent;
@@ -506,6 +502,7 @@
 
 @media (max-width: 1023px) {
       .f-mobile-button {
+            padding: 5px 0;
             .f-actions-dropdown .button {
                   min-width: 160px;
             }
@@ -537,10 +534,10 @@
       }
       .f-mobile-button {
             .f-actions-dropdown .button {
-                  min-width: 100px;
+                  min-width: 85px;
             }
             .f-action-button-b {
-                  min-width: 100px;
+                  min-width: 85px;
             }
       }
       .small-button {

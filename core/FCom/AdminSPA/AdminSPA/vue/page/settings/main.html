@@ -1,7 +1,7 @@
 <div>
       <div class="row">
             <div class="col-md-4 col-xs-6">
-                  <ul class="f-buttons-block f-horizontal-menu f-dropdown visible-lg visible-md">
+                  <ul class="f-horizontal-menu f-dropdown visible-lg visible-md">
                         <li v-for="l1 in settings.config.nav" class="f-dropdown f-horizontal-menu__item" :class="{open:ddOpen('settings/' + l1.path)}">
                               <a href="#" :title="l1.label" class="f-dropdown__toggle f-horizontal-menu__link" data-toggle="dropdown" @click.prevent.stop="ddToggle('settings/' + l1.path)">{{l1.label}}
                                     <!--<i class="fa fa-caret-down f-horizontal-menu__icon" aria-hidden="true"></i>-->

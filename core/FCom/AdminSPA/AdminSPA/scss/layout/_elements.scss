@@ -297,6 +297,19 @@ a:focus {
 		border-color: #ff8f00;
 	}
 }
+.f-control-panel {
+	display: table;
+	width: 100%;
+}
+.f-tabs-container, .f-actions-container {
+	display: table-cell;
+	vertical-align: bottom;
+}
+.f-actions-container {
+	text-align: right;
+	white-space: nowrap;
+	padding: 0 0 10px;
+}
 .overlay {
 	opacity: 0;
 	visibility: hidden;
@@ -308,9 +321,13 @@ a:focus {
 	background: rgba(0, 0, 0, 0.5);
 	z-index: 99;
 	transition: opacity 0.3s ease-in;
-	&.active {
-		opacity: 1;
-		visibility: visible;
+}
+@media (max-width: 1365px) {
+	.overlay {
+		&.active {
+			opacity: 1;
+			visibility: visible;
+		}
 	}
 }
 /*.ps__scrollbar-y-rail {
@@ -350,6 +367,12 @@ a:focus {
 		transform: translateX(-50%);
 	}
 }
+
+@media (max-width: 991px) {
+	.f-actions-container {
+		padding: 0;
+	}
+}
 @media (max-width: 767px) {
 	.secondary-control-block {
 		float: none;
@@ -365,9 +388,6 @@ a:focus {
 		width: 100%;
 		max-width: 300px;
 	}
-	/*.f-content-block {
-		padding: 5px;
-	}*/
 	.f-grid-wrapper {
 		padding: 0;
 	}
