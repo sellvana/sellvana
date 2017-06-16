@@ -305,6 +305,9 @@ a:focus {
 	display: table-cell;
 	vertical-align: bottom;
 }
+.f-tabs-container {
+	overflow: auto;
+}
 .f-actions-container {
 	text-align: right;
 	white-space: nowrap;

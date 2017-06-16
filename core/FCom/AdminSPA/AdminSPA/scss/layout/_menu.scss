@@ -2,6 +2,10 @@
 	margin: 0;
 	padding: 0;
 	white-space: nowrap;
+	width: 75%;
+	min-width: 500px;
+	overflow: auto;
+	position: relative;
 	.f-horizontal-menu__dropdown-menu {
 		display: none;
 		padding: 0;
@@ -34,9 +38,23 @@
 		.f-dropdown__toggle {
 			padding: 8px 30px;
 		}
-
+	}
+	&:after {
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 35px;
+		width: 50px;
+		z-index: 1;
+		content: '';
+		pointer-events: none;
+		background: linear-gradient(to left, #f1f1f1, rgba(248,247,238,0));
+		visibility: visible;
+		opacity: 1;
+		transition: opacity .3s 0s, visibility 0s 0s;
 	}
 }
+
 .f-horizontal-menu__link {
 	color: #2e4354;
 	padding: 8px 20px 8px 20px;

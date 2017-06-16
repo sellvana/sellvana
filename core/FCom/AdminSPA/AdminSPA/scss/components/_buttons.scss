@@ -263,6 +263,10 @@
       &.active {
             color: #020202;
             font-weight: bold;
+            background: #eee;
+            .f-action-button-b__link {
+                  font-weight: bold;
+            }
       }
       &:hover {
             background-color: #d8d8d8;
@@ -500,7 +504,7 @@
       left: inherit;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 991px) {
       .f-mobile-button {
             padding: 5px 0;
             .f-actions-dropdown .button {
@@ -509,6 +513,10 @@
             .f-action-button-b {
                   min-width: 160px;
             }
+      }
+      .f-tabs-container, .f-actions-container {
+
+            vertical-align: top;
       }
 }
 @media (max-width: 767px) {
@@ -529,9 +537,6 @@
       /*.f-action-button-b__toggle {
             font-size: 12px;
       }*/
-      .f-action-button-b__link {
-            font-size: 12px;
-      }
       .f-mobile-button {
             .f-actions-dropdown .button {
                   min-width: 85px;
