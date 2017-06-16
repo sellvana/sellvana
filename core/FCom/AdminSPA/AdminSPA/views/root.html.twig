@@ -23,7 +23,7 @@
         </div>
     </main>
     <sv-comp-messages></sv-comp-messages>
-    <div class="overlay" id="overlay"></div>
+    <div class="overlay" id="overlay" :class="{active:ui.overlayActive}" @click="$store.commit('overlay', false)"></div>
 </div>
 {% endverbatim %}
 </body>

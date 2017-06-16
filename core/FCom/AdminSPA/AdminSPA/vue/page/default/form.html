@@ -5,11 +5,14 @@
             <p class="f-form-title__text" :class-bak="{'hidden-xs':!thumbUrl}">{{formTitle|_}}</p>
         </div>
     </div>
+    <div class="col-lg-12">
+        <div class="f-control-panel">
 
-    <sv-comp-form-tabs :form="form" :tab="tab" container-class="col-xs-6" @event="processTabEvent"></sv-comp-form-tabs>
+            <sv-comp-form-tabs :form="form" :tab="tab" container-class="f-tabs-container" @event="processTabEvent"></sv-comp-form-tabs>
 
-    <sv-comp-form-actions :form="form" container-class="col-xs-6" @event="processActionEvent"></sv-comp-form-actions>
-
+            <sv-comp-form-actions :form="form"  container-class="f-actions-container" @event="processActionEvent"></sv-comp-form-actions>
+        </div>
+    </div>
     <div class="col-xs-12">
         <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
     </div>

@@ -99,11 +99,13 @@ body {
             }
       }
 }
+
 .f-dropdown__toggle {
       color: #000;
       padding-right: 20px;
       display: inline-block;
 }
+
 .f-dropdown__menu {
       padding: 0;
       position: absolute;
@@ -115,7 +117,7 @@ body {
       list-style: none;
       text-align: left;
       background-color: #ffffff;
-      border:  solid 1px #d0dae3;
+      border: solid 1px #d0dae3;
 }
 
 .f-dropdown__menu__item {
@@ -272,6 +274,7 @@ body {
 }
 
 .f-header__setup-block {
+      position: relative;
       .f-header__navbar__link {
             color: #fff;
             padding: 12px 10px;
@@ -386,6 +389,10 @@ body {
       display: none;
 }
 
+.f-main-menu {
+      float: right;
+}
+
 @media (max-width: 1365px) {
       .f-header__navbar-toggle {
             margin: 0 0 0 35px;
@@ -406,6 +413,7 @@ body {
             width: 100px;
       }
 }
+
 @media (max-width: 1279px) {
       .f-header__setup-block {
             .f-header__navbar__link {
@@ -418,11 +426,28 @@ body {
             }
       }
 }
+
 @media (max-width: 767px) {
+      .f-main-menu {
+            float: none;
+            width: calc(100% - 37px);
+            display: inline-block;
+      }
+      .f-header__navbar {
+            width: 100%;
+            text-align: right;
+            font-size: 0;
+      }
       .f-admin-header {
             padding: 0;
             .f-dropdown {
                   position: static;
+            }
+            .f-header__setup-block {
+                  position: relative;
+                  &.open {
+                        position: static;
+                  }
             }
       }
       .f-header__logo {
@@ -435,11 +460,15 @@ body {
       .f-header__navbar__item {
             border-left: solid 1px rgba(255, 255, 255, 0.14);
             position: static;
+            width: 19%;
+            font-size: 13px;
       }
       .f-header__navbar__link {
             font-size: 12px;
-            padding: 14px 5px;
+            padding: 16px 15px 15px;
             border-left: solid 1px rgba(255, 255, 255, 0.14);
+            width: 100%;
+            text-align: center;
             svg {
                   fill: #fff;
                   stroke: #fff;
@@ -464,7 +493,7 @@ body {
       .f-header__notification-block {
             .f-dropdown__menu {
                   &:before {
-                        right: 20px;
+                        right: 29px;
                   }
             }
       }
@@ -472,25 +501,39 @@ body {
       .f-header__setup-block {
             .f-dropdown__menu {
                   &:before {
-                        right: 140px;
+                        right: 58%;
                   }
             }
             .f-header__navbar__link {
-                  padding: 12px 8px 13px;
+                  padding: 16px 15px 15px;
                   font-size: 12px;
+                  text-align: center;
+                  .setup-progress-container {
+                        width: 100%;
+                        margin: 0 auto;
+                        position: absolute;
+                        left: 0;
+                        bottom: -1px;
+                        height: 3px;
+                        border-radius: 0;
+                  }
             }
+
+      }
+      .f-header__navbar__link-icon {
+            display: inline-block;
       }
       .f-header__favorites-block {
             .f-dropdown__menu {
                   &:before {
-                        right: 90px;
+                        right: 44%;
                   }
             }
       }
 
       .f-header__search-block {
             position: static;
-            width: initial;
+            width: 100%;
             .f-dropdown__menu {
                   &:before {
                         content: '';
@@ -498,7 +541,7 @@ body {
                         top: -20px;
                         border: 10px solid transparent;
                         border-bottom: 10px solid #fff;
-                        right: 250px;
+                        right: 76%;
                   }
             }
             .f-input {
@@ -533,10 +576,6 @@ body {
             top: 60px;
       }
 
-      .setup-progress-container {
-            width: 70px;
-            margin: 0 auto;
-      }
       .button.button1.f-form-group-btn.f-header__search-block__button {
             position: absolute;
             right: 0;

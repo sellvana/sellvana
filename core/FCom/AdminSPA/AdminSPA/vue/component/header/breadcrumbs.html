@@ -8,8 +8,9 @@
       </li>
       <li class="f-breadcrumb__item">
             <a href="#" class="f-breadcrumb__item-favorite__link" :class="{on:isFavorite}" @click.prevent="toggleFavorite()">
-                  <i class="fa fa-star-o" aria-hidden="true"></i>
-                  <i class="fa fa-star" aria-hidden="true"></i>
+                 <!-- <i class="fa fa-star-o" aria-hidden="true"></i>
+                  <i class="fa fa-star" aria-hidden="true"></i>-->
+                  <svg width="17" height="15" v-html="svgIconLink('icon-star2')"></svg>
             </a>
       </li>
 </ul>

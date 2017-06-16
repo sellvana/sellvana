@@ -60,21 +60,33 @@
       .fa-star {
             display: none;
       }
+      svg {
+            fill: none;
+            stroke: #fff;
+      }
       &:hover {
             color: #fff;
-            .fa-star-o {
+          /*  .fa-star-o {
                   display: none;
             }
             .fa-star {
                   display: inline-block;
+            }*/
+            svg {
+                  fill: #fff;
+                  stroke: #fff;
             }
       }
       &.on {
-            .fa-star-o {
+            /*.fa-star-o {
                   display: none;
             }
             .fa-star {
                   display: inline-block;
+            }*/
+            svg {
+                  fill: #fff;
+                  stroke: #fff;
             }
       }
 }
@@ -127,12 +139,48 @@
             }
       }
       .f-breadcrumb__item-favorite__link {
-            color: #000;
+           /* color: #000;
             &:focus {
-                  color: #000;
+                  color: inherit;
             }
             &:hover {
-                  color: #000;
+                  color: inherit;
+            }
+            &.on {
+                  &:focus {
+                        color: #000;
+                  }
+                  &:hover {
+                        color: #000;
+                  }
+            }*/
+            svg {
+                  fill: none;
+                  stroke: #000;
+            }
+            &:hover, &:focus {
+                 svg {
+                        fill: none;
+                        stroke: #000;
+                  }
+            }
+            &.on {
+                  /*.fa-star-o {
+                        display: none;
+                  }
+                  .fa-star {
+                        display: inline-block;
+                  }*/
+                  svg {
+                        fill: #000;
+                        stroke: #000;
+                  }
+                  &:hover, &:focus {
+                        svg {
+                              fill: #000;
+                              stroke: #000;
+                        }
+                  }
             }
       }
 }

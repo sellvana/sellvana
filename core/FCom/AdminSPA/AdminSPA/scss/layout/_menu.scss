@@ -1,6 +1,7 @@
 .f-horizontal-menu {
 	margin: 0;
 	padding: 0;
+	white-space: nowrap;
 	.f-horizontal-menu__dropdown-menu {
 		display: none;
 		padding: 0;
@@ -60,7 +61,8 @@
 		.f-horizontal-menu__link {
 			background: #fff;
 			font-weight: bold;
-			padding: 8px 20px;
+			padding: 10px 21px 9px 21px;
+			border: 0;
 		}
 		.f-horizontal-menu__dropdown {
 			display: block;

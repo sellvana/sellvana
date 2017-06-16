@@ -252,6 +252,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
             state: {
                 ddCurrent: false,
                 mainNavOpen: true,
+                overlayActive: false,
                 windowWidth: null,
                 pageClickCounter: 0
             },
@@ -268,6 +269,9 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                 windowResize: function (state, width) {
                     state.windowWidth = width;
                     state.mainNavOpen = width > 1024;
+                },
+                overlay: function (state, active) {
+                    state.overlayActive = active;
                 }
             }
         });
@@ -846,8 +850,10 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                     toggleTranslations: function (field) {
                         if (this.i18n_field && this.i18n_field.name === name) {
                             this.i18n_field = false;
+                            store.commit('overlay', false);
                         } else {
                             this.i18n_field = field;
+                            store.commit('overlay', true);
                         }
                     },
                     processTranslationsEvent: function (type, args) {
