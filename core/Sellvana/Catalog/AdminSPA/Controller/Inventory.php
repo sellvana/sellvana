@@ -146,10 +146,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
 
 
             if ($validated) {
-                var_dump($model->getAllowBackorder());
                 $model->save();
-                var_dump($model->getAllowBackorder());
-                die;
                 $result = $this->getFormData();
                 $result['form'] = $this->normalizeFormConfig($result['form']);
                 $this->ok()->addMessage('Inventory was saved successfully', 'success');
