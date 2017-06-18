@@ -2,10 +2,10 @@
 
 /**
  * Class Sellvana_CatalogFields_Admin_Controller_FieldSets
- * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
- * @property Sellvana_CatalogFields_Model_SetField $Sellvana_CatalogFields_Model_SetField
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_Fieldset $FCom_Core_Model_Fieldset
+ * @property FCom_Core_Model_FieldsetField $FCom_Core_Model_FieldsetField
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  */
 class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Controller_Abstract
 {
@@ -13,8 +13,8 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
     public function fieldSetsGridConfig()
     {
-        $orm = $this->Sellvana_CatalogFields_Model_Set->orm('s')->select('s.*')
-            ->select('(select count(*) from ' . $this->Sellvana_CatalogFields_Model_SetField->table() . ' where set_id=s.id)', 'num_fields');
+        $orm = $this->FCom_Core_Model_Fieldset->orm('s')->select('s.*')
+            ->select('(select count(*) from ' . $this->FCom_Core_Model_FieldsetField->table() . ' where set_id=s.id)', 'num_fields');
 
 
         $config = [
@@ -113,7 +113,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 'id' => 'fieldset-modal-add-grid',
                 'caption' => 'Fields',
                 'data_url' => $this->BApp->href('catalogfields/fieldsets/fieldset_modal_add_grid_data'),
-                'orm' => 'Sellvana_CatalogFields_Model_Field',
+                'orm' => 'FCom_Core_Model_Field',
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30],
@@ -148,10 +148,10 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
     public function fieldsGridConfig()
     {
-        $fld = $this->Sellvana_CatalogFields_Model_Field;
-        $orm = $this->Sellvana_CatalogFields_Model_Field->orm('f')->select('f.*')
-            ->select('(select count(*) from ' . $this->Sellvana_CatalogFields_Model_FieldOption->table() . ' where field_id=f.id)', 'num_options')
-        ;
+        $fld = $this->FCom_Core_Model_Field;
+        $subSql = '(select count(*) from ' . $this->FCom_Core_Model_FieldOption->table() . ' where field_id=f.id)';
+        $orm = $this->FCom_Core_Model_Field->orm('f')->where('field_type', 'product')
+            ->select('f.*')->select($subSql, 'num_options');
 
         $config = [
             'config' => [
@@ -335,7 +335,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
             ]
         ];
 /*
-        $field = $this->Sellvana_CatalogFields_Model_Field->load($this->BRequest->get('field_id'));
+        $field = $this->FCom_Core_Model_Field->load($this->BRequest->get('field_id'));
         $swatchType = $field->get('swatch_type');
         if ($swatchType !== 'N') {
             switch ($swatchType) {
@@ -379,8 +379,8 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
     public function action_fieldset_modal_selected_grid_data()
     {
-        $orm = $this->Sellvana_CatalogFields_Model_SetField->orm('sf')
-            ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
+        $orm = $this->FCom_Core_Model_FieldsetField->orm('sf')
+            ->join('FCom_Core_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
             ->select(['f.id', 'f.field_name', 'f.field_code', 'sf.position'])
             ->where('sf.set_id', $this->BRequest->get('set_id'));
         //TODO check when rows count is over 10.(processORM paginate)
@@ -395,7 +395,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     {
         /** @var FCom_Core_View_BackboneGrid $view */
         $view = $this->view('core/backbonegrid');
-        $orm = $this->Sellvana_CatalogFields_Model_Field->orm()->select('*');
+        $orm = $this->FCom_Core_Model_Field->orm()->select('*');
         $data = $view->processORM($orm, __METHOD__);
         $this->BResponse->json([
             ['c' => $data['state']['c']],
@@ -417,7 +417,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
     public function action_field_option_grid_data()
     {
-        $orm = $this->Sellvana_CatalogFields_Model_FieldOption->orm('fo')->select('fo.*')
+        $orm = $this->FCom_Core_Model_FieldOption->orm('fo')->select('fo.*')
             ->where('field_id', $this->BRequest->get('field_id'));
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
         $this->BResponse->json([
@@ -429,7 +429,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     public function action_options()
     {
         $id = $this->BRequest->get('id');
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($id);
+        $options = $this->FCom_Core_Model_FieldOption->getFieldOptions($id);
 
         $this->BResponse->json(
             [
@@ -448,11 +448,11 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
             $field_ids = $data['field_ids'];
         }
 
-        $model = $this->Sellvana_CatalogFields_Model_SetField;
+        $model = $this->FCom_Core_Model_FieldsetField;
         switch ($r->post('oper')) {
             case 'add':
                 unset($data['id'], $data['oper'], $data['field_ids']);
-                $set = $this->Sellvana_CatalogFields_Model_Set->create($data)->save();
+                $set = $this->FCom_Core_Model_Fieldset->create($data)->save();
                 $result = $set->as_array();
                 $num_fields = 0;
                 if ($field_ids !== '') {
@@ -477,7 +477,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                         }
                     }
                 }
-                $set = $this->Sellvana_CatalogFields_Model_Set->load($data['id']);
+                $set = $this->FCom_Core_Model_Fieldset->load($data['id']);
                 unset($data['id'], $data['oper'], $data['field_ids']);
                 $set->set($data)->save();
                 $result = $set->as_array();
@@ -485,7 +485,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 $this->BResponse->json($result);
                 break;
             default:
-                $this->_processGridDataPost('Sellvana_CatalogFields_Model_Set');
+                $this->_processGridDataPost('FCom_Core_Model_Fieldset');
                 break;
         }
 
@@ -493,10 +493,10 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
     public function action_fieldset_modal_selected_grid_data__POST()
     {
-        //$this->_processPost('Sellvana_CatalogFields_Model_SetField', array('set_id'=>$this->BRequest->get('set_id')));
+        //$this->_processPost('FCom_Core_Model_FieldsetField', array('set_id'=>$this->BRequest->get('set_id')));
         //print_r($this->BRequest->request()); exit;
         $p = $this->BRequest->post();
-        $model = $this->Sellvana_CatalogFields_Model_SetField;
+        $model = $this->FCom_Core_Model_FieldsetField;
         $model->delete_many(['set_id' => (int)$p['set_id']]);
         if ($p['field_ids'] !== '') {
             foreach (explode(',', $p['field_ids']) as $i => $fId) {
@@ -509,16 +509,16 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     public function action_field_grid_data__POST()
     {
         //$this->BResponse->json(['success' => true, 'options' => $op]);
-        $this->_processGridDataPost('Sellvana_CatalogFields_Model_Field');
+        $this->_processGridDataPost('FCom_Core_Model_Field');
     }
 
     public function gridPostAfter($args)
     {
         if ($this->getAction() == 'field_grid_data') {
-            /** @var Sellvana_CatalogFields_Model_Field $model */
+            /** @var FCom_Core_Model_Field $model */
             $data = $args['data'];
             $model = $args['model'];
-            $hlp = $this->Sellvana_CatalogFields_Model_FieldOption;
+            $hlp = $this->FCom_Core_Model_FieldOption;
             $op = 0;
 
             // save options in case field is dropdown
@@ -570,7 +570,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     public function action_field_option_grid_data__POST()
     {
         $p = $this->BRequest->post();
-        $hlp = $this->Sellvana_CatalogFields_Model_FieldOption;
+        $hlp = $this->FCom_Core_Model_FieldOption;
         $op = 0;
 
         $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], '.id'))->find_many_assoc();
@@ -595,21 +595,21 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
             }
         }
         $this->BResponse->json(['success' => true, 'options' => $op]);
-        //$this->_processGridDataPost('Sellvana_CatalogFields_Model_FieldOption', array('field_id'=>$this->BRequest->get('field_id')));
+        //$this->_processGridDataPost('FCom_Core_Model_FieldOption', array('field_id'=>$this->BRequest->get('field_id')));
     }
 
     public function action_form()
     {
         $id = $this->BRequest->param('id', true);
         if ($id) {
-            $model = $this->Sellvana_CatalogFields_Model_Set->load($id);
+            $model = $this->FCom_Core_Model_Fieldset->load($id);
             if (empty($model)) {
                 $this->message('Invalid field set ID', 'error');
                 $this->BResponse->redirect('catalogfields/fieldsets');
                 return;
             }
         } else {
-            $model = $this->Sellvana_CatalogFields_Model_Set->create();
+            $model = $this->FCom_Core_Model_Fieldset->create();
         }
         $this->layout('/catalogfields/fieldsets/form');
         $view = $this->BLayout->getView('catalogfields/fieldsets/form');
@@ -624,9 +624,9 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
         try {
             if ($id) {
-                $model = $this->Sellvana_CatalogFields_Model_Set->load($id);
+                $model = $this->FCom_Core_Model_Fieldset->load($id);
             } else {
-                $model = $this->Sellvana_CatalogFields_Model_Set->create();
+                $model = $this->FCom_Core_Model_Fieldset->create();
             }
             $data['model'] = $this->BLocale->parseRequestDates($data['model'], 'from_date,to_date');
             $model->set($data['model']);
@@ -660,7 +660,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 throw new BException('Invalid field value');
             }
             $val = $p[$name];
-            $exists = $this->Sellvana_CatalogFields_Model_Field->orm()->where($name, $val)->find_one();
+            $exists = $this->FCom_Core_Model_Field->orm()->where($name, $val)->find_one();
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {
             $result = ['error' => $e->getMessage()];
@@ -681,7 +681,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 throw new BException('Invalid field value');
             }
             $val = $p[$name];
-            $exists = $this->Sellvana_CatalogFields_Model_Set->orm()->where($name, $val)->find_one();
+            $exists = $this->FCom_Core_Model_Fieldset->orm()->where($name, $val)->find_one();
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {
             $result = ['error' => $e->getMessage()];

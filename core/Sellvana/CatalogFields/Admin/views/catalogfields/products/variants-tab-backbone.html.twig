@@ -512,7 +512,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 <div class="well clearfix">
     <div class="pull-left" style="width: 245px">
         <select id="sel_var_field" class="form-control" style="width:150px;">
-            {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').getDropdowns()) | raw }}
+            {{ UTIL.optionsHtml(APP.instance('FCom_Core_Model_Field').getDropdowns()) | raw }}
         </select>
         <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
     </div>

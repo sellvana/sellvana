@@ -39,8 +39,8 @@ class FieldTest extends \Codeception\TestCase\Test
             'frontend_label' => "Feature C",
             "table_field_type" => "varchar(255)"
         ];
-        /** @var Sellvana_CatalogFields_Model_Field $field */
-        $field = Sellvana_CatalogFields_Model_Field::i()->create($data)->save();
+        /** @var FCom_Core_Model_Field $field */
+        $field = FCom_Core_Model_Field::i()->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_field');
 
@@ -60,7 +60,7 @@ class FieldTest extends \Codeception\TestCase\Test
             'frontend_label' => "Feature C",
             "table_field_type" => "varchar(255)"
         ];
-        $field = Sellvana_CatalogFields_Model_Field::i()->create($data)->save();
+        $field = FCom_Core_Model_Field::i()->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_field');
 
@@ -68,7 +68,7 @@ class FieldTest extends \Codeception\TestCase\Test
 
         $this->tester->seeNumRecords(2, 'fcom_field');
 
-        $field2 = Sellvana_CatalogFields_Model_Field::i()->load(2);
+        $field2 = FCom_Core_Model_Field::i()->load(2);
         BDb::i()->ddlClearCache();
         $fieldName = BDb::i()->ddlFieldInfo($field2->table(), $data['field_code']);
         $this->assertTrue(empty($fieldName), "Column not deleted");

@@ -108,9 +108,9 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             return;
         }
 
-        $dayRecent = ($this->BConfig->get('modules/Sellvana_Sales/recent_day')) ? $this->BConfig->get('modules/Sellvana_Sales/recent_day') : 7;
+        $dayRecent = $this->BConfig->get('modules/Sellvana_Sales/recent_day', 7);
         $params = [];
-        if (strpos($filter['date'], '~') !== FALSE) {
+        if (strpos($filter['date'], '~') !== false) {
             $range = explode('~', $filter['date']);
             $filter['date'] = array(
                 'min' => $range[0],

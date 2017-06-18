@@ -4,7 +4,7 @@
  * Class Sellvana_IndexTank_Migrate
  *
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  * @property Sellvana_IndexTank_Index_Product $Sellvana_IndexTank_Index_Product
  * @property Sellvana_IndexTank_Model_IndexHelper $Sellvana_IndexTank_Model_IndexHelper
  * @property Sellvana_IndexTank_Model_IndexingStatus $Sellvana_IndexTank_Model_IndexingStatus
@@ -197,7 +197,7 @@ class Sellvana_IndexTank_Migrate extends BClass
 
 
         //add custom fields
-        $fields = $this->Sellvana_CatalogFields_Model_Field->orm()->find_many();
+        $fields = $this->FCom_Core_Model_Field->orm()->find_many();
         if ($fields) {
             foreach ($fields as $f) {
                 $fieldName = $this->Sellvana_IndexTank_Index_Product->getCustomFieldKey($f);

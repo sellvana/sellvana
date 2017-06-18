@@ -502,7 +502,23 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                 }
             },
             grid: {
-                template: svPageDefaultGridTpl
+                template: svPageDefaultGridTpl,
+                methods: {
+                    processActionEvent: function (type, args) {
+                        if (args.link) {
+                            window.location = '#' + args.link;
+                            return;
+                        }
+                        switch (type) {
+                            case 'do_action':
+                                this.doGridAction(args);
+                                break;
+                            default:
+                                console.log('processActionEvent not implemented', type, args);
+                        }
+
+                    }
+                }
             },
             form: {
                 template: svPageDefaultFormTpl,
@@ -649,13 +665,16 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                         }
                     },
                     processActionEvent: function (type, args) {
+                        if (args.link) {
+                            window.location = '#' + args.link;
+                            return;
+                        }
                         switch (type) {
                             case 'do_action':
                                 this.doFormAction(args);
                                 break;
-                            case 'form_action':
-                                this.doFormAction(args);
-                                break;
+                            default:
+                                console.log('processActionEvent not implemented', type, args);
                         }
                     },
 
@@ -688,7 +707,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                             }
                         } else if (r) {
                             var regexp = new RegExp(r.pattern.replace(/^\/|\/$/g, ''));
-                            if (r.pattern && !v.match(regexp)) {
+                            if (r.pattern && v && !v.match(regexp)) {
                                 e.pattern = r.pattern_message || translate('Invalid field value: {field}', a);
                             }
                             if ((r.email || f.input_type === 'email') && !v.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {

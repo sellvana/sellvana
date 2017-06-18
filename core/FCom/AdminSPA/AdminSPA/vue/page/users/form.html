@@ -8,9 +8,9 @@
       <div class="col-lg-12">
             <div class="f-control-panel">
                   <!--container-class="col-xs-6"-->
-                  <sv-comp-form-tabs :form="form" :tab="tab" @event="processTabEvent"></sv-comp-form-tabs>
+                  <sv-comp-tabs :config="form.config" :tab="tab" @event="processTabEvent"></sv-comp-tabs>
                   <!--container-class="col-xs-6"-->
-                  <sv-comp-form-actions :form="form"  @event="processActionEvent"></sv-comp-form-actions>
+                  <sv-comp-actions :config="form.config"  @event="processActionEvent"></sv-comp-actions>
             </div>
       </div>
       <div class="col-xs-12">

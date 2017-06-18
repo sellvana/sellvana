@@ -17,8 +17,8 @@
       <div class="col-sm-12 col-md-8 col-lg-10">
             <div class="row">
                   <div class="col-xs-12">
-                       <sv-comp-form-tabs :form="form" :tab="tab" container-class="col-xs-6" @event="processTabEvent"></sv-comp-form-tabs>
-                       <sv-comp-form-actions :form="form" container-class="col-xs-6" @event="processActionEvent"></sv-comp-form-actions>
+                       <sv-comp-tabs :config="form.config" :tab="tab" container-class="col-xs-6" @event="processTabEvent"></sv-comp-tabs>
+                       <sv-comp-actions :config="form.config" container-class="col-xs-6" @event="processActionEvent"></sv-comp-actions>
                   </div>
             </div>
 

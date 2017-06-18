@@ -1,23 +1,23 @@
 <?php
 
 /**
- * Class Sellvana_CatalogFields_Model_FieldOption
+ * Class FCom_Core_Model_FieldOption
  *
  * @property int $id
  * @property int $field_id
  * @property string $label
  * @property string $locale
  *
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  */
-class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
+class FCom_Core_Model_FieldOption extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_field_option';
 
     protected static $_importExportProfile = [
         'unique_key' => ['field_id', 'label'],
-        'related' => ['field_id' => 'Sellvana_CatalogFields_Model_Field.id'],
+        'related' => ['field_id' => 'FCom_Core_Model_Field.id'],
     ];
 
     protected static $_fieldDefaults = [
@@ -28,11 +28,11 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
     protected static $_allOptionsLoaded = false;
 
     /**
-     * @param int|string|Sellvana_CatalogFields_Model_Field $field
+     * @param int|string|FCom_Core_Model_Field $field
      * @param bool $full
      * @param string $idField
      * @param string $labelField
-     * @return Sellvana_CatalogFields_Model_FieldOption[]|null
+     * @return FCom_Core_Model_FieldOption[]|null
      */
     public function getFieldOptions($field, $full = false, $idField = 'id', $labelField = 'label')
     {
@@ -41,7 +41,7 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
         } elseif (is_numeric($field)) {
             $fieldId = $field;
         } elseif (is_string($field)) {
-            $field = $this->Sellvana_CatalogFields_Model_Field->getField($field);
+            $field = $this->FCom_Core_Model_Field->getField($field);
             if (!$field) {
                 return null;
             }
@@ -95,7 +95,7 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
     public function getListAssoc()
     {
         $result = [];
-        /** @var Sellvana_CatalogFields_Model_FieldOption[] $options */
+        /** @var FCom_Core_Model_FieldOption[] $options */
         $options = $this->orm()->find_many();
         foreach ($options as $o) {
             $result[$o->field_id][] = $o->label;

@@ -281,6 +281,24 @@ class BUtil extends BClass
         return $d;
     }
 
+    public function arrayGet($node, $path, $default = null)
+    {
+        foreach (preg_split('#[\./:]#', $path) as $key) {
+            if (is_object($node)) {
+                if (!isset($node->{$key})) {
+                    return $default;
+                }
+                $node = $node->{$key};
+            } else {
+                if (!isset($node[$key])) {
+                    return $default;
+                }
+                $node = $node[$key];
+            }
+        }
+        return $node;
+    }
+
     /**
      * Convert sequential array of rows to associated array by one of the fields
      *

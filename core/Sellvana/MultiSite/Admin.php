@@ -7,7 +7,7 @@
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
  * @property Sellvana_MultiSite_Model_SiteUser $Sellvana_MultiSite_Model_SiteUser
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  */
 class Sellvana_MultiSite_Admin extends BClass
 {

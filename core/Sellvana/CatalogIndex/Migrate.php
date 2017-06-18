@@ -11,14 +11,14 @@
  * @property Sellvana_CatalogIndex_Model_FieldValue $Sellvana_CatalogIndex_Model_FieldValue
  * @property Sellvana_CatalogIndex_Model_Term $Sellvana_CatalogIndex_Model_Term
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  */
 
 class Sellvana_CatalogIndex_Migrate extends BClass
 {
     public function install__0_5_0_0()
     {
-        $tCustField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tCustField = $this->FCom_Core_Model_Field->table();
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
 
         $tTerm = $this->Sellvana_CatalogIndex_Model_Term->table();

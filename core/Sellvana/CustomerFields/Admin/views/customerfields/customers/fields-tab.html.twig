@@ -1,7 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set ctrl = APP.instance('Sellvana_CustomerFields_Admin_Controller_Customers') %}
 {% set fieldCtrl = APP.instance('Sellvana_CustomerFields_Admin_Controller_Fields') %}
-{% set fieldsOptions = APP.instance('Sellvana_CustomerFields_Model_Field').as_values('field_name') %}
+{% set fieldsOptions = APP.instance('FCom_Core_Model_Field').as_values('field_name') %}
 {% set fieldsConfig = fieldCtrl.fieldsGridConfig() %}
 {% set fieldsConfigCompiled = THIS.view('core/griddle').set('grid', fieldsConfig).getGridConfig() %}
 {% set initialData = APP.instance('Sellvana_CustomerFields_Admin_Controller_Customers').getInitialData(m) %}

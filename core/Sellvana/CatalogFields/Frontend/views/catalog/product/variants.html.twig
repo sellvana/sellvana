@@ -1,5 +1,5 @@
 {% set prod = THIS.get('product') %}
-{% set modelField = APP.instance('Sellvana_CatalogFields_Model_Field') %}
+{% set modelField = APP.instance('FCom_Core_Model_Field') %}
 {% set varData = APP.instance('Sellvana_CatalogFields_Model_ProductVariant').fetchProductVariantsData(prod) %}
 
 {% if varData.fields and varData.variants is not empty %}

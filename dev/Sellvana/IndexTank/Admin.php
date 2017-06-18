@@ -36,8 +36,8 @@ class Sellvana_IndexTank_Admin extends BClass
                     ->on('Sellvana_Catalog_Model_CategoryProduct::onAfterSave', 'Sellvana_IndexTank_Admin::onCategoryProductAfterSave')
                     ->on('Sellvana_Catalog_Model_CategoryProduct::onBeforeDelete', 'Sellvana_IndexTank_Admin::onCategoryProductBeforeDelete')
                     //for custom fields
-                    ->on('Sellvana_CatalogFields_Model_Field::onAfterSave', 'Sellvana_IndexTank_Admin::onCustomFieldAfterSave')
-                    ->on('Sellvana_CatalogFields_Model_Field::onBeforeDelete', 'Sellvana_IndexTank_Admin::onCustomFieldBeforeDelete')
+                    ->on('FCom_Core_Model_Field::onAfterSave', 'Sellvana_IndexTank_Admin::onCustomFieldAfterSave')
+                    ->on('FCom_Core_Model_Field::onBeforeDelete', 'Sellvana_IndexTank_Admin::onCustomFieldBeforeDelete')
                 ;
             }
 
@@ -237,7 +237,7 @@ class Sellvana_IndexTank_Admin extends BClass
     }
 
     /**
-     * Catch event Sellvana_CatalogFields_Model_Field::afterSave
+     * Catch event FCom_Core_Model_Field::afterSave
      * to update given custom field in products index
      * @param array $args contain custom field model
      */
@@ -276,7 +276,7 @@ class Sellvana_IndexTank_Admin extends BClass
     }
 
     /**
-     * Catch event Sellvana_CatalogFields_Model_Field::BeforeDelete
+     * Catch event FCom_Core_Model_Field::BeforeDelete
      * to delete given custom field from products index
      * @param array $args contain custom field model
      */

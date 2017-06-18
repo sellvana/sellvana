@@ -78,7 +78,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
                 /** @var Sellvana_CatalogFields_Model_ProductVarfield[][] $varfields */
                 if (empty($varfields[$pId])) {
                     $varfields[$pId] = $varfieldHlp->orm('vf')
-                        ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+                        ->join('FCom_Core_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
                         ->select('vf.*')
                         ->select(['f.field_code', 'f.field_name', 'f.frontend_label'])
                         ->where('vf.product_id', $pId)

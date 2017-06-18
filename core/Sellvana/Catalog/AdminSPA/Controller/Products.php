@@ -55,6 +55,9 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             'bulk_actions' => [
                 ['name' => 'custom_state', 'label' => 'Change Custom State'],
             ],
+            'actions' => [
+                ['name' => 'new', 'label' => 'Add New Product', 'link' => '/catalog/products/form', 'group' => 'new'],
+            ],
         ];
     }
 
@@ -81,9 +84,13 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
     {
         $pId = $this->BRequest->get('id');
 
-        $product = $this->Sellvana_Catalog_Model_Product->load($pId);
-        if (!$product) {
-            throw new BException('Product not found');
+        if ($pId === null || $pId === '') {
+            $product = $this->Sellvana_Catalog_Model_Product->create();
+        } else {
+            $product = $this->Sellvana_Catalog_Model_Product->load($pId);
+            if (!$product) {
+                throw new BException('Product not found');
+            }
         }
 
         $result = [];

@@ -3,7 +3,7 @@
 /**
  * Class FCom_Admin_Controller_Abstract_Report
  *
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  */
 abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -192,7 +192,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
     protected function _addProductCustomFields($config)
     {
-        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        $fields = $this->FCom_Core_Model_Field->orm('f')->where('field_type', 'product')->find_many();
         foreach ($fields as $field) {
             $type = 'text';
             if (substr($field->get('table_field_type'), 0, 3) == 'int') {
@@ -208,7 +208,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
     protected function _getProductCustomFieldLabels()
     {
         $labels = [];
-        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        $fields = $this->FCom_Core_Model_Field->orm('f')->where('field_type', 'product')->find_many();
         foreach ($fields as $field) {
             $labels[$field->get('field_code')] = $field->get('field_name');
         }

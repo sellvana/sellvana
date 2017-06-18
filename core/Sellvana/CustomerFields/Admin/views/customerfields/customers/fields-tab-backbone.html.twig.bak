@@ -62,7 +62,7 @@
                         </div>
                         <div class="controls col-sm-8">
                             <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
-                                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').fieldOptions('table_field_type')) | raw }}
+                                {{ UTIL.optionsHtml(APP.instance('FCom_Core_Model_Field').fieldOptions('table_field_type')) | raw }}
                             </select>
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                         </div>
                         <div class="controls col-sm-8">
                             <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
-                                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').fieldOptions('admin_input_type')) | raw }}
+                                {{ UTIL.optionsHtml(APP.instance('FCom_Core_Model_Field').fieldOptions('admin_input_type')) | raw }}
                             </select>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
         <div class="col-sm-6" id="field">
             <select id="sel_fields" class="select2 form-control" style="width:150px;"
                     placeholder='{{ 'Choose field...'|_ }}'>
-                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').as_values('field_name')) | raw }}
+                {{ UTIL.optionsHtml(APP.instance('FCom_Core_Model_Field').as_values('field_name')) | raw }}
             </select>
             <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">{{ 'Add a Field'|_ }}</button>
             <button class="btn btn-sm" type="button" id="btn_new_field">{{ 'New Field'|_ }}</button>

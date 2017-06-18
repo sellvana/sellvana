@@ -34,7 +34,7 @@ class SetTest extends \Codeception\TestCase\Test
             'set_type' => "product",
             'set_code' => "test3",
             'set_name' => "Test 3"];
-        Sellvana_CatalogFields_Model_Set::i()->create($data)->save();
+        FCom_Core_Model_Fieldset::i()->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_fieldset');
     }
@@ -47,7 +47,7 @@ class SetTest extends \Codeception\TestCase\Test
             'field_id' => 1,
             'position' => "10"];
 
-        Sellvana_CatalogFields_Model_SetField::i()->create($data)->save();
+        FCom_Core_Model_FieldsetField::i()->create($data)->save();
 
         $this->tester->seeNumRecords(1, 'fcom_fieldset_field');
     }

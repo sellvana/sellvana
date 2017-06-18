@@ -46,6 +46,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         'date' => 'between',
     ];
 
+    static protected $_defaultGridActionConfig = [
+        //'mobile_group' => 'actions',
+    ];
+
     /**
      * @return array
      */
@@ -239,6 +243,32 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 }
             }
             unset($flt);
+        }
+
+        if (!empty($config['actions'])) {
+            $actionGroups = [];
+            $def = !empty($config['default_action']) ? $config['default_action'] : [];
+            $def = array_merge(static::$_defaultGridActionConfig, $def);
+            foreach ($config['actions'] as &$act) {
+                $act = array_merge($def, $act);
+                foreach (['desktop_group', 'mobile_group'] as $g) {
+                    $group = !empty($act[$g]) ? $act[$g] : (!empty($act['group']) ? $act['group'] : null);
+                    if (!empty($group)) {
+                        if (empty($actionGroups[$g][$group])) {
+                            $actionGroups[$g][$group] = $act;
+                        } else {
+                            $actionGroups[$g][$group]['children'][] = $act;
+                        }
+                    }
+                }
+            }
+            unset($act);
+            if (!empty($actionGroups['desktop_group'])) {
+                $config['action_desktop_groups'] = array_values($actionGroups['desktop_group']);
+            }
+            if (!empty($actionGroups['mobile_group'])) {
+                $config['action_mobile_groups'] = array_values($actionGroups['mobile_group']);
+            }
         }
 
         if (!empty($config['pager']) && $config['pager'] === true) {

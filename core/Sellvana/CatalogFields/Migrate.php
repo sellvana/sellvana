@@ -5,10 +5,10 @@
  *
  * @property FCom_Core_Model_MediaLibrary                     $FCom_Core_Model_MediaLibrary
  * @property Sellvana_Catalog_Model_Product                   $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogFields_Model_Field               $Sellvana_CatalogFields_Model_Field
- * @property Sellvana_CatalogFields_Model_FieldOption         $Sellvana_CatalogFields_Model_FieldOption
- * @property Sellvana_CatalogFields_Model_Set                 $Sellvana_CatalogFields_Model_Set
- * @property Sellvana_CatalogFields_Model_SetField            $Sellvana_CatalogFields_Model_SetField
+ * @property FCom_Core_Model_Field               $FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldOption         $FCom_Core_Model_FieldOption
+ * @property FCom_Core_Model_Fieldset                 $FCom_Core_Model_Fieldset
+ * @property FCom_Core_Model_FieldsetField            $FCom_Core_Model_FieldsetField
  * @property Sellvana_CatalogFields_Model_ProductField        $Sellvana_CatalogFields_Model_ProductField
  * @property Sellvana_CatalogFields_Model_ProductVariant      $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_ProductVarfield     $Sellvana_CatalogFields_Model_ProductVarfield
@@ -23,11 +23,12 @@ class Sellvana_CatalogFields_Migrate extends BClass
 {
     public function install__0_5_1_0()
     {
-        $hlpField = $this->Sellvana_CatalogFields_Model_Field;
+        $hlpField = $this->FCom_Core_Model_Field;
         $tField = $hlpField->table();
-        $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
-        $tSet = $this->Sellvana_CatalogFields_Model_Set->table();
-        $tSetField = $this->Sellvana_CatalogFields_Model_SetField->table();
+        $tFieldOption = $this->FCom_Core_Model_FieldOption->table();
+        $tSet = $this->FCom_Core_Model_Fieldset->table();
+        $tSetField = $this->FCom_Core_Model_FieldsetField->table();
+
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductField->table();
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
         $tProdVariant = $this->Sellvana_CatalogFields_Model_ProductVariant->table();
@@ -36,78 +37,6 @@ class Sellvana_CatalogFields_Migrate extends BClass
         $tProdVariantImage = $this->Sellvana_CatalogFields_Model_ProductVariantImage->table();
         $tMediaFile = $this->FCom_Core_Model_MediaLibrary->table();
         $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
-
-        $this->BDb->ddlTableDef($tField, [
-            BDb::COLUMNS => [
-                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
-                'field_type' => "enum('product') NOT NULL DEFAULT 'product'",
-                'field_code' => "varchar(50) NOT NULL",
-                'field_name' => "varchar(50) NOT NULL",
-                'table_field_type' => "varchar(20) NOT NULL",
-                'admin_input_type' => "varchar(20) NOT NULL DEFAULT 'text'",
-                'frontend_label' => "text",
-                'frontend_show' => "tinyint(1) NOT NULL DEFAULT '1'",
-                'config_json' => "text",
-                'sort_order' => "int(11) NOT NULL DEFAULT '0'",
-                'facet_select' => "enum('No','Exclusive','Inclusive') NOT NULL DEFAULT 'No'",
-                'system' => "tinyint(1) NOT NULL DEFAULT '0'",
-                'multilanguage' => "tinyint(1) NOT NULL DEFAULT '0'",
-                'validation' => "varchar(100) DEFAULT NULL",
-                'required' => "tinyint(1) NOT NULL DEFAULT '1'",
-                'data_serialized' => 'text',
-                'create_at' => 'datetime default null',
-                'update_at' => 'datetime default null',
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::KEYS => [
-                'UNQ_field_code' => 'UNIQUE (field_code)',
-            ],
-        ]);
-
-        $this->BDb->ddlTableDef($tFieldOption, [
-            BDb::COLUMNS => [
-                'id' => 'int unsigned not null auto_increment',
-                'field_id' => 'int unsigned not null',
-                'label' => 'varchar(255) not null',
-                'locale' => "varchar(10) not null default '_'",
-                'data_serialized' => 'text', // for translations
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::KEYS => [
-                'field_id__label' => 'UNIQUE (field_id, label)',
-            ],
-            BDb::CONSTRAINTS => [
-                'field' => ['field_id', $tField],
-            ],
-        ]);
-
-        $this->BDb->ddlTableDef($tSet, [
-            BDb::COLUMNS => [
-                'id' => 'int unsigned not null auto_increment',
-                'set_type' => "enum('product') not null default 'product'",
-                'set_code' => 'varchar(100) not null',
-                'set_name' => 'varchar(100) not null',
-            ],
-            BDb::PRIMARY => '(id)',
-        ]);
-
-        $this->BDb->ddlTableDef($tSetField, [
-            BDb::COLUMNS => [
-                'id' => 'int unsigned not null auto_increment',
-                'set_id' => 'int unsigned not null',
-                'field_id' => 'int unsigned not null',
-                'position' => 'smallint(5) unsigned default null',
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::KEYS => [
-                'UNQ_set_id__field_id' => 'UNIQUE (set_id, field_id)',
-                'IDX_set_id__position' => '(set_id, position)',
-            ],
-            BDb::CONSTRAINTS => [
-                'field' => ['field_id', $tField],
-                'set' => ['set_id', $tSet],
-            ],
-        ]);
 
         $this->BDb->ddlTableDef($tProductField, [
             BDb::COLUMNS => [
@@ -219,10 +148,12 @@ class Sellvana_CatalogFields_Migrate extends BClass
             $hlpField->delete_many(['id' => array_keys($dups)]);
         }
 
-        $exist = $hlpField->orm()->where_in('field_code', ['color', 'size'])
+        $exist = $hlpField->orm()->where('field_type', 'product')
+            ->where_in('field_code', ['color', 'size'])
             ->select('field_code')->find_many_assoc('field_code');
         if (empty($exist['color'])) {
             $hlpField->create([
+                'field_type' => 'product',
                 'field_code' => 'color',
                 'field_name' => 'Color',
                 'table_field_type' => 'varchar(255)',
@@ -234,6 +165,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
         }
         if (empty($exist['size'])) {
             $hlpField->create([
+                'field_type' => 'product',
                 'field_code' => 'size',
                 'field_name' => 'Size',
                 'table_field_type' => 'varchar(255)',
@@ -247,7 +179,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tField = $this->FCom_Core_Model_Field->table();
         $fieldName = 'frontend_show';
         if ($this->BDb->ddlFieldInfo($tField, $fieldName)) {
             return false;
@@ -257,19 +189,19 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tField = $this->FCom_Core_Model_Field->table();
         $this->BDb->ddlTableDef($tField, [BDb::COLUMNS => ['sort_order' => "int not null default '0'"]]);
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tField = $this->FCom_Core_Model_Field->table();
         $this->BDb->ddlTableDef($tField, [BDb::COLUMNS => ['facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'"]]);
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tField = $this->FCom_Core_Model_Field->table();
         $this->BDb->ddlTableDef($tField, [BDb::COLUMNS => ['system' => "tinyint(1) NOT NULL DEFAULT '0'"]]);
     }
 
@@ -301,19 +233,19 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $tProdField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tProdField = $this->FCom_Core_Model_Field->table();
         $this->BDb->ddlTableDef($tProdField, [BDb::COLUMNS => ['validation' => "varchar(100) null"]]);
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
-        $tProdField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tProdField = $this->FCom_Core_Model_Field->table();
         $this->BDb->ddlTableDef($tProdField, [BDb::COLUMNS => ['required' => "tinyint(1) NOT NULL DEFAULT '1'"]]);
     }
 
     public function upgrade__0_1_8__0_1_9()
     {
-        $fieldHlp = $this->Sellvana_CatalogFields_Model_Field;
+        $fieldHlp = $this->FCom_Core_Model_Field;
 
         while (true) {
             $dups = $fieldHlp->orm()->select('(min(id))', 'min_id')->group_by('field_code')
@@ -365,8 +297,8 @@ class Sellvana_CatalogFields_Migrate extends BClass
     public function upgrade__0_2_0__0_2_1()
     {
         $tProduct          = $this->Sellvana_Catalog_Model_Product->table();
-        $tField            = $this->Sellvana_CatalogFields_Model_Field->table();
-        $tFieldOption      = $this->Sellvana_CatalogFields_Model_FieldOption->table();
+        $tField            = $this->FCom_Core_Model_Field->table();
+        $tFieldOption      = $this->FCom_Core_Model_FieldOption->table();
         $tProdVariant      = $this->Sellvana_CatalogFields_Model_ProductVariant->table();
         $tProdVarfield     = $this->Sellvana_CatalogFields_Model_ProductVarfield->table();
         $tProdVariantField = $this->Sellvana_CatalogFields_Model_ProductVariantField->table();
@@ -434,7 +366,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_2_1__0_2_2()
     {
-        $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
+        $tFieldOption = $this->FCom_Core_Model_FieldOption->table();
         $this->BDb->ddlTableDef($tFieldOption, [
             BDb::COLUMNS => [
                 'data_serialized' => 'text', // for translations
@@ -491,7 +423,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_5_0_0__0_5_1_0()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tField = $this->FCom_Core_Model_Field->table();
         $this->BDb->ddlTableDef($tField, [
             BDb::COLUMNS => [
                 'data_serialized' => 'text',
@@ -503,11 +435,12 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_5_1_0__0_5_5_0()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tField = $this->FCom_Core_Model_Field->table();
+        $tFieldOption = $this->FCom_Core_Model_FieldOption->table();
+        $tSet = $this->FCom_Core_Model_Fieldset->table();
+
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
-        $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
-        $tSet = $this->Sellvana_CatalogFields_Model_Set->table();
 
         $this->BDb->ddlTableDef($tProductField, [
             BDb::COLUMNS => [
@@ -531,13 +464,13 @@ class Sellvana_CatalogFields_Migrate extends BClass
             ],
         ]);
 
-        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        $fields = $this->FCom_Core_Model_Field->orm('f')->find_many();
         $fieldsAssoc = [];
         foreach ($fields as $field) {
             $fieldsAssoc[$field->get('field_code')] = $field;
         }
 
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->orm('fo')->find_many();
+        $options = $this->FCom_Core_Model_FieldOption->orm('fo')->find_many();
         $optionsAssoc = [];
         foreach ($options as $option) {
             if (empty($optionsAssoc[$option->get('field_id')])) {
@@ -595,7 +528,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
             }
         }
 
-        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        $fields = $this->FCom_Core_Model_Field->orm('f')->find_many();
         foreach ($fields as $field) {
             $fieldDbType = [];
             preg_match('/[a-zA-Z]+/', $field->get('table_field_type'), $fieldDbType);
@@ -605,12 +538,16 @@ class Sellvana_CatalogFields_Migrate extends BClass
         }
 
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
-        $this->BDb->ddlTableDef($tProductField, [BDb::COLUMNS => ['position' => "tinyint(3) NOT NULL DEFAULT '0' after `field_id`"]]);
+        $this->BDb->ddlTableDef($tProductField, [
+            BDb::COLUMNS => [
+                'position' => "tinyint(3) NOT NULL DEFAULT '0' after `field_id`"
+            ]
+        ]);
     }
 
     public function upgrade__0_5_5_0__0_5_6_0()
     {
-        $fHlp = $this->Sellvana_CatalogFields_Model_Field;
+        $fHlp = $this->FCom_Core_Model_Field;
 
         if (($field = $fHlp->getField('size'))) {
             $field->set('table_field_type', 'options')->save();
@@ -619,7 +556,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
             $field->set('table_field_type', 'options')->save();
         }
 
-        $foHlp = $this->Sellvana_CatalogFields_Model_FieldOption;
+        $foHlp = $this->FCom_Core_Model_FieldOption;
 
         $options = $foHlp->preloadAllFieldsOptions()->getAllFieldsOptions();
         $optionsByLabel = [];
@@ -653,7 +590,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_5_6_0__0_5_7_0()
     {
-        $fHlp = $this->Sellvana_CatalogFields_Model_Field;
+        $fHlp = $this->FCom_Core_Model_Field;
         $fields = $fHlp->orm('f')
             ->where_in('admin_input_type', ['select', 'multiselect'])
             ->where_not_equal('table_field_type', 'options')
@@ -687,7 +624,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_5_8_0__0_5_9_0()
     {
-        $set = $this->Sellvana_CatalogFields_Model_Set;
+        $set = $this->FCom_Core_Model_Fieldset;
         $set->create([
             'set_type' => 'product',
             'set_name' => 'Default',
@@ -709,21 +646,6 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_6_1_0__0_6_2_0()
     {
-        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
-        $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
-
-        $this->BDb->ddlTableDef($tField, [
-            BDb::COLUMNS => [
-                'swatch_type' => "char(1) not null default 'N'",
-            ],
-        ]);
-
-        $this->BDb->ddlTableDef($tFieldOption, [
-            BDb::COLUMNS => [
-                'swatch_info' => 'text default null',
-            ],
-        ]);
-
-        $this->Sellvana_CatalogFields_Model_Field->getField('color')->set('swatch_type', 'C')->save();
+        $this->FCom_Core_Model_Field->getField('color')->set('swatch_type', 'C')->save();
     }
 }

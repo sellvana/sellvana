@@ -206,7 +206,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
-            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData($products);
+            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectModelsFieldData($products);
         }
 
         $fields = $this->Sellvana_CatalogIndex_Model_Field->getFields();

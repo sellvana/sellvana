@@ -18,8 +18,8 @@
  * @property string $test2
  *
  * DI
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
- * @property Sellvana_CatalogFields_Model_SetField $Sellvana_CatalogFields_Model_SetField
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldsetField $FCom_Core_Model_FieldsetField
  */
 class Sellvana_CatalogFields_Model_ProductField extends FCom_Core_Model_Abstract
 {
@@ -39,7 +39,7 @@ class Sellvana_CatalogFields_Model_ProductField extends FCom_Core_Model_Abstract
                 //$addSetIds += $this->BUtil->arrayCleanInt($r['add_fieldset_ids']);
                 $addSetIds = array_merge($addSetIds, $this->BUtil->arrayCleanInt($r['add_fieldset_ids']));
             }
-            $where['OR'][] = "f.id IN (SELECT field_id FROM " . $this->Sellvana_CatalogFields_Model_SetField->table()
+            $where['OR'][] = "f.id IN (SELECT field_id FROM " . $this->FCom_Core_Model_FieldsetField->table()
                 . " WHERE set_id IN (" . join(',', $addSetIds) . "))";
                 $p->set('_fieldset_ids', join(',', array_unique($addSetIds)));
         }
@@ -75,9 +75,9 @@ class Sellvana_CatalogFields_Model_ProductField extends FCom_Core_Model_Abstract
         if (!$where) {
             $fields = [];
         } else {
-            $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')
+            $fields = $this->FCom_Core_Model_Field->orm('f')
                     ->select("f.*")
-                    ->left_outer_join($this->Sellvana_CatalogFields_Model_SetField->table(), 'f.id = sf.field_id', 'sf') //todo: implement override left_outer_join to IDE understand BORM::where
+                    ->left_outer_join($this->FCom_Core_Model_FieldsetField->table(), 'f.id = sf.field_id', 'sf') //todo: implement override left_outer_join to IDE understand BORM::where
                     ->where($where, null)
                     ->order_by_asc('sf.position')
                     ->find_many_assoc();
@@ -120,7 +120,7 @@ class Sellvana_CatalogFields_Model_ProductField extends FCom_Core_Model_Abstract
      */
     public function removeField($p, $hide_field)
     {
-        $field = $this->Sellvana_CatalogFields_Model_Field->load($hide_field);
+        $field = $this->FCom_Core_Model_Field->load($hide_field);
         $p->set($field->get('field_code'), '');
 
         $field_unset = false;

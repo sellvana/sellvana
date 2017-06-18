@@ -1,7 +1,7 @@
 {% set fKey = THIS.get('facet_key') %}
 {% set facet = THIS.get('facet') %}
 {% set hlp = APP.instance('Sellvana_CatalogIndex_Main') %}
-{% set swatches = APP.instance('Sellvana_CatalogFields_Model_FieldOption').getFieldOptions(fKey, false, 'label', 'swatch_info') %}
+{% set swatches = APP.instance('FCom_Core_Model_FieldOption').getFieldOptions(fKey, false, 'label', 'swatch_info') %}
 
 {% if facet['values'] %}
     <dt>

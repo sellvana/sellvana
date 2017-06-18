@@ -5,11 +5,11 @@
  *
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
- * @property Sellvana_CatalogFields_Model_SetField $Sellvana_CatalogFields_Model_SetField
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Fieldset $FCom_Core_Model_Fieldset
+ * @property FCom_Core_Model_FieldsetField $FCom_Core_Model_FieldsetField
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property FCom_Core_Main $FCom_Core_Main
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
@@ -29,7 +29,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 'id'      => 'product_fieldsets',
                 'caption' => 'Field Sets',
                 'url' => $this->BApp->href('catalogfields/fieldsets/grid_data'),
-                'orm' => 'Sellvana_CatalogFields_Model_SetField',
+                'orm' => 'FCom_Core_Model_FieldsetField',
                 'columns' => [
                     'id' => ['label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true],
                     'set_code' => ['label' => 'Set Code', 'width' => 100, 'editable' => true],
@@ -59,19 +59,19 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
     {
         //$data = $model->getData('variants_fields');
         $varFields = $this->Sellvana_CatalogFields_Model_ProductVarfield->orm('vf')
-            ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+            ->join('FCom_Core_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
             ->where('product_id', $model->id)
             ->order_by_asc('vf.position')
             ->find_many_assoc('field_id');
         if ($varFields) {
-            $varFieldsOptions = $this->Sellvana_CatalogFields_Model_FieldOption->orm()
+            $varFieldsOptions = $this->FCom_Core_Model_FieldOption->orm()
                 ->where_in('field_id', array_keys($varFields))
                 ->find_many_assoc();
             $options = [];
             foreach ($varFieldsOptions as $vfo) {
-                /** @var Sellvana_CatalogFields_Model_FieldOption $vfo */
+                /** @var FCom_Core_Model_FieldOption $vfo */
                 $options[$vfo->get('field_id')][$vfo->id()] = $vfo->get('label');
             }
         }
@@ -137,7 +137,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         //$vFields = $model->getData('variants_fields');
 
         $varFields = $this->Sellvana_CatalogFields_Model_ProductVarfield->orm('vf')
-            ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+            ->join('FCom_Core_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
             ->where('product_id', $product->id())
@@ -145,7 +145,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             ->find_many_assoc('field_id');
 
         if ($varFields) {
-            $varFieldsOptions = $this->Sellvana_CatalogFields_Model_FieldOption->orm()
+            $varFieldsOptions = $this->FCom_Core_Model_FieldOption->orm()
                 ->where_in('field_id', array_keys($varFields))
                 ->find_many_assoc();
             $options = [];
@@ -300,7 +300,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $fields_options = [];
         $fields = $this->Sellvana_CatalogFields_Model_ProductField->productFields($p, $this->BRequest->request());
         foreach ($fields as $field) {
-            $fields_options[$field->id()] = $this->Sellvana_CatalogFields_Model_FieldOption->orm()
+            $fields_options[$field->id()] = $this->FCom_Core_Model_FieldOption->orm()
                 ->where("field_id", $field->id())->find_many();
         }
 
@@ -313,20 +313,20 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
     public function getInitialData($model)
     {
         $pId = $model->id();
-        $data = $this->Sellvana_CatalogFields_Model_ProductFieldData->getProductFieldSetData([$pId]);
+        $data = $this->Sellvana_CatalogFields_Model_ProductFieldData->getModelsFieldSetData([$pId]);
         return !empty($data[$pId]) ? $data[$pId] : [];
     }
 
     public function fieldsetAry()
     {
-        $sets = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_Set->orm('s')->select('s.*')->find_many());
+        $sets = $this->BDb->many_as_array($this->FCom_Core_Model_Fieldset->orm('s')->select('s.*')->find_many());
 
         return json_encode($sets);
     }
 
     public function fieldAry()
     {
-        $fields = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_SetField->orm('s')->select('s.*')->find_many());
+        $fields = $this->BDb->many_as_array($this->FCom_Core_Model_FieldsetField->orm('s')->select('s.*')->find_many());
 
         return json_encode($fields);
     }
@@ -335,15 +335,15 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
     {
         $r = $this->BRequest;
         $id = $r->get('id');
-        $set = $this->Sellvana_CatalogFields_Model_Set->load($id);
-        $fields = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_SetField->orm('sf')
-            ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
+        $set = $this->FCom_Core_Model_Fieldset->load($id);
+        $fields = $this->BDb->many_as_array($this->FCom_Core_Model_FieldsetField->orm('sf')
+            ->join('FCom_Core_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
             ->select(['f.id', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.required'])
             ->where('sf.set_id', $id)->find_many()
         );
         foreach ($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id'], false, 'label');
+                $field['options'] = $this->FCom_Core_Model_FieldOption->getFieldOptions($field['id'], false, 'label');
             }
         }
 
@@ -362,8 +362,8 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
     {
         $r = $this->BRequest;
         $id = $r->get('id');
-        $field = $this->Sellvana_CatalogFields_Model_Field->load($id);
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id(), false, 'label');
+        $field = $this->FCom_Core_Model_Field->load($id);
+        $options = $this->FCom_Core_Model_FieldOption->getFieldOptions($field->id(), false, 'label');
         $this->BResponse->json([
             'id' => $field->id(),
             'field_code' => $field->field_code,
@@ -403,8 +403,8 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             $res = [];
             $data = $this->BRequest->post();
             $ids = explode(',', $data['ids']);
-            $optionsHlp = $this->Sellvana_CatalogFields_Model_FieldOption;
-            $fields = $this->Sellvana_CatalogFields_Model_Field->orm()->where('id', $ids)->find_many_assoc();
+            $optionsHlp = $this->FCom_Core_Model_FieldOption;
+            $fields = $this->FCom_Core_Model_Field->orm()->where('id', $ids)->find_many_assoc();
             foreach ($fields as $id => $field) {
                 $res[] = [
                     'id' => $id,
@@ -426,13 +426,13 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 
     public function getFieldTypes()
     {
-        $f = $this->Sellvana_CatalogFields_Model_Field;
+        $f = $this->FCom_Core_Model_Field;
         return $f->fieldOptions('table_field_type');
     }
 
     public function getAdminInputTypes()
     {
-        $f = $this->Sellvana_CatalogFields_Model_Field;
+        $f = $this->FCom_Core_Model_Field;
         return $f->fieldOptions('admin_input_type');
     }
 }

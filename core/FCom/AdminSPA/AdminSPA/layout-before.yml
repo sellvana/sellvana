@@ -121,6 +121,12 @@
             - [ requireJs, sv-comp-nav, "@FCom_AdminSPA/AdminSPA/vue/component/nav" ]
             - [ requireJs, sv-comp-nav-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/nav.html" ]
 
+            - [ requireJs, sv-comp-tabs, "@FCom_AdminSPA/AdminSPA/vue/component/tabs" ]
+            - [ requireJs, sv-comp-tabs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/tabs.html" ]
+
+            - [ requireJs, sv-comp-actions, "@FCom_AdminSPA/AdminSPA/vue/component/actions" ]
+            - [ requireJs, sv-comp-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/actions.html" ]
+
             - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
             - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
             - [ requireJs, sv-comp-grid-pager-list-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-list.html" ]
@@ -151,12 +157,6 @@
 			
             - [ requireJs, sv-comp-form, "@FCom_AdminSPA/AdminSPA/vue/component/form" ]
             - [ requireJs, sv-comp-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form.html" ]
-
-            - [ requireJs, sv-comp-form-tabs, "@FCom_AdminSPA/AdminSPA/vue/component/form/tabs" ]
-            - [ requireJs, sv-comp-form-tabs-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/tabs.html" ]
-
-            - [ requireJs, sv-comp-form-actions, "@FCom_AdminSPA/AdminSPA/vue/component/form/actions" ]
-            - [ requireJs, sv-comp-form-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/actions.html" ]
 
             - [ requireJs, sv-comp-form-field, "@FCom_AdminSPA/AdminSPA/vue/component/form/field" ]
             - [ requireJs, sv-comp-form-field-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/form/field.html" ]
@@ -236,7 +236,7 @@
             - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
             - [ addRoute, { path: /settings, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
 
-            - [ addRoute, { path: /modules, require: [sv-page-modules, text!sv-page-modules-tpl, json!sv-page-modules-grid-config ]}]
+            - [ addRoute, { path: /modules, require: [sv-page-modules, text!sv-page-default-grid-tpl, json!sv-page-modules-grid-config ]}]
 
             - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-users-tpl, json!sv-page-users-grid-config ]}]
             - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-users-form-tpl ]}]

@@ -7,7 +7,7 @@ class Sellvana_CatalogFields_Model_ProductVarfield extends FCom_Core_Model_Abstr
     protected static $_importExportProfile = [
         'related' => [
             'product_id' => 'Sellvana_Catalog_Model_Product.id',
-            'field_id' => 'Sellvana_CatalogFields_Model_Field.id',
+            'field_id' => 'FCom_Core_Model_Field.id',
         ],
         'unique_key' => ['product_id', 'field_id'],
     ];

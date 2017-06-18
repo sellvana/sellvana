@@ -4,10 +4,10 @@
  * Class Sellvana_CatalogFields_Main
  *
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  */
@@ -20,6 +20,11 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         $this->FCom_Admin_Model_Role->createPermission([
             'catalog_fields' => 'Catalog Custom Fields'
+        ]);
+
+        $this->FCom_Core_Model_Field->registerFieldType('product', [
+            'label' => 'Products',
+            'class' => 'Sellvana_CatalogFields_Model_ProductField',
         ]);
     }
 
@@ -78,7 +83,7 @@ class Sellvana_CatalogFields_Main extends BClass
                 }
                 foreach ($set['fields'] as $field) {
                     $p->set($field['field_code'], $this->BUtil->dataGet($field, 'value'));
-                    $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
+                    $fieldModel = $this->FCom_Core_Model_Field->load($field['id']);
                     if (!$fieldModel || in_array($field['admin_input_type'], ['select', 'multiselect'])) {
                         continue;
                     }
@@ -93,13 +98,13 @@ class Sellvana_CatalogFields_Main extends BClass
         }
 
         $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
-        $pfdHlp->saveProductsFieldData([$p]);
+        $pfdHlp->saveModelsFieldData([$p]);
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
             $this->Sellvana_MultiSite_Main->saveProductsFieldSiteData([$p]);
         }
 
-        $fieldsDataArr = $pfdHlp->fetchProductsFieldData([$p->id()]);
+        $fieldsDataArr = $pfdHlp->fetchModelsFieldData([$p->id()]);
         if (!empty($fieldsDataArr[$p->id()])) {
             $fieldsData = $fieldsDataArr[$p->id()];
             foreach ($fieldSets as $set) {
@@ -146,7 +151,7 @@ class Sellvana_CatalogFields_Main extends BClass
             $category = $args['category'];
         }
 
-        $customFields = $this->Sellvana_CatalogFields_Model_Field->orm()
+        $customFields = $this->FCom_Core_Model_Field->orm()
             ->where_in('facet_select', ['Inclusive', 'Exclusive'])
             ->where('frontend_show', 1)
             ->order_by_asc('sort_order')
@@ -162,8 +167,8 @@ class Sellvana_CatalogFields_Main extends BClass
         if (!empty($filter)) {
             foreach ($filter as $fkey => $fval) {
                 $fkey = urldecode($fkey);
-                /** @var Sellvana_CatalogFields_Model_Field $field */
-                $field = $this->Sellvana_CatalogFields_Model_Field->orm()->where('field_code', $fkey)->find_one();
+                /** @var FCom_Core_Model_Field $field */
+                $field = $this->FCom_Core_Model_Field->orm()->where('field_code', $fkey)->find_one();
                 $currentFilter[$field->frontend_label][] = [
                     'key' => $field->field_code,
                     'facet_select' => $field->facet_select,
@@ -223,7 +228,7 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         static $customFieldsOptions;
 
-        $optionsHlp = $this->Sellvana_CatalogFields_Model_FieldOption;
+        $optionsHlp = $this->FCom_Core_Model_FieldOption;
         if (!$customFieldsOptions) {
             $customFieldsOptions = $optionsHlp->getListAssoc();
         }
@@ -234,7 +239,7 @@ class Sellvana_CatalogFields_Main extends BClass
             return;
         }
         //find intersection of custom fields with data fields
-        $cfFields = $this->Sellvana_CatalogFields_Model_Field->getAllFields();
+        $cfFields = $this->FCom_Core_Model_Field->getAllFields('field_code', 'product');
         $cfKeys = array_keys($cfFields);
         $dataKeys = array_keys($data);
         $cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -244,7 +249,7 @@ class Sellvana_CatalogFields_Main extends BClass
         }
         //get custom fields values from data
         foreach ($cfIntersection as $cfk) {
-            /** @var Sellvana_CatalogFields_Model_Field $field */
+            /** @var FCom_Core_Model_Field $field */
             $field = $cfFields[$cfk];
             $dataValue = $data[$cfk];
             if (!$config['import']['custom_fields']['create_missing_options']
@@ -306,7 +311,7 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         //$info = $args['info'];
         $object = $args['object'];
-        $cfFields = $this->Sellvana_CatalogFields_Model_Field->getAllFields();
+        $cfFields = $this->FCom_Core_Model_Field->getAllFields('field_code', 'product');
         $cfKeys = array_keys($cfFields);
         //$dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -329,7 +334,7 @@ class Sellvana_CatalogFields_Main extends BClass
 
     public function onProductAfterLoad($args)
     {
-        $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData([$args['model']]);
+        $this->Sellvana_CatalogFields_Model_ProductFieldData->collectModelsFieldData([$args['model']]);
     }
 
     public function onFindManyAfter($args)
@@ -337,7 +342,7 @@ class Sellvana_CatalogFields_Main extends BClass
         /** @var BORM $orm */
         $orm = $args['orm'];
         if ($orm->get('_context') == 'catalog_products') {
-            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData($args['result']);
+            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectModelsFieldData($args['result']);
         }
     }
 }

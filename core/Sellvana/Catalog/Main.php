@@ -3,8 +3,9 @@
 /**
  * Class Sellvana_Catalog_Main
  *
- * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
- * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property FCom_Core_LayoutEditor FCom_Core_LayoutEditor
+ * @property FCom_Core_Model_Field FCom_Core_Model_Field
+ * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
  */
 class Sellvana_Catalog_Main extends BClass
 {

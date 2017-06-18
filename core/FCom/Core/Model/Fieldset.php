@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Class Sellvana_CatalogFields_Model_Set
+ * Class FCom_Core_Model_Fieldset
  *
  * @property int $id
  * @property string $set_type enum (product)
  * @property string $set_code
  * @property string $set_name
  */
-class Sellvana_CatalogFields_Model_Set extends FCom_Core_Model_Abstract
+class FCom_Core_Model_Fieldset extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_fieldset';

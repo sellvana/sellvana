@@ -1,4 +1,4 @@
-{% set fieldSetModel = APP.instance('Sellvana_CatalogFields_Model_Set') %}
+{% set fieldSetModel = APP.instance('FCom_Core_Model_Fieldset') %}
 {% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
 {% set setCtrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_FieldSets') %}
 {% set fieldsConfig = setCtrl.fieldsGridConfig() %}
@@ -38,7 +38,7 @@
             fieldsModalNode,
             fieldsForm,
             fields = [],
-            fieldsOptions = {{ APP.instance('Sellvana_CatalogFields_Model_Field').as_values('field_name') | json_encode| raw }},
+            fieldsOptions = {{ APP.instance('FCom_Core_Model_Field').as_values('field_name') | json_encode| raw }},
             fieldSets = {},
             fieldSetOptions = {{ fieldSetModel.as_values('set_name') | json_encode| raw }};
 

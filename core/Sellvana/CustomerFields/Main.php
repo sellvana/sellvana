@@ -3,11 +3,11 @@
 /**
  * Class Sellvana_CustomerFields_Main
  *
- * @property FCom_Admin_Model_Role                           $FCom_Admin_Model_Role
- * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
- * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
- * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
+ * @property FCom_Admin_Model_Role                           FCom_Admin_Model_Role
+ * @property FCom_Core_Model_Field                           FCom_Core_Model_Field
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData Sellvana_CustomerFields_Model_CustomerFieldData
+ * @property Sellvana_Customer_Model_Customer                Sellvana_Customer_Model_Customer
+ * @property FCom_Core_Model_FieldOption                     FCom_Core_Model_FieldOption
  */
 class Sellvana_CustomerFields_Main extends BClass
 {
@@ -18,6 +18,11 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         $this->FCom_Admin_Model_Role->createPermission([
             'customer_fields' => 'Customer Custom Fields'
+        ]);
+
+        $this->FCom_Core_Model_Field->registerFieldType('customer', [
+            'label' => 'Customers',
+            'class' => 'Sellvana_CustomerFields_Model_CustomerFieldData',
         ]);
     }
 
@@ -57,7 +62,7 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         /** @var Sellvana_Customer_Model_Customer $c */
         $c      = $args['model'];
-        $this->Sellvana_CustomerFields_Model_CustomerFieldData->saveCustomersFieldData([$c]);
+        $this->Sellvana_CustomerFields_Model_CustomerFieldData->saveModelsFieldData([$c]);
         //$data   = $c->as_array();
         //$fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
         //if (array_intersect($fields, array_keys($data))) {
@@ -81,8 +86,8 @@ class Sellvana_CustomerFields_Main extends BClass
      */
     public function hookCustomFieldFilters()
     {
-        $customFields = $this->Sellvana_CustomerFields_Model_Field
-                             ->orm()
+        $customFields = $this->FCom_Core_Model_Field
+                             ->orm()->where('field_type', 'customer')
                              ->where_in('facet_select', ['Inclusive', 'Exclusive'])
                              ->where('frontend_show', 1)
                              ->order_by_asc('sort_order')
@@ -99,8 +104,8 @@ class Sellvana_CustomerFields_Main extends BClass
             foreach ($filter as $fkey => $fval) {
                 $fkey = urldecode($fkey);
                 /** @var Sellvana_CustomerFields_Model_Field $field */
-                $field = $this->Sellvana_CustomerFields_Model_Field
-                            ->orm()
+                $field = $this->FCom_Core_Model_Field
+                            ->orm()->where('field_type', 'customer')
                             ->where('field_code', $fkey)
                             ->find_one();
                 $currentFilter[$field->frontend_label][] = [
@@ -156,7 +161,7 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         static $customFieldsOptions;
 
-        $optionsHlp = $this->Sellvana_CustomerFields_Model_FieldOption;
+        $optionsHlp = $this->FCom_Core_Model_FieldOption;
         if (!$customFieldsOptions) {
             $customFieldsOptions = $optionsHlp->getListAssoc();
         }
@@ -168,7 +173,7 @@ class Sellvana_CustomerFields_Main extends BClass
         }
 
         //find intersection of custom fields with data fields
-        $cfFields       = $this->Sellvana_CustomerFields_Model_Field->getAllFields();
+        $cfFields       = $this->FCom_Core_Model_Field->getAllFields('field_code','customer');
         $cfKeys         = array_keys($cfFields);
         $dataKeys       = array_keys($data);
         $cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -243,7 +248,7 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         //$info = $args['info'];
         $object   = $args['object'];
-        $cfFields = $this->Sellvana_CustomerFields_Model_Field->getAllFields();
+        $cfFields = $this->FCom_Core_Model_Field->getAllFields('field_code', 'customer');
         $cfKeys   = array_keys($cfFields);
         //$dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);

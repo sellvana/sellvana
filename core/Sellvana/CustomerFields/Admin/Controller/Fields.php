@@ -3,8 +3,8 @@
 /**
  * Class Sellvana_CustomerFields_Admin_Controller_Fields
  *
- * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
+ * @property FCom_Core_Model_Field FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldOption FCom_Core_Model_FieldOption
  */
 class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract
 {
@@ -12,10 +12,10 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
 
     public function fieldsGridConfig()
     {
-        $fld = $this->Sellvana_CustomerFields_Model_Field;
-        $orm = $this->Sellvana_CustomerFields_Model_Field->orm('f')->select('f.*')
-            ->select('(select count(*) from ' . $this->Sellvana_CustomerFields_Model_FieldOption->table() . ' where field_id=f.id)', 'num_options')
-        ;
+        $fld = $this->FCom_Core_Model_Field;
+        $subSql = '(select count(*) from ' . $this->FCom_Core_Model_FieldOption->table() . ' where field_id=f.id)';
+        $orm = $fld->orm('f')->where('field_type', 'customer')
+            ->select('f.*')->select($subSql, 'num_options');
 
         $config = [
             'config' => [
@@ -184,7 +184,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
 
     public function action_field_option_grid_data()
     {
-        $orm = $this->Sellvana_CustomerFields_Model_FieldOption->orm('fo')->select('fo.*')
+        $orm = $this->FCom_Core_Model_FieldOption->orm('fo')->select('fo.*')
             ->where('field_id', $this->BRequest->get('field_id'));
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
         $this->BResponse->json([
@@ -196,7 +196,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
     public function action_options()
     {
         $id = $this->BRequest->get('id');
-        $options = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($id);
+        $options = $this->FCom_Core_Model_FieldOption->getListAssocById($id);
 
         $this->BResponse->json(
             [
@@ -209,16 +209,16 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
     public function action_field_grid_data__POST()
     {
         //$this->BResponse->json(['success' => true, 'options' => $op]);
-        $this->_processGridDataPost('Sellvana_CustomerFields_Model_Field');
+        $this->_processGridDataPost('FCom_Core_Model_Field');
     }
 
     public function gridPostAfter($args)
     {
         if ($this->getAction() == 'field_grid_data') {
-            /** @var Sellvana_CustomerFields_Model_Field $model */
+            /** @var FCom_Core_Model_Field $model */
             $data = $args['data'];
             $model = $args['model'];
-            $hlp = $this->Sellvana_CustomerFields_Model_FieldOption;
+            $hlp = $this->FCom_Core_Model_FieldOption;
             $op = 0;
 
             // save options in case field is dropdown
@@ -258,7 +258,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
     public function action_field_option_grid_data__POST()
     {
         $p = $this->BRequest->post();
-        $hlp = $this->Sellvana_CustomerFields_Model_FieldOption;
+        $hlp = $this->FCom_Core_Model_FieldOption;
         $op = 0;
 
         $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
@@ -292,7 +292,8 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                 throw new BException('Invalid field value');
             }
             $val = $p[$name];
-            $exists = $this->Sellvana_CustomerFields_Model_Field->orm()->where($name, $val)->find_one();
+            $exists = $this->FCom_Core_Model_Field->orm()->where('field_type', 'customer')
+                ->where($name, $val)->find_one();
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {
             $result = ['error' => $e->getMessage()];

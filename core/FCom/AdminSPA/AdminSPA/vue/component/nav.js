@@ -21,9 +21,11 @@ define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
                     if (curPage.link === node.link || curPage.nav === node.path) {
                         return true;
                     }
-                    for (var i = 0; i < curPage.breadcrumbs.length; i++) {
-                        if (curPage.breadcrumbs[i].link === node.link || curPage.breadcrumbs[i].nav === node.path) {
-                            return true;
+                    if (curPage.breadcrumbs) {
+                        for (var i = 0; i < curPage.breadcrumbs.length; i++) {
+                            if (curPage.breadcrumbs[i].link === node.link || curPage.breadcrumbs[i].nav === node.path) {
+                                return true;
+                            }
                         }
                     }
                     return false;

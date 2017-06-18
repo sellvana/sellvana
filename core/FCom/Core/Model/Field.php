@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Sellvana_CatalogFields_Model_Field
+ * Class FCom_Core_Model_Field
  *
  * @property int $id
  * @property string $field_type (product|will be add more value)
@@ -21,16 +21,15 @@
  *
  * DI
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  */
-class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
+class FCom_Core_Model_Field extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_field';
 
     protected static $_fieldOptions = [
         'field_type'      => [
-            'product'     => 'Products',
         ],
         'table_field_type' => [
             'varchar'      => 'Short Text',
@@ -60,45 +59,59 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
             'C' => 'Color',
             'I' => 'Image',
         ],
-    ];
-
-    protected static $_fieldDefaults = [
-        'field_type' => 'product',
-    ];
-
-    protected static $_fieldTypes = [
-        'product' => [
-            'class' => 'Sellvana_CatalogFields_Model_ProductField',
+        'account_edit' => [
+            '1' => 'Yes',
+            '0' => 'No'
+        ],
+        'register_form' => [
+            '1' => 'Yes',
+            '0' => 'No'
         ],
     ];
-    protected static $_importExportProfile = ['skip' => [],  'unique_key' => ['field_code',],  ];
+
+    protected static $_fieldTypes = [];
+    protected static $_importExportProfile = ['skip' => [],  'unique_key' => ['field_code']];
 
     protected $_oldTableFieldCode;
     protected $_oldTableFieldType;
 
     protected static $_fieldsCache = [];
 
+    public function registerFieldType($type, $params)
+    {
+        static::$_fieldOptions['field_type'][$type] = $params['label'];
+        static::$_fieldTypes[$type] = $params;
+        return $this;
+    }
+
     /**
      * @param string $key
+     * @param string $fieldType
      *
-     * @return Sellvana_CatalogFields_Model_Field[]
+     * @return FCom_Core_Model_Field[]
      */
-    public function getAllFields($key = 'field_code')
+    public function getAllFields($key = 'field_code', $fieldType = null)
     {
-        if (!isset(static::$_fieldsCache[$key])) {
-            static::$_fieldsCache[$key] = $this->orm('f')->order_by_asc('field_name')->find_many_assoc($key);
+        $ft = $fieldType ?: 'ALL';
+        if (!isset(static::$_fieldsCache[$ft][$key])) {
+            $orm = $this->orm('f')->order_by_asc('field_name');
+            if ($fieldType) {
+                $orm->where('field_type', $fieldType);
+            }
+            static::$_fieldsCache[$ft][$key] = $orm->find_many_assoc($key);
         }
-        return static::$_fieldsCache[$key];
+        return static::$_fieldsCache[$ft][$key];
     }
 
     /**
      * @param string $key
      * @param string $prop
+     * @param string $fieldType
      * @return static|null
      */
-    public function getField($key, $prop = 'field_code')
+    public function getField($key, $prop = 'field_code', $fieldType = null)
     {
-        $fields = $this->getAllFields();
+        $fields = $this->getAllFields($fieldType);
         if (!$key) {
             return null;
         }
@@ -116,12 +129,12 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
 
     public function getFieldOptions($full = false)
     {
-        return $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($this, $full, 'label');
+        return $this->FCom_Core_Model_FieldOption->getFieldOptions($this, $full, 'label');
     }
 
     /**
      * @param array $data
-     * @return Sellvana_CatalogFields_Model_Field
+     * @return FCom_Core_Model_Field
      */
     public function addField($data)
     {
@@ -136,11 +149,12 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param string $fieldType
      * @return array
      */
-    public function getDropdowns()
+    public function getDropdowns($fieldType)
     {
-        $fields = $this->getAllFields();
+        $fields = $this->getAllFields($fieldType);
         $result = [];
         foreach ($fields as $field) {
             if ($field->get('admin_input_type') === 'select') {

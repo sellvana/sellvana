@@ -4,9 +4,9 @@
  * Class Sellvana_CustomerFields_Admin_Controller_Customers
  *
  * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
- * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption                     FCom_Core_Model_FieldOption
  * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
- * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
+ * @property FCom_Core_Model_Field                           FCom_Core_Model_Field
  * @property FCom_Core_Main                                  $FCom_Core_Main
  */
 class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract
@@ -37,7 +37,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         $fields_options = [];
         $fields = $this->Sellvana_CustomerFields_Model_CustomerFieldData->customerFields($p, $this->BRequest->request());
         foreach ($fields as $field) {
-            $fields_options[$field->id()] = $this->Sellvana_CustomerFields_Model_FieldOption->orm()
+            $fields_options[$field->id()] = $this->FCom_Core_Model_FieldOption->orm()
                 ->where("field_id", $field->id())->find_many();
         }
 
@@ -57,8 +57,8 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
     {
         $r = $this->BRequest;
         $id = $r->get('id');
-        $field = $this->Sellvana_CustomerFields_Model_Field->load($id);
-        $options = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($field->id());
+        $field = $this->FCom_Core_Model_Field->load($id);
+        $options = $this->FCom_Core_Model_FieldOption->getListAssocById($field->id());
         $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name, 'field_code' => $field->field_code,
             'admin_input_type' => $field->admin_input_type, 'multilang' => $field->multilanguage,
             'options' => $options, 'required' => $field->required]);
@@ -71,7 +71,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
             $customerId = $data['id'];
             $json = $data['json'];
             $hlp = $this->Sellvana_CustomerFields_Model_CustomerFieldData;
-            $res = $hlp->load($customerId, 'product_id');
+            $res = $hlp->load($customerId, 'customer_id');
             if (!$res) {
                 $hlp->create(['product_id' => $customerId, '_data_serialized' => $json])->save();
                 $status = 'Successfully saved.';
@@ -91,8 +91,8 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
             $res = [];
             $data = $this->BRequest->post();
             $ids = explode(',', $data['ids']);
-            $optionsHlp = $this->Sellvana_CustomerFields_Model_FieldOption;
-            $fields = $this->Sellvana_CustomerFields_Model_Field->orm()->where('id', $ids)->find_many_assoc();
+            $optionsHlp = $this->FCom_Core_Model_FieldOption;
+            $fields = $this->FCom_Core_Model_Field->orm()->where('id', $ids)->find_many_assoc();
             foreach ($fields as $id => $field) {
                 $res[] = [
                     'id' => $id,
@@ -114,13 +114,13 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
 
     public function getFieldTypes()
     {
-        $f = $this->Sellvana_CustomerFields_Model_Field;
+        $f = $this->FCom_Core_Model_Field;
         return $f->fieldOptions('table_field_type');
     }
 
     public function getAdminInputTypes()
     {
-        $f = $this->Sellvana_CustomerFields_Model_Field;
+        $f = $this->FCom_Core_Model_Field;
         return $f->fieldOptions('admin_input_type');
     }
 }

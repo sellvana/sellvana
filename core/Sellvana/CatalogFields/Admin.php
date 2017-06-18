@@ -3,8 +3,8 @@
 /**
  * Class Sellvana_CatalogFields_Admin
  *
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
@@ -24,7 +24,7 @@ class Sellvana_CatalogFields_Admin extends BClass
     {
         $p = $args['model'];
         $data = $p->as_array();
-        $fields = $this->Sellvana_CatalogFields_Model_Field->fieldsInfo('product', true);
+        $fields = $this->FCom_Core_Model_Field->fieldsInfo('product', true);
         if (array_intersect($fields, array_keys($data))) {
             $custom = $this->Sellvana_CatalogFields_Model_ProductField->load($p->id, 'product_id');
             if (!$custom) {
@@ -37,12 +37,12 @@ class Sellvana_CatalogFields_Admin extends BClass
 */
     public function onProductGridColumns($args)
     {
-        /** @var Sellvana_CatalogFields_Model_Field[] $fields */
-        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        /** @var FCom_Core_Model_Field[] $fields */
+        $fields = $this->FCom_Core_Model_Field->orm('f')->find_many();
         foreach ($fields as $f) {
             $col = ['label' => $f->field_name, 'index' => 'pcf.' . $f->field_name, 'hidden' => true];
             if ($f->admin_input_type == 'select') {
-                $col['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->orm()
+                $col['options'] = $this->FCom_Core_Model_FieldOption->orm()
                     ->where('field_id', $f->id)
                     ->find_many_assoc(stripos($f->table_field_type, 'varchar') === 0 ? 'label' : 'id', 'label');
             }
@@ -64,7 +64,7 @@ class Sellvana_CatalogFields_Admin extends BClass
         $fields = $this->Sellvana_CatalogFields_Model_ProductField->productFields($p);
         if ($fields) {
             $fieldIds = $this->BUtil->arrayToOptions($fields, '.id');
-            $fieldOptionsAll = $this->Sellvana_CatalogFields_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
+            $fieldOptionsAll = $this->FCom_Core_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
                 ->order_by_asc('field_id')->order_by_asc('label')->find_many();
             foreach ($fieldOptionsAll as $option) {
                 $fieldsOptions[$option->get('field_id')][] = $option;
@@ -133,12 +133,12 @@ class Sellvana_CatalogFields_Admin extends BClass
                 }
             }
         }
-        /** @var Sellvana_CatalogFields_Model_Field[] $fieldModels */
+        /** @var FCom_Core_Model_Field[] $fieldModels */
         $fieldModels = [];
         $fieldsByCode = [];
         if ($varFieldsData) {
             // retrieve custom fields
-            $fieldHlp = $this->Sellvana_CatalogFields_Model_Field;
+            $fieldHlp = $this->FCom_Core_Model_Field;
             $fieldModels = $fieldHlp->orm()->where_in('id', array_keys($varFieldsData))->find_many_assoc();
             foreach ($fieldModels as $m) {
                 $fieldsByCode[$m->get('field_code')] = $m->id();
@@ -157,8 +157,8 @@ class Sellvana_CatalogFields_Admin extends BClass
 
         if ($variantsData) {
             // retrieve related custom fields options
-            $fieldOptionHlp = $this->Sellvana_CatalogFields_Model_FieldOption;
-            /** @var Sellvana_CatalogFields_Model_FieldOption[] $fieldOptionsModels */
+            $fieldOptionHlp = $this->FCom_Core_Model_FieldOption;
+            /** @var FCom_Core_Model_FieldOption[] $fieldOptionsModels */
             $fieldOptionsModels = $fieldOptionHlp->orm()->where_in('field_id', array_keys($varFieldsData))->find_many();
             $fieldOptionLabelsById = [];
             $fieldOptionIdsByLabel = [];

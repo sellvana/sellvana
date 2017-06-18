@@ -5,9 +5,9 @@
  *
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
  * @property Sellvana_MultiSite_Frontend $Sellvana_MultiSite_Frontend
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  */
 class Sellvana_MultiSite_Main extends BClass
 {
@@ -35,9 +35,15 @@ class Sellvana_MultiSite_Main extends BClass
         return ($oldField['field_code'] == $field['field_code'] && $data->site_id == $oldData->site_id);
     }
 
+    /**
+     * @param $products
+     * @return $this|Sellvana_CatalogFields_Model_ProductFieldData
+     *
+     * @todo refactor with abstract of Sellvana_CatalogFields_Model_ProductFieldData
+     */
     public function saveProductsFieldSiteData($products)
     {
-        $fields = $this->Sellvana_CatalogFields_Model_Field->getAllFields('id');
+        $fields = $this->FCom_Core_Model_Field->getAllFields('id', 'product');
 
         $pIds = $this->BUtil->arrayToOptions($products, '.id');
         if (!$pIds) {
@@ -65,7 +71,7 @@ class Sellvana_MultiSite_Main extends BClass
             array_push($fieldsData[$rawData->get('product_id')][$siteId][$rawData->get('field_id')], $rawData);
         }
 
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->preloadAllFieldsOptions()->getAllFieldsOptions();
+        $options = $this->FCom_Core_Model_FieldOption->preloadAllFieldsOptions()->getAllFieldsOptions();
         $optionsByLabel = [];
         foreach ($options as $fieldId => $fieldOptions) {
             foreach ($fieldOptions as $optionId => $option) {
@@ -122,7 +128,7 @@ class Sellvana_MultiSite_Main extends BClass
                                 $singleValue = $optionsByLabel[$fId][$valueLower];
                             } else {                                   // option doesn't exist
                                 if ($this->Sellvana_CatalogFields_Model_ProductFieldData->getAutoCreateOptions()) { // allow option auto-creation?
-                                    $optionId = $this->Sellvana_CatalogFields_Model_FieldOption->create([
+                                    $optionId = $this->FCom_Core_Model_FieldOption->create([
                                         'field_id' => $fId,
                                         'label' => $singleValue,
                                     ])->save()->id();

@@ -4,14 +4,14 @@
  * Class Sellvana_SampleData_Migrate
  *
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  */
 
 class Sellvana_SampleData_Migrate extends BClass
 {
     public function install__0_1_1()
     {
-        $customField = $this->Sellvana_CatalogFields_Model_Field;
+        $customField = $this->FCom_Core_Model_Field;
         $fields   = [
             'finish'    => [
                 'field_code'       => 'finish',

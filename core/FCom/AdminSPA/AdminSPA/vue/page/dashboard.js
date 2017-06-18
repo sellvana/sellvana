@@ -1,16 +1,17 @@
 define(['sv-hlp'], function (SvHlp) {
 
-    return {
+    var SvPageDashboard = {
+        mixins: [SvHlp.mixins.common],
         store: SvHlp.store,
 		mounted: function () {
             this.$store.commit('setData', {curPage: {
                 link: '/',
                 label: 'Dashboard',
-              /*  icon_class: 'fa fa-tachometer', */
-				icon_link: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="img/icons.svg#icon-dashboard"></use>',
-				breadcrumbs: [
-                ]
+				icon_link: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="img/icons.svg#icon-dashboard"></use>'
             }});
+            this.sendRequest('GET', 'dashboard', {}, function (response) {
+                response
+            });
         },
         methods: {
             sortingUpdate: function (ev) {
@@ -18,4 +19,6 @@ define(['sv-hlp'], function (SvHlp) {
             }
         }
     };
+
+    return SvPageDashboard;
 });

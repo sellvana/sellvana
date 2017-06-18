@@ -15,9 +15,9 @@
  * DI
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
- * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field $FCom_Core_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductVariantField $Sellvana_CatalogFields_Model_ProductVariantField
@@ -40,7 +40,7 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
         $pId = $product->id();
         $varfieldHlp = $this->Sellvana_CatalogFields_Model_ProductVarfield;
         $varfieldModels = $varfieldHlp->orm('vf')
-            ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+            ->join('FCom_Core_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['vf.field_id', 'vf.field_label', 'vf.position'])
             ->select('f.*')
             ->where('vf.product_id', $pId)

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @property Sellvana_CatalogFields_Model_Field       $Sellvana_CatalogFields_Model_Field
+ * @property FCom_Core_Model_Field       $FCom_Core_Model_Field
  * @property Sellvana_Catalog_Model_Product           $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_Category          $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_InventorySku      $Sellvana_Catalog_Model_InventorySku
- * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property FCom_Core_Model_FieldOption $FCom_Core_Model_FieldOption
  * @property Sellvana_Sales_Main                      $Sellvana_Sales_Main
  * @property Sellvana_Cms_Model_Block                 $Sellvana_Cms_Model_Block
  * @property Sellvana_CustomerFields_Model_Field      $Sellvana_CustomerFields_Model_Field
@@ -170,12 +170,12 @@ class Sellvana_Rewards_Admin_Controller_Conditions extends FCom_Admin_Controller
         $fieldType = $fieldCode[0];
         $fieldCode = $fieldCode[1];
 
-        $field = $this->Sellvana_CatalogFields_Model_Field->load($fieldCode, 'field_code');
+        $field = $this->FCom_Core_Model_Field->load($fieldCode, 'field_code');
         $options = [];
 
         if ($fieldType == 'field') {
             if ($field) {
-                $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id());
+                $options = $this->FCom_Core_Model_FieldOption->getFieldOptions($field->id());
             } else {
                 $options = [];
             }
@@ -398,7 +398,7 @@ class Sellvana_Rewards_Admin_Controller_Conditions extends FCom_Admin_Controller
      */
     protected function getCatalogFieldsList($term, &$results, $limit, $offset)
     {
-        $orm = $this->Sellvana_CatalogFields_Model_Field->orm()->where('field_type', 'product');
+        $orm = $this->FCom_Core_Model_Field->orm()->where('field_type', 'product');
 
         if ($term && $term != '*') {
             $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
@@ -428,7 +428,7 @@ class Sellvana_Rewards_Admin_Controller_Conditions extends FCom_Admin_Controller
      */
     protected function getCustomersFieldsList($term, &$results, $limit, $offset)
     {
-        $orm = $this->Sellvana_CustomerFields_Model_Field->orm();
+        $orm = $this->Sellvana_CustomerFields_Model_Field->orm()->where('field_type', 'customer');
 
         if ($term && $term != '*') {
             $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
@@ -457,10 +457,10 @@ class Sellvana_Rewards_Admin_Controller_Conditions extends FCom_Admin_Controller
         return function ($model) use (&$results) {
             /** @var $model BModel */
             $fieldLabel = ' (field)';
-            if($model instanceof Sellvana_CustomerFields_Model_Field){
+            if ($model->get('field_type') === 'customer'){
                 $fieldLabel = ' (customer field)';
-            } elseif($model instanceof Sellvana_CatalogFields_Model_Field) {
-                $fieldLabel = ' (catalog field)';
+            } elseif ($model->get('field_type') === 'product') {
+                $fieldLabel = ' (product field)';
             }
             $result = [
                 'id'   => 'field' . '.' . $model->get('field_code'),

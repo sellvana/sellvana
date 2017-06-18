@@ -13,8 +13,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         'label_class' => 'col-md-3',
         'field_container_class' => 'col-md-9',
     ];
-    
-    static protected $_defaultActionConfig = [
+
+    static protected $_defaultFormActionConfig = [
         'mobile_group' => 'actions',
     ];
 
@@ -65,31 +65,42 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         if (!empty($form['config']['actions'])) {
             if (true === $form['config']['actions']) {
                 $form['config']['actions'] = [
+                    ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
                     ['name' => 'actions', 'label' => 'Actions'],
-                    ['name' => 'back', 'label' => 'Back', 'desktop_group' => 'back', 'button_class' => 'button2'],
-                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4'],
+                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'product.id'],
                     ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
                     ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
                 ];
             }
             $actionGroups = [];
             $def = !empty($form['config']['default_action']) ? $form['config']['default_action'] : [];
-            $def = array_merge(static::$_defaultActionConfig, $def);
+            $def = array_merge(static::$_defaultFormActionConfig, $def);
             foreach ($form['config']['actions'] as &$act) {
                 $act = array_merge($def, $act);
+                if (!empty($act['if'])) {
+                    $ifResult = $this->BUtil->arrayGet($form, $act['if']);
+                    if (!$ifResult) {
+                        continue;
+                    }
+                }
                 foreach (['desktop_group', 'mobile_group'] as $g) {
-                    if (!empty($act[$g])) {
-                        if (empty($actionGroups[$g][$act[$g]])) {
-                            $actionGroups[$g][$act[$g]] = $act;
+                    $group = !empty($act[$g]) ? $act[$g] : (!empty($act['group']) ? $act['group'] : null);
+                    if (!empty($group)) {
+                        if (empty($actionGroups[$g][$group])) {
+                            $actionGroups[$g][$group] = $act;
                         } else {
-                            $actionGroups[$g][$act[$g]]['children'][] = $act;
+                            $actionGroups[$g][$group]['children'][] = $act;
                         }
                     }
                 }
             }
             unset($act);
-            $form['config']['action_desktop_groups'] = array_values($actionGroups['desktop_group']);
-            $form['config']['action_mobile_groups'] = array_values($actionGroups['mobile_group']);
+            if (!empty($actionGroups['desktop_group'])) {
+                $form['config']['action_desktop_groups'] = array_values($actionGroups['desktop_group']);
+            }
+            if (!empty($actionGroups['mobile_group'])) {
+                $form['config']['action_mobile_groups'] = array_values($actionGroups['mobile_group']);
+            }
         }
 
         if (!empty($form['i18n']) && is_string($form['i18n'])) {

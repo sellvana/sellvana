@@ -31,7 +31,7 @@ class FieldOptionTest extends \Codeception\TestCase\Test
         $this->tester->seeNumRecords(2, 'fcom_field_option');
 
         $data = ['id' => 3, 'field_id' => "1", 'label' => "Feature A2"];
-        Sellvana_CatalogFields_Model_FieldOption::i()->create($data)->save();
+        FCom_Core_Model_FieldOption::i()->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_field_option');
     }
@@ -40,7 +40,7 @@ class FieldOptionTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_field_option');
 
-        $fieldOption = Sellvana_CatalogFields_Model_FieldOption::i()->load(2);
+        $fieldOption = FCom_Core_Model_FieldOption::i()->load(2);
         $fieldOption->delete();
 
         $this->tester->seeNumRecords(1, 'fcom_field_option');

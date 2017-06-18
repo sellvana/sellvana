@@ -14,26 +14,26 @@
 
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_5_0_0()
+    public function install__0_6_0_0()
     {
         $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
-        if (!$this->BDb->ddlTableExists($tMediaLibrary)) {
-            $this->BDb->run("
-                CREATE TABLE {$tMediaLibrary} (
-                  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                  `folder` varchar(255) NOT NULL,
-                  `subfolder` varchar(32) DEFAULT NULL,
-                  `file_name` varchar(255) NOT NULL,
-                  `file_size` int(11) DEFAULT NULL,
-                  `data_serialized` text,
-                  `create_at` datetime DEFAULT NULL,
-                  `update_at` datetime DEFAULT NULL,
-                  PRIMARY KEY (`id`),
-                  KEY `folder_file` (`folder`,`file_name`),
-                  KEY `IDX_create_at` (`create_at`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            ");
-        }
+        $this->BDb->ddlTableDef($tMediaLibrary, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'folder' => 'varchar(255) not null',
+                'subfolder' => 'varchar(32) default null',
+                'file_name' => 'varchar(255) not null',
+                'file_size' => 'int(11) default null',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime default null',
+                'update_at' => 'datetime default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'field_file' => '(folder, file_name)',
+                'IDX_create_at' => '(create_at)',
+            ],
+        ]);
         $this->BDb->ddlTableDef($this->FCom_Core_Model_Seq->table(), [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
@@ -120,6 +120,109 @@ class FCom_Core_Migrate extends BClass
             $this->BConfig->set('core/cache/default_backend', $this->_defaultBackend, false, true);
             $this->BConfig->writeConfigFiles('core');
         }
+
+        $tableExternalConfig = $this->FCom_Core_Model_ExternalConfig->table();
+
+        $this->BDb->ddlTableDef($tableExternalConfig, [
+            BDb::COLUMNS => [
+                'id'                => 'int(10) unsigned not null auto_increment',
+                'source_type'       => 'varchar(50) not null',
+                'path'              => 'varchar(255) not null',
+                'value'             => 'text not null',
+                'site_id'           => 'int(11) unsigned default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS    => [
+                'UNQ_external_config' => 'UNIQUE (source_type, path, site_id)',
+            ],
+        ]);
+
+        $hlpField = $this->FCom_Core_Model_Field;
+        $tField = $hlpField->table();
+        $tFieldOption = $this->FCom_Core_Model_FieldOption->table();
+        $tSet = $this->FCom_Core_Model_Fieldset->table();
+        $tSetField = $this->FCom_Core_Model_FieldsetField->table();
+
+        $this->BDb->ddlTableDef($tField, [
+            BDb::COLUMNS => [
+                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
+                'field_type' => "varchar(50) NOT NULL",
+                'field_code' => "varchar(50) NOT NULL",
+                'field_name' => "varchar(50) NOT NULL",
+                'table_field_type' => "varchar(20) NOT NULL",
+                'admin_input_type' => "varchar(20) NOT NULL DEFAULT 'text'",
+                'frontend_label' => "text",
+                'frontend_show' => "tinyint(1) NOT NULL DEFAULT '1'",
+                'config_json' => "text",
+                'sort_order' => "int(11) NOT NULL DEFAULT '0'",
+                'system' => "tinyint(1) NOT NULL DEFAULT '0'",
+                'multilanguage' => "tinyint(1) NOT NULL DEFAULT '0'",
+                'validation' => "varchar(100) DEFAULT NULL",
+                'required' => "tinyint(1) NOT NULL DEFAULT '1'",
+
+                // PRODUCTS
+                'facet_select' => "enum('No','Exclusive','Inclusive') NOT NULL DEFAULT 'No'",
+                'swatch_type' => "char(1) not null default 'N'",
+
+                // CUSTOMERS
+                'register_form' => "BOOLEAN DEFAULT 0",
+                'account_edit'  => "BOOLEAN DEFAULT 0",
+
+                'data_serialized' => 'text',
+                'create_at' => 'datetime default null',
+                'update_at' => 'datetime default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_field_code' => 'UNIQUE (field_code)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tFieldOption, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'field_id' => 'int unsigned not null',
+                'label' => 'varchar(255) not null',
+                'locale' => "varchar(10) not null default '_'",
+                'swatch_info' => 'text default null',
+                'data_serialized' => 'text', // for translations
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'field_id__label' => 'UNIQUE (field_id, label)',
+            ],
+            BDb::CONSTRAINTS => [
+                'field' => ['field_id', $tField],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tSet, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'set_type' => "enum('product') not null default 'product'",
+                'set_code' => 'varchar(100) not null',
+                'set_name' => 'varchar(100) not null',
+            ],
+            BDb::PRIMARY => '(id)',
+        ]);
+
+        $this->BDb->ddlTableDef($tSetField, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'set_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'position' => 'smallint(5) unsigned default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_set_id__field_id' => 'UNIQUE (set_id, field_id)',
+                'IDX_set_id__position' => '(set_id, position)',
+            ],
+            BDb::CONSTRAINTS => [
+                'field' => ['field_id', $tField],
+                'set' => ['set_id', $tSet],
+            ],
+        ]);
     }
 
     public function upgrade__0_1_0__0_1_1()
