@@ -56,8 +56,12 @@
 			- [ requireJs, sv-page-catalog-categories-form-products-config, "~/categories/form/products/grid_config" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout.html" ]
-			
-			
+
+            - [ requireJs, sv-comp-dashboard-low-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/low-inventory.html" ]
+            - [ requireJs, sv-comp-dashboard-new-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/new-products.html" ]
+            - [ requireJs, sv-comp-dashboard-search-recent-terms-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/search-recent-terms.html" ]
+            - [ requireJs, sv-comp-dashboard-search-top-terms-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/search-top-terms.html" ]
+            - [ requireJs, sv-comp-dashboard-without-images-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/without-images.html" ]
 
     - view: app
         do:
@@ -115,3 +119,62 @@
             - [ addFormTab, { path: /catalog/categories/form, name: images, label: Images, pos: 30 } ]
             - [ addFormTab, { path: /catalog/categories/form, name: products, label: Products, pos: 40 } ]
             - [ addFormTab, { path: /catalog/categories/form, name: layout, label: Layout, pos: 50 } ]
+
+sv-page-dashboard-config:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - low-inventory
+                -
+                    title: Low Inventory Products
+                    icon: inbox
+                    template: sv-comp-dashboard-low-inventory-tpl
+                    callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetLowInventory
+                    container_class: col-md-4
+                    filter: true
+                    permission: catalog/inventory
+            -
+                - addWidget
+                - new-products
+                -
+                    title: Latest New Products
+                    icon: inbox
+                    template: sv-comp-dashboard-new-products-tpl
+                    callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetNewProducts
+                    container_class: col-md-4
+                    filter: true
+                    permission: catalog/products
+            -
+                - addWidget
+                - without-images
+                -
+                    title: Products With No Images
+                    icon: inbox
+                    template: sv-comp-dashboard-without-images-tpl
+                    callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetWithoutImages
+                    container_class: col-md-3
+                    filter: true
+                    permission: catalog/products
+            -
+                - addWidget
+                - search-recent-terms
+                -
+                    title: Searches - recent terms (internal)
+                    icon: inbox
+                    template: sv-comp-dashboard-search-recent-terms-tpl
+                    callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetSearchRecentTerms
+                    container_class: col-md-3
+                    filter: true
+                    permission: catalog/products
+            -
+                - addWidget
+                - search-top-terms
+                -
+                    title: Searches - top terms (internal)
+                    icon: inbox
+                    template: sv-comp-dashboard-search-top-terms-tpl
+                    callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetSearchTopTerms
+                    container_class: col-md-3
+                    filter: true
+                    permission: catalog/products

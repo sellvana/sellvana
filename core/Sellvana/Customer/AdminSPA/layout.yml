@@ -10,6 +10,8 @@
 
 			- [ requireJs, sv-page-customers-form-main, "@Sellvana_Customer/AdminSPA/vue/page/customers/form/main" ]
 			- [ requireJs, sv-page-customers-form-main-tpl, "@Sellvana_Customer/AdminSPA/vue/page/customers/form/main.html" ]
+
+			- [ requireJs, sv-comp-dashboard-new-customers-tpl, "@Sellvana_Customer/AdminSPA/vue/component/dashboard/new-customers.html" ]
 			
     - view: app
         do:
@@ -29,3 +31,17 @@
     - view: app
         do:
             - [ addFormTab, { path: /customers/form, name: main, label: Customer Info, pos: 10 } ]
+
+sv-page-dashboard-config:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - new-customers
+                -
+                    title: Recent Customers
+                    icon: group
+                    template: sv-comp-dashboard-new-customers-tpl
+                    callback: Sellvana_Customer_AdminSPA_Dashboard.widgetNewCustomers
+                    async: true
+                    permission: customers/manage

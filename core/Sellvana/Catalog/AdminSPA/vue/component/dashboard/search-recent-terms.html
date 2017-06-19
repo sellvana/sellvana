@@ -1,0 +1,17 @@
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th>{{ "Term"|_ }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-if="!widget.data.terms">
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+            <tr v-else v-for="term in widget.data.terms">
+                <td>{{ term.query }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,14 @@
+<div :class="widget.container_class" :debug="widget.name">
+    <div class="f-content-block">
+        <div class="f-dashboard">
+            <div class="f-dashboard__title">
+                <p>{{widget.title|_}}</p>
+                <a href="#" class="f-roll-up"> <i class="fa fa-window-minimize"></i> </a>
+                <a href="#" class="f-delete"> <i class="fa fa-times"></i> </a>
+            </div>
+            <div class="f-dashboard__content">
+                <component :is="component" :widget="widget"></component>
+            </div>
+        </div>
+    </div>
+</div>

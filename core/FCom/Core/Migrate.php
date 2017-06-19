@@ -10,6 +10,10 @@
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
  * @property FCom_Core_Model_Module $FCom_Core_Model_Module
  * @property FCom_Core_Model_ExternalConfig $FCom_Core_Model_ExternalConfig
+ * @property FCom_Core_Model_Field FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldOption FCom_Core_Model_FieldOption
+ * @property FCom_Core_Model_Fieldset FCom_Core_Model_Fieldset
+ * @property FCom_Core_Model_FieldsetField FCom_Core_Model_FieldsetField
  */
 
 class FCom_Core_Migrate extends BClass
@@ -148,7 +152,7 @@ class FCom_Core_Migrate extends BClass
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'field_type' => "varchar(50) NOT NULL",
                 'field_code' => "varchar(50) NOT NULL",
-                'field_name' => "varchar(50) NOT NULL",
+                'field_name' => "varchar(255) NOT NULL",
                 'table_field_type' => "varchar(20) NOT NULL",
                 'admin_input_type' => "varchar(20) NOT NULL DEFAULT 'text'",
                 'frontend_label' => "text",
@@ -417,5 +421,16 @@ UPDATE {$tModule} SET module_name=CASE module_name
         ];
 
         $this->BDb->ddlTableDef($tableExternalConfig, $tableDef);
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tField = $this->FCom_Core_Model_Field->table();
+
+        $this->BDb->ddlTableDef($tField, [
+            BDb::COLUMNS => [
+                'field_name' => "varchar(255) NOT NULL",
+            ],
+        ]);
     }
 }

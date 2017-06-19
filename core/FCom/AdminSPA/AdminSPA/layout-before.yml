@@ -175,6 +175,10 @@
 
             - [ requireJs, sv-page-dashboard, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard" ]
             - [ requireJs, sv-page-dashboard-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard.html" ]
+            - [ requireJs, sv-page-dashboard-widget, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard/widget" ]
+            - [ requireJs, sv-page-dashboard-widget-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard/widget.html" ]
+
+            - [ requireJs, sv-page-dashboard-visitors-totals-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/dashboard/visitors-totals.html" ]
 
             - [ requireJs, sv-page-account-login, "@FCom_AdminSPA/AdminSPA/vue/page/account/login" ]
             - [ requireJs, sv-page-account-login-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/login.html" ]
@@ -266,6 +270,18 @@ sv-app-setings-config:
             - [ addNav, { path: /themes, label: Themes, pos: 80 }]
 
             - [ addNav, { path: /other, label: Other, pos: 90 }]
+
+sv-page-dashboard-config:
+    - view: dashboard
+        do:
+            -
+              - addWidget
+              - visitors-totals
+              -
+                  title: Visitors
+                  template: sv-page-dashboard-visitors-totals-tpl
+                  callback: FCom_AdminSPA_AdminSPA_View_Dashboard.widgetVisitorsTotals
+                  container_class: col-md-2
 
 /login:
     - { include: / }

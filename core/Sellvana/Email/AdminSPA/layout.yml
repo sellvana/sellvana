@@ -1,7 +1,21 @@
 /:
+    - view: head
+        do:
+            - [ requireJs, sv-comp-dashboard-new-subscriptions-tpl, "@Sellvana_Email/AdminSPA/vue/component/dashboard/new-subscriptions.html" ]
+
     - view: app
         do:
             - [ addNav, { path: /customers/email-prefs, label: Email Subscriptions, link: /customers/email-prefs, pos: 50 } ]
 
-
+sv-page-dashboard-config:
+    - view: dashboard
+        do:
+            -
+              - addWidget
+              - new-subscriptions
+              -
+                  title: New Subscriptions
+                  template: sv-comp-dashboard-new-subscriptions-tpl
+                  callback: Sellvana_Email_AdminSPA_Dashboard.widgetNewSubscriptions
+                  container_class: col-md-2
 

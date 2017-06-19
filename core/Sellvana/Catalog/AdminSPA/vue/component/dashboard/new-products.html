@@ -1,0 +1,23 @@
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "SKU"|_ }}</th>
+            <th>{{ "Name"|_ }}</th>
+            <th>{{ "Date added"|_ }}</th>
+            <th>{{ "Category"|_ }}</th>
+        </tr>
+        </thead>
+        <tr v-if="!widget.data.products">
+            <td colspan="6">{{ "No data"|_ }}</td>
+        </tr>
+        <tr v-else v-for="product in widget.data.products">
+            <td>{{ product.product_sku }}</td>
+            <td>{{ product.product_name }}</td>
+            <td>{{ product.create_at }}</td>
+            <td>{{ product.categories }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </table>
+</div>

@@ -24,6 +24,7 @@ modules:
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                 views:
                     - [ app, FCom_AdminSPA_AdminSPA_View_App ]
+                    - [ dashboard, FCom_AdminSPA_AdminSPA_View_Dashboard ]
                 observe:
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::collectFormConfig", "FCom_AdminSPA_AdminSPA.onSettingsConfig" ]
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::collectFormData:after", "FCom_AdminSPA_AdminSPA.onSettingsDataAfter" ]
