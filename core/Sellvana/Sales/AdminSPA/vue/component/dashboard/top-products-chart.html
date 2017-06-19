@@ -1,0 +1,34 @@
+{% set products = APP.instance('Sellvana_Sales_Admin_Dashboard').getTopProducts() %}
+{% if products|length > 0 %}
+<div id="top-products-chart" style="width: 450px; height: 300px; "></div>
+
+<script>
+    require(['jquery', 'flot', 'flot.pie'], function($) {
+        function labelFormatter(label, series) {
+            return "<div style='font-size:12pt; text-align:center; padding:2px; color:white; font-weight: bold;'>" + Math.round(series.percent) + "%</div>";
+        }
+
+        var data = [];
+        {% for product in products %}
+           data.push({label: '{{ product.get('product_name') }}', data: {{ product.get('profit_fixed') }}});
+        {% endfor %}
+        console.log(data);
+        $.plot('#top-products-chart', data, {
+            series: {
+                pie: {
+                    show: true,
+                    radius: 1,
+                    label: {
+                        show: true,
+                        radius: 3/4,
+                        formatter: labelFormatter,
+                        background: {
+                            opacity: 0.5
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}

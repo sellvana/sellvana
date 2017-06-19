@@ -1,0 +1,21 @@
+<div class="box-content" style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th>{{ "Product Name"|_ }}</th>
+                <th>{{ "Customer"|_ }}</th>
+                <th>{{ "Rating"|_ }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-if="!widget.data.reviews">
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+            <tr v-else v-for="review in widget.data.reviews">
+                <td>{{ review.product_name }}</td>
+                <td>{{ review.firstname }} {{ review.lastname }}</td>
+                <td>{{ review.rating }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

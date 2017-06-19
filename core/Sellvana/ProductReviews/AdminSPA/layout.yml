@@ -1,0 +1,18 @@
+/:
+    - view: head
+        do:
+            - [ requireJs, sv-comp-dashboard-new-reviews-tpl, "@Sellvana_ProductReviews/AdminSPA/vue/component/dashboard/new-reviews.html" ]
+
+sv-page-dashboard-config:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - new-reviews
+                -
+                    title: Latest Product Reviews
+                    icon: inbox
+                    template: sv-comp-dashboard-new-reviews-tpl
+                    callback: Sellvana_ProductReviews_AdminSPA_Dashboard.widgetNewReviews
+                    container_class: col-md-4
+                    permission: product_review
