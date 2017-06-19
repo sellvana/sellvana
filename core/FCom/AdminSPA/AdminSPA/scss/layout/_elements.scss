@@ -42,6 +42,7 @@
 	background: #fff;
 	border-radius: 5px;
 	padding: 15px;
+	margin-bottom: 30px;
 }
 
 a:focus {
@@ -99,10 +100,13 @@ a:focus {
 		}
 	}			
 }
-
+.f-prices-params {
+	&.param-block {
+		margin: 15px 0;
+	}
+}
 .param-block {
 	height: 17px;
-	margin: 15px 0;
 	.f-input {
 		border-radius: 0;
 	}
@@ -266,6 +270,7 @@ a:focus {
 			color: #000;
 			vertical-align: middle;
 			padding: 0 10px;
+			font-size: 11px;
 		}
 		a {
 			font-size: 10px;
@@ -305,9 +310,7 @@ a:focus {
 	display: table-cell;
 	vertical-align: bottom;
 }
-.f-tabs-container {
-	/*overflow: auto;*/
-}
+
 .f-actions-container {
 	text-align: right;
 	white-space: nowrap;

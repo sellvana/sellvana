@@ -1,7 +1,7 @@
 .f-grid-filter-panel {
       margin: 0;
       position: relative;
-      padding: 0 20px;
+      padding: 0 30px;
 }
 
 /*Filter options windows*/
@@ -141,8 +141,8 @@
       .ui-sortable {
             padding: 0;
             li {
-                  display: inline-block;
-                  width: 50%;
+                 /* display: inline-block;
+                  width: 50%;*/
                   & > * {
                         display: inline-block;
                         vertical-align: middle;
@@ -346,6 +346,13 @@
 
 .f-list-pagination__item {
       display: inline-block;
+      &.active {
+            .f-list-pagination__link {
+                 color: #fff;
+                 background: #2e4354;
+
+            }
+      }
 }
 
 .f-list-pagination__link {

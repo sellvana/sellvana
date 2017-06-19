@@ -1,4 +1,4 @@
-<div class="custom-scroll">
+<div class="scrollable-area">
     <div v-for="error in errors" class="error">{{error}}</div>
     <table class="f-price-table">
         <thead>
@@ -116,7 +116,7 @@
         </tfoot>
     </table>
 
-    <div v-for="price in visiblePrices" class="param-block">
+    <div v-for="price in visiblePrices" class="param-block f-prices-params">
         <inline-param v-model="price.customer_group_id" :options="inlineOptions('customer_groups')"></inline-param>
         <inline-param v-model="price.site_id" :options="inlineOptions('multi_site')"></inline-param>
         <inline-param v-model="price.currency_code" :options="inlineOptions('multi_currency')"></inline-param>

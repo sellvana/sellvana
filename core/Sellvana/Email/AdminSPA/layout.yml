@@ -17,5 +17,5 @@ sv-page-dashboard-config:
                   title: New Subscriptions
                   template: sv-comp-dashboard-new-subscriptions-tpl
                   callback: Sellvana_Email_AdminSPA_Dashboard.widgetNewSubscriptions
-                  container_class: col-md-2
+                  container_class: col-md-3
 

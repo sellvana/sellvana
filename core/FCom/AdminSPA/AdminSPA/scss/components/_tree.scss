@@ -2,6 +2,13 @@
 	ul {
 		padding: 0;
 	}
+	.f-buttons-block {
+		display: table;
+		width: 100%;
+	}
+	.f-icon-button {
+		display: table-cell;
+	}
 }
 .tree-node {
 	cursor: pointer;

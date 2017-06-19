@@ -281,7 +281,7 @@ sv-page-dashboard-config:
                   title: Visitors
                   template: sv-page-dashboard-visitors-totals-tpl
                   callback: FCom_AdminSPA_AdminSPA_View_Dashboard.widgetVisitorsTotals
-                  container_class: col-md-2
+                  container_class: col-md-3
 
 /login:
     - { include: / }

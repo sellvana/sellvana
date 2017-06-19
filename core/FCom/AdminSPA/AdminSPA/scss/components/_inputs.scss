@@ -31,6 +31,7 @@ input[type=number] {
 	input[type="date"] {
 		padding: 6px 12px;
 		height: 34px;
+		width: 49%;
 	}
 	.f-input, .f-input-number, .f-textarea {
 		display: table-cell;
@@ -50,6 +51,7 @@ input[type=number] {
 	box-sizing: border-box;
 	width: 1%;
 	white-space: nowrap;
+	text-align: left;
 	&.open {
 		.f-form-group__addon-menu {
 			display: block;

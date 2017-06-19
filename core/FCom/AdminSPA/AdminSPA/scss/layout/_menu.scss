@@ -2,10 +2,6 @@
 	margin: 0;
 	padding: 0;
 	white-space: nowrap;
-	width: 75%;
-	min-width: 500px;
-	overflow: auto;
-	position: relative;
 	.f-horizontal-menu__dropdown-menu {
 		display: none;
 		padding: 0;
@@ -38,20 +34,6 @@
 		.f-dropdown__toggle {
 			padding: 8px 30px;
 		}
-	}
-	&:after {
-		position: absolute;
-		top: 0;
-		right: 0;
-		height: 35px;
-		width: 50px;
-		z-index: 1;
-		content: '';
-		pointer-events: none;
-		background: linear-gradient(to left, #f1f1f1, rgba(248,247,238,0));
-		visibility: visible;
-		opacity: 1;
-		transition: opacity .3s 0s, visibility 0s 0s;
 	}
 }
 
@@ -116,10 +98,62 @@
 	}
 }
 
+.f-tabs-container {
+	position: relative;
+	max-width: 500px;
+	height: 35px; // hide the scroll bar
+	overflow-x: hidden;
+	overflow-y: hidden;
+	.f-horizontal-menu {
+		position: relative;
+		height: 34px; // hide the scroll bar
+		overflow-x: hidden;
+		overflow-y: hidden;
+	}
+}
+
+.paddles {
+
+}
+.paddle {
+	background: linear-gradient(to left, #f1f1f1, rgba(248,247,238,0));
+	position: absolute;
+	bottom: 0;
+	height: 34px;
+	width: 3em;
+	border: 0;
+}
+.left-paddle {
+	left: 0;
+	font-weight: bold;
+	font-size: 16px;
+	text-align: left;
+}
+.right-paddle {
+	right: 0;
+	font-weight: bold;
+	font-size: 16px;
+	text-align: right;
+}
+.hidden {
+	display: none;
+}
+
 @media (max-width: 1365px) {
 
 }
 
-@media (max-width: 767px) {
+@media (max-width: 991px) {
+	.f-tabs-container {
+		max-width: inherit;
+		height: inherit;
+		overflow-x: visible;
+		overflow-y: visible;
+		.f-horizontal-menu {
+			height: inherit;
+			overflow-x: visible;
+			overflow-y: visible;
+		}
+	}
 
 }

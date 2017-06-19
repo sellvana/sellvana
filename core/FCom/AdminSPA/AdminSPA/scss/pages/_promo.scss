@@ -2,7 +2,15 @@
 	margin-top: 30px;
 }
 .configure-block {
+	padding: 10px;
 	&.active {
 		background: #f8f8f8;
+	}
+}
+
+
+@media (max-width: 1023px) {
+	.configure-block {
+		/*padding: 10px 0;*/
 	}
 }

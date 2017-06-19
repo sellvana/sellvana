@@ -1,9 +1,13 @@
 <div>
-    <div v-if="grid && grid.config && grid.config.title" class="f-form-title">
-        <p class="f-form-title__text hidden-xs">{{grid.config.title|_}}</p>
-    </div>
-    <div class="row">
-        <sv-comp-actions :config="grid.config" container-class="col-xs-6 col-offset-xs-6" @event="processActionEvent"></sv-comp-actions>
-    </div>
-    <sv-comp-grid :grid="grid"></sv-comp-grid>
+      <div v-if="grid && grid.config && grid.config.title" class="f-form-title">
+            <p class="f-form-title__text hidden-xs">{{grid.config.title|_}}</p>
+      </div>
+      <div class="row">
+            <div class="col-lg-12">
+                  <div class="f-control-panel">
+                        <sv-comp-actions :config="grid.config" container-class="f-actions-container" @event="processActionEvent"></sv-comp-actions>
+                  </div>
+            </div>
+      </div>
+      <sv-comp-grid :grid="grid"></sv-comp-grid>
 </div>
