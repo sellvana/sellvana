@@ -1,30 +1,32 @@
 <div :class="containerClass">
 
-    <!--START: Desktop tabs view-->
+    <div class="f-tabs-container" ref="menuWrapper">
+        <!--START: Desktop tabs view-->
 
-    <ul class='f-horizontal-menu visible-lg visible-md' :class="{open:ddOpen('menu-open')}">
-            <li v-for="t in formTabs" :key="t.name" :class="{active:tab === t}" class="f-horizontal-menu__item">
+        <ul class='f-horizontal-menu visible-lg visible-md' :class="{open:ddOpen('menu-open')}" ref="menu">
+            <li v-for="t in formTabs" :key="t.name" :class="{active:tab === t}" class="f-horizontal-menu__item" ref="item">
                 <a href="#" @click.prevent="switchTab(t)" class="f-horizontal-menu__link">
                     {{t.label|_}}
                     <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
                 </a>
             </li>
-    </ul>
+        </ul>
 
-    <!--END: Desktop actions view-->
+        <!--END: Desktop tabs view-->
 
-    <!--START: Arrows for scroll-->
+        <!--START: Arrows for scroll-->
 
-    <div class="paddles visible-lg visible-md">
-        <button class="left-paddle paddle hidden">
-            <
-        </button>
-        <button class="right-paddle paddle">
-            >
-        </button>
+        <div class="paddles visible-lg visible-md">
+            <button class="left-paddle paddle hidden" ref="leftPaddle">
+                <
+            </button>
+            <button class="right-paddle paddle hidden" ref="rightPaddle">
+                >
+            </button>
+        </div>
+
+        <!--END: Arrows for scroll-->
     </div>
-
-    <!--END: Arrows for scroll-->
 
     <!--START: Mobile actions view-->
 
