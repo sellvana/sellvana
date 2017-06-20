@@ -23,7 +23,6 @@
 .f-form-title__text {
 	font-size: 20px;
 	font-weight: bold;
-	padding: 20px 10px 17px 15px;
 	margin: 0;
 	display: inline-block;
 }
@@ -305,6 +304,13 @@ a:focus {
 .f-control-panel {
 	display: table;
 	width: 100%;
+	padding: 10px 0 10px 15px;
+	.f-form-title, .f-actions-container {
+		display: table-cell;
+	}
+	.f-actions-container {
+		text-align: right;
+	}
 }
 .f-tabs-container, .f-actions-container {
 	display: table-cell;

@@ -56,7 +56,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
                 ['name' => 'custom_state', 'label' => 'Change Custom State'],
             ],
             'actions' => [
-                ['name' => 'new', 'label' => 'Add New Product', 'link' => '/catalog/products/form', 'group' => 'new'],
+                ['name' => 'new', 'label' => 'Add New Product', 'class' => 'button1', 'link' => '/catalog/products/form', 'group' => 'new'],
             ],
         ];
     }

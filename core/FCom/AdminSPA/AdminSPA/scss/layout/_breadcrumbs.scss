@@ -1,15 +1,19 @@
 .f-breadcrumbs-block {
       display: inline-block;
 }
+.f-breadcrumb {
+      display: inline-block;
+      vertical-align: middle;
+}
 .f-header-breadcrumb {
       margin: 0 0 0 30px;
       padding: 0;
       white-space: nowrap;
-      li:nth-last-child(2), li:last-child {
+      /*li:nth-last-child(2), li:last-child {
             &:after {
                   display: none;
             }
-      }
+      }*/
 }
 .f-breadcrumb__penultimate {
       vertical-align: middle;
@@ -54,6 +58,8 @@
 .f-breadcrumb__item-favorite__link {
       font-size: 17px;
       color: #fff;
+      display: inline-block;
+      vertical-align: middle;
       &:focus {
             color: #fff;
       }
@@ -66,24 +72,12 @@
       }
       &:hover {
             color: #fff;
-          /*  .fa-star-o {
-                  display: none;
-            }
-            .fa-star {
-                  display: inline-block;
-            }*/
-            svg {
+          svg {
                   fill: #fff;
                   stroke: #fff;
             }
       }
       &.on {
-            /*.fa-star-o {
-                  display: none;
-            }
-            .fa-star {
-                  display: inline-block;
-            }*/
             svg {
                   fill: #fff;
                   stroke: #fff;
@@ -92,17 +86,23 @@
 }
 @media (max-width: 1279px) {
       .f-breadcrumbs-block {
+            max-width: calc(100% - 540px);
+            white-space: nowrap;
+      }
+      .f-breadcrumb {
             position: relative;
             display: inline-block;
-            max-width: calc(100% - 570px);
-            &:after {
+            overflow: hidden;
+            max-width: calc(100% - 50px);
+            text-overflow: ellipsis;
+            /* &:after {
                   content: '...';
                   display: block;
                   position: absolute;
                   bottom: 18px;
                   right: -12px;
                   color: #fff;
-            }
+            }*/
       }
       .f-header-breadcrumb {
             overflow: hidden;
@@ -139,21 +139,6 @@
             }
       }
       .f-breadcrumb__item-favorite__link {
-           /* color: #000;
-            &:focus {
-                  color: inherit;
-            }
-            &:hover {
-                  color: inherit;
-            }
-            &.on {
-                  &:focus {
-                        color: #000;
-                  }
-                  &:hover {
-                        color: #000;
-                  }
-            }*/
             svg {
                   fill: none;
                   stroke: #000;
@@ -165,12 +150,6 @@
                   }
             }
             &.on {
-                  /*.fa-star-o {
-                        display: none;
-                  }
-                  .fa-star {
-                        display: inline-block;
-                  }*/
                   svg {
                         fill: #000;
                         stroke: #000;

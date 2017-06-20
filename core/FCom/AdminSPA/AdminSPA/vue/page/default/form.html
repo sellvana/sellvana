@@ -1,17 +1,20 @@
 <div class="row">
-    <div v-if="thumbUrl || formTitle" class="col-md-12 col-sm-12">
-        <div class="f-form-title">
-            <img v-if="thumbUrl" :src="thumbUrl" width="80" class="f-thumb-img">
-            <p class="f-form-title__text" :class-bak="{'hidden-xs':!thumbUrl}">{{formTitle|_}}</p>
-        </div>
-    </div>
-    <div class="col-lg-12">
-        <div class="f-control-panel">
-            <sv-comp-tabs :config="form.config" :tab="tab" container-class="f-tabs-container" @event="processTabEvent"></sv-comp-tabs>
-            <sv-comp-actions :config="form.config" container-class="f-actions-container" @event="processActionEvent"></sv-comp-actions>
-        </div>
-    </div>
-    <div class="col-xs-12">
-        <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
-    </div>
+      <div v-if="thumbUrl || formTitle" class="col-md-12 col-sm-12">
+            <div class="f-control-panel">
+                  <div class="f-form-title">
+                        <img v-if="thumbUrl" :src="thumbUrl" width="80" class="f-thumb-img">
+                        <p class="f-form-title__text" :class-bak="{'hidden-xs':!thumbUrl}">{{formTitle|_}}</p>
+                  </div>
+                  <sv-comp-actions :config="form.config" container-class="" @event="processActionEvent"></sv-comp-actions>
+            </div>
+      </div>
+      <div class="col-lg-12">
+            <div class="f-control-panel">
+                  <sv-comp-tabs :config="form.config" :tab="tab" container-class="" @event="processTabEvent"></sv-comp-tabs>
+                  <sv-comp-actions :config="form.config" container-class="" @event="processActionEvent"></sv-comp-actions>
+            </div>
+      </div>
+      <div class="col-xs-12">
+            <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+      </div>
 </div>

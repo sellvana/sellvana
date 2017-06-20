@@ -13,26 +13,30 @@
 		margin-bottom: 25px;
 		box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
 		.icon {
-			padding: 8px 10px 8px 10px;
 			text-align: center;
+			position: relative;
 			display: inline-block;
 			vertical-align: top;
-			min-height: 42px;
-			min-width: 60px;
+			height: 49px;
+			width: 60px;
 		}
 		i {
 			color: #fff;
 			font-size: 22px;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
 		}
 		span {
 			font-weight: bold;
-			font-size: 13px;
+			font-size: 15px;
 			color: #000;
 		}
 		p {
 			display: block;
-			margin-bottom: 3px;
-			font-size: 11px;
+			margin-bottom: 0px;
+			font-size: 13px;
 			color: #000;
 		}
 		.data {
@@ -40,8 +44,8 @@
 			vertical-align: middle;
 			height: 100%;
 			background: #fff;
-			padding: 5px 14px 5px 6px;
-			    min-width: 90px;
+			padding: 5px 4px 5px 5px;
+			min-width: 90px;
 		}
 	}
 	p {
@@ -59,25 +63,25 @@
 
 .total-sales {
 	.icon {
-		background: #06bfee;
+		background: #c3d2dd;
 	}
 }
 
 .total-users {
 	.icon {
-		background: #dd4a39;
+		background: #c3d2dd;
 	}
 }
 
 .total-members {
 	.icon {
-		background: #00a55b;
+		background: #c3d2dd;
 	}
 }
 
 .total-revenue {
 	.icon {
-		background: #f29b19;
+		background: #c3d2dd;
 	}
 }
 
@@ -91,6 +95,7 @@
 		font-size: 14px;
 		text-transform: uppercase;
 		color: #000;
+		margin-bottom: 0;
 	}
 	.f-roll-up {
 		position: absolute;
