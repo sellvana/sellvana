@@ -1,54 +1,50 @@
-<div :class="containerClass" class="f-tabs-container">
+<div :class="containerClass">
 
-    <div class="f-tabs-container" ref="menuWrapper">
-        <!--START: Desktop tabs view-->
+      <div class="f-tabs-container" ref="menuWrapper">
 
+            <!--START: Desktop tabs view-->
 
-    <div>
-        <ul class='f-horizontal-menu visible-lg visible-md' :class="{open:ddOpen('menu-open')}">
-            <li v-for="t in formTabs" :key="t.name" :class="{active:tab === t}" class="f-horizontal-menu__item">
-                <a href="#" @click.prevent="switchTab(t)" class="f-horizontal-menu__link">
-                    {{t.label|_}}
-                    <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                </a>
-            </li>
-        </ul>
+            <div class="visible-lg visible-md">
+                  <ul class='f-horizontal-menu' :class="{open:ddOpen('menu-open')}" ref="menu">
+                        <li v-for="t in formTabs" :key="t.name" :class="{active:tab === t}" class="f-horizontal-menu__item" ref="item">
+                              <a href="#" @click.prevent="switchTab(t)" class="f-horizontal-menu__link"> {{t.label|_}}
+                                    <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                        </li>
+                  </ul>
 
-        <!--START: Arrows for scroll-->
+                  <!--START: Arrows for scroll-->
 
-        <div class="paddles visible-lg visible-md">
-            <button class="left-paddle paddle hidden">
-                <
-            </button>
-            <button class="right-paddle paddle">
-                >
-            </button>
-        </div>
+                  <div class="paddles visible-lg visible-md">
+                        <button class="left-paddle paddle hidden" ref="leftPaddle">
+                              <
+                        </button>
+                        <button class="right-paddle paddle hidden" ref="rightPaddle">
+                              >
+                        </button>
+                  </div>
 
-        <!--END: Arrows for scroll-->
+                  <!--END: Arrows for scroll-->
 
-    </div>
+            </div>
 
+            <!--END: Desktop tabs view-->
 
-    <!--END: Desktop actions view-->
+            <!--START: Mobile actions view-->
 
-    <!--START: Mobile actions view-->
+            <div class="f-mobile-button hidden-md hidden-lg">
+                  <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
+                        <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">
+                              {{(tab.label||'Tabs')|_}}<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                        <ul class="f-action-button-b__menu f-action-button-b__menu">
+                              <li v-for="t in formTabs" :class="{active:tab === t}" class="f-action-button-b__item">
+                                    <a href="#" @click.prevent="switchTab(t)" class="f-action-button-b__link"> {{t.label|_}}
+                                          <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                              </li>
+                        </ul>
+                  </div>
+            </div>
 
-    <div class="f-mobile-button hidden-md hidden-lg">
-        <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
-            <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">
-                {{(tab.label||'Tabs')|_}}<span class="f-caret"><b class="f-caret__elem"></b></span></a>
-            <ul class="f-action-button-b__menu f-action-button-b__menu">
-                <li v-for="t in formTabs" :class="{active:tab === t}" class="f-action-button-b__item">
-                    <a href="#" @click.prevent="switchTab(t)" class="f-action-button-b__link">
-                        {{t.label|_}}
-                        <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+            <!--START: Mobile actions view-->
 
-    <!--START: Mobile actions view-->
-
+      </div>
 </div>

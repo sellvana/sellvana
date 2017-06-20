@@ -84,6 +84,17 @@
             }
       }
 }
+.f-breadcrumb__overflow {
+      &:after {
+            content: '...';
+            background: #0086c0;
+            display: block;
+            position: absolute;
+            bottom: 16px;
+            right: -1px;
+            color: #fff;
+      }
+}
 @media (max-width: 1279px) {
       .f-breadcrumbs-block {
             max-width: calc(100% - 540px);
@@ -94,20 +105,15 @@
             display: inline-block;
             overflow: hidden;
             max-width: calc(100% - 50px);
-            text-overflow: ellipsis;
-            /* &:after {
-                  content: '...';
-                  display: block;
-                  position: absolute;
-                  bottom: 18px;
-                  right: -12px;
-                  color: #fff;
-            }*/
+           /* text-overflow: ellipsis;*/
+
       }
+
       .f-header-breadcrumb {
             overflow: hidden;
             margin-left: 10px;
             position: relative;
+            color: #fff;
       }
       .f-breadcrumb__link {
             font-size: 14px;

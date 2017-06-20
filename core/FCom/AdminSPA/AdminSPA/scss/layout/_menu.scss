@@ -100,15 +100,16 @@
 
 .f-tabs-container {
 	position: relative;
-	max-width: 500px;
+	width: 100%;
 	height: 35px; // hide the scroll bar
-	overflow-x: hidden;
-	overflow-y: hidden;
+	overflow: hidden;
+	white-space: nowrap;
 	.f-horizontal-menu {
 		position: relative;
-		height: 34px; // hide the scroll bar
-		overflow-x: hidden;
+		height: 41px; // hide the scroll bar
 		overflow-y: hidden;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
 	}
 }
 

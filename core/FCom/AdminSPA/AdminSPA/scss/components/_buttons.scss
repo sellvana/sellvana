@@ -507,6 +507,9 @@
       right: 0;
       left: inherit;
 }
+/*.f-mobile-button {
+      display: none;
+}*/
 
 @media (max-width: 1365px) {
       .f-dashboard-panel {
@@ -516,7 +519,7 @@
 }
 @media (max-width: 991px) {
       .f-mobile-button {
-            padding: 5px 0;
+            padding: 10px 0;
             .f-actions-dropdown .button {
                   min-width: 160px;
             }

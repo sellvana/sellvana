@@ -304,7 +304,7 @@ a:focus {
 .f-control-panel {
 	display: table;
 	width: 100%;
-	padding: 10px 0 10px 15px;
+
 	.f-form-title, .f-actions-container {
 		display: table-cell;
 	}
@@ -312,7 +312,11 @@ a:focus {
 		text-align: right;
 	}
 }
-.f-tabs-container, .f-actions-container {
+
+.f-tabs-container {
+
+}
+.f-actions-container {
 	display: table-cell;
 	vertical-align: bottom;
 }
@@ -381,8 +385,15 @@ a:focus {
 }
 
 @media (max-width: 991px) {
-	.f-actions-container {
-		padding: 0;
+	.f-control-panel {
+		.f-actions-container {
+			text-align: right;
+			padding: 0;
+		}
+	}
+	.f-control-panel-mobile {
+		display: table;
+		width: 100%;
 	}
 }
 @media (max-width: 767px) {

@@ -40,13 +40,18 @@
 		display: inline-block;
 	}
 	& > ul {
-		padding-left: 1em;
+		padding-left: 32px;
 		line-height: 1.5em;
+		.tree-node > ul {
+			padding-left: 32px;
+			line-height: 1.5em;
+			.tree-node > ul {
+				padding-left: 32px;
+				line-height: 1.5em;
+			}
+		}
 	}
-	.tree-node .tree-node .tree-node .node-line {
-		padding-left: 2em;
-		line-height: 1.5em;
-	}
+
 	& > .node-line {
 		.add-child {
 			display: none;
@@ -66,11 +71,10 @@
 
 }
 .f-closed-line-link, .f-opened-line-link {
-	margin-right: 2px;
+	margin-right: 5px;
 }
 .leaf-icon,
 .folder-icon {
 	display: inline-block;
-	width: 32px;
 	padding: 6px 4px 6px 0;
 }
