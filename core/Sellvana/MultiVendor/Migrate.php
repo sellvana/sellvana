@@ -52,7 +52,7 @@ class Sellvana_MultiVendor_Migrate extends BClass
         ]);
     }
 
-    public function install__0_6_0_0__0_6_1_0()
+    public function upgrade__0_6_0_0__0_6_1_0()
     {
         $tPo = $this->Sellvana_MultiVendor_Model_PurchaseOrder->table();
         $tPoItem = $this->Sellvana_MultiVendor_Model_PurchaseOrder_Item->table();

@@ -83,6 +83,13 @@
             #- [ requireJs, sv-page-sales-orders-form-shipments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/shipments" ]
             #- [ requireJs, sv-page-sales-orders-form-shipments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/shipments.html" ]
 
+            - [ requireJs, sv-comp-dashboard-avg-order-value-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/avg-order-value.html ]
+            - [ requireJs, sv-comp-dashboard-orders-late-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/orders-late.html ]
+            - [ requireJs, sv-comp-dashboard-orders-list-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/orders-list.html ]
+            - [ requireJs, sv-comp-dashboard-orders-totals-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/orders-totals.html ]
+            - [ requireJs, sv-comp-dashboard-top-products-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/top-products.html ]
+#            - [ requireJs, sv-comp-dashboard-top-products-chart-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/top-products-chart.html ]
+
     - view: app
         do:
             - [ addNav, { path: /sales, label: Sales, icon: "icon-sales", pos: 20 } ]
@@ -135,3 +142,73 @@
             - [ addDetailsSection, { name: cancellations, pos: 50 } ]
 
 
+
+sv-page-dashboard-config:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - orders-list
+                -
+                    title: Recent Orders
+                    icon: inbox
+                    template: sv-comp-dashboard-orders-list-tpl
+                    callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
+                    container_class: col-md-4
+                    filter: false
+                    permission: sales/orders
+            -
+                - addWidget
+                - orders-totals
+                -
+                    title: Order Totals
+                    icon: inbox
+                    template: sv-comp-dashboard-orders-totals-tpl
+                    callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
+                    container_class: col-md-4
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - avg-order-value
+                -
+                    title: Average Order Value
+                    icon: inbox
+                    container_class: col-md-2
+                    template: sv-comp-dashboard-avg-order-value-tpl
+                    callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - top-products
+                -
+                    title: Top Products
+                    icon: inbox
+                    container_class: col-md-4
+                    template: sv-comp-dashboard-top-products-tpl
+                    callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
+                    filter: true
+                    permission: sales/orders
+#            -
+#                - addWidget
+#                - top-products-chart
+#                -
+#                    title: Top Products (Chart)
+#                    icon: inbox
+#                    container_class: col-md-4
+#                    template: sv-comp-dashboard-top-products-chart-tpl
+#                    callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
+#                    filter: true
+#                    permission: sales/orders
+            -
+                - addWidget
+                - orders-late
+                -
+                    title: Late Orders
+                    icon: inbox
+                    container_class: col-md-4
+                    template: sv-comp-dashboard-orders-late-tpl
+                    callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
+                    filter: false
+                    permission: sales/orders

@@ -1,0 +1,27 @@
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "SKU"|_ }}</th>
+            <th>{{ "Name"|_ }}</th>
+            <th>{{ "Revenue"|_ }}</th>
+            <th>{{ "Qty"|_ }}</th>
+            <th>{{ "Profit"|_ }}</th>
+            <th>{{ "Profit (%%)"|_ }}</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr v-if="!widget.data.products">
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+            <tr v-else v-for="product in widget.data.products">
+                <td>{{ product.product_sku }}</td>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.revenue|currency }}</td>
+                <td>{{ product.qty }}</td>
+                <td>{{ product.profit_fixed|currency }}</td>
+                <td>{{ product.profit_pc }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

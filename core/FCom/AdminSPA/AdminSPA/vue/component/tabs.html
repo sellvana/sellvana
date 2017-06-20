@@ -1,6 +1,8 @@
 <div :class="containerClass" class="f-tabs-container">
 
-    <!--START: Desktop tabs view-->
+    <div class="f-tabs-container" ref="menuWrapper">
+        <!--START: Desktop tabs view-->
+
 
     <div>
         <ul class='f-horizontal-menu visible-lg visible-md' :class="{open:ddOpen('menu-open')}">
@@ -24,12 +26,11 @@
         </div>
 
         <!--END: Arrows for scroll-->
+
     </div>
 
 
     <!--END: Desktop actions view-->
-
-
 
     <!--START: Mobile actions view-->
 

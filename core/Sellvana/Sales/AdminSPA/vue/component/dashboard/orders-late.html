@@ -1,0 +1,22 @@
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <caption>{{ "Show {orders} of {total} order(s)" | _({orders: widget.data.orders.length, total: widget.data.orders_count}) }}</caption>
+        <tr>
+            <th>{{ "ID"|_ }}</th>
+            <th>{{ "Created"|_ }}</th>
+            <th>{{ "Last Activity"|_ }}</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr v-if="!widget.data.orders">
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+            <tr v-else v-for="order in widget.data.orders">
+                <td>{{ order.unique_id }}</td>
+                <td>{{ order.create_at }}</td>
+                <td>{{ order.update_at }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

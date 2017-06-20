@@ -646,6 +646,9 @@ class Sellvana_CatalogFields_Migrate extends BClass
 
     public function upgrade__0_6_1_0__0_6_2_0()
     {
-        $this->FCom_Core_Model_Field->getField('color')->set('swatch_type', 'C')->save();
+        $colorField = $this->FCom_Core_Model_Field->getField('color');
+        if ($colorField) {
+            $colorField->set('swatch_type', 'C')->save();
+        }
     }
 }
