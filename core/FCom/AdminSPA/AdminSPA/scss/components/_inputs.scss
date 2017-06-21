@@ -31,7 +31,6 @@ input[type=number] {
 	input[type="date"] {
 		padding: 6px 12px;
 		height: 34px;
-		width: 49%;
 	}
 	.f-input, .f-input-number, .f-textarea {
 		display: table-cell;
@@ -39,6 +38,10 @@ input[type=number] {
 	.select2-container {
 		width: 100% !important;
 	}
+	.param-block {
+		padding-top: 7px;
+	}
+
 }
 
 .f-form-group__addon {
@@ -47,7 +50,6 @@ input[type=number] {
 	position: relative;
 	font-size: 12px;
 	font-weight: normal;
-	text-align: center;
 	box-sizing: border-box;
 	width: 1%;
 	white-space: nowrap;
@@ -576,9 +578,25 @@ input[type=number] {
 		width: calc(100% - 40px);
 	}
 }
-
+@media (min-width: 992px) and (max-width: 1365px){
+	.f-form-group {
+		input[type="date"] {
+			margin-bottom: 5px;
+		}
+	}
+}
+@media (max-width: 992px) {
+	.f-form-label {
+		text-align: left;
+	}
+}
 @media (max-width: 767px) {
 	.f-form-label {
 		text-align: left;
+	}
+	.f-form-group {
+		input[type="date"] {
+			margin-bottom: 5px;
+		}
 	}
 }

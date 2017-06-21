@@ -2,6 +2,7 @@
 <html>
 
 <head>
+      <!--Counter - 34-->
       <meta charset="UTF-8">
       <title>Untitled Document</title>
       <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -9,9 +10,11 @@
       <link href="scss/font-awesome.css" rel="stylesheet" type="text/css"></link>
       <link href="../scss/style.build.css" rel="stylesheet" type="text/css"></link>
       <script type="text/javascript" charset="utf-8" src="/sellvanaRepo/core/core/FCom/AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="clipboard.min.js"></script>
       <style>
             .row {
-                  margin-bottom: 10px;
+                  margin: 20px 0;
+                  position: relative;
             }
 
             .kit {
@@ -49,6 +52,26 @@
             .margin {
                   margin-bottom: 50px;
             }
+
+            .kit .col-md-7 {
+                  padding: 10px;
+                  border: 1px solid #000;
+            }
+
+            .btn-clipboard {
+                  position: absolute;
+                  right: 0;
+                  bottom: 0;
+                  border: 2px solid darkred;
+                  color: darkred;
+                  background: #fff;
+                  font-weight: bold;
+                  transition: 0.1s ease-in;
+            }
+            .btn-clipboard:hover {
+                  background: darkred;
+                  color: #fff;
+            }
       </style>
 </head>
 
@@ -72,33 +95,36 @@
       </div>
       <h1 id="buttons">Buttons</h1>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <button class="button button1">Add Files</button>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-1">
                   &lt;button class="button button1"&gt;Add Files&lt;/button&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-1">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <button class="button button2">Add Files</button>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-2">
                   &lt;button class="button button2"&gt;Add Files&lt;/button&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-2">Copy HTML</button>
       </div>
-      <!-- <div class="row">
-             <div class="col-md-3">
-                   <button class="button button6">Add Files</button>
-             </div>
-             <div class="col-md-9">
-                   &lt;button class="button button6"&gt;Add Files&lt;/button&gt;
-             </div>
-       </div>
- -->
+      <div class="row">
+            <div class="col-md-5">
+                  <button type="button" class="button button4">Delete</button>
+            </div>
+            <div class="col-md-7" id="block-34">
+                  &lt;button class="button button4"&gt;Delete&lt;/button&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-34">Copy HTML</button>
+      </div>
+
       <h3>Actions buttons</h3>
       <div class="row margin">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-action-button-b open">
                         <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle">Bulk
                               Action<span class="f-caret"><b class="f-caret__elem"></b></span></a>
@@ -107,15 +133,16 @@
                         </ul>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div id="block-3" class="col-md-7">
                   &lt;div class="f-action-button-b open"&gt; &lt;a href="#" data-toggle="dropdown" class="f-action-button-b__toggle"&gt;Bulk Action&lt;span
                   class="f-caret"&gt;&lt;b class="f-caret__elem"&gt;&lt;/b&gt;&lt;/span&gt;&lt;/a&gt; &lt;ul class="f-action-button-b__menu"&gt; &lt;li
                   class="f-action-button-b__item"&gt;&lt;a href="#" class="f-action-button-b__link"&gt;Change Custom State&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt;
                   &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-3">Copy HTML</button>
       </div>
       <div class="row margin">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-dropdown f-selector-dropdown open">
                         <a href="#" data-toggle="dropdown" class="f-dropdown__toggle">
                               <div class="f-action-button-s">
@@ -132,7 +159,7 @@
                         </ul>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div id="block-4" class="col-md-7">
                   &lt;div class="f-dropdown f-selector-dropdown open"&gt; &lt;a href="#" data-toggle="dropdown" class="f-dropdown__toggle"&gt; &lt;div
                   class="f-action-button-s"&gt; &lt;label class="f-selector-dropdown__label"&gt; &lt;input type="checkbox" class="f-input-checkbox
                   f-input-checkbox-s"&gt; &lt;span&gt;&lt;i aria-hidden="true" class="fa fa-check"&gt;&lt;/i&gt;&lt;/span&gt;&lt;/label&gt; &lt;span
@@ -141,9 +168,10 @@
                   type="checkbox" checked="checked" class="f-input-checkbox f-input-checkbox-s"&gt;&lt;span&gt;&lt;i aria-hidden="true" class="fa
                   fa-check"&gt;&lt;/i&gt;&lt;/span&gt;Select Visible&lt;/label&gt;&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-4">Copy HTML</button>
       </div>
       <div class="row margin">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-dropdown f-actions-dropdown open">
                         <button type="button" class="button button1 f-dropdown__toggle">
                               {{'Actions'|_}}
@@ -156,19 +184,20 @@
                         </ul>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-5">
                   &lt;div class="f-dropdown f-actions-dropdown"&gt; &lt;button type="button" class="button button1 f-dropdown__toggle"&gt;
                   {{'Actions'|_}} &lt;/button&gt; &lt;ul class="f-dropdown__menu"&gt; &lt;li&gt;&lt;a href="#" @click="goBack()" class="button
                   button2"&gt;{{'Back'|_}}&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#" @click="doDelete()" class="button button2"&gt;{{'Delete'|_}}&lt;/a&gt;&lt;/li&gt;
                   &lt;li&gt;&lt;a href="#" @click="save()" class="button button1"&gt;{{'Save'|_}}&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href="#"
                   @click="save(true)" class="button button1"&gt;{{'Save and Continue'|_}}&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-5">Copy HTML</button>
       </div>
       <div class="row margin"></div>
       <div class="row margin"></div>
       <div class="row margin"></div>
       <div class="row margin">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-dropdown  f-actions-dropdown-arrow open" :class="{open:ddOpen('actions-open')}">
                         <button type="button" class="button button1" @click="goBack()">Save</button>
                         <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
@@ -178,146 +207,49 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-6">
                   &lt;div class="f-dropdown f-actions-dropdown-arrow open" :class="{open:ddOpen('actions-open')}"&gt; &lt;button type="button"
                   class="button button1" @click="goBack()"&gt;Save&lt;/button&gt; &lt;a href="" class="f-caret f-dropdown__toggle"
                   @click.prevent.stop="ddToggle('actions-open')"&gt;&lt;b class="f-caret__elem"&gt;&lt;/b&gt;&lt;/a&gt; &lt;div
                   class="f-dropdown__menu"&gt; &lt;button type="button" class="button button2" @click="doDelete()"&gt;Delete&lt;/button&gt; &lt;button
                   type="button" class="button button1" @click="save()"&gt;Save&lt;/button&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-6">Copy HTML</button>
       </div>
-      <!--<div class="row">
-            <div class="col-md-3">
-                  <button class="button button16">Add Files</button>
-            </div>
-            <div class="col-md-9">
-                  &lt;button class="button button16"&gt;Add Files&lt;/button&gt;
-            </div>
-      </div>-->
-
-      <!--   <h1 id="statuses">Statuses</h1>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-processing">processing</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-processing"&gt;processing&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-placed">placed</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-placed"&gt;placed&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-shipped">shipped</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-shipped"&gt;shipped&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-canceled">canceled</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-canceled"&gt;canceled&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-pending">pending</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-pending"&gt;pending&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-unpaid">unpaid</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-unpaid"&gt;unpaid&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-paid">paid</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-paid"&gt;paid&lt;/span&gt;
-               </div>
-         </div>
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-re-stocked">re-stocked</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-re-stocked"&gt;re-stocked&lt;/span&gt;
-               </div>
-         </div>
-
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-complete">complete</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-complete">complete&lt;/span&gt;
-               </div>
-         </div>
-
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-refunded">refunded</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-refunded"&gt;refunded&lt;/span&gt;
-               </div>
-         </div>
-
-         <div class="row">
-               <div class="col-md-3">
-                     <span class="status-approved">approved</span>
-               </div>
-               <div class="col-md-9">
-                     &lt;span class="status-approved"&gt;approved&lt;/span&gt;
-               </div>
-         </div>-->
 
       <h1 id="inputs">inputs</h1>
       <h3>Inputs without label</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <input class="f-input" type="text" title=""/>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-7">
                   &lt;input class="f-input" type="text" /&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-7">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <input class="f-input-number" type="number" title=""/>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-8">
                   &lt;input class="f-input-number" type="number" /&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-8">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <textarea class="f-textarea" rows="5" title=""></textarea>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-9">
                   &lt;textarea class="f-textarea" rows="5"&gt;&lt;textarea&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-9">Copy HTML</button>
       </div>
 
       <h3>Container for several inputs</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <fieldset class="f-form-container">
                         <div class="f-form-group row">
                               <label for="id4" class="f-form-label col-md-3"> Company Name </label>
@@ -326,16 +258,37 @@
                         </div>
                   </fieldset>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-10">
                   &lt;fieldset class="f-form-container"&gt; &lt;div class="f-form-group row"&gt; &lt;label for="id4" class="f-form-label col-md-3"&gt;
                   Company Name &lt;/label&gt; &lt;div class="col-md-9"&gt;&lt;input id="id4" type="text" class="f-input"&gt; &lt;/div&gt; &lt;/div&gt;
                   &lt;/fieldset&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-10">Copy HTML</button>
+      </div>
+      <h3>Form group with dates inputs</h3>
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="f-form-group row">
+                        <label class="col-lg-4 col-md-4 col-sm-12 f-form-label" for="id13">{{'Date Range'|_}}</label>
+                        <div class="col-lg-4 col-md-4 col-sm-6">
+                              <input type="date" id="id13" placeholder="date" class="f-input">
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6">
+                              <input type="date" placeholder="date" class="f-input">
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-7" id="block-11">
+                  &lt;div class="f-form-group row"&gt; &lt;label class="col-lg-4 col-md-4 col-sm-12 f-form-label" for="id13"&gt;{{'Date Range'|_}}&lt;/label&gt;
+                  &lt;div class="col-lg-4 col-md-4 col-sm-6"&gt; &lt;input type="date" id="id13" placeholder="date" class="f-input"&gt; &lt;/div&gt;
+                  &lt;div class="col-lg-4 col-md-4 col-sm-6"&gt; &lt;input type="date" placeholder="date" class="f-input"&gt; &lt;/div&gt; &lt;/div&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-11">Copy HTML</button>
       </div>
 
       <h3>Inputs with label</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group row">
                         <label class="col-md-3 f-form-label" for="id7">Input</label>
                         <div class="col-md-9">
@@ -343,14 +296,15 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-12">
                   &lt;div class="f-form-group row"&gt; &lt;label class="col-md-3 f-form-label" for="id7"&gt;Input&lt;/label&gt; &lt;div
                   class="col-md-9"&gt; &lt;input class="f-input" type="text" id="id7"/&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-12">Copy HTML</button>
       </div>
 
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group row">
                         <label for="id5" class="col-md-3 f-form-label">en_US <span class="icon-question-sign">
                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
@@ -361,16 +315,17 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-13">
                   &lt;div class="f-form-group row"&gt; &lt;label for="id5" class="col-md-3 f-form-label"&gt;en_US &lt;span class="icon-question-sign"&gt;
                   &lt;i class="fa fa-question-circle" aria-hidden="true"&gt;&lt;/i&gt; &lt;span class="tooltip"&gt;Message&lt;/span&gt; &lt;/span&gt;
                   &lt;/label&gt; &lt;div class="col-md-9"&gt; &lt;textarea class="f-textarea" rows="5" id="id5"&gt;&lt;/textarea&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-13">Copy HTML</button>
       </div>
 
       <h3>Multilanguage (add class="translating" to parent block "f-form-container")</h3>
       <div class="row translating">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group row ">
                         <label class="col-md-3 f-form-label" for="id"> ID:14</label>
                         <div class="col-md-9">
@@ -379,15 +334,16 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-14">
                   &lt;div class="f-form-group row"&gt; &lt;label class="col-md-3 f-form-label" for="id"&gt; ID:14&lt;/label&gt; &lt;div
                   class="col-md-9"&gt; &lt;input type="text" class="f-input" id="id"&gt; &lt;a href="#" class="translate-icon"&gt;&lt;i
                   aria-hidden="true" class="fa fa-globe"&gt;&lt;/i&gt;&lt;/a&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-14">Copy HTML</button>
       </div>
       <h3>Required field</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group row required">
                         <label class="col-md-3 f-form-label" for="id1">ID:14</label>
                         <div class="col-md-9">
@@ -395,15 +351,16 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-15">
                   &lt;div class="f-form-group row required"&gt; &lt;label class="col-md-3 f-form-label" for="id1"&gt;ID:14&lt;/label&gt; &lt;div
                   class="col-md-9"&gt; &lt;input type="text" class="f-input" id="id1"&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-15">Copy HTML</button>
       </div>
 
       <h3>Error field</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group row error">
                         <label class="col-md-3 f-form-label" for='id3'>Input</label>
                         <div class="col-md-9">
@@ -411,16 +368,41 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-16">
                   &lt;div class="f-form-group row error"&gt; &lt;label class="col-md-3 f-form-label" for='id3'&gt;Input&lt;/label&gt; &lt;div
                   class="col-md-9"&gt; &lt;input type="text" class="f-input" id="id3"&gt; &lt;span class="error-message"&gt;Error description under
                   the field&lt;/span&gt; &lt;/div&gt; &lt;/label&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-16">Copy HTML</button>
       </div>
-
+      <h3>Configure block</h3>
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="configure-block">
+                        <div class="f-form-group row">
+                              <div class="col-sm-4 control-label">
+                                    <label for="id116" class="control-label">{{'Actions:'|_}}</label>
+                              </div>
+                              <div class="col-sm-5">
+                                    <textarea class="f-textarea" rows="5" id="id116"></textarea>
+                              </div>
+                              <div class="col-sm-3">
+                                    <button class="button8">Configure</button>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-7" id="block-17">
+                  &lt;div class="configure-block"&gt; &lt;div class="f-form-group row"&gt; &lt;div class="col-sm-4 control-label"&gt; &lt;label
+                  for="id116" class="control-label"&gt;{{'Actions:'|_}}&lt;/label&gt; &lt;/div&gt; &lt;div class="col-sm-5"&gt; &lt;textarea
+                  class="f-textarea" rows="5" id="id116"&gt;&lt;/textarea&gt; &lt;/div&gt; &lt;div class="col-sm-3"&gt; &lt;button class="button8"&gt;Configure&lt;/button&gt;
+                  &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-17">Copy HTML</button>
+      </div>
       <h3>Form-group-addon with dropdown without range</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group">
                         <div class="f-form-group__addon open">
                               <button data-toggle="dropdown" class="button5 f-form-group__addon-toggle">
@@ -438,7 +420,7 @@
                         <div class="f-form-group-btn not-range"><input type="text" placeholder="value" class="f-input"></div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-17">
                   &lt;div class="f-form-group"&gt; &lt;div class="f-form-group__addon open"&gt; &lt;button data-toggle="dropdown" class="button5
                   f-form-group__addon-toggle"&gt; &lt;span&gt;contains&lt;/span&gt;&lt;span class="f-caret__elem"&gt;&lt;/span&gt; &lt;/button&gt;
                   &lt;ul class="f-form-group__addon-menu"&gt; &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#"
@@ -450,13 +432,14 @@
                   class="f-form-group__addon-link"&gt;is empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class="f-form-group-btn
                   not-range"&gt;&lt;input type="text" placeholder="value" class="f-input"&gt;&lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-17">Copy HTML</button>
       </div>
-      <div class="margin">1</div>
-      <div class="margin">1</div>
+      <div class="margin"></div>
+      <div class="margin"></div>
 
       <h3>Form-group-addon with dropdown, with label</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group">
                         <div class="f-form-group__label"><label>Order ID</label> <a href="#" class="f-delete"><i class="fa fa-trash"></i></a></div>
                         <div>
@@ -479,7 +462,7 @@
                         </div>
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-18">
                   &lt;div class="f-form-group"&gt; &lt;div class="f-form-group__label"&gt;&lt;label&gt;Order ID&lt;/label&gt; &lt;a href="#"
                   class="f-delete"&gt;&lt;i class="fa fa-trash"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt; &lt;div&gt; &lt;div class="f-form-group__addon"&gt;
                   &lt;button data-toggle="dropdown" class="button5 f-form-group__addon-toggle"&gt;&lt;span&gt;contains&lt;/span&gt;&lt;span
@@ -492,11 +475,12 @@
                   class="f-form-group__addon-link"&gt;is empty&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class="f-form-group-btn
                   not-range"&gt;&lt;input type="text" placeholder="value" class="f-input"&gt; &lt;/div&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-18">Copy HTML</button>
       </div>
 
       <h3>Form-group-addon with dropdown, with range</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-form-group">
                         <div class="f-form-group__addon open">
                               <button data-toggle="dropdown" class="button5 f-form-group__addon-toggle">
@@ -520,7 +504,7 @@
 
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-19">
                   &lt;div class="f-form-group"&gt; &lt;div class="f-form-group__addon open"&gt; &lt;button data-toggle="dropdown" class="button5
                   f-form-group__addon-toggle"&gt; &lt;span&gt;between&lt;/span&gt; &lt;span class="caret"&gt;&lt;/span&gt; &lt;/button&gt; &lt;ul
                   class="f-form-group__addon-menu"&gt; &lt;li class="f-form-group__addon-item"&gt;&lt;a href="#" class="f-form-group__addon-link"&gt;equals&lt;/a&gt;
@@ -532,39 +516,42 @@
                   &lt;/div&gt; &lt;div class="f-form-group-btn range"&gt; &lt;input type="number" placeholder="number" class="f-input-number"&gt; &lt;input
                   type="number" placeholder="number" class="f-input-number"&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-19">Copy HTML</button>
       </div>
 
       <div class="margin">1</div>
       <div class="margin">1</div>
       <h3>Input-group-addon without dropdown</h3>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-input-group">
                         <span class="f-input-group__addon">QTY</span> <input type="text" placeholder="value" class="f-input">
                   </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-20">
                   &lt;div class="f-input-group"&gt; &lt;span class="f-input-group__addon"&gt;QTY&lt;/span&gt; &lt;input type="text"
                   placeholder="value" class="f-input"&gt; &lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-20">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <div class="f-input-group">
                         <input type="text" value="" placeholder="Param" class="f-input"> <span class="f-input-group__addon"> = </span>
                         <input type="text" value="" placeholder="Value" class="f-input">
                         <a href="#" class="f-input-group__addon"><i class="fa fa-times"></i></a></div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-21">
                   &lt;div class="f-input-group"&gt; &lt;input type="text" value="" placeholder="Param" class="f-input"&gt; &lt;span
                   class="f-input-group__addon"&gt; = &lt;/span&gt; &lt;input type="text" value="" placeholder="Value" class="f-input"&gt; &lt;a
                   href="#" class="f-input-group__addon"&gt;&lt;i class="fa fa-times"&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-21">Copy HTML</button>
       </div>
 
       <h1 id="tables">tables</h1>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-main-grid">
                         <tr>
                               <td>Subtotal</td>
@@ -580,15 +567,16 @@
                         </tr>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-22">
                   &lt;table class="f-main-grid"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Shipping
                   &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
                   &lt;/tr&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-22">Copy HTML</button>
       </div>
       <p>Styles for tables can be combined.</p>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-striped-table">
                         <tr>
                               <td>Subtotal</td>
@@ -604,14 +592,15 @@
                         </tr>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-23">
                   &lt;table class="f-striped-table"&gt; &lt;tr&gt; &lt;td&gt;Subtotal&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;
                   &lt;td&gt;Shipping &amp; Handling&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;Discount&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
                   &lt;/tr&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-23">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-total-table">
                         <tbody>
                         <tr>
@@ -629,14 +618,15 @@
                         </tbody>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-24">
                   &lt;table class="f-total-table"&gt; &lt;tr&gt; &lt;th&gt;Subtotal&lt;/th&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;
                   &lt;th&gt;Shipping &amp; Handling&lt;/th&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;th&gt;Discount&lt;/th&gt; &lt;td&gt;$0.00&lt;/td&gt;
                   &lt;/tr&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-24">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-secondary-table">
                         <thead>
                         <tr>
@@ -659,15 +649,16 @@
                         </tbody>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-25">
                   &lt;table class="f-secondary-table"&gt; &lt;thead&gt; &lt;tr&gt; &lt;th&gt;Subtotal&lt;/th&gt; &lt;th&gt;Shipping &amp; Handling&lt;/th&gt;
                   &lt;th&gt;Discount&lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
                   &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt;
                   &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-25">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-standart-table">
                         <thead>
                         <tr>
@@ -690,15 +681,16 @@
                         </tbody>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-26">
                   &lt;table class="f-standart-table"&gt; &lt;thead&gt; &lt;tr&gt; &lt;th&gt;Subtotal&lt;/th&gt; &lt;th&gt;Shipping &amp; Handling&lt;/th&gt;
                   &lt;th&gt;Discount&lt;/th&gt; &lt;/tr&gt; &lt;/thead&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td&gt;$250.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt;
                   &lt;td&gt;$0.00&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;td&gt;$0.00&lt;/td&gt; &lt;td&gt;$250.00&lt;/td&gt;
                   &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-26">Copy HTML</button>
       </div>
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-combined-table">
                         <thead>
                         <tr>
@@ -726,16 +718,17 @@
                         </tbody>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-27">
                   &lt;table class="f-combined-table"&gt; &lt;thead&gt; &lt;tr&gt; &lt;td&gt;Thumbnail&lt;/td&gt; &lt;td&gt;Product Info&lt;/td&gt;
                   &lt;td&gt;Shipped&lt;/td&gt; &lt;/tr&gt; &lt;/thead&gt; &lt;tbody&gt; &lt;tr&gt; &lt;td&gt; Describe &lt;/td&gt; &lt;td&gt; Test
                   &lt;/td&gt; &lt;td&gt; &lt;ul&gt; &lt;li&gt;1&lt;/li&gt; &lt;li&gt;2&lt;/li&gt; &lt;li&gt;3&lt;/li&gt; &lt;/ul&gt; &lt;/td&gt; &lt;/tr&gt;
                   &lt;/tbody&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-27">Copy HTML</button>
       </div>
 
       <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-5">
                   <table class="f-combined-columns">
                         <tbody>
                         <tr>
@@ -757,85 +750,65 @@
                         </tbody>
                   </table>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-7" id="block-28">
                   &lt;table class="f-combined-columns"&gt; &lt;tbody&gt; &lt;tr&gt; &lt;th&gt;Name:&lt;/th&gt; &lt;td&gt;orderItem&lt;/td&gt; &lt;/tr&gt;
                   &lt;tr&gt; &lt;th&gt;Qty:&lt;/th&gt; &lt;td&gt;orderItem&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;th&gt;P.SKU:&lt;/th&gt; &lt;td&gt;product_sku&lt;/td&gt;
                   &lt;/tr&gt; &lt;tr&gt; &lt;th&gt;I.SKU:&lt;/th&gt; &lt;td&gt;inventory&lt;/td&gt; &lt;/tr&gt; &lt;/tbody&gt; &lt;/table&gt;
             </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-28">Copy HTML</button>
       </div>
-
-      <!--      <h1 id="dropdown">Edit text</h1>
-            <h2>with select</h2>
-            <div class="row">
-                  <div class="col-md-3">
-                        <p class="param-block">If
-                              <span class="param-result">
-                              <span class="param-options">
-                                    <select2 value="any">
-                                          <option>any</option>
-                                          <option>all</option>
-                                    </select2>
-                              </span>
-                        </span>
-                              just another text
-                        </p>
-                  </div>
-                  <div class="col-md-9">
-                        &lt;p class="param-block"&gt;If
-                        &lt;span class="param-result"&gt;
-                        &lt;span class="param-options"&gt;
-                        &lt;select2 value="any"&gt;
-                        &lt;option&gt;any&lt;/option&gt;
-                        &lt;option&gt;all&lt;/option&gt;
-                        &lt;/select2&gt;
-                        &lt;/span&gt;
-                        &lt;/span&gt;
-                        just another text
-                        &lt;/p&gt;
-                  </div>
-            </div>-->
 
       <h1>Dropdowns</h1>
       <h3>Dropdown without select</h3>
       <div class="row">
-            <div class="f-dropdown open">
-                  <a href="#" data-toggle="dropdown" class="f-dropdown__toggle">Toggle</a>
-                  <ul class="f-dropdown__menu">
-                        <li class="f-dropdown__menu__item done">
-                              <a href="#/profile" class="f-dropdown__menu__link">Basic Information</a>
-                        </li>
-                        <li class="f-dropdown__menu__item done">
-                              <a href="#/users/form?id=1" class="f-dropdown__menu__link">Company Profile</a>
-                        </li>
-                        <li class="f-dropdown__menu__item">
-                              <a href="#/settings" class="f-dropdown__menu__link">Global Configuration</a>
-                        </li>
-                  </ul>
+            <div class="col-md-5">
+                  <div class="f-dropdown open">
+                        <a href="#" data-toggle="dropdown" class="f-dropdown__toggle">Toggle</a>
+                        <ul class="f-dropdown__menu">
+                              <li class="f-dropdown__menu__item done">
+                                    <a href="#/profile" class="f-dropdown__menu__link">Basic Information</a>
+                              </li>
+                              <li class="f-dropdown__menu__item done">
+                                    <a href="#/users/form?id=1" class="f-dropdown__menu__link">Company Profile</a>
+                              </li>
+                              <li class="f-dropdown__menu__item">
+                                    <a href="#/settings" class="f-dropdown__menu__link">Global Configuration</a>
+                              </li>
+                        </ul>
+                  </div>
             </div>
+            <div class="col-md-7" id="block-29">
+                  &lt;div class="f-dropdown open"&gt; &lt;a href="#" data-toggle="dropdown" class="f-dropdown__toggle"&gt;Toggle&lt;/a&gt; &lt;ul
+                  class="f-dropdown__menu"&gt; &lt;li class="f-dropdown__menu__item done"&gt; &lt;a href="#/profile" class="f-dropdown__menu__link"&gt;Basic
+                  Information&lt;/a&gt; &lt;/li&gt; &lt;li class="f-dropdown__menu__item done"&gt; &lt;a href="#/users/form?id=1"
+                  class="f-dropdown__menu__link"&gt;Company Profile&lt;/a&gt; &lt;/li&gt; &lt;li class="f-dropdown__menu__item"&gt; &lt;a
+                  href="#/settings" class="f-dropdown__menu__link"&gt;Global Configuration&lt;/a&gt; &lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-29">Copy HTML</button>
       </div>
       <div class="margin"></div>
 
-            <h1>Inline input</h1>
-            <h3>to activate input just add class "edit" to class "param-result"</h3>
-            <div class="row">
-                  <div class="col-md-3">
-                        <p class="param-block">If <span class="param-result edit">
+      <h1>Inline input</h1>
+      <h3>to activate input just add class "edit" to class "param-result"</h3>
+      <div class="row">
+            <div class="col-md-5">
+                  <p class="param-block">If <span class="param-result edit">
 				<a href="#">any</a>
 				<span class="param-options">
 					<input type="text" class="f-input" value="any"/>
 				</span>
 			</span> just another text </p>
-                  </div>
-                  <div class="col-md-9">
-                        &lt;p class="param-block"&gt;If &lt;span class="param-result"&gt; &lt;a href="#"&gt;any&lt;/a&gt; &lt;span
-                        class="param-options"&gt; &lt;input type="text" class="f-input" value="any"/&gt; &lt;/span&gt; &lt;/span&gt; just another text
-                        &lt;/p&gt;
-                  </div>
             </div>
-            <h1>Inline dropdown without select</h1>
-            <div class="row">
-                  <div class="col-md-3">
-                        <div class="param-block">If <span class="param-result">
+            <div class="col-md-7" id="block-30">
+                  &lt;p class="param-block"&gt;If &lt;span class="param-result"&gt; &lt;a href="#"&gt;any&lt;/a&gt; &lt;span class="param-options"&gt;
+                  &lt;input type="text" class="f-input" value="any"/&gt; &lt;/span&gt; &lt;/span&gt; just another text &lt;/p&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-30">Copy HTML</button>
+      </div>
+      <h1>Inline dropdown without select</h1>
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="param-block">If <span class="param-result">
 				<a href="#" onclick="event.preventDefault(); $(this).parent().toggleClass('open');">any</a>
 				<div class="param-options list">
 					<ul>
@@ -845,49 +818,52 @@
 					</ul>
 				</div>				
 			</span> just another text
-                        </div>
-                  </div>
-                  <div class="col-md-9">
-                        &lt;div class="param-block"&gt;If &lt;span class="param-result"&gt; &lt;a href="#" onclick="event.preventDefault();
-                        $(this).parent().toggleClass('open');"&gt;any&lt;/a&gt; &lt;div class="param-options list"&gt; &lt;ul&gt; &lt;li&gt;&lt;a
-                        href=""&gt;one&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=""&gt;two&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=""&gt;three&lt;/a&gt;&lt;/li&gt;
-                        &lt;/ul&gt; &lt;/div&gt; &lt;/span&gt; just another text &lt;/div&gt;
                   </div>
             </div>
+            <div class="col-md-7" id="block-31">
+                  &lt;div class="param-block"&gt;If &lt;span class="param-result"&gt; &lt;a href="#" onclick="event.preventDefault();
+                  $(this).parent().toggleClass('open');"&gt;any&lt;/a&gt; &lt;div class="param-options list"&gt; &lt;ul&gt; &lt;li&gt;&lt;a href=""&gt;one&lt;/a&gt;&lt;/li&gt;
+                  &lt;li&gt;&lt;a href=""&gt;two&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=""&gt;three&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt;
+                  &lt;/span&gt; just another text &lt;/div&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-31">Copy HTML</button>
+      </div>
 
-            <h1 id="another-elements">another elements</h1>
+      <h1 id="another-elements">another elements</h1>
 
-            <h3>Horizontal menu</h3>
-            <div class="row">
-                  <div class="col-md-3">
-                        <ul class="f-horizontal-menu">
-                              <li class="f-horizontal-menu__item active"><a href="#" class="f-horizontal-menu__link">Category Info</a>
-                              </li>
-                              <li class="f-horizontal-menu__item"><a href="#" class="f-horizontal-menu__link">Page Content</a></li>
+      <h3>Horizontal menu</h3>
+      <div class="row">
+            <div class="col-md-5">
+                  <ul class="f-horizontal-menu">
+                        <li class="f-horizontal-menu__item active"><a href="#" class="f-horizontal-menu__link">Category Info</a>
+                        </li>
+                        <li class="f-horizontal-menu__item"><a href="#" class="f-horizontal-menu__link">Page Content</a></li>
 
-                        </ul>
-                  </div>
-                  <div class="col-md-9">
-                        &lt;ul class="f-horizontal-menu"&gt; &lt;li class="f-horizontal-menu__item active"&gt;&lt;a href="#"
-                        class="f-horizontal-menu__link"&gt;Category Info&lt;/a&gt; &lt;/li&gt; &lt;li class="f-horizontal-menu__item"&gt;&lt;a
-                        href="#" class="f-horizontal-menu__link"&gt;Page Content&lt;/a&gt;&lt;/li&gt;
+                  </ul>
+            </div>
+            <div class="col-md-7" id="block-32">
+                  &lt;ul class="f-horizontal-menu"&gt; &lt;li class="f-horizontal-menu__item active"&gt;&lt;a href="#" class="f-horizontal-menu__link"&gt;Category
+                  Info&lt;/a&gt; &lt;/li&gt; &lt;li class="f-horizontal-menu__item"&gt;&lt;a href="#" class="f-horizontal-menu__link"&gt;Page Content&lt;/a&gt;&lt;/li&gt;
 
-                        &lt;/ul&gt;
+                  &lt;/ul&gt;
+            </div>
+            <button class="btn-clipboard" data-clipboard-target="#block-32">Copy HTML</button>
+      </div>
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="f-bordered-block">
+                        <div class="f-bordered-block__title"><p>Title</p></div>
                   </div>
             </div>
-            <div class="row">
-                  <div class="col-md-3">
-                        <div class="f-bordered-block">
-                              <div class="f-bordered-block__title"><p>Title</p></div>
-                        </div>
-                  </div>
-                  <div class="col-md-9">
-                        &lt;div class="f-bordered-block"&gt;
-                        &lt;div class="f-bordered-block__title"&gt;&lt;p&gt;Title&lt;/p&gt;&lt;/div&gt;
-                        &lt;/div&gt;
-                  </div>
+            <div class="col-md-7" id="block-33">
+                  &lt;div class="f-bordered-block"&gt; &lt;div class="f-bordered-block__title"&gt;&lt;p&gt;Title&lt;/p&gt;&lt;/div&gt; &lt;/div&gt;
             </div>
-
+            <button class="btn-clipboard" data-clipboard-target="#block-33">Copy HTML</button>
+      </div>
+</div>
+<script>
+    new Clipboard('.btn-clipboard');
+</script>
 </body>
 
 </html>
