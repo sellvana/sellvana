@@ -61,6 +61,7 @@
 	display: inline-block;
 	vertical-align: bottom;
 	margin-right: 1px;
+	position: relative;
 	&.active {
 		background: #eee;
 		.f-horizontal-menu__link {

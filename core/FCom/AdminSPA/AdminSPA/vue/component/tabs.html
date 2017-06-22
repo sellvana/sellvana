@@ -8,7 +8,9 @@
                   <ul class='f-horizontal-menu' :class="{open:ddOpen('menu-open')}" ref="menu">
                         <li v-for="t in formTabs" :key="t.name" :class="{active:tab === t}" class="f-horizontal-menu__item" ref="item">
                               <a href="#" @click.prevent="switchTab(t)" class="f-horizontal-menu__link"> {{t.label|_}}
-                                    <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i> </a>
+                                    <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
+                                    <span class="f-badge">5</span>
+                              </a>
                         </li>
                   </ul>
 

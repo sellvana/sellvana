@@ -60,16 +60,14 @@ a:focus {
 	color: #000;
 }
 
-.badge {
+.f-badge {
 	font-size: 10px;
-	background-color: #ff2626;
-	position: absolute;
-	right: 2px;
-	top: 12px;
-	width: 13px;
-	height: 13px;
-	border-radius: 13px;
-	padding: 2px 0;
+	border-radius: 5px;
+	padding: 0px 5px;
+	border: 1px solid #ff9000;
+	color: #ff9000;
+	font-weight: bold;
+	display: inline-block;
 }
 
 .box-no-padding {
