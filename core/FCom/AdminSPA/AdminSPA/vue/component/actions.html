@@ -1,4 +1,4 @@
-<div :class="containerClass" class="f-control-panel__elem">
+<div :class="containerClass">
 
     <div class="f-actions-container">
 
@@ -24,8 +24,6 @@
 
         <div class="f-mobile-button hidden-md hidden-lg">
 
-            <!--START: First actions group-->
-
             <template v-for="group in config.action_mobile_groups">
                 <button v-if="!group.children" :key="group.mobile_group" type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
                 <div v-if="group.children" :key="group.mobile_group" class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open-' + group.mobile_group)}">
@@ -37,8 +35,6 @@
                     </ul>
                 </div>
             </template>
-
-            <!--END: First actions group-->
 
         </div>
 

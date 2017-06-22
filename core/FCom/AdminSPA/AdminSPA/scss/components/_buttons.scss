@@ -382,7 +382,6 @@
       .button {
             padding: 8px 50px 8px 20px;
             text-align: left;
-            margin-left: 0;
             white-space: nowrap;
       }
       .f-dropdown__menu {
@@ -528,6 +527,9 @@
       }
       .f-tabs-container, .f-actions-container {
             vertical-align: top;
+      }
+      .f-tabs-container {
+            padding: 10px 0;
       }
       .f-dashboard-panel {
             .select2-container {

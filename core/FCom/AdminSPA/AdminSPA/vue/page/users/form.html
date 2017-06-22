@@ -1,19 +1,17 @@
-<div class="row">
-      <div class="col-xs-12">
-            <div class="f-form-title">
-                  <img :src="avatarUrl" width="80" class="f-thumb-img">
-                  <p class="f-form-title__text hidden-xs">{{'Form name'|_}}</p>
+<div>
+      <div class="f-control-panel">
+            <div class="f-control-panel__elem">
+                  <div class="f-form-title">
+                        <img :src="avatarUrl" width="80" class="f-thumb-img">
+                        <p class="f-form-title__text hidden-xs">{{'User page'|_}}</p>
+                  </div>
             </div>
+            <sv-comp-actions :config="form.config" @event="processActionEvent"></sv-comp-actions>
       </div>
-      <div class="col-lg-12">
-            <div class="f-control-panel">
-                  <!--container-class="col-xs-6"-->
-                  <sv-comp-tabs :config="form.config" :tab="tab" @event="processTabEvent"></sv-comp-tabs>
-                  <!--container-class="col-xs-6"-->
-                  <sv-comp-actions :config="form.config"  @event="processActionEvent"></sv-comp-actions>
-            </div>
+
+      <div class="f-control-panel">
+            <sv-comp-tabs :config="form.config" :tab="tab" @event="processTabEvent"></sv-comp-tabs>
       </div>
-      <div class="col-xs-12">
-            <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
-      </div>
+
+      <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
 </div>

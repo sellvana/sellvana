@@ -4,8 +4,12 @@
 			- [ requireJs, sv-page-promotions-form, "@Sellvana_Promo/AdminSPA/vue/page/promotions/form" ]
 			- [ requireJs, sv-page-promotions-form-tpl, "@Sellvana_Promo/AdminSPA/vue/page/promotions/form.html" ]
 
+			- [ requireJs, sv-page-promotions-create, "@Sellvana_Promo/AdminSPA/vue/page/promotions/create-coupon" ]
+			- [ requireJs, sv-page-promotions-create-tpl, "@Sellvana_Promo/AdminSPA/vue/page/promotions/create-coupon.html" ]
+
     - view: app
         do:
             - [ addNav, { path: /catalog/promos, label: Promotions, link: /promos, pos: 100 } ]
 
 			- [ addRoute, { path: /promos, require: [ sv-page-promotions-form, "text!sv-page-promotions-form-tpl" ] } ]
+			- [ addRoute, { path: /create-coupon, require: [ sv-page-promotions-create, "text!sv-page-promotions-create-tpl" ] } ]

@@ -9,7 +9,7 @@
 
             <!--Actions buttons for desktop-->
 
-            <sv-comp-actions :config="form.config" container-class="visible-lg visible-md" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :config="form.config" container-class="visible-lg visible-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
       </div>
 
 
@@ -19,7 +19,7 @@
 
             <!--Actions buttons for mobile-->
 
-            <sv-comp-actions :config="form.config" container-class="hidden-lg hidden-md" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :config="form.config" container-class="hidden-lg hidden-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
       </div>
 
       <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
