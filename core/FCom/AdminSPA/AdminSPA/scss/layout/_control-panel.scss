@@ -1,0 +1,54 @@
+/*Styles for control panels*/
+
+.f-control-panel {
+      display: table;
+      width: 100%;
+      .f-actions-container {
+            text-align: right;
+      }
+}
+
+.f-inline-panel { // for control panel on Settings page
+      width: inherit;
+      .f-control-panel__elem {
+            padding-right: 5px;
+      }
+}
+
+.f-control-panel__elem {
+      display: table-cell;
+      vertical-align: bottom;
+      .multiselect {
+            margin: 5px 0;
+      }
+}
+.f-actions-container {
+      text-align: right;
+      padding: 10px 0;
+}
+
+/*Form title*/
+
+.f-form-title {
+      padding: 10px 0;
+      line-height: 34px;
+}
+.f-form-title__text {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0;
+      display: inline-block;
+}
+.f-grid-title__text {
+      font-size: 20px;
+      font-weight: bold;
+}
+
+@media (max-width: 991px) {
+      .f-inline-panel { // for control panel on Settings page
+            width: 100%;
+            .f-control-panel__elem {
+                  padding-right: 0px;
+            }
+      }
+}

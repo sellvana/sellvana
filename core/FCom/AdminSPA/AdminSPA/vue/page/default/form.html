@@ -1,8 +1,10 @@
 <div>
       <div v-if="thumbUrl || formTitle" class="f-control-panel">
-            <div class="f-form-title">
-                  <img v-if="thumbUrl" :src="thumbUrl" width="80" class="f-thumb-img">
-                  <p class="f-form-title__text" :class-bak="{'hidden-xs':!thumbUrl}">{{formTitle|_}}</p>
+            <div class="f-control-panel__elem">
+                  <div class="f-form-title">
+                        <img v-if="thumbUrl" :src="thumbUrl" width="80" class="f-thumb-img">
+                        <p class="f-form-title__text" :class-bak="{'hidden-xs':!thumbUrl}">{{formTitle|_}}</p>
+                  </div>
             </div>
 
             <!--Actions buttons for desktop-->

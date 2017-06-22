@@ -37,6 +37,11 @@
 	}
 }
 
+@media (min-width: 1365px) {
+	.f-horizontal-menu {
+		display: inline-block !important;
+	}
+}
 .f-horizontal-menu__link {
 	color: #2e4354;
 	padding: 8px 20px 8px 20px;

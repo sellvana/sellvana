@@ -1,7 +1,9 @@
 <div>
       <div class="f-control-panel">
-            <div v-if="grid && grid.config && grid.config.title" class="f-form-title">
-                  <p class="f-form-title__text hidden-xs">{{grid.config.title|_}}</p>
+            <div class="f-control-panel__elem">
+                  <div v-if="grid && grid.config && grid.config.title" class="f-form-title">
+                        <p class="f-form-title__text hidden-xs">{{grid.config.title|_}}</p>
+                  </div>
             </div>
             <sv-comp-actions :config="grid.config" container-class="" @event="processActionEvent"></sv-comp-actions>
       </div>

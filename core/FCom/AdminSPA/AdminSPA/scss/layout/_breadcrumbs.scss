@@ -73,14 +73,20 @@
       &:hover {
             color: #fff;
           svg {
-                  fill: #fff;
-                  stroke: #fff;
+                  fill: #eee;
+                  stroke: #eee;
             }
       }
       &.on {
             svg {
                   fill: #fff;
                   stroke: #fff;
+            }
+            &:hover {
+                  svg {
+                        fill: none;
+                        stroke: #eee;
+                  }
             }
       }
 }
@@ -149,9 +155,9 @@
                   fill: none;
                   stroke: #000;
             }
-            &:hover, &:focus {
+            &:hover {
                  svg {
-                        fill: none;
+                        fill: #545353;
                         stroke: #000;
                   }
             }
@@ -160,10 +166,10 @@
                         fill: #000;
                         stroke: #000;
                   }
-                  &:hover, &:focus {
+                  &:hover {
                         svg {
-                              fill: #000;
-                              stroke: #000;
+                              fill: none;
+                              stroke: #545353;
                         }
                   }
             }

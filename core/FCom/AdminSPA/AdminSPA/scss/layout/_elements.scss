@@ -1,6 +1,17 @@
 .f-filter-block {
-	overflow: hidden;
+	overflow: hidden; //to hide "filter params-left" and "filter params-right"
 }
+
+/*Main content block*/
+
+.f-content-block {
+	background: #fff;
+	border-radius: 5px;
+	padding: 15px;
+	margin-bottom: 30px;
+}
+
+/*Main block title*/
 
 .f-block-title {
 	position: relative;
@@ -13,19 +24,6 @@
 		border: 0;
 	}
 }
-.f-grid-title__text {
-	font-size: 20px;
-	font-weight: bold;
-}
-.f-form-title {
-	padding: 10px 0;
-}
-.f-form-title__text {
-	font-size: 20px;
-	font-weight: bold;
-	margin: 0;
-	display: inline-block;
-}
 
 .f-block-title__text {
 	color: #2d2d2d;
@@ -37,11 +35,25 @@
 	position: relative;
 }
 
-.f-content-block {
-	background: #fff;
+/*Bordered block*/
+
+.f-bordered-block {
+	padding: 20px;
+	border: solid 1px #e5e3e3;
 	border-radius: 5px;
-	padding: 15px;
-	margin-bottom: 30px;
+}
+
+.f-bordered-block__title {
+	position: absolute;
+	top: -9px;
+	background: #fff;
+	padding: 0;
+	width: auto;
+	p {
+		font-size: 14px;
+		padding: 0 12px;
+		font-weight: bold;
+	}
 }
 
 a:focus {
@@ -82,9 +94,10 @@ a:focus {
 		white-space: nowrap;
 	}
 }
-.tableDiv {
+/*.tableDiv {
 	margin: 70px 0 0 0;
-}
+}*/
+
 .f-multilanguage-block {
 	background: #fff;
 	border-radius: 5px;
@@ -301,31 +314,8 @@ a:focus {
 		border-color: #ff8f00;
 	}
 }
-.f-control-panel {
-	display: table;
-	width: 100%;
 
-	.f-form-title, .f-actions-container {
-		display: table-cell;
-	}
-	.f-actions-container {
-		text-align: right;
-	}
-}
 
-.f-tabs-container {
-
-}
-.f-actions-container {
-	display: table-cell;
-	vertical-align: bottom;
-}
-
-.f-actions-container {
-	text-align: right;
-	white-space: nowrap;
-	padding: 0 0 10px;
-}
 .overlay {
 	opacity: 0;
 	visibility: hidden;
@@ -349,27 +339,7 @@ a:focus {
 /*.ps__scrollbar-y-rail {
 	height: 100% !important;
 }*/
-.select2-dropdown {
-	z-index: 8;
-}
-.f-bordered-block {
-	padding: 20px;
-	border: solid 1px #e5e3e3;
-	border-radius: 5px;
-}
 
-.f-bordered-block__title {
-	position: absolute;
-	top: -9px;
-	background: #fff;
-	padding: 0;
-	width: auto;
-	p {
-		font-size: 14px;
-		padding: 0 12px;
-		font-weight: bold;
-	}
-}
 @media (max-width: 1365px) {
 	.f-multilanguage-block {
 		padding: 10px;
@@ -388,7 +358,6 @@ a:focus {
 	.f-control-panel {
 		.f-actions-container {
 			text-align: right;
-			padding: 0;
 		}
 	}
 	.f-control-panel-mobile {
