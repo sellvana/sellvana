@@ -115,6 +115,8 @@
             - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-default-form-tpl ] } ]
 
 
+
+
 /sales/orders/form:
     - view: app
         do:
@@ -129,7 +131,9 @@
          	- [ addFormTab, { path: /sales/orders/form, name: details, label: Details, pos: 90 } ]
             #- [ addFormTab, { path: /sales/orders/form, name: comments, label: Comments, pos: 30 } ]
 
-            - [ addRoute, { path: /purchase-orders/new, require: [sv-page-sales-orders-form-purchase-orders-new, text!sv-page-sales-orders-form-purchase-orders-new-tpl ]}]
+            - [ addRoute, { path: /sales/orders/purchase-orders/new, require: [sv-page-sales-orders-form-purchase-orders-new, text!sv-page-sales-orders-form-purchase-orders-new-tpl ]}]
+
+
 
 
 

@@ -1,32 +1,189 @@
+<div class="f-content-block">
+    <!--Old code-->
 
-<div class="f-content-block details-information">
-    <div class="block-title">
-        <p>{{'Shipments'|_}}</p>
-        <button type="button" class="button-small button1" @click="$emit('add', 'shipment')">{{'Add'|_}}</button>
+    <!--
+    <div class="f-content-block details-information">
+        <div class="block-title">
+            <p>{{'Shipments'|_}}</p>
+            <button type="button" class="button-small button1" @click="$emit('add', 'shipment')">{{'Add'|_}}</button>
+        </div>
+        <div>
+            <table v-if="form.shipments.length" class="f-secondary-table">
+                <thead>
+                <tr>
+                    <th>{{'Timeline'|_}}</th>
+                    <th>{{'Packages'|_}}</th>
+                    <th>{{'Method'|_}}</th>
+                    <th>{{'Status'|_}}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="s in form.shipments" @click="$emit('edit', 'shipment', s)" :class="{active:entity===s}">
+                    <td>{{s.create_at|date}}</td>
+                    <td>
+                        <div v-for="item in s.items">
+                            <span>{{item.inventory_sku}} x{{item.qty}}</span>: {{item.product_name}}
+                        </div>
+                    </td>
+                    <td>{{s.carrier_desc}} / {{s.service_desc}}</td>
+                    <td :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div v-else>{{'No shipments in this order'|_}}</div>
+        </div>
+    </div>-->
+    <div class="f-block-title">
+        <p class="f-block-title__text">Shipments</p>
     </div>
-    <div>
-        <table v-if="form.shipments.length" class="f-secondary-table">
-            <thead>
-            <tr>
-                <th>{{'Timeline'|_}}</th>
-                <th>{{'Packages'|_}}</th>
-                <th>{{'Method'|_}}</th>
-                <th>{{'Status'|_}}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="s in form.shipments" @click="$emit('edit', 'shipment', s)" :class="{active:entity===s}">
-                <td>{{s.create_at|date}}</td>
-                <td>
-                    <div v-for="item in s.items">
-                        <span>{{item.inventory_sku}} x{{item.qty}}</span>: {{item.product_name}}
-                    </div>
-                </td>
-                <td>{{s.carrier_desc}} / {{s.service_desc}}</td>
-                <td :class="'status-' + s.state_overall">{{form.options.shipment_state_overall[s.state_overall]}}</td>
-            </tr>
-            </tbody>
-        </table>
-        <div v-else>{{'No shipments in this order'|_}}</div>
+    <div class="f-actions-container">
+        <div class="visible-lg visible-md">
+            <button type="button" class="button button1" >{{"Generate label"|_}}</button>
+            <button type="button" class="button button1" @click="$emit('add', 'shipment')">{{"Add tracking Number"|_}}</button>
+        </div>
+    </div>
+    <div class="f-accordion f-shipment-block" :class="{open:ddOpen('shipment1')}">
+        <div class="f-accordion__title" @click.prevent.stop="ddToggle('shipment1')">
+            <div class="f-shipment-details">
+                <span class="f-shipment-details__item">SH-US-123456-1-1</span>
+                <span class="f-shipment-details__item">Shipped</span>
+                <span class="f-shipment-details__item">UPS 1Z29348592345987923</span>
+            </div>
+        </div>
+        <div class="f-accordion__content" @click.prevent.stop>
+            <div class="f-shipment-details f-shipment-block__details">
+                <span class="f-shipment-details__item">Vigo</span>
+                <span class="f-shipment-details__item">10 lb</span>
+                <span class="f-shipment-details__item">Qty: 7</span>
+                <span class="f-shipment-details__item">Size: 5x4x10</span>
+                <span class="f-shipment-details__item">Created: 2/12/2017</span>
+            </div>
+            <div class="f-action-button-b f-shipment-block__actions"><a href="#" data-toggle="dropdown" class="f-action-button-b__toggle">Bulk Action<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                <ul class="f-action-button-b__menu f-menu_right">
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Reprint Label</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Download Packing Slip</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Mark as Lost</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Mark as Damaged</a></li>
+                </ul>
+            </div>
+            <div class="f-shipment-block__table scrollable-area">
+                <table class="f-secondary-table f-standart-table f-striped-table">
+                    <thead>
+                        <tr>
+                            <th>Thumb</th>
+                            <th>SKU</th>
+                            <th>Vendor SKU</th>
+                            <th>Product Name</th>
+                            <th>Qty Shipped</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>SKU-123</td>
+                            <td>VND-123</td>
+                            <td>Product1</td>
+                            <td>5</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="f-accordion f-shipment-block" :class="{open:ddOpen('shipment2')}">
+        <div class="f-accordion__title" @click.prevent.stop="ddToggle('shipment2')">
+            <div class="f-shipment-details">
+                <span class="f-shipment-details__item">SH-US-123456-1-2</span>
+                <span class="f-shipment-details__item">Shipped</span>
+                <span class="f-shipment-details__item">UPS 1Z29348592345987923</span>
+            </div>
+        </div>
+        <div class="f-accordion__content" @click.prevent.stop>
+            <div class="f-shipment-details f-shipment-block__details">
+                <span class="f-shipment-details__item">Vigo</span>
+                <span class="f-shipment-details__item">10 lb</span>
+                <span class="f-shipment-details__item">Qty: 7</span>
+                <span class="f-shipment-details__item">Size: 5x4x10</span>
+                <span class="f-shipment-details__item">Created: 2/12/2017</span>
+            </div>
+            <div class="f-action-button-b f-shipment-block__actions"><a href="#" data-toggle="dropdown" class="f-action-button-b__toggle">Bulk Action<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                <ul class="f-action-button-b__menu f-menu_right">
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Reprint Label</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Download Packing Slip</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Mark as Lost</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Mark as Damaged</a></li>
+                </ul>
+            </div>
+            <div class="f-shipment-block__table scrollable-area">
+                <table class="f-secondary-table f-standart-table f-striped-table">
+                    <thead>
+                    <tr>
+                        <th>Thumb</th>
+                        <th>SKU</th>
+                        <th>Vendor SKU</th>
+                        <th>Product Name</th>
+                        <th>Qty Shipped</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td></td>
+                        <td>SKU-123</td>
+                        <td>VND-123</td>
+                        <td>Product1</td>
+                        <td>5</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="f-accordion f-shipment-block" :class="{open:ddOpen('shipment3')}">
+        <div class="f-accordion__title" @click.prevent.stop="ddToggle('shipment3')">
+            <div class="f-shipment-details">
+                <span class="f-shipment-details__item">SH-US-123456-1-3</span>
+                <span class="f-shipment-details__item">Shipped</span>
+                <span class="f-shipment-details__item">UPS 1Z29348592345987923</span>
+            </div>
+        </div>
+        <div class="f-accordion__content" @click.prevent.stop>
+            <div class="f-shipment-details f-shipment-block__details">
+                <span class="f-shipment-details__item">Vigo</span>
+                <span class="f-shipment-details__item">10 lb</span>
+                <span class="f-shipment-details__item">Qty: 7</span>
+                <span class="f-shipment-details__item">Size: 5x4x10</span>
+                <span class="f-shipment-details__item">Created: 2/12/2017</span>
+            </div>
+            <div class="f-action-button-b f-shipment-block__actions"><a href="#" data-toggle="dropdown" class="f-action-button-b__toggle">Bulk Action<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                <ul class="f-action-button-b__menu f-menu_right">
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Reprint Label</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Download Packing Slip</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Mark as Lost</a></li>
+                    <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Mark as Damaged</a></li>
+                </ul>
+            </div>
+            <div class="f-shipment-block__table scrollable-area">
+                <table class="f-secondary-table f-standart-table f-striped-table">
+                    <thead>
+                    <tr>
+                        <th>Thumb</th>
+                        <th>SKU</th>
+                        <th>Vendor SKU</th>
+                        <th>Product Name</th>
+                        <th>Qty Shipped</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td></td>
+                        <td>SKU-123</td>
+                        <td>VND-123</td>
+                        <td>Product1</td>
+                        <td>5</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

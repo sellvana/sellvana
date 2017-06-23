@@ -1,3 +1,86 @@
 <div class="f-content-block">
-    Here block
+    <div class="f-buttons-block f-mobile-button text-right">
+        <div class="f-action-button-b" :class="{open:ddOpen('filter1')}">
+            <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('filter1')">Filter by Vendor...<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+            <ul class="f-action-button-b__menu f-menu_right">
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Vendor1</a></li>
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Vendor2</a></li>
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Vendor3</a></li>
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Vendor4</a></li>
+            </ul>
+        </div>
+        <div class="f-action-button-b f-mobile-button" :class="{open:ddOpen('filter2')}">
+            <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('filter2')">Filter by Topic...<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+            <ul class="f-action-button-b__menu f-menu_right">
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Topic1</a></li>
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Topic2</a></li>
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Topic3</a></li>
+                <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">Topic4</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="f-day-block">
+                <p class="f-day-block__name">Today</p>
+                <div class="f-day-content">
+                    <div class="f-message-block row">
+                        <p class="f-message-block__time col-sm-2 col-md-2 col-lg-1 col-lg-offset-1 text-right">1:23 pm</p>
+                        <p class="f-message-block__author col-sm-2 col-md-1">Vigo:</p>
+                        <div class="f-message-block__text col-sm-5">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                                aliqua.</p>
+                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+                                cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                        <div class="f-message-block__po col-sm-3">
+                            <a href="#" class="f-message-block__link" class="small-button button2"> PO-US-123456-1 </a>
+                        </div>
+                    </div>
+                    <div class="f-message-block row">
+                        <p class="f-message-block__time col-sm-2 col-md-2 col-lg-1 col-lg-offset-1 text-right">1:20 pm</p>
+                        <p class="f-message-block__author col-sm-2 col-md-1">Boris:</p>
+                        <div class="f-message-block__text col-sm-5">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                                aliqua.</p>
+                            <p>Ut enim ad minim veniam, cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+                                in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                        <div class="f-message-block__po col-sm-3">
+                            <a href="#" class="f-message-block__link" class="small-button button2"> PO-US-123456-1 </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="f-day-block">
+                <p class="f-day-block__name">Yesterday</p>
+                <div class="f-day-content">
+                    <div class="f-message-block row">
+                        <p class="f-message-block__time col-sm-2 col-md-2 col-lg-1 col-lg-offset-1 text-right">1:23 pm</p>
+                        <p class="f-message-block__author col-sm-2 col-md-1">Vigo:</p>
+                        <div class="f-message-block__text col-sm-5">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                                aliqua.</p>
+                        </div>
+                        <div class="f-message-block__po col-sm-3">
+                            <a href="#" class="f-message-block__link" class="small-button button2"> PO-US-123456-1 </a>
+                        </div>
+                    </div>
+                    <div class="f-message-block row">
+                        <p class="f-message-block__time col-sm-2 col-md-2 col-lg-1 col-lg-offset-1 text-right">1:20 pm</p>
+                        <p class="f-message-block__author col-sm-2 col-md-1">Boris:</p>
+                        <div class="f-message-block__text col-sm-5">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+                                aliqua.</p>
+                            <p>Ut enim ad minim veniam, cillum dolore sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                        <div class="f-message-block__po col-sm-3">
+                            <a href="#" class="f-message-block__link" class="small-button button2"> PO-US-123456-1 </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
