@@ -1,6 +1,7 @@
-.login-container {
-	width: 536px;
-	border-radius: 1px;
+.f-login-container {
+	width: 30%;
+	min-width: 500px;
+	border-radius: 5px;
 	background-color: #fff;
 	box-shadow: 0 0 10px rgba(0, 0, 0, .03);
 	position: absolute;
@@ -11,29 +12,15 @@
 	text-align: center;
 	p {
 		font-size: 22px;
-		color: #ff253d;
+		color: #0086c0;
 		text-align: center;
 		margin-bottom: 15px;
 	}
-	a {
-		color: #ff253d;
-		display: inline-block;
-		&:hover {
-			color: #d40017;
-		}
-	}
 	img {
 		margin-bottom: 30px;
-	}
-	label {
-		display: inline-block;
-		width: 100%;
-		span {
-			font-weight: bold;
-			color: #1b1b1b;
-			display: inline-block;
-			margin-bottom: 9px;
-		}
+		width: 50%;
+		min-width: 100px;
+		max-width: 200px;
 	}
 	form {
 		text-align: left;
@@ -45,30 +32,47 @@
 			color: #000000;
 		}
 	}	
-	.control-label {
+	.f-form-label {
 		text-align: left;
-		margin: 7px 0 7px 0;
-		padding: 0 0 0 40px;
+	}
+	.f-buttons-block {
+		text-align: right;
 	}
 }
-
+.f-login-link {
+	color: #0086c0;
+	display: inline-block;
+	&:hover {
+		color: #054e6d;
+	}
+}
 @media (max-width: 767px) {
-	.login-container {
-		width: 90%;
-		position: absolute;
+	.f-login-container {
+		width: 80%;
+		min-width: 300px;
 		margin: 0 auto;
-		top: 20px;
-		left: 50%;
-		transform: translate(-50%, 0%);
-		padding: 40px 40px 30px;
+		padding: 20px 10px;
 		p {
 			font-size: 16px;
 		}
-		a {
-			margin: 0 0 15px 0;
-		}
-		.buttons-block {
+		.f-buttons-block {
 			text-align: center; 
 		}
+		.f-form-container {
+			padding: 10px;
+		}
+	}
+	.f-login-link {
+		margin: 0 0 15px 0;
+	}
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+	.f-login-container {
+		position: relative;
+		top: 0;
+		left: 0;
+		margin: 0 auto;
+		transform: translate(0);
 	}
 }
