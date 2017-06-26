@@ -23,19 +23,20 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
     public function getGridConfig()
     {
         return [
-            'id' => 'users',
+            'id' => 'modules',
             'data' => $this->getModulesData(),
             'columns' => [
                 ['type' => 'row-select', 'width' => 80],
-                ['type' => 'actions', 'width' => 80, 'actions' => [
-                    ['type' => 'edit', 'link' => '/users/form?id={id}'],
-                    ['type' => 'delete', 'delete_url' => 'users/grid_delete'],
-                ]],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'username', 'label' => 'Username'],
-                ['name' => 'firstname', 'label' => 'First Name'],
-                ['name' => 'lastname', 'label' => 'Last Name'],
-                ['name' => 'email', 'label' => 'Email'],
+                ['name' => 'run_level', 'label' => 'Run Level', 'datacell_component' => 'sv-page-modules-grid-datacell-run-level'],
+                ['name' => 'run_status', 'label' => 'Status'],
+                ['name' => 'name', 'label' => 'Module Name'],
+                ['name' => 'description', 'label' => 'Description'],
+                ['name' => 'version', 'label' => 'Version'],
+                ['name' => 'channel', 'label' => 'Channel'],
+                ['name' => 'schema_version', 'label' => 'DB Version'],
+                ['name' => 'requires', 'label' => 'Requires', 'content_overflow' => true],
+                ['name' => 'required_by', 'label' => 'Required By', 'content_overflow' => true],
+                ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'content_overflow' => true],
             ],
             'filters' => true,
             'export' => true,
