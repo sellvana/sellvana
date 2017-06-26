@@ -57,6 +57,10 @@
 			- [ requireJs, sv-page-catalog-categories-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout.html" ]
 
+
+			- [ requireJs, sv-page-catalog-quick-add-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products" ]
+			- [ requireJs, sv-page-catalog-quick-add-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products.html" ]
+
             - [ requireJs, sv-comp-dashboard-low-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/low-inventory.html" ]
             - [ requireJs, sv-comp-dashboard-new-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/new-products.html" ]
             - [ requireJs, sv-comp-dashboard-search-recent-terms-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/search-recent-terms.html" ]
@@ -92,6 +96,7 @@
             - [ addRoute, { path: /catalog/categories, require: [ sv-page-catalog-categories, text!sv-page-catalog-categories-tpl ] } ]
             - [ addRoute, { path: /catalog/inventory, require: [ sv-page-catalog-inventory, text!sv-page-default-grid-tpl, json!sv-page-catalog-inventory-grid-config ] } ]
             - [ addRoute, { path: /catalog/inventory/form, require: [ sv-page-catalog-inventory-form, text!sv-page-default-form-tpl ] } ]
+            - [ addRoute, { path: /catalog/quick-add/products, require: [ sv-page-catalog-quick-add-products, text!sv-page-catalog-quick-add-products-tpl ] } ]
 
 
 /catalog/products/form:
