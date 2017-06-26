@@ -1,6 +1,19 @@
 <td>
-    <label>
-        <div class="f-checkbox-block"><div class="f-checkbox-block__elem"></div></div>
-        {{row.run_level}}
-    </label>
+      <div class="f-grid-checkbox-block" onclick="event.preventDefault(); $(this).toggleClass('active'); $('.f-level-menu').toggleClass('f-level-menu__active')">
+            <div class="f-grid-checkbox-block__elem"></div>
+      </div>
+      <!--{{row.run_level}}-->
+      <div class="f-level-menu ">
+            <span class="f-level-menu__result">
+                <a href="#" onclick="event.preventDefault(); $(this).parent().toggleClass('open');" class="f-select-param">ONDEMAND</a>
+                <div class="f-level-menu__options">
+                    <ul>
+                        <li><a href="" class="f-level-menu__option" onclick="event.preventDefault(); var item = $(this).html(); $(this).parents('.f-level-menu__result').find('.f-select-param').html(item);">DISABLED</a></li>
+                        <li><a href="" class="f-level-menu__option" onclick="event.preventDefault(); var item = $(this).html(); $(this).parents('.f-level-menu__result').find('.f-select-param').html(item);">ONDEMAND</a></li>
+                        <li><a href="" class="f-level-menu__option" onclick="event.preventDefault(); var item = $(this).html(); $(this).parents('.f-level-menu__result').find('.f-select-param').html(item);">REQUESTED</a></li>
+                        <li><a href="" class="f-level-menu__option" onclick="event.preventDefault(); var item = $(this).html(); $(this).parents('.f-level-menu__result').find('.f-select-param').html(item);">REQUIRED</a></li>
+                    </ul>
+                </div>
+            </span>
+      </div>
 </td>
