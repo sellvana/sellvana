@@ -69,7 +69,10 @@
             - [ addNav, { path: /catalog/categories, label: Navigation, link: /catalog/categories, pos: 10 } ]
             - [ addNav, { path: /catalog/products, label: Products, link: /catalog/products, pos: 20 } ]
             - [ addNav, { path: /catalog/inventory, label: Inventory, link: /catalog/inventory, pos: 30 } ]
-            - [ addNav, { path: /catalog/quick-add-products, label: Quick Add Products, link: /catalog/quick-add-products, pos: 40 } ]
+            - [ addNav, { path: /catalog/quick-add, label: Quick Add, pos: 40 } ]
+            - [ addNav, { path: /catalog/quick-add/products, label: Products to Catalog, link: /catalog/quick-add-products, pos: 10 } ]
+            - [ addNav, { path: /catalog/quick-add/categories, label: Products to Categories, link: /catalog/quick-add-categories, pos: 20 } ]
+            - [ addNav, { path: /catalog/quick-add/images, label: Images to Products, link: /catalog/quick-add-images, pos: 30 } ]
             - [ addNav, { path: /catalog/products-import, label: Products CSV Import, link: /catalog/product-import, pos: 50 } ]
             - [ addNav, { path: /catalog/search-alias, label: Search Terms, link: /catalog/search-alias, pos: 60 } ]
 
