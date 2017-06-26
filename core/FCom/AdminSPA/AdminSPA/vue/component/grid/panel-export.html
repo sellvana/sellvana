@@ -12,6 +12,6 @@
 		<button class="button button1" type="button" @click="submit()">{{'Export'|_}}</button>
 	</div>
 	<div v-show="false">
-		<iframe v-for="url in export_urls" :src="url"></iframe>
+		<iframe v-for="url in export_urls" :key="url" :src="url"></iframe>
 	</div>
 </div>

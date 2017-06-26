@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_Sales_AdminSPA_Controller_Orders_PurchaseOrders
  *
- * @property Sellvana_Sales_AdminSPA_Controller_Orders_PurchaseOrders Sellvana_Sales_Model_Order_History
+ * @property Sellvana_MultiVendor_Model_PurchaseOrder Sellvana_MultiVendor_Model_PurchaseOrder
  */
 class Sellvana_Sales_AdminSPA_Controller_Orders_PurchaseOrders extends FCom_AdminSPA_AdminSPA_Controller_Abstract
 {

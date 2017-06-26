@@ -493,7 +493,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                                     break;
                                 }
                             } else {
-                                if ((_.isString(row[j]) && row[j].match(q)) || (_.isNumber(row[j]) && row[j] == q)) {
+                                if ((_.isString(row[j]) && row[j].match(new RegExp(q, 'i'))) || (_.isNumber(row[j]) && row[j] == q)) {
                                     show = true;
                                     break;
                                 }
