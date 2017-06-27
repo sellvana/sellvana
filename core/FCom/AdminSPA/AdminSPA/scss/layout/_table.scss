@@ -1,3 +1,10 @@
+table {
+	.f-delete, .f-copy {
+		margin: 0 5px;
+		font-size: 16px;
+	}
+}
+
 .f-grid-wrapper {
 	overflow: hidden;
 	min-height: 50vh;
@@ -131,11 +138,17 @@
 
 .f-standart-table {
 	width: 100%;
+	thead {
+		th {
+			vertical-align: middle;
+		}
+	}
 	th, td {
 		height: 30px;
-		padding: 0 8px;
+		padding: 8px 8px;
 		border: 1px solid #eee;
 		white-space: nowrap;
+		vertical-align: top;
 	}
 }
 

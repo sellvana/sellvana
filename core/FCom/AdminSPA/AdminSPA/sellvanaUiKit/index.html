@@ -198,12 +198,13 @@
       <div class="row margin"></div>
       <div class="row margin"></div>
       <div class="row margin"></div>
+      <h3>For dropdown's "right:0" add "f-menu_right" class to "f-dropdown__menu"</h3>
       <div class="row margin">
             <div class="col-md-5">
                   <div class="f-dropdown  f-actions-dropdown-arrow open" :class="{open:ddOpen('actions-open')}">
                         <button type="button" class="button button1" @click="goBack()">Save</button>
                         <a href="" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open')"><b class="f-caret__elem"></b></a>
-                        <div class="f-dropdown__menu">
+                        <div class="f-dropdown__menu f-menu_right">
                               <button type="button" class="button button2" @click="doDelete()">Delete</button>
                               <button type="button" class="button button1" @click="save()">Save</button>
                         </div>
@@ -213,7 +214,7 @@
                   &lt;div class="f-dropdown f-actions-dropdown-arrow open" :class="{open:ddOpen('actions-open')}"&gt; &lt;button type="button"
                   class="button button1" @click="goBack()"&gt;Save&lt;/button&gt; &lt;a href="" class="f-caret f-dropdown__toggle"
                   @click.prevent.stop="ddToggle('actions-open')"&gt;&lt;b class="f-caret__elem"&gt;&lt;/b&gt;&lt;/a&gt; &lt;div
-                  class="f-dropdown__menu"&gt; &lt;button type="button" class="button button2" @click="doDelete()"&gt;Delete&lt;/button&gt; &lt;button
+                  class="f-dropdown__menu f-menu_right"&gt; &lt;button type="button" class="button button2" @click="doDelete()"&gt;Delete&lt;/button&gt; &lt;button
                   type="button" class="button button1" @click="save()"&gt;Save&lt;/button&gt; &lt;/div&gt; &lt;/div&gt;
             </div>
             <button class="btn-clipboard" data-clipboard-target="#block-6">Copy HTML</button>
@@ -289,6 +290,38 @@
       </div>
 
       <h3>Inputs with label</h3>
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="f-form-group row"><label class="col-md-12 f-form-label text-left" for="id8">Inventory
+                        SKU</label>
+                        <div class="col-md-12"><input type="text" class="f-input" id="id8"></div>
+                  </div>
+            </div>
+            <div class="col-md-7">
+                  &lt;div class="f-form-group row"&gt;&lt;label class="col-md-12 f-form-label text-left" for="id8"&gt;Inventory
+                  SKU&lt;/label&gt;
+                  &lt;div class="col-md-12"&gt;&lt;input type="text" class="f-input" id="id8"&gt;&lt;/div&gt;
+                  &lt;/div&gt;
+            </div>
+      </div>
+      <div class="row">
+            <div class="col-md-5">
+                  <div class="f-form-group row">
+                        <label class="col-md-12 f-form-label text-left" for="id3"><span>Short
+                                                                 Description</span></label>
+                        <div class="col-md-12"><textarea type="text" class="f-textarea" id="id3"></textarea>
+                        </div>
+                  </div>
+            </div>
+            <div class="col-md-7">
+                  &lt;div class="f-form-group row"&gt;
+                  &lt;label class="col-md-12 f-form-label text-left" for="id3"&gt;&lt;span&gt;Short
+                  Description&lt;/span&gt;&lt;/label&gt;
+                  &lt;div class="col-md-12"&gt;&lt;textarea type="text" class="f-textarea" id="id3"&gt;&lt;/textarea&gt;
+                  &lt;/div&gt;
+                  &lt;/div&gt;
+            </div>
+      </div>
       <div class="row">
             <div class="col-md-5">
                   <div class="f-form-group row">
@@ -367,7 +400,7 @@
       <div class="row">
             <div class="col-md-5">
                   <div class="f-form-group row required">
-                        <label class="col-md-3 f-form-label" for="id1">ID:14</label>
+                        <label class="col-md-3 f-form-label" for="id1"><span>ID:14</span></label>
                         <div class="col-md-9">
                               <input type="text" class="f-input" id="id1">
                         </div>

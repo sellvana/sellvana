@@ -87,7 +87,7 @@ a:focus {
 	width: 100%;
 	overflow: auto;
 	padding: 0;
-
+	margin: 20px 0;
 	table {
 		white-space: nowrap;
 	}
@@ -234,7 +234,7 @@ a:focus {
 	}
 }
 
-.f-delete, .f-roll-up {
+.f-delete, .f-roll-up, .f-copy {
 	cursor: pointer;
 	i {
 		color: #474646;

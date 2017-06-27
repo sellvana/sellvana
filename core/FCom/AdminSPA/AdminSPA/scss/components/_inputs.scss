@@ -230,8 +230,17 @@ input[type=number] {
 	text-align: right;
 	padding-top: 7px;
 	font-weight: bold;
+	span {
+		color: #000;
+		cursor: pointer;
+		text-align: right;
+		padding-top: 7px;
+		font-weight: bold;
+	}
 }
-
+.text-left {
+	text-align: left;
+}
 .f-input {
 	font-size: 13px;
 	padding: 9px 12px;
@@ -305,8 +314,8 @@ input[type=number] {
 /*Checkbox block*/
 
 .f-checkbox-block {
-	width: 48px;
-	height: 28px;
+	width: 56px;
+	height: 34px;
 	border-radius: 20px;
 	border: 1px solid #eee;
 	transition: 0.1s all ease-in;
@@ -316,8 +325,8 @@ input[type=number] {
 }
 
 .f-checkbox-block__elem {
-	width: 26px;
-	height: 26px;
+	width: 32px;
+	height: 32px;
 	border-radius: 100%;
 	background: #ffffff;
 	position: absolute;
@@ -563,12 +572,15 @@ input[type=number] {
 	.f-form-label {
 		position: relative;
 		padding-right: 2em;
-		&:after {
-			content: "*";
-			display: inline-block;
-			position: absolute;
-			right: 15px;
-			top: 5px;  
+		span {
+			position: relative;
+			&:after {
+				content: "*";
+				display: inline-block;
+				position: absolute;
+				right: -10px;
+				top: 5px;
+			}
 		}
 	}
 }
