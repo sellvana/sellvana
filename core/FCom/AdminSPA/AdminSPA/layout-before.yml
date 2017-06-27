@@ -203,6 +203,8 @@
             - [ requireJs, sv-page-modules, "@FCom_AdminSPA/AdminSPA/vue/page/modules/index" ]
             - [ requireJs, sv-page-modules-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/modules/index.html" ]
             - [ requireJs, sv-page-modules-grid-config, "~/modules/grid_config" ]
+            - [ requireJs, sv-page-modules-grid-datacell-run-level, "@FCom_AdminSPA/AdminSPA/vue/page/modules/grid-datacell-run-level" ]
+            - [ requireJs, sv-page-modules-grid-datacell-run-level-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/modules/grid-datacell-run-level.html" ]
 
             - [ requireJs, sv-page-settings, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main" ]
             - [ requireJs, sv-page-settings-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/settings/main.html" ]

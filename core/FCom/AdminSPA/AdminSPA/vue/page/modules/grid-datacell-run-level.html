@@ -1,0 +1,19 @@
+<td>
+      <!--{{row.run_level}}-->
+      <div class="f-level-menu f-level-menu__active">
+            <span class="f-level-menu__result":class="{open: ddOpen('modules-run-level/' + row.name)}">
+                <a href="#" @click.prevent.stop="ddToggle('modules-run-level/' + row.name)" class="f-select-param">
+                  <div class="f-grid-checkbox-block" :class="{active: row.run_status === 'LOADED'}">
+                        <div class="f-grid-checkbox-block__elem"></div>
+                  </div>
+                </a>
+                <div class="f-level-menu__options">
+                    <ul>
+                        <li v-for="o in run_level_options">
+                            <a href="#" class="f-level-menu__option" @click.prevent="setRunLevel(o)">{{o|_}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </span>
+      </div>
+</td>

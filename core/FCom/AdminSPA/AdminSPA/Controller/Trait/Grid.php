@@ -295,6 +295,37 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         return $config;
     }
 
+    public function processStaticGridData($data, $request = null)
+    {
+        if (null === $request) {
+            $request = $this->BRequest->get();
+        }
+        $data['state'] = $this->BUtil->arrayMerge($data['state'], $request);
+
+        // [] TODO: implement filters and pages
+//        foreach ($data['rows'] as $i => $r) {
+//            $show = true;
+//            if (!$show) {
+//                unset($data['rows'][$i]);
+//            }
+//        }
+
+        if (!empty($data['state']['s'])) {
+            $s = $data['state']['s'];
+            $sd = !empty($data['state']['sd']) ? $data['state']['sd'] : 'asc';
+            usort($data['rows'], function ($r1, $r2) use ($s, $sd) {
+                $d1 = !empty($r1[$s]) ? $r1[$s] : '';
+                $d2 = !empty($r2[$s]) ? $r2[$s] : '';
+                switch ($sd) {
+                    case 'asc': return $d1 < $d2 ? -1 : ($d1 > $d2 ? 1 : 0);
+                    case 'desc': return $d1 < $d2 ? 1 : ($d1 > $d2 ? -1 : 0);
+                }
+            });
+        }
+
+        return $data;
+    }
+
     /**
      * @param array $config
      * @param array $filters

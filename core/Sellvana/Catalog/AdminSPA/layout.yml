@@ -57,6 +57,10 @@
 			- [ requireJs, sv-page-catalog-categories-form-layout, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout" ]
 			- [ requireJs, sv-page-catalog-categories-form-layout-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/categories/form/layout.html" ]
 
+
+			- [ requireJs, sv-page-catalog-quick-add-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products" ]
+			- [ requireJs, sv-page-catalog-quick-add-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products.html" ]
+
             - [ requireJs, sv-comp-dashboard-low-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/low-inventory.html" ]
             - [ requireJs, sv-comp-dashboard-new-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/new-products.html" ]
             - [ requireJs, sv-comp-dashboard-search-recent-terms-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/search-recent-terms.html" ]
@@ -69,7 +73,10 @@
             - [ addNav, { path: /catalog/categories, label: Navigation, link: /catalog/categories, pos: 10 } ]
             - [ addNav, { path: /catalog/products, label: Products, link: /catalog/products, pos: 20 } ]
             - [ addNav, { path: /catalog/inventory, label: Inventory, link: /catalog/inventory, pos: 30 } ]
-            - [ addNav, { path: /catalog/quick-add-products, label: Quick Add Products, link: /catalog/quick-add-products, pos: 40 } ]
+            - [ addNav, { path: /catalog/quick-add, label: Quick Add, pos: 40 } ]
+            - [ addNav, { path: /catalog/quick-add/products, label: Products to Catalog, link: /catalog/quick-add/products, pos: 10 } ]
+            - [ addNav, { path: /catalog/quick-add/categories, label: Products to Categories, link: /catalog/quick-add/categories, pos: 20 } ]
+            - [ addNav, { path: /catalog/quick-add/images, label: Images to Products, link: /catalog/quick-add/images, pos: 30 } ]
             - [ addNav, { path: /catalog/products-import, label: Products CSV Import, link: /catalog/product-import, pos: 50 } ]
             - [ addNav, { path: /catalog/search-alias, label: Search Terms, link: /catalog/search-alias, pos: 60 } ]
 
@@ -89,6 +96,7 @@
             - [ addRoute, { path: /catalog/categories, require: [ sv-page-catalog-categories, text!sv-page-catalog-categories-tpl ] } ]
             - [ addRoute, { path: /catalog/inventory, require: [ sv-page-catalog-inventory, text!sv-page-default-grid-tpl, json!sv-page-catalog-inventory-grid-config ] } ]
             - [ addRoute, { path: /catalog/inventory/form, require: [ sv-page-catalog-inventory-form, text!sv-page-default-form-tpl ] } ]
+            - [ addRoute, { path: /catalog/quick-add/products, require: [ sv-page-catalog-quick-add-products, text!sv-page-catalog-quick-add-products-tpl ] } ]
 
 
 /catalog/products/form:
