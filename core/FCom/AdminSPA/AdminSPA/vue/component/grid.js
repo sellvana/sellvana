@@ -246,7 +246,9 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 },
                 sortingUpdate: function (ev) {
                     var vm = this, $columns = $(ev.from).find('li'), i, l, cols = [], $c, name, pos, positions = {}, col;
-
+                    if (!$columns.length) {
+                        return;
+                    }
                     for (i = 0, l = $columns.length; i < l; i++) {
                         $c = $($columns[i]);
                         name = $c.data('name');
