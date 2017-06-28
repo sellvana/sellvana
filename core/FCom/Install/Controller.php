@@ -157,9 +157,12 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             $this->FCom_Core_Model_Module->init();
             $this->BMigrate->migrateModules(['FCom_Core', 'FCom_Admin'], true);
         }
+        $this->view('step2')->set([
+            'tz' => $this->BLocale->tzOptions(),
+        ]);
         $this->BLayout->applyLayout('/step2');
         if (!$this->BSession->get('w/admin')) {
-            $this->BSession->set('w/admin', ['username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => '']);
+            $this->BSession->set('w/admin', ['username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => '', 'tz' => date_default_timezone_get()]);
         }
     }
 
@@ -172,6 +175,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         try {
             $w = $this->BRequest->post('w');
             if (empty($w['admin']) || !$this->BValidate->validateInput($w['admin'], [
+                ['tz', '@required'],
                 ['firstname', '@required'],
                 ['lastname', '@required'],
                 ['email', '@required'],

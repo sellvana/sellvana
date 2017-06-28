@@ -7,9 +7,10 @@
         <h1 class="panel-title">{{ 'Step 2 of 3: First Admin User' |_ }}</h1>
     </div>
 
+    {{ forms.select(fieldData, {field:'tz', label:'User Timezone'|_, required:1, options:THIS.tz}) }}
     {{ forms.input(fieldData, {field:'firstname', label:'First Name'|_, required:1}) }}
     {{ forms.input(fieldData, {field:'lastname', label:'Last Name'|_, required:1}) }}
-    {{ forms.input(fieldData, {field:'email', type:'email', label:'Email'|_, required:1, type:'email'}) }}
+    {{ forms.input(fieldData, {field:'email', label:'Email'|_, required:1, type:'email'}) }}
     {{ forms.input(fieldData, {field:'username', label:'User Name'|_, required:1}) }}
     {{ forms.input(fieldData, {field:'password', type:'password', label:'Password'|_, required:1, placeholder:'*****', attr:{pattern:".{6,}"}, input_class:'has-progress-bar'}) }}
     {{ forms.input(fieldData, {field:'password_confirm', type:'password', label:'Confirm Password'|_, required:1, placeholder:'*****', attr:{pattern:".{6,}"}}) }}
