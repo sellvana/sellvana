@@ -233,10 +233,44 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
             methods: {
                 toggleColumn: function (col) {
                     Vue.set(col, 'hidden', !col.hidden);
-                    this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
+                    //this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
+                    var vm = this, postData = {
+                        do: 'grid.col.hidden',
+                        grid: this.grid.config.id,
+                        col: col.name,
+                        hidden: col.hidden
+                    };
+                    this.sendRequest('POST', '/personalize', postData, function (response) {
+                        console.log(response);
+                    });
                 },
                 sortingUpdate: function (ev) {
-                    console.log(ev);
+                    var vm = this, $columns = $(ev.from).find('li'), i, l, cols = [], $c, name, pos, positions = {}, col;
+
+                    for (i = 0, l = $columns.length; i < l; i++) {
+                        $c = $($columns[i]);
+                        name = $c.data('name');
+                        pos = i + 1;
+                        positions[name] = pos;
+                        cols.push({name: name, position: pos, hidden: $c.data('hidden') || ''});
+                    }
+                    for (i = 0, l = this.grid.config.columns.length; i < l; i++) {
+                        col = this.grid.config.columns[i];
+                        Vue.set(col, 'position', positions[col.name]);
+                    }
+                    this.grid.config.columns.sort(function (c1, c2) {
+                        return c1.position - c2.position;
+                    });
+
+                    var postData = {
+                        do: 'grid.col.order',
+                        grid: this.grid.config.id,
+                        cols: cols
+                    };
+
+                    this.sendRequest('POST', '/personalize', postData, function (response) {
+                        console.log(response);
+                    });
                 }
             }
         };

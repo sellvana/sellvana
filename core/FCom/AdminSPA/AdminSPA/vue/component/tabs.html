@@ -9,7 +9,7 @@
                         <li v-for="t in formTabs" :key="t.name" :class="{active:tab === t}" class="f-horizontal-menu__item" ref="item">
                               <a href="#" @click.prevent="switchTab(t)" class="f-horizontal-menu__link"> {{t.label|_}}
                                     <i v-if="t.errors" class="fa fa-warning"></i><i v-if="t.edited" class="fa fa-pencil"></i>
-                                    <span class="f-badge">5</span>
+                                    <span v-if="t.badge" class="f-badge">{{t.badge}}</span>
                               </a>
                         </li>
                   </ul>
@@ -18,10 +18,10 @@
 
                   <div class="paddles visible-lg visible-md">
                         <button class="left-paddle paddle hidden" ref="leftPaddle">
-                              <
+                              &lt;
                         </button>
                         <button class="right-paddle paddle hidden" ref="rightPaddle">
-                              >
+                              &gt;
                         </button>
                   </div>
 

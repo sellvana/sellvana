@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
+ *
+ * @property fCom_Admin_Model_User fCom_Admin_Model_User
+ */
 trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 {
 
@@ -55,10 +60,17 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
      */
     abstract public function getGridConfig();
 
-    public function action_grid_config()
+    public function getProcessedGridConfig()
     {
         $config = $this->getGridConfig();
         $config = $this->normalizeGridConfig($config);
+        $config = $this->applyGridPersonalization($config);
+        return $config;
+    }
+
+    public function action_grid_config()
+    {
+        $config = $this->getProcessedGridConfig();
         $this->respond($config);
     }
 
@@ -584,6 +596,30 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function applyGridPersonalization($config)
     {
+        $pers = $this->FCom_Admin_Model_User->personalize();
+        if (empty($pers['grid'][$config['id']])) {
+            return $config;
+        }
+        $p = $pers['grid'][$config['id']];
+        if (!empty($p['state'])) {
+            $config['state'] = $p['state'];
+        }
+        if (!empty($p['columns'])) {
+            foreach ($config['columns'] as &$col) {
+                if (isset($p['columns'][$col['name']]['hidden'])) {
+                    $col['hidden'] = $p['columns'][$col['name']]['hidden'];
+                }
+                if (isset($p['columns'][$col['name']]['position'])) {
+                    $col['position'] = $p['columns'][$col['name']]['position'];
+                }
+            }
+            unset($col);
+            usort($config['columns'], function ($c1, $c2) {
+                $d1 = !empty($c1['position']) ? $c1['position'] : 999;
+                $d2 = !empty($c2['position']) ? $c2['position'] : 999;
+                return $d1 < $d2 ? -1 : ($d1 > $d2 ? 1 : 0);
+            });
+        }
         return $config;
     }
 }

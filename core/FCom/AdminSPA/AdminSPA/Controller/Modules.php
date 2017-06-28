@@ -138,12 +138,17 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
 
     public function action_index__POST()
     {
-        $r = $this->BRequest->post();
-        foreach ($r['data'] as $key) {
-           $this->BConfig->set('module_run_levels/FCom_Core/' . $key['module_name'], $key['run_level_core'], false, true);
-           $this->BConfig->writeConfigFiles('core');
+        try {
+            $r = $this->BRequest->post();
+            foreach ($r['data'] as $key) {
+                $this->BConfig->set('module_run_levels/FCom_Core/' . $key['module_name'], $key['run_level_core'], false, true);
+                $this->BConfig->writeConfigFiles('core');
+            }
+            $this->addMessage('Module run levels have been updated, please reload the page to see changes', 'success');
+            $this->ok()->respond();
+        } catch (Exception $e) {
+            $this->addMessage($e)->respond();
         }
-        $this->ok()->respond();
     }
 
     public function action_migrate__POST()
