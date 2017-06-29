@@ -204,18 +204,14 @@ table {
 .f-level-menu {
 	position: relative;
 	display: inline;
-	&.f-level-menu__active {
-		.f-level-menu__result {
-			pointer-events: auto;
-			/* border-bottom: 1px solid #000; */
+	&.open {
+		.f-level-menu__options {
+			display: inline;
+			z-index: 1;
 		}
-		.open {
-
-			.f-level-menu__options {
-				display: inline;
-				z-index: 1;
-			}
-		}
+	}
+	.f-level-menu__toggle {
+		border: 0;
 	}
 }
 .f-level-menu__result {
