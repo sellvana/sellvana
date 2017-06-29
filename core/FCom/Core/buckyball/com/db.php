@@ -1801,7 +1801,7 @@ class BORM extends ORMWrapper
             $d['sc'] = $d['s'] . ' ' . (!empty($d['sd']) ? $d['sd'] : 'asc');
         }
 
-        if (!empty($r['sc']) && empty($r['s'])) { // split request sort and dir combined
+        if (!empty($r['sc']) && $r['sc'] !== ' asc' && empty($r['s'])) { // split request sort and dir combined
             list($r['s'], $r['sd']) = preg_split('#[| ]#', trim($r['sc']));
         }
         if (!empty($r['s']) && !preg_match('#^[a-zA-Z0-9_.]+$#', $r['s'])) { // if sort contains not allowed characters

@@ -4,6 +4,7 @@
  * Class Sellvana_Sales_AdminSPA_Controller_Orders
  *
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_InventorySku Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_ProductMedia Sellvana_Catalog_Model_ProductMedia
  * @property Sellvana_Catalog_Model_ProductPrice Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CustomerGroups_Model_Group Sellvana_CustomerGroups_Model_Group
@@ -26,17 +27,17 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
                     'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
                 ['name' => 'product_name', 'label' => 'Name', 'width' => 250,
                     'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id">{{row.product_name}}</a></td>'],
-                ['name' => 'product_sku', 'label' => 'Product SKU', 'index' => 'p.product_sku', 'width' => 100],
+                ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 100],
                 ['name' => 'short_description', 'label' => 'Description',  'width' => 200, 'hidden' => true],
                 ['name' => 'is_hidden', 'label' => 'Hidden?', 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
                 ['name' => 'manage_inventory', 'label' => 'Manage Inv?', 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
                 //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
                 //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
                 ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
-                ['name' => 'ship_weight', 'label' => 'Ship Weight',  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
-                ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
-                ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100, 'cell' => 'datetime'],
-                ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100, 'cell' => 'datetime'],
+                ['name' => 'shipping_weight', 'label' => 'Ship Weight',  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
+                ['name' => 'position', 'label' => 'Position', 'hidden' => true],
+                ['name' => 'create_at', 'label' => 'Created', 'width' => 100, 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => 'Updated', 'width' => 100, 'cell' => 'datetime'],
             ],
             'filters' => [
                 ['name' => 'id', 'type' => 'number'],
@@ -63,7 +64,10 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
     public function getGridOrm()
     {
-        return $this->Sellvana_Catalog_Model_Product->orm('p');
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
+            ->join('Sellvana_Catalog_Model_InventorySku', ['p.inventory_sku', '=', 'i.inventory_sku'], 'i')
+            ->select(['i.net_weight', 'i.shipping_weight']);
+        return $orm;
     }
 
     public function processGridPageData($data)

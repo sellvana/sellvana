@@ -3,7 +3,7 @@
 /**
  * Trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
  *
- * @property fCom_Admin_Model_User fCom_Admin_Model_User
+ * @property FCom_Admin_Model_User FCom_Admin_Model_User
  */
 trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 {
@@ -76,8 +76,14 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function action_grid_data()
     {
-        $data = $this->getGridRequestOrm()->paginate();
+        $config = $this->getProcessedGridConfig();
+        $config = $this->processGridStatePersonalization($config);
+        $filters = !empty($config['state']['filters']) ? $config['state']['filters'] : null;
+        $data = $this->getGridRequestOrm()->paginate($config['state']);
         $data = $this->processGridPageData($data);
+        if ($filters) {
+            $data['state']['filters'] = $filters;
+        }
         $result = [
             'rows' => $data['rows'],
             'state' => $data['state'],
@@ -105,7 +111,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         $config = $this->getGridConfig();
         $config = $this->normalizeGridConfig($config);
         $orm = $this->getGridOrm();
-        $filters = $this->BRequest->request('filters');
+        $filters = !empty($config['state']['filters']) ? $config['state']['filters'] : $this->BRequest->request('filters');
         if ($filters) {
             if (is_string($filters)) {
                 $filters = $this->BUtil->fromJson($filters);
@@ -124,6 +130,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function normalizeGridConfig($config)
     {
+        if (method_exists($this, 'getGridOrm')) {
+            $indexPrefix = $this->getGridOrm()->table_alias() . '.';
+        }
+
         $colsByName = [];
         foreach ($config['columns'] as $i => &$col) {
             if (!isset($col['sortable'])) {
@@ -134,6 +144,13 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 $col['field'] = $col['name'];
             } elseif (!empty($col['field']) && empty($col['name'])) {
                 $col['name'] = $col['field'];
+            } elseif (!empty($col['type'])) {
+                $col['name'] = $col['field'] = $col['type'];
+            } else {
+                throw new BException('Invalid field configuration: ' . print_r($col, 1));
+            }
+            if (empty($col['index']) && !empty($indexPrefix) && !empty($col['name'])) {
+                $col['index'] = $indexPrefix . $col['name'];
             }
             if (!empty($col['type'])) {
                 switch ($col['type']) {
@@ -219,6 +236,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 }
                 $col = !empty($colsByName[$flt['name']]) ? $colsByName[$flt['name']] : [];
 
+
                 if (empty($flt['options'])) {
                     if (!empty($col['options'])) {
                         $flt['options'] = $col['options'];
@@ -231,7 +249,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         $flt['type'] = !empty($flt['options']) ? 'select' : 'text';
                     }
                 }
-                if (empty($flt['index'])) {
+                if (empty($flt['index']) && !empty($col)) {
                     $flt['index'] = !empty($col['index']) ? $col['index'] : $col['field'];
                 }
                 if (empty($flt['label'])) {
@@ -361,7 +379,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         continue;
                     }
                     if (empty($f['type'])) {
-                        $f['type'] = $types[$f['field']];
+                        $f['type'] = !empty($types[$f['field']]) ? $types[$f['field']] : 'text';
                     }
                 }
             }
@@ -619,6 +637,38 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 $d2 = !empty($c2['position']) ? $c2['position'] : 999;
                 return $d1 < $d2 ? -1 : ($d1 > $d2 ? 1 : 0);
             });
+        }
+        $config = $this->_addFilterConfigToState($config);
+        return $config;
+    }
+
+    public function processGridStatePersonalization($config, $state = null)
+    {
+        if (null === $state) {
+            $state = $this->BRequest->request();
+        }
+        if (!empty($state['filters']) && is_string($state['filters'])) {
+            $state['filters'] = $this->BUtil->fromJson($state['filters']);
+        }
+        $pers = ['grid' => [$config['id'] => ['state' => $state]]];
+        $this->FCom_Admin_Model_User->personalize($pers);
+        $config['state'] = $state;
+        $config = $this->_addFilterConfigToState($config);
+        return $config;
+    }
+
+    protected function _addFilterConfigToState($config)
+    {
+        if (!empty($config['state']['filters']) && !empty($config['filters'])) {
+            foreach ($config['state']['filters'] as &$f) {
+                foreach ($config['filters'] as $flt) {
+                    if ($flt['field'] === $f['field']) {
+                        $f['config'] = $flt;
+                        break;
+                    }
+                }
+            }
+            unset($f);
         }
         return $config;
     }

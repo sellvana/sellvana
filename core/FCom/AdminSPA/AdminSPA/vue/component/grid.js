@@ -38,7 +38,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 }
                 result[i] = r;
             }
-            return JSON.stringify(result);
+            return result;
         }
 
         function prepareDataRequest(grid) {
@@ -54,15 +54,15 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 if (grid.state.p) {
                     params.p = grid.state.p;
                 }
-                if (grid.filters) {
-                    params.filters = prepareFiltersRequest(grid.filters);
+                if (grid.state.filters) {
+                    params.filters = prepareFiltersRequest(grid.state.filters);
                 }
             }
             return params;
         }
 
         function initGridState(grid) {
-            var state = _.extend({}, _.get(grid, 'config.state', {}), grid.state || {});
+            var state = _.get(grid, 'config.state', {});
             if (!state.c) {
                 state.c = grid.rows && _.isArrayLike(grid.rows) ? grid.rows.length : 0;
             }
@@ -70,7 +70,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 state.p = 1;
             }
             if (!state.ps) {
-                state.ps = _.get(grid, 'config.default_pagesize', 10);
+                state.ps = 10;
             }
             if (!state.mp) {
                 state.mp = Math.ceil(state.c / state.ps);
@@ -247,7 +247,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                 sortingUpdate: function (ev) {
                     var vm = this, $columns = $(ev.from).find('li'), i, l, cols = [], $c, name, pos, positions = {}, col;
                     if (!$columns.length) {
-                        return;
+                        return;__
                     }
                     for (i = 0, l = $columns.length; i < l; i++) {
                         $c = $($columns[i]);
@@ -466,7 +466,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     return _.get(this.grid, 'state.filters', []);
                 },
                 hasFilters: function () {
-                    return this.grid.filters && !_.isEmpty(this.grid.filters);
+                    return this.currentFilters && !_.isEmpty(this.currentFilters);
                 }
             },
             methods: {
@@ -578,23 +578,23 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash',
                     initGridState(grid);
                 },
                 applyFilters: function (filters) {
-                    var oldFilters = this.grid.filters || [];
-                    Vue.set(this.grid, 'filters', oldFilters.concat(filters));
+                    var oldFilters = _.get(this.grid, 'state.filters', []);
+                    Vue.set(this.grid.state, 'filters', oldFilters.concat(filters));
                     this.fetchData();
                 },
                 removeFilter: function (i) {
-                    if (!this.grid || !this.grid.filters) {
+                    if (!this.grid || !this.grid.state || !this.grid.state.filters) {
                         return;
                     }
-                    this.grid.filters.splice(i, 1);
+                    this.grid.state.filters.splice(i, 1);
                     //Vue.set(this.grid, 'filters', filters);
                     this.fetchData();
                 },
                 removeAllFilters: function () {
-                    if (!this.grid || !this.grid.filters) {
+                    if (!this.grid || !this.grid.state || !this.grid.state.filters) {
                         return;
                     }
-                    Vue.set(this.grid, 'filters', []);
+                    Vue.set(this.grid.state, 'filters', []);
                     this.fetchData();
                 },
                 bulkAction: function (act) {

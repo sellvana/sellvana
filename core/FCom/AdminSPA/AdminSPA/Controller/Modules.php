@@ -11,19 +11,11 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
 {
     protected static $_origClass = __CLASS__;
 
-    protected $_permission = 'system/modules';
-    protected $_navPath = 'modules/installed';
-    protected $_modelClass = 'FCom_Core_Model_Module';
-    protected $_gridHref = 'modules';
-    protected $_gridLayoutName = '/modules';
-    protected $_gridTitle = 'Modules';
-    protected $_recordName = 'Product';
-    protected $_mainTableAlias = 'm';
-
     public function getGridConfig()
     {
         return [
             'id' => 'modules',
+            'title' => 'Modules',
             'data_url' => 'modules/grid_data',
             'columns' => [
                 ['type' => 'row-select', 'width' => 80],
@@ -38,6 +30,12 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
                 ['name' => 'requires', 'label' => 'Requires', 'content_overflow' => true],
                 ['name' => 'required_by', 'label' => 'Required By', 'content_overflow' => true],
                 ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'content_overflow' => true],
+            ],
+            'default_action' => [/*'mobile_group' => 'actions', */'button_class' => 'button1'],
+            'actions' => [
+                /*['name' => 'actions', 'label' => 'Actions'],*/
+                ['name' => 'migrate', 'label' => 'Run Migrations', 'group' => 'migrate'],
+                ['name' => 'reset_cache', 'label' => 'Reset Cache', 'group' => 'reset_cache'],
             ],
         ];
     }
@@ -155,21 +153,20 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
     {
         try {
             $this->BMigrate->migrateModules(true, true, 'modules');
-            $this->message('Migration complete');
+            $this->addMessage('Migrations complete', 'success')->ok();
         } catch (Exception $e) {
             $this->BDebug->logException($e);
-            $this->message($e->getMessage(), 'error');
+            $this->addMessage($e);
         }
-        $this->BResponse->redirect('modules');
+        $this->respond();
     }
 
-    public function action_reset_cache()
+    public function action_reset_cache__POST()
     {
         $this->BCache->deleteAll();
         if (function_exists('opcache_reset')) {
             opcache_reset();
         }
-        echo "DONE";
-        die;
+        $this->addMessage('Cache was reset successfully.', 'success')->ok()->respond();
     }
 }

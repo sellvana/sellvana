@@ -15,7 +15,7 @@
 
 	<div class="col-lg-6">
 		<div class="f-filter-tags">
-			<div class="f-filter-tags__tag" v-for="(flt, i) in grid.filters">
+			<div v-if="grid.state && grid.state.filters" v-for="(flt, i) in grid.state.filters" class="f-filter-tags__tag">
 				{{flt.config.label|_}} {{flt.config.ops[flt.op]}}
 
 				<template v-if="flt.config.type==='select' && flt.op.match(/^(in|not_in)$/)">
