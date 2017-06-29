@@ -8,4 +8,25 @@
             <sv-comp-actions :config="grid.config" container-class="f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
       </div>
       <sv-comp-grid :grid="grid"></sv-comp-grid>
+      <a href="#" onclick="event.preventDefault(); $('#popup').toggleClass('open'); $('#overlay').toggleClass('open');">Link to popup</a>
+      <div class="f-grid-popup" id="popup">
+            <div class="f-block-title">
+                  <p class="f-block-title__text">Popup title</p>
+                  <button class="f-delete" draggable="false" onclick="event.preventDefault(); $('#popup').toggleClass('open'); $('#overlay').toggleClass('open');"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="f-grid-popup__content" >
+                  <fieldset class="f-form-container">
+                        <div class="f-form-group row"> <label class="col-md-3 f-form-label" for="id7">Input</label> <div class="col-md-9"> <input class="f-input" type="text" id="id7"/> </div> </div>
+                        <div class="f-form-group row"> <label class="col-md-3 f-form-label" for="id9">Input</label> <div class="col-md-9"> <input class="f-input" type="text" id="id9"/> </div> </div>
+                        <div class="f-form-group row"> <label class="col-md-3 f-form-label" for="id9">Input</label> <div class="col-md-9"> <input class="f-input" type="text" id="id9"/> </div> </div>
+                        <div class="f-form-group row"> <label class="col-md-3 f-form-label" for="id9">Input</label> <div class="col-md-9"> <input class="f-input" type="text" id="id9"/> </div> </div>
+                        <div class="f-form-group row"> <label class="col-md-3 f-form-label" for="id9">Input</label> <div class="col-md-9"> <input class="f-input" type="text" id="id9"/> </div> </div>
+                        <div class="f-form-group row"> <label class="col-md-3 f-form-label" for="id9">Input</label> <div class="col-md-9"> <input class="f-input" type="text" id="id9"/> </div> </div>
+                  </fieldset>
+            </div>
+            <div class="f-buttons-block">
+                  <button class="button button2">Cancel</button>
+                  <button class="button button1">Submit</button>
+            </div>
+      </div>
 </div>

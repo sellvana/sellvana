@@ -312,7 +312,29 @@ a:focus {
 	}
 }
 
-
+.f-grid-popup {
+	width: 60%;
+	min-width: 300px;
+	max-width: 600px;
+	background: #fff;
+	z-index: 100;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px;
+	border-radius: 5px;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease-in;
+	.f-buttons-block {
+		text-align: right;
+	}
+	&.open {
+		opacity: 1;
+		visibility: visible;
+	}
+}
 .overlay {
 	opacity: 0;
 	visibility: hidden;
@@ -324,9 +346,17 @@ a:focus {
 	background: rgba(0, 0, 0, 0.5);
 	z-index: 99;
 	transition: opacity 0.3s ease-in;
+	&.open { //for popup in grid
+		opacity: 1;
+		visibility: visible;
+	}
+}
+.f-grid-popup__content {
+	max-height: 300px;
+	overflow: auto;
 }
 @media (max-width: 1365px) {
-	.overlay {
+	.overlay { //for translating popup
 		&.active {
 			opacity: 1;
 			visibility: visible;
@@ -382,5 +412,35 @@ a:focus {
 	}
 	.f-grid-title__text {
 		padding: 10px 0;
+	}
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+	.f-grid-popup {
+		width: 60%;
+		min-width: 300px;
+		max-width: 600px;
+		background: #fff;
+		z-index: 100;
+		position: absolute;
+		top: 10px;
+		left: 50%;
+		transform: translate(-50%, 0%);
+		padding: 20px;
+		border-radius: 5px;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.3s ease-in;
+		.f-buttons-block {
+			text-align: right;
+		}
+		&.open {
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+	.f-grid-popup__content {
+		max-height: 200px;
+		overflow: auto;
 	}
 }
