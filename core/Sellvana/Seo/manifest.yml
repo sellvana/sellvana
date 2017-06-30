@@ -16,6 +16,9 @@ modules:
 
             FCom_AdminSPA:
                 auto_use: [ layout ]
+                routing:
+                    - [ /url_aliases, Sellvana_Seo_AdminSPA_Controller_UrlAliases.index ]
+                    - [ /url_aliases/.action, Sellvana_Seo_AdminSPA_Controller_UrlAliases ]
 
             FCom_Frontend:
                 auto_use: [ bootstrap, views, layout ]

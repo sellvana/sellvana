@@ -156,7 +156,7 @@ console.log(filters, result);
                 Vue.set(grid, 'config', response.config);
             }
             if (response.state) {
-                Vue.set(grid, 'state', response.state);
+                Vue.set(grid.config, 'state', response.state);
             } else {
                 initGridState(grid);
             }
