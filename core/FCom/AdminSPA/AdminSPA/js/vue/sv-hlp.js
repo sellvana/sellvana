@@ -1,5 +1,5 @@
 define([
-    'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortable',
+    'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortablejs',
     'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress', 'perfect-scrollbar',
     'vue-password-strength-meter', 'sv-comp-form-field', 'sv-comp-form-layout',
     'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
@@ -29,6 +29,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
 
         Vue.directive('sortable', {
             inserted: function(el, binding) {
+                $(el).data('sortable-binding', binding);
                 el.sortableInstance = Sortable.create(el, binding.value);
             },
             unbind: function (el) {
@@ -209,6 +210,18 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                     } else {
                         Vue.set(state.personalize.grid[grid.config.id].columns, col.field, 0);
                     }
+                },
+                setGridConfigColumns: function (state, grid) {
+                    if (!state.grid) {
+                        Vue.set(state, 'grid', {});
+                    }
+                    if (!state.grid[grid.config.id]) {
+                        Vue.set(state.grid, grid.config.id, {});
+                    }
+                    if (!state.grid[grid.config.id].config) {
+                        Vue.set(state.grid[grid.config.id], 'config', {});
+                    }
+                    Vue.set(state.grid[grid.config.id].config, 'columns', grid.config.columns);
                 },
                 addFavorite: function (state, fav) {
                     var favs = state.favorites || [];

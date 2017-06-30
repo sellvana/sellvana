@@ -150,18 +150,18 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
             break;
         case 'grid.col.hidden':
-            if (empty($r['grid']) || empty($r['col']) || empty($r['hidden'])) {
+            if (empty($r['grid']) || empty($r['col']) || !isset($r['hidden'])) {
                 break;
             }
-            $columns = [$r['col'] => ['hidden' => $r['hidden']]];
+            $columns = [$r['col'] => ['hidden' => !empty($r['hidden']) && $r['hidden'] !== 'false']];
             $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
 
             break;
         case 'grid.filter.hidden':
-            if (empty($r['grid']) || empty($r['col']) || empty($r['hidden'])) {
+            if (empty($r['grid']) || empty($r['col']) || !isset($r['hidden'])) {
                 break;
             }
-            $filters = [$r['col'] => ['hidden' => $r['hidden']]];
+            $filters = [$r['col'] => ['hidden' => !empty($r['hidden']) && $r['hidden'] !== 'false']];
             $data = ['grid' => [$r['grid'] => ['filters' => $filters]]];
 
             break;
@@ -177,7 +177,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 if (empty($col['name']) || $col['name'] === 'cb') {
                     continue;
                 }
-                $columns[$col['name']] = ['position' => $col['position'], 'hidden' => !empty($col['hidden'])];
+                $columns[$col['name']] = [
+                    'position' => $col['position'],
+                    'hidden' => !empty($col['hidden']) && ($col['hidden'] !== 'false')
+                ];
             }
             $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
 
@@ -194,7 +197,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 if ( empty( $col['field'] ) ) {
                     continue;
                 }
-                $filters[ $col['field'] ] = [ 'position' => $col['position'], 'hidden' => $col['hidden'] ];
+                $filters[ $col['field'] ] = [
+                    'position' => $col['position'],
+                    'hidden' => !empty($col['hidden']) && ($col['hidden'] !== 'false')
+                ];
             }
             $data = [ 'grid' => [ $r['grid'] => [ 'filters' => $filters ] ] ];
             break;
@@ -212,7 +218,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 }
                 $columns[$col['name']] = [
                     'position' => $col['position'],
-                    'hidden' => empty($col['hidden']) ? false : $col['hidden']
+                    'hidden' => !empty($col['hidden']) && ($col['hidden'] !== 'false')
                 ];
             }
             $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];

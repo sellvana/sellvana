@@ -71,6 +71,19 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     public function action_grid_config()
     {
         $config = $this->getProcessedGridConfig();
+
+        if (!empty($config['state']['filters'])) {
+            foreach ($config['state']['filters'] as &$f) {
+                if (is_array($f['val'])) {
+                    $f['values'] = $f['val'];
+                } else {
+                    $f['value'] = $f['val'];
+                }
+                unset($f['val']);
+            }
+            unset($f);
+        }
+
         $this->respond($config);
     }
 
@@ -78,17 +91,73 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     {
         $config = $this->getProcessedGridConfig();
         $config = $this->processGridStatePersonalization($config);
-        $filters = !empty($config['state']['filters']) ? $config['state']['filters'] : null;
+        $filters = isset($config['state']['filters']) ? $config['state']['filters'] : null;
         $data = $this->getGridRequestOrm()->paginate($config['state']);
         $data = $this->processGridPageData($data);
+
         if ($filters) {
-            $data['state']['filters'] = $filters;
+            foreach ($filters as &$f) {
+                if (is_array($f['val'])) {
+                    $f['values'] = $f['val'];
+                } else {
+                    $f['value'] = $f['val'];
+                }
+                unset($f['val']);
+            }
+            unset($f);
         }
+
+        $data['state']['filters'] = $filters;
         $result = [
             'rows' => $data['rows'],
             'state' => $data['state'],
         ];
         $this->respond($result);
+    }
+
+    public function action_grid_personalize__POST()
+    {
+        try {
+            $r = $this->BRequest->request();
+            $data = [];
+            if (empty($r['do'])) {
+                $this->BResponse->json(['error' => true, 'r' => $r]);
+                return;
+            }
+            switch ($r['do']) {
+                case 'grid.col.hidden':
+                    if (empty($r['grid']) || empty($r['col']) || !isset($r['hidden'])) {
+                        break;
+                    }
+                    $columns = [$r['col'] => ['hidden' => !empty($r['hidden']) && $r['hidden'] !== 'false']];
+                    $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
+
+                    break;
+
+                case 'grid.cols.order':
+                    if (is_array($r['cols'])) {
+                        $cols = $r['cols'];
+                    } else {
+                        $cols = $this->BUtil->fromJson($r['cols']);
+                    }
+
+                    $columns = [];
+                    foreach ($cols as $i => $col) {
+                        if (empty($col['name'])) {
+                            continue;
+                        }
+                        $columns[$col['name']] = ['position' => $col['position']];
+                    }
+                    $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
+
+                    break;
+            }
+            $this->BEvents->fire(__METHOD__, ['request' => $r, 'data' => &$data]);
+            $this->FCom_Admin_Model_User->personalize($data);
+            $this->ok()->respond();
+        } catch (Exception $e) {
+            $this->addResponse($e)->respond();
+        }
     }
 
     public function action_grid_export()
@@ -132,6 +201,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     {
         if (method_exists($this, 'getGridOrm')) {
             $indexPrefix = $this->getGridOrm()->table_alias() . '.';
+        }
+
+        if (!empty($config['data_url']) && empty($config['personalize_url'])) {
+            $config['personalize_url'] = str_replace('grid_data', 'grid_personalize', $config['data_url']);
         }
 
         $colsByName = [];
@@ -397,6 +470,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                     break;
                 } elseif (!empty($f['field'])) {
                     $configFilterFields[$f['field']] = $fId;
+                    $configFilterFields[$indexes[$f['field']]] = $fId;
                 }
             }
         }
@@ -405,7 +479,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 || !is_array($f)
                 || empty($f['field'])
                 || empty($f['type'])
-                || !isset($configFilterFields[$f['field']])
+                || (!isset($configFilterFields[$f['field']]) && !in_array($f['field'], $indexes))
                 || ((!isset($f['val']) || $f['val'] === '') && (!isset($f['from']) || $f['from'] === '') && (!isset($f['to']) || $f['to'] === ''))
             ) {
                 continue;
@@ -647,11 +721,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         if (null === $state) {
             $state = $this->BRequest->request();
         }
-        if (!empty($state['filters']) && is_string($state['filters'])) {
+        if (isset($state['filters']) && is_string($state['filters'])) {
             $state['filters'] = $this->BUtil->fromJson($state['filters']);
         }
-        $pers = ['grid' => [$config['id'] => ['state' => $state]]];
-        $this->FCom_Admin_Model_User->personalize($pers);
+        $this->FCom_Admin_Model_User->personalize(["grid/{$config['id']}/state" => $state], true);
         $config['state'] = $state;
         $config = $this->_addFilterConfigToState($config);
         return $config;

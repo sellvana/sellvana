@@ -12,7 +12,7 @@ modules:
                     - [ /header/.action, FCom_AdminSPA_AdminSPA_Controller_Header ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]
                     - [ /media/.action, FCom_AdminSPA_AdminSPA_Controller_Media ]
-                    - [ /personalize, FCom_Admin_Controller.personalize ]
+                    - [ /personalize, FCom_AdminSPA_AdminSPA_Controller_Util.personalize ]
 
                     - [ /auth/?.action, FCom_AdminSPA_AdminSPA_Controller_Auth ]
                     - [ /account/?.action, FCom_AdminSPA_AdminSPA_Controller_Account ]

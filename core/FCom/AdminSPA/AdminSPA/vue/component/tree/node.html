@@ -8,6 +8,6 @@
 		</div>
     </div>
     <ul v-show="node.open" v-if="isFolder" v-sortable="{group: treeId}">
-        <sv-comp-tree-node class="tree-node" v-for="child in node.children" :node="child" :tree-id="treeId" :cur-node="curNode" @event="proxyEvent"></sv-comp-tree-node>
+        <sv-comp-tree-node class="tree-node" v-for="child in node.children" :key="child.id" :node="child" :tree-id="treeId" :cur-node="curNode" @event="proxyEvent"></sv-comp-tree-node>
     </ul>
 </li>

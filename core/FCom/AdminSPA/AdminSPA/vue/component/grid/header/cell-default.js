@@ -4,7 +4,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
         mixins: [SvHlp.mixins.common],
         props: ['grid', 'col'],
         template: '<th>'
-		+ '<a v-if="col.sortable" href="#" :class="anchorClass" @click.prevent="toggleSort()" class="f-main-grid__header-link">{{col.label|_}}'
+		    + '<a v-if="col.sortable" href="#" :class="anchorClass" @click.prevent="toggleSort()" class="f-main-grid__header-link">{{col.label|_}}'
             + '<i class="fa fa-caret-up f-sorted f-sorted-up" aria-hidden="true" v-if="sorted(\'up\', 1)"></i>'
             + '<i class="fa fa-caret-down f-sorted f-sorted-down" aria-hidden="true" v-if="sorted(\'down\', 1)"></i></a>'
             + '<span v-else>{{col.label|_}}</span>'
@@ -15,10 +15,10 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                     if (!this.col.sortable) {
                         return false;
                     }
-                    if (!this.grid || !this.grid.state || this.grid.state.s !== this.col.field) {
+                    if (!this.grid || !this.grid.config || !this.grid.config.state || this.grid.config.state.s !== this.col.field) {
                         return def;
                     }
-                    var sd = this.grid.state.sd;
+                    var sd = this.grid.config.state.sd;
                     return (dir === 'up' && sd === 'asc') || (dir === 'down' && sd === 'desc');
                 }
             },
@@ -31,20 +31,20 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                 if (!this.col.sortable) {
                     return;
                 }
-                if (!this.grid.state) {
-                    Vue.set(this.grid, 'state', {});
+                if (!this.grid.config.state) {
+                    Vue.set(this.grid.config, 'state', {});
                 }
                 var s = this.col.field, sd = 'asc';
-                if (this.grid.state.s === s) {
-                    if (this.grid.state.sd === 'asc') {
+                if (this.grid.config.state.s === s) {
+                    if (this.grid.config.state.sd === 'asc') {
                         sd = 'desc';
                     } else {
                         s = false;
                         sd = false;
                     }
                 }
-                Vue.set(this.grid.state, 's', s);
-                Vue.set(this.grid.state, 'sd', sd);
+                Vue.set(this.grid.config.state, 's', s);
+                Vue.set(this.grid.config.state, 'sd', sd);
                 this.$emit('event', 'fetch-data');
             }
         }

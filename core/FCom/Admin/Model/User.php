@@ -505,16 +505,17 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     *     - colModel
     *
     * @param array|null $data
+    * @param boolean $asPaths
     * @return FCom_Admin_Model_User|array
     */
-    public function personalize($data = null)
+    public function personalize($data = null, $asPaths = false)
     {
         if (!$this->orm) {
             $user = $this->sessionUser();
             if (!$user) {
                 return null;
             }
-            return $user->personalize($data);
+            return $user->personalize($data, $asPaths);
         }
         if (!$this->_persModel) {
             $this->_persModel = $this->FCom_Admin_Model_Personalize->load($this->id(), 'user_id');
@@ -529,7 +530,18 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (is_null($data)) {
             return $this->_persData;
         }
-        $this->_persData = $this->BUtil->arrayMerge($this->_persData, $data);
+        if ($asPaths) {
+            foreach ((array)$data as $path => $value) {
+                $node =& $this->_persData;
+                foreach (explode('/', trim($path, '/')) as $key) {
+                    $node =& $node[$key];
+                }
+                $node = $value;
+                unset($node);
+            }
+        } else {
+            $this->_persData = $this->BUtil->arrayMerge($this->_persData, $data);
+        }
         $this->_persModel->set('data_json', $this->BUtil->toJson($this->_persData))->save();
         return $this;
     }

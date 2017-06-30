@@ -77,7 +77,7 @@
             - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2-4.0.3.min", { deps: [ jquery ] } ]
             - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
-            - [ requireJs, sortable, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
+            - [ requireJs, sortablejs, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
             - [ requireJs, ckeditor, "@FCom_AdminSPA/AdminSPA/js/lib/ckeditor/ckeditor" ]
             - [ requireJs, deep-diff, "@FCom_AdminSPA/AdminSPA/js/lib/deep-diff-0.3.4.min" ]
 
@@ -88,6 +88,8 @@
             #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
             - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect.min" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect.min.css" ]
+
+            - [ requireJs, vue-draggable, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-draggable-2.14.1" ]
 
             - [ requireJs, vue-password-strength-meter, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-password-strength-meter-0.1.1" ]
 
