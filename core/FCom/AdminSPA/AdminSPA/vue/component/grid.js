@@ -179,13 +179,13 @@ console.log(filters, result);
                     //return this.grid.config && this.grid.config.pager ? this.grid.config.pager.pagesize_options : [];
                 },
                 curPagesize: function () {
-                    return _.get(this.grid, 'state.ps', 10);
+                    return _.get(this.grid, 'config.state.ps', 10);
                 },
                 numPages: function () {
-                    return _.get(this.grid, 'state.mp', 0);
+                    return _.get(this.grid, 'config.state.mp', 0);
                 },
                 curPage: function () {
-                    return _.get(this.grid, 'state.p', 1);
+                    return _.get(this.grid, 'config.state.p', 1);
                 }
             },
             methods: {
