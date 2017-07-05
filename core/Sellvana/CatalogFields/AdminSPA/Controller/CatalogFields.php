@@ -10,14 +10,37 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
 {
     public function getGridConfig()
     {
+        $fld = $this->FCom_Core_Model_Field;
+
+        $yesNoOpts = ['0' => 'No', '1' => 'Yes'];
+
         return [
             'id' => 'catalog_fields',
             'data_url' => 'catalogfields/grid_data',
             'columns' => [
                 ['type' => 'row-select'],
+                ['type' => 'actions', 'actions' => [
+                    ['type' => 'edit', 'link' => 'fields/form?id={id}'],
+                    ['type' => 'delete', 'delete_url' => true],
+                ]],
                 ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'field_code', 'label' => 'Field Code', 'datacell_template' => '<td><a :href="\'#/catalog/fields/form?id=\'+row.id">{{row.field_code}}</a></td>'],
-                ['name' => 'field_name', 'label' => 'Field Name', 'datacell_template' => '<td><a :href="\'#/catalog/fields/form?id=\'+row.id">{{row.field_name}}</a></td>'],
+                ['name' => 'field_code', 'label' => 'Field Code',
+                 'datacell_template' => '<td><a :href="\'#/catalog/fields/form?id=\'+row.id">{{row.field_code}}</a></td>'],
+                ['name' => 'field_name', 'label' => 'Field Name',
+                 'datacell_template' => '<td><a :href="\'#/catalog/fields/form?id=\'+row.id">{{row.field_name}}</a></td>'],
+                ['name' => 'field_type', 'label' => 'Field Type'],
+                ['name' => 'frontend_label', 'label' => 'Frontend Label'],
+                ['name' => 'frontend_show', 'label' => 'Show on frontend',
+                 'options' => $fld->fieldOptions('frontend_show')],
+                ['name' => 'sort_order', 'label' => 'Sort Order'],
+                ['name' => 'table_field_type', 'label' => 'DB Type', 'options' => $fld->fieldOptions('table_field_type')],
+                ['name' => 'admin_input_type', 'label' => 'Input Type',
+                 'options' => $fld->fieldOptions('admin_input_type')],
+                ['name' => 'num_options', 'label' => 'Options', 'default' => 0],
+                ['name' => 'system', 'label' => 'System field', 'options' => $yesNoOpts],
+                ['name' => 'multilanguage', 'label' => 'Multi language', 'options' => $yesNoOpts],
+                ['name' => 'swatch_type', 'label' => 'Swatch type', 'options' => $fld->fieldOptions('swatch_type')],
+                ['name' => 'required', 'label' => 'Required', 'options' => $yesNoOpts],
             ],
             'filters' => true,
             'export' => true,
