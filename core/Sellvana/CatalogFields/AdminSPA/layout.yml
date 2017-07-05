@@ -1,6 +1,22 @@
 /:
+    - view: head
+        do:
+            - [ requireJs, sv-page-catalog-fields, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/index ]
+            - [ requireJs, sv-page-catalog-fields-grid-config, ~/catalogfields/grid_config ]
+            - [ requireJs, sv-page-catalog-fields-form, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form ]
+            - [ requireJs, sv-page-catalog-fields-form-main, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/main ]
+            - [ requireJs, sv-page-catalog-fields-form-main-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/main.html ]
+
     - view: app
         do:
             - [ addNav, { path: /catalog/fieldsets, label: Custom Attribute Sets, link: /catalog/fieldsets, pos: 70 } ]
             - [ addNav, { path: /catalog/fields, label: Custom Attributes, link: /catalog/fields, pos: 80 } ]
+
+            - [ addRoute, { path: /catalog/fields, require: [ sv-page-catalog-fields, text!sv-page-default-grid-tpl, json!sv-page-catalog-fields-grid-config ] } ]
+            - [ addRoute, { path: /catalog/fields/form, require: [ sv-page-catalog-fields-form, text!sv-page-default-form-tpl ] } ]
+
+/catalog/fields/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /catalog/inventory/form, name: main, label: Field Info, pos: 10 } ]
 

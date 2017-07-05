@@ -1,0 +1,15 @@
+<div class="row">
+      <div class="col-md-12 col-lg-6">
+            <div class="f-content-block">
+                  <fieldset class="f-form-container">
+                        <sv-comp-form-field v-for="f in form.config.fields" :key="f.name" v-if="f.tab==='main'"
+                                            v-show="formFieldShowCond(f)" :form="form" :field="f.name"
+                                            v-model="form[f.model][f.name]" @event="processFieldEvent"></sv-comp-form-field>
+                  </fieldset>
+            </div>
+      </div>
+      <div class="col-md-12 col-lg-6">
+            <sv-comp-form-translations v-if="i18n_enabled && i18n_field" :form="form" :field="i18n_field"
+                                       @event="processTranslationsEvent"></sv-comp-form-translations>
+      </div>
+</div>

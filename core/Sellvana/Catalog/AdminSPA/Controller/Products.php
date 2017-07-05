@@ -99,8 +99,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
         $result = [];
 
-        $result['form']['product'] = $product->as_array();
-        $result['form']['config']['title'] = $product->get('product_name');
+            $result['form']['product'] = $product->as_array();
+            $result['form']['config']['title'] = $product->get('product_name');
         $result['form']['config']['thumb_url'] = $product->thumbUrl(100);
 
         $invModel = $product->getInventoryModel();
