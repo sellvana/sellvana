@@ -286,3 +286,26 @@ table {
 	-webkit-box-shadow: 2px 1px 3px 0 rgba(0,0,0,0.06);
 	box-shadow: 2px 1px 3px 0 rgba(0,0,0,0.06);
 }
+
+.f-add-prod-table {
+	border: 0;
+	width: 100%;
+	thead {
+		background: #d2caca;
+		th {
+			font-weight: bold;
+			padding: 13px 11px;
+			vertical-align: top;
+		}
+	}
+	tbody {
+		td {
+			padding: 13px 11px;
+			vertical-align: top;
+		}
+	}
+	.button {
+		display: block;
+		margin-bottom: 5px;
+	}
+}

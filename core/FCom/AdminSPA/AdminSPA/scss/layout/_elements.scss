@@ -70,12 +70,17 @@ a:focus {
 	display: inline-block;
 }
 
+.no-padding {
+	padding: 0;
+}
+
 .box-no-padding {
 	padding: 15px 0;
 	.f-buttons-block {
 		padding: 0 15px;
 	}
 }
+
 .line {
 	width: 80%;
 	margin: 0 auto 20px;

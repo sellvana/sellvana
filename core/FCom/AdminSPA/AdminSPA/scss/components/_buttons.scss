@@ -249,7 +249,7 @@
       padding: 0;
       position: absolute;
       top: calc(100% - 1px);
-      z-index: 1000;
+      z-index: 97;
       display: none;
       list-style: none;
       text-align: left;
@@ -258,6 +258,8 @@
       border-radius: 5px;
       width: 100%;
       min-width: 160px;
+      max-height: 204px;
+      overflow: auto;
 }
 
 .f-action-button-b__item {

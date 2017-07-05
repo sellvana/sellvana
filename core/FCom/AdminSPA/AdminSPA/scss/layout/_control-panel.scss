@@ -51,7 +51,11 @@
       .f-inline-panel { // for control panel on Settings page
             width: 100%;
             .f-control-panel__elem {
-                  padding-right: 0px;
+                  padding-right: 0;
             }
+      }
+
+      .f-control-panel__elem {
+            vertical-align: middle;
       }
 }
