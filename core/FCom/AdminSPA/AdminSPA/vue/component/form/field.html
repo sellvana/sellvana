@@ -105,9 +105,9 @@
                    :is="fieldConfig('component')"
                    :id="field_id"></component>
 
-        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="translate-icon" @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
+        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="field-row-icon" @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
 
-        <a v-if="fieldConfig('removable')" href="#" class="translate-icon" @click.prevent="$emit('event', 'remove_field', field_config)"><i class="fa fa-trash" aria-hidden="true"></i></a>
+        <a v-if="fieldConfig('removable')" href="#" class="field-row-icon" @click.prevent="$emit('event', 'remove_field', field_config)"><i class="fa fa-trash" aria-hidden="true"></i></a>
 
         <div v-if="fieldConfig('notes')">{{fieldConfig('notes')}}</div>
 
