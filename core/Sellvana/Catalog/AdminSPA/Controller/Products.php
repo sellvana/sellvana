@@ -16,6 +16,24 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
     public function getGridConfig()
     {
         $bool = [0 => 'no', 1 => 'Yes'];
+
+        $editPopupConfig = [
+            'title' => 'Bulk Edit Selected Products',
+            'form' => $this->normalizeFormConfig([
+                'product' => new stdClass,
+                'config' => [
+                    'default_field' => ['tab' => 'main', 'model' => 'product'],
+                    'fields' => [
+                        ['name' => 'is_hidden', 'label' => 'Hidden?', 'type' => 'checkbox', 'removable' => true],
+                    ],
+                ],
+            ]),
+            'actions' => [
+                ['name' => 'close', 'label' => 'Close', 'class' => 'button2'],
+                ['name' => 'apply', 'label' => 'Apply', 'class' => 'button1'],
+            ],
+        ];
+
         return [
             'id' => 'products',
             'title' => 'Products',
@@ -54,7 +72,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             'export' => true,
             'pager' => true,
             'bulk_actions' => [
-                ['name' => 'custom_state', 'label' => 'Change Custom State'],
+                ['name' => 'edit_products', 'label' => 'Edit Products', 'popup' => $editPopupConfig],
             ],
             'actions' => [
                 ['name' => 'new', 'label' => 'Add New Product', 'button_class' => 'button1', 'link' => '/catalog/products/form', 'group' => 'new'],

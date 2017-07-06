@@ -530,6 +530,21 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                                 console.log('processActionEvent not implemented', type, args);
                         }
 
+                    },
+                    processGridEvent: function (type, args) {
+                        switch (type) {
+                            case 'popup-action':
+                                this.doBulkAction(args);
+                                break;
+                        }
+                    },
+                    doBulkAction: function (act) {
+                        switch (act.name) {
+                            case 'close':
+                                this.grid.popup = null;
+                                break;
+                        }
+                        console.log(act);
                     }
                 }
             },

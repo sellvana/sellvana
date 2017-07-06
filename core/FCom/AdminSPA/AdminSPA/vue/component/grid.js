@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable',
+define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
         'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
         'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-cell-row-select-tpl',
@@ -7,7 +7,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvHlp, $, _, VueDraggable,
+    function(Vue, SvHlp, $, _, VueDraggable, SvCompPopup,
              SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
              SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
              gridTpl, gridHeaderCellRowSelectTpl,
@@ -580,6 +580,19 @@ console.log(filters, result);
                 },
                 bulkAction: function (act) {
                     console.log(act);
+                    if (act.popup) {
+                        Vue.set(this.grid, 'popup', act.popup);
+                        // this.grid.popup.grid = this.grid;
+                        // this.grid.popup.open = true;
+                    }
+                },
+                processPopupEvent: function (type, args) {
+                    switch (type) {
+                        case 'close':
+                            this.grid.popup = null;
+                            break;
+                    }
+                    this.$emit('event', type, args);
                 },
                 updateConfig: function (config) {
                     Vue.set(this.grid, 'config', config);

@@ -51,8 +51,8 @@
                        v-model="value_model"
                        :id="field_id"
                        :options="field_options"
-                       track-by="id"
-                       label="text"
+                       :track-by="fieldConfig('id_prop') || 'id'"
+                       :label="fieldConfig('label_prop') || 'text'"
                        :close-on-select="false"
                        :class="fieldConfig('input_class')"
                        :style="fieldConfig('input_style')"
@@ -105,8 +105,9 @@
                    :is="fieldConfig('component')"
                    :id="field_id"></component>
 
-        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="translate-icon"
-           @click.prevent="$emit('event', 'toggle_i18n', field_config)" id="translate"><i class="fa fa-globe" aria-hidden="true"></i></a>
+        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="translate-icon" @click.prevent="$emit('event', 'toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
+
+        <a v-if="fieldConfig('removable')" href="#" class="translate-icon" @click.prevent="$emit('event', 'remove_field', field_config)"><i class="fa fa-trash" aria-hidden="true"></i></a>
 
         <div v-if="fieldConfig('notes')">{{fieldConfig('notes')}}</div>
 

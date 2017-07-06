@@ -129,6 +129,9 @@
             - [ requireJs, sv-comp-actions, "@FCom_AdminSPA/AdminSPA/vue/component/actions" ]
             - [ requireJs, sv-comp-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/actions.html" ]
 
+            - [ requireJs, sv-comp-popup, "@FCom_AdminSPA/AdminSPA/vue/component/popup" ]
+            - [ requireJs, sv-comp-popup-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/popup.html" ]
+
             - [ requireJs, sv-comp-grid, "@FCom_AdminSPA/AdminSPA/vue/component/grid" ]
             - [ requireJs, sv-comp-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid.html" ]
             - [ requireJs, sv-comp-grid-pager-list-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/pager-list.html" ]
