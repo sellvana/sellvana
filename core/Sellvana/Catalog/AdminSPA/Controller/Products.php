@@ -24,7 +24,9 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
                 'config' => [
                     'default_field' => ['tab' => 'main', 'model' => 'product'],
                     'fields' => [
+                        ['name' => 'product_name', 'label' => 'Product Name', 'removable' => true],
                         ['name' => 'is_hidden', 'label' => 'Hidden?', 'type' => 'checkbox', 'removable' => true],
+                        ['name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'removable' => true],
                     ],
                 ],
             ]),

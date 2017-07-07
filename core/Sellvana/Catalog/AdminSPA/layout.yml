@@ -60,6 +60,7 @@
 
 			- [ requireJs, sv-page-catalog-quick-add-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products" ]
 			- [ requireJs, sv-page-catalog-quick-add-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products.html" ]
+			- [ requireJs, sv-page-catalog-quick-add-products-config, "~/quickadd/products/config" ]
 
             - [ requireJs, sv-comp-dashboard-low-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/low-inventory.html" ]
             - [ requireJs, sv-comp-dashboard-new-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/new-products.html" ]
