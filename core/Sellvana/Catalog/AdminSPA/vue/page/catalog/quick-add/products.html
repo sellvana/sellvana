@@ -13,11 +13,11 @@
                         </ul>
                   </div>
             </div>
-            <!--<div class="f-control-panel__elem">-->
-                  <!--<div class="f-actions-container">-->
-                        <!--<button type="button" class="button button1">{{"Create Products"|_}}</button>-->
-                  <!--</div>-->
-            <!--</div>-->
+            <div class="f-control-panel__elem">
+                  <div class="f-actions-container">
+                        <button type="button" class="button button1" @click="createProducts">{{"Create Products"|_}}</button>
+                  </div>
+            </div>
       </div>
       <div class="f-content-block no-padding">
             <div v-for="(p, pId) in products" class="scrollable-area">
@@ -101,15 +101,13 @@
                                           </fieldset>
                                     </td>
                                     <td>
-                                          <dropzone :id="'upload-' + pId" v-model="p.images" :url="config.dropzone_options.url"
+                                          <dropzone :id="'upload-' + pId" v-model="p.images" :url="config.dropzone_upload_url + '?uuid=' + p.uuid"
                                                     :use-custom-dropzone-options="true" :dropzone-options="config.dropzone_options"
-                                                    @vdropzone-success="showUploadSuccess">
-                                                <input type="hidden" name="X-CSRF-TOKEN" :value="config.csrf_token">
-                                          </dropzone>
+                                                    @vdropzone-sending="dropzoneSending" @vdropzone-success="dropzoneSuccess"></dropzone>
                                     </td>
                                     <td>
-                                          <a href="#" class="button button2">{{'Duplicate'|_}}</a>
-                                          <a href="#" class="button button3">{{'Remove'|_}}</a>
+                                          <a href="#" class="button button2" @click.prevent="duplicateProduct(p)">{{'Duplicate'|_}}</a>
+                                          <a v-if="products.length > 1" href="#" class="button button4" @click.prevent="removeProduct(pId)">{{'Remove'|_}}</a>
                                     </td>
                               </tr>
                               </tbody>
@@ -128,6 +126,11 @@
                                     <a href="#" class="f-action-button-b__link" @click.prevent="addNewProducts(n)">{{n}}</a>
                               </li>
                         </ul>
+                  </div>
+            </div>
+            <div class="f-control-panel__elem">
+                  <div class="f-actions-container">
+                        <button type="button" class="button button1" @click="createProducts">{{"Create Products"|_}}</button>
                   </div>
             </div>
       </div>
