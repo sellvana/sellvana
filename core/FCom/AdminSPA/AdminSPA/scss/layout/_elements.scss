@@ -386,6 +386,11 @@ a:focus {
 	overflow-y: auto;
 	padding: 0 15px;
 }
+.f-control-panel-mobile {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
 @media (max-width: 1365px) {
 	.overlay { //for translating popup
 		&.active {
@@ -414,12 +419,14 @@ a:focus {
 
 @media (max-width: 991px) {
 	.f-control-panel {
+		table-layout: auto;
 		.f-actions-container {
 			text-align: right;
 		}
 	}
 	.f-control-panel-mobile {
 		display: table;
+		table-layout: auto;
 		width: 100%;
 	}
 }
