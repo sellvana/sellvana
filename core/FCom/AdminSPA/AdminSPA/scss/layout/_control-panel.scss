@@ -3,6 +3,7 @@
 .f-control-panel {
       display: table;
       width: 100%;
+      table-layout: fixed;
       .f-actions-container {
             text-align: right;
       }
