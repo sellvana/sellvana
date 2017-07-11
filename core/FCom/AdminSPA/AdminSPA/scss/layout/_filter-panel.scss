@@ -403,6 +403,30 @@
       color: #2e4354;
 }
 
+.f-tags__tag {
+      position: relative;
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 10px 0 0;
+}
+
+.f-tags__tag-content {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 9px 20px 9px 10px;
+      background: #e3e3e3;
+      border-radius: 5px;
+      color: #2e4354;
+      min-width: 80px;
+}
+
+.f-tags__drop {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 9px 10px 9px 10px;
+      color: #2e4354;
+}
+
 .f-tags__remove {
       display: inline-block;
       padding: 9px 6px;

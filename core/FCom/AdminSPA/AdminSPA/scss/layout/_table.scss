@@ -80,6 +80,12 @@ table {
 			color: #5f5f5f;
 		}
 	}
+	.f-td-action {
+		text-decoration: none;
+		border-bottom: 0;
+		vertical-align: middle;
+		display: inline-block;
+	}
 }
 .f-main-grid__header-link {
 	padding: 15px 7px;
@@ -307,5 +313,22 @@ table {
 	.button {
 		display: block;
 		margin-bottom: 5px;
+	}
+}
+
+.f-icon-column {
+	.f-input-number, .f-input, .f-textarea {
+		width: calc(100% - 30px);
+	}
+}
+.f-td-action {
+	padding: 8px;
+	svg {
+		fill: #c0bbbb;
+		stroke: #c0bbbb;
+		&:hover {
+			fill: #000;
+			stroke: #000;
+		}
 	}
 }

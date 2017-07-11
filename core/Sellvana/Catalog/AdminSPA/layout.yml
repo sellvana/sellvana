@@ -29,6 +29,8 @@
 			- [ requireJs, sv-page-catalog-products-form-videos-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/videos.html" ]
 			- [ requireJs, sv-page-catalog-products-form-custom_views, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/custom_views" ]
 			- [ requireJs, sv-page-catalog-products-form-custom_views-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/custom_views.html" ]
+			- [ requireJs, sv-page-catalog-products-form-variants, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/variants" ]
+            - [ requireJs, sv-page-catalog-products-form-variants-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/variants.html" ]
 
             - [ requireJs, sv-page-catalog-inventory, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/index" ]
             - [ requireJs, sv-page-catalog-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/inventory/index.html" ]
@@ -100,6 +102,7 @@
             - [ addRoute, { path: /catalog/quick-add/products, require: [ sv-page-catalog-quick-add-products, text!sv-page-catalog-quick-add-products-tpl ] } ]
 
 
+
 /catalog/products/form:
     - view: app
         do:
@@ -112,6 +115,7 @@
 #            - [ addFormTab, { path: /catalog/products/form, name: videos, label: Videos, pos: 70 } ]
             - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 80 } ]
 #            - [ addFormTab, { path: /catalog/products/form, name: custom_views, label: Custom Views, pos: 90 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: variants, label: Variants, pos: 90 } ]
 
 /catalog/inventory/form:
     - view: app

@@ -120,6 +120,11 @@
             border: 1px solid #da1429;
             color: #fff;
       }
+      &:disabled {
+            color: rgba(255, 255, 255, 1);
+            border: 1px solid #aba7a7;
+            background-color: #dee1e2;
+      }
 }
 
 

@@ -83,7 +83,7 @@ a:focus {
 
 .line {
 	width: 80%;
-	margin: 0 auto 20px;
+	margin: 20px auto 20px;
 	height: 2px;
 	background: #c7c7c7;
 }
@@ -381,6 +381,7 @@ a:focus {
 		visibility: visible;
 	}
 }
+
 .f-grid-popup__content {
 	max-height: 300px;
 	overflow-y: auto;
@@ -393,7 +394,7 @@ a:focus {
 }
 @media (max-width: 1365px) {
 	.overlay { //for translating popup
-		&.active {
+		&.open {
 			opacity: 1;
 			visibility: visible;
 		}
