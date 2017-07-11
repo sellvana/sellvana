@@ -1644,6 +1644,7 @@ class BORM extends ORMWrapper
 
         static::_log_query($query, $values);
 #$mem = memory_get_usage();
+#print_r($query); print_r($values);
         $statement = static::$_db->prepare($query);
         $success   = $statement->execute($values);
         //$success = true;
@@ -2140,6 +2141,11 @@ class BORM extends ORMWrapper
             $this->_is_new = false;
         }
         return $model;
+    }
+
+    static public function get_last_values()
+    {
+        return static::$_last_values;
     }
 
     public function __destruct()

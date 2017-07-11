@@ -579,6 +579,10 @@ console.log(filters, result);
                     this.fetchData();
                 },
                 bulkAction: function (act) {
+                    if (!Object.keys(this.grid.rows_selected).length) {
+                        alert(SvHlp._('Please select some rows first'));
+                        return;
+                    }
                     console.log(act);
                     if (act.popup) {
                         Vue.set(this.grid, 'popup', act.popup);
@@ -587,11 +591,6 @@ console.log(filters, result);
                     }
                 },
                 processPopupEvent: function (type, args) {
-                    switch (type) {
-                        case 'close':
-                            this.grid.popup = null;
-                            break;
-                    }
                     this.$emit('event', type, args);
                 },
                 updateConfig: function (config) {
@@ -611,7 +610,15 @@ console.log(filters, result);
                 'sv-comp-grid-pager-select': SvCompGridPagerSelect,
 				'sv-comp-grid-pager-dropdown': SvCompGridPagerDropdown
             },
-            template: gridTpl
+            template: gridTpl,
+            watch: {
+                'grid.fetch_data_flag': function (flag) {
+                    if (flag) {
+                        this.fetchData();
+                        this.grid.fetch_data_flag = false;
+                    }
+                }
+            }
         };
 
         Vue.component('sv-comp-grid', SvCompGrid);

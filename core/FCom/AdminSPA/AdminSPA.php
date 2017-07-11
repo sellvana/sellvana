@@ -251,6 +251,17 @@ class FCom_AdminSPA_AdminSPA extends BClass
                     ],
                 ],
             ],
+            '/areas/cron/area' => [
+                'config' => [
+                    'default_field' => [
+                        'root' => 'modules/FCom_Cron',
+                    ],
+                    'fields' => [
+                        ['name' => 'FCom_Cron', 'label' => 'IP: Mode', 'type' => 'component',
+                            'component' => 'sv-comp-form-ip-mode', 'root' => 'mode_by_ip'],
+                    ],
+                ],
+            ],
         ]);
     }
 

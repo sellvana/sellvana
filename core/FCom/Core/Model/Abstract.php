@@ -156,6 +156,10 @@ class FCom_Core_Model_Abstract extends BModel
         }
         $this->set('update_at', $now);
 
+//        if (null === $this->get('uuid')) {
+//            $this->set('uuid_bin', hex2bin(str_replace('-', '', uniqid())));
+//        }
+
         return true;
     }
 

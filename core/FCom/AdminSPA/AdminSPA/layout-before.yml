@@ -10,7 +10,8 @@
 
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/bootstrap.css" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/jquery-ui.css" ]
-            - [ css, "@FCom_AdminSPA/AdminSPA/scss/select2.min.css" ]
+            #- [ css, "@FCom_AdminSPA/AdminSPA/scss/select2.min.css" ]
+            - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/select2/select2-4.0.3.min.css" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/daterangepicker.css" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/scss/codemirror.css" ]
             - [ scss, "@FCom_AdminSPA/AdminSPA/scss/style.scss" ]
@@ -74,7 +75,7 @@
             - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
             #- [ requireJs, vue-strap, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-strap-2.0.0" ]
             - [ requireJs, l10n, "https://unpkg.com/webl10n/l10n" ]
-            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2-4.0.3.min", { deps: [ jquery ] } ]
+            - [ requireJs, select2, "@FCom_AdminSPA/AdminSPA/js/lib/select2/select2-full-4.0.3.min", { deps: [ jquery ] } ]
             - [ requireJs, accounting, "@FCom_AdminSPA/AdminSPA/js/lib/accounting-0.4.2" ]
             - [ requireJs, moment, "@FCom_AdminSPA/AdminSPA/js/lib/moment-2.17.1" ]
             - [ requireJs, sortablejs, "@FCom_AdminSPA/AdminSPA/js/lib/sortable-1.5.0rc1" ]
@@ -246,6 +247,7 @@
             - [ addRoute, { path: /password-reset, require: [sv-page-account-password-reset, text!sv-page-account-password-reset-tpl ]}]
             - [ addRoute, { path: /profile, require: [sv-page-account-profile, text!sv-page-account-profile-tpl ]}]
             - [ addRoute, { path: /settings, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
+            - [ addRoute, { path: /settings/*, require: [sv-page-settings, text!sv-page-settings-tpl, json!sv-page-settings-config ]}]
 
             - [ addRoute, { path: /modules, require: [sv-page-modules, text!sv-page-default-grid-tpl, json!sv-page-modules-grid-config ]}]
 
@@ -273,6 +275,9 @@ sv-app-setings-config:
 
             - [ addNav, { path: /areas/admin, label: Admin Settings, pos: 30 }]
             - [ addNav, { path: /areas/admin/area, label: Area Settings, pos: 10 }]
+
+            - [ addNav, { path: /areas/cron, label: Cron Settings, pos: 30 }]
+            - [ addNav, { path: /areas/cron/area, label: Area Settings, pos: 10 }]
 
             - [ addNav, { path: /themes, label: Themes, pos: 80 }]
 

@@ -4,7 +4,7 @@
       </a>
       <div class="f-breadcrumb f-header-breadcrumb">
            <!-- <li v-for="part in breadcrumbParts" class="f-breadcrumb__item">-->
-                  <router-link v-for="part in breadcrumbParts" v-if="part.link" :to="part.link" class="f-breadcrumb__link">{{part.label|_}}</router-link>
+                  <router-link v-for="part in breadcrumbParts" :key="part.link" v-if="part.link" :to="part.link" class="f-breadcrumb__link">{{part.label|_}}</router-link>
                   <a v-else href="#" @click.prevent class="f-breadcrumb__link">{{part.label|_}}</a>
            <!-- </li>-->
           <!--  <li class="f-breadcrumb__item">-->

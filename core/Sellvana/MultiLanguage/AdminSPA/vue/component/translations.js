@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'text!sv-comp-form-translations-tpl'], function (_, Vue, translationsTpl) {
+define(['lodash', 'jquery', 'vue', 'text!sv-comp-form-translations-tpl'], function (_, $, Vue, translationsTpl) {
     var SvCompFormTranslations = {
         template: translationsTpl,
         props: ['form', 'field'],
@@ -51,6 +51,12 @@ define(['lodash', 'vue', 'text!sv-comp-form-translations-tpl'], function (_, Vue
         created: function () {
             Vue.set(this, 'translations', this.form.i18n[this.field.name] || {});
             this.calcAvailableLocales();
+        },
+        mounted: function () {
+            var $container = $(this.$refs.container);
+            if ($container.css('max-width') !== 'none') {
+                this.$store.commit('overlay', true);
+            }
         },
         watch: {
             field: {

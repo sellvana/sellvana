@@ -9,7 +9,7 @@
         <div v-if="add_fields_options.length" class="row">
             <div class="col-md-9">
                 <!--<v-multiselect v-model="add_fields" :options="add_fields_options" track-by="name" label="label" :multiple="true"></v-multiselect>-->
-                <select2 v-model="add_fields" :multiple="true" :params="{width:'100%'}">
+                <select2 v-model="add_fields" :multiple="true" :params="{width:'100%', closeOnSelect: false}">
                     <option v-for="o in add_fields_options" :value="o.name">{{o.label|_}}</option>
                 </select2>
             </div>

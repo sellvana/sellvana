@@ -745,4 +745,50 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         }
         return $config;
     }
+
+    public function getAllowedFieldsForBulkUpdate($bulkAction = null, $model = null)
+    {
+        $gridConfig = $this->getProcessedGridConfig();
+        $fields = [];
+        foreach ($gridConfig['bulk_actions'] as $action) {
+            if (null !== $bulkAction && $action['name'] !== $bulkAction) {
+                continue;
+            }
+            foreach ($action['popup']['form']['config']['fields'] as $field) {
+                if (null === $bulkAction) {
+                    $fields[$action['name']][$field['model']] = $field['name'];
+                } elseif (null === $model) {
+                    $fields[$field['model']][] = $field['name'];
+                } elseif ($field['model'] === $model) {
+                    $fields[] = $field['name'];
+                }
+            }
+        }
+        return $fields;
+    }
+
+    public function getBulkUpdateData($bulkAction, $model, $post = null)
+    {
+        if ($post === null) {
+            $post = $this->BRequest->post();
+        }
+        $allowedFields = $this->getAllowedFieldsForBulkUpdate($bulkAction, $model);
+        foreach ($post['data'][$model] as $k => $v) {
+            if (!preg_match('/^[a-z0-9_]+$/', $k)) {
+                continue;
+            }
+            if (!in_array($k, $allowedFields)) {
+                continue;
+            }
+            if ($v === 'true') {
+                $v = 1;
+            } elseif ($v === 'false') {
+                $v = 0;
+            } elseif ($v === 'null') {
+                $v = null;
+            }
+            $data[$k] = $v;
+        }
+        return $data;
+    }
 }

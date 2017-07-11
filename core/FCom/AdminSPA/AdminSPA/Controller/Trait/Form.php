@@ -45,6 +45,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         }
         
         if (!empty($form['config']['fields'])) {
+            $models = [];
             $def = !empty($form['config']['default_field']) ? $form['config']['default_field'] : [];
             $def = array_merge(static::$_defaultFieldConfig, $def);
             foreach ($form['config']['fields'] as &$field) {
@@ -58,8 +59,18 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                         $field['options'] = $this->BUtil->arrayMapToSeq($field['options']);
                     }
                 }
+                if (!empty($field['model'])) {
+                    $models[$field['model']] = $field['model'];
+                }
             }
             unset($field);
+            if ($models) {
+                foreach ($models as $model) {
+                    if (empty($form[$model])) {
+                        $form[$model] = new stdClass;
+                    }
+                }
+            }
         }
 
         if (!empty($form['config']['actions'])) {

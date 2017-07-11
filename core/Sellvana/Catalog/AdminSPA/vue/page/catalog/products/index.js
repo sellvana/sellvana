@@ -21,23 +21,9 @@ define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-catalog-products-grid-config'], 
             }});
         },
         methods: {
-            doBulkAction: function (act) {
-                switch (act.name) {
-                    case 'apply':
-                        var vm = this, postData = {
-                            do: 'bulk-update',
-                            ids: Object.keys(this.grid.rows_selected),
-                            data: this.grid.popup.form.product
-                        };
-                        this.sendRequest('POST', this.grid.config.data_url, postData, function (response) {
-                            console.log(response);
-                        });
-                        break;
-                    case 'close':
-                        this.grid.popup = null;
-                        break;
-                }
-                console.log(act);
+            doBulkAction: function (type, args) {
+                this.doDefaultBulkAction(type, args);
+                console.log(type, args);
             }
         }
     };
