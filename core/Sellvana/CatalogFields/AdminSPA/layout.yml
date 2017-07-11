@@ -18,5 +18,6 @@
 /catalog/fields/form:
     - view: app
         do:
-            - [ addFormTab, { path: /catalog/inventory/form, name: main, label: Field Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/fields/form, name: main, label: Field Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/fields/form, name: main, label: Field Options, pos: 20 } ]
 
