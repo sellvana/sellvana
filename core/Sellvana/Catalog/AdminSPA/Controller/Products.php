@@ -165,7 +165,6 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             $this->ok();
         } catch (Exception $e) {
             $this->addMessage($e);
-            $this->addResponses(['log' => BORM::get_query_log()]);
         }
         $this->respond(['result' => $result]);
     }

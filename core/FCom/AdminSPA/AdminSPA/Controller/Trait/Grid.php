@@ -777,6 +777,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             $post = $this->BRequest->post();
         }
         $allowedFields = $this->getAllowedFieldsForBulkUpdate($bulkAction, $model);
+        $data = [];
         foreach ($post['data'][$model] as $k => $v) {
             if (!preg_match('/^[a-z0-9_]+$/', $k)) {
                 continue;

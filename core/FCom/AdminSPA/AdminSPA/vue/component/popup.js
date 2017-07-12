@@ -37,7 +37,7 @@ define(['vue', 'sv-hlp', 'text!sv-comp-popup-tpl'], function (Vue, SvHlp, tpl) {
         },
         methods: {
             closePopup: function () {
-                this.$emit('event', 'close');
+                this.$emit('event', 'popup-action', {name: 'cancel'});
             },
             processFieldEvent: function (type, args) {
                 var i, l, f;
