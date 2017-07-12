@@ -9,10 +9,6 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
             'data_url' => 'users/grid_data',
             'columns' => [
                 ['type' => 'row-select', 'width' => 80],
-                ['type' => 'actions', 'width' => 80, 'actions' => [
-                    ['type' => 'edit', 'link' => '/users/form?id={id}'],
-                    ['type' => 'delete', 'delete_url' => 'users/grid_delete'],
-                ]],
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'username', 'label' => 'Username'],
                 ['name' => 'firstname', 'label' => 'First Name'],

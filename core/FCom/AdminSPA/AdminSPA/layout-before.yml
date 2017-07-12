@@ -178,6 +178,8 @@
 
             - [ requireJs, sv-page-default-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/grid.html" ]
             - [ requireJs, sv-page-default-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form.html" ]
+            - [ requireJs, sv-page-default-form-tab, "@FCom_AdminSPA/AdminSPA/vue/page/default/form-tab" ]
+            - [ requireJs, sv-page-default-form-tab-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form-tab.html" ]
 
             - [ requireJs, sv-page-dashboard, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard" ]
             - [ requireJs, sv-page-dashboard-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard.html" ]

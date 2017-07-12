@@ -31,8 +31,8 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
                 ['name' => 'required_by', 'label' => 'Required By', 'content_overflow' => true],
                 ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'content_overflow' => true],
             ],
-            'default_action' => [/*'mobile_group' => 'actions', */'button_class' => 'button1'],
-            'actions' => [
+            'page_actions' => [
+                'default' => [/*'mobile_group' => 'actions', */'button_class' => 'button1'],
                 /*['name' => 'actions', 'label' => 'Actions'],*/
                 ['name' => 'migrate', 'label' => 'Run Migrations', 'group' => 'migrate'],
                 ['name' => 'reset_cache', 'label' => 'Reset Cache', 'group' => 'reset_cache'],

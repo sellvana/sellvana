@@ -68,7 +68,7 @@ define(['jquery', 'lodash', 'vue', 'select2'], function ($, _, Vue) {
             params: {
                 deep: true,
                 handler: function (params) {
-                    console.log(params);
+                    // console.log(params);
                     var $el = $(this.$el);
                     // if (this.options) {
                     //     params = _.extend(params, {data: this.options});

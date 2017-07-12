@@ -2,12 +2,12 @@ define([
     'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortablejs',
     'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress', 'perfect-scrollbar',
     'vue-password-strength-meter', 'sv-comp-form-field', 'sv-comp-form-layout',
-    'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl'
+    'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl', 'text!sv-page-default-form-tab-tpl',
 ],
 function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
           VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress, PerfectScrollbar,
           VuePassword, SvCompFormField, SvCompFormLayout,
-          svPageDefaultGridTpl, svPageDefaultFormTpl
+          svPageDefaultGridTpl, svPageDefaultFormTpl, svPageDefaultFormTabTpl
 ) {
 
     Vue.use(VueRouter);
@@ -616,6 +616,9 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
                     }
                 }
                 return '';
+            },
+            pageActionsGroups: function () {
+                return this.form.config.page_actions_groups || {};
             }
         },
         methods: {
@@ -872,6 +875,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
     };
 
     var formTabMixin = {
+        template: svPageDefaultFormTabTpl,
         components: {
             'sv-comp-form-field': SvCompFormField,
             'sv-comp-form-layout': SvCompFormLayout

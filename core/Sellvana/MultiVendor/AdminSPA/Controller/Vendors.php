@@ -14,10 +14,6 @@ class Sellvana_MultiVendor_AdminSPA_Controller_Vendors extends FCom_AdminSPA_Adm
             'data_url' => 'vendors/grid_data',
             'columns' => [
                 ['type' => 'row-select'],
-                ['type' => 'actions', 'actions' => [
-                    ['name' => 'edit'],
-                    ['name' => 'delete'],
-                ]],
                 ['name' => 'id', 'label' => 'ID', 'index' => 'v.id'],
                 ['name' => 'vendor_name', 'label' => 'Vendor Name', 'index' => 'v.vendor_name'],
                 ['name' => 'notify_type', 'label' => 'Notification', 'options' => $notifyTypeOptions],

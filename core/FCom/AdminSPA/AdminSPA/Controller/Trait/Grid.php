@@ -348,11 +348,15 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             unset($flt);
         }
 
-        if (!empty($config['actions'])) {
+        if (!empty($config['page_actions'])) {
             $actionGroups = [];
-            $def = !empty($config['default_action']) ? $config['default_action'] : [];
-            $def = array_merge(static::$_defaultGridActionConfig, $def);
-            foreach ($config['actions'] as &$act) {
+            if (!empty($config['page_actions']['default'])) {
+                $def = array_merge(static::$_defaultGridActionConfig, $config['page_actions']['default']);
+                unset($config['page_actions']['default']);
+            } else {
+                $def = static::$_defaultGridActionConfig;
+            }
+            foreach ($config['page_actions'] as &$act) {
                 $act = array_merge($def, $act);
                 foreach (['desktop_group', 'mobile_group'] as $g) {
                     $group = !empty($act[$g]) ? $act[$g] : (!empty($act['group']) ? $act['group'] : null);
@@ -367,10 +371,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             }
             unset($act);
             if (!empty($actionGroups['desktop_group'])) {
-                $config['action_desktop_groups'] = array_values($actionGroups['desktop_group']);
+                $config['page_actions_groups']['desktop'] = array_values($actionGroups['desktop_group']);
             }
             if (!empty($actionGroups['mobile_group'])) {
-                $config['action_mobile_groups'] = array_values($actionGroups['mobile_group']);
+                $config['page_actions_groups']['mobile'] = array_values($actionGroups['mobile_group']);
             }
         }
 

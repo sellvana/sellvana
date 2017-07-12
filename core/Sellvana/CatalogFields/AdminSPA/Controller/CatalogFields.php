@@ -44,7 +44,7 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
 
         $result['form']['field'] = $field->as_array();
 
-        $result['form']['config']['actions'] = true;
+        $result['form']['config']['page_actions'] = true;
         $result['form']['config']['title'] = $field->get('field_name');
 
         $result['form']['config']['tabs'] = '/catalog/fields/form';

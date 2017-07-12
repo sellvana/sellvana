@@ -1,6 +1,6 @@
 <div>
-      <div v-if="thumbUrl || formTitle" class="f-control-panel">
-            <div class="f-control-panel__elem">
+      <div class="f-control-panel">
+            <div v-if="thumbUrl || formTitle" class="f-control-panel__elem">
                   <div class="f-form-title">
                         <img v-if="thumbUrl" :src="thumbUrl" width="80" class="f-thumb-img">
                         <p class="f-form-title__text" :class-bak="{'hidden-xs':!thumbUrl}">{{formTitle|_}}</p>
@@ -9,7 +9,7 @@
 
             <!--Actions buttons for desktop-->
 
-            <sv-comp-actions :config="form.config" container-class="visible-lg visible-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :groups="form.config.page_actions_groups" container-class="visible-lg visible-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
       </div>
 
 
@@ -19,9 +19,9 @@
 
             <!--Actions buttons for mobile-->
 
-            <sv-comp-actions :config="form.config" container-class="hidden-lg hidden-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :groups="form.config.page_actions_groups" container-class="hidden-lg hidden-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
       </div>
 
-      <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+      <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" :tab="t.name" @event="processTabEvent"></component>
 
 </div>

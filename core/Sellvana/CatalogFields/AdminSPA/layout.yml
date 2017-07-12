@@ -7,6 +7,13 @@
             - [ requireJs, sv-page-catalog-fields-form-main, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/main ]
             - [ requireJs, sv-page-catalog-fields-form-main-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/main.html ]
 
+			- [ requireJs, sv-page-catalog-products-form-variants, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants" ]
+            - [ requireJs, sv-page-catalog-products-form-variants-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants.html" ]
+			- [ requireJs, sv-page-catalog-products-form-customfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/customfields" ]
+            - [ requireJs, sv-page-catalog-products-form-customfields-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/customfields.html" ]
+			- [ requireJs, sv-page-catalog-products-form-shopperfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields" ]
+            - [ requireJs, sv-page-catalog-products-form-shopperfields-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields.html" ]
+
     - view: app
         do:
             - [ addNav, { path: /catalog/fieldsets, label: Custom Attribute Sets, link: /catalog/fieldsets, pos: 70 } ]
@@ -18,5 +25,11 @@
 /catalog/fields/form:
     - view: app
         do:
-            - [ addFormTab, { path: /catalog/inventory/form, name: main, label: Field Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/inventory/form, name: main, label: Field Info, pos: 10, component: default } ]
 
+/catalog/products/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /catalog/products/form, name: variants, label: Variants, pos: 90 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: customfields, label: Additional Fields, pos: 100 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: shopperfields, label: Shopper Fields, pos: 110 } ]

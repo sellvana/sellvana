@@ -2,10 +2,18 @@ define(['vue', 'sv-hlp', 'text!sv-comp-actions-tpl'], function (Vue, SvHlp, acti
     var SvCompFormActions = {
         mixins: [SvHlp.mixins.common],
         props: {
-            'config': {type: Object},
+            'groups': {type: Object},
             'container-class': {type: String, default: 'f-actions-container'}
         },
         template: actionsTpl,
+        computed: {
+            desktop_groups: function () {
+                return this.groups ? this.groups.desktop : [];
+            },
+            mobile_groups: function () {
+                return this.groups ? this.groups.mobile : [];
+            }
+        },
         methods: {
             doFormAction: function (action) {
                 this.$emit('event', 'do_action', action);

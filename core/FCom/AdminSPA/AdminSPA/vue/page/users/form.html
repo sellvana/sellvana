@@ -6,7 +6,7 @@
                         <p class="f-form-title__text hidden-xs">{{'User page'|_}}</p>
                   </div>
             </div>
-            <sv-comp-actions :config="form.config" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :groups="form.config.page_actions_groups" @event="processActionEvent"></sv-comp-actions>
       </div>
 
       <div class="f-control-panel">

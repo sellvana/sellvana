@@ -4,7 +4,7 @@ define(['sv-hlp', 'text!sv-page-catalog-products-form-variants-tpl'], function (
         template: tabProdVariants,
         computed: {
 
-        },
+        }
     };
     return SvPageCatalogProductsFormVariants;
 });

@@ -98,6 +98,7 @@ modules:
                     - [ /inventory/?.action, Sellvana_Catalog_AdminSPA_Controller_Inventory ]
                     - [ /inventory/form/products/?.action, Sellvana_Catalog_AdminSPA_Controller_Inventory_Products ]
                     - [ /quickadd/products/?.action, Sellvana_Catalog_AdminSPA_Controller_QuickAdd_Products ]
+                    - [ /import-products/?.action, Sellvana_Catalog_AdminSPA_Controller_ImportProducts ]
                 observe:
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Catalog_AdminSPA_Controller_Products.onHeaderSearch ]
 
