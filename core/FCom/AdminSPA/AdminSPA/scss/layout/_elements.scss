@@ -70,6 +70,53 @@ a:focus {
 	display: inline-block;
 }
 
+
+/*Options block with another title*/
+
+.f-options-title {
+	background: #d2caca;
+	padding: 13px 10px;
+	position: relative;
+}
+.f-options-title__text {
+	font-weight: bold;
+	font-size: 13px;
+	margin-bottom: 0;
+}
+
+.f-options__control {
+	position: absolute;
+	right: 0;
+	top: 4px;
+	white-space: nowrap;
+	.select2-container {
+		width: 100px !important;
+	}
+	a {
+		padding: 10px;
+		color: #fff;
+		&:hover {
+			color: #000;
+		}
+	}
+}
+.f-options__control-elem {
+	display: inline-block;
+	vertical-align: middle;
+}
+.f-options-content {
+	padding: 20px;
+	text-align: center;
+	.f-tags {
+		display: inline-block;
+		width: 150px;
+	}
+	.f-tags__tag {
+		display: inline-block;
+		width: 110px;
+		margin: 10px 0;
+	}
+}
 .no-padding {
 	padding: 0;
 }

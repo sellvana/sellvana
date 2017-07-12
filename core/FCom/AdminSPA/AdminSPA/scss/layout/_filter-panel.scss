@@ -408,6 +408,7 @@
       display: inline-block;
       vertical-align: middle;
       margin: 0 10px 0 0;
+      text-align: left;
 }
 
 .f-tags__tag-content {
@@ -418,6 +419,7 @@
       border-radius: 5px;
       color: #2e4354;
       min-width: 80px;
+      width: calc(100% - 26px);
 }
 
 .f-tags__drop {
