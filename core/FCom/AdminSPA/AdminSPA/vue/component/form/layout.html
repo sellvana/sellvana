@@ -31,12 +31,11 @@
             </div>
       </div>
       <div class="col-md-9 col-lg-10">
-            <div class="row">
-                  <div class="col-md-12">
-                        <div class="widget-block">
+           <div class="f-widget-container">
+                        <div class="widget-block header-widget-block main-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Header'|_}}</p>
-                                    <div class="f-action-button-b f-widget__actions-button">
+                                   <!-- <div class="f-action-button-b f-widget__actions-button">
                                           <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown">
                                                 <span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span> </a>
                                           <ul class="f-action-button-b__menu">
@@ -44,12 +43,22 @@
                                                 <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
                                                 <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
                                           </ul>
+                                    </div>-->
+                                    <div class="f-dropdown f-actions-dropdown f-widget__actions-button">
+                                          <button type="button" class="small-button button1 f-dropdown__toggle"> {{'Visibility'|_}}</button>
+                                          <ul class="f-dropdown__menu">
+                                                <li><a href="#" class="small-button button2">{{'Inherit'|_}}</a></li>
+                                                <li><a href="#" class="small-button button2">{{'Visible'|_}}</a></li>
+                                                <li><a href="#" class="small-button button1">{{'Hidden'|_}}</a></li>
+                                          </ul>
                                     </div>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'CMS Block'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -97,8 +106,10 @@
                                           </div>
                                     </div>
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Products Carousel'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -143,25 +154,26 @@
                                     </div>
                               </div>
                         </div>
-                  </div>
-                  <div class="col-md-12 col-lg-3">
-                        <div class="widget-block">
+
+                        <div class="widget-block sidebar-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Left column'|_}}</p>
-                                    <div class="f-action-button-b f-widget__actions-button">
-                                          <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown">
-                                                <span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span> </a>
-                                          <ul class="f-action-button-b__menu">
-                                                <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                                <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                                <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+
+                                    <div class="f-dropdown f-actions-dropdown f-widget__actions-button">
+                                          <button type="button" class="small-button button1 f-dropdown__toggle"> {{'Visibility'|_}}</button>
+                                          <ul class="f-dropdown__menu">
+                                                <li><a href="#" class="small-button button2">{{'Inherit'|_}}</a></li>
+                                                <li><a href="#" class="small-button button2">{{'Visible'|_}}</a></li>
+                                                <li><a href="#" class="small-button button1">{{'Hidden'|_}}</a></li>
                                           </ul>
                                     </div>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Split 2 Columns'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -176,8 +188,10 @@
                                           </div>
                                     </div>
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Split 3 Columns'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -196,25 +210,25 @@
                                     </div>
                               </div>
                         </div>
-                  </div>
-                  <div class="col-md-12 col-lg-6">
-                        <div class="widget-block main-widget-block">
+
+                        <div class="widget-block main-main-widget-block main-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Main'|_}}</p>
-                                    <div class="f-action-button-b f-widget__actions-button">
-                                          <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown">
-                                                <span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span> </a>
-                                          <ul class="f-action-button-b__menu">
-                                                <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                                <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                                <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                    <div class="f-dropdown f-actions-dropdown f-widget__actions-button">
+                                          <button type="button" class="small-button button1 f-dropdown__toggle"> {{'Visibility'|_}}</button>
+                                          <ul class="f-dropdown__menu">
+                                                <li><a href="#" class="small-button button2">{{'Inherit'|_}}</a></li>
+                                                <li><a href="#" class="small-button button2">{{'Visible'|_}}</a></li>
+                                                <li><a href="#" class="small-button button1">{{'Hidden'|_}}</a></li>
                                           </ul>
                                     </div>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Text'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -228,8 +242,10 @@
                                           </div>
                                     </div>
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Widget'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -280,25 +296,25 @@
                                     </div>
                               </div>
                         </div>
-                  </div>
-                  <div class="col-md-12 col-lg-3">
-                        <div class="widget-block">
+
+                        <div class="widget-block sidebar-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Right column'|_}}</p>
-                                    <div class="f-action-button-b f-widget__actions-button">
-                                          <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown">
-                                                <span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span> </a>
-                                          <ul class="f-action-button-b__menu">
-                                                <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                                <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                                <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                    <div class="f-dropdown f-actions-dropdown f-widget__actions-button">
+                                          <button type="button" class="small-button button1 f-dropdown__toggle"> {{'Visibility'|_}}</button>
+                                          <ul class="f-dropdown__menu">
+                                                <li><a href="#" class="small-button button2">{{'Inherit'|_}}</a></li>
+                                                <li><a href="#" class="small-button button2">{{'Visible'|_}}</a></li>
+                                                <li><a href="#" class="small-button button1">{{'Hidden'|_}}</a></li>
                                           </ul>
                                     </div>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Remove view'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -313,25 +329,25 @@
                                     </div>
                               </div>
                         </div>
-                  </div>
-                  <div class="col-md-12">
-                        <div class="widget-block">
+
+                        <div class="widget-block footer-widget-block main-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Footer'|_}}</p>
-                                    <div class="f-action-button-b f-widget__actions-button">
-                                          <a href="#" class="f-action-button-b__toggle" data-toggle="dropdown">
-                                                <span>{{'Visibility'|_}}</span><span class="f-caret"><b class="f-caret__elem"></b></span> </a>
-                                          <ul class="f-action-button-b__menu">
-                                                <li><a href="#" class="color14">{{'Inherit'|_}}</a></li>
-                                                <li><a href="#" class="color15">{{'Visible'|_}}</a></li>
-                                                <li><a href="#" class="color16">{{'Hidden'|_}}</a></li>
+                                    <div class="f-dropdown f-actions-dropdown f-widget__actions-button">
+                                          <button type="button" class="small-button button1 f-dropdown__toggle"> {{'Visibility'|_}}</button>
+                                          <ul class="f-dropdown__menu">
+                                                <li><a href="#" class="small-button button2">{{'Inherit'|_}}</a></li>
+                                                <li><a href="#" class="small-button button2">{{'Visible'|_}}</a></li>
+                                                <li><a href="#" class="small-button button1">{{'Hidden'|_}}</a></li>
                                           </ul>
                                     </div>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Video Embed (YouTube)'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -383,8 +399,10 @@
                                           </div>
                                     </div>
                                     <div class="widget">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                           <div class="widget-title">
                                                 <p>{{'Insert media'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content">
@@ -430,7 +448,6 @@
                                     </div>
                               </div>
                         </div>
-                  </div>
-            </div>
+           </div>
       </div>
 </div>

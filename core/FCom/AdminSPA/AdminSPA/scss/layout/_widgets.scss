@@ -1,3 +1,19 @@
+.f-widget-container {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+.header-widget-block, .footer-widget-block {
+	flex-basis: 100%;
+}
+.sidebar-widget-block {
+	flex-basis: 24%;
+}
+.main-main-widget-block {
+	flex-basis: 24%;
+	flex-grow: 1;
+	margin: 0 10px;
+}
 .widget-menu {
 	position: relative;
 	left: -15px;
@@ -31,7 +47,7 @@
 .widget-block {
 	background: #fafafa;
 	margin-bottom: 20px;
-	box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);
+	/*box-shadow: 2.5px 4.3px 5px 0 rgba(0, 0, 0, 0.11);*/
 	.dropdown.action {
 		width: 100px;
 		min-width: 100px;
@@ -58,7 +74,10 @@
 	}
 }
 .main-widget-block {
-	background: #dcdcdc; 
+	background: #dcdcdc;
+	.widget-block-title {
+		background: #c3d2dd;
+	}
 }
 .widget-block-title {
 	padding: 3px 0 3px 12px;
@@ -66,34 +85,41 @@
 	position: relative;
 	p {
 		text-transform: uppercase;
-		font-size: 15px;
+		font-size: 16px;
 		padding: 4px 0 4px 0;
 		color: #000;
 		display: inline-block;
 		width: 49%;
+		font-weight: bold;
 	}
 }
 .f-widget__actions-button {
 	position: absolute !important;
 	right: 12px;
+	top: 6px;
 }
 .widget-block-content {
 	padding: 10px;
+
 }
 .widget {
-	padding: 15px;
+	padding: 0 10px;
 	border: 1px solid #dad6d6;
 	border-radius: 3px;
 	background: #f9f9f9;
 	margin-bottom: 10px;
+	position: relative;
 	.widget-title {
 		position: relative;
-		margin-bottom: 15px;
+		padding-top: 10px;
+		margin-bottom: 10px;
 		p {
 			text-transform: uppercase;
 			color: #000;
 			font-size: 14px;
 			font-weight: bold;
+			padding-right: 60px;
+			padding-left: 18px;
 		}
 	}
 	.f-delete {
@@ -101,6 +127,18 @@
 		right: 0;
 		top: 0;
 		font-size: 15px;
+		padding: 10px;
+	}
+	.f-edit {
+		position: absolute;
+		right: 30px;
+		top: 0;
+		font-size: 15px;
+		padding: 10px;
+		color: #474646;
+		&:hover {
+			color: #000;
+		}
 	}
 	input, textarea, .select2 {
 		width: 100% !important;
@@ -115,8 +153,21 @@
 	.input-group {
 		margin: 5px 0;
 	}
+	.f-dragg {
+		padding: 6px 10px;
+		position: absolute;
+		left: 0;
+		top: 0;
+		color: #474646;
+		font-size: 24px;
+		&:hover {
+			color: #000;
+		}
+	}
 }
-
+.widget-content {
+	display: none; //COMMENT
+}
 @media (max-width: 767px) {
 	.widget-menu {
 		left: 0;
