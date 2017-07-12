@@ -220,7 +220,14 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             }
         }
 
-        $result['form']['config']['page_actions'] = true;
+        $result['form']['config']['page_actions'] = [
+            'default' => ['mobile_group' => 'actions'],
+            ['name' => 'actions', 'label' => 'Actions'],
+            ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
+            ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'product.id'],
+            ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
+            ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
+        ];
 
         $result['form']['config']['tabs'] = '/catalog/products/form';
         $result['form']['config']['default_field'] = ['model' => 'product'];

@@ -106,7 +106,7 @@
 /catalog/products/form:
     - view: app
         do:
-            - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10, component: default } ]
             - [ addFormTab, { path: /catalog/products/form, name: prices, label: Prices, pos: 20 } ]
             - [ addFormTab, { path: /catalog/products/form, name: categories, label: Categories, pos: 30 } ]
             - [ addFormTab, { path: /catalog/products/form, name: inventory, label: Inventory & Shipping, pos: 40 } ]

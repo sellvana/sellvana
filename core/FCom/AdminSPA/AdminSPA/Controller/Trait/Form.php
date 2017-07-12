@@ -79,7 +79,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                     'default' => ['mobile_group' => 'actions'],
                     ['name' => 'actions', 'label' => 'Actions'],
                     ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
-                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'product.id'],
+                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'model.id'],
                     ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
                     ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
                 ];
