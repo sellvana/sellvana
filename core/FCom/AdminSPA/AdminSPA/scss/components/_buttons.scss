@@ -1,5 +1,5 @@
 .f-buttons-block {
-      padding: 5px 0 6px;
+      /*padding: 5px 0 6px;*/
       .f-dropdown {
             display: inline-block;
       }
@@ -577,5 +577,11 @@
       .f-action-button-b__menu {
             left: 0;
       }
-
+      .f-buttons-block {
+            padding: 5px 0 6px;
+            .button {
+                  margin-left: 0;
+                  margin-right: 6px;
+            }
+      }
 }

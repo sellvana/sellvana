@@ -9,7 +9,9 @@
                               </select2>
                         </div>
                         <div class="col-md-9">
-                             <button class="button button1">Create  New Fieldset</button>
+                              <div class="f-buttons-block">
+                                    <button class="button button1">Create New Fieldset</button>
+                              </div>
                         </div>
                   </div>
                   <div class="line"></div>
@@ -22,8 +24,8 @@
                                           <option>Size</option>
                                     </select2>
                                     <button class="button button1 f-options__control-elem">Create Field</button>
-                                    <a href="#" title="close" class="f-options__control-elem"><i class="fa fa-times"></i></a>
-                                    <a href="#" title="ok" class="f-options__control-elem"><i class="fa fa-check" aria-hidden="true"></i></a>
+                                    <a href="#" title="close" class="f-options__control-elem f-delete"><i class="fa fa-times"></i></a>
+                                    <a href="#" title="ok" class="f-options__control-elem f-collapse"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
                               </div>
                         </div>
                         <div class="f-options-content">
@@ -41,7 +43,7 @@
                               </div>
                         </div>
                   </div>
-                  <div class="f-options">
+                  <div class="f-options f-options--collapsed" :class="{'f-options--collapsed':ddOpen('collapse-block1')}">
                         <div class="f-options-title">
                               <p class="f-options-title__text">Default</p>
                               <div class="f-options__control">
@@ -50,8 +52,8 @@
                                           <option>Size</option>
                                     </select2>
                                     <button class="button button1 f-options__control-elem">Create Field</button>
-                                    <a href="#" title="close" class="f-options__control-elem"><i class="fa fa-times"></i></a>
-                                    <a href="#" title="ok" class="f-options__control-elem"><i class="fa fa-check" aria-hidden="true"></i></a>
+                                    <a href="#" title="close" class="f-options__control-elem f-delete"><i class="fa fa-times"></i></a>
+                                    <a href="#" title="ok" class="f-options__control-elem f-collapse" @click.prevent.stop="ddToggle('collapse-block')"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
                               </div>
                         </div>
                         <div class="f-options-content">
@@ -72,18 +74,18 @@
             </div>
       </div>
       <div class="col-md-12 col-lg-6">
-            <div class="f-content-block">
+            <div class="f-content-block f-option-modal">
                   <div class="f-block-title">
                         <p class="f-block-title__text">Create Field</p>
                         <button draggable="false" class="f-delete"><i class="fa fa-times"></i></button>
                   </div>
                   <fieldset class="f-form-container">
                         <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">Field Code</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
-                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">Field Name</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
-                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">Frontend Label</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
-                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">Sort order</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
-                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">DB Type</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
-                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">Input Type</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
+                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id2">Field Name</label> <div class="col-md-9"> <input type="text" class="f-input" id="id2"> </div> </div>
+                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id3">Frontend Label</label> <div class="col-md-9"> <input type="text" class="f-input" id="id3"> </div> </div>
+                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id4">Sort order</label> <div class="col-md-9"> <input type="text" class="f-input" id="id4"> </div> </div>
+                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id5">DB Type</label> <div class="col-md-9"> <input type="text" class="f-input" id="id5"> </div> </div>
+                        <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id6">Input Type</label> <div class="col-md-9"> <input type="text" class="f-input" id="id6"> </div> </div>
                         <div class="f-form-group row required"><label class="col-md-3  f-form-label"> <span>{{'Multi Language'|_}}</span></label>
                               <div class="col-md-9">
                                     <checkbox></checkbox>

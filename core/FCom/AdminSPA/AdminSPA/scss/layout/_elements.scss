@@ -72,7 +72,6 @@ a:focus {
 
 
 /*Options block with another title*/
-
 .f-options-title {
 	background: #d2caca;
 	padding: 13px 10px;
@@ -92,11 +91,21 @@ a:focus {
 	.select2-container {
 		width: 100px !important;
 	}
-	a {
+	.f-delete, .f-collapse {
 		padding: 10px;
-		color: #fff;
+		i {
+			color: #fff;
+		}
 		&:hover {
-			color: #000;
+			i {
+				color: #000;
+			}
+		}
+	}
+	.f-collapse {
+		padding: 9px 10px;
+		i {
+			font-size: 18px;
 		}
 	}
 }
@@ -116,6 +125,10 @@ a:focus {
 		width: 110px;
 		margin: 10px 0;
 	}
+}
+.f-options--collapsed {
+	height: 42px;
+	overflow: hidden;
 }
 .no-padding {
 	padding: 0;
@@ -165,6 +178,7 @@ a:focus {
 .f-prices-params {
 	&.param-block {
 		margin: 15px 0;
+		white-space: nowrap;
 	}
 }
 .param-block {
@@ -452,7 +466,7 @@ a:focus {
 }*/
 
 @media (max-width: 1365px) {
-	.f-multilanguage-block {
+	.f-option-modal {
 		padding: 10px;
 		position: fixed;
 		top: 10px;
@@ -489,15 +503,43 @@ a:focus {
 			font-size: 14px;
 		}
 	}
-	.f-multilanguage-block {
-		width: 100%;
-		max-width: 300px;
+
+	.f-option-modal {
+		width: 90%;
+		min-width: 300px;
+		max-height: 80vh;
+		.f-form-container {
+			padding: 10px 0;
+			max-height: 368px;
+			overflow: auto;
+		}
 	}
 	.f-grid-wrapper {
 		padding: 0;
 	}
 	.f-grid-title__text {
 		padding: 10px 0;
+	}
+	.f-options__control {
+		position: static;
+		right: 0;
+		top: 0;
+		.select2-container {
+			width: 50% !important;
+		}
+		.f-delete, .f-collapse {
+			position: absolute;
+			top: 0;
+		}
+		.f-delete {
+			right: 33px;
+		}
+		.f-collapse {
+			right: 0;
+		}
+	}
+	.f-options-title__text {
+		margin-bottom: 13px;
 	}
 }
 
