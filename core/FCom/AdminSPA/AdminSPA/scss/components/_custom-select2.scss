@@ -1,6 +1,11 @@
 .select2-container {
      width: 100% !important;
 }
+body {
+      & > .select2-container {
+            width: auto !important;
+      }
+}
 .select2-container--open {
       z-index: 999999;
 }

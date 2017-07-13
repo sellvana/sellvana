@@ -2,6 +2,7 @@
 	margin: 0;
 	padding: 0;
 	white-space: nowrap;
+	border-radius: 5px;
 	.f-horizontal-menu__dropdown-menu {
 		display: none;
 		padding: 0;
@@ -45,30 +46,55 @@
 .f-horizontal-menu__link {
 	color: #2e4354;
 	padding: 8px 20px 8px 20px;
-	border-radius: 5px 5px 0 0;
-	border: solid 1px #d9d9d9;
+	border-top: solid 1px #d9d9d9;
+	border-bottom: solid 1px #d9d9d9;
 	text-align: center;
 	font-weight: bold;
 	font-size: 13px;
 	display: block;
 	background: #f1f1f1;
+	position: relative;
 	&:hover, &:focus {
 		background: #fff;
 		color: #000;
 	}
+	&:after {
+		content: '';
+		width: 1px;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		right: -1px;
+		display: block;
+		background: #d9d9d9;
+	}
+
 }
 .f-horizontal-menu__item {
 	display: inline-block;
 	vertical-align: bottom;
 	margin-right: 1px;
 	position: relative;
+	&:last-of-type {
+		.f-horizontal-menu__link {
+			border-radius: 0 5px 5px 0;
+			border-right: solid 1px #d9d9d9;
+			&:after {
+				display: none;
+			}
+		}
+	}
+	&:first-of-type {
+		.f-horizontal-menu__link {
+			border-radius: 5px 0 0 5px;
+			border-left: solid 1px #d9d9d9;
+		}
+	}
 	&.active {
 		background: #eee;
 		.f-horizontal-menu__link {
 			background: #fff;
 			font-weight: bold;
-			padding: 10px 21px 9px 21px;
-			border: 0;
 		}
 		.f-horizontal-menu__dropdown {
 			display: block;
@@ -107,12 +133,16 @@
 .f-tabs-container {
 	position: relative;
 	width: 100%;
-	height: 35px; // hide the scroll bar
+	height: 43px; // hide the scroll bar
 	overflow: hidden;
 	white-space: nowrap;
+	padding: 0px 0;
+
+
+
 	.f-horizontal-menu {
 		position: relative;
-		height: 41px; // hide the scroll bar
+		height: 49px; // hide the scroll bar
 		overflow-y: hidden;
 		overflow-x: auto;
 		-webkit-overflow-scrolling: touch;
@@ -125,7 +155,7 @@
 .paddle {
 	background: linear-gradient(to left, #f1f1f1, rgba(248,247,238,0));
 	position: absolute;
-	bottom: 0;
+	bottom: 9px;
 	height: 34px;
 	width: 3em;
 	border: 0;

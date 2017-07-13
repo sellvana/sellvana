@@ -86,7 +86,7 @@ a:focus {
 .f-options__control {
 	position: absolute;
 	right: 0;
-	top: 4px;
+	top: 2px;
 	white-space: nowrap;
 	.select2-container {
 		width: 100px !important;
@@ -114,21 +114,14 @@ a:focus {
 	vertical-align: middle;
 }
 .f-options-content {
-	padding: 20px;
-	text-align: center;
-	.f-tags {
-		display: inline-block;
-		width: 150px;
-	}
-	.f-tags__tag {
-		display: inline-block;
-		width: 110px;
-		margin: 10px 0;
-	}
+	padding: 20px 0;
 }
 .f-options--collapsed {
 	height: 42px;
 	overflow: hidden;
+}
+.f-tag-container {
+	margin: 10px 0;
 }
 .no-padding {
 	padding: 0;
@@ -464,7 +457,27 @@ a:focus {
 /*.ps__scrollbar-y-rail {
 	height: 100% !important;
 }*/
-
+.widget-content-modal {
+	padding: 10px;
+	position: fixed;
+	top: 10px;
+	width: 80%;
+	max-width: 600px;
+	margin: 0 auto;
+	z-index: 100;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #fff;
+	border-radius: 5px;
+}
+.widget-img-thumb {
+	display: inline-block;
+	vertical-align: top;
+	max-width: 100px;
+	margin-right: 10px;
+	height: 50px;
+	width: 100px;
+}
 @media (max-width: 1365px) {
 	.f-option-modal {
 		padding: 10px;
@@ -541,6 +554,11 @@ a:focus {
 	.f-options-title__text {
 		margin-bottom: 13px;
 	}
+	.f-tag-container {
+		.f-tags__tag {
+			margin: 0;
+		}
+	}
 }
 
 @media (max-width: 767px) and (orientation: landscape) {
@@ -571,4 +589,5 @@ a:focus {
 		max-height: 200px;
 		overflow: auto;
 	}
+
 }

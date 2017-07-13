@@ -414,12 +414,12 @@
 .f-tags__tag-content {
       display: inline-block;
       vertical-align: middle;
-      padding: 9px 20px 9px 10px;
+      padding: 0 20px 0 0;
       background: #e3e3e3;
       border-radius: 5px;
       color: #2e4354;
       min-width: 80px;
-      width: calc(100% - 26px);
+      position: relative;
 }
 
 .f-tags__drop {
