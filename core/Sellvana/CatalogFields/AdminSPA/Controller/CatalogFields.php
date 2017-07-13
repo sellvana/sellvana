@@ -9,9 +9,14 @@
 class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
     extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
+
+    static protected $_modelClass = 'FCom_Core_Model_Field';
+    static protected $_modelName = 'field';
+    static protected $_recordName = 'Field';
+
     public function getGridConfig()
     {
-        $fld = $this->FCom_Core_Model_Field;
+        $fld = $this->{static::$_modelClass};
 
         $yesNoOpts = ['0' => 'No', '1' => 'Yes'];
 
@@ -76,7 +81,7 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
     public function getFormData()
     {
         $pId = $this->BRequest->get('id');
-        $bool = [0 => 'no', 1 => 'Yes'];
+        $bool = [['id' => 0, 'text' => 'no'], ['id' => 1, 'text' => 'Yes']];
 
         $field = $this->FCom_Core_Model_Field->load($pId);
         if (!$field) {
@@ -85,28 +90,49 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 
         $result = [];
 
-        $result['form']['field'] = $field->as_array();
+        $result['form'][static::$_modelName] = $field->as_array();
 
-		$result['form']['config']['actions'] = true;
+		$result['form']['config']['page_actions'] = true;
 		$result['form']['config']['title'] = $field->get('field_name');
 
 		$result['form']['config']['tabs'] = '/catalog/fields/form';
-		$result['form']['config']['default_field'] = ['model' => 'field', 'tab' => 'main'];
-		$result['form']['config']['fields'] = [
+		$result['form']['config']['default_field'] = ['model' => 'field', 'tab' => 'info'];
+		$result['form']['config']['fields'] = [ // still need to figure out what are the possible options for fields
 			[ 'required' => true, 'name' => 'field_code', 'label' => 'Field Code'],
 			[ 'required' => true, 'name' => 'field_name', 'label' => 'Field Name'],
 			[ 'required' => true, 'name' => 'frontend_label', 'label' => 'Frontend label'],
 			[ 'required' => true, 'name' => 'frontend_show', 'label' => 'Show on frontend', 'type' => 'checkbox'],
 			[ 'required' => true, 'name' => 'sort_order', 'label' => 'Sort order'],
-			[ 'required' => true, 'name' => 'table_field_type', 'label' => 'DB Type'],
-			[ 'required' => true, 'name' => 'admin_input_type', 'label' => 'Input Type'],
-			[ 'required' => true, 'name' => 'multilanguage', 'label' => 'Multi Language'],
-			[ 'required' => true, 'name' => 'swatch_type', 'label' => 'Swatch type'],
-			[ 'required' => true, 'name' => 'required', 'label' => 'Required'],
+			[ 'required' => true, 'name' => 'table_field_type', 'label' => 'DB Type', 'options' => [
+                ['id' => 'varchar', 'text' => 'Short Text'],
+                ['id' => 'text', 'text' => 'Long Text'],
+                ['id' => 'options', 'text' => 'Options'],
+                ['id' => 'int', 'text' => 'Integer'],
+                ['id' => 'tinyint', 'text' => 'Tiny Integer'],
+                ['id' => 'decimal', 'text' => 'Decimal'],
+                ['id' => 'date', 'text' => 'Date'],
+                ['id' => 'datetime', 'text' => 'Date/Time'],
+                ['id' => 'serialized', 'text' => 'Serialized'],
+            ]],
+			[ 'required' => true, 'name' => 'admin_input_type', 'label' => 'Input Type', 'options' => [
+                ['id' => 'text', 'text' => 'Text Line'],
+                ['id' => 'textarea', 'text' => 'Text Area'],
+                ['id' => 'select', 'text' => 'Drop down'],
+                ['id' => 'multiselect', 'text' => 'Multiple Select'],
+                ['id' => 'boolean', 'text' => 'Yes/No'],
+                ['id' => 'wysiwyg', 'text' => 'WYSIWYG editor'],
+            ]],
+			[ 'required' => true, 'name' => 'multilanguage', 'label' => 'Multi Language', 'type' => 'checkbox'],
+			[ 'required' => true, 'name' => 'swatch_type', 'label' => 'Swatch type', 'options' => [
+			    ['id'=> 'N', 'text' => 'None'],
+			    ['id'=> 'C', 'text' => 'Color'],
+			    ['id'=> 'I', 'text' => 'Image'],
+            ]],
+			[ 'required' => true, 'name' => 'required', 'label' => 'Required', 'type' => 'checkbox'],
 		];
 
 //		$result['form']['i18n'] = $this->getModelTranslations('field', $field->id());
-
+//
         return $result;
     }
 
