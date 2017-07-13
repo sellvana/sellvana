@@ -87,17 +87,25 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
 
         $result['form']['field'] = $field->as_array();
 
-        $result['form']['config']['page_actions'] = true;
-        $result['form']['config']['title'] = $field->get('field_name');
+		$result['form']['config']['actions'] = true;
+		$result['form']['config']['title'] = $field->get('field_name');
 
-        $result['form']['config']['tabs'] = '/catalog/fields/form';
-        $result['form']['config']['default_field'] = ['model' => 'field', 'tab' => 'main'];
-        $result['form']['config']['fields'] = [
-            ['name' => 'field_code', 'label' => 'Field Code'],
-            ['name' => 'field_name', 'label' => 'Field Name'],
-        ];
+		$result['form']['config']['tabs'] = '/catalog/fields/form';
+		$result['form']['config']['default_field'] = ['model' => 'field', 'tab' => 'main'];
+		$result['form']['config']['fields'] = [
+			[ 'required' => true, 'name' => 'field_code', 'label' => 'Field Code'],
+			[ 'required' => true, 'name' => 'field_name', 'label' => 'Field Name'],
+			[ 'required' => true, 'name' => 'frontend_label', 'label' => 'Frontend label'],
+			[ 'required' => true, 'name' => 'frontend_show', 'label' => 'Show on frontend', 'type' => 'checkbox'],
+			[ 'required' => true, 'name' => 'sort_order', 'label' => 'Sort order'],
+			[ 'required' => true, 'name' => 'table_field_type', 'label' => 'DB Type'],
+			[ 'required' => true, 'name' => 'admin_input_type', 'label' => 'Input Type'],
+			[ 'required' => true, 'name' => 'multilanguage', 'label' => 'Multi Language'],
+			[ 'required' => true, 'name' => 'swatch_type', 'label' => 'Swatch type'],
+			[ 'required' => true, 'name' => 'required', 'label' => 'Required'],
+		];
 
-        $result['form']['i18n'] = 'field';
+//		$result['form']['i18n'] = $this->getModelTranslations('field', $field->id());
 
         return $result;
     }
@@ -121,8 +129,8 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
             $origModelData = $modelData = $model->as_array();
             $validated = $model->validate($modelData, [], 'product');
             //if ($modelData !== $origModelData) {
-            //    var_dump($modelData);
-            //    $model->set($modelData);
+                //var_dump($modelData);
+                //$model->set($modelData);
             //}
 
 
