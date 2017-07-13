@@ -32,7 +32,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 				}
 				this.sendRequest('POST', 'catalogfields/form_delete', {id: this.form.field.id}, function (response) {
 					if (response.status) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/catalog/fields');
 					}
 				});
 			},
@@ -56,7 +56,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 						//Vue.set(vm.form, 'updates', {});
 					}
                     if (!stayOnPage) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/catalog/fields');
                     }
                     vm.action_in_progress = false;
 				})

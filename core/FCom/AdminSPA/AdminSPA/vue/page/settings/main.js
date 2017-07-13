@@ -58,7 +58,7 @@ define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings
             },
             switchTab: function (tab) {
                 this.curTab = tab;
-                document.location.assign('#/settings' + tab.path);
+                this.$router.push('/settings' + tab.path);
                 this.updateBreadcrumbs(tab.label, tab.path);
                 // this.$store.commit('setData', {curPage: {
                 //     label: tab.label,

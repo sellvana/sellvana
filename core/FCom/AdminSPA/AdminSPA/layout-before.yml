@@ -201,12 +201,14 @@
             - [ requireJs, sv-page-account-logout-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/account/logout.html" ]
 
             - [ requireJs, sv-page-users, "@FCom_AdminSPA/AdminSPA/vue/page/users/index" ]
-            - [ requireJs, sv-page-users-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/index.html" ]
             - [ requireJs, sv-page-users-grid-config, "~/users/grid_config" ]
             - [ requireJs, sv-page-users-form, "@FCom_AdminSPA/AdminSPA/vue/page/users/form" ]
-            - [ requireJs, sv-page-users-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form.html" ]
-            - [ requireJs, sv-page-users-form-main, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main" ]
-            - [ requireJs, sv-page-users-form-main-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main.html" ]
+#            - [ requireJs, sv-page-users-form-main, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main" ]
+#            - [ requireJs, sv-page-users-form-main-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/users/form/main.html" ]
+
+            - [ requireJs, sv-page-roles, "@FCom_AdminSPA/AdminSPA/vue/page/roles/index" ]
+            - [ requireJs, sv-page-roles-grid-config, "~/roles/grid_config" ]
+            - [ requireJs, sv-page-roles-form, "@FCom_AdminSPA/AdminSPA/vue/page/roles/form" ]
 
             - [ requireJs, sv-page-modules, "@FCom_AdminSPA/AdminSPA/vue/page/modules/index" ]
             - [ requireJs, sv-page-modules-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/modules/index.html" ]
@@ -237,9 +239,9 @@
             - [ addNav, { label: System, path: /system, icon: "icon-settings", pos: 100 }]
             - [ addNav, { label: Users, path: /system/users, link: /users, pos: 10 }]
             - [ addNav, { label: Roles & Permissions, path: /system/roles, link: /roles, pos: 20 }]
-            - [ addNav, { label: Global Import / Export, path: /system/import-export, link: /import-export, pos: 30 }]
+#            - [ addNav, { label: Global Import / Export, path: /system/import-export, link: /import-export, pos: 30 }]
             - [ addNav, { label: Settings, path: /system/settings, link: /settings, pos: 100 }]
-            - [ addNav, { label: Media Library, path: /system/media-library, link: /media-library, pos: 110 }]
+#            - [ addNav, { label: Media Library, path: /system/media-library, link: /media-library, pos: 110 }]
 
             - [ addRoute, { path: /, require: [sv-page-dashboard, text!sv-page-dashboard-tpl ]}]
             - [ addRoute, { path: /not-found, require: [sv-page-not-found, text!sv-page-not-found-tpl ]}]
@@ -253,8 +255,11 @@
 
             - [ addRoute, { path: /modules, require: [sv-page-modules, text!sv-page-default-grid-tpl, json!sv-page-modules-grid-config ]}]
 
-            - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-users-tpl, json!sv-page-users-grid-config ]}]
-            - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-users-form-tpl ]}]
+            - [ addRoute, { path: /users, require: [sv-page-users, text!sv-page-default-grid-tpl, json!sv-page-users-grid-config ]}]
+            - [ addRoute, { path: /users/form, require: [sv-page-users-form, text!sv-page-default-form-tpl ]}]
+
+            - [ addRoute, { path: /roles, require: [sv-page-roles, text!sv-page-default-grid-tpl, json!sv-page-roles-grid-config ]}]
+            - [ addRoute, { path: /roles/form, require: [sv-page-roles-form, text!sv-page-default-form-tpl ]}]
 
 
 sv-app-setings-config:
@@ -304,4 +309,9 @@ sv-page-dashboard-config:
 /users/form:
     - view: app
         do:
-            - [ addFormTab, { path: /users/form, name: main, label: User Info, pos: 10 } ]
+            - [ addFormTab, { path: /users/form, name: main, label: "User Information", pos: 10, component: default } ]
+
+/roles/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /roles/form, name: main, label: "Role & Permissions", pos: 10, component: default } ]

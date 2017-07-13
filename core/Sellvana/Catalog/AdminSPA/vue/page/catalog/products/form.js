@@ -2,14 +2,6 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 
 	return {
 		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
-		data: function () {
-			return {
-				product: {},
-				product_old: {},
-				inventory: {},
-				inventory_old: {}
-			}
-		},
 		methods: {
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {
@@ -35,7 +27,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 				}
 				this.sendRequest('POST', 'products/form_delete', {id: this.form.product.id}, function (response) {
 					if (response.status) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/catalog/products');
 					}
 				});
 			},
@@ -59,7 +51,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 						//Vue.set(vm.form, 'updates', {});
 					}
                     if (!stayOnPage) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/catalog/products');
                     }
                     vm.action_in_progress = false;
 				})
