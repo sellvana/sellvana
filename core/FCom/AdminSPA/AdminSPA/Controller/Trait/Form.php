@@ -45,6 +45,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         }
         
         if (!empty($form['config']['fields'])) {
+            $models = [];
             $def = !empty($form['config']['default_field']) ? $form['config']['default_field'] : [];
             $def = array_merge(static::$_defaultFieldConfig, $def);
             foreach ($form['config']['fields'] as &$field) {
@@ -58,24 +59,39 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                         $field['options'] = $this->BUtil->arrayMapToSeq($field['options']);
                     }
                 }
+                if (!empty($field['model'])) {
+                    $models[$field['model']] = $field['model'];
+                }
             }
             unset($field);
+            if ($models) {
+                foreach ($models as $model) {
+                    if (empty($form[$model])) {
+                        $form[$model] = new stdClass;
+                    }
+                }
+            }
         }
 
-        if (!empty($form['config']['actions'])) {
-            if (true === $form['config']['actions']) {
-                $form['config']['actions'] = [
+        if (!empty($form['config']['page_actions'])) {
+            if (true === $form['config']['page_actions']) {
+                $form['config']['page_actions'] = [
+                    'default' => ['mobile_group' => 'actions'],
                     ['name' => 'actions', 'label' => 'Actions'],
                     ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
-                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'product.id'],
+                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'model.id'],
                     ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
                     ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
                 ];
             }
             $actionGroups = [];
-            $def = !empty($form['config']['default_action']) ? $form['config']['default_action'] : [];
-            $def = array_merge(static::$_defaultFormActionConfig, $def);
-            foreach ($form['config']['actions'] as &$act) {
+            if (!empty($form['config']['page_actions']['default'])) {
+                $def = array_merge(static::$_defaultFormActionConfig, $form['config']['page_actions']['default']);
+                unset($form['config']['page_actions']['default']);
+            } else {
+                $def = static::$_defaultFormActionConfig;
+            }
+            foreach ($form['config']['page_actions'] as &$act) {
                 $act = array_merge($def, $act);
                 if (!empty($act['if'])) {
                     $ifResult = $this->BUtil->arrayGet($form, $act['if']);
@@ -96,10 +112,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
             unset($act);
             if (!empty($actionGroups['desktop_group'])) {
-                $form['config']['action_desktop_groups'] = array_values($actionGroups['desktop_group']);
+                $form['config']['page_actions_groups']['desktop'] = array_values($actionGroups['desktop_group']);
             }
             if (!empty($actionGroups['mobile_group'])) {
-                $form['config']['action_mobile_groups'] = array_values($actionGroups['mobile_group']);
+                $form['config']['page_actions_groups']['mobile'] = array_values($actionGroups['mobile_group']);
             }
         }
 

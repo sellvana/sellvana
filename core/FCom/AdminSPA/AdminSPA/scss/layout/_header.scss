@@ -455,7 +455,7 @@ body {
       }
       .f-header__navbar-toggle {
             margin: 0;
-            padding: 13px 15px;
+            padding: 15px 15px 14px;
       }
       .f-header__navbar__item {
             border-left: solid 1px rgba(255, 255, 255, 0.14);
@@ -465,7 +465,7 @@ body {
       }
       .f-header__navbar__link {
             font-size: 12px;
-            padding: 16px 15px 15px;
+            padding: 17px 15px 17px;
             border-left: solid 1px rgba(255, 255, 255, 0.14);
             width: 100%;
             text-align: center;
@@ -513,7 +513,7 @@ body {
                         margin: 0 auto;
                         position: absolute;
                         left: 1px;
-                        bottom: 0px;
+                        bottom: 0;
                         height: 3px;
                         border-radius: 0;
                   }

@@ -16,6 +16,55 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
     public function getGridConfig()
     {
         $bool = [0 => 'no', 1 => 'Yes'];
+        $countries = $this->BLocale->getAvailableCountries();
+
+        $editPopupConfig = [
+            'title' => 'Bulk Update Selected Products',
+            'form' => $this->normalizeFormConfig([
+                'config' => [
+                    'default_field' => ['tab' => 'main', 'model' => 'product'],
+                    'fields' => [
+                        ['name' => 'product_name', 'label' => 'Product Name'],
+                        ['name' => 'short_description', 'label' => 'Short Description', 'type' => 'textarea'],
+                        ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
+                        ['name' => 'is_hidden', 'label' => 'Hidden?', 'type' => 'checkbox'],
+                        ['name' => 'is_featured', 'label' => 'Featured?', 'type' => 'checkbox'],
+                        ['name' => 'is_popular', 'label' => 'Popular?', 'type' => 'checkbox'],
+                        ['name' => 'manage_inventory', 'label' => 'Manage Inventory?', 'type' => 'checkbox'],
+                        ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'type' => 'checkbox'],
+                        ['name' => 'unit_cost', 'label' => 'Unit Cost', 'model' => 'inventory'],
+                        ['name' => 'net_weight', 'label' => 'Net Weight', 'model' => 'inventory'],
+                        ['name' => 'shipping_weight', 'label' => 'Shipping Weight', 'model' => 'inventory'],
+                        ['name' => 'shipping_size', 'label' => 'Shipping Size', 'model' => 'inventory'],
+                        ['name' => 'pack_separate', 'label' => 'Pack Separate?', 'model' => 'inventory', 'type' => 'checkbox'],
+                        ['name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'model' => 'inventory'],
+                        ['name' => 'qty_warn_customer', 'label' => 'Qty To Warn Customer', 'model' => 'inventory'],
+                        ['name' => 'qty_notify_admin', 'label' => 'Qty To Notify Admin', 'model' => 'inventory'],
+                        ['name' => 'qty_cart_min', 'label' => 'Minimum Qty In Cart', 'model' => 'inventory'],
+                        ['name' => 'qty_cart_max', 'label' => 'Maximum Qty In Cart', 'model' => 'inventory'],
+                        ['name' => 'qty_cart_inc', 'label' => 'Qty Increment', 'model' => 'inventory'],
+                        ['name' => 'qty_buffer', 'label' => 'Qty Increment', 'model' => 'inventory'],
+                        ['name' => 'qty_reserved', 'label' => 'Qty Increment', 'model' => 'inventory'],
+                        ['name' => 'allow_backorder', 'label' => 'Allow Backorder', 'model' => 'inventory', 'type' => 'checkbox'],
+                        ['name' => 'hs_tariff_number', 'label' => 'HS Tariff Number', 'model' => 'inventory'],
+                        ['name' => 'origin_country', 'label' => 'Origin Country', 'model' => 'inventory', 'type' => 'select2', 'options' => $countries],
+                    ],
+                ],
+            ]),
+            'actions' => [
+                ['name' => 'cancel', 'label' => 'Cancel', 'class' => 'button2'],
+                ['name' => 'bulk_update', 'label' => 'Update Selected Products', 'class' => 'button1'],
+            ],
+        ];
+
+        $deletePopupConfig = [
+            'title' => 'Are you sure you want to delete selected products?',
+            'actions' => [
+                ['name' => 'cancel', 'label' => 'Cancel', 'class' => 'button2'],
+                ['name' => 'bulk_delete', 'label' => 'Delete Selected Products', 'class' => 'button4'],
+            ],
+        ];
+
         return [
             'id' => 'products',
             'title' => 'Products',
@@ -54,9 +103,10 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             'export' => true,
             'pager' => true,
             'bulk_actions' => [
-                ['name' => 'custom_state', 'label' => 'Change Custom State'],
+                ['name' => 'edit_products', 'label' => 'Edit Products', 'popup' => $editPopupConfig],
+                ['name' => 'delete_products', 'label' => 'Delete Products', 'popup' => $deletePopupConfig],
             ],
-            'actions' => [
+            'page_actions' => [
                 ['name' => 'new', 'label' => 'Add New Product', 'button_class' => 'button1', 'link' => '/catalog/products/form', 'group' => 'new'],
             ],
         ];
@@ -79,9 +129,44 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         return parent::processGridPageData($data);
     }
 
-    public function action_grid_delete__POST()
+    public function action_grid_data__POST()
     {
+        try {
+            $result = [];
+            $post = $this->BRequest->post();
+            if (empty($post['do']) || empty($post['ids'])) {
+                throw new BException('Invalid request');
+            }
+            $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $post['ids']);
+            switch ($post['do']) {
+                case 'bulk_update':
+                    if (empty($post['data'])) {
+                        throw new BException('Invalid request: missing data');
+                    }
+                    if (!empty($post['data']['product'])) {
+                        $data = $this->getBulkUpdateData('edit_products', 'product', $post);
+                        $orm->iterate(function ($r) use ($data) { $r->set($data)->save(); });
+                    }
+                    if (!empty($post['data']['inventory'])) {
+                        $invSkus = $orm->find_many_assoc('inventory_sku', 'inventory_sku');
+                        $invOrm = $this->Sellvana_Catalog_Model_InventorySku->orm('i')
+                            ->where_in('inventory_sku', array_values($invSkus));
+                        $data = $this->getBulkUpdateData('edit_products', 'inventory', $post);
+                        $invOrm->iterate(function ($r) use ($data) { $r->set($data)->save(); });
+                    }
+                    $this->addMessage('Products have been updated successfully.', 'success');
+                    break;
 
+                case 'bulk_delete':
+                    $orm->iterate(function ($r) { $r->delete(); });
+                    $this->addMessage('Products have been deleted successfully.', 'success');
+                    break;
+            }
+            $this->ok();
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+        $this->respond(['result' => $result]);
     }
 
     public function getFormData()
@@ -99,8 +184,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
         $result = [];
 
-            $result['form']['product'] = $product->as_array();
-            $result['form']['config']['title'] = $product->get('product_name');
+        $result['form']['product'] = $product->as_array();
+        $result['form']['config']['title'] = $product->get('product_name');
         $result['form']['config']['thumb_url'] = $product->thumbUrl(100);
 
         $invModel = $product->getInventoryModel();
@@ -134,7 +219,14 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             }
         }
 
-        $result['form']['config']['actions'] = true;
+        $result['form']['config']['page_actions'] = [
+            'default' => ['mobile_group' => 'actions'],
+            ['name' => 'actions', 'label' => 'Actions'],
+            ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
+            ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'product.id'],
+            ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
+            ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
+        ];
 
         $result['form']['config']['tabs'] = '/catalog/products/form';
         $result['form']['config']['default_field'] = ['model' => 'product'];

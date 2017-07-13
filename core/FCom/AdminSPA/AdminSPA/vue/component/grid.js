@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable',
+define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
         'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
         'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-cell-row-select-tpl',
@@ -7,7 +7,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvHlp, $, _, VueDraggable,
+    function(Vue, SvHlp, $, _, VueDraggable, SvCompPopup,
              SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
              SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
              gridTpl, gridHeaderCellRowSelectTpl,
@@ -579,7 +579,19 @@ console.log(filters, result);
                     this.fetchData();
                 },
                 bulkAction: function (act) {
+                    if (!Object.keys(this.grid.rows_selected).length) {
+                        alert(SvHlp._('Please select some rows first'));
+                        return;
+                    }
                     console.log(act);
+                    if (act.popup) {
+                        Vue.set(this.grid, 'popup', act.popup);
+                        // this.grid.popup.grid = this.grid;
+                        // this.grid.popup.open = true;
+                    }
+                },
+                processPopupEvent: function (type, args) {
+                    this.$emit('event', type, args);
                 },
                 updateConfig: function (config) {
                     Vue.set(this.grid, 'config', config);
@@ -598,7 +610,15 @@ console.log(filters, result);
                 'sv-comp-grid-pager-select': SvCompGridPagerSelect,
 				'sv-comp-grid-pager-dropdown': SvCompGridPagerDropdown
             },
-            template: gridTpl
+            template: gridTpl,
+            watch: {
+                'grid.fetch_data_flag': function (flag) {
+                    if (flag) {
+                        this.fetchData();
+                        this.grid.fetch_data_flag = false;
+                    }
+                }
+            }
         };
 
         Vue.component('sv-comp-grid', SvCompGrid);

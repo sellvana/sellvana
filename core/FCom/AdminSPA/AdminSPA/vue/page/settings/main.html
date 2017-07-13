@@ -23,25 +23,27 @@
                                     <!--<i class="fa fa-caret-down f-horizontal-menu__icon" aria-hidden="true"></i>-->
                               </a>
                               <ul class="f-horizontal-menu__dropdown-menu">
-                                    <li v-for="l2 in l1.children"><a href="#" @click.prevent="switchTab(l2)" class="f-horizontal-menu__link">{{l2.label}}</a>
+                                    <li v-for="l2 in l1.children">
+                                          <a href="#" @click.prevent="switchTab(l2)" class="f-horizontal-menu__link">{{l2.label}}</a>
                                     </li>
                               </ul>
                         </li>
                   </ul>
             </div>
-            <div class="f-control-panel__elem">
-                  <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+            <div class="f-control-panel__elem f-mobile-button hidden-md hidden-lg">
+                  <div class="f-buttons-block text-center ">
                         <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
-                              <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
-                                    menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                              <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">{{'Tabs menu'|_}}<span class="f-caret"><b class="f-caret__elem"></b></span></a>
                               <ul class="f-action-button-b__menu">
+                                    <li v-for="l1 in settings.config.nav">
 
+                                    </li>
                               </ul>
                         </div>
                   </div>
             </div>
-            <div class="f-control-panel__elem">
-                  <div class="f-buttons-block text-center f-mobile-button hidden-md hidden-lg">
+            <div class="f-control-panel__elem f-mobile-button hidden-md hidden-lg">
+                  <div class="f-buttons-block text-center ">
                         <div class="f-action-button-b" :class="{open:ddOpen('tabs-open')}">
                               <a href="#" data-toggle="dropdown" class="f-action-button-b__toggle" @click.prevent.stop="ddToggle('tabs-open')">Tabs
                                     menu<span class="f-caret"><b class="f-caret__elem"></b></span></a>
@@ -52,9 +54,13 @@
                   </div>
             </div>
             <div class="f-control-panel__elem hidden-sm hidden-xs">
-
-                        <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label" :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true" :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search" @input="searchSelect(arguments[0])"></v-multiselect>
-
+                  <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading"
+                                 label="label" :placeholder="'Search Settings...'|_" :clear-on-select="true"
+                                 :close-on-select="true" :options-limit="200" :limit="3" :limit-text="searchLimitText"
+                                 @search-change="search" @input="searchSelect(arguments[0])"></v-multiselect>
+                  <!--<select2 @input="searchSelect(arguments[0])">-->
+                        <!--<option v-for="o in search_options" :value="o">{{o.label}}</option>-->
+                  <!--</select2>-->
             </div>
       </div>
 

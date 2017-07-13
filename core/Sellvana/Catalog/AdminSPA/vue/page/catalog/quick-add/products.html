@@ -1,30 +1,26 @@
-<div>
+ <div>
       <div class="f-control-panel">
             <div class="f-control-panel__elem">
-                  <div class="f-action-button-b open"><a href="#" data-toggle="dropdown" class="f-action-button-b__toggle">Add Products<span class="f-caret"><b class="f-caret__elem"></b></span></a>
+                  <div class="f-action-button-b" :class="{open: ddOpen('quick-add/products/new/top')}">
+                        <a href="#" class="f-action-button-b__toggle" @click.prevent="ddToggle('quick-add/products/new/top')">
+                              {{'Add Products'|_}}
+                              <span class="f-caret"><b class="f-caret__elem"></b></span>
+                        </a>
                         <ul class="f-action-button-b__menu">
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">1</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">2</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">3</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">4</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">5</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">6</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">7</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">8</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">9</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">10</a></li>
-                              <li class="f-action-button-b__item"><a href="#" class="f-action-button-b__link">20</a></li>
+                              <li v-for="n in config.add_new_options" class="f-action-button-b__item">
+                                    <a href="#" class="f-action-button-b__link" @click.prevent="addNewProducts(n)">{{n}}</a>
+                              </li>
                         </ul>
                   </div>
             </div>
             <div class="f-control-panel__elem">
                   <div class="f-actions-container">
-                        <button type="button" class="button button1">{{"Create Products"|_}}</button>
+                        <button type="button" class="button button1" @click="createProducts">{{"Create Products"|_}}</button>
                   </div>
             </div>
       </div>
       <div class="f-content-block no-padding">
-            <div class="scrollable-area">
+            <div v-for="(p, pId) in products" class="scrollable-area">
                   <table class="f-add-prod-table">
                               <thead>
                                     <tr>
@@ -41,40 +37,39 @@
                                     <td>
                                           <fieldset class="f-form-container">
                                                 <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id1"><span>Action</span></label>
-                                                      <div class="col-md-8"><checkbox></checkbox></div>
+                                                      <label class="col-md-4 f-form-label text-left"><span>{{'Enabled?'|_}}</span></label>
+                                                      <div class="col-md-8"><checkbox v-model="p.enabled"></checkbox></div>
                                                 </div>
                                                 <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id1"><span>Product
-                                                           SKU</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id1"></div>
+                                                      <label class="col-md-12 f-form-label text-left"><span>{{'Product SKU'|_}}</span></label>
+                                                      <div class="col-md-12"><input type="text" class="f-input" v-model="p.product_sku"></div>
                                                 </div>
                                                 <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id2"><span>Product
-                                                           name</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id2"></div>
+                                                      <label class="col-md-12 f-form-label text-left"><span>{{'Product Name'|_}}</span></label>
+                                                      <div class="col-md-12"><input type="text" class="f-input" v-model="p.product_name"></div>
                                                 </div>
                                                 <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id3"><span>Short
-                                                           Description</span></label>
-                                                      <div class="col-md-12"><textarea type="text" class="f-textarea" id="id3"></textarea></div>
+                                                      <label class="col-md-12 f-form-label text-left"><span>{{'Short Description'|_}}</span></label>
+                                                      <div class="col-md-12"><textarea type="text" class="f-textarea" v-model="p.short_description"></textarea></div>
                                                 </div>
                                           </fieldset>
                                     </td>
                                     <td>
                                           <fieldset class="f-form-container">
                                                 <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id1"><span>Hidden?</span></label>
-                                                      <div class="col-md-8"><checkbox id="id5"></checkbox></div>
+                                                      <label class="col-md-4 f-form-label text-left"><span>{{'Hidden?'|_}}</span></label>
+                                                      <div class="col-md-8"><checkbox v-model="p.is_hidden"></checkbox></div>
                                                 </div>
                                                 <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id4"><span>Price</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id4"></div>
+                                                      <label class="col-md-12 f-form-label text-left"><span>{{'Price'|_}}</span></label>
+                                                      <div class="col-md-12"><input type="text" class="f-input" v-model="p.base_price"></div>
                                                 </div>
                                                 <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id6"><span>Categories</span></label>
+                                                      <label class="col-md-12 f-form-label text-left"><span>{{'Categories'|_}}</span></label>
                                                       <div class="col-md-12">
-                                                            <select2 type="text" class="f-input" id="id6"></select2>
+                                                            <select2 type="text" class="f-input" v-model="p.categories">
+                                                                  <option v-for="c in config.categories" :value="c.id">{{c.full_name}}</option>
+                                                            </select2>
                                                       </div>
                                                 </div>
                                           </fieldset>
@@ -82,228 +77,37 @@
                                     <td>
                                           <fieldset class="f-form-container">
                                                 <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id7"><span>Manage?</span></label>
+                                                      <label class="col-md-4 f-form-label text-left"><span>{{'Manage?'|_}}</span></label>
                                                       <div class="col-md-8">
-                                                            <checkbox id="id7"></checkbox>
+                                                            <checkbox v-model="p.manage_inventory"></checkbox>
                                                       </div>
                                                 </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id8">Inventory
-                                                      SKU</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id8"></div>
+                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left">{{'Inventory SKU'|_}}</label>
+                                                      <div class="col-md-12"><input type="text" class="f-input" v-model="p.inventory_sku"></div>
                                                 </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id9">Qty In
-                                                      Stock</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id9"></div>
+                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left">{{'Qty In Stock'|_}}</label>
+                                                      <div class="col-md-12"><input type="text" class="f-input" v-model="p.qty_in_stock"></div>
                                                 </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id10">Ship
-                                                      Weight</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id10"></div>
+                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left">{{'Ship Weight'|_}}</label>
+                                                      <div class="col-md-12"><input type="text" class="f-input" v-model="p.ship_weight"></div>
                                                 </div>
                                           </fieldset>
                                     </td>
                                     <td>
                                           <fieldset class="f-form-container">
                                                 <div class="f-form-group row">
-                                                      <ckeditor v-if="field_type === 'wysiwyg'" v-model="value_model" :id="field_id"></ckeditor>
+                                                      <ckeditor :id="'ckeditor-' + pId" v-model="p.description"></ckeditor>
                                                 </div>
                                           </fieldset>
                                     </td>
                                     <td>
-                                          <dropzone :id="id" :url="uploadUrl" :useCustomDropzoneOptions="true" :dropzoneOptions="dropzoneOptions" @vdropzone-success="showSuccess"></dropzone>
+                                          <dropzone :id="'upload-' + pId" v-model="p.images" :url="config.dropzone_upload_url + '?uuid=' + p.uuid"
+                                                    :use-custom-dropzone-options="true" :dropzone-options="config.dropzone_options"
+                                                    @vdropzone-sending="dropzoneSending" @vdropzone-success="dropzoneSuccess"></dropzone>
                                     </td>
                                     <td>
-                                          <a href="#" class="button button2">Copy</a>
-                                          <a href="#" class="button button2">Delete</a>
-                                    </td>
-                              </tr>
-                              </tbody>
-                        </table>
-            </div>
-            <div class="scrollable-area">
-                  <table class="f-add-prod-table">
-                              <thead>
-                              <tr>
-                                    <th>{{"Basic Info"|_}}</th>
-                                    <th>{{"More Info"|_}}</th>
-                                    <th>{{"Stock"|_}}</th>
-                                    <th>{{"Long Description"|_}}</th>
-                                    <th>{{"Images"|_}}</th>
-                                    <th>{{"Actions"|_}}</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              <tr class="f-add-block">
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id1"><span>Action</span></label>
-                                                      <div class="col-md-8"><checkbox></checkbox></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id1"><span>Product
-                                                           SKU</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id1"></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id2"><span>Product
-                                                           name</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id2"></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id3"><span>Short
-                                                           Description</span></label>
-                                                      <div class="col-md-12"><textarea type="text" class="f-textarea" id="id3"></textarea></div>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id1"><span>Hidden?</span></label>
-                                                      <div class="col-md-8"><checkbox id="id5"></checkbox></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id4"><span>Price</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id4"></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id6"><span>Categories</span></label>
-                                                      <div class="col-md-12">
-                                                            <select2 type="text" class="f-input" id="id6"></select2>
-                                                      </div>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id7"><span>Manage?</span></label>
-                                                      <div class="col-md-8">
-                                                            <checkbox id="id7"></checkbox>
-                                                      </div>
-                                                </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id8">Inventory
-                                                      SKU</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id8"></div>
-                                                </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id9">Qty In
-                                                      Stock</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id9"></div>
-                                                </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id10">Ship
-                                                      Weight</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id10"></div>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <ckeditor v-if="field_type === 'wysiwyg'" v-model="value_model" :id="field_id"></ckeditor>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <dropzone :id="id" :url="uploadUrl" :useCustomDropzoneOptions="true" :dropzoneOptions="dropzoneOptions" @vdropzone-success="showSuccess"></dropzone>
-                                    </td>
-                                    <td>
-                                          <a href="#" class="button button2">Copy</a>
-                                          <a href="#" class="button button2">Delete</a>
-                                    </td>
-                              </tr>
-                              </tbody>
-                        </table>
-            </div>
-            <div class="scrollable-area">
-                  <table class="f-add-prod-table">
-                              <thead>
-                              <tr>
-                                    <th>{{"Basic Info"|_}}</th>
-                                    <th>{{"More Info"|_}}</th>
-                                    <th>{{"Stock"|_}}</th>
-                                    <th>{{"Long Description"|_}}</th>
-                                    <th>{{"Images"|_}}</th>
-                                    <th>{{"Actions"|_}}</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              <tr class="f-add-block">
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id1"><span>Action</span></label>
-                                                      <div class="col-md-8"><checkbox></checkbox></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id1"><span>Product
-                                                           SKU</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id1"></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id2"><span>Product
-                                                           name</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id2"></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id3"><span>Short
-                                                           Description</span></label>
-                                                      <div class="col-md-12"><textarea type="text" class="f-textarea" id="id3"></textarea></div>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id1"><span>Hidden?</span></label>
-                                                      <div class="col-md-8"><checkbox id="id5"></checkbox></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id4"><span>Price</span></label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id4"></div>
-                                                </div>
-                                                <div class="f-form-group row required">
-                                                      <label class="col-md-12 f-form-label text-left" for="id6"><span>Categories</span></label>
-                                                      <div class="col-md-12">
-                                                            <select2 type="text" class="f-input" id="id6"></select2>
-                                                      </div>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <label class="col-md-4 f-form-label text-left" for="id7"><span>Manage?</span></label>
-                                                      <div class="col-md-8">
-                                                            <checkbox id="id7"></checkbox>
-                                                      </div>
-                                                </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id8">Inventory
-                                                      SKU</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id8"></div>
-                                                </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id9">Qty In
-                                                      Stock</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id9"></div>
-                                                </div>
-                                                <div class="f-form-group row "><label class="col-md-12 f-form-label text-left" for="id10">Ship
-                                                      Weight</label>
-                                                      <div class="col-md-12"><input type="text" class="f-input" id="id10"></div>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <fieldset class="f-form-container">
-                                                <div class="f-form-group row">
-                                                      <ckeditor v-if="field_type === 'wysiwyg'" v-model="value_model" :id="field_id"></ckeditor>
-                                                </div>
-                                          </fieldset>
-                                    </td>
-                                    <td>
-                                          <dropzone :id="id" :url="uploadUrl" :useCustomDropzoneOptions="true" :dropzoneOptions="dropzoneOptions" @vdropzone-success="showSuccess"></dropzone>
-                                    </td>
-                                    <td>
-                                          <a href="#" class="button button2">Copy</a>
-                                          <a href="#" class="button button2">Delete</a>
+                                          <a href="#" class="button button2" @click.prevent="duplicateProduct(p)">{{'Duplicate'|_}}</a>
+                                          <a v-if="products.length > 1" href="#" class="button button4" @click.prevent="removeProduct(pId)">{{'Remove'|_}}</a>
                                     </td>
                               </tr>
                               </tbody>
@@ -312,18 +116,21 @@
       </div>
       <div class="f-control-panel">
             <div class="f-control-panel__elem">
-                  <div class="row">
-                        <div class="col-xs-3">
-                              <input class="f-input" placeholder="Number of Products"/>
-                        </div>
-                        <div class="col-xs-9">
-                              <button type="button" class="button button2 f-control-panel__elem">{{"Add Products"|_}}</button>
-                        </div>
+                  <div class="f-action-button-b" :class="{open: ddOpen('quick-add/products/new/bottom')}">
+                        <a href="#" class="f-action-button-b__toggle" @click.prevent="ddToggle('quick-add/products/new/bottom')">
+                              {{'Add Products'|_}}
+                              <span class="f-caret"><b class="f-caret__elem"></b></span>
+                        </a>
+                        <ul class="f-action-button-b__menu">
+                              <li v-for="n in config.add_new_options" class="f-action-button-b__item">
+                                    <a href="#" class="f-action-button-b__link" @click.prevent="addNewProducts(n)">{{n}}</a>
+                              </li>
+                        </ul>
                   </div>
             </div>
             <div class="f-control-panel__elem">
                   <div class="f-actions-container">
-                        <button type="button" class="button button1">{{"Create Products"|_}}</button>
+                        <button type="button" class="button button1" @click="createProducts">{{"Create Products"|_}}</button>
                   </div>
             </div>
       </div>

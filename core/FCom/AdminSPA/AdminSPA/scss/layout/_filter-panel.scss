@@ -403,6 +403,32 @@
       color: #2e4354;
 }
 
+.f-tags__tag {
+      position: relative;
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 10px 0 0;
+      text-align: left;
+}
+
+.f-tags__tag-content {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 0 20px 0 0;
+      background: #e3e3e3;
+      border-radius: 5px;
+      color: #2e4354;
+      min-width: 80px;
+      position: relative;
+}
+
+.f-tags__drop {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 9px 10px 9px 10px;
+      color: #2e4354;
+}
+
 .f-tags__remove {
       display: inline-block;
       padding: 9px 6px;
@@ -510,9 +536,6 @@
       .f-filter-tags__tag {
             padding: 5px 20px 5px 10px;
       }
-      .f-tags__remove {
-            padding: 5px 6px;
-      }
       .f-pagination__prev-page {
             width: 35%;
             text-align: right;
@@ -522,5 +545,9 @@
             width: 35%;
             text-align: left;
             padding-left: 10px;
+      }
+
+      .f-tags__tag {
+           margin: 10px 10px 10px 0;
       }
 }

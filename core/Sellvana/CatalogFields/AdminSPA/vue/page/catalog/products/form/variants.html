@@ -1,0 +1,195 @@
+<div class="row">
+      <div class="col-md-12 col-lg-6">
+            <div class="f-content-block">
+                  <div class="row">
+                        <div class="col-md-3">
+                              <select2>
+                                    <option selected>Color</option>
+                                    <option>Size</option>
+                              </select2>
+                        </div>
+                        <div class="col-md-9">
+                              <div class="f-tags">
+                                    <div class="f-tags__tag">
+
+                                          <div class="f-tags__tag-content">
+                                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>Color
+                                                <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a></div>
+                                    </div>
+                                    <div class="f-tags__tag">
+
+                                          <div class="f-tags__tag-content">
+                                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>Size
+                                                <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a></div>
+                                    </div>
+                                    <div class="f-tags__tag">
+
+                                          <div class="f-tags__tag-content">
+                                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>Size
+                                                <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a></div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+                  <div class="line"></div>
+                  <div class="row">
+                        <div class="col-md-3">
+                              <input type="text" class="f-input" placeholder="Search with results"/>
+                        </div>
+                        <div class="col-md-9">
+                              <div class="f-buttons-block">
+                                    <button class="button button1">New Variant</button>
+                                    <button class="button button4" disabled >Delete</button>
+                              </div>
+                        </div>
+                  </div>
+                  <div>
+                        <div class="scrollable-area">
+                              <table class="f-main-grid">
+                                    <thead>
+                                          <tr>
+                                                <th>Price</th>
+                                                <th>Images</th>
+                                                <th>Inventory</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody>
+                                          <tr>
+                                                <td class="f-icon-column"><input type="number" class="f-input-number"/><a href="#" class="f-td-action"><svg width="22" height="22" v-html="svgIconLink('icon-two-arrows')"></svg></a></td>
+                                                <td><a href="#" class="f-td-action"><svg width="20" height="19" v-html="svgIconLink('icon-image')"></svg></a></td>
+                                                <td><a href="#" class="f-td-action"><svg width="20" height="19" v-html="svgIconLink('icon-box')"></svg></a></td>
+                                          </tr>
+                                    </tbody>
+                              </table>
+                        </div>
+
+                  </div>
+            </div>
+      </div>
+      <div class="col-md-12 col-lg-6">
+            <div class="f-content-block f-option-modal">
+                  <div class="f-block-title">
+                        <p class="f-block-title__text">Inventory</p>
+                        <button draggable="false" class="f-delete"><i class="fa fa-times"></i></button>
+                  </div>
+                  <fieldset class="f-form-container">
+                        <div class="row">
+                              <div class="col-md-5">
+                                    <div class="f-form-group row">
+                                          <label class="col-md-12 f-form-label text-left" for="id8">Inventory SKU</label>
+                                          <div class="col-md-12">
+                                                <input type="text" class="f-input" id="id8">
+                                          </div>
+                                    </div>
+                              </div>
+                              <div class="col-md-5">
+                                    <div class="f-form-group row">
+                                          <label class="col-md-12 f-form-label text-left" for="id9">QTY</label>
+                                          <div class="col-md-12">
+                                                <input type="text" class="f-input" id="id9">
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+                  </fieldset>
+                  <div class="buttons-block text-right">
+                        <button class="button button2">Close</button>
+                        <button class="button button1">Apply</button>
+                  </div>
+            </div>
+      </div>
+      <div class="col-md-12 col-lg-6">
+            <div class="f-content-block f-option-modal">
+                  <div class="f-block-title">
+                        <p class="f-block-title__text">Variants prices</p>
+                        <button draggable="false" class="f-delete"><i class="fa fa-times"></i></button>
+                  </div>
+                  <fieldset class="f-form-container">
+                        <div class="scrollable-area">
+                              <table class="f-price-table">
+                                    <thead>
+                                          <tr>
+                                                <th></th>
+                                                <th>Customer Group</th>
+                                                <th>Site</th>
+                                                <th>Currency</th>
+                                                <th>Price Type</th>
+                                                <th>Amount</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody>
+                                          <tr>
+                                                <td>
+                                                      <a href="#" class="f-delete"><i class="fa fa-trash"></i></a>
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                                <td>
+                                                      <input type="number" class="f-input-number">
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                          </tr>
+                                          <tr>
+                                                <td>
+                                                      <a href="#" class="f-delete"><i class="fa fa-trash"></i></a>
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                                <td>
+                                                      <input type="number" class="f-input-number">
+                                                </td>
+                                                <td>
+                                                      <select2>
+                                                            <option>Default</option>
+                                                            <option>All (+)</option>
+                                                      </select2>
+                                                </td>
+                                          </tr>
+
+                              </table>
+                        </div>
+                  </fieldset>
+                  <div class="buttons-block text-right">
+                        <button class="button button2">Cancel</button>
+                        <button class="button button1">Apply</button>
+                  </div>
+            </div>
+      </div>
+</div>

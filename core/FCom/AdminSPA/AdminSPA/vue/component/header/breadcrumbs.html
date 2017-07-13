@@ -1,14 +1,15 @@
 <div :class="{'visible-lg visible-md visible-sm':!mobile, 'hidden-lg hidden-md hidden-sm':mobile}">
-      <ul class="f-breadcrumb f-header-breadcrumb">
-            <li v-for="part in breadcrumbParts" class="f-breadcrumb__item">
-                  <router-link v-if="part.link" :to="part.link" class="f-breadcrumb__link">{{part.label|_}}</router-link>
-                  <a v-else href="#" @click.prevent class="f-breadcrumb__link">{{part.label|_}}</a>
-            </li>
-            <li class="f-breadcrumb__penultimate">
-                  <a href="#" @click.prevent class="f-breadcrumb__link"><i v-if="curPage.icon_class" :class="curPage.icon_class" aria-hidden="true"></i>{{curPage.label|_}}</a>
-            </li>
-      </ul>
       <a href="#" class="f-breadcrumb__item-favorite__link" :class="{on:isFavorite}" @click.prevent="toggleFavorite()">
             <svg width="17" height="15" v-html="svgIconLink('icon-star2')"></svg>
       </a>
+      <div class="f-breadcrumb f-header-breadcrumb">
+           <!-- <li v-for="part in breadcrumbParts" class="f-breadcrumb__item">-->
+                  <router-link v-for="part in breadcrumbParts" :key="part.link" v-if="part.link" :to="part.link" class="f-breadcrumb__link">{{part.label|_}}</router-link>
+                  <a v-else href="#" @click.prevent class="f-breadcrumb__link">{{part.label|_}}</a>
+           <!-- </li>-->
+          <!--  <li class="f-breadcrumb__item">-->
+                  <a href="#" @click.prevent class="f-breadcrumb__link"><i v-if="curPage.icon_class" :class="curPage.icon_class" aria-hidden="true"></i>{{curPage.label|_}}</a>
+           <!-- </li>-->
+      </div>
+
 </div>

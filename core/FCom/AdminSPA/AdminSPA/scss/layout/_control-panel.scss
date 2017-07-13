@@ -3,6 +3,7 @@
 .f-control-panel {
       display: table;
       width: 100%;
+      table-layout: fixed;
       .f-actions-container {
             text-align: right;
       }
@@ -12,6 +13,9 @@
       width: inherit;
       .f-control-panel__elem {
             padding-right: 5px;
+      }
+      .multiselect {
+            min-width: 435px;
       }
 }
 

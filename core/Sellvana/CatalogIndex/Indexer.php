@@ -41,6 +41,10 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
 
     protected function _indexSaveSortData()
     {
+        if (!static::$_sortData) {
+            $this->BDebug->log('No sort data for indexer');
+            return;
+        }
         $sortFields = $this->Sellvana_CatalogIndex_Model_Field->getFields('sort');
         $sortHlp = $this->Sellvana_CatalogIndex_Model_DocSort;
         foreach (static::$_sortData as $pId => $sData) {

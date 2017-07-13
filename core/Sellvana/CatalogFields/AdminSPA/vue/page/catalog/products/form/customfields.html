@@ -1,0 +1,164 @@
+<div class="row">
+    <div class="col-md-12 col-lg-6">
+        <div class="f-content-block">
+            <div class="row">
+                <div class="col-md-3">
+                    <select2>
+                        <option selected>Color</option>
+                        <option>Size</option>
+                    </select2>
+                </div>
+                <div class="col-md-9">
+                    <div class="f-buttons-block">
+                        <button class="button button1">Create New Fieldset</button>
+                    </div>
+                </div>
+            </div>
+            <div class="line"></div>
+            <div class="f-options">
+                <div class="f-options-title">
+                    <p class="f-options-title__text">Default</p>
+                    <div class="f-options__control">
+                        <select2 class="f-options__control-elem">
+                            <option>Color</option>
+                            <option>Size</option>
+                        </select2>
+                        <button class="button button1 f-options__control-elem">Create Field</button>
+                        <a href="#" title="close" class="f-options__control-elem f-delete"><i class="fa fa-times"></i></a>
+                        <a href="#" title="ok" class="f-options__control-elem f-collapse"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="f-options-content">
+                    <div class="f-tags">
+                        <div class="f-tag-container row">
+                            <div class="f-tags__tag col-xs-4">
+                                <div class="f-tags__tag-content">
+                                    <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
+                                    Color
+                                    <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <select2>
+                                    <option>Red</option>
+                                    <option>Black</option>
+                                    <option>Green</option>
+                                    <option>Yellow</option>
+                                </select2>
+                            </div>
+                        </div>
+                        <div class="f-tag-container row">
+                            <div class="f-tags__tag col-xs-4">
+                                <div class="f-tags__tag-content">
+                                    <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
+                                    Size
+                                    <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <select2>
+                                    <option>16</option>
+                                    <option>14</option>
+                                    <option>17</option>
+                                    <option>20</option>
+                                </select2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="f-options f-options--collapsed" :class="{'f-options--collapsed':ddOpen('collapse-block1')}">
+                <div class="f-options-title">
+                    <p class="f-options-title__text">Default</p>
+                    <div class="f-options__control">
+                        <select2 class="f-options__control-elem">
+                            <option>Color</option>
+                            <option>Size</option>
+                        </select2>
+                        <button class="button button1 f-options__control-elem">Create Field</button>
+                        <a href="#" title="close" class="f-options__control-elem f-delete"><i class="fa fa-times"></i></a>
+                        <a href="#" title="ok" class="f-options__control-elem f-collapse" @click.prevent.stop="ddToggle('collapse-block')"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="f-options-content">
+                    <div class="f-tags">
+                        <div class="f-tag-container row">
+                            <div class="f-tags__tag col-xs-4">
+                                <div class="f-tags__tag-content">
+                                    <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
+                                    Color
+                                    <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a>
+                                </div>
+                            </div>
+                            <select2 class="col-xs-4">
+                                <option>Red</option>
+                                <option>Black</option>
+                                <option>Green</option>
+                                <option>Yellow</option>
+                            </select2>
+                        </div>
+                        <div class="f-tag-container row">
+                            <div class="f-tags__tag col-xs-4">
+                                <div class="f-tags__tag-content">
+                                    <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
+                                    Size
+                                    <a href="#" class="f-tags__remove"><i aria-hidden="true" class="fa fa-times"></i></a>
+                                </div>
+                            </div>
+                            <select2 class="col-xs-4">
+                                <option>16</option>
+                                <option>14</option>
+                                <option>17</option>
+                                <option>20</option>
+                            </select2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 col-lg-6">
+        <div class="f-content-block f-option-modal">
+            <div class="f-block-title">
+                <p class="f-block-title__text">Create Field</p>
+                <button draggable="false" class="f-delete"><i class="fa fa-times"></i></button>
+            </div>
+            <fieldset class="f-form-container">
+                <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id1">Field Code</label> <div class="col-md-9"> <input type="text" class="f-input" id="id1"> </div> </div>
+                <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id2">Field Name</label> <div class="col-md-9"> <input type="text" class="f-input" id="id2"> </div> </div>
+                <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id3">Frontend Label</label> <div class="col-md-9"> <input type="text" class="f-input" id="id3"> </div> </div>
+                <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id4">Sort order</label> <div class="col-md-9"> <input type="text" class="f-input" id="id4"> </div> </div>
+                <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id5">DB Type</label> <div class="col-md-9"> <input type="text" class="f-input" id="id5"> </div> </div>
+                <div class="f-form-group row required"> <label class="col-md-3 f-form-label" for="id6">Input Type</label> <div class="col-md-9"> <input type="text" class="f-input" id="id6"> </div> </div>
+                <div class="f-form-group row required"><label class="col-md-3  f-form-label"> <span>{{'Multi Language'|_}}</span></label>
+                    <div class="col-md-9">
+                        <checkbox></checkbox>
+                    </div>
+
+                </div>
+                <div class="f-form-group row required"><label class="col-md-3  f-form-label"> <span>{{'Swatch Type'|_}}</span></label>
+                    <div class="col-md-9">
+                        <checkbox></checkbox>
+                    </div>
+
+                </div>
+                <div class="f-form-group row required"><label class="col-md-3  f-form-label"> <span>{{'Required'|_}}</span></label>
+                    <div class="col-md-9">
+                        <checkbox></checkbox>
+                    </div>
+
+                </div>
+                <div class="f-form-group row required"><label class="col-md-3  f-form-label"> <span>{{'Show on frontend'|_}}</span></label>
+                    <div class="col-md-9">
+                        <checkbox></checkbox>
+                    </div>
+
+                </div>
+            </fieldset>
+            <div class="buttons-block text-right">
+                <button class="button button2">Cancel</button>
+                <button class="button button1">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>

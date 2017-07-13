@@ -19,6 +19,12 @@ define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-catalog-products-grid-config'], 
                     {nav:'/catalog', label:'Catalog', icon_class:'fa fa-book'}
                 ]
             }});
+        },
+        methods: {
+            doBulkAction: function (type, args) {
+                this.doDefaultBulkAction(type, args);
+                console.log(type, args);
+            }
         }
     };
 });

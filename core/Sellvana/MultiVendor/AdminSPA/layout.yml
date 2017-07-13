@@ -15,7 +15,7 @@
         do:
             - [ addNav, { path: /catalog/vendors, label: Vendors, link: /vendors, pos: 60 } ]
 
-            - [ addRoute, { path: /vendors, require: [ sv-page-vendors, text!sv-page-vendors-tpl, json!sv-page-vendors-grid-config ] } ]
+            - [ addRoute, { path: /vendors, require: [ sv-page-vendors, text!sv-page-default-grid-tpl, json!sv-page-vendors-grid-config ] } ]
             - [ addRoute, { path: /vendors/form, require: [ sv-page-vendors-form, text!sv-page-vendors-form-tpl ] } ]
 
 /vendors/form:

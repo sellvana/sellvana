@@ -1,0 +1,33 @@
+<div class="f-grid-popup open">
+    <div class="f-grid-popup__title">
+        <p class="f-grid-popup__text">{{popup.title|_(popup.title_args)}}</p>
+    </div>
+    <button type="button" class="f-delete" draggable="false" @click="closePopup()"><i class="fa fa-times"></i></button>
+
+    <div class="f-grid-popup__content">
+
+        <div v-if="add_fields_options.length" class="row">
+            <div class="col-md-9">
+                <!--<v-multiselect v-model="add_fields" :options="add_fields_options" track-by="name" label="label" :multiple="true"></v-multiselect>-->
+                <select2 v-model="add_fields" :multiple="true" :params="{width:'100%', closeOnSelect: false}">
+                    <option v-for="o in add_fields_options" :value="o.name">{{o.label|_}}</option>
+                </select2>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="button button1" @click="addFields">{{'Add Fields'|_}}</button>
+            </div>
+        </div>
+
+        <fieldset v-if="visible_fields" class="f-form-container">
+            <sv-comp-form-field v-for="f in visible_fields" :key="f.name"
+                                v-show="formFieldShowCond(f)" :form="form" :field="f.name"
+                                v-model="form[f.model][f.name]" @event="processFieldEvent"></sv-comp-form-field>
+        </fieldset>
+
+        <component v-if="popup.component" :is="popup.component" @event="processComponentEvent"></component>
+    </div>
+
+    <div class="f-buttons-block">
+        <button v-for="act in popup.actions" type="button" class="button" :class="act.class" @click="doAction(act)">{{act.label|_}}</button>
+    </div>
+</div>

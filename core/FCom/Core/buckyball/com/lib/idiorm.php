@@ -75,6 +75,9 @@
         // Last query run, only populated if logging is enabled
         protected static $_last_query;
 
+        // ADDED
+        protected static $_last_values;
+
         // Log of all queries run, only populated if logging is enabled
         protected static $_query_log = array();
 
@@ -824,13 +827,11 @@
             if (count($this->_where_conditions) === 0) {
                 return '';
             }
-
             $where_conditions = array();
             foreach ($this->_where_conditions as $condition) {
                 $where_conditions[] = $condition[static::WHERE_FRAGMENT];
                 $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
             }
-
             return "WHERE " . join(" AND ", $where_conditions);
         }
 
@@ -966,15 +967,17 @@
                 }
             }
 
+            static::$_last_values = $this->_values; //ADDED
             static::_log_query($query, $this->_values);
             $statement = static::$_db->prepare($query);
-#try {
+//try {
             $statement->execute($this->_values);
-#} catch (Exception $e) {
-#echo $query;
-#print_r($e);
-#exit;
-#}
+//} catch (Exception $e) {
+//echo $query;
+//print_r($this->_values);
+//print_r($e);
+//exit;
+//}
             $rows = array();
             while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $rows[] = $row;

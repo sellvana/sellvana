@@ -5,7 +5,7 @@
         <!--START: Desktop actions view-->
 
         <div class="visible-lg visible-md">
-            <template v-for="group in config.action_desktop_groups">
+            <template v-for="group in desktop_groups">
                 <button v-if="!group.children" :key="group.desktop_group" type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
                 <div v-if="group.children" :key="group.desktop_group" class="f-dropdown f-actions-dropdown-arrow" :class="{open:ddOpen('actions-open-' + group.desktop_group)}">
                     <button type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
@@ -24,7 +24,7 @@
 
         <div class="f-mobile-button hidden-md hidden-lg">
 
-            <template v-for="group in config.action_mobile_groups">
+            <template v-for="group in mobile_groups">
                 <button v-if="!group.children" :key="group.mobile_group" type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
                 <div v-if="group.children" :key="group.mobile_group" class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open-' + group.mobile_group)}">
                     <button type="button" class="button button1 f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open-' + group.mobile_group)">{{group.label|_}}</button>

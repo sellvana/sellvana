@@ -60,6 +60,10 @@
 
 			- [ requireJs, sv-page-catalog-quick-add-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products" ]
 			- [ requireJs, sv-page-catalog-quick-add-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/quick-add/products.html" ]
+			- [ requireJs, sv-page-catalog-quick-add-products-config, "~/quickadd/products/config" ]
+
+			- [ requireJs, sv-page-catalog-import-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/index" ]
+			- [ requireJs, sv-page-catalog-import-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/index.html" ]
 
             - [ requireJs, sv-comp-dashboard-low-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/low-inventory.html" ]
             - [ requireJs, sv-comp-dashboard-new-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/new-products.html" ]
@@ -77,7 +81,7 @@
             - [ addNav, { path: /catalog/quick-add/products, label: Products to Catalog, link: /catalog/quick-add/products, pos: 10 } ]
             - [ addNav, { path: /catalog/quick-add/categories, label: Products to Categories, link: /catalog/quick-add/categories, pos: 20 } ]
             - [ addNav, { path: /catalog/quick-add/images, label: Images to Products, link: /catalog/quick-add/images, pos: 30 } ]
-            - [ addNav, { path: /catalog/products-import, label: Products CSV Import, link: /catalog/product-import, pos: 50 } ]
+            - [ addNav, { path: /catalog/import-products, label: Products CSV Import, link: /catalog/import-products, pos: 50 } ]
             - [ addNav, { path: /catalog/search-alias, label: Search Terms, link: /catalog/search-alias, pos: 60 } ]
 
             - [ addNav, { path: /reports/catalog, label: Products and Inventory, pos: 30 } ]
@@ -97,12 +101,12 @@
             - [ addRoute, { path: /catalog/inventory, require: [ sv-page-catalog-inventory, text!sv-page-default-grid-tpl, json!sv-page-catalog-inventory-grid-config ] } ]
             - [ addRoute, { path: /catalog/inventory/form, require: [ sv-page-catalog-inventory-form, text!sv-page-default-form-tpl ] } ]
             - [ addRoute, { path: /catalog/quick-add/products, require: [ sv-page-catalog-quick-add-products, text!sv-page-catalog-quick-add-products-tpl ] } ]
-
+            - [ addRoute, { path: /catalog/import-products, require: [ sv-page-catalog-import-products, text!sv-page-catalog-import-products-tpl ]}]
 
 /catalog/products/form:
     - view: app
         do:
-            - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/products/form, name: main, label: Product Info, pos: 10, component: default } ]
             - [ addFormTab, { path: /catalog/products/form, name: prices, label: Prices, pos: 20 } ]
             - [ addFormTab, { path: /catalog/products/form, name: categories, label: Categories, pos: 30 } ]
             - [ addFormTab, { path: /catalog/products/form, name: inventory, label: Inventory & Shipping, pos: 40 } ]
@@ -139,7 +143,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-low-inventory-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetLowInventory
-                    container_class: col-md-4
+                    container_class:
                     filter: true
                     permission: catalog/inventory
             -
@@ -150,7 +154,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-new-products-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetNewProducts
-                    container_class: col-md-4
+                    container_class: f-widget-grow
                     filter: true
                     permission: catalog/products
             -
@@ -161,7 +165,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-without-images-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetWithoutImages
-                    container_class: col-md-3
+                    container_class:
                     filter: true
                     permission: catalog/products
             -
@@ -172,7 +176,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-search-recent-terms-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetSearchRecentTerms
-                    container_class: col-md-3
+                    container_class:
                     filter: true
                     permission: catalog/products
             -
@@ -183,6 +187,6 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-search-top-terms-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetSearchTopTerms
-                    container_class: col-md-3
+                    container_class:
                     filter: true
                     permission: catalog/products

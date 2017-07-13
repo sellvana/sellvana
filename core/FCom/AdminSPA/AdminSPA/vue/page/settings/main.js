@@ -1,5 +1,5 @@
-define(['jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings-config', 'sv-comp-form-field', 'sv-comp-form-ip-mode'],
-    function ($, DeepDiff, Vue, SvHlp, settingsConfig, SvCompFormField, SvCompFormIpMode) {
+define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings-config', 'sv-comp-form-field', 'sv-comp-form-ip-mode'],
+    function (_, $, DeepDiff, Vue, SvHlp, settingsConfig, SvCompFormField, SvCompFormIpMode) {
 
     return {
         mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
@@ -25,12 +25,30 @@ define(['jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings-config', 
             }
         },
         methods: {
-            fetchData: function () {
+            fetchData: function (to, from) {
                 var vm = this;
-                this.sendRequest('GET', 'settings/form_data', {}, function (response) {
-                    Vue.set(vm.settings, 'data', response.data);
-                    // Vue.set(vm.settings, 'data_old', _.extend({}, response.data));
-                });
+                if (this.$route.params[0]) {
+                    var path = '/' + this.$route.params[0], i1, l1, n1, i2, l2, n2;
+                    for (i1 = 0, l1 = this.settings.config.nav.length; i1 < l1; i1++) {
+                        n1 = this.settings.config.nav[i1];
+                        if (_.isEmpty(n1.children)) {
+                            continue;
+                        }
+                        for (i2 = 0, l2 = n1.children.length; i2 < l2; i2++) {
+                            n2 = n1.children[i2];
+                            if (n2.path === path) {
+                                this.switchTab(n2);
+                            }
+                        }
+                    }
+                }
+                if (!from) {
+                    this.sendRequest('GET', 'settings/form_data', {}, function (response) {
+                        Vue.set(vm.settings, 'data', response.data);
+                        // Vue.set(vm.settings, 'data_old', _.extend({}, response.data));
+                        vm.updateBreadcrumbs();
+                    });
+                }
             },
             saveAll: function () {
                 var vm = this, data = this.settings.data;//DeepDiff.diff(this.settings.data_old, this.settings.data);
@@ -40,6 +58,8 @@ define(['jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings-config', 
             },
             switchTab: function (tab) {
                 this.curTab = tab;
+                document.location.assign('#/settings' + tab.path);
+                this.updateBreadcrumbs(tab.label, tab.path);
                 // this.$store.commit('setData', {curPage: {
                 //     label: tab.label,
                 //     breadcrumbs: [
@@ -113,14 +133,27 @@ define(['jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings-config', 
                     }
                 }
             },
-            updateBreadcrumbs: function () {
-                this.$store.commit('setData', {curPage: {
-                    link: '/settings',
-                    label: 'Settings',
-                    breadcrumbs: [
-                        {nav:'/system', label: 'System', icon_class:'fa fa-cog'}
-                    ]
-                }});
+            updateBreadcrumbs: function (page, link) {
+                var curPage;
+                if (page) {
+                    curPage = {
+                        link: '/settings' + (link || ''),
+                        label: page,
+                        breadcrumbs: [
+                            {nav:'/system', label: 'System', icon_class:'fa fa-cog'},
+                            {nav:'/settings', label: 'Settings'}
+                        ]
+                    }
+                } else {
+                    curPage = {
+                        link: '/settings',
+                        label: 'Settings',
+                        breadcrumbs: [
+                            {nav:'/system', label: 'System', icon_class:'fa fa-cog'}
+                        ]
+                    };
+                }
+                this.$store.commit('setData', {curPage: curPage});
             }
         },
         watch: {

@@ -158,7 +158,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-orders-list-tpl
                     callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
-                    container_class: col-md-4
+                    container_class: f-widget-grow
                     filter: false
                     permission: sales/orders
             -
@@ -169,7 +169,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-orders-totals-tpl
                     callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
-                    container_class: col-md-4
+                    container_class:
                     filter: true
                     permission: sales/orders
             -
@@ -178,7 +178,7 @@ sv-page-dashboard-config:
                 -
                     title: Average Order Value
                     icon: inbox
-                    container_class: col-md-2
+                    container_class:
                     template: sv-comp-dashboard-avg-order-value-tpl
                     callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
                     filter: true
@@ -189,7 +189,7 @@ sv-page-dashboard-config:
                 -
                     title: Top Products
                     icon: inbox
-                    container_class: col-md-4
+                    container_class: f-widget-grow
                     template: sv-comp-dashboard-top-products-tpl
                     callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
                     filter: true
@@ -211,7 +211,7 @@ sv-page-dashboard-config:
                 -
                     title: Late Orders
                     icon: inbox
-                    container_class: col-md-4
+                    container_class: f-widget-grow
                     template: sv-comp-dashboard-orders-late-tpl
                     callback: Sellvana_Sales_AdminSPA_Dashboard.widgetOrdersList
                     filter: false

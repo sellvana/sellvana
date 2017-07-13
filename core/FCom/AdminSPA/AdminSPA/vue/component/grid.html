@@ -10,7 +10,7 @@
             <div class="row">
                   <sv-comp-grid-panel :grid="grid" :cnt-visible="cntVisible" @event="onEvent"></sv-comp-grid-panel>
             </div>
-            <div class="scrollable-area" id="">
+            <div class="scrollable-area">
                   <table class="f-main-grid">
                         <colgroup>
                               <col v-for="col in columns" :width="col.width">
@@ -32,5 +32,6 @@
                  </div>
              </div>-->
       </div>
+      <sv-comp-popup v-if="grid.popup" :popup="grid.popup" @event="processPopupEvent"></sv-comp-popup>
 </div>
 

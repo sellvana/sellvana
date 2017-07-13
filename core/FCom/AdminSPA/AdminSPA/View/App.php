@@ -29,6 +29,17 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
         return $this;
     }
 
+    public function removeNav($path)
+    {
+        foreach ($this->_navs as $i => $nav) {
+            if ($nav['path'] === $path) {
+                unset($this->_navs[$i]);
+                break;
+            }
+        }
+        return $this;
+    }
+
     public function getNavs()
     {
         return $this->_navs;
@@ -132,6 +143,8 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
             unset($t['path']);
             if (empty($t['component'])) {
                 $t['component'] = 'sv-page' . str_replace('/', '-', $path) . '-' . $t['name'];
+            } elseif ($t['component'] === 'default') {
+                $t['component'] = 'sv-page-default-form-tab';
             }
             $tabs[] = $t;
         }

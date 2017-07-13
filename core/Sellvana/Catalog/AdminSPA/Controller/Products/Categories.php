@@ -17,10 +17,6 @@ class Sellvana_Catalog_AdminSPA_Controller_Products_Categories extends FCom_Admi
             'data_url' => 'products/form/categories/grid_data?id=' . $prodId,
             'columns' => [
                 ['type' => 'row-select', 'width' => 55],
-                ['type' => 'actions', 'actions' => [
-                    ['type' => 'edit', 'link' => '/catalog/categories/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-                    ['type' => 'delete', 'delete_url' => 'products/form/categories/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
-                ]],
                 ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 55, 'hidden' => true],
                 ['name' => 'node_name', 'label' => 'Category Name', 'index' => 'c.node_name', 'width' => 100],
                 ['name' => 'position', 'label' => 'Position', 'index' => 'c.position', 'hidden' => true],

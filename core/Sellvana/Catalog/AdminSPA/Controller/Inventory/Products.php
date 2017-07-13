@@ -36,10 +36,6 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory_Products extends FCom_Admin
             'data' => $data,
             'columns' => [
                 ['type' => 'row-select', 'width' => 55],
-                ['type' => 'actions', 'actions' => [
-                    ['type' => 'edit', 'link' => '/catalog/products/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-                    ['type' => 'delete', 'delete_url' => 'categories/form/products/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
-                ]],
                 ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
                 ['name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                     'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
