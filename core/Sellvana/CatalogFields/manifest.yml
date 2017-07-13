@@ -41,6 +41,7 @@ modules:
                 auto_use: [ layout ]
                 routing:
                     - [ /catalogfields/?.action, Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields ]
+                    - [ /catalogfields/options/?.action, Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields_Options ]
 
             FCom_Frontend:
                 auto_use: [ views ]

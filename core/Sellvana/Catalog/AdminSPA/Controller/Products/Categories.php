@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_ProductMedia Sellvana_Catalog_Model_ProductMedia
+ * @property Sellvana_Catalog_Model_Category Sellvana_Catalog_Model_Category
  */
 class Sellvana_Catalog_AdminSPA_Controller_Products_Categories extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
