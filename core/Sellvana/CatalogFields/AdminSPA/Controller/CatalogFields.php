@@ -4,6 +4,7 @@
  * Class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
  *
  * @property FCom_Core_Model_Field FCom_Core_Model_Field
+ * @property FCom_Core_Model_FieldOption FCom_Core_Model_FieldOption
  */
 
 class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
@@ -42,7 +43,20 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
                 ['name' => 'swatch_type', 'label' => 'Swatch type', 'options' => $fld->fieldOptions('swatch_type')],
                 ['name' => 'required', 'label' => 'Required', 'options' => $yesNoOpts],
             ],
-            'filters' => true,
+            'filters' => [
+                ['field' => 'id', 'type' => 'number'],
+                ['field' => 'field_code', 'type' => 'text'],
+                ['field' => 'field_name', 'type' => 'text'],
+                ['field' => 'frontend_label', 'type' => 'text'],
+                ['field' => 'frontend_show', 'type' => 'multiselect'],
+                ['field' => 'table_field_type', 'type' => 'multiselect'],
+                ['field' => 'admin_input_type', 'type' => 'multiselect'],
+                ['field' => 'num_options', 'type' => 'text'],
+                ['field' => 'system', 'type' => 'multiselect'],
+                ['field' => 'multilanguage', 'type' => 'multiselect'],
+                ['field' => 'swatch_type', 'type' => 'multiselect'],
+                ['field' => 'required', 'type' => 'multiselect'],
+            ],
             'export' => true,
             'pager' => true,
         ];
@@ -50,7 +64,13 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
 
     public function getGridOrm()
     {
-        return $this->FCom_Core_Model_Field->orm('f')->where('field_type', 'product');
+        $subSql = '(select count(*) from ' . $this->FCom_Core_Model_FieldOption->table() . ' where field_id=f.id)';
+                                              ;
+        return $this->FCom_Core_Model_Field
+            ->orm('f')
+            ->where('field_type', 'product')
+            ->select('f.*')
+            ->select($subSql, 'num_options');
     }
 
     public function getFormData()
@@ -100,10 +120,10 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_Admi
 
             $origModelData = $modelData = $model->as_array();
             $validated = $model->validate($modelData, [], 'product');
-            if ($modelData !== $origModelData) {
-                var_dump($modelData);
-                $model->set($modelData);
-            }
+            //if ($modelData !== $origModelData) {
+            //    var_dump($modelData);
+            //    $model->set($modelData);
+            //}
 
 
             if ($validated) {
