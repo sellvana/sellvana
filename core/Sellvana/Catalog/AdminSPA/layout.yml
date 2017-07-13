@@ -143,7 +143,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-low-inventory-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetLowInventory
-                    container_class: col-md-4
+                    container_class:
                     filter: true
                     permission: catalog/inventory
             -
@@ -154,7 +154,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-new-products-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetNewProducts
-                    container_class: col-md-4
+                    container_class: f-widget-grow
                     filter: true
                     permission: catalog/products
             -
@@ -165,7 +165,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-without-images-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetWithoutImages
-                    container_class: col-md-3
+                    container_class:
                     filter: true
                     permission: catalog/products
             -
@@ -176,7 +176,7 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-search-recent-terms-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetSearchRecentTerms
-                    container_class: col-md-3
+                    container_class:
                     filter: true
                     permission: catalog/products
             -
@@ -187,6 +187,6 @@ sv-page-dashboard-config:
                     icon: inbox
                     template: sv-comp-dashboard-search-top-terms-tpl
                     callback: Sellvana_Catalog_AdminSPA_Dashboard.widgetSearchTopTerms
-                    container_class: col-md-3
+                    container_class:
                     filter: true
                     permission: catalog/products
