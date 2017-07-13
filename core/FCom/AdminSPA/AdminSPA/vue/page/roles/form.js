@@ -2,50 +2,46 @@ define(['lodash', 'vue', 'sv-hlp'], function (_, Vue, SvHlp) {
 
     return {
         mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
-        computed: {
-            avatarUrl: function () {
-                return this.form && this.form.avatar ? this.form.avatar.thumb_url : '';
-            }
-        },
         methods: {
             updateBreadcrumbs: function () {
-                var u = this.form.user;
+                var r = this.form.role;
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
                     label: this.form.config.title || SvHlp._('Loading...'),
                     breadcrumbs: [
                         {nav:'/system', label: 'System', icon_class:'fa fa-cog'},
-                        {link:'/users', label: 'Users'}
+                        {link:'/roles', label: 'Roles'}
                     ]
                 }});
             },
             fetchData: function () {
-                var userId = this.$router.currentRoute.query.id, vm = this;
-                this.sendRequest('GET', 'users/form_data', {id: userId}, function (response) {
+                var roleId = this.$router.currentRoute.query.id, vm = this;
+                this.sendRequest('GET', 'roles/form_data', {id: roleId}, function (response) {
                     vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs();
                 });
             },
             doDelete: function () {
                 var vm = this;
-                if (!confirm(SvHlp._('Are you sure you want to delete this user?'))) {
+                if (!confirm(SvHlp._('Are you sure you want to delete this role?'))) {
                     return;
                 }
-                this.sendRequest('POST', 'users/form_delete', {id: this.form.user.id}, function (response) {
+                this.sendRequest('POST', 'roles/form_delete', {id: this.form.role.id}, function (response) {
                     if (response.ok) {
-                        vm.$router.push('/users');
+                        vm.$router.push('/roles');
                     }
                 });
             },
             save: function (stayOnPage) {
                 var vm = this;
-                this.sendRequest('POST', 'users/form_data', {user: this.form.user}, function (response) {
+                this.sendRequest('POST', 'roles/form_data', {role: this.form.role}, function (response) {
                     for (var i in response.form) {
                         Vue.set(vm.form, i, response.form[i]);
                     }
                     if (response.ok && !stayOnPage) {
-                        vm.$router.push('/users');
+                        vm.$router.push('/roles');
                     }
+                    vm.action_in_progress = false;
                 })
             }
         }

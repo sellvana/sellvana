@@ -18,10 +18,6 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
             'data_url' => 'inventory/grid_data',
             'columns' => [
                 ['type' => 'row_select'],
-                ['type' => 'btn_group', 'buttons' => [
-                    ['name' => 'edit'],
-                    ['name' => 'delete'],
-                ]],
                 ['name' => 'id', 'label' => 'ID', 'width' => 50],
                 ['name' => 'title', 'label' => 'Title'],
                 ['name' => 'inventory_sku', 'label' => 'SKU',

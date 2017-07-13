@@ -60,6 +60,12 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
      */
     abstract public function getGridConfig();
 
+    public function getGridOrm()
+    {
+        $modelClass = static::$_modelClass;
+        return $this->{$modelClass}->orm();
+    }
+
     public function getProcessedGridConfig()
     {
         $config = $this->getGridConfig();
@@ -113,6 +119,41 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             'state' => $data['state'],
         ];
         $this->respond($result);
+    }
+
+    public function action_grid_data__POST()
+    {
+        try {
+            $result = [];
+            $modelClass = static::$_modelClass;
+            $modelName = static::$_modelName;
+            $post = $this->BRequest->post();
+            if (empty($post['do']) || empty($post['ids'])) {
+                throw new BException('Invalid request');
+            }
+            $orm = $this->{$modelClass}->orm('_main')->where_in('_main.id', $post['ids']);
+            switch ($post['do']) {
+                case 'bulk_update':
+                    if (empty($post['data'])) {
+                        throw new BException('Invalid request: missing data');
+                    }
+                    if (!empty($post['data'][$modelName])) {
+                        $data = $this->getBulkUpdateData('edit_' . $modelName . 's', $modelName, $post);
+                        $orm->iterate(function ($r) use ($data) { $r->set($data)->save(); });
+                    }
+                    $this->addMessage('Rows have been updated successfully.', 'success');
+                    break;
+
+                case 'bulk_delete':
+                    $orm->iterate(function ($r) { $r->delete(); });
+                    $this->addMessage('Rows have been deleted successfully.', 'success');
+                    break;
+            }
+            $this->ok();
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
+        $this->respond(['result' => $result]);
     }
 
     public function action_grid_personalize__POST()

@@ -114,7 +114,7 @@ define(['vue', 'sv-hlp'],
 						Vue.set(vm.form, 'updates', {});
 					}
                     if (!stayOnPage) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/sales/orders');
                     }
 				})
 		    }

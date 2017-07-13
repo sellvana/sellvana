@@ -1,12 +1,12 @@
 define([
     'jquery', 'lodash', 'vue', 'vue-router', 'vuex', 'accounting', 'moment', 'sortablejs',
     'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress', 'perfect-scrollbar',
-    'vue-password-strength-meter', 'sv-comp-form-field', 'sv-comp-form-layout',
+    'vue-password-strength-meter', 'sv-comp-form-field',
     'text!sv-page-default-grid-tpl', 'text!sv-page-default-form-tpl', 'text!sv-page-default-form-tab-tpl',
 ],
 function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
           VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress, PerfectScrollbar,
-          VuePassword, SvCompFormField, SvCompFormLayout,
+          VuePassword, SvCompFormField,
           svPageDefaultGridTpl, svPageDefaultFormTpl, svPageDefaultFormTabTpl
 ) {
 
@@ -877,8 +877,7 @@ function ($, _, Vue, VueRouter, Vuex, Accounting, Moment, Sortable,
     var formTabMixin = {
         template: svPageDefaultFormTabTpl,
         components: {
-            'sv-comp-form-field': SvCompFormField,
-            'sv-comp-form-layout': SvCompFormLayout
+            'sv-comp-form-field': SvCompFormField
         },
         data: function () {
             return {

@@ -35,7 +35,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                 }
                 this.sendRequest('POST', 'inventory/form_delete', {id: this.form.inventory.id}, function (response) {
                     if (response.status) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/catalog/inventory');
                     }
                 });
             },
@@ -59,7 +59,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                         //Vue.set(vm.form, 'updates', {});
                     }
                     if (!stayOnPage) {
-                        vm.$router.go(-1);
+                        vm.$router.push('/catalog/inventory');
                     }
                     vm.action_in_progress = false;
                 })
