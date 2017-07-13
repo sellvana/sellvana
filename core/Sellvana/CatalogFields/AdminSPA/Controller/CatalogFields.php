@@ -6,8 +6,8 @@
  * @property FCom_Core_Model_Field FCom_Core_Model_Field
  * @property FCom_Core_Model_FieldOption FCom_Core_Model_FieldOption
  */
-
-class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
+class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
+    extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
     public function getGridConfig()
     {

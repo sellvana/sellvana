@@ -4,11 +4,11 @@
             - [ requireJs, sv-page-catalog-fields, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/index ]
             - [ requireJs, sv-page-catalog-fields-grid-config, ~/catalogfields/grid_config ]
             - [ requireJs, sv-page-catalog-fields-form, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form ]
-            - [ requireJs, sv-page-catalog-fields-form-main, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/main ]
-            - [ requireJs, sv-page-catalog-fields-form-main-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/main.html ]
+            - [ requireJs, sv-page-catalog-fields-form-info, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/info ]
+            - [ requireJs, sv-page-catalog-fields-form-info-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/info.html ]
             - [ requireJs, sv-page-catalog-fields-form-options, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/options ]
             - [ requireJs, sv-page-catalog-fields-form-options-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/options.html ]
-            - [ requireJs, sv-page-catalog-fields-form-options-config, ~/catalogfields/form/options/grid_config ]
+            - [ requireJs, sv-page-catalog-fields-form-options-config, ~/catalogfields/options/grid_config ]
 
 			- [ requireJs, sv-page-catalog-products-form-variants, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants" ]
             - [ requireJs, sv-page-catalog-products-form-variants-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants.html" ]
@@ -28,7 +28,7 @@
 /catalog/fields/form:
     - view: app
         do:
-            - [ addFormTab, { path: /catalog/fields/form, name: main, label: Field Info, pos: 10 } ]
+            - [ addFormTab, { path: /catalog/fields/form, name: info, label: Field Info, pos: 10 } ]
             - [ addFormTab, { path: /catalog/fields/form, name: options, label: Field Options, pos: 20 } ]
 
 /catalog/products/form:
