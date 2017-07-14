@@ -221,13 +221,12 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
             if (!$model) {
                 throw new BException("This field does not exist");
             }
-
-            if ($data) {
-                $model->set($data);
+            if (isset($data['field'])) {
+                $model->set($data['field']);
             }
 
-            $origModelData = $modelData = $model->as_array();
-            $validated     = $model->validate($modelData, [], 'product');
+            $modelData = $model->as_array();
+            $validated = $model->validate($modelData, [], 'field');
             //if ($modelData !== $origModelData) {
             //var_dump($modelData);
             //$model->set($modelData);
@@ -235,9 +234,12 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 
             if ($validated) {
                 $model->save();
+                if (isset($data['options'])) {
+                    $this->saveFieldOptions($model->id(), $data['options']);
+                }
                 $result         = $this->getFormData();
                 $result['form'] = $this->normalizeFormConfig($result['form']);
-                $this->ok()->addMessage('Inventory was saved successfully', 'success');
+                $this->ok()->addMessage(static::$_recordName . ' was saved successfully', 'success');
             } else {
                 $result = ['status' => 'error'];
                 $this->error()->addMessage('Cannot save data, please fix above errors', 'error');
@@ -247,5 +249,40 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
             $this->addMessage($e);
         }
         $this->respond($result);
+    }
+
+    /**
+     * Options should be in format:
+     *  [
+     *      [label: "Label", swatch_info: "INFO"],
+ *          ...
+     *  ]
+     * @param       $id - Field Id
+     * @param array $options - array of field options
+     */
+    protected function saveFieldOptions($id, array $options)
+    {
+        if (empty($options)) {
+            return;
+        }
+
+        foreach ($options as $option) {
+            if (isset($option['id'])) {
+                $model = $this->FCom_Core_Model_FieldOption->load($id);
+            } else {
+                $model = $this->FCom_Core_Model_FieldOption->create();
+            }
+
+            $model->set($option);
+            $model->set('field_id', $id);
+            $modelData = $model->as_array();
+            $validated = $model->validate($modelData, [], 'field');
+
+            if ($validated) {
+                $model->save();
+            } else {
+                $this->error()->addMessage('Cannot save data, please fix above errors', 'error');
+            }
+        }
     }
 }
