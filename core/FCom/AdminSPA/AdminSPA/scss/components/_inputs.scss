@@ -212,7 +212,14 @@ input[type=number] {
 		margin: 0 0 20px 0;
 	}
 }
-
+.f-import-forms {
+	.f-form-label {
+		text-align: left;
+	}
+	.f-delete {
+		margin-right: 5px;
+	}
+}
 .f-form-group {
 	.error-message {
 		visibility: hidden;

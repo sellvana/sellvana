@@ -41,6 +41,8 @@
 	padding: 20px;
 	border: solid 1px #e5e3e3;
 	border-radius: 5px;
+	position: relative;
+	margin: 15px 0;
 }
 
 .f-bordered-block__title {
@@ -455,6 +457,163 @@ a:focus {
 	width: 100%;
 	table-layout: fixed;
 }
+.f-column-name {
+	font-weight: bold;
+	font-size: 13px;
+	margin-bottom: 0;
+	border-bottom: solid 2px #979797;
+	margin-top: 30px;
+}
+.f-progress-import {
+	width: 50%;
+	margin: 0 auto;
+	padding: 20px 0;
+}
+.f-progress-import__container {
+	width: calc(100% - 150px);
+	display: inline-block;
+	height: 14px;
+	border: solid 1px #d6d5d5;
+	border-radius: 15px;
+}
+.f-progress-import__bar {
+	background: #69B221;
+	height: 100%;
+	border-radius: 15px 0 0 15px;
+}
+.f-progress-import__label {
+	font-size: 14px;
+	padding: 0 12px;
+	font-weight: bold;
+	margin: 0;
+}
+.f-stop-button {
+	display: inline-block;
+	margin-left: 20px;
+	vertical-align: super;
+}
+.f-import-switch {
+	padding: 50px 0;
+	width: 49%;
+	margin: 0 25%;
+}
+.f-import-switch__container {
+	height: 16px;
+	background-color: #d8d8d8;
+	box-shadow: inset 5px 4px 7px 0 rgba(141, 136, 136, 0.5);
+	position: relative;
+	border-radius: 15px;
+}
+.f-switch {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background-color: #d8d8d8;
+	box-shadow: inset 5px 4px 7px 0 rgba(141, 136, 136, 0.5);
+	font-size: 30px;
+	font-weight: 500;
+	text-align: center;
+	color: #bdb5b5;
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding: 14px 0;
+	&.active {
+		width: 51px;
+		height: 60px;
+		background-color: #ff8f00;
+		box-shadow: 0 2px 4px 0 rgba(191, 182, 182, 0.5);
+		color: #ffffff;
+		text-shadow: 0 2px 4px rgba(144, 142, 142, 0.5);
+		border-radius: 5px;
+		padding: 21px 0;
+		&:before {
+			content: '';
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+			bottom: -28px;
+			border: 15px solid transparent;
+			border-top: 15px solid #ff8f00;
+		}
+	}
+	&:after {
+		text-shadow: none;
+	}
+}
+.f-switch1 {
+	left: 10%;
+	&:after {
+		content: 'Upload or select file';
+		position: absolute;
+		top: 80px;
+		left: 50%;
+		transform: translateX(-50%);
+		font-size: 13px;
+		color: #4c4545;
+		font-weight: 500;
+		width: 125px;
+		text-align: center;
+	}
+}
+.f-switch2 {
+	left: 50%;
+	&:after {
+		content: 'Configure columns and other options';
+		position: absolute;
+		top: 80px;
+		left: 50%;
+		transform: translateX(-50%);
+		font-size: 13px;
+		color: #4c4545;
+		font-weight: 500;
+		width: 125px;
+		text-align: center;
+	}
+}
+.f-switch3 {
+	left: 90%;
+	&:after {
+		content: 'Proceed with import Review Import results';
+		position: absolute;
+		top: 80px;
+		left: 50%;
+		transform: translateX(-50%);
+		font-size: 13px;
+		color: #4c4545;
+		font-weight: 500;
+		width: 125px;
+		text-align: center;
+	}
+}
+
+.f-steps-block {
+	padding: 50px 0;
+	position: relative;
+}
+.f-controls-left, .f-import-switch, .f-controls-right {
+	display: inline-block;
+	vertical-align: middle;
+}
+.f-controls-left {
+	width: 25%;
+	position: absolute;
+	left: 0;
+	top: 68px;
+	.button {
+		display: block;
+		width: 133px;
+		margin: 5px 0;
+		padding: 7px 0;
+	}
+}
+.f-controls-right {
+	width: 25%;
+	position: absolute;
+	right: 0;
+	top: 68px;
+}
 @media (max-width: 1365px) {
 	.overlay { //for translating popup
 		&.open {
@@ -567,6 +726,70 @@ a:focus {
 		.f-tags__tag {
 			margin: 0;
 		}
+	}
+	.f-steps-block {
+		padding: 0;
+	}
+	.f-import-switch {
+		padding: 30px 0;
+		width: 100%;
+		margin: 0 0 60px 0;
+	}
+	.f-controls-left, .f-controls-right {
+		width: 100%;
+		position: relative;
+		left: 0;
+		top: 0;
+		text-align: center;
+		.button {
+			display: inline-block;
+			width: 120px;
+			margin: 5px 0;
+			padding: 7px 0;
+			vertical-align: middle;
+		}
+	}
+	.f-switch {
+		width: 24px;
+		height: 24px;
+		font-size: 15px;
+		padding: 4px 0;
+		box-shadow: inset 3px 2px 4px 0 rgba(141, 136, 136, 0.5);
+		&:after {
+			top: 46px;
+			font-size: 11px;
+			width: 87px;
+			text-shadow: none;
+		}
+	}
+	.f-import-switch__container {
+		height: 10px;
+		box-shadow: inset 3px 2px 4px 0 rgba(141, 136, 136, 0.5);
+	}
+	.f-switch.active {
+		width: 26px;
+		height: 38px;
+		padding: 10px 0;
+		&:before {
+			bottom: -10px;
+			border: 5px solid transparent;
+			border-top: 5px solid #ff8f00;
+		}
+	}
+	.f-progress-import {
+		width: 100%;
+		margin: 0 auto;
+		padding: 20px 0;
+	}
+	.f-progress-import__container {
+		width: 100%;
+		display: block;
+		margin-bottom: 20px;
+	}
+	.f-stop-button {
+		width: 108px;
+		margin: 0 auto;
+		display: block !important;
 	}
 }
 

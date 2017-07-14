@@ -106,17 +106,23 @@ table {
 }
 .f-striped-table {
 	width: 100%;
-	tbody {
-		tr:nth-child(odd) {
-			background: #f8f8f8;
-		}
+	tr:nth-child(even) {
+		background: #f8f8f8;
 	}
+
 	th, td {
 		height: 30px;
 		padding: 0 8px;
 	}
 }
-
+.f-errors-table {
+	tbody {
+		td:first-child {
+			position: relative;
+			text-transform: uppercase;
+		}
+	}
+}
 .f-total-table {
 	width: 100%;
 	text-align: left;
@@ -315,7 +321,43 @@ table {
 		margin-bottom: 5px;
 	}
 }
-
+.f-line-valid {
+	background: #1dc833;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	display: inline-block;
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.f-line-warning {
+	background: #ff9000;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	display: inline-block;
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.f-line-error {
+	background: #ff0000;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	display: inline-block;
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.f-status-td {
+	position: relative;
+	padding-right: 25px !important;
+}
 .f-icon-column {
 	.f-input-number, .f-input, .f-textarea {
 		width: calc(100% - 30px);
