@@ -1,5 +1,5 @@
 define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-catalog-fields-grid-config'], function (SvHlp, SvCompGrid, gridConfig) {
-    var Component = {
+    return {
         mixins: [SvHlp.mixins.common, SvHlp.mixins.grid],
         data: function () {
             return {
@@ -12,15 +12,15 @@ define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-catalog-fields-grid-config'], fu
             'sv-comp-grid': SvCompGrid
         },
         created: function () {
-            this.$store.commit('setData', {curPage: {
-                link: '/catalog/fields',
-                label: 'Custom Fields',
-                breadcrumbs: [
-                    {nav:'/catalog', label:'Catalog'}
-                ]
-            }});
+            this.$store.commit('setData', {
+                curPage: {
+                    link: '/catalog/fields',
+                    label: 'Custom Fields',
+                    breadcrumbs: [
+                        {nav: '/catalog', label: 'Catalog'}
+                    ]
+                }
+            });
         }
     };
-
-    return Component;
 });
