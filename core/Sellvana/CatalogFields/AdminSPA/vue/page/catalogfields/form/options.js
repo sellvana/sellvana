@@ -1,4 +1,4 @@
-define(['lodash', 'sv-hlp', 'text!sv-page-catalog-fields-form-options-tpl'], function (_, SvHlp, tabFieldOptionsTpl) {
+define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-catalog-fields-form-options-tpl'], function (_, Vue, SvHlp, tabFieldOptionsTpl) {
     return {
         data: function () {
             return {
@@ -10,8 +10,9 @@ define(['lodash', 'sv-hlp', 'text!sv-page-catalog-fields-form-options-tpl'], fun
             }
         },
         mounted: function() {
-            this.fetchData();
+            this.options = this.form.options;
         },
+        props: ['form'],
         mixins: [SvHlp.mixins.common],
         template: tabFieldOptionsTpl,
         methods: {
@@ -19,20 +20,11 @@ define(['lodash', 'sv-hlp', 'text!sv-page-catalog-fields-form-options-tpl'], fun
                 this.options.push(_.clone(this.defaultOption))
             },
             deleteOption: function (option) {
-                this.options = _.reject(this.options, function (o) {
+                var idx = _.findIndex(this.options, function (o) {
                     return o === option;
                 });
-            },
-            fetchData: function () {
-                var vm = this;
-                if (this.$route.query) {
-                    this.sendRequest('GET', 'catalogfields/options/data', this.$route.query, function (response) {
-                        if(_.isArray(response)) {
-                            _.each(response, function (op) {
-                                vm.options.push(op);
-                            });
-                        }
-                    });
+                if (idx !== -1) {
+                    this.options.splice(idx, 1);
                 }
             }
         }

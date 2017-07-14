@@ -46,7 +46,10 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
                     vm.action_in_progress = false;
                     return;
                 }
-                this.sendRequest('POST', 'catalogfields/form_data?id=' + this.form.field.id, this.form.field, function (response) {
+                this.sendRequest('POST', 'catalogfields/form_data?id=' + this.form.field.id, {
+                    field: this.form.field,
+                    options: this.form.options
+                }, function (response) {
                     if (response.form) {
                         vm.processFormDataResponse(response);
                         vm.updateBreadcrumbs(vm.form.field.field_name);
