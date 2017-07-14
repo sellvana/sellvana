@@ -35,10 +35,51 @@
                         <div class="widget-block header-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Header'|_}}</p>
-                                    <!-- <div class="f-icon-block">
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')"></svg>
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-close')"></svg>
-                                </div>-->
+                                    <a href="#" class="f-icon-block" :class="{open:ddOpen('block-visible')}" @click.prevent.stop="ddToggle('block-visible')">
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')" class="open-eye"></svg>
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-close')" class="close-eye"></svg>
+                                    </a>
+                              </div>
+                              <div class="widget-block-content">
+                                    <div class="widget no-padding">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
+                                          <div class="widget-title">
+                                                <p>{{'Split 2 Columns'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-params-result">
+                                                <div class="f-two-col">
+                                                      <div class="widget-container"></div>
+                                                      <div class="widget-container"></div>
+                                                </div>
+                                          </div>
+                                    </div>
+                                    <div class="widget no-padding">
+                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
+                                          <div class="widget-title">
+                                                <p>{{'Split 3 Columns'|_}}</p>
+                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
+                                          </div>
+                                          <div class="widget-params-result">
+                                                <div class="f-three-col">
+                                                      <div class="widget-container"></div>
+                                                      <div class="widget-container"></div>
+                                                      <div class="widget-container"></div>
+                                                </div>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+
+                        <div class="widget-block sidebar-widget-block">
+                              <div class="widget-block-title">
+                                    <p>{{'Left column'|_}}</p>
+                                    <a href="#" class="f-icon-block" :class="{open:ddOpen('block-visible')}" @click.prevent.stop="ddToggle('block-visible')">
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')" class="open-eye"></svg>
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-close')" class="close-eye"></svg>
+                                    </a>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
@@ -49,10 +90,13 @@
                                                 <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
                                           </div>
                                           <div class="widget-content-modal">
+                                                <div class="f-block-title">
+                                                      <p class="f-block-title__text">CMS Block</p>
+                                                      <button draggable="false" class="f-delete"><i class="fa fa-times"></i></button>
+                                                </div>
                                                 <fieldset class="f-form-container">
                                                       <div class="f-form-group row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
+                                                                  <div class="col-md-12">
                                                                   <select2>
                                                                         <option>Option1</option>
                                                                         <option>Option2</option>
@@ -60,8 +104,7 @@
                                                             </div>
                                                       </div>
                                                       <div class="f-form-group row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                   <div class="f-input-group">
                                                                         <input type="text" class="f-input" value="" placeholder="Param">
                                                                         <span class="f-input-group__addon"> = </span>
@@ -71,8 +114,7 @@
                                                             </div>
                                                       </div>
                                                       <div class="f-form-group row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                   <div class="f-input-group">
                                                                         <input type="text" class="f-input" value="" placeholder="Param">
                                                                         <span class="f-input-group__addon"> = </span>
@@ -82,20 +124,23 @@
                                                             </div>
                                                       </div>
                                                       <div class="f-form-group row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                   <div class="control-block">
                                                                         <button class="button button2">{{'Add custom param'|_}}</button>
                                                                   </div>
                                                             </div>
                                                       </div>
                                                 </fieldset>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
+                                                </div>
                                           </div>
                                           <div class="widget-params-result">
                                                 <table class="f-total-table f-standart-table">
-                                                       <tr>
-                                                             <th>Parameter 1</th>
-                                                             <td>Value 1</td>
+                                                      <tr>
+                                                            <th>Parameter 1</th>
+                                                            <td>Value 1</td>
                                                       </tr>
                                                       <tr>
                                                             <th>Parameter 2</th>
@@ -157,52 +202,15 @@
                                                             </div>
                                                       </div>
                                                 </fieldset>
-                                          </div>
-                                          <div class="widget-params-result">
-                                                <img src="#" alt="" class="widget-img-thumb">
-                                                <img src="#" alt="" class="widget-img-thumb">
-                                                <img src="#" alt="" class="widget-img-thumb">
-                                          </div>
-                                    </div>
-                              </div>
-                        </div>
-
-                        <div class="widget-block sidebar-widget-block">
-                              <div class="widget-block-title">
-                                    <p>{{'Left column'|_}}</p>
-                                    <!-- <div class="f-icon-block">
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')"></svg>
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-close')"></svg>
-                                </div>-->
-                              </div>
-                              <div class="widget-block-content">
-                                    <div class="widget no-padding">
-                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
-                                          <div class="widget-title">
-                                                <p>{{'Split 2 Columns'|_}}</p>
-                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                                          </div>
-                                          <div class="widget-params-result">
-                                               <div class="f-two-col">
-                                                     <div class="widget-container"></div>
-                                                     <div class="widget-container"></div>
-                                               </div>
-                                          </div>
-                                    </div>
-                                    <div class="widget no-padding">
-                                          <a href="#" class="f-dragg"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
-                                          <div class="widget-title">
-                                                <p>{{'Split 3 Columns'|_}}</p>
-                                                <a href="#" class="f-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                                <a href="#" class="f-delete" draggable="false"><i class="fa fa-times"></i></a>
-                                          </div>
-                                          <div class="widget-params-result">
-                                                <div class="f-three-col">
-                                                      <div class="widget-container"></div>
-                                                      <div class="widget-container"></div>
-                                                      <div class="widget-container"></div>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
                                                 </div>
+                                          </div>
+                                          <div class="widget-params-result">
+                                                <img src="#" alt="" class="widget-img-thumb">
+                                                <img src="#" alt="" class="widget-img-thumb">
+                                                <img src="#" alt="" class="widget-img-thumb">
                                           </div>
                                     </div>
                               </div>
@@ -211,10 +219,10 @@
                         <div class="widget-block main-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Main'|_}}</p>
-                                    <!-- <div class="f-icon-block">
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')"></svg>
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-close')"></svg>
-                                </div>-->
+                                    <a href="#" class="f-icon-block" :class="{open:ddOpen('block-visible')}" @click.prevent.stop="ddToggle('block-visible')">
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')" class="open-eye"></svg>
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-close')" class="close-eye"></svg>
+                                    </a>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
@@ -236,6 +244,10 @@
                                                             </div>
                                                       </div>
                                                 </fieldset>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
+                                                </div>
                                           </div>
                                           <div class="widget-params-result">
                                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -266,8 +278,7 @@
                                                             </div>
                                                       </div>
                                                       <div class="f-form-group row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                   <div class="f-input-group">
                                                                         <input type="text" class="f-input" value="" placeholder="Param">
                                                                         <span class="f-input-group__addon"> = </span>
@@ -277,8 +288,7 @@
                                                             </div>
                                                       </div>
                                                       <div class="f-form-group row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                   <div class="f-input-group">
                                                                         <input type="text" class="f-input" value="" placeholder="Param">
                                                                         <span class="f-input-group__addon"> = </span>
@@ -288,14 +298,17 @@
                                                             </div>
                                                       </div>
                                                       <div class="f-form-group row">
-                                                            <label class="col-md-3"></label>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                   <div class="control-block">
                                                                         <button class="button button2">{{'Add custom param'|_}}</button>
                                                                   </div>
                                                             </div>
                                                       </div>
                                                 </fieldset>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
+                                                </div>
                                           </div>
                                           <div class="widget-params-result">
                                                 <table class="f-total-table f-standart-table">
@@ -320,11 +333,10 @@
                         <div class="widget-block sidebar-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Right column'|_}}</p>
-
-                                   <!-- <div class="f-icon-block">
-                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')"></svg>
-                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-close')"></svg>
-                                    </div>-->
+                                    <a href="#" class="f-icon-block" :class="{open:ddOpen('block-visible')}" @click.prevent.stop="ddToggle('block-visible')">
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')" class="open-eye"></svg>
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-close')" class="close-eye"></svg>
+                                    </a>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
@@ -339,12 +351,16 @@
                                                       <p class="f-block-title__text">Remove view</p>
                                                       <button draggable="false" class="f-delete"><i class="fa fa-times"></i></button>
                                                 </div>
-                                                <div class="form-horizontal">
-                                                      <div class="form-group">
+                                                <fieldset class="f-form-container">
+                                                      <div class="f-form-group row">
                                                             <div class="col-md-12">
                                                                   <input class="f-input" type="text"/>
                                                             </div>
                                                       </div>
+                                                </fieldset>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
                                                 </div>
                                           </div>
                                           <div class="widget-params-result">
@@ -357,10 +373,10 @@
                         <div class="widget-block footer-widget-block">
                               <div class="widget-block-title">
                                     <p>{{'Footer'|_}}</p>
-                                    <!-- <div class="f-icon-block">
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')"></svg>
-                                      <svg width="20" height="19" v-html="svgIconLink('icon-open-close')"></svg>
-                                </div>-->
+                                    <a href="#" class="f-icon-block" :class="{open:ddOpen('block-visible')}" @click.prevent.stop="ddToggle('block-visible')">
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-eye')" class="open-eye"></svg>
+                                          <svg width="20" height="19" v-html="svgIconLink('icon-open-close')" class="close-eye"></svg>
+                                    </a>
                               </div>
                               <div class="widget-block-content">
                                     <div class="widget">
@@ -420,6 +436,10 @@
                                                             </div>
                                                       </div>
                                                 </fieldset>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
+                                                </div>
                                           </div>
                                           <div class="widget-params-result">
                                                 <iframe width="560" height="315" src="https://www.youtube.com/embed/N2W_Vb61jH4" frameborder="0" allowfullscreen></iframe>
@@ -452,6 +472,8 @@
                                                       </div>
                                                       <div class="f-form-group row">
                                                             <div class="col-md-3 f-form-label">
+                                                            </div>
+                                                            <div class="col-md-9 text-right">
                                                                   <button class="button button1">{{'Select image'|_}}</button>
                                                             </div>
                                                       </div>
@@ -475,6 +497,10 @@
                                                             </div>
                                                       </div>
                                                 </fieldset>
+                                                <div class="f-buttons-block text-right">
+                                                      <button type="button" class="button button2">Cancel</button>
+                                                      <button type="button" class="button button1">Apply</button>
+                                                </div>
                                           </div>
                                           <div class="widget-params-result">
                                                 <div class="widget-params-result">
