@@ -80,10 +80,10 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 
     public function getFormData()
     {
-        $pId = $this->BRequest->get('id');
+        $fId = $this->BRequest->get('id');
         $bool = [['id' => 0, 'text' => 'no'], ['id' => 1, 'text' => 'Yes']];
 
-        $field = $this->FCom_Core_Model_Field->load($pId);
+        $field = $this->FCom_Core_Model_Field->load($fId);
         if (!$field) {
             throw new BException('Field not found');
         }

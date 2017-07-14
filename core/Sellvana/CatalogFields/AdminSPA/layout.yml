@@ -8,7 +8,6 @@
             - [ requireJs, sv-page-catalog-fields-form-info-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/info.html ]
             - [ requireJs, sv-page-catalog-fields-form-options, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/options ]
             - [ requireJs, sv-page-catalog-fields-form-options-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/options.html ]
-            - [ requireJs, sv-page-catalog-fields-form-options-data, ~/catalogfields/options/data ]
 
             - [ requireJs, sv-page-catalog-products-form-variants, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants" ]
             - [ requireJs, sv-page-catalog-products-form-variants-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants.html" ]

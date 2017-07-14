@@ -17,10 +17,25 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields_Options
     static protected $_modelName = 'field_option';
     static protected $_recordName = 'Field Option';
 
+    public function action_data()
+    {
+        $this->respond($this->getFormData());
+    }
+
     public function getFormData()
     {
         $fieldId = $this->BRequest->get('id');
-        var_dump($fieldId);
-        die();
+        $result = [];
+
+        if ($fieldId) {
+            $fieldOptions = $this->FCom_Core_Model_FieldOption
+                ->orm()
+                ->select(['id', 'label', 'swatch_info'])
+                ->where('field_id', $fieldId);
+            
+            $result = $fieldOptions->find_many();
+        }
+
+        return $result;
     }
 }
