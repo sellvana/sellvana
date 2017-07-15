@@ -1,7 +1,7 @@
-define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
+define(['vue', 'sv-mixin-common', 'text!sv-comp-nav-tpl'], function(Vue, SvMixinCommon, navTpl) {
     var SvCompNav = {
-        mixins: [SvHlp.mixins.common],
-        store: SvHlp.store,
+        mixins: [SvMixinCommon],
+        template: navTpl,
         data: function () {
             return {
                 ui: this.$store.state.ui,
@@ -48,7 +48,6 @@ define(['vue', 'sv-hlp', 'text!sv-comp-nav-tpl'], function(Vue, SvHlp, navTpl) {
                 }
             }
         },
-        template: navTpl,
         watch: {
             mainNavOpen: function (a) {
                 if (!a) {

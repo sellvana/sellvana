@@ -1,5 +1,5 @@
-define(['lodash', 'sv-hlp', 'vue-dropzone', 'text!sv-page-catalog-quick-add-products-tpl', 'json!sv-page-catalog-quick-add-products-config'],
-    function (_, SvHlp, VueDropzone, addProductsTpl, addProductsConfig) {
+define(['lodash', 'sv-mixin-form-tab', 'vue-dropzone', 'text!sv-page-catalog-quick-add-products-tpl', 'json!sv-page-catalog-quick-add-products-config'],
+    function (_, SvMixinFormTab, VueDropzone, addProductsTpl, addProductsConfig) {
 
     function uuidv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -15,7 +15,7 @@ define(['lodash', 'sv-hlp', 'vue-dropzone', 'text!sv-page-catalog-quick-add-prod
     ];
 
     var Component = {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         template: addProductsTpl,
         data: function () {
             return {

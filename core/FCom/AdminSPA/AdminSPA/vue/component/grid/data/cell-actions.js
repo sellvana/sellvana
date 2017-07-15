@@ -1,5 +1,6 @@
-define(['sv-hlp', 'text!sv-comp-grid-data-cell-actions-tpl'], function (SvHlp, actionsTpl) {
+define(['sv-mixin-common', 'text!sv-comp-grid-data-cell-actions-tpl'], function (SvMixinCommon, actionsTpl) {
     return {
+        mixins: [SvMixinCommon],
         props: ['grid', 'row', 'col'],
         template: actionsTpl,
         computed: {
@@ -13,7 +14,7 @@ define(['sv-hlp', 'text!sv-comp-grid-data-cell-actions-tpl'], function (SvHlp, a
         },
         methods: {
             deleteRow: function (row, act) {
-                if (!confirm(SvHlp._('Are you sure you want to delete the row?'))) {
+                if (!confirm(this._(('Are you sure you want to delete the row?')))) {
                     return;
                 }
                 this.$emit('delete-row', row);

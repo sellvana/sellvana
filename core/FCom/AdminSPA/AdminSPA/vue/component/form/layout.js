@@ -1,6 +1,6 @@
-define(['vue', 'sv-hlp', 'text!sv-comp-form-layout-tpl'], function (Vue, SvHlp, layoutTpl) {
+define(['vue', 'sv-mixin-common', 'text!sv-comp-form-layout-tpl'], function (Vue, SvMixinCommon, layoutTpl) {
     var Component = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: layoutTpl,
         props: ['form', 'layout'],
         data: function () {

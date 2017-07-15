@@ -1,11 +1,13 @@
-define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-header-breadcrumbs', 'sv-comp-messages', 'sv-comp-nav',
-        'sv-comp-actions', 'sv-comp-tabs',
+define(['vue', 'sv-mixin-common', 'sv-mixin-common', 'sv-mixin-grid', 'sv-mixin-form', 'sv-mixin-form-tab',
+        'sv-comp-header', 'sv-comp-header-breadcrumbs', 'sv-comp-messages', 'sv-comp-nav',
+        'sv-hlp', 'sv-comp-actions', 'sv-comp-tabs',
         'text!sv-comp-header-tpl', 'text!sv-comp-nav-tpl'],
-    function (Vue, SvHlp, SvCompHeader, SvCompHeaderBreadcrumbs, SvCompMessages, SvCompNav) {
+    function (Vue, SvMixinCommon, SvMixinCommon, SvMixinGrid, SvMixinForm, SvMixinFormTab,
+              SvCompHeader, SvCompHeaderBreadcrumbs, SvCompMessages, SvCompNav) {
 
     var SvApp = {
         el: '#sv-app',
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         data: function () {
             return {
                 ui: this.$store.state.ui,
@@ -35,8 +37,6 @@ define(['vue', 'sv-hlp', 'sv-comp-header', 'sv-comp-header-breadcrumbs', 'sv-com
             }
 
         },
-        router: SvHlp.router,
-        store: SvHlp.store
     };
 
     new Vue(SvApp);

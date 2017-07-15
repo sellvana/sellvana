@@ -1,5 +1,4 @@
-define(['vue', 'sv-hlp'],
-    function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
 
         var defForm = {
             options: {},
@@ -11,7 +10,7 @@ define(['vue', 'sv-hlp'],
         };
 
         return {
-            mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+            mixins: [SvMixinForm],
             data: function () {
                 return {
                     form: defForm
@@ -39,7 +38,7 @@ define(['vue', 'sv-hlp'],
                     });
                 },
                 doDelete: function () {
-                    if (!confirm(SvHlp._('Are you sure you want to delete this vendor?'))) {
+                    if (!confirm(this._(('Are you sure you want to delete this vendor?')))) {
                         return;
                     }
                     this.sendRequest('POST', 'vendors/form_delete', {id: this.form.vendor.id}, function (response) {

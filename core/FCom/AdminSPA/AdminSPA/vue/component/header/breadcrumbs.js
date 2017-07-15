@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-breadcrumbs-tpl'], function (SvHlp, headerBreadcrumbsTpl) {
+define(['sv-mixin-common', 'text!sv-comp-header-breadcrumbs-tpl'], function (SvMixinCommon, headerBreadcrumbsTpl) {
     var SvCompHeaderBreadcrumbs = {
         props: ['mobile'],
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: headerBreadcrumbsTpl,
         computed: {
             breadcrumbParts: function () {

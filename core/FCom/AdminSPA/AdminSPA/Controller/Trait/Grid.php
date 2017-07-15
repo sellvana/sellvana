@@ -51,10 +51,6 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         'date' => 'between',
     ];
 
-    static protected $_defaultGridActionConfig = [
-        //'mobile_group' => 'actions',
-    ];
-
     /**
      * @return array
      */
@@ -62,6 +58,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function getGridOrm()
     {
+        if (empty(static::$_modelClass)) {
+            return false;
+        }
+
         $modelClass = static::$_modelClass;
         return $this->{$modelClass}->orm();
     }
@@ -240,9 +240,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function normalizeGridConfig($config)
     {
-        if (method_exists($this, 'getGridOrm')) {
-            $indexPrefix = $this->getGridOrm()->table_alias() . '.';
-        }
+        $gridOrm = $this->getGridOrm();
+        $indexPrefix = $gridOrm ? $gridOrm->table_alias() . '.' : '';
 
         if (!empty($config['data_url']) && empty($config['personalize_url'])) {
             $config['personalize_url'] = str_replace('grid_data', 'grid_personalize', $config['data_url']);
@@ -390,33 +389,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         }
 
         if (!empty($config['page_actions'])) {
-            $actionGroups = [];
-            if (!empty($config['page_actions']['default'])) {
-                $def = array_merge(static::$_defaultGridActionConfig, $config['page_actions']['default']);
-                unset($config['page_actions']['default']);
-            } else {
-                $def = static::$_defaultGridActionConfig;
-            }
-            foreach ($config['page_actions'] as &$act) {
-                $act = array_merge($def, $act);
-                foreach (['desktop_group', 'mobile_group'] as $g) {
-                    $group = !empty($act[$g]) ? $act[$g] : (!empty($act['group']) ? $act['group'] : null);
-                    if (!empty($group)) {
-                        if (empty($actionGroups[$g][$group])) {
-                            $actionGroups[$g][$group] = $act;
-                        } else {
-                            $actionGroups[$g][$group]['children'][] = $act;
-                        }
-                    }
-                }
-            }
-            unset($act);
-            if (!empty($actionGroups['desktop_group'])) {
-                $config['page_actions_groups']['desktop'] = array_values($actionGroups['desktop_group']);
-            }
-            if (!empty($actionGroups['mobile_group'])) {
-                $config['page_actions_groups']['mobile'] = array_values($actionGroups['mobile_group']);
-            }
+            $config['page_actions_groups'] = $this->getActionsGroups($config['page_actions']);
+        }
+
+        if (!empty($config['panel_actions'])) {
+            $config['panel_actions_groups'] = $this->getActionsGroups($config['panel_actions']);
         }
 
         if (!empty($config['pager']) && $config['pager'] === true) {

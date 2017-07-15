@@ -11,6 +11,7 @@
             - [ requireJs, sv-page-vendors-form-main, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/form/main" ]
             - [ requireJs, sv-page-vendors-form-main-tpl, "@Sellvana_MultiVendor/AdminSPA/vue/page/vendors/form/main.html" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /catalog/vendors, label: Vendors, link: /vendors, pos: 60 } ]

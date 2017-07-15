@@ -13,6 +13,7 @@
 
 			- [ requireJs, sv-comp-dashboard-new-customers-tpl, "@Sellvana_Customer/AdminSPA/vue/component/dashboard/new-customers.html" ]
 			
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /customers, label: Customers, icon: "icon-customers", pos: 40 } ]

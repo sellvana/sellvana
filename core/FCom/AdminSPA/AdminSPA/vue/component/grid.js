@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
+define(['vue', 'sv-mixin-common', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
         'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
         'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-cell-row-select-tpl',
@@ -7,7 +7,7 @@ define(['vue', 'sv-hlp', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvHlp, $, _, VueDraggable, SvCompPopup,
+    function(Vue, SvMixinCommon, $, _, VueDraggable, SvCompPopup,
              SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
              SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
              gridTpl, gridHeaderCellRowSelectTpl,
@@ -166,9 +166,8 @@ console.log(filters, result);
         }
 
         var SvCompGridPagerList = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             props: ['grid'],
-            store: SvHlp.store,
             template: gridPagerListTpl,
             computed: {
                 ddName: function () {
@@ -217,10 +216,9 @@ console.log(filters, result);
         var SvCompGridPagerDropdown = $.extend({}, SvCompGridPagerList, {template: gridPagerDropdownTpl});
 
         var SvCompGridPanelColumns = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPanelColumnsTpl,
-            store: SvHlp.store,
             components: {
                 draggable: VueDraggable
             },
@@ -258,7 +256,7 @@ console.log(filters, result);
         };
 
         var SvCompGridPanelFilters = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPanelFiltersTpl,
             data: function () {
@@ -301,7 +299,7 @@ console.log(filters, result);
                     return {
                         data: this.availableFilters,
                         allowClear: true,
-                        placeholder: SvHlp._(this.availableFilters.length > 1 ? 'Add filter...' : 'No filters available to add')
+                        placeholder: this.availableFilters.length > 1 ? this._(('Add filter...')) : this._(('No filters available to add'))
                     };
                 }
             },
@@ -375,7 +373,7 @@ console.log(filters, result);
         };
 
         var SvCompGridPanelExport = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPanelExportTpl,
             data: function () {
@@ -406,7 +404,7 @@ console.log(filters, result);
         };
 
         var SvCompGridBulkActions = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridBulkActionsTpl,
             computed: {
@@ -422,7 +420,7 @@ console.log(filters, result);
         };
 
         var SvCompGridPanel = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             props: ['grid', 'cnt-visible'],
             components: {
                 'sv-comp-grid-pager-list': SvCompGridPagerList,
@@ -467,7 +465,7 @@ console.log(filters, result);
 
         var SvCompGrid = {
             props: ['grid'],
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             data: function() {
                 return {
                     cntVisible: 0
@@ -533,6 +531,7 @@ console.log(filters, result);
                         case 'remove-all-filters': this.removeAllFilters(arg); break;
                         case 'bulk-action': this.bulkAction(arg); break;
                         case 'update-config': this.updateConfig(arg); break;
+                        default: this.$emit('event', event, arg);
                     }
                 },
                 fetchData: function (grid) {
@@ -580,18 +579,15 @@ console.log(filters, result);
                 },
                 bulkAction: function (act) {
                     if (!Object.keys(this.grid.rows_selected).length) {
-                        alert(SvHlp._('Please select some rows first'));
+                        alert(this._(('Please select some rows first')));
                         return;
                     }
                     console.log(act);
                     if (act.popup) {
-                        Vue.set(this.grid, 'popup', act.popup);
+                        Vue.set(this.grid, act.action_type || 'popup', act.popup);
                         // this.grid.popup.grid = this.grid;
                         // this.grid.popup.open = true;
                     }
-                },
-                processPopupEvent: function (type, args) {
-                    this.$emit('event', type, args);
                 },
                 updateConfig: function (config) {
                     Vue.set(this.grid, 'config', config);

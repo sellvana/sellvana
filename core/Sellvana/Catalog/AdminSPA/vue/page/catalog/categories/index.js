@@ -1,5 +1,5 @@
-define(['lodash', 'sv-hlp', 'sv-comp-tree', 'sv-comp-grid'/*, 'json!sv-page-catalog-category-products-grid-config'*/],
-    function (_, SvHlp, SvCompTree, SvCompGrid, gridConfig) {
+define(['lodash', 'sv-mixin-form', 'sv-comp-tree', 'sv-comp-grid'/*, 'json!sv-page-catalog-category-products-grid-config'*/],
+    function (_, SvMixinForm, SvCompTree, SvCompGrid, gridConfig) {
 
     var defForm = {
         options: {},
@@ -12,7 +12,7 @@ define(['lodash', 'sv-hlp', 'sv-comp-tree', 'sv-comp-grid'/*, 'json!sv-page-cata
     };
 
     return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+        mixins: [SvMixinForm],
         data: function () {
             return {
                 tree: {},
@@ -49,7 +49,7 @@ define(['lodash', 'sv-hlp', 'sv-comp-tree', 'sv-comp-grid'/*, 'json!sv-page-cata
                 console.log(event);
                 switch (event.type) {
                     case 'select':
-                        SvHlp.router.push('/catalog/categories?id=' + event.node.id);
+                        this.$router.push('/catalog/categories?id=' + event.node.id);
                         break;
                 }
             },

@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'text!sv-comp-form-field-tpl'], function (_, Vue, fieldTpl) {
+define(['lodash', 'vue', 'sv-app-data', 'text!sv-comp-form-field-tpl'], function (_, Vue, SvAppData, fieldTpl) {
 
     var SvCompFormField;
     SvCompFormField = {

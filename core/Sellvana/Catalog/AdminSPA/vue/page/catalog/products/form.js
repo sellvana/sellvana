@@ -1,7 +1,7 @@
-define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
 
 	return {
-		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+		mixins: [SvMixinForm],
 		methods: {
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {
@@ -22,7 +22,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
 			},
 			doDelete: function () {
                 var vm = this;
-				if (!confirm(SvHlp._('Are you sure you want to delete this product?'))) {
+				if (!confirm(this._(('Are you sure you want to delete this product?')))) {
 					return;
 				}
 				this.sendRequest('POST', 'products/form_delete', {id: this.form.product.id}, function (response) {

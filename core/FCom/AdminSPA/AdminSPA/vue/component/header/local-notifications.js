@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-local-notifications-tpl'], function (SvHlp, headerLocalNotificationsTpl) {
+define(['sv-mixin-common', 'text!sv-comp-header-local-notifications-tpl'], function (SvMixinCommon, headerLocalNotificationsTpl) {
 
     var SvHeaderLocalNotifications = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: headerLocalNotificationsTpl,
         data: function () {
             return {

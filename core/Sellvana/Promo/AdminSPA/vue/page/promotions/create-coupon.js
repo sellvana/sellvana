@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-promotions-create-tpl'], function (SvHlp, CreateCouponTpl) {
+define(['sv-mixin-form-tab', 'text!sv-page-promotions-create-tpl'], function (SvMixinFormTab, CreateCouponTpl) {
     return {
-        mixins: [SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         template: CreateCouponTpl,
         props: ['form']
     }

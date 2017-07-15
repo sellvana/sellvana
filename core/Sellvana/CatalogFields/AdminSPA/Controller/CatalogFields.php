@@ -92,7 +92,7 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 
         $result['form'][static::$_modelName] = $field->as_array();
 
-		$result['form']['config']['page_actions'] = true;
+		$result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
 		$result['form']['config']['title'] = $field->get('field_name');
 
 		$result['form']['config']['tabs'] = '/catalog/fields/form';

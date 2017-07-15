@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-favorites-tpl'], function (SvHlp, headerFavoritesTpl) {
+define(['sv-mixin-common', 'text!sv-comp-header-favorites-tpl'], function (SvMixinCommon, headerFavoritesTpl) {
 
     var SvCompHeaderFavorites = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: headerFavoritesTpl,
         computed: {
             favorites: function () {

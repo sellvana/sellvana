@@ -8,6 +8,7 @@ modules:
             FCom_AdminSPA:
                 auto_use: [ layout, views ]
                 routing:
+                    - [ /sv-app-data.js, FCom_AdminSPA_AdminSPA_Controller_Main.sv_app_data_js ]
                     - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]
                     - [ /header/.action, FCom_AdminSPA_AdminSPA_Controller_Header ]
                     - [ /components/*path, FCom_AdminSPA_AdminSPA_Controller_Main.components ]

@@ -1,6 +1,6 @@
-define(['jquery', 'sv-hlp'], function($, SvHlp) {
+define(['jquery', 'sv-mixin-common'], function($, SvMixinCommon) {
     return {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         data: function () {
             return {
                 username: '',
@@ -23,7 +23,7 @@ define(['jquery', 'sv-hlp'], function($, SvHlp) {
 					
                     vm.logging_in = false;
                     if (response._redirect) {
-                        SvHlp.router.push(response._redirect);
+                        vm.$router.push(response._redirect);
                     }
                 });
             }

@@ -1,4 +1,4 @@
-define(['vue', 'dropzone', 'vue-dropzone', 'text!sv-comp-form-media-tpl'], function (Vue, Dropzone, VueDropzone, mediaTpl) {
+define(['vue', 'dropzone', 'vue-dropzone', 'sv-app-data', 'text!sv-comp-form-media-tpl'], function (Vue, Dropzone, VueDropzone, SvAppData, mediaTpl) {
 
     var SvCompFormMedia = {
         template: mediaTpl,

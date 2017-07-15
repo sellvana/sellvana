@@ -1,4 +1,4 @@
-define(['sv-hlp', 'text!sv-page-dashboard-widget-tpl'], function (SvHlp, widgetTpl) {
+define(['sv-mixin-common', 'text!sv-page-dashboard-widget-tpl'], function (SvMixinCommon, widgetTpl) {
     var SvPageDashboardWidget = {
         template: widgetTpl,
         props: ['widget'],
@@ -8,7 +8,7 @@ define(['sv-hlp', 'text!sv-page-dashboard-widget-tpl'], function (SvHlp, widgetT
                     return require(this.widget.component);
                 } else if (this.widget.template) {
                     return {
-                        mixins: [SvHlp.mixins.common],
+                        mixins: [SvMixinCommon],
                         props: ['widget'],
                         template: require('text!' + this.widget.template)
                     }

@@ -88,4 +88,46 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         $result = $this->FCom_AdminSPA_AdminSPA->mergeResponses($result);
         $this->BResponse->json($result);
     }
+
+    public function getActionsGroups($actions, $form = null)
+    {
+        $actionGroups = [];
+        if (!empty($actions['default'])) {
+            $def = $actions['default'];
+            unset($actions['default']);
+        }
+        foreach ($actions as &$act) {
+            if (!empty($def)) {
+                $act = array_merge($def, $act);
+            }
+            if (!empty($act['if']) && $form) {
+                $ifResult = $this->BUtil->arrayGet($form, $act['if']);
+                if (!$ifResult) {
+                    continue;
+                }
+            }
+            if (empty($act['group']) && empty($act['desktop_group']) && empty($act['mobile_group'])) {
+                $act['group'] = $act['name'];
+            }
+            foreach (['desktop_group', 'mobile_group'] as $g) {
+                $group = !empty($act[$g]) ? $act[$g] : (!empty($act['group']) ? $act['group'] : null);
+                if (!empty($group)) {
+                    if (empty($actionGroups[$g][$group])) {
+                        $actionGroups[$g][$group] = $act;
+                    } else {
+                        $actionGroups[$g][$group]['children'][] = $act;
+                    }
+                }
+            }
+        }
+        unset($act);
+        $result = [];
+        if (!empty($actionGroups['desktop_group'])) {
+            $result['desktop'] = array_values($actionGroups['desktop_group']);
+        }
+        if (!empty($actionGroups['mobile_group'])) {
+            $result['mobile'] = array_values($actionGroups['mobile_group']);
+        }
+        return $result;
+    }
 }

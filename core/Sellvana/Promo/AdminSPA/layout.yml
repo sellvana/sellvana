@@ -7,6 +7,7 @@
 			- [ requireJs, sv-page-promotions-create, "@Sellvana_Promo/AdminSPA/vue/page/promotions/create-coupon" ]
 			- [ requireJs, sv-page-promotions-create-tpl, "@Sellvana_Promo/AdminSPA/vue/page/promotions/create-coupon.html" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /catalog/promos, label: Promotions, link: /promos, pos: 100 } ]

@@ -1,6 +1,6 @@
-define(['sv-hlp'], function (SvHlp) {
+define(['sv-mixin-common'], function (SvMixinCommon) {
     return {
-        store: SvHlp.store,
+        mixins: [SvMixinCommon],
         mounted: function () {
             this.$store.commit('setData', {curPage: {
                 link: '/not-found',

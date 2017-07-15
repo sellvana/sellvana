@@ -46,6 +46,7 @@
 			</div>
 			<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @event="onEvent"></sv-comp-grid-bulk-actions>
 			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="hidden-xs"></sv-comp-grid-pager-dropdown>
+			<sv-comp-actions :groups="grid.config.panel_actions_groups" event-name="panel-action" @event="onEvent"></sv-comp-actions>
 		</div>
 	</div>
 </div>

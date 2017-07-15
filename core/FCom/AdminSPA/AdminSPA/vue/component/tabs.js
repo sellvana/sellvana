@@ -1,6 +1,6 @@
-define(['jquery', 'vue', 'sv-hlp', 'text!sv-comp-tabs-tpl'], function ($, Vue, SvHlp, tabsTpl) {
+define(['jquery', 'vue', 'sv-mixin-common', 'text!sv-comp-tabs-tpl'], function ($, Vue, SvMixinCommon, tabsTpl) {
     var SvCompFormTabs = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: {
             'config': {type: Object},
             'container-class': {type: String, default: ''},
@@ -14,7 +14,7 @@ define(['jquery', 'vue', 'sv-hlp', 'text!sv-comp-tabs-tpl'], function ($, Vue, S
         },
         methods: {
             switchTab: function (tab) {
-                this.$emit('event', 'tab_switch', tab);
+                this.$emit('event', 'tab-switch', tab);
             }
         },
         mounted: function () {

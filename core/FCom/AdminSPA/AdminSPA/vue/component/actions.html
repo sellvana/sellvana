@@ -1,4 +1,4 @@
-<div :class="containerClass">
+<div v-if="groups" class="f-buttons-block" :class="containerClass" style="display:inline-block">
 
     <div class="f-actions-container">
 
@@ -6,13 +6,13 @@
 
         <div class="visible-lg visible-md">
             <template v-for="group in desktop_groups">
-                <button v-if="!group.children" :key="group.desktop_group" type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
+                <button v-if="!group.children" :key="group.desktop_group" type="button" class="button" :class="group.button_class" @click="doAction(group)">{{group.label|_}}</button>
                 <div v-if="group.children" :key="group.desktop_group" class="f-dropdown f-actions-dropdown-arrow" :class="{open:ddOpen('actions-open-' + group.desktop_group)}">
-                    <button type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
+                    <button type="button" class="button" :class="group.button_class" @click="doAction(group)">{{group.label|_}}</button>
                     <a href="#" class="f-caret f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open-' + group.desktop_group)"><b class="f-caret__elem"></b></a>
                     <div class="f-dropdown__menu f-menu_right">
                         <button v-for="action in group.children" :key="action.name" type="button" class="button"
-                                :class="action.button_class" @click="doFormAction(action)">{{action.label|_}}</button>
+                                :class="action.button_class" @click="doAction(action)">{{action.label|_}}</button>
                     </div>
                 </div>
             </template>
@@ -25,12 +25,12 @@
         <div class="f-mobile-button hidden-md hidden-lg">
 
             <template v-for="group in mobile_groups">
-                <button v-if="!group.children" :key="group.mobile_group" type="button" class="button" :class="group.button_class" @click="doFormAction(group)">{{group.label|_}}</button>
+                <button v-if="!group.children" :key="group.mobile_group" type="button" class="button" :class="group.button_class" @click="doAction(group)">{{group.label|_}}</button>
                 <div v-if="group.children" :key="group.mobile_group" class="f-dropdown f-actions-dropdown" :class="{open:ddOpen('actions-open-' + group.mobile_group)}">
                     <button type="button" class="button button1 f-dropdown__toggle" @click.prevent.stop="ddToggle('actions-open-' + group.mobile_group)">{{group.label|_}}</button>
                     <ul class="f-dropdown__menu f-menu_right">
                         <li v-for="action in group.children" :key="action.name">
-                            <button type="button" class="button" :class="action.button_class" @click="doFormAction(action)">{{action.label|_}}</button>
+                            <button type="button" class="button" :class="action.button_class" @click="doAction(action)">{{action.label|_}}</button>
                         </li>
                     </ul>
                 </div>

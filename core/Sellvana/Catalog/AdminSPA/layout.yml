@@ -71,6 +71,7 @@
             - [ requireJs, sv-comp-dashboard-search-top-terms-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/search-top-terms.html" ]
             - [ requireJs, sv-comp-dashboard-without-images-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/without-images.html" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /catalog, label: Catalog, icon: "icon-catalog", pos: 30 } ]

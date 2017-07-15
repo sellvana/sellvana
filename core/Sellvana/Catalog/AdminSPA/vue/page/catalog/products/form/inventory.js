@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-catalog-products-form-inventory-tpl'], function (SvHlp, tabTpl) {
+define(['sv-mixin-form-tab', 'text!sv-page-catalog-products-form-inventory-tpl'], function (SvMixinFormTab, tabTpl) {
     return {
-        mixins: [SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         template: tabTpl,
         props: ['form']
     }

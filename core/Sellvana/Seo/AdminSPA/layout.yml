@@ -4,6 +4,7 @@
             - [ requireJs, sv-page-seo-url-aliases, "@Sellvana_Seo/AdminSPA/vue/page/url-aliases/index" ]
             - [ requireJs, sv-page-seo-url-aliases-grid-config, "~/url_aliases/grid_config" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /seo, label: SEO, icon: "icon-seo", pos: 60 } ]

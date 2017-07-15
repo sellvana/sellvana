@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp', 'text!sv-comp-header-tpl',
+define(['vue', 'sv-mixin-common', 'text!sv-comp-header-tpl',
         'sv-comp-header-breadcrumbs', 'sv-comp-header-search', 'sv-comp-header-favorites', 'sv-comp-header-account',
         'sv-comp-header-local-notifications', 'sv-comp-header-chat', 'sv-comp-header-setup',
 
@@ -6,7 +6,7 @@ define(['vue', 'sv-hlp', 'text!sv-comp-header-tpl',
         'text!sv-comp-header-account-tpl', 'text!sv-comp-header-chat-tpl', 'text!sv-comp-header-local-notifications-tpl',
         'text!sv-comp-header-setup-tpl'
     ],
-    function(Vue, SvHlp, headerTpl,
+    function(Vue, SvMixinCommon, headerTpl,
              SvCompHeaderBreadcrumbs, SvCompHeaderSearch, SvCompHeaderFavorites, SvCompHeaderAccount,
              SvCompHeaderLocalNotifications, SvCompHeaderChat, SvCompHeaderSetup,
 
@@ -15,7 +15,7 @@ define(['vue', 'sv-hlp', 'text!sv-comp-header-tpl',
     ) {
 
         var SvCompHeader = {
-            mixins: [SvHlp.mixins.common],
+            mixins: [SvMixinCommon],
             template: headerTpl,
             components: {
                 'sv-comp-header-breadcrumbs': SvCompHeaderBreadcrumbs,

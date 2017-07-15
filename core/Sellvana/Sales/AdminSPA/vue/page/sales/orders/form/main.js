@@ -1,5 +1,5 @@
-define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
-    function (_, SvHlp, SvCompGrid, tabMainTpl) {
+define(['lodash', 'sv-app-data', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
+    function (_, SvAppData, SvMixinCommon, SvCompGrid, tabMainTpl) {
 
 
 	var defForm = {
@@ -19,7 +19,7 @@ define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main
 
     return {
 
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: tabMainTpl,
         props: {
             form: {

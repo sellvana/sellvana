@@ -1,8 +1,8 @@
-define(['vue', 'sv-hlp', 'text!sv-comp-popup-tpl'], function (Vue, SvHlp, tpl) {
+define(['vue', 'sv-mixin-form-tab', 'text!sv-comp-popup-tpl'], function (Vue, SvMixinFormTab, tpl) {
 
     var Component = {
         template: tpl,
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         props: ['popup'],
         data: function () {
             return {

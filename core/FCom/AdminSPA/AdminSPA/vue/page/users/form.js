@@ -1,7 +1,7 @@
-define(['lodash', 'vue', 'sv-hlp'], function (_, Vue, SvHlp) {
+define(['lodash', 'vue', 'sv-mixin-form'], function (_, Vue, SvMixinForm) {
 
     return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+        mixins: [SvMixinForm],
         computed: {
             avatarUrl: function () {
                 return this.form && this.form.avatar ? this.form.avatar.thumb_url : '';
@@ -12,7 +12,7 @@ define(['lodash', 'vue', 'sv-hlp'], function (_, Vue, SvHlp) {
                 var u = this.form.user;
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
-                    label: this.form.config.title || SvHlp._('Loading...'),
+                    label: this.form.config.title || this._(('Loading...')),
                     breadcrumbs: [
                         {nav:'/system', label: 'System', icon_class:'fa fa-cog'},
                         {link:'/users', label: 'Users'}
@@ -28,7 +28,7 @@ define(['lodash', 'vue', 'sv-hlp'], function (_, Vue, SvHlp) {
             },
             doDelete: function () {
                 var vm = this;
-                if (!confirm(SvHlp._('Are you sure you want to delete this user?'))) {
+                if (!confirm(this._(('Are you sure you want to delete this user?')))) {
                     return;
                 }
                 this.sendRequest('POST', 'users/form_delete', {id: this.form.user.id}, function (response) {

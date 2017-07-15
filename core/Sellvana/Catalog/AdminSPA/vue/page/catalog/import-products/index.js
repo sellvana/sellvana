@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-catalog-import-products-tpl'], function (SvHlp, tpl) {
+define(['sv-mixin-common', 'text!sv-page-catalog-import-products-tpl'], function (SvMixinCommon, tpl) {
     var Component = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: tpl
     };
 

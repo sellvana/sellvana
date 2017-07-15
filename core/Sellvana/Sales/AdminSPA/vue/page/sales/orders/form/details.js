@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
+define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-details-tpl',
         // 'sv-page-sales-orders-form-details-payment-add',
         // 'sv-page-sales-orders-form-details-payment-edit',
         // 'sv-page-sales-orders-form-details-shipment-add',
@@ -25,7 +25,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-add-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-edit-tpl'
-    ], function (_, Vue, SvHlp, tabDetailsTpl,
+    ], function (_, Vue, SvMixinCommon, tabDetailsTpl,
          // PaymentAdd, PaymentEdit, ShipmentAdd, ShipmentEdit, RefundAdd, RefundEdit, ReturnAdd, ReturnEdit, CancellationAdd, CancellationEdit,
         paymentsTpl, paymentsAddTpl, paymentsEditTpl,
         shipmentsTpl, shipmentsAddTpl, shipmentsEditTpl,
@@ -46,12 +46,12 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     }
 
     var EntityListMixin = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: ['form', 'entity']
     };
 
     var EntityAddMixin = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: ['form', 'entity'],
         data: function () {
             return {
@@ -69,7 +69,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     };
 
     var EntityEditMixin = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: ['form', 'entity'],
         computed: {
             orderItem: function () {
@@ -501,7 +501,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
     }
 
     return {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: {
             form: {
                 type: Object
@@ -564,7 +564,7 @@ define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-sales-orders-form-details-tpl',
                         break;
 
                     case 'delete':
-                        if (!confirm(SvHlp._('Are you sure you want to delete this ' + action.entity.entity_type + '?'))) {
+                        if (!confirm(this._((('Are you sure you want to delete this {type}?')), {type: action.entity.entity_type}))) {
                             return;
                         }
                         var vm = this, postData = {

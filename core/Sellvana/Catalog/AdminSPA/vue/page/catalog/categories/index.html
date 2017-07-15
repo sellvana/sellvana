@@ -26,18 +26,18 @@
                   </div>
                   <!--Actions buttons for desktop-->
 
-                  <sv-comp-actions :config="form.config" container-class="f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
+                  <sv-comp-actions :config="form.config" container-class="f-control-panel__elem" @event="onEvent"></sv-comp-actions>
             </div>
             <div class="row">
                   <div class="col-xs-12">
                         <div class="f-control-panel">
-                              <sv-comp-tabs :groups="form.config.page_actions_groups" :tab="tab" container-class="" @event="processTabEvent"></sv-comp-tabs>
+                              <sv-comp-tabs :groups="form.config.page_actions_groups" :tab="tab" container-class="" @event="onEvent"></sv-comp-tabs>
                         </div>
                   </div>
             </div>
 
 
-            <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="processTabEvent"></component>
+            <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" @event="onEvent"></component>
 
        <!--     <component v-for="t in form.config.tabs" v-if="tab === t.name" :is="t.component_config" :form="form" @tab="switchTab"></component>-->
 

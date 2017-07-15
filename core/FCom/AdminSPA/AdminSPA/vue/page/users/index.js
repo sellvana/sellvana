@@ -1,6 +1,6 @@
-define(['sv-hlp', 'sv-comp-grid', 'json!sv-page-users-grid-config'], function (SvHlp, SvCompGrid, gridConfig) {
+define(['sv-mixin-grid', 'json!sv-page-users-grid-config'], function (SvMixinGrid, gridConfig) {
     return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.grid],
+        mixins: [SvMixinGrid],
         data: function () {
             return {
                 grid: {

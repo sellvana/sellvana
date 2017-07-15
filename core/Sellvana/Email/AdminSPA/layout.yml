@@ -3,6 +3,7 @@
         do:
             - [ requireJs, sv-comp-dashboard-new-subscriptions-tpl, "@Sellvana_Email/AdminSPA/vue/component/dashboard/new-subscriptions.html" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /customers/email-prefs, label: Email Subscriptions, link: /customers/email-prefs, pos: 50 } ]

@@ -1,8 +1,7 @@
-define(['vue', 'sv-hlp'],
-    function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
 
         return {
-            mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+            mixins: [SvMixinForm],
             data: function () {
                 return {
                     form: {
@@ -29,7 +28,7 @@ define(['vue', 'sv-hlp'],
                     });
                 },
                 doDelete: function () {
-                    if (!confirm(SvHlp._('Are you sure you want to delete this customer?'))) {
+                    if (!confirm(this._(('Are you sure you want to delete this customer?')))) {
                         return;
                     }
                     this.sendRequest('POST', 'customers/form_delete', {id: this.form.customer.id}, function (response) {

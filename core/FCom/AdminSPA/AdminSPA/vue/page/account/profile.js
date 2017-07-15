@@ -1,6 +1,6 @@
-define(['lodash', 'vue', 'sv-hlp', 'json!sv-page-account-profile-config'], function (_, Vue, SvHlp, profileFormConfig) {
+define(['lodash', 'vue', 'sv-mixin-form-tab', 'json!sv-page-account-profile-config'], function (_, Vue, SvMixinFormTab, profileFormConfig) {
     return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         data: function () {
             var user = _.extend({change_password: false, new_password: '', confirm_password: ''}, this.$store.state.user);
             return {

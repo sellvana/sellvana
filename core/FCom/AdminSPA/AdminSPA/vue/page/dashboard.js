@@ -1,8 +1,7 @@
-define(['sv-hlp', 'sv-page-dashboard-widget', 'text!sv-page-dashboard-widget-tpl'], function (SvHlp, SvPageDashboardWidget) {
+define(['sv-mixin-common', 'sv-page-dashboard-widget', 'text!sv-page-dashboard-widget-tpl'], function (SvMixinCommon, SvPageDashboardWidget) {
 
     var SvPageDashboard = {
-        mixins: [SvHlp.mixins.common],
-        store: SvHlp.store,
+        mixins: [SvMixinCommon],
         data: function () {
             return {
                 widgets: []
