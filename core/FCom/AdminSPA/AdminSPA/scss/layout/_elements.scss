@@ -122,18 +122,18 @@ a:focus {
 	height: 42px;
 	overflow: hidden;
 }
-.f-tag-container {
+/*.f-tag-container {
 	margin: 10px 0;
 	white-space: nowrap;
-}
-.f-tag-container__elem {
+}*/
+/*.f-tag-container__elem {
 	display: inline-block;
 	vertical-align: middle;
 	.select2-container {
 		min-width: 160px;
 		width: 80%;
 	}
-}
+}*/
 .no-padding {
 	padding: 0;
 }
@@ -722,11 +722,11 @@ a:focus {
 	.f-options-title__text {
 		margin-bottom: 13px;
 	}
-	.f-tag-container {
+	/*.f-tag-container {
 		.f-tags__tag {
 			margin: 0;
 		}
-	}
+	}*/
 	.f-steps-block {
 		padding: 0;
 	}
