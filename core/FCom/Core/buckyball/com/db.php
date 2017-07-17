@@ -1381,6 +1381,15 @@ class BORM extends ORMWrapper
                 $array[$v1][$v2] = $value;
             }
         }
+        if (!empty($options['seq'])) {
+            $seq = [];
+            $key = $options['seq'] === true ? 'id' : $options['seq'][0];
+            $label = $options['seq'] === true ? 'text' : $options['seq'][1];
+            foreach ($array as $k => $v) {
+                $seq[] = [$key => $k, $label => $v];
+            }
+            $array = $seq;
+        }
         return $array;
     }
 
@@ -2358,21 +2367,20 @@ class BModel extends Model
     */
     public static function origClass()
     {
-        /*
-        if (null === static::$_origClass) {
-            $origClass = get_called_class();
-            $parents = class_parents($origClass);
-            foreach ($parents as $parent) {
-                if ($parent !== 'Model' && $parent !== 'BModel' && strpos($parent, 'Abstract') === false) {
-                    $origClass = $parent;
-                } else {
-                    break;
-                }
-            }
-#echo "<pre>"; var_dump(get_called_class(), $parents, static::$_origClass, $origClass); echo "</pre>";
-            static::$_origClass = $origClass;
-        }
-        */
+//        if (null === static::$_origClass) {
+//            $origClass = get_called_class();
+//            $parents = class_parents($origClass);
+//            foreach ($parents as $parent) {
+//                if ($parent !== 'Model' && $parent !== 'BModel' && strpos($parent, 'Abstract') === false) {
+//                    $origClass = $parent;
+//                } else {
+//                    break;
+//                }
+//            }
+//#echo "<pre>"; var_dump(get_called_class(), $parents, static::$_origClass, $origClass); echo "</pre>";
+//            static::$_origClass = $origClass;
+//        }
+
         return static::$_origClass;
     }
 

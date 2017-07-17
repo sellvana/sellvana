@@ -2363,6 +2363,65 @@ class Sellvana_Sales_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_6_12_0__0_6_13_0()
+    {
+        $tOrderCancel = $this->Sellvana_Sales_Model_Order_Cancel->table();
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+        $tOrderRefund = $this->Sellvana_Sales_Model_Order_Refund->table();
+        $tOrderReturn = $this->Sellvana_Sales_Model_Order_Return->table();
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'unique_id' => 'varchar(20) after id',
+            ],
+            BDb::KEYS => [
+                'UNQ_unique_id' => 'UNIQUE (unique_id)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'unique_id' => 'varchar(20) after id',
+            ],
+            BDb::KEYS => [
+                'UNQ_unique_id' => 'UNIQUE (unique_id)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            BDb::COLUMNS => [
+                'unique_id' => 'varchar(20) after id',
+            ],
+            BDb::KEYS => [
+                'UNQ_unique_id' => 'UNIQUE (unique_id)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturn, [
+            BDb::COLUMNS => [
+                'unique_id' => 'varchar(20) after id',
+            ],
+            BDb::KEYS => [
+                'UNQ_unique_id' => 'UNIQUE (unique_id)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'unique_id' => 'varchar(20) after id',
+            ],
+            BDb::KEYS => [
+                'UNQ_unique_id' => 'UNIQUE (unique_id)',
+            ],
+        ]);
+
+        $seq = $this->FCom_Core_Model_Seq->load('order', 'entity_type');
+        if ($seq) {
+            $seq->set('current_seq_id', 'SO-10000000')->save();
+        }
+    }
 }
 
 /**

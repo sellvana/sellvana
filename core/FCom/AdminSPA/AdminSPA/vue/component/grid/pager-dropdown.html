@@ -1,4 +1,4 @@
-<div class='f-pagination f-filter__elem'>
+<div v-if="numPages" class='f-pagination f-filter__elem'>
    <!-- <div class="pagination hidden-lg dropdown" :class="{open:ddOpen(ddName)}">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" :aria-expanded="ddOpen(ddName)"
            @click.prevent.stop="ddToggle(ddName)"><span>{{curPagesize}}</span><span class="f-caret"><b class="caret"></b></span></a>

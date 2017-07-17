@@ -1,0 +1,26 @@
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>{{'Thumbnail'|_}}</th>
+                <th>{{'SKU'|_}}</th>
+                <th>{{'Vendor SKU'|_}}</th>
+                <th>{{'UPC'|_}}</th>
+                <th>{{'Item Name'|_}}</th>
+                <th>{{'Qty for PO'|_}}</th>
+                <th>{{'Qty Available'|_}}</th>
+                <th>{{'Qty Ordered'|_}}</th>
+                <th>{{'Unit Cost'|_}}</th>
+                <th>{{'Total Cost'|_}}</th>
+                <th>{{'Unit Price'|_}}</th>
+                <th>{{'Row Total'|_}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in items">
+                <td><img :src="item.thumb_url"/></td>
+                <td>{{}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

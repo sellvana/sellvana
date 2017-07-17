@@ -149,6 +149,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
                         }
                         break;
 
+                    case 'page-action':
                     case 'form-action':
                         this.doFormAction(args);
                         break;

@@ -27,14 +27,16 @@ define(['lodash', 'sv-app-data', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-pag
             }
 		},
         data: function () {
-            return {
+            var data = {
                 editing: {customer: false, shipping: false, billing: false, order: false},
                 dict: SvAppData,
                 itemsGrid: {
-                    config: _.get(this.form, 'items_grid_config', {}),
-                    rows: this.form.items
+                    config: this.form.items_grid_config || {}
+                    // rows: this.form.items
                 }
-            }
+            };
+            data.itemsGrid.config.data = this.form.items;
+            return data;
         },
         computed: {
             regionOptions: function () {
@@ -52,6 +54,9 @@ define(['lodash', 'sv-app-data', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-pag
         methods: {
             toggleEditing: function(type) {
                 this.editing[type] = !this.editing[type];
+            },
+            onEvent: function (type, args) {
+                console.log(type, args);
             }
         },
         watch: {

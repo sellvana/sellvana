@@ -1,11 +1,12 @@
 define(['lodash', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], function (_, Vue, store, router, NProgress, SvAppData) {
 
+    // TODO: RegEx to collect translations: (\{\{|\(\()\s*['"](.*?)['"]\s*(\)\)|\|\s*_)
     function translate(text, args) {
         if (_.isObject(text)) {
             args = _.cloneDeep(text);
             text = text.text || text[0];
         }
-        var translated = typeof text === 'string' ? text : '' + text; // implement Sellvana logic
+        var translated = typeof text === 'string' ? text : '' + text; // TODO: implement Sellvana logic
         return translated.supplant(args);
     }
 

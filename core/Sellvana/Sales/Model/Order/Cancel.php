@@ -120,6 +120,17 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function onBeforeSave()
+    {
+        parent::onBeforeSave();
+
+        if (!$this->get('unique_id')) {
+            $this->FCom_Core_Model_Seq->setNextChildId($this, 'Sellvana_Sales_Model_Order','order_id', 'SO', 'CL');
+        }
+
+        return $this;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

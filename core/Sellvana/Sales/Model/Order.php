@@ -74,7 +74,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         if (!$this->get('unique_id')) {
-            $this->set('unique_id', $this->FCom_Core_Model_Seq->getNextSeqId('order'));
+            $firstId = $this->BConfig->get('modules/Sellvana_Sales/order_number');
+            $this->set('unique_id', $this->FCom_Core_Model_Seq->getNextSeqId('order', $firstId));
         }
 
         return true;
@@ -547,21 +548,25 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return !empty($methods[$pm]) ? $methods[$pm] : false;
     }
 
-    public function loadItemsProducts($withInventory = false)
+    public function loadItemsProducts($withInventory = false, $items = null)
     {
+        if (null === $items) {
+            $items = $this->items();
+        }
         $pIds = [];
-        foreach ($this->items() as $item) {
+        foreach ($items as $item) {
             $pIds[] = $item->get('product_id');
         }
         $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $pIds)->find_many_assoc();
         if ($withInventory) {
             $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($products);
         }
-        foreach ($this->items() as $item) {
+        foreach ($items as $item) {
             $pId = $item->get('product_id');
             if (!empty($products[$pId])) {
                 $item->setProduct($products[$pId]);
             }
+            $item->set('thumb_url', $item->thumbUrl(48));
         }
         return $this;
     }

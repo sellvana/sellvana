@@ -193,6 +193,17 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
         unset($this->_order, $this->_items, $this->_state);
     }
 
+    public function onBeforeSave()
+    {
+        parent::onBeforeSave();
+
+        if (!$this->get('unique_id')) {
+            $this->FCom_Core_Model_Seq->setNextChildId($this, 'Sellvana_Sales_Model_Order','order_id', 'SO', 'SH');
+        }
+
+        return $this;
+    }
+
     public function onBeforeDelete()
     {
         $this->deleteFiles();

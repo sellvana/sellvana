@@ -24,6 +24,7 @@ define(['vue', 'sv-mixin-form'],
 		},
 		methods: {
             updateBreadcrumbs: function (label) {
+            	var label = !this.form.config.title ? (('Loading...')) : (this.form.order.id ? this.form.order.unique_id : 'New Order');
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
                     label: label,

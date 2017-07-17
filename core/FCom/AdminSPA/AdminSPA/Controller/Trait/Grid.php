@@ -66,9 +66,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         return $this->{$modelClass}->orm();
     }
 
-    public function getProcessedGridConfig()
+    public function getNormalizedGridConfig($config = null)
     {
-        $config = $this->getGridConfig();
+        if (null === $config) {
+            $config = $this->getGridConfig();
+        }
         $config = $this->normalizeGridConfig($config);
         $config = $this->applyGridPersonalization($config);
         return $config;
@@ -76,7 +78,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function action_grid_config()
     {
-        $config = $this->getProcessedGridConfig();
+        $config = $this->getNormalizedGridConfig();
 
         if (!empty($config['state']['filters'])) {
             foreach ($config['state']['filters'] as &$f) {
@@ -95,7 +97,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function action_grid_data()
     {
-        $config = $this->getProcessedGridConfig();
+        $config = $this->getNormalizedGridConfig();
         $config = $this->processGridStatePersonalization($config);
         $filters = isset($config['state']['filters']) ? $config['state']['filters'] : null;
         $data = $this->getGridRequestOrm()->paginate($config['state']);
@@ -770,7 +772,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function getAllowedFieldsForBulkUpdate($bulkAction = null, $model = null)
     {
-        $gridConfig = $this->getProcessedGridConfig();
+        $gridConfig = $this->getNormalizedGridConfig();
         $fields = [];
         foreach ($gridConfig['bulk_actions'] as $action) {
             if (null !== $bulkAction && $action['name'] !== $bulkAction) {

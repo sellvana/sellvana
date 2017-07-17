@@ -14,6 +14,8 @@
  */
 class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
+    static protected $_origClass = __CLASS__;
+
     public function getGridConfig()
     {
         $stateOverallOptions = $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels();
@@ -140,6 +142,8 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $form['shipping_methods'] = $this->_getShippingMethods();
 
         $form['updates'] = new stdClass;
+
+        $this->BEvents->fire(__METHOD__, ['form' => &$form]);
         
         return $form;
     }
@@ -175,11 +179,6 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     {
         $order->loadItemsProducts(true);
         $items = $order->items(false);
-        /** @var Sellvana_Sales_Model_Order_Item $item */
-        foreach ($items as $item) {
-            $item->set('thumb_url', $item->thumbUrl(48));
-        }
-
         return $this->BDb->many_as_array($items);
     }
 
