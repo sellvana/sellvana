@@ -2371,7 +2371,10 @@ class BModel extends Model
 //            $origClass = get_called_class();
 //            $parents = class_parents($origClass);
 //            foreach ($parents as $parent) {
-//                if ($parent !== 'Model' && $parent !== 'BModel' && strpos($parent, 'Abstract') === false) {
+//                if ($parent !== 'Model' && $parent !== 'BModel'
+//                    && strpos($parent, 'Abstract') === false
+//                    && strpos($parent, 'Trait') === false
+//                ) {
 //                    $origClass = $parent;
 //                } else {
 //                    break;

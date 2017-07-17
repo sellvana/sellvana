@@ -38,6 +38,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         try {
             $data = $this->BRequest->post($modelName);
             $modelId = (int)$data['id'];
+            $eventName =  "{$this->origClass()}::action_form_data_POST";
+            $this->BEvents->fire("{$eventName}:before", ['data' => &$data, 'model_id' => &$modelId]);
             if ($modelId) {
                 $model = $this->{$modelClass}->load($modelId);
                 if (!$model) {
@@ -47,6 +49,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                 $model = $this->{$modelClass}->create();
             }
             $model->set($data)->save();
+            $this->BEvents->fire("{$eventName}:after", ['data' => $data, 'model' => $model]);
             $this->ok()->addMessage($recordName . ' has been updated', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
@@ -98,6 +101,10 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
 
     public function normalizeFormConfig($form)
     {
+        $eventName = $this->origClass() . '::normalizeFormConfig:before';
+
+        $this->BEvents->fire($eventName, ['form' => &$form]);
+
         if (!empty($form['config']['tabs']) && is_string($form['config']['tabs'])) {
             $form['config']['tabs'] = $this->getFormTabs($form['config']['tabs']);
         }

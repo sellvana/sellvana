@@ -13,6 +13,8 @@
  */
 class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
+    static protected $_origClass = __CLASS__;
+
     public function getGridConfig()
     {
         $bool = [0 => 'no', 1 => 'Yes'];
@@ -271,6 +273,10 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             $r = $this->BRequest;
             $data = $r->post();
             $id = $r->param('id', true);
+
+            $eventName =  "{$this->origClass()}::action_form_data_POST";
+            $this->BEvents->fire("{$eventName}:before", ['data' => &$data, 'model_id' => &$id]);
+
             $model = $this->Sellvana_Catalog_Model_Product->load($id);
             if (!$model) {
                 throw new BException("This item does not exist");
@@ -287,6 +293,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
             if ($validated) {
                 $model->save();
+                $this->BEvents->fire("{$eventName}:after", ['data' => $data, 'model' => $model]);
+
                 $result = $this->getFormData();
                 $result['form'] = $this->normalizeFormConfig($result['form']);
                 $this->ok()->addMessage('Product was saved successfully', 'success');
