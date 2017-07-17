@@ -1,7 +1,7 @@
-define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-common'], function (Vue, SvMixinCommon) {
 
     return {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: ['grid', 'col'],
         template: '<th>'
 		    + '<a v-if="col.sortable" href="#" :class="anchorClass" @click.prevent="toggleSort()" class="f-main-grid__header-link">{{col.label|_}}'

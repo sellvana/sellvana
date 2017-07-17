@@ -9,19 +9,19 @@
 
             <!--Actions buttons for desktop-->
 
-            <sv-comp-actions :groups="form.config.page_actions_groups" container-class="visible-lg visible-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :groups="form.config.page_actions_groups" event-name="page-action" container-class="f-control-panel__elem visible-lg visible-md" @event="onEvent"></sv-comp-actions>
       </div>
 
 
       <!--add "f-control-panel" class only for mobile-->
       <div class="f-control-panel">
-            <sv-comp-tabs :config="form.config" :tab="tab" container-class="" @event="processTabEvent"></sv-comp-tabs>
+            <sv-comp-tabs :config="form.config" :tab="tab" container-class="" @event="onEvent"></sv-comp-tabs>
 
             <!--Actions buttons for mobile-->
 
-            <sv-comp-actions :groups="form.config.page_actions_groups" container-class="hidden-lg hidden-md f-control-panel__elem" @event="processActionEvent"></sv-comp-actions>
+            <sv-comp-actions :groups="form.config.page_actions_groups" event-name="page-action" container-class="f-control-panel__elem hidden-lg hidden-md" @event="onEvent"></sv-comp-actions>
       </div>
 
-      <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" :tab="t.name" @event="processTabEvent"></component>
+      <component v-for="t in formTabs" :key="t.name" v-show="tab === t" :is="t.component_config" :form="form" :tab="t.name" @event="onEvent"></component>
 
 </div>

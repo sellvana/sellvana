@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-search-tpl'], function (SvHlp, headerSearchTpl) {
+define(['sv-mixin-common', 'text!sv-comp-header-search-tpl'], function (SvMixinCommon, headerSearchTpl) {
     var SvCompHeaderSearch = {
         props: ['mobile'],
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: headerSearchTpl,
         data: function () {
             return {
@@ -11,9 +11,10 @@ define(['sv-hlp', 'text!sv-comp-header-search-tpl'], function (SvHlp, headerSear
         },
         methods: {
             submitSearch: function () {
+                var vm = this;
                 this.sendRequest('GET', '/header/search', {q: this.query}, function (response) {
                     if (response.link) {
-                        SvHlp.router.push(response.link);
+                        vm.$router.push(response.link);
                     }
                 });
             }

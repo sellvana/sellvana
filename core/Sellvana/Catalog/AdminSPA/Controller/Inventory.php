@@ -87,7 +87,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
 
         $result['form']['inventory'] = $inventory->as_array();
 
-        $result['form']['config']['page_actions'] = true;
+        $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
 
         $result['form']['config']['tabs'] = '/catalog/inventory/form';
         $result['form']['config']['default_field'] = ['model' => 'inventory', 'tab' => 'main'];

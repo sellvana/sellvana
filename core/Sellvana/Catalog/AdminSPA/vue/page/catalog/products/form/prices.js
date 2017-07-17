@@ -9,7 +9,7 @@ define(['sv-comp-form-catalog-prices', 'text!sv-page-catalog-products-form-price
             'form.prices': {
                 deep: true,
                 handler: function (prices) {
-                    this.$emit('event', 'tab_edited', 'prices');
+                    this.$emit('event', 'tab-edited', 'prices');
                 }
             }
         }

@@ -16,27 +16,58 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
         return '0123456789';
     }
 
-    public function getNextSeqId($entityType)
-    {
-
-        $this->BDb->run('lock tables ' . $this->table() . ' write');
-        $seq = $this->orm($this->table())->where('entity_type', $entityType)->find_one();
-        if (!$seq) {
-            $seq = $this->create([
-                'entity_type' => $entityType,
-                'current_seq_id' => $this->getFirstSeqId($entityType)
-            ])->save();
-        }
-        $nextId = $this->BUtil->nextStringValue($seq->current_seq_id, $this->getAllowedChars());
-        $seq->set('current_seq_id', $nextId)->save();
-        $this->BDb->run('unlock tables');
-        return $nextId;
-    }
-
     public function getFirstSeqId($entityType)
     {
         $seqId = str_pad('1', 8, '0');
         $this->BEvents->fire(__METHOD__, ['entity_type' => $entityType, 'seq_id' => & $seqId]);
         return $seqId;
+    }
+
+    public function getNextSeqId($entityType, $firstSeqId = null)
+    {
+        $alias = $this->orm()->table_alias();
+        $this->BDb->run("lock tables {$this->table()} write, {$this->table()} as {$alias} write");
+        $seq = $this->load($entityType, 'entity_type');
+        if (!$seq) {
+            $seq = $this->setNextSeqId($entityType,$firstSeqId ?: $this->getFirstSeqId($entityType));
+            $nextId = $seq->get('current_seq_id');
+        } else {
+            $nextId = $this->BUtil->nextStringValue($seq->get('current_seq_id'), $this->getAllowedChars());
+            $seq->set('current_seq_id', $nextId)->save();
+        }
+        $this->BDb->run('unlock tables');
+        return $nextId;
+    }
+
+    public function setNextSeqId($entityType, $seqId)
+    {
+        $seq = $this->load($entityType, 'entity_type');
+        if (!$seq) {
+            $seq = $this->create(['entity_type' => $entityType]);
+        }
+        $seq->set('current_seq_id', $seqId)->save();
+        return $seq;
+    }
+
+    public function setNextChildId(FCom_Core_Model_Abstract $child, $parentClass, $parentField, $parentPrefix, $childPrefix)
+    {
+        $parentId = $child->get($parentField);
+        if ($parentId) {
+            $lastUniqueId = $child->orm()->where($parentField, $parentId)
+                ->order_by_asc('(length(unique_id))')->order_by_asc('unique_id')
+                ->find_one();
+            if (!$lastUniqueId) {
+                /** @var FCom_Core_Model_Abstract $parent */
+                $parent = $this->{$parentClass}->load($parentId);
+                $nextId = str_replace($parentPrefix . '-', $childPrefix . '-', $parent->get('unique_id')) . '-01';
+            } else {
+                preg_match("#^({$parentPrefix}-\d+-)(\d+)$#", $lastUniqueId, $m);
+                $nextId = $m[1] . '-' . ($m[2] + 1);
+            }
+        } else {
+            $nextId = $this->getNextSeqId(strtolower($childPrefix), $childPrefix . '-90000000');
+        }
+        $child->set('unique_id', $nextId);
+        return $nextId;
     }
 }

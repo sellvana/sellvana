@@ -1,4 +1,4 @@
-define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-common'], function (Vue, SvMixinCommon) {
     var InlineParam = {
         template1: '<span class="param-result" :class="{edit: edit_mode}">' +
             '<a v-if="!options" href="#" @click.prevent="toggleEdit">{{valueLabel|_}}</a>' +
@@ -18,7 +18,7 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
             '</span>' +
         '</span>',
 
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
 
         props: ['value', 'options', 'params', 'select2'],
         data: function () {

@@ -1,6 +1,6 @@
-define(['sv-hlp'], function (SvHlp, formTpl) {
+define(['sv-mixin-common'], function (SvMixinCommon, formTpl) {
     var SvPagePromoForm = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         // template: formTpl
         methods: {
             updateBreadcrumbs: function (label) {

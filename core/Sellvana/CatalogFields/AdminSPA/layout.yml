@@ -16,6 +16,7 @@
             - [ requireJs, sv-page-catalog-products-form-shopperfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields" ]
             - [ requireJs, sv-page-catalog-products-form-shopperfields-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields.html" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /catalog/fieldsets, label: Custom Attribute Sets, link: /catalog/fieldsets, pos: 70 } ]

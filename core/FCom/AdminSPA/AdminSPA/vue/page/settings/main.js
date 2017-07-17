@@ -1,8 +1,8 @@
-define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings-config', 'sv-comp-form-field', 'sv-comp-form-ip-mode'],
-    function (_, $, DeepDiff, Vue, SvHlp, settingsConfig, SvCompFormField, SvCompFormIpMode) {
+define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-mixin-form', 'json!sv-page-settings-config', 'sv-comp-form-field', 'sv-comp-form-ip-mode'],
+    function (_, $, DeepDiff, Vue, SvMixinForm, settingsConfig, SvCompFormField, SvCompFormIpMode) {
 
     return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+        mixins: [SvMixinForm],
         data: function () {
             return {
                 settings: {
@@ -72,7 +72,7 @@ define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-hlp', 'json!sv-page-settings
                 Vue.set(this.panelsOpen, panel.path, force ? true : !this.panelsOpen[panel.path]);
             },
             searchLimitText: function (count) {
-                return SvHlp._('and {count} other results', {count:count});
+                return this._((('and {count} other results')), {count:count});
             },
             search: function (query, loading) {
                 var i, j, form, field, found = [], cnt = 0, queryLower = query.toLowerCase();

@@ -6,7 +6,7 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
     // Vue.component('sv-comp-grid-data-cell-actions', SvCompGridDataCellActions);
 
     return {
-        //mixins: [SvHlp.mixins.common],
+        //mixins: [SvMixinCommon],
         props: ['grid', 'row'],
         template: '<tr><component v-for="col in columns" :key="col.name" v-if="!col.hidden" :is="cellComponent(col)" '
             + ':name="col.name" :grid="grid" :row="row" :col="col" @event="onEvent"></component></tr>',

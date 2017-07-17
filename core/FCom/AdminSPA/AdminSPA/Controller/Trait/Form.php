@@ -14,10 +14,6 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         'field_container_class' => 'col-md-9',
     ];
 
-    static protected $_defaultFormActionConfig = [
-        'mobile_group' => 'actions',
-    ];
-
     //abstract public function getFormData();
 
     public function action_form_data()
@@ -42,6 +38,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         try {
             $data = $this->BRequest->post($modelName);
             $modelId = (int)$data['id'];
+            $eventName =  "{$this->origClass()}::action_form_data_POST";
+            $this->BEvents->fire("{$eventName}:before", ['data' => &$data, 'model_id' => &$modelId]);
             if ($modelId) {
                 $model = $this->{$modelClass}->load($modelId);
                 if (!$model) {
@@ -51,6 +49,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                 $model = $this->{$modelClass}->create();
             }
             $model->set($data)->save();
+            $this->BEvents->fire("{$eventName}:after", ['data' => $data, 'model' => $model]);
             $this->ok()->addMessage($recordName . ' has been updated', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
@@ -87,8 +86,25 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         return $this->view('app')->getFormTabs($path);
     }
 
+    public function getDefaultFormPageActions()
+    {
+        return [
+            'default' => ['mobile_group' => 'actions'],
+            ['name' => 'actions', 'label' => 'Actions'],
+            ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
+            ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4',
+                'if' => static::$_modelName . '.id'],
+            ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
+            ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
+        ];
+    }
+
     public function normalizeFormConfig($form)
     {
+        $eventName = $this->origClass() . '::normalizeFormConfig:before';
+
+        $this->BEvents->fire($eventName, ['form' => &$form]);
+
         if (!empty($form['config']['tabs']) && is_string($form['config']['tabs'])) {
             $form['config']['tabs'] = $this->getFormTabs($form['config']['tabs']);
         }
@@ -129,50 +145,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         }
 
         if (!empty($form['config']['page_actions'])) {
-            if (true === $form['config']['page_actions']) {
-                $form['config']['page_actions'] = [
-                    'default' => ['mobile_group' => 'actions'],
-                    ['name' => 'actions', 'label' => 'Actions'],
-                    ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
-                    ['name' => 'delete', 'label' => 'Delete', 'desktop_group' => 'delete', 'button_class' => 'button4',
-                        'if' => static::$_modelName . '.id'],
-                    ['name' => 'save', 'label' => 'Save', 'desktop_group' => 'save', 'button_class' => 'button1'],
-                    ['name' => 'save-continue', 'label' => 'Save & Continue', 'desktop_group' => 'save', 'button_class' => 'button1'],
-                ];
-            }
-            $actionGroups = [];
-            if (!empty($form['config']['page_actions']['default'])) {
-                $def = array_merge(static::$_defaultFormActionConfig, $form['config']['page_actions']['default']);
-                unset($form['config']['page_actions']['default']);
-            } else {
-                $def = static::$_defaultFormActionConfig;
-            }
-            foreach ($form['config']['page_actions'] as &$act) {
-                $act = array_merge($def, $act);
-                if (!empty($act['if'])) {
-                    $ifResult = $this->BUtil->arrayGet($form, $act['if']);
-                    if (!$ifResult) {
-                        continue;
-                    }
-                }
-                foreach (['desktop_group', 'mobile_group'] as $g) {
-                    $group = !empty($act[$g]) ? $act[$g] : (!empty($act['group']) ? $act['group'] : null);
-                    if (!empty($group)) {
-                        if (empty($actionGroups[$g][$group])) {
-                            $actionGroups[$g][$group] = $act;
-                        } else {
-                            $actionGroups[$g][$group]['children'][] = $act;
-                        }
-                    }
-                }
-            }
-            unset($act);
-            if (!empty($actionGroups['desktop_group'])) {
-                $form['config']['page_actions_groups']['desktop'] = array_values($actionGroups['desktop_group']);
-            }
-            if (!empty($actionGroups['mobile_group'])) {
-                $form['config']['page_actions_groups']['mobile'] = array_values($actionGroups['mobile_group']);
-            }
+            $form['config']['page_actions_groups'] = $this->getActionsGroups($form['config']['page_actions'], $form);
         }
 
         if (!empty($form['i18n']) && is_string($form['i18n'])) {

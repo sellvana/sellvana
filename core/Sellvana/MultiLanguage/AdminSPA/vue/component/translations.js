@@ -1,4 +1,4 @@
-define(['lodash', 'jquery', 'vue', 'text!sv-comp-form-translations-tpl'], function (_, $, Vue, translationsTpl) {
+define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translations-tpl'], function (_, $, Vue, SvAppData, translationsTpl) {
     var SvCompFormTranslations = {
         template: translationsTpl,
         props: ['form', 'field'],

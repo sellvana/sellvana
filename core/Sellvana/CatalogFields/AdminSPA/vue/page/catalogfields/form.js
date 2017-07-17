@@ -1,24 +1,22 @@
-define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
 
-    return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
-        data: function () {
-            return {
-                field: {}
-            }
-        },
-        methods: {
+	return {
+		mixins: [SvMixinForm],
+		data: function () {
+			return {
+				field: {}
+			}
+		},
+		methods: {
             updateBreadcrumbs: function (label) {
-                this.$store.commit('setData', {
-                    curPage: {
-                        link: this.$router.currentRoute.fullPath,
-                        label: label,
-                        breadcrumbs: [
-                            {nav: '/catalog', label: 'Catalog', icon_class: 'fa fa-book'},
-                            {link: '/catalog/fields', label: 'Fields'}
-                        ]
-                    }
-                });
+                this.$store.commit('setData', {curPage: {
+                    link: this.$router.currentRoute.fullPath,
+                    label: label,
+                    breadcrumbs: [
+                        {nav:'/catalog', label:'Catalog', icon_class:'fa fa-book'},
+                        {link:'/catalog/fields', label:'Fields'}
+                    ]
+                }});
             },
             fetchData: function () {
                 var fieldId = this.$router.currentRoute.query.id, vm = this;
@@ -29,11 +27,11 @@ define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
             },
             doDelete: function () {
                 var vm = this;
-                if (!confirm(SvHlp._('Are you sure you want to delete this field?'))) {
-                    return;
-                }
-                this.sendRequest('POST', 'catalogfields/form_delete', {id: this.form.field.id}, function (response) {
-                    if (response.status) {
+				if (!confirm(this._(('Are you sure you want to delete this field?')))) {
+					return;
+				}
+				this.sendRequest('POST', 'catalogfields/form_delete', {id: this.form.field.id}, function (response) {
+					if (response.status) {
                         vm.$router.push('/catalog/fields');
                     }
                 });

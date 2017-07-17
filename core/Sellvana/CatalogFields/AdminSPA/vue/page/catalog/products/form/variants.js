@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-catalog-products-form-variants-tpl'], function (SvHlp, tabProdVariants) {
+define(['sv-mixin-common', 'text!sv-page-catalog-products-form-variants-tpl'], function (SvMixinCommon, tabProdVariants) {
     var SvPageCatalogProductsFormVariants = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: tabProdVariants,
         computed: {
 

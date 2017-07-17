@@ -14,10 +14,15 @@
  */
 class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
+    static protected $_origClass = __CLASS__;
+
     public function getGridConfig()
     {
+        $stateOverallOptions = $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels();
+
         return [
             'id' => 'orders',
+            'title' => 'Orders',
             'data_url' => 'orders/grid_data',
             'columns' => [
                 ['type' => 'row-select'],
@@ -27,10 +32,29 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 //                ]],
                 ['name' => 'id', 'label' => 'Internal ID'],
                 ['name' => 'unique_id', 'label' => 'Order ID', 'datacell_template' => '<td><a :href="\'#/sales/orders/form?id=\'+row.id">{{row.unique_id}}</a></td>'],
-                ['name' => 'state_overall', 'label' => 'Overall State', 'options' => $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels()],
-                ['name' => 'billing_firstname', 'label' => 'Last Name'],
-                ['name' => 'billing_lastname', 'label' => 'Last Name'],
+                ['name' => 'state_overall', 'label' => 'Overall State', 'options' => $stateOverallOptions],
                 ['name' => 'customer_email', 'label' => 'Email'],
+
+                ['name' => 'billing_firstname', 'label' => 'Billing Last Name'],
+                ['name' => 'billing_lastname', 'label' => 'Billing Last Name'],
+                ['name' => 'billing_street1', 'label' => 'Billing Street'],
+                ['name' => 'billing_city', 'label' => 'Billing Street'],
+                ['name' => 'billing_region', 'label' => 'Billing State'],
+                ['name' => 'billing_postcode', 'label' => 'Billing Zip'],
+                ['name' => 'billing_country', 'label' => 'Billing Country'],
+                ['name' => 'billing_phone', 'label' => 'Billing Phone'],
+                ['name' => 'billing_fax', 'label' => 'Billing Fax'],
+
+                ['name' => 'shipping_firstname', 'label' => 'Shipping Last Name'],
+                ['name' => 'shipping_lastname', 'label' => 'Shipping Last Name'],
+                ['name' => 'shipping_street1', 'label' => 'Shipping Street'],
+                ['name' => 'shipping_city', 'label' => 'Shipping Street'],
+                ['name' => 'shipping_region', 'label' => 'Shipping State'],
+                ['name' => 'shipping_postcode', 'label' => 'Shipping Zip'],
+                ['name' => 'shipping_country', 'label' => 'Shipping Country'],
+                ['name' => 'shipping_phone', 'label' => 'Shipping Phone'],
+                ['name' => 'shipping_fax', 'label' => 'Shipping Fax'],
+
                 ['name' => 'create_at', 'label' => 'Created', 'type' => 'date']
             ],
             'filters' => [
@@ -69,7 +93,11 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         }
         $form = [];
 
+        $form['config']['title'] = ['Sales Order #{id}', 'id' => $order->get('unique_id')];
         $form['config']['tabs'] = $this->getFormTabs('/sales/orders/form');
+        $form['config']['page_actions'] = [
+            ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
+        ];
 
         $form['config']['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
 
@@ -114,6 +142,8 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $form['shipping_methods'] = $this->_getShippingMethods();
 
         $form['updates'] = new stdClass;
+
+        $this->BEvents->fire(__METHOD__, ['form' => &$form]);
         
         return $form;
     }
@@ -149,11 +179,6 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     {
         $order->loadItemsProducts(true);
         $items = $order->items(false);
-        /** @var Sellvana_Sales_Model_Order_Item $item */
-        foreach ($items as $item) {
-            $item->set('thumb_url', $item->thumbUrl(48));
-        }
-
         return $this->BDb->many_as_array($items);
     }
 

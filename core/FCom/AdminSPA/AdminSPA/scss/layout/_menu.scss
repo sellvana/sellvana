@@ -68,26 +68,31 @@
 		display: block;
 		background: #d9d9d9;
 	}
-
+	.fa {
+		margin: 0 0 0 7px;
+		color: #bcbebf;
+	}
 }
 .f-horizontal-menu__item {
 	display: inline-block;
 	vertical-align: bottom;
 	margin-right: 1px;
 	position: relative;
+	&:first-of-type {
+		.f-horizontal-menu__link {
+			border-left: solid 1px #d9d9d9;
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+		}
+	}
 	&:last-of-type {
 		.f-horizontal-menu__link {
-			border-radius: 0 5px 5px 0;
 			border-right: solid 1px #d9d9d9;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
 			&:after {
 				display: none;
 			}
-		}
-	}
-	&:first-of-type {
-		.f-horizontal-menu__link {
-			border-radius: 5px 0 0 5px;
-			border-left: solid 1px #d9d9d9;
 		}
 	}
 	&.active {

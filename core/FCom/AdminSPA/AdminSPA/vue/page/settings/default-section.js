@@ -1,7 +1,7 @@
-define(['lodash', 'sv-hlp'], function (_, SvHlp) {
+define(['lodash', 'sv-mixin-form-tab'], function (_, SvMixinFormTab) {
 
     return {
-        mixins: [SvHlp.mixins.common, SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         props: ['settings', 'panel', 'site'],
         computed: {
             form: function () {

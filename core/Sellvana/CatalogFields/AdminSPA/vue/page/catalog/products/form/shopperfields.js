@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-catalog-products-form-shopperfields-tpl'], function (SvHlp, tpl) {
+define(['sv-mixin-common', 'text!sv-page-catalog-products-form-shopperfields-tpl'], function (SvMixinCommon, tpl) {
     var SvPageCatalogProductsFormShopperFields = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: tpl,
         computed: {
 

@@ -74,6 +74,7 @@
             - [ requireJs, sv-comp-dashboard-top-products-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/top-products.html ]
 #            - [ requireJs, sv-comp-dashboard-top-products-chart-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/top-products-chart.html ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /sales, label: Sales, icon: "icon-sales", pos: 20 } ]

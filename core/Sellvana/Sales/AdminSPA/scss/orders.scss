@@ -148,7 +148,7 @@ input[type="file"] {
 	}
 }
 .f-information-block {
-	margin: 20px 0;
+	margin: 30px 0 20px;
 }
 .f-information-block__content {
 	padding: 0 15px;
@@ -200,7 +200,13 @@ input[type="file"] {
 		}
 	}	
 }
-
+.f-editor {
+	padding: 4px 6px;
+	display: inline-block;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
 .f-edited-block {
 	margin: 0;
 	display: inline-block;
@@ -217,17 +223,17 @@ input[type="file"] {
 		padding-right: 0;
 		padding-left: 0;
 	}
-	.close-editor {
+	.fa-eye {
 		display: none;
 	}
 	.section-edit {
 		display: none;
 	}
-	&.on {
-		.editor {
+	&.open {
+		.fa-pencil {
 			display: none;
 		}
-		.close-editor {
+		.fa-eye {
 			display: inline-block;
 		}
 		.section-edit {

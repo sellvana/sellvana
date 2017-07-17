@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-catalog-categories-form-content-tpl'], function (SvHlp, tabTpl) {
+define(['sv-app-data', 'sv-mixin-form-tab', 'text!sv-page-catalog-categories-form-content-tpl'], function (SvAppData, SvMixinFormTab, tabTpl) {
     return {
-        mixins: [SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         template: tabTpl,
         props: ['form'],
         data: function () {

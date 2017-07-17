@@ -1,6 +1,6 @@
-define(['vue', 'sv-hlp', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, SvHlp, gridHeaderCellRowSelectTpl) {
+define(['vue', 'sv-mixin-common', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, SvMixinCommon, gridHeaderCellRowSelectTpl) {
     return {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: ['grid', 'col'],
         data: function () {
             return {

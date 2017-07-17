@@ -33,6 +33,9 @@ body {
 .select2-container--default .select2-selection--multiple {
       border: solid 1px #d0dae3;
 }
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+      font-size: 18px;
+}
 .select2-container--default .select2-search--inline .select2-search__field {
       font-size: 12px;
       box-shadow: none;
@@ -41,10 +44,9 @@ body {
       padding: 2px 7px 1px;
 }
 .select2-container .select2-selection--multiple {
-      min-height: inherit;
+      min-height: 34px;
       padding: 0 0 2px 0;
       border-radius: 5px;
-      max-height: 34px;
 }
 .select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
       background: #e3e3e3;

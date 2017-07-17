@@ -1,6 +1,6 @@
-define(['sv-hlp', 'text!sv-page-modules-grid-datacell-run-level-tpl'], function (SvHlp, tpl) {
+define(['sv-mixin-common', 'text!sv-page-modules-grid-datacell-run-level-tpl'], function (SvMixinCommon, tpl) {
     var Component = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         props: ['grid', 'row', 'col'],
         template: tpl,
         data: function () {

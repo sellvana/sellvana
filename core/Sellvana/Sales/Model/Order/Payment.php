@@ -622,6 +622,17 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $methodObj ? $methodObj->isManualStateManagementAllowed() : false;
     }
 
+    public function onBeforeSave()
+    {
+        parent::onBeforeSave();
+
+        if (!$this->get('unique_id')) {
+            $this->FCom_Core_Model_Seq->setNextChildId($this, 'Sellvana_Sales_Model_Order','order_id', 'SO', 'PY');
+        }
+
+        return $this;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

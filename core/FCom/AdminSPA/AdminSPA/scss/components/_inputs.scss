@@ -213,9 +213,7 @@ input[type=number] {
 	}
 }
 .f-import-forms {
-	.f-form-label {
-		text-align: left;
-	}
+
 	.f-delete {
 		margin-right: 5px;
 	}
@@ -237,6 +235,7 @@ input[type=number] {
 	text-align: right;
 	padding-top: 7px;
 	font-weight: bold;
+	margin-bottom: 0;
 	span {
 		color: #000;
 		cursor: pointer;
@@ -250,8 +249,8 @@ input[type=number] {
 }
 .f-input {
 	font-size: 13px;
-	padding: 9px 12px;
-	max-height: 34px;
+	padding: 8px 12px;
+	min-height: 34px;
 	border-radius: 5px;
 	box-shadow: none;
 	border: solid 1px #d0dae3;
@@ -595,6 +594,9 @@ input[type=number] {
 .translating {
 	.f-input, .f-textarea, .f-input-number, .ckeditor {
 		width: calc(100% - 40px);
+	}
+	.select2-container {
+		width: calc(100% - 40px) !important;
 	}
 }
 @media (min-width: 992px) and (max-width: 1365px){

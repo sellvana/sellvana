@@ -92,7 +92,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
             ['name' => 'locale', 'label' => 'Locale', 'options' => $locales],
         ];
 
-        $result['form']['config']['page_actions'] = true;
+        $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
 
         return $result;
     }

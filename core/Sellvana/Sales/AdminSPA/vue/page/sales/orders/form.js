@@ -1,5 +1,5 @@
-define(['vue', 'sv-hlp'],
-	   function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-form'],
+	   function (Vue, SvMixinForm) {
 
 	var defForm = {
 		options: {},
@@ -16,9 +16,7 @@ define(['vue', 'sv-hlp'],
     };
 
 	return {
-
-
-		mixins: [SvHlp.mixins.common, SvHlp.mixins.form],
+		mixins: [SvMixinForm],
 		data: function () {
 			return {
 				form: defForm
@@ -26,6 +24,7 @@ define(['vue', 'sv-hlp'],
 		},
 		methods: {
             updateBreadcrumbs: function (label) {
+            	var label = !this.form.config.title ? (('Loading...')) : (this.form.order.id ? this.form.order.unique_id : 'New Order');
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
                     label: label,
@@ -39,7 +38,7 @@ define(['vue', 'sv-hlp'],
                 var orderId = this.$router.currentRoute.query.id, vm = this;
                 this.sendRequest('GET', 'orders/form_data', {id: orderId}, function (response) {
                     vm.processFormDataResponse(response);
-                    vm.updateBreadcrumbs(SvHlp._('Order #' + vm.form.order.unique_id));
+                    vm.updateBreadcrumbs(this._((('Order #{id}')), {id: vm.form.order.unique_id}));
                 });
 			},
 			doFormAction: function (action) {
@@ -51,7 +50,7 @@ define(['vue', 'sv-hlp'],
 						break;
 
 					case 'delete':
-						if (!confirm(SvHlp._('Are you sure you want to delete this ' + action.entity.entity_type + '?'))) {
+						if (!confirm(this._((('Are you sure you want to delete this {type}?')), {type: action.entity.entity_type}))) {
 							return;
 						}
 						var postData = {
@@ -67,7 +66,7 @@ define(['vue', 'sv-hlp'],
 				}
 			},
 			doDelete: function () {
-				if (!confirm(SvHlp._('Are you sure you want to delete this order?'))) {
+				if (!confirm(this._(('Are you sure you want to delete this order?')))) {
 					return;
 				}
 				this.sendRequest('POST', 'orders/form_delete', {id: this.form.order.id}, function (response) {

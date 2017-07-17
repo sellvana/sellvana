@@ -1,6 +1,6 @@
-define(['vue', 'sv-hlp'], function (Vue, SvHlp) {
+define(['vue', 'sv-mixin-form-tab'], function (Vue, SvMixinFormTab) {
     var Component = {
-        mixins: [SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         props: ['form', 'tab']
     };
 

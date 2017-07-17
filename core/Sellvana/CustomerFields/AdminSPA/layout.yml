@@ -1,4 +1,4 @@
-/:
+sv-app-data-js:
     - view: app
         do:
 #            - [ addNav, { path: /customers/customer-fields, label: Customer Fields, link: /customers/customer-fields, pos: 40 } ]

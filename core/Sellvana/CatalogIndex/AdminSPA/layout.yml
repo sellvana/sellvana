@@ -1,4 +1,4 @@
-/:
+sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /catalog/fieldsets, label: Custom Field Sets, link: /catalog/fieldsets, pos: 70 } ]

@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-account-tpl'], function (SvHlp, headerAccountTpl) {
+define(['sv-mixin-common', 'text!sv-comp-header-account-tpl'], function (SvMixinCommon, headerAccountTpl) {
 
     var SvCompHeaderAccount = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: headerAccountTpl,
         data: function () {
             return {

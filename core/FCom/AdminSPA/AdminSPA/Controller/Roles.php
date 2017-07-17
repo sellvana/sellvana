@@ -74,7 +74,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Roles extends FCom_AdminSPA_AdminSPA_Con
             ['name' => 'permissions', 'label' => 'Permissions', 'options' => $permOptions, 'type' => 'select2', 'multiple' => true],
         ];
 
-        $result['form']['config']['page_actions'] = true;
+        $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
 
         return $result;
     }

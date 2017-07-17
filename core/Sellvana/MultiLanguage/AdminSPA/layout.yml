@@ -5,6 +5,7 @@
             - [ requireJs, sv-comp-form-translations-tpl, "@Sellvana_MultiLanguage/AdminSPA/vue/component/translations.html" ]
             - [ requireRun, sv-comp-form-translations ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addModule, Sellvana_MultiLanguage ]

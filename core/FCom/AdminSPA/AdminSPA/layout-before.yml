@@ -98,9 +98,17 @@
             - [ requireJs, vue-select2, "@FCom_AdminSPA/AdminSPA/js/vue/vue-select2" ]
             - [ requireJs, inline-param, "@FCom_AdminSPA/AdminSPA/js/vue/inline-param" ]
 
-            - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/js/vue/sv-hlp" ]
-            - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/js/vue/sv-app" ]
+            - [ requireJs, sv-hlp, "@FCom_AdminSPA/AdminSPA/vue/core/sv-hlp" ]
+            - [ requireJs, sv-store, "@FCom_AdminSPA/AdminSPA/vue/core/sv-store" ]
+            - [ requireJs, sv-router, "@FCom_AdminSPA/AdminSPA/vue/core/sv-router" ]
+            - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/vue/core/sv-app" ]
+            - [ requireJs, sv-app-data, "~/sv-app-data" ]
             - [ requireRun, sv-app ]
+
+            - [ requireJs, sv-mixin-common, "@FCom_AdminSPA/AdminSPA/vue/mixin/common" ]
+            - [ requireJs, sv-mixin-grid, "@FCom_AdminSPA/AdminSPA/vue/mixin/grid" ]
+            - [ requireJs, sv-mixin-form, "@FCom_AdminSPA/AdminSPA/vue/mixin/form" ]
+            - [ requireJs, sv-mixin-form-tab, "@FCom_AdminSPA/AdminSPA/vue/mixin/form-tab" ]
 
             - [ requireJs, sv-comp-messages, "@FCom_AdminSPA/AdminSPA/vue/component/messages" ]
 
@@ -225,6 +233,7 @@
             - [ requireJs, sv-page-not-found, "@FCom_AdminSPA/AdminSPA/vue/page/not-found" ]
             - [ requireJs, sv-page-not-found-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/not-found.html" ]
 
+sv-app-data-js:
     - view: app
         do:
             - [ addModule, FCom_AdminSPA ]

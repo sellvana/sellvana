@@ -17,10 +17,19 @@ class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstr
     {
         $this->BDebug->disableAllLogging();
         $this->BDebug->disableDumpLog();
+
         $this->layout('/');
+    }
+
+    public function action_sv_app_data_js()
+    {
+        $this->BDebug->disableAllLogging();
+        $this->BDebug->disableDumpLog();
+
+        $this->layout('sv-app-data-js');
+
         /** @var FCom_AdminSPA_AdminSPA_View_App $app */
         $app = $this->view('app');
-        $locales = $this->BLocale->getAvailableLocaleCodes();
         $countries = $this->BLocale->getAvailableCountries();
         $regions = $this->BLocale->getAvailableRegions();
         $user = $this->FCom_Admin_Model_User->sessionUser();
@@ -47,11 +56,13 @@ class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstr
         ];
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_MultiLanguage')) {
+            //$locales = $this->BLocale->getAvailableLocaleCodes();
             $data['locales'] = $this->Sellvana_MultiLanguage_Main->getAllowedLocales();
             $data['locales_seq'] = $this->BUtil->arrayMapToSeq($data['locales']);
         }
 
-        $this->view('root')->set(['data' => $data]);
+        $this->BResponse->setContentType('application/javascript')
+            ->set('define([],function(){return ' . $this->BUtil->toJson($data) . '})');
     }
 
     public function action_l10n()

@@ -1,7 +1,7 @@
-define(['sv-hlp', 'text!sv-comp-header-chat-tpl'], function (SvHlp, headerChatTpl) {
+define(['sv-mixin-common', 'text!sv-comp-header-chat-tpl'], function (SvMixinCommon, headerChatTpl) {
 
     var SvCompHeaderChat = {
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: headerChatTpl,
         data: function () {
             return {

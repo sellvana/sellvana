@@ -1,6 +1,8 @@
-define(['lodash', 'sv-hlp', 'sv-comp-form-layout', 'text!sv-page-catalog-products-form-layout-tpl'], function (_, SvHlp, SvCompFormLayout, tabMainTpl) {
+define(['lodash', 'sv-app-data', 'sv-mixin-form-tab', 'sv-comp-form-layout', 'text!sv-page-catalog-products-form-layout-tpl'],
+    function (_, SvAppData, SvMixinFormTab, SvCompFormLayout, tabMainTpl) {
+
     return {
-        mixins: [SvHlp.mixins.formTab],
+        mixins: [SvMixinFormTab],
         template: tabMainTpl,
         props: ['form'],
         data: function () {

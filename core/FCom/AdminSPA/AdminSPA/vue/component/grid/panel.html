@@ -1,5 +1,6 @@
 <div class="f-grid-filter-panel">
 	<sv-comp-grid-panel-filters v-if="grid.config && grid.config.filters" :grid="grid" @event="onEvent"></sv-comp-grid-panel-filters>
+
 	<div class="filter params-right" :class="{open:ddOpen(grid.config.id+'/columns-open')}">
 		<a href="#" class="filter-open-button" @click.prevent.stop="ddToggle(grid.config.id+'/columns-open')">
 			<svg width="18" height="18" v-html="svgIconLink(ddOpen(grid.config.id+'/columns-open') ? 'icon-close' : 'icon-columns')"></svg>
@@ -36,9 +37,12 @@
 
 	<div class="col-lg-6">
 		<div class="f-grid-panel">
-			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="visible-xs  f-filter__elem"></sv-comp-grid-pager-dropdown>
-			<span class="amount-rows f-filter__elem"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
-			<div class="f-search-block f-filter__elem">
+			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="visible-xs f-filter__elem"></sv-comp-grid-pager-dropdown>
+
+			<span v-if="cntTotal" class="amount-rows f-filter__elem"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
+			<span v-else="cntTotal" class="amount-rows f-filter__elem"> {{'No requested data found'|_}} </span>
+
+			<div v-if="cntTotal" class="f-search-block f-filter__elem">
 				<input type="text" :placeholder="'Search grid...'|_" v-model="quickSearch" class="f-input" />
 				<button class="visible-xs" name="button" type="button">
 					<svg width="20" height="19" v-html="svgIconLink('icon-search')"></svg>
@@ -46,6 +50,7 @@
 			</div>
 			<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @event="onEvent"></sv-comp-grid-bulk-actions>
 			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="hidden-xs"></sv-comp-grid-pager-dropdown>
+			<sv-comp-actions :groups="grid.config.panel_actions_groups" class="f-filter__elem" event-name="panel-action" @event="onEvent"></sv-comp-actions>
 		</div>
 	</div>
 </div>

@@ -1,6 +1,6 @@
 modules:
     Sellvana_Sales:
-        version: 0.6.12.0
+        version: 0.6.13.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -11,7 +11,7 @@ modules:
                 Sellvana_Sales:
                     default_payment_method: basic
                     default_shipping_method: plain
-                    order_number: "0000000"
+                    order_number: "SO-10000000"
                     cart_cookie_token_ttl_days: 30
                     orders_late_limit: 25
                     cross_sale_limit: 6

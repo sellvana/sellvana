@@ -120,8 +120,8 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
             return $obj->as_array();
         }, $fieldOptions->find_many());
 
-        $result['form']['config']['page_actions'] = true;
-        $result['form']['config']['title']        = $field->get('field_name');
+		$result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
+		$result['form']['config']['title'] = $field->get('field_name');
 
         $result['form']['config']['tabs']          = '/catalog/fields/form';
         $result['form']['config']['default_field'] = ['model' => 'field', 'tab' => 'info'];

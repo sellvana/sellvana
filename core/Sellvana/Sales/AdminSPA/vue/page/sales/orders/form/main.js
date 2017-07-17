@@ -1,5 +1,5 @@
-define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
-    function (_, SvHlp, SvCompGrid, tabMainTpl) {
+define(['lodash', 'sv-app-data', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main-tpl'],
+    function (_, SvAppData, SvMixinCommon, SvCompGrid, tabMainTpl) {
 
 
 	var defForm = {
@@ -19,7 +19,7 @@ define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main
 
     return {
 
-        mixins: [SvHlp.mixins.common],
+        mixins: [SvMixinCommon],
         template: tabMainTpl,
         props: {
             form: {
@@ -27,14 +27,16 @@ define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main
             }
 		},
         data: function () {
-            return {
+            var data = {
                 editing: {customer: false, shipping: false, billing: false, order: false},
                 dict: SvAppData,
                 itemsGrid: {
-                    config: _.get(this.form, 'items_grid_config', {}),
-                    rows: this.form.items
+                    config: this.form.items_grid_config || {}
+                    // rows: this.form.items
                 }
-            }
+            };
+            data.itemsGrid.config.data = this.form.items;
+            return data;
         },
         computed: {
             regionOptions: function () {
@@ -52,6 +54,9 @@ define(['lodash', 'sv-hlp', 'sv-comp-grid', 'text!sv-page-sales-orders-form-main
         methods: {
             toggleEditing: function(type) {
                 this.editing[type] = !this.editing[type];
+            },
+            onEvent: function (type, args) {
+                console.log(type, args);
             }
         },
         watch: {

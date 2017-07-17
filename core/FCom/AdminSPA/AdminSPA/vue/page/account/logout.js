@@ -1,7 +1,6 @@
-define(['sv-hlp'], function(SvHlp) {
+define(['sv-mixin-common'], function(SvMixinCommon) {
     return {
-        mixins: [SvHlp.mixins.common],
-        store: SvHlp.store,
+        mixins: [SvMixinCommon],
         computed: {
             isLoggedIn: function () {
                 return this.$store.state.user && this.$store.state.user.id;
@@ -13,7 +12,7 @@ define(['sv-hlp'], function(SvHlp) {
             }
             var postData = {}, vm = this;
             this.sendRequest('POST', 'auth/logout', postData, function (response) {
-                SvHlp.processResponse(response);
+                vm.processResponse(response);
                 vm.$router.push("/login");
             });
         },
