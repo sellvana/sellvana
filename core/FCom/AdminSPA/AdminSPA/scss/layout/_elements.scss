@@ -399,6 +399,7 @@ a:focus {
 	transition: opacity 0.3s ease-in;
 	.f-buttons-block {
 		text-align: right;
+		padding: 15px;
 	}
 	&.open {
 		opacity: 1;
@@ -413,6 +414,9 @@ a:focus {
 		border: 0;
 		font-size: 18px;
 	}
+	/*.box-no-padding .f-buttons-block {
+		padding: 0 25px;
+	}*/
 }
 .f-grid-popup__title {
 	padding: 1px 15px;
@@ -429,7 +433,12 @@ a:focus {
 	margin: 0 5px 0 0;
 	position: relative;
 }
-
+.f-grid-popup__control {
+	padding: 10px 15px;
+	.button {
+		min-width: 100%;
+	}
+}
 .overlay {
 	opacity: 0;
 	visibility: hidden;
