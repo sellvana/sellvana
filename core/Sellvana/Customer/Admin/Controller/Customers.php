@@ -31,7 +31,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
-                    'title' => $this->_(('Log in as customer')), 'target' => (('AdminCustomer'))],
+                    'title' => $this->_(('Log in as customer')), 'target' => 'AdminCustomer'],
                 ['name' => 'delete'],
             ]],
             ['name' => 'id', 'label' => (('ID')), 'index' => 'c.id'],

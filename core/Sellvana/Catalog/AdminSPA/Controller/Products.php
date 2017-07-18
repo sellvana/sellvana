@@ -17,7 +17,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
     public function getGridConfig()
     {
-        $bool = [0 => 'no', 1 => (('Yes'))];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
         $countries = $this->BLocale->getAvailableCountries();
 
         $editPopupConfig = [

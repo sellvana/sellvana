@@ -56,7 +56,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Users extends FCom_AdminSPA_AdminSPA_Con
     public function getFormData()
     {
         $userId = $this->BRequest->get('id');
-        $bool = [0 => 'no', 1 => (('Yes'))];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
 
         if ($userId) {
             $user = $this->FCom_Admin_Model_User->load($userId);

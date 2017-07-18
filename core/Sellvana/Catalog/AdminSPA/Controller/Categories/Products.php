@@ -11,7 +11,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories_Products extends FCom_Admi
     public function getGridConfig()
     {
         $catId = $this->BRequest->get('id');
-        $bool = [0 => 'no', 1 => (('Yes'))];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
         return [
             'id' => 'category_products',
             'data_url' => 'categories/form/products/grid_data?id=' . $catId,

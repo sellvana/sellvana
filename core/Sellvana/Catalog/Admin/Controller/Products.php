@@ -36,7 +36,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $bool = [0 => 'no', 1 => (('Yes'))];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
         $config['columns'] = [
             ['type' => 'row_select', 'width' => 55],
             ['type' => 'btn_group', 'buttons' => [

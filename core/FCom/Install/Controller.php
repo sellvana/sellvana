@@ -55,7 +55,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         $w = $this->BRequest->post('w');
         if (empty($w['agree']) || $w['agree'] !== 'Agree') {
-            $this->message((('Please click (("I Agree")) checkbox before continuing with installation')), 'error', 'install');
+            $this->message((('Please click "I Agree" checkbox before continuing with installation')), 'error', 'install');
             $this->BResponse->redirect('');
             return;
         }

@@ -305,7 +305,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     ['name' => 'state_refund', 'label' => (('Refund State')), 'options' => $refundStates, 'hidden' => true],
                     ['name' => 'state_return', 'label' => (('Return State')), 'options' => $returnStates, 'hidden' => true],
                     ['name' => 'state_custom', 'label' => (('Custom')), 'width' => 50, 'options' => $customStates],
-                    ['name' => 'auto_added', 'label' => (('Auto Added')), 'width' => 50, 'options' => [1 => (('YES')), 0 => 'no']],
+                    ['name' => 'auto_added', 'label' => (('Auto Added')), 'width' => 50, 'options' => [1 => (('YES')), 0 => (('no'))]],
                 ],
                 /*
                 'actions'   => [

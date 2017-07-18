@@ -74,7 +74,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory extends FCom_AdminSPA_Admin
     public function getFormData()
     {
         $pId = $this->BRequest->get('id');
-        $bool = [0 => 'no', 1 => (('Yes'))];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
 
         $inventory = $this->Sellvana_Catalog_Model_InventorySku->load($pId);
         if (!$inventory) {

@@ -19,9 +19,9 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
     ];
 
     static protected $_fieldOptions = [
-        'manage_inventory' => [1 => (('YES')), 0 => 'no', -1 => (('Default'))],
-        'allow_backorder' => [1 => (('YES')), 0 => 'no', ],
-        'pack_separate' => [1 => (('YES')), 0 => 'no', ],
+        'manage_inventory' => [1 => (('YES')), 0 => (('no')), -1 => (('Default'))],
+        'allow_backorder' => [1 => (('YES')), 0 => (('no')), ],
+        'pack_separate' => [1 => (('YES')), 0 => (('no')), ],
     ];
 
     static protected $_fieldDefaults = [

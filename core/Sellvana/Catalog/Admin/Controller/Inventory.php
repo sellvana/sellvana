@@ -27,7 +27,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     public function gridConfig()
     {
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
-//        $yesNo = [0 => 'no', 1 => 'YES'];
+//        $yesNo = [0 => (('no')), 1 => 'YES'];
         $config = parent::gridConfig();
         #$manInvOptions = $invHlp->fieldOptions('manage_inventory');
         $backorderOptions = $invHlp->fieldOptions('allow_backorder');

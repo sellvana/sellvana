@@ -26,7 +26,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Inventory_Products extends FCom_Admin
                 ->find_many());
         }
 
-        $bool = [0 => 'no', 1 => (('Yes'))];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
 
         return [
             'id' => 'product_inventory_sku',
