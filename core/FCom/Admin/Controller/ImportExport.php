@@ -12,9 +12,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'importexport';
     protected $_formViewPrefix = 'importexport/';
-    protected $_gridTitle = 'Import Export';
-    protected $_formTitle = 'Import Export';
-    protected $_recordName = 'Import Export';
+    protected $_gridTitle = (('Import Export'));
+    protected $_formTitle = (('Import Export'));
+    protected $_recordName = (('Import Export'));
     protected $_formLayoutName = '/importexport';
 
     public function getExportConfig()
@@ -25,7 +25,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         $config['columns']            = [
             ['type' => 'row_select'],
-            ['name' => 'model', 'label' => 'Models to export'],
+            ['name' => 'model', 'label' => (('Models to export'))],
         ];
         $config['filters']            = [['field' => 'model', 'type' => 'text']];
         $config['grid_before_create'] = 'modelsGridRegister';
@@ -80,11 +80,11 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $config['id']                 = 'role_all_ie_perm_grid_' . $model->id();
         $config['data_mode']          = 'local';
         $config['columns']            = [
-            ['name' => 'permission_name', 'label' => 'Permission Name', 'width' => 250],
+            ['name' => 'permission_name', 'label' => (('Permission Name')), 'width' => 250],
             [
                 'type'     => 'input',
                 'name'     => 'import',
-                'label'    => 'Import',
+                'label'    => (('Import')),
                 'width'    => 100,
                 'editable' => 'inline',
                 'editor'   => 'checkbox',
@@ -93,7 +93,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             [
                 'type'     => 'input',
                 'name'     => 'export',
-                'label'    => 'Export',
+                'label'    => (('Export')),
                 'width'    => 100,
                 'editable' => 'inline',
                 'editor'   => 'checkbox',
@@ -213,7 +213,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_import__POST()
     {
         if (empty($_FILES) || !isset($_FILES['upload'])) {
-            $this->BResponse->json(['msg' => "Nothing found"]);
+            $this->BResponse->json(['msg' => (("Nothing found"))]);
             return;
         }
         $this->BResponse->setContentType('application/json');
@@ -242,7 +242,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 if ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
                 } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $fullFileName)) {
-                    $error = $this->_("Problem storing uploaded file.");
+                    $error = $this->_(("Problem storing uploaded file."));
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
 
@@ -253,7 +253,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
-                    $error = $this->_("Invalid import file.");
+                    $error = $this->_(("Invalid import file."));
                 }
 
                 $row = [
@@ -298,7 +298,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         //    xdebug_start_trace();
         //}
         $result = $this->FCom_Core_ImportExport->export($models, $toFile);
-        $this->BResponse->json(['result' => $result ? 'Success': 'Failure']);
+        $this->BResponse->json(['result' => $result ? (('Success')): (('Failure'))]);
         //if(function_exists('xdebug_stop_trace')){
         //    xdebug_stop_trace();
         //}

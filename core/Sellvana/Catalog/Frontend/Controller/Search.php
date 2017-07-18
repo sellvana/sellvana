@@ -102,7 +102,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             ->setCanonicalPrevNext();
 
         $layout->getView('header-top')->set('query', $q);
-        $layout->getView('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
+        $layout->getView('breadcrumbs')->set('crumbs', ['home', ['label' => $this->_((('Search: %s')), $q), 'active' => true]]);
         $layout->getView('catalog/search')->set('query', $q)->set('data', $productsData);
 
         $this->FCom_Core_Main->lastNav(true);

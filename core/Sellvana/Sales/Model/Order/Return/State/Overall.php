@@ -13,15 +13,15 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Mod
         DECLINED = 'declined';
 
     protected $_valueLabels = [
-        self::PENDING => 'Pending',
-        self::REQUESTED => 'Requested',
-        self::RMA_SENT => 'RMA Sent',
-        self::EXPIRED => 'Expired',
-        self::CANCELED => 'Canceled',
-        self::RECEIVED => 'Received',
-        self::APPROVED => 'Approved',
-        self::RESTOCKED => 'Re-stocked',
-        self::DECLINED => 'Declined',
+        self::PENDING => (('Pending')),
+        self::REQUESTED => (('Requested')),
+        self::RMA_SENT => (('RMA Sent')),
+        self::EXPIRED => (('Expired')),
+        self::CANCELED => (('Canceled')),
+        self::RECEIVED => (('Received')),
+        self::APPROVED => (('Approved')),
+        self::RESTOCKED => (('Re-stocked')),
+        self::DECLINED => (('Declined')),
     ];
 
     protected $_defaultMethods = [

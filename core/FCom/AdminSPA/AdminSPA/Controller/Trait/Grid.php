@@ -281,7 +281,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                             $col['name'] = 'row-select';
                         }
                         if (empty($col['label'])) {
-                            $col['label'] = 'Selection';
+                            $col['label'] = (('Selection'));
                         }
                         if (empty($col['id_field'])) {
                             $col['id_field'] = 'id';
@@ -300,7 +300,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                             $col['name'] = 'actions';
                         }
                         if (empty($col['label'])) {
-                            $col['label'] = 'Actions';
+                            $col['label'] = (('Actions'));
                         }
                         if (empty($col['actions'])) {
                             if (!empty($config['edit_link'])) {
@@ -408,7 +408,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             $config['export'] = [
                 'url' => 'orders/grid_export',
                 'format_options' => [
-                    ['value' => 'csv', 'label' => 'CSV'],
+                    ['value' => 'csv', 'label' => (('CSV'))],
                 ],
             ];
         }

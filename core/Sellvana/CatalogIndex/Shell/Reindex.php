@@ -42,7 +42,7 @@ class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Reindex catalog';
+        return (('Reindex catalog'));
     }
 
     public function getLongHelp()

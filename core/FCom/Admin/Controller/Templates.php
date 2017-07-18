@@ -11,8 +11,8 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     protected $_permission = 'system/templates';
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'templates';
-    protected $_gridTitle = 'Frontend Templates';
-    protected $_recordName = 'Template';
+    protected $_gridTitle = (('Frontend Templates'));
+    protected $_recordName = (('Template'));
     protected $_navPath = 'system/templates';
 
     public function gridConfig()
@@ -26,13 +26,13 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             ['type' => 'btn_group',
                 'buttons' => [
                     ['name' => 'edit', 'href' => $this->BApp->href('templates/form?id='), 'col' => 'view_name'],
-                    ['name' => 'delete', 'caption' => 'Remove/Revert']
+                    ['name' => 'delete', 'caption' => (('Remove/Revert'))]
                 ]
             ],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
-            ['name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true],
-            ['name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50],
-            ['name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100],
+            ['name' => 'view_name', 'label' => (('View Name')), 'index' => 'view_name', 'width' => 100, 'overflow' => true],
+            ['name' => 'file_ext', 'label' => (('File Ext.')), 'index' => 'file_ext', 'width' => 50],
+            ['name' => 'module_name', 'label' => (('Module')), 'index' => 'module_name', 'width' => 100],
         ];
 
         $config['state'] = ['s' => 'view_name'];
@@ -56,7 +56,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             ['field' => 'module_name', 'type' => 'text']
         ];
         $config['actions'] = [
-            'delete' => ['caption' => 'Remove/Revert'],
+            'delete' => ['caption' => (('Remove/Revert'))],
         ];
         $config['events'] = ['delete', 'mass-delete'];
         $config['grid_before_create'] = 'template_grid';
@@ -95,7 +95,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $actions = $view->get('actions');
         $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" '
             . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
-            .  $this->_('Remove/Revert') . '</span></button>';
+            .  $this->_(('Remove/Revert')) . '</span></button>';
         $view->set('actions', $actions);
 
         $view->set('tab_view_prefix', $this->_formViewPrefix);

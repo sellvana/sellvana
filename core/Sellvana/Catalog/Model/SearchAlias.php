@@ -11,8 +11,8 @@ class Sellvana_Catalog_Model_SearchAlias extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'alias_type' => [
-            self::TYPE_FULL => 'Full',
-            self::TYPE_WORD => 'Word',
+            self::TYPE_FULL => (('Full')),
+            self::TYPE_WORD => (('Word')),
         ],
     ];
 

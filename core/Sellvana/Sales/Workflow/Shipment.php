@@ -166,7 +166,7 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
     {
         $newState = $args['shipment']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
-        $args['shipment']->addHistoryEvent('custom_state', 'Admin user has changed custom shipment state to "' . $label . '"');
+        $args['shipment']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom shipment state to "%s"')), $label));
         $args['shipment']->save();
     }
 

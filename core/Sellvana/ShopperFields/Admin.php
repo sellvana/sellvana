@@ -8,7 +8,7 @@ class Sellvana_ShopperFields_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'shopper_fields' => 'Product Shopper Fields',
+            'shopper_fields' => (('Product Shopper Fields')),
         ]);
     }
 
@@ -38,31 +38,31 @@ class Sellvana_ShopperFields_Admin extends BClass
         $config = [
             'config' => [
                 'id' => 'frontend-field-grid',
-                'caption' => 'Frontend Field Grid',
+                'caption' => (('Frontend Field Grid')),
                 'data_mode' => 'local',
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select', 'width' => 80],
                     ['type' => 'btn_group', 'width' => 80, 'buttons' => [
-                        ['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-dollar ", 'title' => 'Edit Prices'],
+                        ['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-dollar ", 'title' => (('Edit Prices'))],
                         ['name' => 'delete'],
                     ]],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'name', 'label' => 'Field Name', 'multilang' => ['id' => 'name', 'locales' => $locales, 'callback' => 'saveShopperLangField'], 'width' => 200, 'editable' => 'inline',
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true],
+                    ['name' => 'name', 'label' => (('Field Name')), 'multilang' => ['id' => 'name', 'locales' => $locales, 'callback' => 'saveShopperLangField'], 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'type' => 'input', 'validation' => ['required' => true]],
-                    ['name' => 'label', 'label' => 'Field Label', 'multilang' => ['id' => 'label', 'locales' => $locales, 'callback' => 'saveShopperLangField'], 'editable' => 'inline',
+                    ['name' => 'label', 'label' => (('Field Label')), 'multilang' => ['id' => 'label', 'locales' => $locales, 'callback' => 'saveShopperLangField'], 'editable' => 'inline',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
-                    ['name' => 'input_type', 'label' => 'Field Type', 'width' => 120, 'editable' => 'inline','editor' => 'select',
+                    ['name' => 'input_type', 'label' => (('Field Type')), 'width' => 120, 'editable' => 'inline','editor' => 'select',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
-                        'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'], 'select2' => true, 'callback' => 'updateValidation'],
-                    ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select', 'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1, 'select2' => true],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 80, 'editable' => 'inline',
+                        'options' => ['textarea' => (('Text Area')), 'text' => (('Text Line')), 'select' => (('Drop Down')), 'checkbox' => (('Check Box'))], 'select2' => true, 'callback' => 'updateValidation'],
+                    ['name' => 'required', 'label' => (('Required')), 'width' => 150, 'editor' => 'select', 'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => (('Yes')), 0 => (('No'))], 'default' => 1, 'select2' => true],
+                    ['type' => 'input', 'name' => 'position', 'label' => (('Position')), 'width' => 80, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],
-                    ['name' => 'group', 'label' => 'Group Name', 'width' => 80, 'editable' => 'inline',
+                    ['name' => 'group', 'label' => (('Group Name')), 'width' => 80, 'editable' => 'inline',
                         'addable' => true, 'type' => 'input', 'validation' => []],
-                    ['name' => 'qty_min', 'label' => 'Qty Min', 'width' => 80, 'editable' => 'inline',
+                    ['name' => 'qty_min', 'label' => (('Qty Min')), 'width' => 80, 'editable' => 'inline',
                         'addable' => true, 'type' => 'input', 'validation' => []],
-                    ['name' => 'qty_max', 'label' => 'Qty Max', 'width' => 80, 'editable' => 'inline',
+                    ['name' => 'qty_max', 'label' => (('Qty Max')), 'width' => 80, 'editable' => 'inline',
                         'addable' => true, 'type' => 'input', 'validation' => []],
 
             ],
@@ -77,13 +77,13 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'actions' => [
                     //'new' => ['caption' => 'Add Fields'],
                     'add-blank-row' => [
-                        'caption'  => 'Add Fields',
+                        'caption'  => (('Add Fields')),
                         'type'     => 'button',
                         'id'       => 'add-blank-row',
                         'class'    => 'btn-primary',
                         'callback' => 'addBlankRows'
                     ],
-                    'delete' => ['caption' => 'Remove']
+                    'delete' => ['caption' => (('Remove'))]
                 ],
                 'callbacks' => [
                     'componentDidMount' => 'fieldsGridRegister'
@@ -99,17 +99,17 @@ class Sellvana_ShopperFields_Admin extends BClass
         $config = [
             'config' => [
                 'id' => 'options-grid',
-                'caption' => 'Options Grid',
+                'caption' => (('Options Grid')),
                 'data_mode' => 'local',
                 'data' => [],
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Option Name (Bundle Part Name)', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
-                    ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true],
+                    ['type' => 'input', 'name' => 'label', 'label' => (('Option Name (Bundle Part Name)')), 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
+                    ['type' => 'input', 'name' => 'sku', 'label' => (('Sku')), 'width' => 150, 'editable' => 'inline', 'sortable' => false],
+                    ['type' => 'input', 'name' => 'position', 'label' => (('Position')), 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
                     ['type' => 'btn_group', 'buttons' => [
-                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", 'textValue' => 'Edit Price', "icon" => " icon-dollar", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Update Prices', 'data-placement' => 'top']], 
+                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", 'textValue' => (('Edit Price')), "icon" => " icon-dollar", 'attrs' => ['data-toggle' => 'tooltip', 'title' => (('Update Prices')), 'data-placement' => 'top']],
                             ['name' => 'delete', 'callback' => 'deleteOptionRowCallback']
                         ]
                     ]
@@ -120,20 +120,20 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'actions' => [
                     //'new' => ['caption' => 'Add Fields'],
                     'add-new-field-option' => [
-                        'caption'  => 'Add New Option',
+                        'caption'  => (('Add New Option')),
                         'type'     => 'button',
                         'id'       => 'add-new-field-option',
                         'class'    => 'btn-primary',
                         'callback' => 'insertNewFieldOption'
                     ],
                     'add-prices' => [
-                        'caption'  => 'Apply Prices',
+                        'caption'  => (('Apply Prices')),
                         'type'     => 'button',
                         'id'       => 'add-prices',
                         'class'    => 'btn-info',
                         'callback' => 'applyPricesForAllFields'
                     ],
-                    'delete' => ['caption' => 'Remove']
+                    'delete' => ['caption' => (('Remove'))]
                 ],
                 'callbacks' => [
                     'componentDidMount' => 'optionsGridRegister'

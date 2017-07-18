@@ -69,8 +69,8 @@ class FCom_Test_Core_Test extends BClass
      * @var array
      */
     private $responses = [
-        'timeout'   => 'Operation timed out after',
-        'writeable' => 'Path for logs is not writable',
+        'timeout'   => (('Operation timed out after')),
+        'writeable' => (('Path for logs is not writable')),
         'passed'    => array(
             'PASSED',   // Functional & Acceptance Test
             'OK \('     // Unit Test

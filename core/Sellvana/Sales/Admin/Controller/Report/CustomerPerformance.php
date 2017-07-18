@@ -14,7 +14,7 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerPerformance extends FCom_Ad
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/customer_performance';
     protected $_gridHref = 'sales/report/customer_performance';
-    protected $_gridTitle = 'Customer Performance';
+    protected $_gridTitle = (('Customer Performance'));
 
     public function gridConfig()
     {
@@ -40,7 +40,7 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerPerformance extends FCom_Ad
             ['name' => 'period_refund_qty', 'index' => 'period_refund_qty'],
             ['name' => 'period_refund_amount', 'index' => 'period_refund_amount', 'cell' => 'currency'],
 
-            ['name' => 'order_create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
+            ['name' => 'order_create_at', 'label' => (('Created')), 'index' => 'o.create_at', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'order_create_at', 'type' => 'date-range'],
@@ -55,25 +55,25 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerPerformance extends FCom_Ad
     protected function _getFieldLabels()
     {
         return [
-            'id' => 'Customer Id',
-            'customer_name' => 'Customer Name',
-            'email' => 'Customer Email',
-            'title' => 'Customer Group',
-            'lifetime_sales' => 'Lifetime Sales',
-            'lifetime_order_count' => 'Lifetime Number of Orders',
-            'lifetime_avg_amount' => 'Lifetime Avg Order Value',
-            'lifetime_item_qty' => 'Lifetime # of units purchased',
-            'lifetime_refund_qty' => 'Lifetime # of Refunds',
-            'lifetime_refund_amount' => 'Amount of Lifetime Refunds',
-            'create_at' => 'Date Created',
-            'days_since_last_order' => 'Days since last order',
-            'period_sales' => 'Total amount during specified Period',
-            'period_order_count' => 'Total Orders During Specified Period',
+            'id' => (('Customer Id')),
+            'customer_name' => (('Customer Name')),
+            'email' => (('Customer Email')),
+            'title' => (('Customer Group')),
+            'lifetime_sales' => (('Lifetime Sales')),
+            'lifetime_order_count' => (('Lifetime Number of Orders')),
+            'lifetime_avg_amount' => (('Lifetime Avg Order Value')),
+            'lifetime_item_qty' => (('Lifetime # of units purchased')),
+            'lifetime_refund_qty' => (('Lifetime # of Refunds')),
+            'lifetime_refund_amount' => (('Amount of Lifetime Refunds')),
+            'create_at' => (('Date Created')),
+            'days_since_last_order' => (('Days since last order')),
+            'period_sales' => (('Total amount during specified Period')),
+            'period_order_count' => (('Total Orders During Specified Period')),
             'period_item_qty' => '# of Items During Specified Period',
-            'period_avg_amount' => 'AOV During Period',
+            'period_avg_amount' => (('AOV During Period')),
             'period_refund_qty' => '# of Refunds During Period',
-            'period_refund_amount' => 'Amount of Refunds During Period',
-            'order_create_at' => 'Created',
+            'period_refund_amount' => (('Amount of Refunds During Period')),
+            'order_create_at' => (('Created')),
         ];
     }
 

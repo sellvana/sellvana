@@ -11,8 +11,8 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'blog/category';
     protected $_modelClass = 'Sellvana_Blog_Model_Category';
-    protected $_gridTitle = 'Blog Categories';
-    protected $_recordName = 'Blog Category';
+    protected $_gridTitle = (('Blog Categories'));
+    protected $_recordName = (('Blog Category'));
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'c';
     protected $_navPath = 'cms/category';
@@ -27,11 +27,11 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
                 ['name' => 'edit'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'id', 'label' => 'ID'],
-            ['name' => 'name', 'label' => 'Name'],
-            ['name' => 'description', 'label' => 'Description'],
-            ['name' => 'url_key', 'label' => 'URL Key'],
-            ['name' => 'post', 'label' => 'Posts', 'href' => $this->BApp->href('blog/post/?category=')],
+            ['name' => 'id', 'label' => (('ID'))],
+            ['name' => 'name', 'label' => (('Name'))],
+            ['name' => 'description', 'label' => (('Description'))],
+            ['name' => 'url_key', 'label' => (('URL Key'))],
+            ['name' => 'post', 'label' => (('Posts')), 'href' => $this->BApp->href('blog/post/?category=')],
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -106,7 +106,7 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
         if ($model && $model->id) {
-            $view->addTab('post', ['label' => $this->_('Blog Posts'), 'pos' => 20]);
+            $view->addTab('post', ['label' => $this->_(('Blog Posts')), 'pos' => 20]);
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }

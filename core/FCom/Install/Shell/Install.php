@@ -137,7 +137,7 @@ class FCom_Install_Shell_Install extends FCom_Core_Shell_Abstract
      */
     public function getShortHelp()
     {
-        return 'Run installation wizard';
+        return (('Run installation wizard'));
     }
 
     /**

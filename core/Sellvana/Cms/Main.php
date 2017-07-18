@@ -12,7 +12,7 @@ class Sellvana_Cms_Main extends BClass
     {
         $this->FCom_Core_LayoutEditor
             ->addWidgetType('cms_block', [
-                'title' => 'CMS Block',
+                'title' => (('CMS Block')),
                 'pos' => 50,
                 'options' => $this->Sellvana_Cms_Model_Block->getAllBlocksAsOptions(),
                 'compile' => function ($args) {

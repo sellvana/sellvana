@@ -38,7 +38,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
             }
             exec("php -f \"$path\" $tests", $output);
         } else {
-            $output = [$this->_("Cannot run CLI tests from browser.")];
+            $output = [$this->_(("Cannot run CLI tests from browser."))];
         }
         $this->BResponse->header('Content-Type: application/json');
         echo $this->BUtil->toJson($output);
@@ -63,7 +63,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
 
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'test', 'label' => "Select tests to run"],
+            ['name' => 'test', 'label' => (("Select tests to run"))],
         ];
         $config['filters'] = [['field' => 'test', 'type' => 'text']];
         $config['grid_before_create'] = 'testsGridRegister';
@@ -739,7 +739,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
                     chmod($phpunit, 0755); // make executable
                 }
             } else {
-                $this->BDebug->warning($this->_("Could not create $phpunit file."));
+                $this->BDebug->warning($this->_(("Could not create $phpunit file.")));
             }
         }
 

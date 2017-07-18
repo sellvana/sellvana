@@ -29,8 +29,8 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
             $layout->getView('cart')->set('redirectLogin', true);
         }
 
-        $layout->getView('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
-            ['label' => 'Cart', 'active' => true]]);
+        $layout->getView('breadcrumbs')->set('crumbs', [['label' => (('Home')), 'href' =>  $this->BApp->baseUrl()],
+            ['label' => (('Cart')), 'active' => true]]);
 
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
@@ -82,7 +82,7 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
                     $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
                     $p = $result['items'][0]->getProduct();
                     $result = [
-                        'title' => 'Added to cart',
+                        'title' => (('Added to cart')),
                         'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> '
                             . htmlspecialchars($p->product_name)
                             . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')

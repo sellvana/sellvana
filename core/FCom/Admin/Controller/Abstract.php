@@ -80,7 +80,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             return false;
         }
 
-        $this->view('head')->addTitle($this->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
+        $this->view('head')->addTitle($this->_((('%s Admin')), $this->BConfig->get('modules/FCom_Core/site_title')));
 
         return true;
     }

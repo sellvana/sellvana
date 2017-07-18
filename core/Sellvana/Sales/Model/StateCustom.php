@@ -17,12 +17,12 @@ class Sellvana_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
     
     protected static $_fieldOptions = [
         'entity_type' => [
-           "order" => "Order",
-           "order_item" => "Order Item",
-           "payment" => "Payment",
-           "shipment" => "Shipment",
-           "return" => "Return",
-           "refund" => "Refund"
+           "order" => (("Order")),
+           "order_item" => (("Order Item")),
+           "payment" => (("Payment")),
+           "shipment" => (("Shipment")),
+           "return" => (("Return")),
+           "refund" => (("Refund"))
         ],
     ];
     

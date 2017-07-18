@@ -13,7 +13,7 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
     protected $_permission = 'customer/reports';
     protected $_navPath = 'reports/customer/product_history';
     protected $_gridHref = 'customer/report/product_history';
-    protected $_gridTitle = 'Product History';
+    protected $_gridTitle = (('Product History'));
 
     public function gridConfig()
     {
@@ -49,15 +49,15 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
     protected function _getFieldLabels()
     {
         return [
-            'order_date' => 'Order Date',
-            'customer_id' => 'Customer',
-            'unique_id' => 'Order #',
-            'product_sku' => 'Sku',
-            'product_name' => 'Product Name',
-            'qty_ordered' => 'Qty ordered',
-            'price' => 'Price',
-            'row_total' => 'Row total',
-            'amount_refunded' => 'Refunded Amt',
+            'order_date' => (('Order Date')),
+            'customer_id' => (('Customer')),
+            'unique_id' => (('Order #')),
+            'product_sku' => (('Sku')),
+            'product_name' => (('Product Name')),
+            'qty_ordered' => (('Qty ordered')),
+            'price' => (('Price')),
+            'row_total' => (('Row total')),
+            'amount_refunded' => (('Refunded Amt')),
         ];
     }
 

@@ -11,7 +11,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
 
     protected $_code = 'stripe';
 
-    protected $_name = 'Stripe';
+    protected $_name = (('Stripe'));
 
     protected $_apiUrl = 'https://api.stripe.com';
     protected $_apiVersion = '2014-12-17';
@@ -101,7 +101,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
                 'amount' => round($payment->get('amount_due') * 100),
                 'currency' => $order->get('order_currency') ?: 'USD',
                 'card' => $token,
-                'description' => 'Test',
+                'description' => (('Test')),
             ]);
             $transaction
                 ->set('transaction_id', $charge->id)

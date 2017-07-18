@@ -11,8 +11,8 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'urlaliases';
     protected $_modelClass = 'Sellvana_Seo_Model_UrlAlias';
-    protected $_gridTitle = 'URL Aliases';
-    protected $_recordName = 'URL Alias';
+    protected $_gridTitle = (('URL Aliases'));
+    protected $_recordName = (('URL Alias'));
     protected $_mainTableAlias = 'a';
     protected $_navPath = 'seo/urlaliases';
     protected $_permission = 'seo/urlaliases';
@@ -24,27 +24,27 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'a.id'],
-            ['type' => 'input', 'name' => 'request_url', 'label' => 'Request URL', 'index' => 'a.request_url',
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'a.id'],
+            ['type' => 'input', 'name' => 'request_url', 'label' => (('Request URL')), 'index' => 'a.request_url',
                 'editable' => true, 'addable' => true, 'validation' =>
                 ['required' => true, 'unique' => $this->BApp->href('urlaliases/unique'), 'maxlength' => 100]],
-            ['type' => 'input', 'name' => 'target_url', 'label' => 'Target URL', 'index' => 'a.target_url',
+            ['type' => 'input', 'name' => 'target_url', 'label' => (('Target URL')), 'index' => 'a.target_url',
                 'editable' => true, 'addable' => true, 'validation' =>
                 ['required' => true, 'maxlength' => 100]],
-            ['type' => 'input', 'name' => 'is_active', 'label' => 'Active', 'index' => 'a.is_active', 'width' => 80,
+            ['type' => 'input', 'name' => 'is_active', 'label' => (('Active')), 'index' => 'a.is_active', 'width' => 80,
                 'editable' => true, 'addable' => true, 'editor' => 'select', 'options' => $fieldHlp->fieldOptions('is_active')],
-            ['type' => 'input', 'name' => 'is_regexp', 'label' => 'Regexp', 'index' => 'a.is_regexp', 'width' => 80,
+            ['type' => 'input', 'name' => 'is_regexp', 'label' => (('Regexp')), 'index' => 'a.is_regexp', 'width' => 80,
                 'editable' => true, 'addable' => true, 'editor' => 'select', 'options' => $fieldHlp->fieldOptions('is_regexp')],
-            ['type' => 'input', 'name' => 'redirect_type', 'label' => 'Redirect Type', 'index' => 'a.redirect_type', 'width' => 80,
+            ['type' => 'input', 'name' => 'redirect_type', 'label' => (('Redirect Type')), 'index' => 'a.redirect_type', 'width' => 80,
                 'editable' => true, 'addable' => true, 'editor' => 'select', 'options' => $fieldHlp->fieldOptions('redirect_type')],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'a.create_at', 'formatter' => 'date'],
-            ['name' => 'update_at', 'label' => 'Updated', 'index' => 'a.update_at', 'formatter' => 'date'],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 'a.create_at', 'formatter' => 'date'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'index' => 'a.update_at', 'formatter' => 'date'],
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => (('Actions')), 'sortable' => false, 'width' => 80,
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
             'new' => [
-                'caption'  => 'New Url Alias',
+                'caption'  => (('New Url Alias')),
                 'addClass' => '_modal'
             ],
             'delete' => true

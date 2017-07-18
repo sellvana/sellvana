@@ -45,7 +45,7 @@ class Sellvana_CatalogIndex_Shell_Populate extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Populate catalog with random test sample data';
+        return (('Populate catalog with random test sample data'));
     }
 
     public function getLongHelp()

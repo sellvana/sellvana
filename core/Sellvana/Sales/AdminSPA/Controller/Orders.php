@@ -22,7 +22,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
         return [
             'id' => 'orders',
-            'title' => 'Orders',
+            'title' => (('Orders')),
             'data_url' => 'orders/grid_data',
             'columns' => [
                 ['type' => 'row-select'],
@@ -30,32 +30,32 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 //                    ['type' => 'edit', 'link' => '/sales/orders/form?id={id}', 'icon_class' => 'fa fa-pencil'],
 //                    //['type' => 'delete', 'delete_url' => 'orders/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
 //                ]],
-                ['name' => 'id', 'label' => 'Internal ID'],
-                ['name' => 'unique_id', 'label' => 'Order ID', 'datacell_template' => '<td><a :href="\'#/sales/orders/form?id=\'+row.id">{{row.unique_id}}</a></td>'],
-                ['name' => 'state_overall', 'label' => 'Overall State', 'options' => $stateOverallOptions],
-                ['name' => 'customer_email', 'label' => 'Email'],
+                ['name' => 'id', 'label' => (('Internal ID'))],
+                ['name' => 'unique_id', 'label' => (('Order ID')), 'datacell_template' => '<td><a :href="\'#/sales/orders/form?id=\'+row.id">{{row.unique_id}}</a></td>'],
+                ['name' => 'state_overall', 'label' => (('Overall State')), 'options' => $stateOverallOptions],
+                ['name' => 'customer_email', 'label' => (('Email'))],
 
-                ['name' => 'billing_firstname', 'label' => 'Billing Last Name'],
-                ['name' => 'billing_lastname', 'label' => 'Billing Last Name'],
-                ['name' => 'billing_street1', 'label' => 'Billing Street'],
-                ['name' => 'billing_city', 'label' => 'Billing Street'],
-                ['name' => 'billing_region', 'label' => 'Billing State'],
-                ['name' => 'billing_postcode', 'label' => 'Billing Zip'],
-                ['name' => 'billing_country', 'label' => 'Billing Country'],
-                ['name' => 'billing_phone', 'label' => 'Billing Phone'],
-                ['name' => 'billing_fax', 'label' => 'Billing Fax'],
+                ['name' => 'billing_firstname', 'label' => (('Billing Last Name'))],
+                ['name' => 'billing_lastname', 'label' => (('Billing Last Name'))],
+                ['name' => 'billing_street1', 'label' => (('Billing Street'))],
+                ['name' => 'billing_city', 'label' => (('Billing Street'))],
+                ['name' => 'billing_region', 'label' => (('Billing State'))],
+                ['name' => 'billing_postcode', 'label' => (('Billing Zip'))],
+                ['name' => 'billing_country', 'label' => (('Billing Country'))],
+                ['name' => 'billing_phone', 'label' => (('Billing Phone'))],
+                ['name' => 'billing_fax', 'label' => (('Billing Fax'))],
 
-                ['name' => 'shipping_firstname', 'label' => 'Shipping Last Name'],
-                ['name' => 'shipping_lastname', 'label' => 'Shipping Last Name'],
-                ['name' => 'shipping_street1', 'label' => 'Shipping Street'],
-                ['name' => 'shipping_city', 'label' => 'Shipping Street'],
-                ['name' => 'shipping_region', 'label' => 'Shipping State'],
-                ['name' => 'shipping_postcode', 'label' => 'Shipping Zip'],
-                ['name' => 'shipping_country', 'label' => 'Shipping Country'],
-                ['name' => 'shipping_phone', 'label' => 'Shipping Phone'],
-                ['name' => 'shipping_fax', 'label' => 'Shipping Fax'],
+                ['name' => 'shipping_firstname', 'label' => (('Shipping Last Name'))],
+                ['name' => 'shipping_lastname', 'label' => (('Shipping Last Name'))],
+                ['name' => 'shipping_street1', 'label' => (('Shipping Street'))],
+                ['name' => 'shipping_city', 'label' => (('Shipping Street'))],
+                ['name' => 'shipping_region', 'label' => (('Shipping State'))],
+                ['name' => 'shipping_postcode', 'label' => (('Shipping Zip'))],
+                ['name' => 'shipping_country', 'label' => (('Shipping Country'))],
+                ['name' => 'shipping_phone', 'label' => (('Shipping Phone'))],
+                ['name' => 'shipping_fax', 'label' => (('Shipping Fax'))],
 
-                ['name' => 'create_at', 'label' => 'Created', 'type' => 'date']
+                ['name' => 'create_at', 'label' => (('Created')), 'type' => 'date']
             ],
             'filters' => [
                 ['name' => 'id', 'type' => 'number'],
@@ -66,7 +66,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'export' => true,
             'pager' => true,
             'bulk_actions' => [
-                ['name' => 'custom_state', 'label' => 'Change Custom State'],
+                ['name' => 'custom_state', 'label' => (('Change Custom State'))],
             ],
             'state' => [
                 's' => 'id',
@@ -93,10 +93,10 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         }
         $form = [];
 
-        $form['config']['title'] = ['Sales Order #{id}', 'id' => $order->get('unique_id')];
+        $form['config']['title'] = [(('Sales Order #{id}')), 'id' => $order->get('unique_id')];
         $form['config']['tabs'] = $this->getFormTabs('/sales/orders/form');
         $form['config']['page_actions'] = [
-            ['name' => 'back', 'label' => 'Back', 'group' => 'back', 'button_class' => 'button2'],
+            ['name' => 'back', 'label' => (('Back')), 'group' => 'back', 'button_class' => 'button2'],
         ];
 
         $form['config']['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
@@ -353,21 +353,21 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'columns' =>  [
                 ['type' => 'row-select'],
                 //['type' => 'actions'],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
+                ['name' => 'id', 'label' => (('ID'))],
+                ['name' => 'thumb_path', 'label' => (('Thumbnail')), 'width' => 48, 'sortable' => false,
                     'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
-                ['name' => 'product_name', 'label' => 'Product Name'],
-                ['name' => 'product_sku', 'label' => 'Product SKU'],
-                ['name' => 'price', 'label' => 'Price'],
-                ['name' => 'qty_ordered', 'label' => 'Qty'],
-                ['name' => 'row_total', 'label' => 'Total'],
-                ['name' => 'state_overall', 'label' => 'Overall', 'options' => $itemStateOverallOptions],
-                ['name' => 'state_payment', 'label' => 'Payment', 'options' => $itemStatePaymentOptions],
-                ['name' => 'state_delivery', 'label' => 'Delivery', 'options' => $itemStateDeliveryOptions],
-                ['name' => 'state_custom', 'label' => 'Custom', 'options' => $itemStateCustomOptions],
+                ['name' => 'product_name', 'label' => (('Product Name'))],
+                ['name' => 'product_sku', 'label' => (('Product SKU'))],
+                ['name' => 'price', 'label' => (('Price'))],
+                ['name' => 'qty_ordered', 'label' => (('Qty'))],
+                ['name' => 'row_total', 'label' => (('Total'))],
+                ['name' => 'state_overall', 'label' => (('Overall')), 'options' => $itemStateOverallOptions],
+                ['name' => 'state_payment', 'label' => (('Payment')), 'options' => $itemStatePaymentOptions],
+                ['name' => 'state_delivery', 'label' => (('Delivery')), 'options' => $itemStateDeliveryOptions],
+                ['name' => 'state_custom', 'label' => (('Custom')), 'options' => $itemStateCustomOptions],
             ],
             'bulk_actions' => [
-                ['name' => 'delete', 'label' => 'Delete Items'],
+                ['name' => 'delete', 'label' => (('Delete Items'))],
             ],
         ];
     }

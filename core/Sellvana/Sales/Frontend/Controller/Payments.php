@@ -91,7 +91,7 @@ class Sellvana_Sales_Frontend_Controller_Payments extends FCom_Frontend_Controll
             if (!empty($result['error'])) {
                 $this->message($result['error']['message'], 'error');
             } else {
-                $this->message($this->_('Payment has been successfully approved'), 'success');
+                $this->message($this->_(('Payment has been successfully approved')), 'success');
             }
         } catch (BException $e) {
             $this->forward(false);

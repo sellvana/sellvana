@@ -8,10 +8,10 @@ class Sellvana_Sales_Model_Cart_State_Overall extends FCom_Core_Model_Abstract_S
         ARCHIVED = 'archived';
 
     protected $_valueLabels = [
-        self::ACTIVE => 'Active',
-        self::ORDERED => 'Ordered',
-        self::ABANDONED => 'Abandoned',
-        self::ARCHIVED => 'Archived',
+        self::ACTIVE => (('Active')),
+        self::ORDERED => (('Ordered')),
+        self::ABANDONED => (('Abandoned')),
+        self::ARCHIVED => (('Archived')),
     ];
 
     protected $_defaultValue = self::ACTIVE;

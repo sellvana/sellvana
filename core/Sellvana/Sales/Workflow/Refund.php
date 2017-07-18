@@ -44,7 +44,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
     {
         $newState = $args['refund']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
-        $args['refund']->addHistoryEvent('custom_state', 'Admin user has changed custom refund state to "' . $label . '"');
+        $args['refund']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom refund state to "%s"')), $label));
         $args['refund']->save();
     }
     

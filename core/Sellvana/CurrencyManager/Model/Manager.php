@@ -27,9 +27,9 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
     {
         $positions = ($empty) ? ['' => ''] : [];
         $positions += [
-            self::SYMBOL_POSITION_DEFAULT => $this->_('Default'),
-            self::SYMBOL_POSITION_RIGHT => $this->_('Right'),
-            self::SYMBOL_POSITION_LEFT => $this->_('Left'),
+            self::SYMBOL_POSITION_DEFAULT => $this->_(('Default')),
+            self::SYMBOL_POSITION_RIGHT => $this->_(('Right')),
+            self::SYMBOL_POSITION_LEFT => $this->_(('Left')),
         ];
 
         return $positions;
@@ -43,10 +43,10 @@ class Sellvana_CurrencyManager_Model_Manager extends BClass
     {
         $types = ($empty) ? ['' => ''] : [];
         $types += [
-            self::SYMBOL_TYPE_NONE        => $this->_('Do not use'),
-            self::SYMBOL_TYPE_SYMBOL      => $this->_('Use symbol'),
-            self::SYMBOL_TYPE_CODE        => $this->_('Use code'),
-            self::SYMBOL_TYPE_NAME        => $this->_('Use name'),
+            self::SYMBOL_TYPE_NONE        => $this->_(('Do not use')),
+            self::SYMBOL_TYPE_SYMBOL      => $this->_(('Use symbol')),
+            self::SYMBOL_TYPE_CODE        => $this->_(('Use code')),
+            self::SYMBOL_TYPE_NAME        => $this->_(('Use name')),
         ];
 
         return $types;

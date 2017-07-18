@@ -20,10 +20,10 @@ class Sellvana_Rewards_Admin extends BClass
                     ->where('b.customer_id', $customer->id())
                     ->select(['t.*', 'o.unique_id']),
                 'columns' => [
-                    ['name' => 'event', 'label' => 'Event', 'index' => 't.event'],
-                    ['name' => 'amount', 'label' => 'Amount', 'index' => 't.amount'],
-                    ['name' => 'unique_id', 'label' => 'Order #', 'index' => 'o.unique_id'],
-                    ['name' => 'create_at', 'label' => 'Created At', 'index' => 't.create_at'],
+                    ['name' => 'event', 'label' => (('Event')), 'index' => 't.event'],
+                    ['name' => 'amount', 'label' => (('Amount')), 'index' => 't.amount'],
+                    ['name' => 'unique_id', 'label' => (('Order #')), 'index' => 'o.unique_id'],
+                    ['name' => 'create_at', 'label' => (('Created At')), 'index' => 't.create_at'],
                 ],
                 'state' => ['s' => 'create_at', 'sd' => 'desc'],
             ],
@@ -59,11 +59,11 @@ class Sellvana_Rewards_Admin extends BClass
                     ->where('t.product_id', $product->id())
                     ->select(['t.*', 'o.unique_id']),
                 'columns' => [
-                    ['name' => 'event', 'label' => 'Event', 'index' => 't.event'],
-                    ['name' => 'points', 'label' => 'Points', 'index' => 't.points'],
-                    ['name' => 'amount', 'label' => 'Amount', 'index' => 't.amount'],
-                    ['name' => 'unique_id', 'label' => 'Order #', 'index' => 'o.unique_id'],
-                    ['name' => 'create_at', 'label' => 'Created At', 'index' => 't.create_at'],
+                    ['name' => 'event', 'label' => (('Event')), 'index' => 't.event'],
+                    ['name' => 'points', 'label' => (('Points')), 'index' => 't.points'],
+                    ['name' => 'amount', 'label' => (('Amount')), 'index' => 't.amount'],
+                    ['name' => 'unique_id', 'label' => (('Order #')), 'index' => 'o.unique_id'],
+                    ['name' => 'create_at', 'label' => (('Created At')), 'index' => 't.create_at'],
                 ],
                 'state' => ['s' => 'create_at', 'sd' => 'desc'],
             ],

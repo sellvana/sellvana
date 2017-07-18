@@ -14,14 +14,14 @@ class Sellvana_MultiVendor_Main extends BClass
     {
         $states = [
             '@Overall' => [
-                'overall:placed' => 'Placed',
-                'overall:legit' => 'Passed Verification',
-                'overall:complete' => 'Complete',
+                'overall:placed' => (('Placed')),
+                'overall:legit' => (('Passed Verification')),
+                'overall:complete' => (('Complete')),
             ],
             '@Payment' => [
-                'payment:free' => 'Free',
-                'payment:processing' => 'Processing',
-                'payment:paid' => 'Paid',
+                'payment:free' => (('Free')),
+                'payment:processing' => (('Processing')),
+                'payment:paid' => (('Paid')),
             ],
         ];
 

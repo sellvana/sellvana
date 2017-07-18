@@ -13,7 +13,7 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/shipping_method';
     protected $_gridHref = 'sales/report/shipping_method';
-    protected $_gridTitle = 'Shipping Methods';
+    protected $_gridTitle = (('Shipping Methods'));
 
     public function gridConfig()
     {
@@ -27,7 +27,7 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
 
         $config['columns'] = [
             ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => 'All time'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => (('All time'))],
             ['name' => 'shipping_method', 'index' => 'o.shipping_method', 'options' => $methodOptions],
             ['name' => 'shipping_service', 'index' => 'o.shipping_service'],
             ['name' => 'order_count', 'index' => 'order_count'],
@@ -50,14 +50,14 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
     protected function _getFieldLabels()
     {
         return [
-            'period' => 'Period',
-            'shipping_method' => 'Shipping Carrier',
-            'shipping_service' => 'Shipping Method',
+            'period' => (('Period')),
+            'shipping_method' => (('Shipping Carrier')),
+            'shipping_service' => (('Shipping Method')),
             'order_count' => '# of Orders',
             'qty_sold' => '# of Items',
-            'total_shipping_amount' => 'Shipping Amount Collected',
-            'period_type' => 'Group by',
-            'create_at' => 'Created',
+            'total_shipping_amount' => (('Shipping Amount Collected')),
+            'period_type' => (('Group by')),
+            'create_at' => (('Created')),
         ];
     }
 

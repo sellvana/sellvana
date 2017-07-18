@@ -29,7 +29,7 @@ class Sellvana_Sales_Admin_Controller_Returns extends Sellvana_Sales_Admin_Contr
                 'qtys' => $qtys,
             ]);
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Return has been created');
+            $result['message'] = $this->_(('Return has been created'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -69,7 +69,7 @@ class Sellvana_Sales_Admin_Controller_Returns extends Sellvana_Sales_Admin_Contr
                 }
             }
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Return updates have been applied');
+            $result['message'] = $this->_(('Return updates have been applied'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();

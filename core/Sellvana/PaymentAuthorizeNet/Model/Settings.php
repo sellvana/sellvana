@@ -106,8 +106,8 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
     public function paymentActions()
     {
         return [
-            "AUTH_ONLY"         => $this->_("Authorize Only"),
-            "AUTH_CAPTURE" => $this->_("Authorize and Capture")
+            "AUTH_ONLY"         => $this->_(("Authorize Only")),
+            "AUTH_CAPTURE" => $this->_(("Authorize and Capture"))
         ];
     }
 /*
@@ -122,7 +122,7 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => $this->_("Other")
+            "OT" => $this->_(("Other"))
         ];
     }
 
@@ -193,7 +193,7 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
         // todo - update to be dynamically built
         return [
             "-"          => "-- Select One --",
-            "processing" => "Processing"
+            "processing" => (('Processing'))
         ];
     }
 

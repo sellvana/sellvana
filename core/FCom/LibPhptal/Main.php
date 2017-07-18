@@ -38,7 +38,7 @@ class FCom_LibPhptal_Main extends BClass
         ]]);
 
         $this->BLayout->addRenderer('FCom_LibPhptal', [
-            'description' => 'PHPTAL',
+            'description' => (('PHPTAL')),
             'callback'    => 'FCom_LibPhptal_Main::renderer',
             'file_ext'    => ['.zpt', '.zpt.html'],
             'editor'      => 'html',

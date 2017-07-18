@@ -5,7 +5,7 @@ class Sellvana_Sales_Model_Order_Shipment_Package_State extends FCom_Core_Model_
     const OVERALL = 'overall';
 
     protected $_stateLabels = [
-        self::OVERALL => 'Overall',
+        self::OVERALL => (('Overall')),
     ];
 
     /**

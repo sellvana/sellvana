@@ -12,7 +12,7 @@ class Sellvana_PaymentBasic_Main extends BClass
     {
         $this->Sellvana_Sales_Main->addPaymentMethod('basic', 'Sellvana_PaymentBasic_PaymentMethod');
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_PaymentBasic' => 'Basic Payment Settings',
+            'settings/Sellvana_PaymentBasic' => (('Basic Payment Settings')),
         ]);
     }
 }

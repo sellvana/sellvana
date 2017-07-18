@@ -54,29 +54,29 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'stock_status' => [
-            'in_stock' => 'In Stock',
-            'backorder' => 'On Backorder',
-            'special_order' => 'Special Order',
-            'do_not_carry' => 'Do Not Carry',
-            'temp_unavail' => 'Temporarily Unavailable',
-            'vendor_disc' => 'Supplier Discontinued',
-            'mfr_disc' => 'MFR Discontinued',
+            'in_stock' => (('In Stock')),
+            'backorder' => (('On Backorder')),
+            'special_order' => (('Special Order')),
+            'do_not_carry' => (('Do Not Carry')),
+            'temp_unavail' => (('Temporarily Unavailable')),
+            'vendor_disc' => (('Supplier Discontinued')),
+            'mfr_disc' => (('MFR Discontinued')),
         ],
         'rollover_effects' => [
-            'fade' => 'Fade',
-            'clip' => 'Clip',
-            'blind' => 'Blinds',
-            'drop' => 'Drop',
-            'fold' => 'Fold',
-            'highlight' => 'Highlight',
-            'puff' => 'Puff',
-            'pulsate' => 'Pulsate',
-            'slide' => 'Slide'
+            'fade' => (('Fade')),
+            'clip' => (('Clip')),
+            'blind' => (('Blinds')),
+            'drop' => (('Drop')),
+            'fold' => (('Fold')),
+            'highlight' => (('Highlight')),
+            'puff' => (('Puff')),
+            'pulsate' => (('Pulsate')),
+            'slide' => (('Slide'))
         ],
         'grid_tile_type' => [
-            'D' => 'Default',
-            'C' => 'Cms Block',
-            'V' => 'Custom View',
+            'D' => (('Default')),
+            'C' => (('Cms Block')),
+            'V' => (('Custom View')),
         ],
     ];
 
@@ -142,7 +142,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->_('The SKU number entered is already in use. Please enter a valid SKU number.');
+            return $this->_(('The SKU number entered is already in use. Please enter a valid SKU number.'));
         }
         return true;
     }
@@ -160,7 +160,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return $this->_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->_(('The URL Key entered is already in use. Please enter a valid URL Key.'));
         }
         return true;
     }
@@ -986,13 +986,13 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->where('pl.product_id', $this->id)->find_many();
         $productLink = [];
         if (empty($types) || in_array('related', $types)) {
-            $productLink['related'] = ['title' => $this->_('Related Products'), 'products' => [] ];
+            $productLink['related'] = ['title' => $this->_(('Related Products')), 'products' => [] ];
         }
         if (empty($types) || in_array('similar', $types)) {
-            $productLink['similar'] = ['title' => $this->_('You may also like these items'), 'products' => [] ];
+            $productLink['similar'] = ['title' => $this->_(('You may also like these items')), 'products' => [] ];
         }
         if (empty($types) || in_array('cross_sell', $types)) {
-            $productLink['cross_sell'] = ['title' => $this->_('You may also like these items'), 'products' => [] ];
+            $productLink['cross_sell'] = ['title' => $this->_(('You may also like these items')), 'products' => [] ];
         }
 
         foreach ($arrProduct as $product) {
@@ -1181,8 +1181,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function backOrders()
     {
         return [
-            "NOT_BACK_ORDERS"         => $this->_("No Back Orders"),
-            "ALLOW_QUANTITY_BELOW" => $this->_("Allow Quantity Below 0")
+            "NOT_BACK_ORDERS"         => $this->_(("No Back Orders")),
+            "ALLOW_QUANTITY_BELOW" => $this->_(("Allow Quantity Below 0"))
         ];
     }
 
@@ -1314,21 +1314,21 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($mapPriceModel) {
             $mapPrice = $mapPriceModel->getPrice();
             if ($mapPrice > $finalPrice) {
-                $finalText = $this->_('Add to cart');
+                $finalText = $this->_(('Add to cart'));
             }
         }
 
         if ($msrpPriceModel) {
             $msrpPrice = $msrpPriceModel->getPrice();
-            $prices['msrp'] = ['type' => 'old', 'label' => 'List Price', 'pos' => 10, 'value' => $msrpPrice];
+            $prices['msrp'] = ['type' => 'old', 'label' => (('List Price')), 'pos' => 10, 'value' => $msrpPrice];
         }
 
         if ($finalPrice !== null && $finalPrice < $basePrice) {
-            $prices['base'] = ['type' => 'old', 'label' => $msrpPriceModel ? 'Our Price' : 'Price', 'pos' => 20, 'value' => $basePrice];
-            $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice,
+            $prices['base'] = ['type' => 'old', 'label' => $msrpPriceModel ? (('Our Price')) : (('Price')), 'pos' => 20, 'value' => $basePrice];
+            $prices['sale'] = ['type' => 'new', 'label' => (('Sale')), 'pos' => 30, 'value' => $finalPrice,
                 'formatted' => $finalText, 'final' => 1];
         } else {
-            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice, 'final' => 1];
+            $prices['base'] = ['type' => 'reg', 'label' => (('Price')), 'pos' => 20, 'value' => $basePrice, 'final' => 1];
         }
 
         $this->BEvents->fire(__METHOD__, [
@@ -1344,7 +1344,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
             $diff = $basePrice - $finalPrice;
             $saveText = $this->BLocale->currency($diff) . ' (' . number_format($diff / $basePrice * 100) . '%)';
-            $prices['save'] = ['type' => 'save', 'label' => 'You Save', 'pos' => 90, 'formatted' => $saveText];
+            $prices['save'] = ['type' => 'save', 'label' => (('You Save')), 'pos' => 90, 'formatted' => $saveText];
         }
 
         uasort($prices, function($v1, $v2) {

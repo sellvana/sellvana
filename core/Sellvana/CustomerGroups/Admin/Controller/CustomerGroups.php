@@ -12,8 +12,8 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
 
     protected $_gridHref = 'customer-groups';
     protected $_modelClass = 'Sellvana_CustomerGroups_Model_Group';
-    protected $_gridTitle = 'Customer Groups';
-    protected $_recordName = 'Customer Group';
+    protected $_gridTitle = (('Customer Groups'));
+    protected $_recordName = (('Customer Group'));
     protected $_mainTableAlias = 'cg';
     protected $_permission = 'customer_groups/manage';
     protected $_navPath = 'customer/customer-groups';
@@ -26,10 +26,10 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 'cg.id'],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title',
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50, 'index' => 'cg.id'],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'width' => 300, 'index' => 'cg.title',
                 'editable' => true, 'addable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code',
+            ['type' => 'input', 'name' => 'code', 'label' => (('Code')), 'width' => 300, 'index' => 'cg.code',
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('customer-groups/unique')]],
         ];
@@ -50,7 +50,7 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_group" class="btn grid-new btn-primary _modal">'
-                . $this->_('Add New Customer Group') . '</button>']]);
+                . $this->_(('Add New Customer Group')) . '</button>']]);
     }
 
     public function formPostAfter($args)
@@ -97,12 +97,12 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         $config['id']      = 'group_all_customer_groups_grid_' . $group->id;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'title', 'label' => 'Title', 'index' => 'c.firstname', 'width' => 400],
-            ['name' => 'code', 'label' => 'Code', 'index' => 'c.lastname', 'width' => 200],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'title', 'label' => (('Title')), 'index' => 'c.firstname', 'width' => 400],
+            ['name' => 'code', 'label' => (('Code')), 'index' => 'c.lastname', 'width' => 200],
         ];
         $config['actions'] = [
-            'add' => ['caption' => 'Add selected customer groups']
+            'add' => ['caption' => (('Add selected customer groups'))]
         ];
         $config['filters'] = [
             ['field' => 'title', 'type' => 'text'],
@@ -134,15 +134,15 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
             'data_mode' => 'local',
             'columns' => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true],
-                ['name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200],
-                ['name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200],
-                ['name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'c.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'firstname', 'label' => (('Firstname')), 'index' => 'c.username', 'width' => 200],
+                ['name' => 'lastname', 'label' => (('Lastname')), 'index' => 'c.username', 'width' => 200],
+                ['name' => 'email', 'label' => (('Email')), 'index' => 'c.email', 'width' => 200],
             ],
             'actions' => [
-                'delete' => ['caption' => 'Remove'],
+                'delete' => ['caption' => (('Remove'))],
                 'add-group-customer' => [
-                    'caption' => 'Add customer',
+                    'caption' => (('Add customer')),
                     'type' => 'button',
                     'id' => 'add-customer-from-grid',
                     'class' => 'btn-primary',

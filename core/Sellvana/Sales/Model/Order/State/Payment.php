@@ -13,15 +13,15 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         PARTIAL_REFUNDED = 'partial_refunded';
 
     protected $_valueLabels = [
-        self::FREE => 'Free',
-        self::UNPAID => 'Unpaid',
-        self::PROCESSING => 'Processing',
-        self::PARTIAL_PAID => 'Partial Paid',
-        self::PAID => 'Paid',
-        self::OUTSTANDING => 'Outstanding',
-        self::VOID => 'Void',
-        self::REFUNDED => 'Refunded',
-        self::PARTIAL_REFUNDED => 'Partial Refunded',
+        self::FREE => (('Free')),
+        self::UNPAID => (('Unpaid')),
+        self::PROCESSING => (('Processing')),
+        self::PARTIAL_PAID => (('Partial Paid')),
+        self::PAID => (('Paid')),
+        self::OUTSTANDING => (('Outstanding')),
+        self::VOID => (('Void')),
+        self::REFUNDED => (('Refunded')),
+        self::PARTIAL_REFUNDED => (('Partial Refunded')),
     ];
 
     protected $_defaultValueWorkflow = [

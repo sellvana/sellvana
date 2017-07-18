@@ -35,7 +35,7 @@ class FCom_Core_Shell_Config extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Configuration management';
+        return (('Configuration management'));
     }
 
     public function getLongHelp()

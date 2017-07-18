@@ -10,13 +10,13 @@ class Sellvana_CatalogAds_Admin_Controller_Ads extends FCom_Admin_Controller_Abs
     protected static $_origClass = __CLASS__;
 
     protected $_modelClass = 'Sellvana_CatalogAds_Model_Ad';
-    protected $_recordName = 'Catalog Ad';
+    protected $_recordName = (('Catalog Ad'));
     protected $_mainTableAlias = 'a';
     protected $_permission = 'catalog/ads';
     protected $_navPath = 'catalog/ads';
 
     protected $_gridHref = 'catalog/ads';
-    protected $_gridTitle = 'Catalog Ads';
+    protected $_gridTitle = (('Catalog Ads'));
 
     protected $_formViewPrefix = 'catalog/ads-form/';
     protected $_formTitleField = 'name';
@@ -37,14 +37,14 @@ class Sellvana_CatalogAds_Admin_Controller_Ads extends FCom_Admin_Controller_Abs
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
-            ['name' => 'name', 'label' => 'Ad Name'],
-            ['name' => 'priority', 'label' => 'Priority'],
-            ['name' => 'grid_position', 'label' => 'Grid Position'],
-            ['name' => 'grid_cms_block_id', 'label' => 'Grid CMS Block', 'options' => $cmsBlocks],
-            ['name' => 'list_position', 'label' => 'Grid Position'],
-            ['name' => 'list_cms_block_id', 'label' => 'Grid CMS Block', 'options' => $cmsBlocks],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Created', 'cell' => 'datetime'],
+            ['name' => 'name', 'label' => (('Ad Name'))],
+            ['name' => 'priority', 'label' => (('Priority'))],
+            ['name' => 'grid_position', 'label' => (('Grid Position'))],
+            ['name' => 'grid_cms_block_id', 'label' => (('Grid CMS Block')), 'options' => $cmsBlocks],
+            ['name' => 'list_position', 'label' => (('Grid Position'))],
+            ['name' => 'list_cms_block_id', 'label' => (('Grid CMS Block')), 'options' => $cmsBlocks],
+            ['name' => 'create_at', 'label' => (('Created')), 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => (('Created')), 'cell' => 'datetime'],
         ];
 
         $config['filters'] = [

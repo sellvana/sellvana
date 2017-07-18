@@ -355,7 +355,7 @@ class FCom_Core_Main extends BClass
 
         if ('DISABLED' === $mode) {
             $this->BResponse->header('X-Remote-IP: ' . $this->BRequest->ip());
-            $this->BResponse->status('404', 'Page not found', 'Page not found');
+            $this->BResponse->status('404', (('Page not found')), 'Page not found');
             die;
         }
 

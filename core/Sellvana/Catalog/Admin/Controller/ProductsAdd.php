@@ -39,7 +39,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
             try {
                 $p = $prodHlp->load($prodData['product_sku'], 'product_sku');
                 if ($p) {
-                    $this->message($this->_('Product with SKU %s already exists', $prodData['product_sku']), 'error');
+                    $this->message($this->_((('Product with SKU %s already exists')), $prodData['product_sku']), 'error');
                     $errors++;
                     continue;
                 }

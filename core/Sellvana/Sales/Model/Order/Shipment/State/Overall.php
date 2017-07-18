@@ -14,14 +14,14 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
         CANCELED = 'canceled';
 
     protected $_valueLabels = [
-        self::PENDING => 'Pending',
-        self::PACKING => 'Packing',
-        self::SHIPPING => 'Shipping',
-        self::SHIPPED => 'Shipped',
-        self::EXCEPTION => 'Exception',
-        self::DELIVERED => 'Delivered',
-        self::RETURNED => 'Returned',
-        self::CANCELED => 'Canceled',
+        self::PENDING => (('Pending')),
+        self::PACKING => (('Packing')),
+        self::SHIPPING => (('Shipping')),
+        self::SHIPPED => (('Shipped')),
+        self::EXCEPTION => (('Exception')),
+        self::DELIVERED => (('Delivered')),
+        self::RETURNED => (('Returned')),
+        self::CANCELED => (('Canceled')),
     ];
 
     protected $_defaultMethods = [

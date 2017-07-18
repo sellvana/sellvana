@@ -31,7 +31,7 @@ class Sellvana_Catalog_Frontend_ControlPanel extends BClass
     {
         $model = $this->getModel('Sellvana_Catalog_Model_Product', $params['data']['model_id']);
         if (!$model) {
-            return ['error' => 'Product not found'];
+            return ['error' => (('Product not found'))];
         }
         $field = $params['data']['field'];
         $value = isset($params['value']) ? $params['value'] : null;
@@ -43,7 +43,7 @@ class Sellvana_Catalog_Frontend_ControlPanel extends BClass
                     $value = $src;
                 }
             } else {
-                return ['error' => 'Invalid image source'];
+                return ['error' => (('Invalid image source'))];
             }
         }
         $model->set($field, $value);
@@ -59,7 +59,7 @@ class Sellvana_Catalog_Frontend_ControlPanel extends BClass
     {
         $model = $this->getModel('Sellvana_Catalog_Model_Category', $params['data']['model_id']);
         if (!$model) {
-            return ['error' => 'Category not found'];
+            return ['error' => (('Category not found'))];
         }
         $field = $params['data']['field'];
         $value = isset($params['value']) ? $params['value'] : null;

@@ -155,7 +155,7 @@ class BLayoutTest extends \Codeception\TestCase\Test
     public function testHookView()
     {
         $layout = $this->_layout;
-        $view = ['my', 'raw_text' => 'Called'];
+        $view = ['my', 'raw_text' => (('Called'))];
         $layout->hookView('main', $view);
         $result = $layout->dispatch('hook:main');
 

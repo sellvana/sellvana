@@ -10,8 +10,8 @@ class Sellvana_Email_Admin_Controller_Messages extends FCom_Admin_Controller_Abs
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'messages';
     protected $_modelClass = 'Sellvana_Email_Model_Message';
-    protected $_gridTitle = 'Messages';
-    protected $_recordName = 'Message';
+    protected $_gridTitle = (('Messages'));
+    protected $_recordName = (('Message'));
     protected $_mainTableAlias = 'm';
 
     public function messagesGridConfig($customer)
@@ -21,12 +21,12 @@ class Sellvana_Email_Admin_Controller_Messages extends FCom_Admin_Controller_Abs
         $config['id'] = 'customer_messages_grid_' . $customer->id;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'view_name', 'label' => 'View Name'],
-            ['name' => 'recipient', 'label' => 'Recipient'],
-            ['name' => 'subject', 'label' => 'Subject'],
-            ['name' => 'status', 'label' => 'Status'],
-            ['name' => 'num_attemps', 'label' => 'Number of Attempts'],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+            ['name' => 'view_name', 'label' => (('View Name'))],
+            ['name' => 'recipient', 'label' => (('Recipient'))],
+            ['name' => 'subject', 'label' => (('Subject'))],
+            ['name' => 'status', 'label' => (('Status'))],
+            ['name' => 'num_attemps', 'label' => (('Number of Attempts'))],
+            ['name' => 'create_at', 'label' => (('Created')), 'cell' => 'datetime'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
         ];
         $config['filters'] = [

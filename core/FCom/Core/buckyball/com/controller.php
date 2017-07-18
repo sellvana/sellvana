@@ -693,14 +693,14 @@ class BRequest extends BClass
         $result = [];
 
         $uploadErrors = [
-            UPLOAD_ERR_OK         => "No errors.",
-            UPLOAD_ERR_INI_SIZE   => "Larger than upload_max_filesize.",
-            UPLOAD_ERR_FORM_SIZE  => "Larger than form MAX_FILE_SIZE.",
-            UPLOAD_ERR_PARTIAL    => "Partial upload.",
-            UPLOAD_ERR_NO_FILE    => "No file.",
-            UPLOAD_ERR_NO_TMP_DIR => "No temporary directory.",
-            UPLOAD_ERR_CANT_WRITE => "Can't write to disk.",
-            UPLOAD_ERR_EXTENSION  => "File upload stopped by extension."
+            UPLOAD_ERR_OK         => (('No errors.')),
+            UPLOAD_ERR_INI_SIZE   => (('Larger than upload_max_filesize.')),
+            UPLOAD_ERR_FORM_SIZE  => (('Larger than form MAX_FILE_SIZE.')),
+            UPLOAD_ERR_PARTIAL    => (('Partial upload.')),
+            UPLOAD_ERR_NO_FILE    => (('No file.')),
+            UPLOAD_ERR_NO_TMP_DIR => (('No temporary directory.')),
+            UPLOAD_ERR_CANT_WRITE => (("Can't write to disk.")),
+            UPLOAD_ERR_EXTENSION  => (('File upload stopped by extension.'))
         ];
         if (is_array($source['error'])) {
             foreach ($source['error'] as $key => $error) {
@@ -743,9 +743,9 @@ class BRequest extends BClass
     public function getAvailableCsrfMethods($includeEmpty = false)
     {
         $methods = [
-            'token' => 'Token',
-            'origin' => 'Origin',
-            'referrer' => 'Referrer',
+            'token' => (('Token')),
+            'origin' => (('Origin')),
+            'referrer' => (('Referrer')),
             'token+referrer' => 'Token & Referrer'
         ];
 
@@ -1457,13 +1457,13 @@ class BResponse extends BClass
         $this->BSession->close();
 
         if (!file_exists($source)) {
-            $this->status(404, 'File not found', 'File not found');
+            $this->status(404, (('File not found')), 'File not found');
             $this->shutdown(__METHOD__);
             return;
         }
 
         if (!$this->BUtil->isPathWithinRoot($source)) {
-            $this->status(403, 'Invalid file location', 'Invalid file location');
+            $this->status(403, (('Invalid file location')), 'Invalid file location');
             $this->shutdown(__METHOD__);
             return;
         }
@@ -1529,7 +1529,7 @@ class BResponse extends BClass
             if (!empty(static::$_httpStatuses[$status])) {
                 $message = static::$_httpStatuses[$status];
             } else {
-                $message = 'Unknown';
+                $message = (('Unknown'));
             }
         }
         $protocol = $this->BRequest->serverProtocol();
@@ -1640,7 +1640,7 @@ class BResponse extends BClass
         }
 
         if (!$hostIsValid) {
-            $this->status(404, 'Unapproved HTTP Host header', 'Host not found');
+            $this->status(404, (('Unapproved HTTP Host header')), 'Host not found');
             die();
         }
 
@@ -2174,7 +2174,7 @@ class BRouting extends BClass
 
         if ($attempts >= 100) {
             echo "<pre>"; print_r($route); echo "</pre>";
-            $this->BDebug->error($this->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
+            $this->BDebug->error($this->_((('BFrontController: Reached 100 route iterations: %s')), print_r($route, 1)));
         }
     }
 
@@ -2393,7 +2393,7 @@ class BRouteNode extends BClass
             }
         }
         if ($attempts >= 100) {
-            $this->BDebug->error($this->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
+            $this->BDebug->error($this->_((('BRouteNode: Reached 100 route iterations: %s')), print_r($observer, 1)));
         }
         return false;
     }

@@ -13,8 +13,8 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
     protected $_gridHref = 'prodreviews';
     protected $_modelClass = 'Sellvana_ProductReviews_Model_Review';
     protected $_mainTableAlias = 'pr';
-    protected $_gridTitle = 'Product Reviews';
-    protected $_recordName = 'Product Review';
+    protected $_gridTitle = (('Product Reviews'));
+    protected $_recordName = (('Product Review'));
     protected $_formTitleField = 'title';
     protected $_formViewPrefix = 'prodreviews/form/';
     //custom grid view
@@ -34,16 +34,16 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
         unset($config['form_url']); //unset this to use modal
         $columns = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'addable' => true,
+            ['name' => 'id', 'label' => (('ID')), 'width' => 55, 'hidden' => true],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'addable' => true,
                 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'addable' => true,
+            ['type' => 'input', 'name' => 'text', 'label' => (('Comment')), 'addable' => true,
                 'editable' => true, 'editor' => 'textarea'],
             /*['name' => 'rating', 'label' => 'Total Rating',
                 'editable' => true, 'display' => 'eval', 'element_print' => $this->inputRatingHtml('rating'),
                 'print' => '"<div class=\'rateit\' data-review=\'"+rc.row["id"]+"\' data-rateit-resetable=\'false\' data-rateit-min=\''.$reviewConfigs['min'].'\' data-rateit-max=\''.$reviewConfigs['max'].'\' data-rateit-readonly=\'false\' data-rateit-step=\''.$reviewConfigs['step'].'\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
                 /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))]*/
-            ['type' => 'rating', 'name' => 'rating', 'label' => 'Total Rating',
+            ['type' => 'rating', 'name' => 'rating', 'label' => (('Total Rating')),
                 /*'editable' => 'inline', 'editor' => 'rating',*/ 'disabled' => true,
                 /*'element_print' => $this->inputRatingHtml('rating'),*/
                 'validation' => [
@@ -51,16 +51,16 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
                     'range' => [$reviewConfigs['min'], $reviewConfigs['max']]
                 ]
             ],
-            ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'addable' => true,
+            ['type' => 'input', 'name' => 'helpful', 'label' => (('Helpful')), 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
-            ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
-                'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['type' => 'input', 'name' => 'verified_purchase', 'label' => 'Verified Purchase', 'addable' => true, 'editable' => true,
-                'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
+            ['type' => 'input', 'name' => 'approved', 'label' => (('Approved')), 'addable' => true, 'editable' => true,
+                'multirow_edit' => true, 'options' => ['1' => (('Yes')), '0' => (('No'))], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'verified_purchase', 'label' => (('Verified Purchase')), 'addable' => true, 'editable' => true,
+                'multirow_edit' => true, 'options' => ['1' => (('Yes')), '0' => (('No'))], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'product_id', 'label' => (('Product')), 'addable' => true, 'hidden' => true,
                 'options' => $this->Sellvana_Catalog_Model_Product->getOptionsData(), 'editor' => 'select',
                 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'customer_id', 'label' => 'Customer', 'addable' => true, 'hidden' => true,
+            ['type' => 'input', 'name' => 'customer_id', 'label' => (('Customer')), 'addable' => true, 'hidden' => true,
                 'options' => $this->Sellvana_Customer_Model_Customer->getOptionsData(), 'editor' => 'select',
                 'validation' => ['required' => true]]
         ];
@@ -86,7 +86,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             'deny' => [
                 'class'        => 'btn btn-warning',
                 'id'           => "prod-reviews-deny",
-                'caption'      => 'Deny',
+                'caption'      => (('Deny')),
                 'type'         => 'button',
                 'callback'     => 'denyReviews',
                 'isMassAction' => true,
@@ -94,7 +94,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             'approve' => [
                 'class'        => 'btn btn-primary',
                 'id'           => "prod-reviews-approve",
-                'caption'      => 'Approve',
+                'caption'      => (('Approve')),
                 'type'         => 'button',
                 'callback'     => 'approveReviews',
                 'isMassAction' => true
@@ -103,7 +103,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
 
 
         //$config['autowidth'] = false;
-        $config['caption'] = 'All review';
+        $config['caption'] = (('All review'));
         //$config['multiselect'] = false;
         //$config['height'] = '100%';
         $config['columns'] = $columns;
@@ -114,7 +114,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             $i = $this->BUtil->arrayFind($config['columns'], ['name' => '_actions']);
             $config['columns'][$i]['data']['edit']['href'] = $this->BApp->href('/prodreviews/form_only?id=');
             $config['columns'][$i]['data']['edit']['async_edit'] = true;
-            $config['columns'][] = ['name' => 'customer', 'label' => 'Customer', 'width' => 250];
+            $config['columns'][] = ['name' => 'customer', 'label' => (('Customer')), 'width' => 250];
             $config['data_mode'] = 'local';
             $config['edit_url_required'] = true;
             //$config['filters'][] = array('field'=>'product_name', 'type'=>'text');
@@ -137,7 +137,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             }*/
             //print_r($data);
             unset($config['columns'][6]['data']['edit']);
-            $config['columns'][6]['data']['custom'] = ['caption' => 'Edit...'];
+            $config['columns'][6]['data']['custom'] = ['caption' => (('Edit...'))];
             $config['data'] = $data;
 
             $config['callbacks'] = [
@@ -146,9 +146,9 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
             $config['id'] = 'products_reviews_grid';
-            $config['columns'][] = ['name' => 'product_name', 'label' => 'Product name'];
-            $config['columns'][] = ['name' => 'customer', 'label' => 'Customer'];
-            $config['columns'][] = ['name' => 'create_at', 'label' => 'Created'];
+            $config['columns'][] = ['name' => 'product_name', 'label' => (('Product name'))];
+            $config['columns'][] = ['name' => 'customer', 'label' => (('Customer'))];
+            $config['columns'][] = ['name' => 'create_at', 'label' => (('Created'))];
             $config['orm'] = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.*')
                 ->left_outer_join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
                 ->left_outer_join('Sellvana_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
@@ -165,7 +165,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             'buttons' => [['name' => 'edit'], ['name' => 'delete']]];*/
         $config['columns'][] = ['type' => 'btn_group',
             'buttons' => [
-                ['name' => 'edit-custom', 'callback' => 'showModalToEditReview', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil ", 'title' => 'Edit Review'],
+                ['name' => 'edit-custom', 'callback' => 'showModalToEditReview', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil ", 'title' => (('Edit Review'))],
                 ['name' => 'delete']
             ]
         ];
@@ -216,26 +216,26 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
         $config['id'] = 'customer_reviews_grid_' . $customer->id;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 250, 'addable' => true,
+            ['name' => 'id', 'label' => (('ID')), 'width' => 55, 'hidden' => true],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'width' => 250, 'addable' => true,
                 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'width' => 250, 'addable' => true,
+            ['type' => 'input', 'name' => 'text', 'label' => (('Comment')), 'width' => 250, 'addable' => true,
                 'editable' => true, 'editor' => 'textarea'],
-            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true,
+            ['type' => 'input', 'name' => 'rating', 'label' => (('Total Rating')), 'width' => 60, 'addable' => true,
                 'editable' => true, 'element_print' => $this->inputRatingHtml('rating'),
                 'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
                 /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/],
-            ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'width' => 60, 'addable' => true,
+            ['type' => 'input', 'name' => 'helpful', 'label' => (('Helpful')), 'width' => 60, 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
-            ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
-                'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['type' => 'input', 'name' => 'verified_purchase', 'label' => 'Verified Purchase', 'addable' => true, 'editable' => true,
-                'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
+            ['type' => 'input', 'name' => 'approved', 'label' => (('Approved')), 'addable' => true, 'editable' => true,
+                'multirow_edit' => true, 'options' => ['1' => (('Yes')), '0' => (('No'))], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'verified_purchase', 'label' => (('Verified Purchase')), 'addable' => true, 'editable' => true,
+                'multirow_edit' => true, 'options' => ['1' => (('Yes')), '0' => (('No'))], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'product_id', 'label' => (('Product')), 'addable' => true, 'hidden' => true,
                   'options' => $this->Sellvana_Catalog_Model_Product->getOptionsData(), 'editor' => 'select',
                   'validation' => ['required' => true]],
-            ['name' => 'product_name', 'label' => 'Product name', 'width' => 250],
-            ['name' => 'create_at', 'label' => 'Created']
+            ['name' => 'product_name', 'label' => (('Product name')), 'width' => 250],
+            ['name' => 'create_at', 'label' => (('Created'))]
         ];
 
         $config['filters'] = [
@@ -246,7 +246,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
 
         $config['actions'] = ['delete' => true];
 
-        $config['columns'][] = ['name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
+        $config['columns'][] = ['name' => '_actions', 'label' => (('Actions')), 'sortable' => false, 'width' => 80,
             'data' => ['edit' => true, 'delete' => true]];
 
         $config['orm'] = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.*')->where('customer_id', $customer->id)

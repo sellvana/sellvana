@@ -18,8 +18,8 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     protected $_permission = 'promo';
     protected $_modelClass = 'Sellvana_Promo_Model_Promo';
     protected $_gridHref = 'promo';
-    protected $_gridTitle = 'Promotions';
-    protected $_recordName = 'Promotion';
+    protected $_gridTitle = (('Promotions'));
+    protected $_recordName = (('Promotion'));
     protected $_formTitleField = 'description';
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'catalog/promo';
@@ -39,22 +39,22 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 ['name' => 'edit'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number'],
-            ['name' => 'summary', 'label' => 'Summary', 'width' => 250],
-            ['name' => 'promo_type', 'label' => 'Promo Type', 'options' => $hlp->fieldOptions('promo_type') ],
-            ['name' => 'coupon_type', 'label' => 'Coupon Type', 'options' => $hlp->fieldOptions('coupon_type') ],
-            ['name' => 'internal_notes', 'label' => 'Admin Notes', 'width' => 250, 'hidden' => 1],
-            ['name' => 'customer_label', 'label' => 'Customer Label', 'width' => 250, 'hidden' => 1],
-            ['name' => 'customer_details', 'label' => 'Customer Details', 'width' => 250, 'hidden' => 1],
-            ['name' => 'from_date', 'label' => 'Start Date', 'formatter' => 'date', 'cell' => 'date'],
-            ['name' => 'to_date', 'label' => 'End Date', 'formatter' => 'date', 'cell' => 'date'],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
+            ['name' => 'id', 'label' => (('ID')), 'width' => 55, 'sorttype' => 'number'],
+            ['name' => 'summary', 'label' => (('Summary')), 'width' => 250],
+            ['name' => 'promo_type', 'label' => (('Promo Type')), 'options' => $hlp->fieldOptions('promo_type') ],
+            ['name' => 'coupon_type', 'label' => (('Coupon Type')), 'options' => $hlp->fieldOptions('coupon_type') ],
+            ['name' => 'internal_notes', 'label' => (('Admin Notes')), 'width' => 250, 'hidden' => 1],
+            ['name' => 'customer_label', 'label' => (('Customer Label')), 'width' => 250, 'hidden' => 1],
+            ['name' => 'customer_details', 'label' => (('Customer Details')), 'width' => 250, 'hidden' => 1],
+            ['name' => 'from_date', 'label' => (('Start Date')), 'formatter' => 'date', 'cell' => 'date'],
+            ['name' => 'to_date', 'label' => (('End Date')), 'formatter' => 'date', 'cell' => 'date'],
+            ['type' => 'input', 'name' => 'status', 'label' => (('Status')), 'index' => 'p.status',
                 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $hlp->fieldOptions('status')
             ],
-            ['name' => 'details', 'label' => 'Details', 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date', 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date', 'cell' => 'datetime'],
+            ['name' => 'details', 'label' => (('Details')), 'hidden' => true],
+            ['name' => 'create_at', 'label' => (('Created')), 'formatter' => 'date', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'formatter' => 'date', 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -179,12 +179,12 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     {
         if ($this->BRequest->get('export')) {
             if ($this->BRequest->csrf('referrer', 'GET')) {
-                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                $this->BResponse->status('403', (('Invalid referrer')), 'Invalid referrer');
                 return;
             }
         } else {
             if (!$this->BRequest->xhr()) {
-                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
                 return;
             }
         }
@@ -249,10 +249,10 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             'form_url' => null,
             'columns' => [
                 ['type' => 'row_select', 'width'=>40],
-                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'id', 'label' => (('ID')), 'hidden' => true],
                 ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
-                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
-                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40]
+                ['name' => 'code', 'label' => (('Code')), 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
+                ['name' => 'total_used', 'label' => (('Used')), 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40]
             ],
             'actions' => [
                 'delete' => true,
@@ -275,7 +275,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         $r = $this->BRequest;
         $id = $r->get('id');
         //if(!$id){
-        //    $html = $this->_("Promotion id not found");
+        //    $html = $this->_(("Promotion id not found"));
         //    $status = 'error';
         //    $this->BResponse->status(400, $html, false);
         //} else {
@@ -294,7 +294,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
 
         if (empty($data)) {
             $status = "error";
-            $message = $this->_("No data received.");
+            $message = $this->_(("No data received."));
             $this->BResponse->status(400, $message, $message);
         } else {
             $pattern = isset($data['code_pattern'])? $data['code_pattern']: null;
@@ -315,7 +315,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             $message = $this->_("%d coupon(s) generated.", $generated['generated']);
             if ($generated['generated'] < $couponCount) {
                 $status = 'warning';
-                $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
+                $message .= $this->_((("\nFailed to generate %d coupons")), $generated['failed']);
             }
         }
         $result = ['status' => $status, 'message' => $message];
@@ -330,7 +330,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     {
         //$id = $this->BRequest->get('id');
         if (empty($_FILES) || !isset($_FILES['upload'])) {
-            $this->BResponse->json(['msg' => "Nothing found"]);
+            $this->BResponse->json(['msg' => (("Nothing found"))]);
             return;
         }
         $this->BResponse->setContentType('application/json');
@@ -357,14 +357,14 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 } elseif ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
                 } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $fullFileName)) {
-                    $error = $this->_("Problem storing uploaded file.");
+                    $error = $this->_(("Problem storing uploaded file."));
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
                     $imported = $importer->importFromFile($fullFileName);
                     $error = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
-                    $error = $this->_("Invalid import file.");
+                    $error = $this->_(("Invalid import file."));
                 }
 
                 $row = [
@@ -530,7 +530,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
 
         try {
             $created = $this->Sellvana_Promo_Model_PromoCoupon->createCouponCodes($codes, $model->id());
-            $this->message($this->_("Created %d coupon codes.", $created));
+            $this->message($this->_((("Created %d coupon codes.")), $created));
             return $created;
         } catch(Exception $e) {
             $this->message($e->getMessage(), 'error');
@@ -576,9 +576,9 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, [
             ['name'          => 'promo_status',
-                'label'         => 'Status',
+                'label'         => (('Status')),
                 'width'         => 80,
-                'options'       => ['' => 'All', 'A' => 'Active', 'I' => 'Inactive'],
+                'options'       => ['' => (('All')), 'A' => (('Active')), 'I' => (('Inactive'))],
                 'editable'      => true,
                 'edittype'      => 'select',
                 'searchoptions' => ['defaultValue' => 'A']
@@ -632,12 +632,12 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         return [
             'grid' => [
                 'id' => 'promo_attachments',
-                'caption' => 'Promotion Attachments',
+                'caption' => (('Promotion Attachments')),
                 'datatype' => 'local',
                 'data' => $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTACH)->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => [
-                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 400, 'hidden' => true],
+                    ['name' => 'file_name', 'label' => (('File Name')), 'width' => 400],
                 ],
                 'multiselect' => true,
                 'multiselectWidth' => 30,
@@ -645,8 +645,8 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 'forceFit' => true,
             ],
             'navGrid' => ['add' => false, 'edit' => false, 'search' => false, 'del' => false, 'refresh' => false],
-            ['navButtonAdd', 'caption' => 'Add', 'buttonicon' => 'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor' => 'pointer'],
-            ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
+            ['navButtonAdd', 'caption' => (('Add')), 'buttonicon' => 'ui-icon-plus', 'title' => (('Add Attachments to Promotion')), 'cursor' => 'pointer'],
+            ['navButtonAdd', 'caption' => (('Remove')), 'buttonicon' => 'ui-icon-trash', 'title' => (('Remove Attachments From Promotion')), 'cursor' => 'pointer'],
         ];
     }
 }

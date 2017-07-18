@@ -10,12 +10,12 @@ class Sellvana_Sales_Model_Cart_State_Payment extends FCom_Core_Model_Abstract_S
         FAILED = 'failed';
 
     protected $_valueLabels = [
-        self::FREE => 'Free',
-        self::UNPAID => 'Unpaid',
-        self::PAID => 'Paid',
-        self::EXTERNAL => 'External',
-        self::ACCEPTED => 'Accepted',
-        self::FAILED => 'Failed',
+        self::FREE => (('Free')),
+        self::UNPAID => (('Unpaid')),
+        self::PAID => (('Paid')),
+        self::EXTERNAL => (('External')),
+        self::ACCEPTED => (('Accepted')),
+        self::FAILED => (('Failed')),
     ];
 
     protected $_defaultValue = self::UNPAID;

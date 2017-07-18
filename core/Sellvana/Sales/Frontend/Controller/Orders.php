@@ -81,8 +81,8 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         }
         $orders = $orm->find_many();
 
-        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
-        $crumbs[] = ['label' => 'Orders', 'active' => true];
+        $crumbs[] = ['label' => (('Account')), 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => (('Orders')), 'active' => true];
         $this->layout('/orders/list');
         $this->view('breadcrumbs')->set('crumbs', $crumbs);
         $this->view('orders/list')->set([
@@ -124,9 +124,9 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
             return;
         }
 
-        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
-        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('orders')];
-        $crumbs[] = ['label' => 'View order', 'active' => true];
+        $crumbs[] = ['label' => (('Account')), 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => (('Orders')), 'href' => $this->BApp->href('orders')];
+        $crumbs[] = ['label' => (('View order')), 'active' => true];
         $this->layout('/orders/view');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('orders/view')->order = $order;
@@ -155,9 +155,9 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
             $this->forward(false);
             return;
         }
-        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
-        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('orders')];
-        $crumbs[] = ['label' => 'Cancel Items', 'active' => true];
+        $crumbs[] = ['label' => (('Account')), 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => (('Orders')), 'href' => $this->BApp->href('orders')];
+        $crumbs[] = ['label' => (('Cancel Items')), 'active' => true];
         $this->layout('/orders/cancel');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('orders/cancel')->order = $order;
@@ -187,9 +187,9 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
             $this->forward(false);
             return;
         }
-        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
-        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('orders')];
-        $crumbs[] = ['label' => 'Return Items', 'active' => true];
+        $crumbs[] = ['label' => (('Account')), 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => (('Orders')), 'href' => $this->BApp->href('orders')];
+        $crumbs[] = ['label' => (('Return Items')), 'active' => true];
         $this->layout('/orders/return');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('orders/return')->order = $order;

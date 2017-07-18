@@ -21,6 +21,6 @@ class FCom_ApiServer_Controller_V1_Import
         $exporter = $this->FCom_Core_ImportExport;
         $fromFile = fopen('php://input', 'r');
         $exporter->importFile($fromFile);
-        $this->created(['Done']);
+        $this->created([(('Done'))]);
     }
 }

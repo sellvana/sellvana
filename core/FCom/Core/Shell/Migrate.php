@@ -22,7 +22,7 @@ class FCom_Core_Shell_Migrate extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Run pending DB migration scripts';
+        return (('Run pending DB migration scripts'));
     }
 
     public function getLongHelp()

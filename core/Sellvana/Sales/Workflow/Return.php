@@ -63,7 +63,7 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
     {
         $newState = $args['return']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
-        $args['return']->addHistoryEvent('custom_state', 'Admin user has changed custom return state to "' . $label . '"');
+        $args['return']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom return state to "%s"')), $label));
         $args['return']->save();
     }
 

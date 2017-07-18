@@ -2,6 +2,12 @@
       <div class="row">
             <div class="col-md-12">
                   <fieldset class="f-section">
+                        <select v-model="view_mode">
+                              <option value="simple">{{'Simple'|_}}</option>
+                              <option value="table">{{'Advanced (grid)'|_}}</option>
+                              <option value="text">{{'Advanced (text)'|_}}</option>
+                        </select>
+                        <sv-comp-form-field
                         <sv-comp-form-catalog-prices
                               :options="form.config.options"
                               :prices="form.prices"></sv-comp-form-catalog-prices>

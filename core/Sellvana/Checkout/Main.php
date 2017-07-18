@@ -13,7 +13,7 @@ class Sellvana_Checkout_Main extends BClass
     {
         $this->Sellvana_Sales_Main->addCheckoutMethod('default', 'Sellvana_Checkout_Frontend_CheckoutMethod');
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_Checkout' => 'Checkout Settings',
+            'settings/Sellvana_Checkout' => (('Checkout Settings')),
         ]);
     }
 }

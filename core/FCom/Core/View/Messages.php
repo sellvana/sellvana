@@ -16,9 +16,9 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
      * @var array
      */
     protected $_titles = [
-        'success' => 'Success',
-        'warning' => 'Warning',
-        'error' => 'Error',
+        'success' => (('Success')),
+        'warning' => (('Warning')),
+        'error' => (('Error')),
     ];
 
     /**

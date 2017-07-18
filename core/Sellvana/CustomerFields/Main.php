@@ -17,11 +17,11 @@ class Sellvana_CustomerFields_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'customer_fields' => 'Customer Custom Fields'
+            'customer_fields' => (('Customer Custom Fields'))
         ]);
 
         $this->FCom_Core_Model_Field->registerFieldType('customer', [
-            'label' => 'Customers',
+            'label' => (('Customers')),
             'class' => 'Sellvana_CustomerFields_Model_CustomerFieldData',
         ]);
     }

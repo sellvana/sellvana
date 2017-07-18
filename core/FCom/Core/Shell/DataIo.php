@@ -39,7 +39,7 @@ class FCom_Core_Shell_DataIo extends FCom_Core_Shell_Abstract
      */
     public function getShortHelp()
     {
-        return 'Import\Export management';
+        return (('Import\Export management'));
     }
 
     /**
@@ -370,7 +370,7 @@ EOT;
         }
         $this->println("");
         if ($this->getOption(self::OPTION_VERBOSE) === true) {
-            $keys = ["Unchanged", "New", "Updated", "Total", "Name"];
+            $keys = [(("Unchanged")), (("New")), (("Updated")), (("Total")), (("Name"))];
             $str = '';
             $str2 = '';
 

@@ -30,8 +30,8 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
         $addresses = $customer->getAddresses();
 
-        $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
-        $crumbs[] = ['label' => 'View Addresses', 'active' => true];
+        $crumbs[] = ['label' => (('Account')), 'href' => $this->BApp->href('customer/myaccount')];
+        $crumbs[] = ['label' => (('View Addresses')), 'active' => true];
         $this->layout('/customer/address/list');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/address/list')->customer = $customer;
@@ -180,12 +180,12 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
         $addresses = $customer->getAddresses();
         if ('s' == $type) {
-            $label = "Choose shipping address";
+            $label = (("Choose shipping address"));
         } else {
-            $label = "Choose billing address";
+            $label = (("Choose billing address"));
         }
 
-        $crumbs[] = ['label' => 'Checkout', 'href' => $this->BApp->href('checkout')];
+        $crumbs[] = ['label' => (('Checkout')), 'href' => $this->BApp->href('checkout')];
         $crumbs[] = ['label' => $label, 'active' => true];
         $this->layout('/customer/address/choose');
         $this->view('breadcrumbs')->crumbs = $crumbs;

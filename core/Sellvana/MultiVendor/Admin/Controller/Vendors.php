@@ -13,8 +13,8 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
     protected static $_origClass = __CLASS__;
     protected $_gridHref         = 'multivendor/vendors';
     protected $_modelClass       = 'Sellvana_MultiVendor_Model_Vendor';
-    protected $_gridTitle        = 'Multi Vendors';
-    protected $_recordName       = 'Vendor';
+    protected $_gridTitle        = (('Multi Vendors'));
+    protected $_recordName       = (('Vendor'));
     protected $_mainTableAlias   = 'v';
     protected $_permission       = 'multi_vendor';
     protected $_formViewPrefix   = 'multivendor/vendors-form/';
@@ -30,13 +30,13 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
                 ['name' => 'edit'],
                 ['name' => 'delete', 'edit_inline' => false],
             ]],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'v.id'],
-            ['name' => 'vendor_name', 'label' => 'Vendor Name', 'index' => 'v.vendor_name'],
-            ['name' => 'notify_type', 'label' => 'Notification', 'options' => $notifyTypeOptions],
-            ['name' => 'email_notify', 'label' => 'Email for Notification', 'index' => 'v.email_notify'],
-            ['name' => 'email_support', 'label' => 'Email for Support', 'index' => 'v.email_support'],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'v.create_at', 'formatter' => 'date'],
-            ['name' => 'update_at', 'label' => 'Updated', 'index' => 'v.update_at', 'formatter' => 'date'],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'v.id'],
+            ['name' => 'vendor_name', 'label' => (('Vendor Name')), 'index' => 'v.vendor_name'],
+            ['name' => 'notify_type', 'label' => (('Notification')), 'options' => $notifyTypeOptions],
+            ['name' => 'email_notify', 'label' => (('Email for Notification')), 'index' => 'v.email_notify'],
+            ['name' => 'email_support', 'label' => (('Email for Support')), 'index' => 'v.email_support'],
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 'v.create_at', 'formatter' => 'date'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'index' => 'v.update_at', 'formatter' => 'date'],
         ];
         $config['actions'] = [
             'delete' => true,
@@ -74,20 +74,20 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
         $config['config']['data_mode'] = 'local';
         $config['config']['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200]
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'product_name', 'label' => (('Name')), 'index' => 'p.product_name', 'width' => 400],
+            ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 200]
         ];
         $config['config']['actions'] = [
             #'add' => ['caption' => 'Add products'],
             'add-product' => [
-                'caption'  => 'Add Products',
+                'caption'  => (('Add Products')),
                 'type'     => 'button',
                 'id'       => 'add-product-from-grid',
                 'class'    => 'btn-primary',
                 'callback' => 'showModalToAddProduct'
             ],
-            'delete' => ['caption' => 'Remove']
+            'delete' => ['caption' => (('Remove'))]
         ];
         $config['config']['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],

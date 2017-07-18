@@ -172,23 +172,23 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
     protected function _createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
     {
         if (!$this->_setBankId($bankId)) {
-            throw new Exception($this->_("Bank id: %s is not valid.", [$bankId]));
+            throw new Exception($this->_((("Bank id: %s is not valid.")), [$bankId]));
         }
 
         if (!$this->_setDescription($description)) {
-            throw new Exception($this->_("Provided description \"%s\" cannot be used.", [$description]));
+            throw new Exception($this->_((("Provided description \"%s\" cannot be used.")), [$description]));
         }
 
         if (!$this->setAmount($amount)) {
-            throw new Exception($this->_("Invalid amount: %s", [$amount]));
+            throw new Exception($this->_((("Invalid amount: %s")), [$amount]));
         }
 
         if (!$returnUrl = filter_var($returnUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception($this->_("Incorrect return url: %s", [$returnUrl]));
+            throw new Exception($this->_((("Incorrect return url: %s")), [$returnUrl]));
         }
 
         if (!$reportUrl = filter_var($reportUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception($this->_("Incorrect report url: %s", [$reportUrl]));
+            throw new Exception($this->_((("Incorrect report url: %s")), [$reportUrl]));
         }
 
         $query_variables = [
@@ -369,7 +369,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
         if (!$response) {
             $info       = $this->BUtil->lastRemoteHttpInfo();
             $error_code = isset($info['errno']) ? $info['errno'] : -1;
-            $error_msg  = isset($info['error']) ? $info['error'] : $this->_("An error occurred");
+            $error_msg  = isset($info['error']) ? $info['error'] : $this->_(("An error occurred"));
             throw new Exception($error_msg, $error_code);
         }
 
@@ -387,7 +387,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
         $xml_object    = simplexml_load_string($xml);
         if (!$xml_object) {
             $error_code = -2;
-            $error_msg  = $this->_("There was an error processing XML.");
+            $error_msg  = $this->_(("There was an error processing XML."));
             $errors     = libxml_get_errors();
             $debugError = '';
             foreach ($errors as $error) {
@@ -411,7 +411,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
     {
         if (empty($xml)) {
             return [
-                'error_message' => "Empty response",
+                'error_message' => (("Empty response")),
                 'error_code'    => 100,
             ];
         }

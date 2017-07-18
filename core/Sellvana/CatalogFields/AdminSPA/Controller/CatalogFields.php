@@ -12,13 +12,13 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 
     static protected $_modelClass = 'FCom_Core_Model_Field';
     static protected $_modelName = 'field';
-    static protected $_recordName = 'Field';
+    static protected $_recordName = (('Field'));
 
     public function getGridConfig()
     {
         $fld = $this->{static::$_modelClass};
 
-        $yesNoOpts = ['0' => 'No', '1' => 'Yes'];
+        $yesNoOpts = ['0' => (('No')), '1' => (('Yes'))];
 
         return [
             'id' => 'catalog_fields',
@@ -29,24 +29,24 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
                     ['type' => 'edit', 'link' => 'fields/form?id={id}'],
                     ['type' => 'delete', 'delete_url' => true],
                 ]],
-                ['name' => 'id', 'label' => 'ID'],
-                ['name' => 'field_code', 'label' => 'Field Code',
+                ['name' => 'id', 'label' => (('ID'))],
+                ['name' => 'field_code', 'label' => (('Field Code')),
                  'datacell_template' => '<td><a :href="\'#/catalog/fields/form?id=\'+row.id">{{row.field_code}}</a></td>'],
-                ['name' => 'field_name', 'label' => 'Field Name',
+                ['name' => 'field_name', 'label' => (('Field Name')),
                  'datacell_template' => '<td><a :href="\'#/catalog/fields/form?id=\'+row.id">{{row.field_name}}</a></td>'],
-                ['name' => 'field_type', 'label' => 'Field Type'],
-                ['name' => 'frontend_label', 'label' => 'Frontend Label'],
-                ['name' => 'frontend_show', 'label' => 'Show on frontend',
+                ['name' => 'field_type', 'label' => (('Field Type'))],
+                ['name' => 'frontend_label', 'label' => (('Frontend Label'))],
+                ['name' => 'frontend_show', 'label' => (('Show on frontend')),
                  'options' => $fld->fieldOptions('frontend_show')],
-                ['name' => 'sort_order', 'label' => 'Sort Order'],
-                ['name' => 'table_field_type', 'label' => 'DB Type', 'options' => $fld->fieldOptions('table_field_type')],
-                ['name' => 'admin_input_type', 'label' => 'Input Type',
+                ['name' => 'sort_order', 'label' => (('Sort Order'))],
+                ['name' => 'table_field_type', 'label' => (('DB Type')), 'options' => $fld->fieldOptions('table_field_type')],
+                ['name' => 'admin_input_type', 'label' => (('Input Type')),
                  'options' => $fld->fieldOptions('admin_input_type')],
-                ['name' => 'num_options', 'label' => 'Options', 'default' => 0],
-                ['name' => 'system', 'label' => 'System field', 'options' => $yesNoOpts],
-                ['name' => 'multilanguage', 'label' => 'Multi language', 'options' => $yesNoOpts],
-                ['name' => 'swatch_type', 'label' => 'Swatch type', 'options' => $fld->fieldOptions('swatch_type')],
-                ['name' => 'required', 'label' => 'Required', 'options' => $yesNoOpts],
+                ['name' => 'num_options', 'label' => (('Options')), 'default' => 0],
+                ['name' => 'system', 'label' => (('System field')), 'options' => $yesNoOpts],
+                ['name' => 'multilanguage', 'label' => (('Multi language')), 'options' => $yesNoOpts],
+                ['name' => 'swatch_type', 'label' => (('Swatch type')), 'options' => $fld->fieldOptions('swatch_type')],
+                ['name' => 'required', 'label' => (('Required')), 'options' => $yesNoOpts],
             ],
             'filters' => [
                 ['field' => 'id', 'type' => 'number'],
@@ -81,7 +81,7 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
     public function getFormData()
     {
         $pId = $this->BRequest->get('id');
-        $bool = [['id' => 0, 'text' => 'no'], ['id' => 1, 'text' => 'Yes']];
+        $bool = [['id' => 0, 'text' => 'no'], ['id' => 1, 'text' => (('Yes'))]];
 
         $field = $this->FCom_Core_Model_Field->load($pId);
         if (!$field) {
@@ -98,37 +98,37 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 		$result['form']['config']['tabs'] = '/catalog/fields/form';
 		$result['form']['config']['default_field'] = ['model' => 'field', 'tab' => 'info'];
 		$result['form']['config']['fields'] = [ // still need to figure out what are the possible options for fields
-			[ 'required' => true, 'name' => 'field_code', 'label' => 'Field Code'],
-			[ 'required' => true, 'name' => 'field_name', 'label' => 'Field Name'],
-			[ 'required' => true, 'name' => 'frontend_label', 'label' => 'Frontend label'],
-			[ 'required' => true, 'name' => 'frontend_show', 'label' => 'Show on frontend', 'type' => 'checkbox'],
-			[ 'required' => true, 'name' => 'sort_order', 'label' => 'Sort order'],
-			[ 'required' => true, 'name' => 'table_field_type', 'label' => 'DB Type', 'options' => [
-                ['id' => 'varchar', 'text' => 'Short Text'],
-                ['id' => 'text', 'text' => 'Long Text'],
-                ['id' => 'options', 'text' => 'Options'],
-                ['id' => 'int', 'text' => 'Integer'],
-                ['id' => 'tinyint', 'text' => 'Tiny Integer'],
-                ['id' => 'decimal', 'text' => 'Decimal'],
-                ['id' => 'date', 'text' => 'Date'],
-                ['id' => 'datetime', 'text' => 'Date/Time'],
-                ['id' => 'serialized', 'text' => 'Serialized'],
+			[ 'required' => true, 'name' => 'field_code', 'label' => (('Field Code'))],
+			[ 'required' => true, 'name' => 'field_name', 'label' => (('Field Name'))],
+			[ 'required' => true, 'name' => 'frontend_label', 'label' => (('Frontend label'))],
+			[ 'required' => true, 'name' => 'frontend_show', 'label' => (('Show on frontend')), 'type' => 'checkbox'],
+			[ 'required' => true, 'name' => 'sort_order', 'label' => (('Sort order'))],
+			[ 'required' => true, 'name' => 'table_field_type', 'label' => (('DB Type')), 'options' => [
+                ['id' => 'varchar', 'text' => (('Short Text'))],
+                ['id' => 'text', 'text' => (('Long Text'))],
+                ['id' => 'options', 'text' => (('Options'))],
+                ['id' => 'int', 'text' => (('Integer'))],
+                ['id' => 'tinyint', 'text' => (('Tiny Integer'))],
+                ['id' => 'decimal', 'text' => (('Decimal'))],
+                ['id' => 'date', 'text' => (('Date'))],
+                ['id' => 'datetime', 'text' => (('Date/Time'))],
+                ['id' => 'serialized', 'text' => (('Serialized'))],
             ]],
-			[ 'required' => true, 'name' => 'admin_input_type', 'label' => 'Input Type', 'options' => [
-                ['id' => 'text', 'text' => 'Text Line'],
-                ['id' => 'textarea', 'text' => 'Text Area'],
-                ['id' => 'select', 'text' => 'Drop down'],
-                ['id' => 'multiselect', 'text' => 'Multiple Select'],
-                ['id' => 'boolean', 'text' => 'Yes/No'],
-                ['id' => 'wysiwyg', 'text' => 'WYSIWYG editor'],
+			[ 'required' => true, 'name' => 'admin_input_type', 'label' => (('Input Type')), 'options' => [
+                ['id' => 'text', 'text' => (('Text Line'))],
+                ['id' => 'textarea', 'text' => (('Text Area'))],
+                ['id' => 'select', 'text' => (('Drop down'))],
+                ['id' => 'multiselect', 'text' => (('Multiple Select'))],
+                ['id' => 'boolean', 'text' => (('Yes/No'))],
+                ['id' => 'wysiwyg', 'text' => (('WYSIWYG editor'))],
             ]],
-			[ 'required' => true, 'name' => 'multilanguage', 'label' => 'Multi Language', 'type' => 'checkbox'],
-			[ 'required' => true, 'name' => 'swatch_type', 'label' => 'Swatch type', 'options' => [
-			    ['id'=> 'N', 'text' => 'None'],
-			    ['id'=> 'C', 'text' => 'Color'],
-			    ['id'=> 'I', 'text' => 'Image'],
+			[ 'required' => true, 'name' => 'multilanguage', 'label' => (('Multi Language')), 'type' => 'checkbox'],
+			[ 'required' => true, 'name' => 'swatch_type', 'label' => (('Swatch type')), 'options' => [
+			    ['id'=> 'N', 'text' => (('None'))],
+			    ['id'=> 'C', 'text' => (('Color'))],
+			    ['id'=> 'I', 'text' => (('Image'))],
             ]],
-			[ 'required' => true, 'name' => 'required', 'label' => 'Required', 'type' => 'checkbox'],
+			[ 'required' => true, 'name' => 'required', 'label' => (('Required')), 'type' => 'checkbox'],
 		];
 
 //		$result['form']['i18n'] = $this->getModelTranslations('field', $field->id());

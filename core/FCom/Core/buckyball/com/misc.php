@@ -214,7 +214,7 @@ class BUtil extends BClass
                 return '[' . implode(',', $out) . ']';
             }
         }
-        return '"UNSUPPORTED TYPE"';
+        return '(("UNSUPPORTED TYPE"))';
     }
 
     /**
@@ -4659,39 +4659,39 @@ class BValidate extends BClass
     protected $_defaultRules = [
         'required' => [
             'rule'    => 'BValidate::ruleRequired',
-            'message' => 'Missing field: :field',
+            'message' => (('Missing field: :field')),
         ],
         'url'       => [
             'rule'    => '#(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(\#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?#',
-            'message' => 'Invalid URL',
+            'message' => (('Invalid URL')),
         ],
         'email'     => [
             'rule'    => 'BValidate::ruleEmail',
-            'message' => 'Invalid Email',
+            'message' => (('Invalid Email')),
         ],
         'string'    => [
             'rule'    => 'BValidate::ruleString',
-            'message' => 'Invalid string length', // this is default, actual message supplied by callback
+            'message' => (('Invalid string length')), // this is default, actual message supplied by callback
         ],
         'numeric'   => [
             'rule'    => 'BValidate::ruleNumeric',
-            'message' => 'Invalid number: :field',
+            'message' => (('Invalid number: :field')),
         ],
         'integer'   => [
             'rule'    => 'BValidate::ruleInteger',
-            'message' => 'Invalid integer: :field',
+            'message' => (('Invalid integer: :field')),
         ],
         'alphanum'  => [
             'rule'    => '/^[a-zA-Z0-9 ]+$/',
-            'message' => 'Invalid alphanumeric: :field',
+            'message' => (('Invalid alphanumeric: :field')),
         ],
         'alpha'  => [
             'rule'    => '/^[a-zA-Z ]+$/',
-            'message' => 'Invalid alphabet field: :field',
+            'message' => (('Invalid alphabet field: :field')),
         ],
         'password_confirm' => [
             'rule'    => 'BValidate::rulePasswordConfirm',
-            'message' => 'Password confirmation does not match',
+            'message' => (('Password confirmation does not match')),
             'args'    => ['original' => 'password'],
         ],
     ];
@@ -4699,7 +4699,7 @@ class BValidate extends BClass
     /**
      * @var string
      */
-    protected $_defaultMessage = "Validation failed for: :field";
+    protected $_defaultMessage = (('Validation failed for: :field'));
     /**
      * @var array
      */
@@ -4942,10 +4942,10 @@ class BValidate extends BClass
         }
         $value = $data[$args['field']];
         if (!empty($args['min']) && strlen($value) < $args['min']) {
-            return 'The field should be at least ' . $args['min'] . ' characters long: :field';
+            return $this->_((('The field should be at least %s characters long: :field')), $args['min']);
         }
         if (!empty($args['max']) && strlen($value) > $args['max']) {
-            return 'The field can not exceed ' . $args['max'] . ' characters: :field';
+            return $this->_((('The field can not exceed %s characters: :field')), $args['max']);
         }
         return true;
     }
@@ -5726,7 +5726,7 @@ function var_export54($var, $indent="") {
             }
             return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
         case "boolean":
-            return $var ? "TRUE" : "FALSE";
+            return $var ? (("TRUE")) : "FALSE";
         default:
             return var_export($var, TRUE);
     }

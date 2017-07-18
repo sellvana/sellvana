@@ -8,7 +8,7 @@ class Sellvana_ShippingPlain_ShippingMethod extends Sellvana_Sales_Method_Shippi
     /**
      * @var string
      */
-    protected $_name = 'Plain Shipping';
+    protected $_name = (('Plain Shipping'));
     protected $_code = 'plain';
     protected $_configPath = 'modules/Sellvana_ShippingPlain';
     /**
@@ -36,8 +36,8 @@ class Sellvana_ShippingPlain_ShippingMethod extends Sellvana_Sales_Method_Shippi
     public function getServices()
     {
         return [
-            '_01' => 'Air',
-            '_02' => 'Ground',
+            '_01' => (('Air')),
+            '_02' => (('Ground')),
         ];
     }
 }

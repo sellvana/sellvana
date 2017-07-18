@@ -52,7 +52,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
     protected static $_actions = [
         'reauthorize' => [
-            'label' => 'Reauthorize',
+            'label' => (('Reauthorize')),
             'capability' => 'reauth',
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
@@ -62,7 +62,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             ],
         ],
         'capture' => [
-            'label' => 'Capture',
+            'label' => (('Capture')),
             'capability' => 'capture',
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
@@ -71,7 +71,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             ],
         ],
         'partial_capture' => [
-            'label' => 'Partial Capture',
+            'label' => (('Partial Capture')),
             'capability' => 'partial_capture',
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
@@ -80,7 +80,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             ],
         ],
         'void' => [
-            'label' => 'Void',
+            'label' => (('Void')),
             'capability' => 'void',
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::AUTHORIZED,
@@ -89,7 +89,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             ]
         ],
         'refund' => [
-            'label' => 'Refund',
+            'label' => (('Refund')),
             'capability' => 'refund',
             'states' => [
                 Sellvana_Sales_Model_Order_Payment_State_Processor::CAPTURED,
@@ -165,7 +165,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
                 /** @var Sellvana_Sales_Model_Order_Item $item */
                 $item = $items[$itemId];
                 if ($item->getAmountCanPay() < $amount) {
-                    throw new BException($this->_('The amount for item %s is too large: %s', [$item->get('inventory_sku'), $amount]));
+                    throw new BException($this->_((('The amount for item %s is too large: %s')), [$item->get('inventory_sku'), $amount]));
                 }
             }
         }
@@ -174,7 +174,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
         foreach ($amounts as $itemId => $amount) {
             if (empty($items[$itemId])) {
-                throw new BException($this->_('Invalid item id: %s', $itemId));
+                throw new BException($this->_((('Invalid item id: %s')), $itemId));
             }
 
             if ($amount > 0) {
@@ -192,7 +192,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         $orderTotals = $this->order()->getData('totals');
         foreach (array_keys($totals) as $totalType) {
             if (!array_key_exists($totalType, $orderTotals)) {
-                throw new BException($this->_('Invalid total: %s', $totalType));
+                throw new BException($this->_((('Invalid total: %s')), $totalType));
             }
             $total = $orderTotals[$totalType];
 
@@ -604,7 +604,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             $totalBalanceAmount -= $itemBalanceAmount;
             $oItem->save();
         }
-        $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
+        $this->addHistoryEvent('paid', (('Admin user has changed payment state to "Paid"')));
         $this->save();
     }
 
@@ -612,7 +612,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         $this->state()->overall()->setRefunded();
         $this->add('amount_refunded', $this->get('amount_captured'));
-        $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Refunded"');
+        $this->addHistoryEvent('paid', (('Admin user has changed payment state to "Refunded"')));
         $this->save();
     }
 

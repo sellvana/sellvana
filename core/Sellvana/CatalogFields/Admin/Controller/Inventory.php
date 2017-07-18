@@ -29,16 +29,16 @@ class Sellvana_CatalogFields_Admin_Controller_Inventory extends FCom_Admin_Contr
         $config = [
             'config' => [
                 'id' => 'variable-field-grid',
-                'caption' => 'Variable Field Grid',
+                'caption' => (('Variable Field Grid')),
                 'data_mode' => 'local',
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'product', 'label' => 'Product', 'width' => 300, 'sortable' => false],
-                    ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 300],
-                    ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 300],
-                    ['name' => 'variant_price', 'label' => 'Price', 'width' => 300]
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true],
+                    ['name' => 'product', 'label' => (('Product')), 'width' => 300, 'sortable' => false],
+                    ['name' => 'product_sku', 'label' => (('Product SKU')), 'width' => 300],
+                    ['name' => 'inventory_sku', 'label' => (('Inventory SKU')), 'width' => 300],
+                    ['name' => 'variant_price', 'label' => (('Price')), 'width' => 300]
                 ],
                 'filters' => [
                     ['field' => 'product_sku', 'type' => 'text'],

@@ -11,7 +11,7 @@ class Sellvana_Customer_Admin_Controller_Report_Country extends FCom_Admin_Contr
     protected $_permission = 'customer/reports';
     protected $_navPath = 'reports/customer/country';
     protected $_gridHref = 'customer/report/country';
-    protected $_gridTitle = 'Users by Country';
+    protected $_gridTitle = (('Users by Country'));
 
 
     public function gridConfig()
@@ -44,15 +44,15 @@ class Sellvana_Customer_Admin_Controller_Report_Country extends FCom_Admin_Contr
     protected function _getFieldLabels()
     {
         return [
-            'country' => 'Country',
-            'region' => 'State',
-            'city' => 'City',
+            'country' => (('Country')),
+            'region' => (('State')),
+            'city' => (('City')),
             'customer_count' => '# of Customers',
             'customer_with_order_count' => '# of Customers who Ordered',
             'order_count' => '# of Orders',
             'item_count' => '# of Items',
-            'total_amount' => 'Total Sales',
-            'create_at' => 'Created'
+            'total_amount' => (('Total Sales')),
+            'create_at' => (('Created'))
         ];
     }
 

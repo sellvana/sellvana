@@ -10,7 +10,7 @@ class Sellvana_CurrencyManager_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_CurrencyManager' => 'Currency Manager Settings',
+            'settings/Sellvana_CurrencyManager' => (('Currency Manager Settings')),
         ]);
     }
 }

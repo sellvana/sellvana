@@ -14,8 +14,8 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
 
     protected $_gridHref = 'salestax/customer-classes';
     protected $_modelClass = 'Sellvana_SalesTax_Model_CustomerClass';
-    protected $_gridTitle = 'Customer Tax Classes';
-    protected $_recordName = 'Customer Tax Class';
+    protected $_gridTitle = (('Customer Tax Classes'));
+    protected $_recordName = (('Customer Tax Class'));
     protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'tc';
     protected $_navPath = 'sales/tax/customer-classes';
@@ -25,12 +25,12 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
         $config = parent::gridConfig();
         //unset($config['form_url']);
         $config['id'] = 'customer-class';
-        $config['caption'] = 'Customer Class';
+        $config['caption'] = (('Customer Class'));
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300,
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'width' => 300,
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/customer-classes/unique')]],
         ];
@@ -145,16 +145,16 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
             'data_mode'          => 'local',
             'columns'            => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-                ['name' => 'firstname', 'label' => 'First Name', 'index' => 'c.firstname', 'width' => 400],
-                ['name' => 'lastname', 'label' => 'Last Name', 'index' => 'c.lastname', 'width' => 200],
-                ['name' => 'email', 'label' => 'Email', 'index' => 'p.product_sku', 'width' => 200],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'firstname', 'label' => (('First Name')), 'index' => 'c.firstname', 'width' => 400],
+                ['name' => 'lastname', 'label' => (('Last Name')), 'index' => 'c.lastname', 'width' => 200],
+                ['name' => 'email', 'label' => (('Email')), 'index' => 'p.product_sku', 'width' => 200],
             ],
             'actions'            => [
                 #'add' => ['caption' => 'Add products'],
-                'delete'          => ['caption' => 'Remove'],
+                'delete'          => ['caption' => (('Remove'))],
                 'add-tax-product' => [
-                    'caption'  => 'Add Tax Customers',
+                    'caption'  => (('Add Tax Customers')),
                     'type'     => 'button',
                     'id'       => 'add-tax-customer-from-grid',
                     'class'    => 'btn-primary',
@@ -209,15 +209,15 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
             'data_mode'          => 'local',
             'columns'            => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-                ['name' => 'title', 'label' => 'Title', 'index' => 'c.firstname', 'width' => 400],
-                ['name' => 'code', 'label' => 'Code', 'index' => 'c.lastname', 'width' => 200],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'title', 'label' => (('Title')), 'index' => 'c.firstname', 'width' => 400],
+                ['name' => 'code', 'label' => (('Code')), 'index' => 'c.lastname', 'width' => 200],
             ],
             'actions'            => [
                 #'add' => ['caption' => 'Add products'],
-                'delete'          => ['caption' => 'Remove'],
+                'delete'          => ['caption' => (('Remove'))],
                 'add-tax-product' => [
-                    'caption'  => 'Add Tax Groups',
+                    'caption'  => (('Add Tax Groups')),
                     'type'     => 'button',
                     'id'       => 'add-tax-customergroup-from-grid',
                     'class'    => 'btn-primary',

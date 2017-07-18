@@ -12,8 +12,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected        $_permission     = 'system/users';
     protected        $_modelClass     = 'FCom_Admin_Model_User';
     protected        $_gridHref       = 'users';
-    protected        $_gridTitle      = 'Admin Users';
-    protected        $_recordName     = 'User';
+    protected        $_gridTitle      = (('Admin Users'));
+    protected        $_recordName     = (('User'));
     protected        $_mainTableAlias = 'au';
     protected        $_navPath        = 'system/users';
     protected        $_formTitleField = 'username';
@@ -28,15 +28,15 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                 ['name' => 'edit'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'],
-            ['name' => 'username', 'label' => 'User Name', 'width' => 100],
-            ['name' => 'email', 'label' => 'Email', 'width' => 150],
-            ['name' => 'firstname', 'label' => 'First Name', 'width' => 150],
-            ['name' => 'lastname', 'label' => 'Last Name', 'width' => 150],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'id', 'width' => 55, 'cell' => 'integer'],
+            ['name' => 'username', 'label' => (('User Name')), 'width' => 100],
+            ['name' => 'email', 'label' => (('Email')), 'width' => 150],
+            ['name' => 'firstname', 'label' => (('First Name')), 'width' => 150],
+            ['name' => 'lastname', 'label' => (('Last Name')), 'width' => 150],
             [
                 'type' => 'input',
                 'name' => 'is_superadmin',
-                'label' => 'SuperAdmin',
+                'label' => (('SuperAdmin')),
                 'width' => 100,
                 'editable' => true,
                 'editor' => 'select',
@@ -45,15 +45,15 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             [
                 'type' => 'input',
                 'name' => 'status',
-                'label' => 'Status',
+                'label' => (('Status')),
                 'width' => 100,
                 'editor' => 'select',
                 'editable' => true,
                 'multirow_edit' => true,
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')
             ],
-            ['name' => 'create_at', 'label' => 'Created', 'width' => 100, 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Updated', 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'create_at', 'label' => (('Created')), 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'width' => 100, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => ['caption' => 'status'],
@@ -119,12 +119,12 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['config']['id'] = 'role_users_grid_' . $model->id;
         $config['config']['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'username', 'label' => 'Username', 'index' => 'au.username', 'width' => 200],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 200],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'au.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'username', 'label' => (('Username')), 'index' => 'au.username', 'width' => 200],
+            ['name' => 'email', 'label' => (('Email')), 'index' => 'au.email', 'width' => 200],
             [
                 'name' => 'user_status',
-                'label' => 'Status',
+                'label' => (('Status')),
                 'index' => 'au.status',
                 'width' => 200,
                 'editable' => true,
@@ -136,13 +136,13 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['config']['actions'] = [
             #'add' => ['caption' => 'Add user'],
             'add-user' => [
-                'caption'  => 'Add User',
+                'caption'  => (('Add User')),
                 'type'     => 'button',
                 'id'       => 'add-user-from-grid',
                 'class'    => 'btn-primary',
                 'callback' => 'showModalToAddUser'
             ],
-            'delete' => ['caption' => 'Remove']
+            'delete' => ['caption' => (('Remove'))]
         ];
         $config['config']['filters'] = [
             ['field' => 'username', 'type' => 'text'],
@@ -172,13 +172,13 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['id']      = 'role_all_users_grid_' . $model->id;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true],
-            ['name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'au.id', 'width' => 55, 'hidden' => true],
+            ['name' => 'username', 'label' => (('Name')), 'index' => 'au.username', 'width' => 250],
+            ['name' => 'email', 'label' => (('Email')), 'index' => 'au.email', 'width' => 100],
             [
                 'type' => 'input',
                 'name' => 'status',
-                'label' => 'Status',
+                'label' => (('Status')),
                 'index' => 'au.status',
                 'width' => 100,
                 'editable' => true,
@@ -188,7 +188,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ]
         ];
         $config['actions'] = [
-            'add' => ['caption' => 'Add selected users']
+            'add' => ['caption' => (('Add selected users'))]
         ];
         $config['filters'] = [
             ['field' => 'username', 'type' => 'text'],

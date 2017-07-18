@@ -10,8 +10,8 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Catalog_Model_SearchAlias';
     protected $_gridHref = 'catalog/searchalias';
-    protected $_gridTitle = 'Search Terms';
-    protected $_recordName = 'Search Terms';
+    protected $_gridTitle = (('Search Terms'));
+    protected $_recordName = (('Search Terms'));
     protected $_mainTableAlias = 's';
 
     public function gridViewBefore($args)
@@ -42,26 +42,26 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
                     ['name' => 'delete'],
                 ]
             ],
-            ['name' => 'id', 'label' => 'ID', 'index' => 's.id'],
-            ['type' => 'input', 'name' => 'alias_type', 'label' => 'Alias Type', 'width' => 100,
+            ['name' => 'id', 'label' => (('ID')), 'index' => 's.id'],
+            ['type' => 'input', 'name' => 'alias_type', 'label' => (('Alias Type')), 'width' => 100,
                 'addable' => true, 'editable' => true, 'edit_inline' => true,
                 'editor' => 'select', 'options' => $typeOptions, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'alias_term', 'label' => 'Alias Term', 'width' => 100,
+            ['type' => 'input', 'name' => 'alias_term', 'label' => (('Alias Term')), 'width' => 100,
                 'addable' => true, 'editable' => true, 'edit_inline' => true,
                 'editor' => 'text', 'validation' => ['required' => true, 'maxlength' => 50]],
-            ['type' => 'input', 'name' => 'target_term', 'label' => 'Target Term', 'width' => 100,
+            ['type' => 'input', 'name' => 'target_term', 'label' => (('Target Term')), 'width' => 100,
                 'addable' => true, 'editable' => true, 'edit_inline' => true,
                 'editor' => 'text', 'validation' => ['required' => true, 'maxlength' => 50]],
-            ['type' => 'input', 'name' => 'target_url', 'label' => 'Target URL', 'width' => 100,
+            ['type' => 'input', 'name' => 'target_url', 'label' => (('Target URL')), 'width' => 100,
                 'addable' => true, 'editable' => true, 'edit_inline' => true,
                 'editor' => 'text', 'validation' => ['required' => true]],
-            ['name' => 'num_hits', 'label' => 'Num Hits', 'width' => 100],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 's.create_at', 'width' => 100],
-            ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'width' => 100],
+            ['name' => 'num_hits', 'label' => (('Num Hits')), 'width' => 100],
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 's.create_at', 'width' => 100],
+            ['name' => 'update_at', 'label' => (('Updated')), 'index' => 's.update_at', 'width' => 100],
         ];
         $config['actions'] = [
             'new' => [
-                'caption'  => 'New Search Term',
+                'caption'  => (('New Search Term')),
                 'addClass' => '_modal'
             ],
             'delete' => true,

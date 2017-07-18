@@ -6,8 +6,8 @@ class Sellvana_Sales_Model_Order_Refund_State extends FCom_Core_Model_Abstract_S
         CUSTOM = 'custom';
 
     protected $_stateLabels = [
-        self::OVERALL => 'Overall',
-        self::CUSTOM => 'Custom',
+        self::OVERALL => (('Overall')),
+        self::CUSTOM => (('Custom')),
     ];
 
     /**

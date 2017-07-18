@@ -111,7 +111,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
 
         $payment->addHistoryEvent('complete',
-            $this->_('Customer completed payment by %s', $order->getPaymentMethod()->getName()),
+            $this->_((('Customer completed payment by %s')), $order->getPaymentMethod()->getName()),
             ['entity_id' => $payment->id()]
         );
     }
@@ -130,7 +130,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
 
         $order->addHistoryEvent('failed',
-            $this->_('Customer failed payment by %s', $order->get('payment_method')),
+            $this->_((('Customer failed payment by %s')), $order->get('payment_method')),
             ['entity_id' => $payment->id()]
         );
     }
@@ -164,9 +164,9 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             );
         } else {
             if (!empty($args['result'])) {
-                $message = 'Error: ' . $args['result']['error']['message'];
+                $message = $this->_((('Error: %s')), $args['result']['error']['message']);
             } else {
-                $message = $this->_('Unknown error. Please try again later.');
+                $message = $this->_(('Unknown error. Please try again later.'));
             }
             $this->BSession->addMessage($message, 'error', 'frontend');
         }
@@ -378,7 +378,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Payment_State_Custom $newState */
         $newState = $args['payment']->state()->custom()->changeState($args['state']);
         $label = $newState->getValueLabel();
-        $args['payment']->addHistoryEvent('custom_state', 'Admin user has changed custom payment state to "' . $label . '"');
+        $args['payment']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom payment state to "%s"')), $label));
         $args['payment']->save();
     }
 

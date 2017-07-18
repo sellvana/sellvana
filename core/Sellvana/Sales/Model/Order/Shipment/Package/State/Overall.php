@@ -17,15 +17,15 @@ class Sellvana_Sales_Model_Order_Shipment_Package_State_Overall extends Sellvana
 
     protected $_valueLabels = [
         self::NA => 'N/A',
-        self::PENDING => 'Pending',
-        self::LABEL => 'Label Printed',
-        self::RECEIVED => 'Received',
-        self::SHIPPED => 'Shipped',
-        self::IN_TRANSIT => 'In Transit',
-        self::EXCEPTION => 'Exception',
-        self::DELIVERED => 'Delivered',
-        self::REFUSED => 'Refused',
-        self::RETURNED => 'Returned',
+        self::PENDING => (('Pending')),
+        self::LABEL => (('Label Printed')),
+        self::RECEIVED => (('Received')),
+        self::SHIPPED => (('Shipped')),
+        self::IN_TRANSIT => (('In Transit')),
+        self::EXCEPTION => (('Exception')),
+        self::DELIVERED => (('Delivered')),
+        self::REFUSED => (('Refused')),
+        self::RETURNED => (('Returned')),
     ];
 
     protected $_defaultMethods = [

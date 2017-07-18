@@ -11,14 +11,14 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/product_performance';
     protected $_gridHref = 'sales/report/product_performance';
-    protected $_gridTitle = 'Product Performance';
+    protected $_gridTitle = (('Product Performance'));
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true, 'default' => 'None'],
-            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => 'All time'],
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true, 'default' => (('None'))],
+            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => (('All time'))],
             ['name' => 'product_sku', 'index' => 'product_sku', 'width' => 70],
             ['name' => 'product_name', 'index' => 'product_name'],
             ['name' => 'qty_sold', 'index' => 'qty_sold'],
@@ -41,13 +41,13 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
     protected function _getFieldLabels()
     {
         return [
-            'period' => 'Period',
-            'product_sku' => 'Inventory SKU',
-            'product_name' => 'Inventory SKU Name',
-            'qty_sold' => 'Qty Sold',
-            'row_total_amount' => 'Total After Discounts',
-            'period_type' => 'Group by',
-            'create_at' => 'Created',
+            'period' => (('Period')),
+            'product_sku' => (('Inventory SKU')),
+            'product_name' => (('Inventory SKU Name')),
+            'qty_sold' => (('Qty Sold')),
+            'row_total_amount' => (('Total After Discounts')),
+            'period_type' => (('Group by')),
+            'create_at' => (('Created')),
         ];
     }
 

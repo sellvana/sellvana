@@ -1,7 +1,11 @@
 define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl', 'inline-param'], function (_, Vue, pricesTpl) {
     var SvCompFormCatalogPrices = {
         template: pricesTpl,
-        props: ['options', 'prices'],
+        props: {
+            options: { type: Object },
+            prices: { type: Object },
+            view_mode : { type: String, default: 'table' }
+        },
         data: function () {
             return {
                 new_price_type: '',

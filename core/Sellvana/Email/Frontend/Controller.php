@@ -60,7 +60,7 @@ class Sellvana_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstra
                 $model->save();
             }
             //response
-            $successMessage = $this->_('Email subscribe successful.');
+            $successMessage = $this->_(('Email subscribe successful.'));
             if ($r->xhr()) { //ajax request
                 if ($valid) {
                     $result = ['status' => 'success', 'message' => $successMessage];

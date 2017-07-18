@@ -114,7 +114,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $config = [
             'config' => [
                 'id'          => $id,
-                'caption'     => 'Media Library',
+                'caption'     => (('Media Library')),
                 'orm'         => $orm,
                 //'data_mode' => 'json',
                 //'url'       => $url.'/data?folder='.urlencode($folder),
@@ -122,12 +122,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'edit_url'    => $url . '/edit?folder=' . urlencode($folder),
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 50, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => (('Preview')), 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false],
+                    ['name' => 'file_name', 'label' => (('File Name')), 'width' => 400],
+                    ['name' => 'file_size', 'label' => (('File Size')), 'width' => 260, 'search' => false,
                         'display' => 'file_size'],
-                    ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
+                    ['name' => 'associated_products', 'label' => (('Associated Products')), 'width' => 50],
                     ['type' => 'btn_group',
                         'buttons' => [
                             ['name' => 'delete']
@@ -145,7 +145,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     'componentDidMount' => 'registerGrid' . $id,
                 ],
                 'actions' => [
-                    'rescan'  => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-media'],
+                    'rescan'  => ['caption' => (('Rescan')), 'class' => 'btn-info btn-rescan-media'],
                     'refresh' => true,
                 ]
             ]
@@ -160,13 +160,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $config['config']['columns'] = [
                 ['type' => 'row_select'],
                 ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                ['name' => 'id', 'label' => (('ID')), 'width' => 50, 'hidden' => true],
+                ['name' => 'file_name', 'label' => (('File Name')), 'width' => 200, 'display' => 'eval',
                     'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
                         . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
-                ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                ['name' => 'file_size', 'label' => (('File Size')), 'width' => 260, 'search' => false,
                     'display' => 'file_size'],
-                ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
+                ['name' => 'associated_products', 'label' => (('Associated Products')), 'width' => 50],
                 //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
             ];
         }
@@ -194,16 +194,16 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ['type' => 'row_select'],
                 ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
                 ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
-                ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                ['name' => 'id', 'label' => (('ID')), 'width' => 50, 'hidden' => true],
+                ['name' => 'file_name', 'label' => (('File Name')), 'width' => 200, 'display' => 'eval',
                     'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
                         . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
-                ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                ['name' => 'prev_img', 'label' => (('Preview')), 'width' => 110, 'display' => 'eval',
                     'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
                         . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
                         . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
                     'sortable' => false],
-                ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                ['name' => 'file_size', 'label' => (('File Size')), 'width' => 260, 'search' => false,
                     'display' => 'file_size']
             ];
         }
@@ -241,22 +241,22 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $config = [
             'config' => [
                 'id'            => $id,
-                'caption'       => 'Media Library',
+                'caption'       => (('Media Library')),
                 'orm'           => $orm,
                 'data_url'      => $url . '/data',
                 'edit_url'      => $url . '/edit',
                 'pending_state' => true,
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 50, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => (('Preview')), 'width' => 110, 'display' => 'eval',
                         'print' => $elementPrint,
                         'sortable' => false],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
-                    ['name' => 'folder', 'label' => 'Folder', 'width' => 200],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                    ['name' => 'file_name', 'label' => (('File Name')), 'width' => 400],
+                    ['name' => 'folder', 'label' => (('Folder')), 'width' => 200],
+                    ['name' => 'file_size', 'label' => (('File Size')), 'width' => 260, 'search' => false,
                         'display' => 'file_size'],
-                    ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
+                    ['name' => 'associated_products', 'label' => (('Associated Products')), 'width' => 50],
                     ['type' => 'btn_group',
                         'buttons' => [
                             ['name' => 'delete']
@@ -275,13 +275,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ],
                 'actions' => [
                     'add-image' => [
-                        'caption'  => 'Add Files',
+                        'caption'  => (('Add Files')),
                         'type'     => 'button',
                         'id'       => 'add-attachment-from-grid',
                         'class'    => 'btn-primary',
                         'callback' => 'gridShowMedia' . $id
                     ],
-                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-media'],
+                    'rescan' => ['caption' => (('Rescan')), 'class' => 'btn-info btn-rescan-media'],
                     //'refresh' => true,
                 ],
                 'page_rows_data_callback' => [$this, 'afterInitialLibraryData']
@@ -369,7 +369,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         unset($gridConfig['config']['pending_state']);
         $config = [
             'id'         => 'media_library',
-            'title'      => $this->_("Media Library"),
+            'title'      => $this->_(("Media Library")),
             'gridConfig' => $gridConfig,
         ];
         $this->layout('/media');
@@ -420,7 +420,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $fullName = $this->FCom_Core_Main->dir($folder) . '/' . $fileName;
                 
                 if (!$this->BUtil->isPathWithinRoot($fullName, ['@media_dir', '@random_dir'])) {
-                    $this->BResponse->status(403, 'Invalid file source', 'Invalid file source');
+                    $this->BResponse->status(403, (('Invalid file source')), 'Invalid file source');
                 }
 
                 $this->BResponse->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
@@ -533,17 +533,17 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         } elseif (!empty($blacklistExt[$ext]) || !in_array($ext, $options['whitelist_ext'])) {
                             $id      = '';
                             $status  = static::ERROR;
-                            $message = 'Illegal file extension';
+                            $message = (('Illegal file extension'));
                         } elseif (preg_match('#\.(gif|jpe?g|png)$#',
                                 $fileName) && !@getimagesize($uploads['tmp_name'][$i])
                         ) {
                             $id      = '';
                             $status  = static::ERROR;
-                            $message = 'Invalid image uploaded';
+                            $message = (('Invalid image uploaded'));
                         } elseif (!$this->BUtil->moveUploadedFileSafely($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
                             $id      = '';
                             $status  = static::ERROR;
-                            $message = 'Unable to save the file';
+                            $message = (('Unable to save the file'));
                         } else {
                             $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
 

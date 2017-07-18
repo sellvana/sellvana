@@ -11,8 +11,8 @@ class Sellvana_MultiVendor_Model_Vendor extends FCom_Core_Model_Abstract
 
     static protected $_fieldOptions = [
         'notify_type' => [
-            'no' => 'No notifications',
-            'realtime' => 'Real-time notifications',
+            'no' => (('No notifications')),
+            'realtime' => (('Real-time notifications')),
         ],
     ];
 

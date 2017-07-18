@@ -4,8 +4,8 @@ class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Co
 {
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'translations';
-    protected $_gridTitle = 'All translations';
-    protected $_recordName = 'Translation';
+    protected $_gridTitle = (('All translations'));
+    protected $_recordName = (('Translation'));
     protected $_permission = 'translations';
     protected $_navPath = 'system/translations';
 
@@ -19,10 +19,10 @@ class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Co
         }
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'module', 'label' => 'Module', 'width' => 250],
-            ['type' => 'input', 'name' => 'locale', 'label' => 'Locale', 'width' => 50, 'options' => $localeOptions, 'editor' => 'select'],
-            ['name' => 'file', 'label' => 'File', 'width' => 60],
-            ['name' => 'id', 'label' => 'Id', 'width' => 200]
+            ['name' => 'module', 'label' => (('Module')), 'width' => 250],
+            ['type' => 'input', 'name' => 'locale', 'label' => (('Locale')), 'width' => 50, 'options' => $localeOptions, 'editor' => 'select'],
+            ['name' => 'file', 'label' => (('File')), 'width' => 60],
+            ['name' => 'id', 'label' => (('Id')), 'width' => 200]
         ];
         $config['data_mode'] = 'local';
         $data = [];

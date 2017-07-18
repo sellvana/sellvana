@@ -9,12 +9,12 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Sales_Model_Order';
-    protected $_recordName = 'Order';
+    protected $_recordName = (('Order'));
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/customer_groups';
     protected $_gridHref = 'sales/report/customer_groups';
-    protected $_gridTitle = 'Customer Groups';
+    protected $_gridTitle = (('Customer Groups'));
 
 
     public function gridConfig()
@@ -50,18 +50,18 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
     protected function _getFieldLabels()
     {
         return [
-            'group_id' => 'Customer Group ID',
-            'group_title' => 'Customer Group',
-            'subtotal_aggr' => 'Subtotal',
-            'tax_amount_aggr' => 'Tax',
-            'shipping_price_aggr' => 'Shipping',
-            'discount_amount_aggr' => 'Discounts',
-            'grand_total_aggr' => 'Total',
-            'amount_paid_aggr' => 'Received',
-            'amount_refunded_aggr' => 'Refunded',
+            'group_id' => (('Customer Group ID')),
+            'group_title' => (('Customer Group')),
+            'subtotal_aggr' => (('Subtotal')),
+            'tax_amount_aggr' => (('Tax')),
+            'shipping_price_aggr' => (('Shipping')),
+            'discount_amount_aggr' => (('Discounts')),
+            'grand_total_aggr' => (('Total')),
+            'amount_paid_aggr' => (('Received')),
+            'amount_refunded_aggr' => (('Refunded')),
             'item_qty_aggr' => '# of Units Sold',
             'pc_of_sales' => '% of sales',
-            'create_at' => 'Created',
+            'create_at' => (('Created')),
         ];
     }
 

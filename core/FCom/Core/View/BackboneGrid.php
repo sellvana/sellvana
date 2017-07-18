@@ -85,11 +85,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function multiselectToggleOptions()
     {
         return [
-            'show_all' => 'Show All',
-            'show_sel' => 'Show Selected',
-            'upd_sel' => 'Select Visible',
-            'upd_unsel' => 'Unselect Visible',
-            'upd_clear' => 'Unselect All',
+            'show_all' => (('Show All')),
+            'show_sel' => (('Show Selected')),
+            'upd_sel' => (('Select Visible')),
+            'upd_unsel' => (('Unselect Visible')),
+            'upd_clear' => (('Unselect All')),
             /*'@Show'=>array(
                 'show_all'=>'All',
                 'show_sel'=>'Sel'
@@ -270,7 +270,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                     break;
                 case 'btn_group':
-                    $col['label'] = 'Actions';
+                    $col['label'] = (('Actions'));
                     $col['name'] = 'btn_group';
                     $col['sortable'] = false;
                     foreach ($col['buttons'] as $bId => &$btn) {
@@ -393,22 +393,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                 switch ($k) {
                     case 'refresh':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Refresh');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Refresh'));
                         $class   = 'js-change-url grid-refresh btn';
                         $html    = $this->BUtil->tagHtml('a', ['href' => '#', 'class' => $class], $caption);
                         break;
                     case 'export':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Export');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Export'));
                         $class   = 'grid-export btn';
                         $html    = $this->BUtil->tagHtml('button', ['type' => 'button', 'class' => $class], $caption);
                         break;
                     case 'link_to_page':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Export');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Export'));
                         $class   = 'grid-export btn';
                         $html    = $this->BUtil->tagHtml('a', ['href' => $action['href'], 'class' => $class], $caption);
                         break;
                     case 'edit':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Edit');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Edit'));
                         $class   = 'btn grid-mass-edit mass-action btn-success';
                         $html    = $this->BUtil->tagHtml('a',
                             ['class' => $class .' disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid['config']['id'] . '-mass-edit', 'role' => 'button'],
@@ -416,17 +416,17 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         );
                         break;
                     case 'delete':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Delete');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Delete'));
                         $class   = 'btn grid-mass-delete mass-action btn-danger' . ((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : '');
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class . ' disabled', 'type' => 'button'], $caption);
                         break;
                     case 'add': //todo: confirm with Boris merge this action with 'new'
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Add'));
                         $class   = 'btn grid-add btn-primary';
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
                     case 'new':
-                        $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Add'));
                         $class   = 'btn grid-new btn-primary' . (isset($action['modal']) && $action['modal'] ? ' _modal' : '');
                         $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
@@ -434,7 +434,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         $action = static::$_defaultActions[$k];
                 }
             } elseif (!isset($action['html']) || !$action['html']) {
-                $caption = isset($action['caption']) ? $action['caption'] : $this->_('Add');
+                $caption = isset($action['caption']) ? $action['caption'] : $this->_(('Add'));
                 $class = isset($action['class']) ? 'btn ' . $action['class'] : 'btn';
                 $html = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button', 'id' => isset($action['id']) ? $action['id'] : ''], $caption);
             }
@@ -924,11 +924,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $params = $this->grid['result']['state'];
         }
         if (!empty($params['search'])) {
-            $descr = $this->_("Filtered by:") . ' ';
+            $descr = $this->_(("Filtered by:")) . ' ';
             foreach ($params['search'] as $k => $s) {
                 if ($k === '_quick') {
                     $filter = ['type' => 'quick'];
-                    $descr .= '<b>' . $this->_('Quick search') . '</b>';
+                    $descr .= '<b>' . $this->_(('Quick search')) . '</b>';
                 } else {
                     $filter = $this->grid['config']['filters'][$k];
                     $descr .= '<b>' . $filter['label'] . '</b>';
@@ -938,25 +938,25 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         $opts = [];
                         $os = explode(',', $s);
                         if (sizeof($os) == 1) {
-                            $descr .= ' ' . $this->_('is <u>%s</u>', $this->q($filter['options'][$os[0]]));
+                            $descr .= ' ' . $this->_((('is <u>%s</u>')), $this->q($filter['options'][$os[0]]));
                         } else {
                             foreach ($os as $o) {
                                 $opts[] = $filter['options'][$o];
                             }
-                            $descr .= ' ' . $this->_('is one of <u>%s</u>', $this->q(join(', ', $opts)));
+                            $descr .= ' ' . $this->_((('is one of <u>%s</u>')), [$this->q(join(', ')), $opts]);
                         }
                         break;
 
                     case 'text-range': case 'date-range':
-                        $descr .= ' ' . $this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
+                        $descr .= ' ' . $this->_((('is between <u>%s</u> and <u>%s</u>')), [$this->q($s['from']), $this->q($s['to'])]);
 
                         break;
                     case 'quick':
-                        $descr .= ' ' . $this->_('by <u>%s</u>', $this->q($s));
+                        $descr .= ' ' . $this->_((('by <u>%s</u>')), $this->q($s));
                         break;
 
                     default:
-                        $descr .= ' ' . $this->_('contains <u>%s</u>', $this->q($s));
+                        $descr .= ' ' . $this->_((('contains <u>%s</u>')), $this->q($s));
                 }
                 $descr .= '; ';
             }

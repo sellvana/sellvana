@@ -12,9 +12,9 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'blog/post';
     protected $_modelClass = 'Sellvana_Blog_Model_Post';
-    protected $_gridTitle = 'Blog Posts';
+    protected $_gridTitle = (('Blog Posts'));
     protected $_formHref = 'blog/post/form';
-    protected $_recordName = 'Blog Post';
+    protected $_recordName = (('Blog Post'));
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'cms/blog';
@@ -31,23 +31,23 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
                 ['name' => 'edit'],
                 ['name' => 'delete', 'edit_inline' => false]
             ]],
-            ['name' => 'id', 'label' => 'ID'],
-            ['name' => 'author', 'label' => 'Author'],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true,
+            ['name' => 'id', 'label' => (('ID'))],
+            ['name' => 'author', 'label' => (('Author'))],
+            ['type' => 'input', 'name' => 'status', 'label' => (('Status')), 'edit_inline' => false, 'editable' => true,
                 'multirow_edit' => true, 'editor' => 'select', 'multirow_edit_show' => true,
                 'options' => $this->Sellvana_Blog_Model_Post->fieldOptions('status'),
                 'index' => $this->_mainTableAlias . '.status'],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'editable' => true, 'edit_inline' => true,
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'editable' => true, 'edit_inline' => true,
                 'validation' => ['required' => true]
 //                'href' => $this->BApp->href('blog/post/form/?id=:id')
             ],
-            ['name' => 'url_key', 'label' => 'Url Key', 'hidden' => true],
-            ['name' => 'meta_title', 'label' => 'Meta Title', 'hidden' => true],
-            ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
-            ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
-            ['name' => 'create_ym', 'label' => 'Create ym' , 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'datetime'],
+            ['name' => 'url_key', 'label' => (('Url Key')), 'hidden' => true],
+            ['name' => 'meta_title', 'label' => (('Meta Title')), 'hidden' => true],
+            ['name' => 'meta_description', 'label' => (('Meta Description')), 'hidden' => true],
+            ['name' => 'meta_keywords', 'label' => (('Meta Keywords')), 'hidden' => true],
+            ['name' => 'create_ym', 'label' => (('Create ym')) , 'hidden' => true],
+            ['name' => 'create_at', 'label' => (('Created')), 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'cell' => 'datetime'],
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -103,10 +103,10 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
             'orm' => $orm,
             'columns' => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55],
-                ['name' => 'author', 'label' => 'Author'],
-                ['name' => 'title', 'label' => 'Title', 'href' => $this->BApp->href('blog/post/form/?id=:id')],
-                ['name' => 'status', 'label' => 'Status', 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 55],
+                ['name' => 'author', 'label' => (('Author'))],
+                ['name' => 'title', 'label' => (('Title')), 'href' => $this->BApp->href('blog/post/form/?id=:id')],
+                ['name' => 'status', 'label' => (('Status')), 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                     'options' => $this->Sellvana_Blog_Model_Post->fieldOptions('status')],
             ],
             'filters' => [
@@ -143,21 +143,21 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
             //'caption'      =>$caption,
             'columns'      => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-                ['name' => 'author', 'label' => 'Author', 'index' => 'u.author_user_id'],
-                ['name' => 'title', 'label' => 'Title'],
-                ['name' => 'status', 'label' => 'Status'],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'author', 'label' => (('Author')), 'index' => 'u.author_user_id'],
+                ['name' => 'title', 'label' => (('Title'))],
+                ['name' => 'status', 'label' => (('Status'))],
             ],
             'actions' => [
 //                'add' => ['caption' => 'Add Posts'],
                 'add-posts' => [
-                    'caption'  => 'Add Posts',
+                    'caption'  => (('Add Posts')),
                     'type'     => 'button',
                     'id'       => 'add-posts-from-grid',
                     'class'    => 'btn-primary',
                     'callback' => 'showModalToAddPosts'
                 ],
-                'delete' => ['caption' => 'Remove']
+                'delete' => ['caption' => (('Remove'))]
             ],
             'filters' => [
                 ['field' => 'title', 'type' => 'text'],

@@ -74,10 +74,10 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
             $res = $hlp->load($customerId, 'customer_id');
             if (!$res) {
                 $hlp->create(['product_id' => $customerId, '_data_serialized' => $json])->save();
-                $status = 'Successfully saved.';
+                $status = (('Successfully saved.'));
             } else {
                 $res->set('_data_serialized', $json)->save();
-                $status = 'Successfully updated.';
+                $status = (('Successfully updated.'));
             }
         } catch (Exception $e) {
             $status = false;

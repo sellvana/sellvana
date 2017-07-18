@@ -13,19 +13,19 @@ class Sellvana_Catalog_Main extends BClass
     {
         $this->FCom_Core_LayoutEditor
             ->addLayoutType('product', [
-                'title' => 'Product',
+                'title' => (('Product')),
             ])
             ->addLayoutType('category', [
-                'title' => 'Category',
+                'title' => (('Category')),
             ])
             ->addDeclaredWidget('featured_products', [
-                'title' => 'Featured Products',
+                'title' => (('Featured Products')),
                 'view_name' => 'catalog/featured-products',
                 'params' => [
                     'cnt' => [
                         'type' => 'input',
                         'args' => [
-                            'label' => 'Products Count',
+                            'label' => (('Products Count')),
                             'type' => 'number',
                             'value' => 6,
                         ],
@@ -33,19 +33,19 @@ class Sellvana_Catalog_Main extends BClass
                     'auto_scroll' => [
                         'type' => 'boolean',
                         'args' => [
-                            'label' => 'Auto Scroll',
+                            'label' => (('Auto Scroll')),
                         ]
                     ]
                 ],
             ])
             ->addDeclaredWidget('popular_products', [
-                'title' => 'Popular Products',
+                'title' => (('Popular Products')),
                 'view_name' => 'catalog/popular-products',
                 'params' => [
                     'cnt' => [
                         'type' => 'input',
                         'args' => [
-                            'label' => 'Products Count',
+                            'label' => (('Products Count')),
                             'type' => 'number',
                             'value' => 6,
                         ],
@@ -53,7 +53,7 @@ class Sellvana_Catalog_Main extends BClass
                 ],
             ])
             ->addWidgetType('product_carousel', [
-                'title'       => 'Products Carousel',
+                'title'       => (('Products Carousel')),
                 'source_view' => 'catalog/products/carousel',
                 'view_name'   => 'catalog/product/carousel',
                 'pos'         => 100,
@@ -83,9 +83,9 @@ class Sellvana_Catalog_Main extends BClass
     public function getNavTopTypeOptions()
     {
         return [
-            'root_only' => 'Root Categories',
-            'selected' => 'Categories Selected for Nav',
-            'root_selected' => 'Root and Selected Categories',
+            'root_only' => (('Root Categories')),
+            'selected' => (('Categories Selected for Nav')),
+            'root_selected' => (('Root and Selected Categories')),
         ];
     }
 }

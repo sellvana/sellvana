@@ -12,7 +12,7 @@
 class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'subtotal';
-    protected $_label = 'Subtotal';
+    protected $_label = (('Subtotal'));
     protected $_cartField = 'subtotal';
     protected $_sortOrder = 10;
 

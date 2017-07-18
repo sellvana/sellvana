@@ -10,8 +10,8 @@ class Sellvana_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'multisite';
     protected $_modelClass = 'Sellvana_MultiSite_Model_Site';
-    protected $_gridTitle = 'Multi Sites';
-    protected $_recordName = 'Site';
+    protected $_gridTitle = (('Multi Sites'));
+    protected $_recordName = (('Site'));
     protected $_mainTableAlias = 's';
     protected $_permission = 'multi_site';
     protected $_formViewPrefix = 'multisite/sites-form/';
@@ -26,11 +26,11 @@ class Sellvana_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract
                 ['name' => 'edit'],
                 ['name' => 'delete', 'edit_inline' => false]
             ]],
-            ['name' => 'id', 'label' => 'ID', 'index' => 's.id'],
-            ['name' => 'name', 'label' => 'Site Name', 'index' => 's.name'],
-            ['name' => 'match_domains', 'label' => 'Match Domains', 'index' => 's.match_domains'],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 's.create_at', 'formatter' => 'date', 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'formatter' => 'date', 'cell' => 'datetime'],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 's.id'],
+            ['name' => 'name', 'label' => (('Site Name')), 'index' => 's.name'],
+            ['name' => 'match_domains', 'label' => (('Match Domains')), 'index' => 's.match_domains'],
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 's.create_at', 'formatter' => 'date', 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'index' => 's.update_at', 'formatter' => 'date', 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'delete' => true,

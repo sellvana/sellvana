@@ -14,7 +14,7 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductImages extends FCom_Admin_
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/integrity/product_images';
     protected $_gridHref = 'catalog/report/integrity/product_images';
-    protected $_gridTitle = 'Products Without Images';
+    protected $_gridTitle = (('Products Without Images'));
 
     public function gridConfig()
     {
@@ -41,9 +41,9 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductImages extends FCom_Admin_
     protected function _getFieldLabels()
     {
         $labels = [
-            'product_sku' => 'SKU',
-            'product_name' => 'Name',
-            'image_count' => 'Image Count',
+            'product_sku' => (('SKU')),
+            'product_name' => (('Name')),
+            'image_count' => (('Image Count')),
         ];
 
         $labels = array_merge($labels, $this->_getProductCustomFieldLabels());

@@ -15,7 +15,7 @@ class FCom_LibTwig_Main extends BClass
     public function bootstrap()
     {
         $this->BLayout->addRenderer('FCom_LibTwig', [
-            'description' => 'Twig (HTML)',
+            'description' => (('Twig (HTML)')),
             'callback'    => 'FCom_LibTwig_Main::renderer',
             'file_ext'    => ['.html.twig', '.twig.html'],
             'editor'      => 'html',

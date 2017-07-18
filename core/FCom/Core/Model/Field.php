@@ -32,40 +32,40 @@ class FCom_Core_Model_Field extends FCom_Core_Model_Abstract
         'field_type'      => [
         ],
         'table_field_type' => [
-            'varchar'      => 'Short Text',
-            'text'         => 'Long Text',
-            'options'      => 'Options',
-            'int'          => 'Integer',
-            'tinyint'      => 'Tiny Integer',
-            'decimal'      => 'Decimal',
-            'date'         => 'Date',
-            'datetime'     => 'Date/Time',
-            'serialized'   => 'Serialized',
+            'varchar'      => (('Short Text')),
+            'text'         => (('Long Text')),
+            'options'      => (('Options')),
+            'int'          => (('Integer')),
+            'tinyint'      => (('Tiny Integer')),
+            'decimal'      => (('Decimal')),
+            'date'         => (('Date')),
+            'datetime'     => (('Date/Time')),
+            'serialized'   => (('Serialized')),
         ],
         'admin_input_type' => [
-            'text'         => 'Text Line',
-            'textarea'     => 'Text Area',
-            'select'       => 'Drop down',
-            'multiselect'  => 'Multiple Select',
-            'boolean'      => 'Yes/No',
-            'wysiwyg'      => 'WYSIWYG editor'
+            'text'         => (('Text Line')),
+            'textarea'     => (('Text Area')),
+            'select'       => (('Drop down')),
+            'multiselect'  => (('Multiple Select')),
+            'boolean'      => (('Yes/No')),
+            'wysiwyg'      => (('WYSIWYG editor'))
         ],
         'frontend_show'    => [
-            '1'            => 'Yes',
-            '0'            => 'No'
+            '1'            => (('Yes')),
+            '0'            => (('No'))
         ],
         'swatch_type'      => [
-            'N' => 'None',
-            'C' => 'Color',
-            'I' => 'Image',
+            'N' => (('None')),
+            'C' => (('Color')),
+            'I' => (('Image')),
         ],
         'account_edit' => [
-            '1' => 'Yes',
-            '0' => 'No'
+            '1' => (('Yes')),
+            '0' => (('No'))
         ],
         'register_form' => [
-            '1' => 'Yes',
-            '0' => 'No'
+            '1' => (('Yes')),
+            '0' => (('No'))
         ],
     ];
 

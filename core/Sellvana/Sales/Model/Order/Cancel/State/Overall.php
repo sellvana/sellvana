@@ -9,11 +9,11 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Mod
         COMPLETE = 'complete';
 
     protected $_valueLabels = [
-        self::REQUESTED => 'Requested',
-        self::PENDING => 'Pending',
-        self::APPROVED => 'Approved',
-        self::DECLINED => 'Declined',
-        self::COMPLETE => 'Complete',
+        self::REQUESTED => (('Requested')),
+        self::PENDING => (('Pending')),
+        self::APPROVED => (('Approved')),
+        self::DECLINED => (('Declined')),
+        self::COMPLETE => (('Complete')),
     ];
 
     protected $_setValueNotificationTemplates =[

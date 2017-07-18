@@ -10,11 +10,11 @@ class Sellvana_Cms_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_Cms' => 'CMS Settings',
-            'cms' => 'CMS',
-            'cms/pages' => 'Manage Pages',
-            'cms/blocks' => 'Manage Blocks',
-            'cms/nav' => 'Manage Navigation',
+            'settings/Sellvana_Cms' => (('CMS Settings')),
+            'cms' => (('CMS')),
+            'cms/pages' => (('Manage Pages')),
+            'cms/blocks' => (('Manage Blocks')),
+            'cms/nav' => (('Manage Navigation')),
         ]);
     }
 }

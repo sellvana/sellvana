@@ -5,6 +5,11 @@ define(['sv-comp-form-catalog-prices', 'text!sv-page-catalog-products-form-price
         },
         template: tabTpl,
         props: ['form'],
+        data: function () {
+            return {
+                view_mode: 'simple',
+            };
+        },
         watch: {
             'form.prices': {
                 deep: true,

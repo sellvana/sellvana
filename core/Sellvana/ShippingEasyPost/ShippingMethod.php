@@ -12,7 +12,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
     const MODE_TEST = 'test';
     const MODE_PROD = 'prod';
 
-    protected $_name = 'EasyPost';
+    protected $_name = (('EasyPost'));
     protected $_code = 'easypost';
     protected $_configPath = 'modules/Sellvana_ShippingEasyPost';
 
@@ -40,7 +40,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         if (empty($data['access_key'])) {
             $result = [
                 'error' => 1,
-                'message' => 'Incomplete EasyPost User Authentication configuration',
+                'message' => (('Incomplete EasyPost User Authentication configuration')),
             ];
             return $result;
         }
@@ -49,7 +49,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
 
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
 
-        $data['name'] = 'John Doe';
+        $data['name'] = (('John Doe'));
         if ($cart->get('shipping_firstname') && $cart->get('shipping_lastname')) {
             $data['name'] = $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname');
         }
@@ -82,7 +82,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         } else {
             $result = [
                 'error' => 1,
-                'message' => 'No rates for one of the packages',
+                'message' => (('No rates for one of the packages')),
             ];
             return $result;
         }

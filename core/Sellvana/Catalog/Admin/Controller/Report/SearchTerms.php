@@ -11,7 +11,7 @@ class Sellvana_Catalog_Admin_Controller_Report_SearchTerms extends FCom_Admin_Co
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/search_terms';
     protected $_gridHref = 'catalog/report/inventory/search_terms';
-    protected $_gridTitle = 'Search Terms';
+    protected $_gridTitle = (('Search Terms'));
 
     public function gridConfig()
     {
@@ -37,11 +37,11 @@ class Sellvana_Catalog_Admin_Controller_Report_SearchTerms extends FCom_Admin_Co
     protected function _getFieldLabels()
     {
         return [
-            'query' => 'Search String',
+            'query' => (('Search String')),
             'num_searches' => '# of searches',
             'num_products_found_last' => '# of Results',
-            'first_at' => 'First Search',
-            'last_at' => 'Last Search',
+            'first_at' => (('First Search')),
+            'last_at' => (('Last Search')),
         ];
     }
 

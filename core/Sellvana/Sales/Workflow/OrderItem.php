@@ -26,7 +26,7 @@ class Sellvana_Sales_Workflow_OrderItem extends Sellvana_Sales_Workflow_Abstract
     {
         $newState = $args['item']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
-        $args['item']->addHistoryEvent('custom_state', 'Admin user has changed custom order item state to "' . $label . '"');
+        $args['item']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom order item state to "%s"')), $label));
         $args['item']->save();
     }
 }

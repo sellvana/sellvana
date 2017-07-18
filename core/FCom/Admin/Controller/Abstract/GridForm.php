@@ -9,10 +9,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     // Optional parameters
     protected $_permission;# = 'feature/permission';
     protected $_navPath;# = 'nav/subnav';
-    protected $_recordName = 'Record';
+    protected $_recordName = (('Record'));
     protected $_mainTableAlias = 'main';
 
-    protected $_gridTitle = 'List of Records';
+    protected $_gridTitle = (('List of Records'));
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
     protected $_useDefaultLayout = false;
@@ -187,12 +187,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         if ($this->BRequest->get('export')) {
             if ($this->BRequest->csrf('referrer', 'GET')) {
-                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                $this->BResponse->status('403', (('Invalid referrer')), 'Invalid referrer');
                 return;
             }
         } else {
             if (!$this->BRequest->xhr()) {
-                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
                 return;
             }
         }
@@ -314,7 +314,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'onclick' => "location.href='{$this->BApp->href($this->_gridHref)}'",
             ],
             [
-                ['span', null, $this->_('Back to list')],
+                ['span', null, $this->_(('Back to list'))],
             ], 10
         ];
 
@@ -329,7 +329,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     'onclick' => 'return confirm(\'Are you sure?\')',
                 ],
                 [
-                    ['span', null, $this->_('Delete')],
+                    ['span', null, $this->_(('Delete'))],
                 ], 20
             ];
         }
@@ -342,7 +342,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'data-style' => 'expand-left',
             ],
             [
-                ['span', null, $this->_('Save')],
+                ['span', null, $this->_(('Save'))],
             ], 30
         ];
 
@@ -354,7 +354,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 'data-style' => 'expand-left',
             ],
             [
-                ['span', null, $this->_('Save And Continue')],
+                ['span', null, $this->_(('Save And Continue'))],
             ], 1000
         ];
 
@@ -362,9 +362,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $titleFieldValue = is_string($this->_formTitleField) && preg_match('#^[a-z0-9_]+$#i', $this->_formTitleField)
                 ? $m->get($this->_formTitleField)
                 : $this->BUtil->call($this->_formTitleField, $m);
-            $this->_formTitle = $this->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
+            $this->_formTitle = $this->_((('Edit %s: %s')), [$this->_recordName, $titleFieldValue]);
         } else {
-            $this->_formTitle = $this->_('Create New %s', [$this->_recordName]);
+            $this->_formTitle = $this->_((('Create New %s')), [$this->_recordName]);
         }
 
         $args['view']->set([

@@ -53,17 +53,17 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $result = [
             'local' => [
-                'title' => 'Local Alerts',
+                'title' => (('Local Alerts')),
                 'icon_class' => 'icon-bell',
                 'count' => 0,
             ],
             'remote' => [
-                'title' => 'Remote Notifications',
+                'title' => (('Remote Notifications')),
                 'icon_class' => 'icon-rss',
                 'count' => 0,
             ],
             'realtime' => [
-                'title' => 'Real-Time Activity',
+                'title' => (('Real-Time Activity')),
                 'icon_class' => 'icon-bolt',
                 'count' => 0,
             ],

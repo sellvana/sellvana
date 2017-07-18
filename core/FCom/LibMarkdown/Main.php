@@ -19,7 +19,7 @@ class FCom_LibMarkdown_Main extends BClass
     public function bootstrap()
     {
         $this->BLayout->addRenderer('FCom_LibMarkdown', [
-            'description' => 'Markdown Extra',
+            'description' => (('Markdown Extra')),
             'callback' => 'FCom_LibMarkdown_Main::renderer',
             'file_ext' => ['.md'],
         ]);

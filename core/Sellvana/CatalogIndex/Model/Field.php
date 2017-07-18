@@ -17,46 +17,46 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'field_type'        => [
-            'int'      => 'Integer',
-            'decimal'  => 'Decimal',
-            'varchar'  => 'String',
-            'text'     => 'Text',
-            'category' => 'Category'
+            'int'      => (('Integer')),
+            'decimal'  => (('Decimal')),
+            'varchar'  => (('String')),
+            'text'     => (('Text')),
+            'category' => (('Category'))
         ],
         'source_type'       => [
-            'field' => 'Field',
-            'method' => 'Model Method',
-            'callback' => 'Callback',
+            'field' => (('Field')),
+            'method' => (('Model Method')),
+            'callback' => (('Callback')),
         ],
         'filter_type'       => [
-            'none'      => 'None',
-            'exclusive' => 'Exclusive',
-            'inclusive' => 'Inclusive',
-            'range'     => 'Range'
+            'none'      => (('None')),
+            'exclusive' => (('Exclusive')),
+            'inclusive' => (('Inclusive')),
+            'range'     => (('Range'))
         ],
-        'filter_multivalue' => [0 => 'No', 1 => 'Yes'],
-        'filter_counts'     => [0 => 'No', 1 => 'Yes'],
-        'filter_show_empty' => [0 => 'No', 1 => 'Yes'],
+        'filter_multivalue' => [0 => (('No')), 1 => (('Yes'))],
+        'filter_counts'     => [0 => (('No')), 1 => (('Yes'))],
+        'filter_show_empty' => [0 => (('No')), 1 => (('Yes'))],
         'search_type'       => [
-            'none' => 'None',
-            'terms' => 'Terms'
+            'none' => (('None')),
+            'terms' => (('Terms'))
         ],
         'sort_type'         => [
-            'none' => 'None',
-            'asc'  => 'Ascending Only',
-            'desc' => 'Descending Only',
-            'both' => 'Both Directions'
+            'none' => (('None')),
+            'asc'  => (('Ascending Only')),
+            'desc' => (('Descending Only')),
+            'both' => (('Both Directions'))
         ],
         'sort_method'       => [
-            'text' => 'Text',
-            'signed' => 'Signed Integer',
-            'unsigned' => 'Unsigned Integer',
-            'decimal' => 'Decimal',
-            'date' => 'Date',
-            'time' => 'Time',
-            'datetime' => 'Datetime',
-            'binary' => 'Binary',
-            'char' => 'Char',
+            'text' => (('Text')),
+            'signed' => (('Signed Integer')),
+            'unsigned' => (('Unsigned Integer')),
+            'decimal' => (('Decimal')),
+            'date' => (('Date')),
+            'time' => (('Time')),
+            'datetime' => (('Datetime')),
+            'binary' => (('Binary')),
+            'char' => (('Char')),
         ],
     ];
 

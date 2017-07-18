@@ -56,13 +56,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         return [
             '' => '',
             '@Show' => [
-                'show_all' => 'All',
-                'show_sel' => 'Sel',
-                'show_unsel' => 'Unsel',
+                'show_all' => (('All')),
+                'show_sel' => (('Sel')),
+                'show_unsel' => (('Unsel')),
             ],
             '@Select' => [
-                'upd_sel' => 'Sel',
-                'upd_unsel' => 'Unsel',
+                'upd_sel' => (('Sel')),
+                'upd_unsel' => (('Unsel')),
             ],
         ];
     }
@@ -174,7 +174,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
                 case '_actions':
                     $col['type'] = 'actions';
-                    $col['label'] = 'Actions';
+                    $col['label'] = (('Actions'));
                     //$col['width'] = 50;
                     $col['no_reorder'] = true;
                     $col['format'] = function($args) use($col) {
@@ -209,13 +209,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                     case 'refresh':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'js-change-url grid-refresh btn'],
-                            $this->_('Refresh')
+                            $this->_(('Refresh'))
                         )];
                         break;
                     case 'link_to_page':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            $this->_('Link')
+                            $this->_(('Link'))
                         )];
                         break;
 
@@ -587,11 +587,11 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $params = $this->grid['result']['state'];
         }
         if (!empty($params['search'])) {
-            $descr = $this->_("Filtered by:") . ' ';
+            $descr = $this->_(("Filtered by:")) . ' ';
             foreach ($params['search'] as $k => $s) {
                 if ($k === '_quick') {
                     $filter = ['type' => 'quick'];
-                    $descr .= '<b>' . $this->_('Quick search') . '</b>';
+                    $descr .= '<b>' . $this->_(('Quick search')) . '</b>';
                 } else {
                     $filter = $this->grid['config']['filters'][$k];
                     $descr .= '<b>' . $filter['label'] . '</b>';
@@ -601,25 +601,25 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                         $opts = [];
                         $os = explode(',', $s);
                         if (sizeof($os) == 1) {
-                            $descr .= ' ' . $this->_('is <u>%s</u>', $this->q($filter['options'][$os[0]]));
+                            $descr .= ' ' . $this->_((('is <u>%s</u>')), $this->q($filter['options'][$os[0]]));
                         } else {
                             foreach ($os as $o) {
                                 $opts[] = $filter['options'][$o];
                             }
-                            $descr .= ' ' . $this->_('is one of <u>%s</u>', $this->q(join(', ', $opts)));
+                            $descr .= ' ' . $this->_((('is one of <u>%s</u>')), [$this->q(join(', ')), $opts]);
                         }
                         break;
 
                     case 'text-range': case 'date-range':
-                        $descr .= ' ' . $this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
+                        $descr .= ' ' . $this->_((('is between <u>%s</u> and <u>%s</u>')), [$this->q($s['from']), $this->q($s['to'])]);
 
                         break;
                     case 'quick':
-                        $descr .= ' ' . $this->_('by <u>%s</u>', $this->q($s));
+                        $descr .= ' ' . $this->_((('by <u>%s</u>')), $this->q($s));
                         break;
 
                     default:
-                        $descr .= ' ' . $this->_('contains <u>%s</u>', $this->q($s));
+                        $descr .= ' ' . $this->_((('contains <u>%s</u>')), $this->q($s));
                 }
                 $descr .= '; ';
             }

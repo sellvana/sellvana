@@ -5,7 +5,7 @@
  */
 class Sellvana_PaymentCC_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
-    protected $_name = 'Credit Card';
+    protected $_name = (('Credit Card'));
     protected $_code = 'cc';
 
     protected $_capabilities = [

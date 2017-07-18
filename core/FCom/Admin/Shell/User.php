@@ -216,7 +216,7 @@ class FCom_Admin_Shell_User extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Admin user management';
+        return (('Admin user management'));
     }
 
     public function getLongHelp()

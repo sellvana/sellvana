@@ -277,7 +277,7 @@ class BApp extends BClass
                 break;
 
             default:
-                BDebug::error($this->_('Unknown feature: %s', $feature));
+                BDebug::error($this->_((('Unknown feature: %s')), $feature));
         }
         static::$_compat[$feature] = $compat;
         return $compat;
@@ -680,7 +680,7 @@ class BConfig extends BClass
         if (preg_match('#^@([^/]+)(.*)#', $filename, $m)) {
             $module = $this->BModuleRegistry->module($m[1]);
             if (!$module) {
-                BDebug::error($this->_('Invalid module name: %s', $m[1]));
+                BDebug::error($this->_((('Invalid module name: %s')), $m[1]));
             }
             $filename = $module->root_dir . $m[2];
         }
@@ -694,7 +694,7 @@ class BConfig extends BClass
             $filename = $configDir . '/' . $filename;
         }
         if (!is_readable($filename)) {
-            BDebug::error($this->_('Invalid configuration file name: %s', $filename));
+            BDebug::error($this->_((('Invalid configuration file name: %s')), $filename));
         }
 
         switch ($ext) {
@@ -718,7 +718,7 @@ class BConfig extends BClass
                 break;
         }
         if (!is_array($config)) {
-            BDebug::error($this->_('Invalid configuration contents: %s', $filename));
+            BDebug::error($this->_((('Invalid configuration contents: %s')), $filename));
         }
         $this->add($config, $toSave);
         return $this;
@@ -1200,10 +1200,10 @@ class BClassRegistry extends BClass
     public function augmentProperty($class, $property, $op, $type, $callback)
     {
         if ($op !== 'set' && $op !== 'get') {
-            BDebug::error($this->_('Invalid property augmentation operator: %s', $op));
+            BDebug::error($this->_((('Invalid property augmentation operator: %s')), $op));
         }
         if ($type !== 'override' && $type !== 'before' && $type !== 'after') {
-            BDebug::error($this->_('Invalid property augmentation type: %s', $type));
+            BDebug::error($this->_((('Invalid property augmentation type: %s')), $type));
         }
         $entry = [
             'module_name' => $this->BModuleRegistry->currentModuleName(),

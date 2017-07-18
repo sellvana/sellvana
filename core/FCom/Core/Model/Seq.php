@@ -53,7 +53,7 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
     {
         $parentId = $child->get($parentField);
         if ($parentId) {
-            $lastUniqueId = $child->orm()->where($parentField, $parentId)
+            $lastUniqueId = $child->orm()->where($parentField, $parentId)->select('unique_id')
                 ->order_by_asc('(length(unique_id))')->order_by_asc('unique_id')
                 ->find_one();
             if (!$lastUniqueId) {
@@ -61,8 +61,10 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
                 $parent = $this->{$parentClass}->load($parentId);
                 $nextId = str_replace($parentPrefix . '-', $childPrefix . '-', $parent->get('unique_id')) . '-01';
             } else {
-                preg_match("#^({$parentPrefix}-\d+-)(\d+)$#", $lastUniqueId, $m);
-                $nextId = $m[1] . '-' . ($m[2] + 1);
+                if (!preg_match("#^({$childPrefix}-\d+-)(\d+)$#", $lastUniqueId->get('unique_id'), $m)) {
+                    throw new BException('Invalid last unique id: ' . $lastUniqueId->get('unique_id'));
+                }
+                $nextId = $m[1] . str_pad($m[2] + 1, 2, '0', STR_PAD_LEFT);
             }
         } else {
             $nextId = $this->getNextSeqId(strtolower($childPrefix), $childPrefix . '-90000000');

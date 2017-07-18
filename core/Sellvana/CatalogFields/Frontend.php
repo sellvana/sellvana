@@ -70,7 +70,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
             $variants = $variantHlp->orm()->where('product_id', $pId)->find_many();
             if ($variants) {
                 if (empty($item['variant_select'])) {
-                    $item['error'] = $this->_('Please specify the product variant');
+                    $item['error'] = $this->_(('Please specify the product variant'));
                     $item['action'] = 'redirect_product';
                     continue;
                 }
@@ -100,7 +100,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
                     }
                 }
                 if (!$variant) {
-                    $item['error'] = $this->_('Invalid variant');
+                    $item['error'] = $this->_(('Invalid variant'));
                     continue;
                 }
 

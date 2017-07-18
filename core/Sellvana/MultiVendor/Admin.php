@@ -13,8 +13,8 @@ class Sellvana_MultiVendor_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'multi_vendor'          => 'Multi Vendor',
-            'settings/multi_vendor' => 'Multi Vendor Settings',
+            'multi_vendor'          => (('Multi Vendor')),
+            'settings/multi_vendor' => (('Multi Vendor Settings')),
         ]);
     }
 

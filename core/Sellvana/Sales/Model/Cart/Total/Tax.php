@@ -7,7 +7,7 @@
 class Sellvana_Sales_Model_Cart_Total_Tax extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'tax';
-    protected $_label = 'Tax';
+    protected $_label = (('Tax'));
     protected $_cartField = 'tax_amount';
     protected $_sortOrder = 80;
 

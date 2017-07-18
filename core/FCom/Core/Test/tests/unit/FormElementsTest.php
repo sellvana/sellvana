@@ -51,7 +51,7 @@ class EmbedTest extends \Codeception\TestCase\Test
         $r = $this->form->getInputId($p);
         $this->tester->assertNotEquals('input-test-id', $r, 'Input id is not correct');
 
-        $p['settings_module'] = 'Test';
+        $p['settings_module'] = (('Test'));
         $p['field'] = 'product';
         $r = $this->form->getInputId($p);
         $this->tester->assertRegExp('/^[A-z]+\-(Test)\-[A-z]+/', $r, 'Input id is not correct');
@@ -82,7 +82,7 @@ class EmbedTest extends \Codeception\TestCase\Test
         $r = $this->form->getInputName($p);
         $this->tester->assertNotEquals('input-test-name', $r, 'Input name is not correct');
 
-        $p['settings_module'] = 'Test';
+        $p['settings_module'] = (('Test'));
         $p['field'] = 'product';
         $r = $this->form->getInputName($p);
         $this->tester->assertRegExp('/^[A-z\[]+(Test)\]\[[A-z]+\]/', $r, 'Input name is not correct');
@@ -124,7 +124,7 @@ class EmbedTest extends \Codeception\TestCase\Test
 
         $this->tester->haveInDatabase('fcom_product', [
             'id' => '1',
-            'product_name' => 'Product 1',
+            'product_name' => (('Product 1')),
             'product_sku' => 'test-1',
             'url_key' => 'product-1'
         ]);

@@ -16,7 +16,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     const SERVICE_TRACK = 'Track';
     const SERVICE_VOID = 'Void';
 
-    protected $_name           = 'Universal post service';
+    protected $_name           = (('Universal post service'));
     protected $_code           = 'ups';
     protected $_configPath     = 'modules/Sellvana_ShippingUps';
     protected $_trackingUpdate = true;
@@ -51,28 +51,28 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         if ($data['weight'] == 0) {
             $result = [
                 'error' => 1,
-                'message' => 'Can not ship without weight',
+                'message' => (('Can not ship without weight')),
             ];
             return $result;
         }
         if (empty($data['from_postcode']) || empty($data['from_country'])) {
             $result = [
                 'error' => 1,
-                'message' => 'Origin Postcode and Country are required',
+                'message' => (('Origin Postcode and Country are required')),
             ];
             return $result;
         }
         if (empty($data['to_postcode']) || empty($data['to_country'])) {
             $result = [
                 'error' => 1,
-                'message' => 'Destination zipcode and country are required',
+                'message' => (('Destination zipcode and country are required')),
             ];
             return $result;
         }
         if (empty($data['access_key']) || empty($data['user_id']) || empty($data['password'])) {
             $result = [
                 'error' => 1,
-                'message' => 'Incomplete UPS User Authentication configuration',
+                'message' => (('Incomplete UPS User Authentication configuration')),
             ];
             return $result;
         }
@@ -88,10 +88,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $data['packaging_type'] = '02';
         }
         if (empty($data['dimension_units'])) {
-            $data['dimension_units'] = 'IN';
+            $data['dimension_units'] = (('IN'));
         }
         if (empty($data['weight_units'])) {
-            $data['weight_units'] = 'LBS';
+            $data['weight_units'] = (('LBS'));
         }
 
         $request = "<?xml version=\"1.0\"?>
@@ -162,7 +162,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             $parsed = new SimpleXMLElement($response);
         } catch (Exception $e) {
             $result['error'] = 1;
-            $result['message'] = $this->_('Couldn\'t get response from UPS');
+            $result['message'] = $this->_(('Couldn\'t get response from UPS'));
 
             return $result;
         }
@@ -208,30 +208,30 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
         //The commented Services are not available to return shipment
         return [
-            '_01' => 'Next Day Air',
+            '_01' => (('Next Day Air')),
             '_02' => '2nd Day Air',
-            '_03' => 'Ground',
-            '_07' => 'Express',
-            '_08' => 'Expedited',
-            '_11' => 'UPS Standard',
+            '_03' => (('Ground')),
+            '_07' => (('Express')),
+            '_08' => (('Expedited')),
+            '_11' => (('UPS Standard')),
             '_12' => '3 Day Select',
-            '_13' => 'Next Day Air Saver',//
-            '_14' => 'UPS Next Day Air Early',
-            '_54' => 'Express Plus',
+            '_13' => (('Next Day Air Saver')),//
+            '_14' => (('UPS Next Day Air Early')),
+            '_54' => (('Express Plus')),
             '_59' => '2nd Day Air A.M.',//
-            '_65' => 'UPS Saver',
-            '_M2' => 'First Class Mail',
-            '_M3' => 'Priority Mail',
-            '_M4' => 'Expedited MaiI Innovations',
-            '_M5' => 'Priority Mail Innovations',
-            '_M6' => 'Economy Mail Innovations',
-            '_70' => 'UPS Access Point Economy',
-            '_82' => 'UPS Today Standard',//
-            '_83' => 'UPS Today Dedicated Courier',//
-            '_84' => 'UPS Today Intercity',//
-            '_85' => 'UPS Today Express',//
-            '_86' => 'UPS Today Express Saver',//
-            '_96' => 'UPS Worldwide Express Freight',
+            '_65' => (('UPS Saver')),
+            '_M2' => (('First Class Mail')),
+            '_M3' => (('Priority Mail')),
+            '_M4' => (('Expedited MaiI Innovations')),
+            '_M5' => (('Priority Mail Innovations')),
+            '_M6' => (('Economy Mail Innovations')),
+            '_70' => (('UPS Access Point Economy')),
+            '_82' => (('UPS Today Standard')),//
+            '_83' => (('UPS Today Dedicated Courier')),//
+            '_84' => (('UPS Today Intercity')),//
+            '_85' => (('UPS Today Express')),//
+            '_86' => (('UPS Today Express Saver')),//
+            '_96' => (('UPS Worldwide Express Freight')),
         ];
     }
 
@@ -349,8 +349,8 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         $catalogConfig = $this->BConfig->get('modules/Sellvana_Catalog');
         $dimensions = explode('x', $this->_data('package_size'));
         $weightCode = [
-            'lb' => 'LBS',
-            'kg' => 'KGS'
+            'lb' => (('LBS')),
+            'kg' => (('KGS'))
         ];
         $weight = $this->_data('weight') ?: $this->_data('shipping_weight');
         if (count($dimensions) !== 3) {
@@ -365,7 +365,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         ];
 
         $shipmentSection = [];
-        $shipmentSection['Description'] = 'Ship WS test';
+        $shipmentSection[(('Description'))] = (('Ship WS test'));
 
         $shipmentSection['Shipper'] = [
             'Name' => $config->get("modules/Sellvana_Sales/store_name"),
@@ -590,10 +590,10 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     public function getLabelFormats()
     {
         return [
-            '_01' => 'EPL',
-            '_02' => 'SPL',
-            '_03' => 'ZPL',
-            '_04' => 'GIF'
+            '_01' => (('EPL')),
+            '_02' => (('SPL')),
+            '_03' => (('ZPL')),
+            '_04' => (('GIF'))
         ];
     }
 
@@ -649,7 +649,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             return ['error' => true, 'message' => $e->getMessage(), 'states' => $states];
         }
 
-        return ['message' => 'Success', 'states' => $states];
+        return ['message' => (('Success')), 'states' => $states];
     }
 
     /**

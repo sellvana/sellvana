@@ -11,13 +11,13 @@ class Sellvana_Sales_Model_Order_Item_State extends FCom_Core_Model_Abstract_Sta
         CUSTOM = 'custom';
 
     protected $_stateLabels = [
-        self::OVERALL => 'Overall',
-        self::DELIVERY => 'Delivery',
-        self::PAYMENT => 'Payment',
-        self::RETURNS => 'Return',
-        self::REFUND => 'Refund',
-        self::CANCEL => 'Cancel',
-        self::CUSTOM => 'Custom',
+        self::OVERALL => (('Overall')),
+        self::DELIVERY => (('Delivery')),
+        self::PAYMENT => (('Payment')),
+        self::RETURNS => (('Return')),
+        self::REFUND => (('Refund')),
+        self::CANCEL => (('Cancel')),
+        self::CUSTOM => (('Custom')),
     ];
 
     /**

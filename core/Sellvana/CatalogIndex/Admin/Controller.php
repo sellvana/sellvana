@@ -23,7 +23,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
         BORM::configure('logging', 0);
         $this->BConfig->set('db/logging', 0);
 
-        echo $this->_("<pre>Starting...\n");
+        echo $this->_(("<pre>Starting...\n"));
         if ($this->BRequest->request('CLEAR')) {
             //$this->Sellvana_CatalogIndex_Main->getIndexer()->indexDropDocs(true);
             $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
@@ -67,7 +67,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
 
         // create categories / subcategories
         if (true) {
-            echo $this->_('<p>Creating categories...</p>');
+            echo $this->_(('<p>Creating categories...</p>'));
             /** @var Sellvana_Catalog_Model_Category $root */
             $root = $this->Sellvana_Catalog_Model_Category->load(1);
             for ($i = 1; $i <= 1; $i++) {

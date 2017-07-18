@@ -12,8 +12,8 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
     protected $_gridHref = 'carts';
     protected $_modelClass = 'Sellvana_Sales_Model_Cart';
     protected $_mainTableAlias = 'c';
-    protected $_gridTitle = 'Shopping Carts';
-    protected $_recordName = 'Cart';
+    protected $_gridTitle = (('Shopping Carts'));
+    protected $_recordName = (('Cart'));
     protected $_permission = 'sales/carts';
 
     public function gridConfig()
@@ -45,40 +45,40 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
                 //['name' => 'edit'],
             ]],
 
-            ['name' => 'id', 'index' => 'c.id', 'label' => 'ID', 'width' => 70],
-            ['name' => 'admin_name', 'index' => 'c.admin_id', 'label' => 'Assisted by'],
-            ['name' => 'create_at', 'index' => 'c.create_at', 'label' => 'Order Date', 'cell' => 'datetime'],
+            ['name' => 'id', 'index' => 'c.id', 'label' => (('ID')), 'width' => 70],
+            ['name' => 'admin_name', 'index' => 'c.admin_id', 'label' => (('Assisted by'))],
+            ['name' => 'create_at', 'index' => 'c.create_at', 'label' => (('Order Date')), 'cell' => 'datetime'],
 
-            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'c.grand_total', 'cell' => 'currency'],
-            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'c.amount_due', 'cell' => 'currency'],
-            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'c.amount_paid', 'cell' => 'currency'],
-            ['name' => 'discount_amount', 'label' => 'Discount', 'cell' => 'currency'],
-            ['name' => 'discount_percent', 'label' => 'Discount %'],
-            ['name' => 'shipping_price', 'label' => 'Shipping Price', 'cell' => 'currency'],
+            ['name' => 'grand_total', 'label' => (('Order Total')), 'index' => 'c.grand_total', 'cell' => 'currency'],
+            ['name' => 'amount_due', 'label' => (('Due')), 'index' => 'c.amount_due', 'cell' => 'currency'],
+            ['name' => 'amount_paid', 'label' => (('Paid')), 'index' => 'c.amount_paid', 'cell' => 'currency'],
+            ['name' => 'discount_amount', 'label' => (('Discount')), 'cell' => 'currency'],
+            ['name' => 'discount_percent', 'label' => (('Discount %'))],
+            ['name' => 'shipping_price', 'label' => (('Shipping Price')), 'cell' => 'currency'],
 
-            ['name' => 'shipping_method', 'label' => 'Carrier', 'options' => $carrierOptions],
-            ['name' => 'shipping_service', 'label' => 'Carrier Service', 'options' => $serviceOptions],
-            ['name' => 'payment_method', 'label' => 'Payment Method', 'options' => $paymentMethodOptions],
+            ['name' => 'shipping_method', 'label' => (('Carrier')), 'options' => $carrierOptions],
+            ['name' => 'shipping_service', 'label' => (('Carrier Service')), 'options' => $serviceOptions],
+            ['name' => 'payment_method', 'label' => (('Payment Method')), 'options' => $paymentMethodOptions],
 
-            ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'c.state_overall', 'options' => $overallStates],
-            ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'c.state_payment', 'options' => $paymentStates],
+            ['name' => 'state_overall', 'label' => (('Overall State')), 'index' => 'c.state_overall', 'options' => $overallStates],
+            ['name' => 'state_payment', 'label' => (('Payment State')), 'index' => 'c.state_payment', 'options' => $paymentStates],
 
             #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
 
-            ['name' => 'billing_firstname', 'label' => 'Bill First Name', 'index' => 'billing_firstname'],
-            ['name' => 'billing_lastname', 'label' => 'Bill Last Name', 'index' => 'billing_lastname'],
-            ['name' => 'billing_city', 'label' => 'Bill City', 'index' => 'billing_city'],
-            ['name' => 'billing_postcode', 'label' => 'Bill Zip', 'index' => 'billing_postcode'],
-            ['name' => 'billing_region', 'label' => 'Bill State/Province', 'index' => 'billing_region'],
-            ['name' => 'billing_country', 'label' => 'Bill Country', 'index' => 'billing_country'],
+            ['name' => 'billing_firstname', 'label' => (('Bill First Name')), 'index' => 'billing_firstname'],
+            ['name' => 'billing_lastname', 'label' => (('Bill Last Name')), 'index' => 'billing_lastname'],
+            ['name' => 'billing_city', 'label' => (('Bill City')), 'index' => 'billing_city'],
+            ['name' => 'billing_postcode', 'label' => (('Bill Zip')), 'index' => 'billing_postcode'],
+            ['name' => 'billing_region', 'label' => (('Bill State/Province')), 'index' => 'billing_region'],
+            ['name' => 'billing_country', 'label' => (('Bill Country')), 'index' => 'billing_country'],
 
-            ['name' => 'shipping_firstname', 'label' => 'Ship First Name', 'index' => 'shipping_firstname'],
-            ['name' => 'shipping_lastname', 'label' => 'Ship Last Name', 'index' => 'shipping_lastname'],
-            ['name' => 'shipping_city', 'label' => 'Ship City', 'index' => 'shipping_city'],
-            ['name' => 'shipping_postcode', 'label' => 'Ship Zip', 'index' => 'shipping_postcode'],
-            ['name' => 'shipping_region', 'label' => 'Ship State/Province', 'index' => 'shipping_region'],
-            ['name' => 'shipping_country', 'label' => 'Ship Country', 'index' => 'shipping_country'],
+            ['name' => 'shipping_firstname', 'label' => (('Ship First Name')), 'index' => 'shipping_firstname'],
+            ['name' => 'shipping_lastname', 'label' => (('Ship Last Name')), 'index' => 'shipping_lastname'],
+            ['name' => 'shipping_city', 'label' => (('Ship City')), 'index' => 'shipping_city'],
+            ['name' => 'shipping_postcode', 'label' => (('Ship Zip')), 'index' => 'shipping_postcode'],
+            ['name' => 'shipping_region', 'label' => (('Ship State/Province')), 'index' => 'shipping_region'],
+            ['name' => 'shipping_country', 'label' => (('Ship Country')), 'index' => 'shipping_country'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -117,18 +117,18 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
         $config['id'] = 'customer_grid_carts_' . $customer->id;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'width' => 70, 'hidden' => true],
-            ['name' => 'session_id', 'label' => 'Session ID'],
-            ['name' => 'item_num', 'label' => 'Total Items'],
-            ['name' => 'item_qty', 'label' => 'Total Qty'],
-            ['name' => 'subtotal', 'label' => 'Sub Total', 'cell' => 'currency'],
-            ['name' => 'discount_amount', 'label' => 'Discount', 'cell' => 'currency'],
-            ['name' => 'grand_total', 'label' => 'Grand Total', 'cell' => 'currency'],
-            ['name' => 'shipping_method', 'label' => 'Shipping Method'],
-            ['name' => 'payment_method', 'label' => 'Payment Method'],
-            ['type' => 'input', 'name' => 'state_overall', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
+            ['name' => 'id', 'label' => (('ID')), 'width' => 70, 'hidden' => true],
+            ['name' => 'session_id', 'label' => (('Session ID'))],
+            ['name' => 'item_num', 'label' => (('Total Items'))],
+            ['name' => 'item_qty', 'label' => (('Total Qty'))],
+            ['name' => 'subtotal', 'label' => (('Sub Total')), 'cell' => 'currency'],
+            ['name' => 'discount_amount', 'label' => (('Discount')), 'cell' => 'currency'],
+            ['name' => 'grand_total', 'label' => (('Grand Total')), 'cell' => 'currency'],
+            ['name' => 'shipping_method', 'label' => (('Shipping Method'))],
+            ['name' => 'payment_method', 'label' => (('Payment Method'))],
+            ['type' => 'input', 'name' => 'state_overall', 'label' => (('Status')), 'editor' => 'select', 'editable' => true,
                   'options' => $this->Sellvana_Sales_Model_Cart->fieldOptions('state_overall')],
-            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'datetime'],
+            ['name' => 'create_at', 'label' => (('Created')), 'cell' => 'datetime'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],

@@ -12,8 +12,8 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected        $_permission     = 'system/roles';
     protected        $_modelClass     = 'FCom_Admin_Model_Role';
     protected        $_gridHref       = 'roles';
-    protected        $_gridTitle      = 'Roles and Permissions';
-    protected        $_recordName     = 'Role';
+    protected        $_gridTitle      = (('Roles and Permissions'));
+    protected        $_recordName     = (('Role'));
     protected        $_formTitleField = 'role_name';
     protected        $_formLayoutName = '/roles/form';
 
@@ -24,7 +24,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'width' => 85, 'buttons' => [['name' => 'edit']]],
-            ['name' => 'role_name', 'label' => 'Role Name', 'width' => 100],
+            ['name' => 'role_name', 'label' => (('Role Name')), 'width' => 100],
         ];
         $config['actions'] = [
             'delete' => true,
@@ -49,12 +49,12 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
             'mass_edit_type' => 'div',
             'columns'        => [
                 ['type' => 'row_select'],
-                ['name' => 'title', 'label' => 'Permission Name', 'width' => 100],
-                ['name' => 'path', 'label' => 'Permission Path', 'width' => 100],
+                ['name' => 'title', 'label' => (('Permission Name')), 'width' => 100],
+                ['name' => 'path', 'label' => (('Permission Path')), 'width' => 100],
                 [
                     'type'               => 'input',
                     'name'               => 'status',
-                    'label'              => "Status",
+                    'label'              => (("Status")),
                     'overflow'           => true,
                     'options'            => $this->FCom_Admin_Model_Role->fieldOptions('status'),
                     'width'              => 100,
@@ -70,7 +70,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
                 ['field' => 'status', 'type' => 'multiselect']
             ],
             'actions' => [
-                'edit' => ['caption' => 'Status']
+                'edit' => ['caption' => (('Status'))]
             ],
             'callbacks' => [
                 'componentDidMount' => 'permissionsGridMounted'

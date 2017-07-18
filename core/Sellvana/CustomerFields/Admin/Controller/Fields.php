@@ -20,7 +20,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
         $config = [
             'config' => [
                 'id' => 'fields',
-                'caption' => 'Fields',
+                'caption' => (('Fields')),
                 'orm' => $orm,
                 'data_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
                 'edit_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
@@ -36,43 +36,43 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                         //['name' => 'edit'],
                         ['name' => 'delete']
                     ]],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true],
+                    ['type' => 'input', 'name' => 'field_code', 'label' => (('Field Code')), 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true,
                             'unique' => $this->BApp->href('/customerfields/fields/unique_field')]],
-                    ['type' => 'input', 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'editable' => true, 'editor' => 'text',
+                    ['type' => 'input', 'name' => 'field_name', 'label' => (('Field Name')), 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
-                    ['type' => 'input', 'name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 100, 'editable' => true, 'editor' => 'text',
+                    ['type' => 'input', 'name' => 'frontend_label', 'label' => (('Frontend Label')), 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
-                    ['type' => 'input', 'name' => 'frontend_show', 'label' => 'Show on frontend', 'width' => 90,
+                    ['type' => 'input', 'name' => 'frontend_show', 'label' => (('Show on frontend')), 'width' => 90,
                             'editable' => true, 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                             'options' => $fld->fieldOptions('frontend_show'), 'editor' => 'select'],
-                    ['type' => 'input', 'name' => 'account_edit', 'label' => 'Use in account edit', 'width' => 70,
+                    ['type' => 'input', 'name' => 'account_edit', 'label' => (('Use in account edit')), 'width' => 70,
                             'editable' => true, 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                             'options' => $fld->fieldOptions('account_edit'), 'editor' => 'select'],
-                    ['type' => 'input', 'name' => 'register_form', 'label' => 'Use in register form', 'width' => 70,
+                    ['type' => 'input', 'name' => 'register_form', 'label' => (('Use in register form')), 'width' => 70,
                             'editable' => true, 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                             'options' => $fld->fieldOptions('register_form'), 'editor' => 'select'],
-                    ['type' => 'input', 'name' => 'sort_order', 'label' => 'Sort order', 'width' => 30, 'editable' => true, 'editor' => 'text',
+                    ['type' => 'input', 'name' => 'sort_order', 'label' => (('Sort order')), 'width' => 30, 'editable' => true, 'editor' => 'text',
                             /*'editor'=>'select',*/ 'validate' => 'number', 'addable' => true,
                             'multirow_edit' => true, 'validation' => ['required' => true]/*,
                             'options'=>range(0,20)*/],
                             /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
                                 'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
-                    ['type' => 'input', 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180, 'editor' => 'select',
+                    ['type' => 'input', 'name' => 'table_field_type', 'label' => (('DB Type')), 'width' => 180, 'editor' => 'select',
                             'addable' => true, 'editable' => true, 'validation' => ['required' => true], 'options' => $fld->fieldOptions('table_field_type')],
-                    ['type' => 'input', 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180,
+                    ['type' => 'input', 'name' => 'admin_input_type', 'label' => (('Input Type')), 'width' => 180,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'multirow_edit' => true,
                         'validation' => ['required' => true], 'options' => $fld->fieldOptions('admin_input_type')],
-                    ['type' => 'input', 'name' => 'num_options', 'label' => 'Options', 'width' => 30, 'default' => '0'],
-                    ['type' => 'input', 'name' => 'system', 'label' => 'System field', 'width' => 90, 'editable' => false, 'editor' => 'select',
-                         'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true], 'options' => ['0' => 'No', '1' => 'Yes']],
-                    ['type' => 'input', 'name' => 'multilanguage', 'label' => 'Multi Language', 'width' => 90,
+                    ['type' => 'input', 'name' => 'num_options', 'label' => (('Options')), 'width' => 30, 'default' => '0'],
+                    ['type' => 'input', 'name' => 'system', 'label' => (('System field')), 'width' => 90, 'editable' => false, 'editor' => 'select',
+                         'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true], 'options' => ['0' => (('No')), '1' => (('Yes'))]],
+                    ['type' => 'input', 'name' => 'multilanguage', 'label' => (('Multi Language')), 'width' => 90,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'multirow_edit' => true,
-                        'validation' => ['required' => true], 'options' => ['0' => 'No', '1' => 'Yes']],
-                    ['type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
+                        'validation' => ['required' => true], 'options' => ['0' => (('No')), '1' => (('Yes'))]],
+                    ['type' => 'input', 'name' => 'required', 'label' => (('Required')), 'width' => 90, 'editable' => true,
                         'editor' => 'select', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
-                        'options' => ['1' => 'Yes', '0' => 'No']],
+                        'options' => ['1' => (('Yes')), '0' => (('No'))]],
                 ],
                 'filters' => [
                     ['field' => 'field_code', 'type' => 'text'],
@@ -89,7 +89,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                 ],
                 'actions' => [
                     'add-field' => [
-                        'caption' => 'Add a field',
+                        'caption' => (('Add a field')),
                         'type' => 'button',
                         'id' => 'add-field-from-grid',
                         'class' => 'btn-primary',
@@ -113,7 +113,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
         $config = [
             'config' => [
                 'id' => 'options-grid',
-                'caption' => 'Fields',
+                'caption' => (('Fields')),
                 'dataUrl' => $this->BApp->href('customerfields/fields/field_option_grid_data?field_id='),
                 'data_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
                 'edit_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
@@ -121,8 +121,8 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                 'data_mode' => 'local',
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline',
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true],
+                    ['type' => 'input', 'name' => 'label', 'label' => (('Label')), 'width' => 300, 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
                     ['type' => 'btn_group',
                         'buttons' => [['name' => 'delete', 'noconfirm' => true]]
@@ -135,13 +135,13 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                 'actions' => [
                     //'new' => ['caption' => 'Insert New Option'],
                     'add-options' => [
-                        'caption' => 'Insert New Option',
+                        'caption' => (('Insert New Option')),
                         'type' => 'button',
                         'id' => 'add_new_field',
                         'class' => 'btn-primary',
                         'callback' => 'insertNewOption',
                     ],
-                    'delete' => ['caption' => 'Remove', 'confirm' => false]
+                    'delete' => ['caption' => (('Remove')), 'confirm' => false]
                 ],
                 'callbacks' => [
                     'componentDidMount' => 'optionsModalGridRegister'

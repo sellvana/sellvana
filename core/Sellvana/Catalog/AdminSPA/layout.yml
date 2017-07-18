@@ -114,7 +114,7 @@ sv-app-data-js:
 #            - [ addFormTab, { path: /catalog/products/form, name: merchandizing, label: Merchandizing, pos: 50 } ]
             - [ addFormTab, { path: /catalog/products/form, name: images, label: Images, pos: 60 } ]
 #            - [ addFormTab, { path: /catalog/products/form, name: videos, label: Videos, pos: 70 } ]
-            - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 80 } ]
+#            - [ addFormTab, { path: /catalog/products/form, name: layout, label: Layout, pos: 80 } ]
 #            - [ addFormTab, { path: /catalog/products/form, name: custom_views, label: Custom Views, pos: 90 } ]
 
 /catalog/inventory/form:

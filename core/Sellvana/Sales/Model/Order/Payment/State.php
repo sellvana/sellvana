@@ -7,9 +7,9 @@ class Sellvana_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_
         PROCESSOR = 'processor';
 
     protected $_stateLabels = [
-        self::OVERALL => 'Overall',
-        self::CUSTOM => 'Custom',
-        self::PROCESSOR => 'Processor',
+        self::OVERALL => (('Overall')),
+        self::CUSTOM => (('Custom')),
+        self::PROCESSOR => (('Processor')),
     ];
 
     /**
