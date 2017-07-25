@@ -1,9 +1,14 @@
 <div>
       <div class="f-control-panel">
+            <h1>{{ currentState }}</h1>
             <div class="f-control-panel__elem">
                   <div class="f-form-title"><p class="f-form-title__text hidden-xs">Upload and Import Products</p></div>
             </div>
       </div>
+      <sv-csv-imp-upload v-if="currentState == states.upload"></sv-csv-imp-upload>
+      <sv-csv-imp-configure v-if="currentState == states.configure"></sv-csv-imp-configure>
+      <sv-csv-imp-import v-if="currentState == states.import"></sv-csv-imp-import>
+      <sv-csv-imp-status v-if="currentState == states.status"></sv-csv-imp-status>
       <div class="f-content-block">
             <div class="f-steps-block">
 
