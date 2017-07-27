@@ -115,9 +115,9 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
         $cntTotal = $this->Sellvana_Email_Model_Mailing_ListRecipient->orm('lr')
 			->where('lr.list_id', $this->get('list_id'))
             ->join('Sellvana_Email_Model_Mailing_Subscriber', ['s.id', '=', 'lr.subscriber_id'], 's')
-			->left_outer_join('Sellvana_Email_Model_Pref', ['p.email', '=', 's.email'], 'p')
-			->where_raw('p.unsub_all is null or p.unsub_all=0')
-			->count();
+            ->left_outer_join('Sellvana_Email_Model_Pref', ['p.email', '=', 's.email'], 'p')
+            ->where_raw('p.unsub_all is null or p.unsub_all=0')
+            ->count();
         $this->set([
             'status' => 'R',
             'cnt_total' => $cntTotal,

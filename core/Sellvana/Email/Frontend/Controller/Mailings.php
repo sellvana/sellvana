@@ -40,7 +40,7 @@ class Sellvana_Email_Frontend_Controller_Mailings extends FCom_Frontend_Controll
         ])->save();
 
         $link->add('cnt_clicked')->save();
-		$campaign->add('cnt_clicked')->save();
+        $campaign->add('cnt_clicked')->save();
 
         $this->BResponse->redirect($link->get('link_href'));
     }
@@ -69,6 +69,8 @@ class Sellvana_Email_Frontend_Controller_Mailings extends FCom_Frontend_Controll
 		
 		$campaign->add('cnt_opened')->save();
 
+        $campaign->add('cnt_opened')->save();
+
         $clearPixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
         $this->BResponse->setContentType('image/png')->set($clearPixel);
     }
@@ -96,6 +98,8 @@ class Sellvana_Email_Frontend_Controller_Mailings extends FCom_Frontend_Controll
         ])->save();
 		
 		$campaign->add('cnt_unsub')->save();
+
+        $campaign->add('cnt_unsub')->save();
 
         $sub = $this->Sellvana_Email_Model_Mailing_Subscriber->load($recipient->get('subscriber_id'));
         $this->view('mailings/unsubscribe')->set('email', $sub->get('email'));
