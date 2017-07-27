@@ -4,8 +4,10 @@ define(['sv-mixin-common', 'vue-dropzone', 'text!sv-page-catalog-import-products
         mixins: [SvMixinCommon],
         data: function () {
             return {
-                upload_url: '/catalog/products/import/config',
+                upload_url: 'import-products/upload?type=product-import',
                 dropzone_options: {
+                    'paramName': 'upload',
+                    'uploadMultiple': true,
                     'acceptedFileTypes': 'text/txt,text/csv',
                     'maxFileSizeInMB': 100,
                     'autoProcessQueue': true,
