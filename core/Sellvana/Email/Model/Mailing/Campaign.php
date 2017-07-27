@@ -97,6 +97,10 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
                     'subscriber_id' => $subId,
                     'list_recipient_id' => $sub->id(),
                     'status' => 'P',
+					'email' => $sub->get('email'),
+					'firstname' => $sub->get('firstname'),
+					'lastname' => $sub->get('lastname'),
+					'company' => $sub->get('company'),
                 ]);
             }
             $rcpt[$subId]->sendEmail($this);

@@ -56,7 +56,7 @@ class Sellvana_Email_Model_Mailing_CampaignRecipient extends FCom_Core_Model_Abs
 
         try {
             $result = $this->BEmail->send([
-                'headers' => ['content-type' => 'Content-Type: text/html'],
+                'content-type' => 'text/html; charset=UTF-8',
                 'from' => '"' . $campaign->get('sender_name') . '" <' . $campaign->get('sender_email') . '>',
                 'to' => '"' . $this->get('firstname') . ' ' . $this->get('lastname') . '" <' . $this->get('email') . '>',
                 'subject' => $campaign->get('subject'),
@@ -118,7 +118,7 @@ class Sellvana_Email_Model_Mailing_CampaignRecipient extends FCom_Core_Model_Abs
 
     public function getTrackLinkUrl(Sellvana_Email_Model_Mailing_Link $link, Sellvana_Email_Model_Mailing_Campaign $campaign)
     {
-        return $this->BApp->frontendHref($this->BUtil->setUrlQuery('mailings/track_link', [
+        return $this->BApp->frontendHref($this->BUtil->setUrlQuery('mailings/link', [
             'link' => $link->get('unique_id'),
             'campaign' => $campaign->get('unique_id'),
             'recipient' => $this->get('unique_id'),
