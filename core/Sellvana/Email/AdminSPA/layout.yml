@@ -3,7 +3,7 @@
         do:
             - [ requireJs, sv-comp-dashboard-new-subscriptions-tpl, "@Sellvana_Email/AdminSPA/vue/component/dashboard/new-subscriptions.html" ]
 
-            - [ requireJs, sv-page-mailing-campaigns, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns  /index" ]
+            - [ requireJs, sv-page-mailing-campaigns, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/index" ]
             - [ requireJs, sv-page-mailing-campaigns-grid-config, "~/mailing/campaigns/grid_config" ]
             - [ requireJs, sv-page-mailing-campaigns-form, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/form" ]
             - [ requireJs, sv-page-mailing-campaigns-form-recipients, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/form/recipients" ]
