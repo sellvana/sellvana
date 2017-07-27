@@ -69,6 +69,8 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
             ->where('lr.list_id', $this->get('list_id'))
             ->join('Sellvana_Email_Model_Mailing_Subscriber', ['s.id', '=', 'lr.subscriber_id'], 's')
             ->left_outer_join('Sellvana_Email_Model_Mailing_CampaignRecipient', ['cr.list_recipient_id', '=', 'lr.id'], 'cr')
+            ->left_outer_join('Sellvana_Email_Model_Pref', ['p.email', '=', 's.email'], 'p')
+            ->where_raw('p.unsub_all is null or p')
             ->where_raw("cr.status is null or cr.status='P'")
             ->select(['lr.*', 's.email', 's.firstname', 's.lastname', 's.company'])
             ->limit(100)
@@ -97,6 +99,7 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
                     'subscriber_id' => $subId,
                     'list_recipient_id' => $sub->id(),
                     'status' => 'P',
+					'unique_id' => $this->BUtil->randomString(16),
 					'email' => $sub->get('email'),
 					'firstname' => $sub->get('firstname'),
 					'lastname' => $sub->get('lastname'),

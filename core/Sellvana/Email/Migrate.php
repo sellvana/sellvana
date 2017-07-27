@@ -267,6 +267,7 @@ class Sellvana_Email_Migrate extends BClass
                 'list_recipient_id' => 'int unsigned',
                 'campaign_recipient_id' => 'int unsigned',
                 'event_type' => 'varchar(20)',
+                'remote_ip' => 'varchar(20)',
                 'data_serialized' => 'text',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',

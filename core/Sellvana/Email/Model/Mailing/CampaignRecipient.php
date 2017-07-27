@@ -43,6 +43,12 @@ class Sellvana_Email_Model_Mailing_CampaignRecipient extends FCom_Core_Model_Abs
         );
         $body = preg_replace_callback('#\{\{[\'"](.*?)[\'"]\s*\|\s*track_link\s*\}\}#', function ($m) use ($campaign) {
             $links = $campaign->get('links');
+            if (!$links) {
+                $links = $this->Sellvana_Email_Model_Mailing_Link->orm()
+                    ->where('campaign_id', $campaign->id())
+                    ->find_many_assoc('link_href');
+                $campaign->set('links', $links);
+            }
             $url = $m[1];
             if (empty($links[$url])) {
                 $links[$url] = $this->Sellvana_Email_Model_Mailing_Link->create([
