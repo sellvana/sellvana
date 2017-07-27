@@ -3,10 +3,31 @@
         do:
             - [ requireJs, sv-comp-dashboard-new-subscriptions-tpl, "@Sellvana_Email/AdminSPA/vue/component/dashboard/new-subscriptions.html" ]
 
+            - [ requireJs, sv-page-mailing-campaigns, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns  /index" ]
+            - [ requireJs, sv-page-mailing-campaigns-grid-config, "~/mailing/campaigns/grid_config" ]
+            - [ requireJs, sv-page-mailing-campaigns-form, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/form" ]
+            - [ requireJs, sv-page-mailing-campaigns-form-recipients, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/form/recipients" ]
+            - [ requireJs, sv-page-mailing-campaigns-form-status, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/form/status" ]
+            - [ requireJs, sv-page-mailing-campaigns-form-status-tpl, "@Sellvana_Email/AdminSPA/vue/page/mailing/campaigns/form/status.html" ]
+
+            - [ requireJs, sv-page-mailing-lists, "@Sellvana_Email/AdminSPA/vue/page/mailing/lists/index" ]
+            - [ requireJs, sv-page-mailing-lists-grid-config, "~/mailing/lists/grid_config" ]
+            - [ requireJs, sv-page-mailing-lists-form, "@Sellvana_Email/AdminSPA/vue/page/mailing/lists/form" ]
+            - [ requireJs, sv-page-mailing-lists-form-recipients, "@Sellvana_Email/AdminSPA/vue/page/mailing/lists/form/recipients" ]
+
 sv-app-data-js:
     - view: app
         do:
             - [ addNav, { path: /customers/email-prefs, label: Email Subscriptions, link: /customers/email-prefs, pos: 50 } ]
+            - [ addNav, { path: /mailing, label: Mailings, pos: 45, icon: icon-mailings } ]
+            - [ addNav, { path: /mailing/lists, label: Lists, link: /mailing/lists, pos: 10 } ]
+            - [ addNav, { path: /mailing/campaigns, label: Campaigns, link: /mailing/campaigns, pos: 20 } ]
+
+            - [ addRoute, { path: /mailing/campaigns, require: [ sv-page-mailing-campaigns, text!sv-page-default-grid-tpl, json!sv-page-mailing-campaigns-grid-config ] } ]
+            - [ addRoute, { path: /mailing/campaigns/form, require: [ sv-page-mailing-campaigns-form, text!sv-page-default-form-tpl ] } ]
+
+            - [ addRoute, { path: /mailing/lists, require: [ sv-page-mailing-lists, text!sv-page-default-grid-tpl, json!sv-page-mailing-lists-grid-config ] } ]
+            - [ addRoute, { path: /mailing/lists/form, require: [ sv-page-mailing-lists-form, text!sv-page-default-form-tpl ] } ]
 
 sv-page-dashboard-config:
     - view: dashboard
@@ -20,3 +41,17 @@ sv-page-dashboard-config:
                   callback: Sellvana_Email_AdminSPA_Dashboard.widgetNewSubscriptions
                   container_class: col-md-3
 
+
+/mailing/campaigns/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /mailing/campaigns/form, name: main, label: "Campaign Information", pos: 10, component: default } ]
+            - [ addFormTab, { path: /mailing/campaigns/form, name: recipients, label: "Recipients", pos: 20 } ]
+            - [ addFormTab, { path: /mailing/campaigns/form, name: status, label: "Status", pos: 30 } ]
+
+/mailing/lists/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /mailing/lists/form, name: main, label: "Mailing List Information", pos: 10, component: default } ]
+            - [ addFormTab, { path: /mailing/lists/form, name: recipients, label: "Recipients", pos: 20 } ]
+            - [ addFormTab, { path: /mailing/lists/form, name: import, label: "Import Subscribers", pos: 30, component: default } ]

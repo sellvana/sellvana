@@ -137,7 +137,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             'cancel_state_overall' => $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels(),
         ];
 
-        $form['items_grid_config'] = $this->applyGridPersonalization($this->normalizeGridConfig($this->getItemsGridConfig()));
+        $form['items_grid_config'] = $this->getNormalizedGridConfig($this->getItemsGridConfig());
         $form['payment_methods'] = $this->_getPaymentMethods();
         $form['shipping_methods'] = $this->_getShippingMethods();
 
@@ -348,7 +348,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $itemStateDeliveryOptions = $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels();
         $itemStateCustomOptions = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
 
-        return [
+        $config = [
             'id' => 'order_items',
             'columns' =>  [
                 ['type' => 'row-select'],
@@ -370,6 +370,10 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                 ['name' => 'delete', 'label' => (('Delete Items'))],
             ],
         ];
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['config' => &$config]);
+
+        return $config;
     }
 
     public function action_form_data__POST()

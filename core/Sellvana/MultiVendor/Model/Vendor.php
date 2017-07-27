@@ -20,8 +20,12 @@ class Sellvana_MultiVendor_Model_Vendor extends FCom_Core_Model_Abstract
         'notify_type' => 'realtime',
     ];
 
-    public function vendorOptions()
+    public function vendorOptions($includeEmpty = true)
     {
-        return ['' => ''] + $this->orm()->order_by_asc('vendor_name')->find_many_assoc('id', 'vendor_name');
+        $options = $this->orm()->order_by_asc('vendor_name')->find_many_assoc('id', 'vendor_name');
+        if ($includeEmpty) {
+            $options = ['' => ''] + $options;
+        }
+        return $options;
     }
 }

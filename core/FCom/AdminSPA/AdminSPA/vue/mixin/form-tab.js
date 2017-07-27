@@ -7,6 +7,7 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-mixin-common', 'sv-comp-form-field',
         components: {
             'sv-comp-form-field': SvCompFormField
         },
+        props: ['form', 'tab'],
         data: function () {
             return {
                 i18n_field: false
@@ -86,6 +87,15 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-mixin-common', 'sv-comp-form-field',
                 result = eval(cond);
 
                 return result;
+            },
+            onEvent: function (eventType, args) {
+                switch (eventType) {
+                    case 'panel-action':
+                        this.doPanelAction(args);
+
+                    default:
+                        this.$emit('event', eventType, args);
+                }
             }
         }
     };

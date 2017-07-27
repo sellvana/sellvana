@@ -3,7 +3,7 @@ define(['lodash', 'vue', 'text!sv-comp-form-catalog-prices-tpl', 'inline-param']
         template: pricesTpl,
         props: {
             options: { type: Object },
-            prices: { type: Object },
+            prices: { type: Array },
             view_mode : { type: String, default: 'table' }
         },
         data: function () {

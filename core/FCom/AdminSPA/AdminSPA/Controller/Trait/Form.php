@@ -28,6 +28,15 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         $this->respond($result);
     }
 
+    public function onBeforeFormDataPost($args)
+    {
+        return $this;
+    }
+
+    public function onAfterFormDataPost($args)
+    {
+        return $this;
+    }
 
     public function action_form_data__POST()
     {
@@ -37,9 +46,13 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         $recordName = static::$_recordName;
         try {
             $data = $this->BRequest->post($modelName);
-            $modelId = (int)$data['id'];
+            $modelId = !empty($data['id']) ? (int)$data['id'] : null;
             $eventName =  "{$this->origClass()}::action_form_data_POST";
-            $this->BEvents->fire("{$eventName}:before", ['data' => &$data, 'model_id' => &$modelId]);
+
+            $args = ['data' => &$data, 'model_id' => &$modelId];
+            $this->onBeforeFormDataPost($args);
+            $this->BEvents->fire("{$eventName}:before", $args);
+
             if ($modelId) {
                 $model = $this->{$modelClass}->load($modelId);
                 if (!$model) {
@@ -49,8 +62,17 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                 $model = $this->{$modelClass}->create();
             }
             $model->set($data)->save();
-            $this->BEvents->fire("{$eventName}:after", ['data' => $data, 'model' => $model]);
-            $this->ok()->addMessage($recordName . ' has been updated', 'success');
+
+            $args = ['data' => $data, 'model' => $model];
+            $this->onAfterFormDataPost($args);
+            $this->BEvents->fire("{$eventName}:after", $args);
+
+            $this->ok();
+            if ($modelId) {
+                $this->addMessage($this->_((('%s has been updated')), $recordName), 'success');
+            } else {
+                $this->addMessage($this->_((('%s has been created')), $recordName), 'success');
+            }
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -73,7 +95,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                 throw new BException('Invalid ' . $recordName .' ID');
             }
             $model->delete();
-            $this->ok()->addMessage($recordName .' has been deleted', 'success');
+            $this->ok()->addMessage($this->_((('%s has been deleted')), $recordName), 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
         }
