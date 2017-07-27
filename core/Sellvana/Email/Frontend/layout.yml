@@ -10,4 +10,4 @@ base:
     - { hook: main, views: subscription/email-subscribe }
 
 /mailings/unsubscribe:
-    - { root: mailings/unsubscribed }
+    - { root: mailings/unsubscribe }

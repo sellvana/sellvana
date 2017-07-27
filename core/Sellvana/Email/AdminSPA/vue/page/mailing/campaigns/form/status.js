@@ -50,18 +50,8 @@ define(['sv-mixin-form-tab', 'text!sv-page-mailing-campaigns-form-status-tpl'], 
                 })
             }
         },
-        watch: {
-            tab: function (tab) {
-console.log(tab);
-                if (tab === 'status') {
-                    //if (this.form.campaign.status === 'R') {
-                    this.progressTimer = setTimeout(this.checkProgress, 3000);
-                    //}
-                } else {
-                    clearTimeout(this.progressTimer);
-                    this.progressTimer = false;
-                }
-            }
+        created: function () {
+			this.progressTimer = setTimeout(this.checkProgress, 3000);
         },
         beforeDestroy: function () {
             if (this.progressTimer) {

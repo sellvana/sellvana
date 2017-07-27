@@ -68,10 +68,10 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
         return $this->Sellvana_Email_Model_Mailing_ListRecipient->orm('lr')
             ->where('lr.list_id', $this->get('list_id'))
             ->join('Sellvana_Email_Model_Mailing_Subscriber', ['s.id', '=', 'lr.subscriber_id'], 's')
-            ->left_outer_join('Sellvana_Email_Model_Mailing_CampaignRecipient', ['cr.list_recipient_id', '=', 'lr.id'], 'cr')
+            ->left_outer_join('Sellvana_Email_Model_Mailing_CampaignRecipient', ['cr.subscriber_id', '=', 's.id'], 'cr')
             ->left_outer_join('Sellvana_Email_Model_Pref', ['p.email', '=', 's.email'], 'p')
-            ->where_raw('p.unsub_all is null or p')
-            ->where_raw("cr.status is null or cr.status='P'")
+            ->where_raw('p.unsub_all is null')//TODO: OR unsub_all=0
+            ->where_raw("cr.status is null")//TODO: OR cr.status='P'
             ->select(['lr.*', 's.email', 's.firstname', 's.lastname', 's.company'])
             ->limit(100)
             ->find_many_assoc('subscriber_id');
@@ -94,7 +94,7 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
          */
         foreach ($subs as $subId => $sub) {
             if (empty($rcpts[$subId])) {
-                $rcpt[$subId] = $rcptHlp->create([
+                $rcpts[$subId] = $rcptHlp->create([
                     'campaign_id' => $this->id(),
                     'subscriber_id' => $subId,
                     'list_recipient_id' => $sub->id(),
@@ -106,13 +106,18 @@ class Sellvana_Email_Model_Mailing_Campaign extends FCom_Core_Model_Abstract
 					'company' => $sub->get('company'),
                 ]);
             }
-            $rcpt[$subId]->sendEmail($this);
+            $rcpts[$subId]->sendEmail($this);
         }
     }
 
     public function start()
     {
-        $cntTotal = $this->Sellvana_Email_Model_Mailing_ListRecipient->orm()->where('list_id', $this->get('list_id'))->count();
+        $cntTotal = $this->Sellvana_Email_Model_Mailing_ListRecipient->orm('lr')
+			->where('lr.list_id', $this->get('list_id'))
+            ->join('Sellvana_Email_Model_Mailing_Subscriber', ['s.id', '=', 'lr.subscriber_id'], 's')
+			->left_outer_join('Sellvana_Email_Model_Pref', ['p.email', '=', 's.email'], 'p')
+			->where_raw('p.unsub_all is null or p.unsub_all=0')
+			->count();
         $this->set([
             'status' => 'R',
             'cnt_total' => $cntTotal,

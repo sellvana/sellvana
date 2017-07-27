@@ -20,11 +20,12 @@ class Sellvana_Email_Model_Mailing_ListRecipient extends FCom_Core_Model_Abstrac
 
     public function importAsTextCsv($listId, $textCsv)
     {
+		$sep = strpos($textCsv, "\t") !== false ? "\t" : ',';
         $lines = str_getcsv($textCsv, "\n");
         unset($textCsv);
         $rows = [];
         foreach ($lines as $line) {
-            $rows[] = str_getcsv($line);
+            $rows[] = str_getcsv($line, $sep);
         }
         unset($lines);
         $emails = array_column($rows, 0);
