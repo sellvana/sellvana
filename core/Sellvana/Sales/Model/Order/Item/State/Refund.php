@@ -8,10 +8,10 @@ class Sellvana_Sales_Model_Order_Item_State_Refund extends Sellvana_Sales_Model_
         REFUNDED = 'refunded';
 
     protected $_valueLabels = [
-        self::NONE => 'None',
-        self::PROCESSING => 'Processing',
-        self::PARTIAL => 'Partial',
-        self::REFUNDED => 'Refunded',
+        self::NONE => (('None')),
+        self::PROCESSING => (('Processing')),
+        self::PARTIAL => (('Partial')),
+        self::REFUNDED => (('Refunded')),
     ];
 
     protected $_defaultMethods = [

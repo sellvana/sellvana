@@ -19,11 +19,11 @@ class Sellvana_CatalogFields_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'catalog_fields' => 'Catalog Custom Fields'
+            'catalog_fields' => (('Catalog Custom Fields'))
         ]);
 
         $this->FCom_Core_Model_Field->registerFieldType('product', [
-            'label' => 'Products',
+            'label' => (('Products')),
             'class' => 'Sellvana_CatalogFields_Model_ProductField',
         ]);
     }

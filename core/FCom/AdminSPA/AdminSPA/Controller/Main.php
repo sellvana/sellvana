@@ -94,7 +94,7 @@ EOT;
         $path = preg_replace('#[^a-zA-Z0-9_/-]#', '', $path);
 
         if (!$path) {
-            $this->BResponse->status(404, 'Template not found', 'Template not found');
+            $this->BResponse->status(404, (('Template not found')), 'Template not found');
             return;
         }
         $view = $this->view('components/' . $path);
@@ -108,7 +108,7 @@ EOT;
         return;
 
 //        if (!$path) {
-//            $result = ['error' => true, 'message' => $this->_('Invalid path')];
+//            $result = ['error' => true, 'message' => $this->_(('Invalid path'))];
 //        } else {
 //            $view = $this->view('components/' . $path);
 //            $args = $this->BRequest->request('args');

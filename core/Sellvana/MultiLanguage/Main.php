@@ -16,8 +16,8 @@ class Sellvana_MultiLanguage_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_MultiLanguage' => 'Multi Language Settings',
-            'translations' => 'Translations',
+            'settings/Sellvana_MultiLanguage' => (('Multi Language Settings')),
+            'translations' => (('Translations')),
         ]);
 
     }

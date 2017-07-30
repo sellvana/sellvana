@@ -12,17 +12,17 @@ class Sellvana_Catalog_AdminSPA_Controller_Products_Categories extends FCom_Admi
     public function getGridConfig()
     {
         $prodId = $this->BRequest->get('id');
-        $bool = [0 => 'no', 1 => 'Yes'];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
         return [
             'id' => 'product_categories',
             'data_url' => 'products/form/categories/grid_data?id=' . $prodId,
             'columns' => [
                 ['type' => 'row-select', 'width' => 55],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 55, 'hidden' => true],
-                ['name' => 'node_name', 'label' => 'Category Name', 'index' => 'c.node_name', 'width' => 100],
-                ['name' => 'position', 'label' => 'Position', 'index' => 'c.position', 'hidden' => true],
-                ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at', 'width' => 100, 'cell' => 'datetime'],
-                ['name' => 'update_at', 'label' => 'Updated', 'index' => 'c.update_at', 'width' => 100, 'cell' => 'datetime'],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'c.id', 'width' => 55, 'hidden' => true],
+                ['name' => 'node_name', 'label' => (('Category Name')), 'index' => 'c.node_name', 'width' => 100],
+                ['name' => 'position', 'label' => (('Position')), 'index' => 'c.position', 'hidden' => true],
+                ['name' => 'create_at', 'label' => (('Created')), 'index' => 'c.create_at', 'width' => 100, 'cell' => 'datetime'],
+                ['name' => 'update_at', 'label' => (('Updated')), 'index' => 'c.update_at', 'width' => 100, 'cell' => 'datetime'],
             ],
             'filters' => [
                 ['name' => 'id', 'type' => 'number'],

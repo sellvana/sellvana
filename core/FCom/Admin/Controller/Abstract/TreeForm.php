@@ -22,7 +22,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     public function action_tree_data()
     {
         if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
             return;
         }
 
@@ -105,19 +105,19 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                         $node->cacheSaveDirty();
                         $result['id'] = $child->id();
                     } else {
-                        $result = ['status' => 0, 'message' => $this->_("Can't create node duplicate name node.")];
+                        $result = ['status' => 0, 'message' => $this->_(("Can't create node duplicate name node."))];
                     }
                     break;
 
                 case 'rename_node':
                     if ($node->id() < 2) {
-                        throw new BException($this->_("Can't rename root"));
+                        throw new BException($this->_(("Can't rename root")));
                     }
                     if ($node->validateNodeName($r->post('title'))) {
                         $node->rename($r->post('title'), true);
                         $node->cacheSaveDirty();
                     } else {
-                        $result = ['status' => 0, 'message' => $this->_("Can't rename duplicate name node.")];
+                        $result = ['status' => 0, 'message' => $this->_(("Can't rename duplicate name node."))];
                     }
 
                     break;
@@ -225,7 +225,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
                 $model->save();
                 $model->refreshDescendants(true, true);
-                $result = ['status' => 'success', 'message' => 'Node updated', 'path' => $model->full_name];
+                $result = ['status' => 'success', 'message' => (('Node updated')), 'path' => $model->full_name];
             } else {
                 $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $result = ['status' => 'error', 'message' => $this->getErrorMessages()];

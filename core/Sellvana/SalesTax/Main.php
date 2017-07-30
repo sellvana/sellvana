@@ -19,12 +19,12 @@ class Sellvana_SalesTax_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'sales/tax' => 'Sales Tax',
-            'sales/tax/zones' => 'Sales Tax Zones',
-            'sales/tax/rules' => 'Sales Tax Rules',
-            'sales/tax/product_classes' => 'Sales Tax Product Classes',
-            'sales/tax/customer_classes' => 'Sales Tax Customer Classes',
-            'settings/Sellvana_SalesTax' => 'Sales Tax Settings',
+            'sales/tax' => (('Sales Tax')),
+            'sales/tax/zones' => (('Sales Tax Zones')),
+            'sales/tax/rules' => (('Sales Tax Rules')),
+            'sales/tax/product_classes' => (('Sales Tax Product Classes')),
+            'sales/tax/customer_classes' => (('Sales Tax Customer Classes')),
+            'settings/Sellvana_SalesTax' => (('Sales Tax Settings')),
         ]);
     }
 

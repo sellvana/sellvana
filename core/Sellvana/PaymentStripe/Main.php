@@ -15,7 +15,7 @@ class Sellvana_PaymentStripe_Main extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_PaymentStripe' => 'Payment Stripe Settings',
+            'settings/Sellvana_PaymentStripe' => (('Payment Stripe Settings')),
         ]);
     }
 }

@@ -47,12 +47,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'status' => [
-            'A' => 'Active',
-            'I' => 'Inactive',
+            'A' => (('Active')),
+            'I' => (('Inactive')),
         ],
         'is_superadmin' => [
-            '0' => 'No',
-            '1' => 'Yes',
+            '0' => (('No')),
+            '1' => (('Yes')),
         ],
     ];
 
@@ -62,11 +62,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['username', '@required'],
-        ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
-        ['username', 'BValidate::ruleFieldUnique', 'An account with this user name already exists'],
+        ['username', '/^[A-Za-z0-9._@-]{1,255}$/', (('Username allowed characters are letters, numbers, dot, underscore, hyphen and @'))],
+        ['username', 'BValidate::ruleFieldUnique', (('An account with this user name already exists'))],
         ['email', '@required'],
         ['email', '@email'],
-        ['email', 'BValidate::ruleFieldUnique', 'An account with this email address already exists'],
+        ['email', 'BValidate::ruleFieldUnique', (('An account with this email address already exists'))],
         ['password', 'FCom_Admin_Model_User::validatePasswordSecurity'],
 
         //array('is_superadmin', '@integer'),
@@ -94,8 +94,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function statusOptions()
     {
         return [
-            static::STATUS_ACTIVE => 'Active',
-            static::STATUS_INACTIVE => 'Inactive',
+            static::STATUS_ACTIVE => (('Active')),
+            static::STATUS_INACTIVE => (('Inactive')),
         ];
     }
 
@@ -190,7 +190,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         $password = $data[$args['field']];
         if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
-            return $this->_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
+            return $this->_(('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.'));
         }
         return true;
     }

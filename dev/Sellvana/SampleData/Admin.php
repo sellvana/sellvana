@@ -15,7 +15,7 @@ class Sellvana_SampleData_Admin extends BClass
 
     public function bootstrap()
     {
-        $this->FCom_Admin_Model_Role->createPermission(['sample_data' => 'Install Sample Data']);
+        $this->FCom_Admin_Model_Role->createPermission(['sample_data' => (('Install Sample Data'))]);
     }
 
     public function loadProducts()

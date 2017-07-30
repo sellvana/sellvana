@@ -27,14 +27,14 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $config = [
             'grid' => [
                 'id'      => 'product_fieldsets',
-                'caption' => 'Field Sets',
+                'caption' => (('Field Sets')),
                 'url' => $this->BApp->href('catalogfields/fieldsets/grid_data'),
                 'orm' => 'FCom_Core_Model_FieldsetField',
                 'columns' => [
-                    'id' => ['label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true],
-                    'set_code' => ['label' => 'Set Code', 'width' => 100, 'editable' => true],
-                    'set_name' => ['label' => 'Set Name', 'width' => 200, 'editable' => true],
-                    'num_fields' => ['label' => 'Fields', 'width' => 30],
+                    'id' => ['label' => (('ID')), 'width' => 55, 'sorttype' => 'number', 'key' => true],
+                    'set_code' => ['label' => (('Set Code')), 'width' => 100, 'editable' => true],
+                    'set_name' => ['label' => (('Set Name')), 'width' => 200, 'editable' => true],
+                    'num_fields' => ['label' => (('Fields')), 'width' => 30],
                 ],
                 'actions' => [
                     'edit' => true,
@@ -91,19 +91,19 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $config = [
             'config' => [
                 'id' => 'variable-field-grid',
-                'caption' => 'Variable Field Grid',
+                'caption' => (('Variable Field Grid')),
                 'data_mode' => 'local',
                 'data' => ($data === null ? [] : $data),
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'name', 'label' => 'Field Name', 'width' => 300],
-                    ['name' => 'field_code', 'label' => 'Field Code', 'width' => 300],
-                    ['name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 300],
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true],
+                    ['name' => 'name', 'label' => (('Field Name')), 'width' => 300],
+                    ['name' => 'field_code', 'label' => (('Field Code')), 'width' => 300],
+                    ['name' => 'frontend_label', 'label' => (('Frontend Label')), 'width' => 300],
                     ['type' => 'btn_group',  'buttons' => [['name' => 'delete']]]
                 ],
                 'actions' => [
-                   'delete' => ['caption' => 'Remove']
+                   'delete' => ['caption' => (('Remove'))]
                 ],
                 'grid_before_create' => 'variantFieldGriddleRegister',
                 'callbacks' => [
@@ -131,7 +131,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                     ['name' => 'edit-custom', 'callback' => 'showModalToEditVariantPrice', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "]
                 ]
             ],
-            ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
+            ['name' => 'id', 'label' => (('ID')), 'width' => 30, 'hidden' => true, 'position' => 1]
         ];
 
         //$vFields = $model->getData('variants_fields');
@@ -175,11 +175,11 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 #var_dump($columns); exit;
         }
         $image = $this->variantImageGrid($product);
-        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => '', 'attrs' => ['readOnly' => 'readOnly']];
-        $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
-        $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
+        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => (('Variant SKU')), 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => (('Inventory SKU')), 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => (('PRICE')), 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => '', 'attrs' => ['readOnly' => 'readOnly']];
+        $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => (('QTY')), 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
+        $columns[] = ['name' => 'image', 'label' => (('IMAGES')), 'width' => 250, 'display' => 'eval',
             'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"variant-image\" style=\"width: 100%\"><option value></option></select>"' ];
         $columns[] = ['name' => 'variant_file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
@@ -235,7 +235,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $config = [
             'config' => [
                 'id' => 'variant-grid-' . $product->id(),
-                'caption' => 'Variable Field Grid',
+                'caption' => (('Variable Field Grid')),
                 'data_mode' => 'local',
                 'data' => $data,
                 'columns' => $columns,
@@ -243,8 +243,8 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                     '_quick' => ['expr' => 'field_name like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
-                    'new' => ['caption' => 'New Variant'],
-                    'delete' => ['caption' => 'Remove']
+                    'new' => ['caption' => (('New Variant'))],
+                    'delete' => ['caption' => (('Remove'))]
                 ],
                 'grid_before_create' => 'variantGriddleRegister',
                 'callbacks' => [
@@ -386,10 +386,10 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             $res = $hlp->load($prodId, 'product_id');
             if (!$res) {
                 $hlp->create(['product_id' => $prodId, '_data_serialized' => $json])->save();
-                $status = 'Successfully saved.';
+                $status = (('Successfully saved.'));
             } else {
                 $res->set('_data_serialized', $json)->save();
-                $status = 'Successfully updated.';
+                $status = (('Successfully updated.'));
             }
         } catch (Exception $e) {
             $status = false;

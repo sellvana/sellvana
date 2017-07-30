@@ -934,13 +934,13 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getStateInfo()
     {
-        $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($this->get('grand_total'), 'base')
-            . ' | ' . $this->_('Overall Status') . ': ' . $this->state()->overall()->getValueLabel()
-            . ' | ' . $this->_('Payment') . ': ' . $this->state()->payment()->getValueLabel()
-            . ' | ' . $this->_('Delivery') . ': ' . $this->state()->delivery()->getValueLabel();
+        $info = $this->_(('Grand Total')) . ': ' . $this->BLocale->currency($this->get('grand_total'), 'base')
+            . ' | ' . $this->_(('Overall Status')) . ': ' . $this->state()->overall()->getValueLabel()
+            . ' | ' . $this->_(('Payment')) . ': ' . $this->state()->payment()->getValueLabel()
+            . ' | ' . $this->_(('Delivery')) . ': ' . $this->state()->delivery()->getValueLabel();
         $customState = $this->state()->custom()->getValueLabel();
         if ($customState) {
-            $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
+            $info .= ' | ' . $this->_(('Custom Status')) . ' ' . $customState;
         }
 
         return $info;
@@ -952,7 +952,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         if (!empty($this->shipments())) {
             foreach ($this->shipments() as $shipment) {
                 $itemsInShipment = [
-                    'label' => $this->_('Shipment') . ' #' . $shipment->id() . ' (' . $this->_($shipment->state()->overall()->getValue()) . ')',
+                    'label' => $this->_(('Shipment')) . ' #' . $shipment->id() . ' (' . $this->_($shipment->state()->overall()->getValue()) . ')',
                     'items' => [],
                 ];
                 foreach ($shipment->items() as $sItem) {
@@ -964,7 +964,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         if (!empty($this->getShippableItems())) {
             $itemGroups[] = [
-                'label' => $this->_('Pending items'),
+                'label' => $this->_(('Pending items')),
                 'items' => $this->getShippableItems(),
             ];
         }
@@ -978,7 +978,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         if (!empty($virtualItems)) {
             $itemGroups[] = [
-                'label' => $this->_('Virtual items'),
+                'label' => $this->_(('Virtual items')),
                 'items' => $virtualItems
             ];
         }

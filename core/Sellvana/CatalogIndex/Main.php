@@ -222,13 +222,13 @@ class Sellvana_CatalogIndex_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_CatalogIndex' => 'Product Indexing Settings',
-            'catalog_index' => 'Product Indexing',
+            'settings/Sellvana_CatalogIndex' => (('Product Indexing Settings')),
+            'catalog_index' => (('Product Indexing')),
         ]);
 
         $this->addIndexer('builtin', [
             'class' => 'Sellvana_CatalogIndex_Indexer',
-            'label' => 'Built-in',
+            'label' => (('Built-in')),
         ]);
     }
 
@@ -286,7 +286,7 @@ class Sellvana_CatalogIndex_Main extends BClass
 
         // create categories / subcategories
         if ($params['c']) {
-            echo $this->_('<p>Creating categories...</p>');
+            echo $this->_(('<p>Creating categories...</p>'));
             /** @var Sellvana_Catalog_Model_Category $root */
             $root = $this->Sellvana_Catalog_Model_Category->load(1);
             for ($i = 1; $i <= $params['c']; $i++) {
@@ -294,7 +294,7 @@ class Sellvana_CatalogIndex_Main extends BClass
             }
         }
         if ($params['s']) {
-            echo $this->_('<p>Creating subcategories...</p>');
+            echo $this->_(('<p>Creating subcategories...</p>'));
             //$root = $this->Sellvana_Catalog_Model_Category->load(1);
             /** @var Sellvana_Catalog_Model_Category[] $cats */
             $cats = $this->Sellvana_Catalog_Model_Category->orm()->where('parent_id', 1)->find_many();
@@ -308,7 +308,7 @@ class Sellvana_CatalogIndex_Main extends BClass
         // create products
         $products = [];
         if ($params['p']) {
-            echo $this->_('<p>Creating products and inventory...</p>');
+            echo $this->_(('<p>Creating products and inventory...</p>'));
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
@@ -366,7 +366,7 @@ class Sellvana_CatalogIndex_Main extends BClass
 
         // assign products to categories
         if (true) {
-            echo $this->_('<p>Assigning products to categories...</p>');
+            echo $this->_(('<p>Assigning products to categories...</p>'));
 
             $tCategoryProduct = $this->Sellvana_Catalog_Model_CategoryProduct->table();
             $this->BDb->run("TRUNCATE {$tCategoryProduct}");
@@ -392,7 +392,7 @@ class Sellvana_CatalogIndex_Main extends BClass
 
         // reindex products
         if ($params['r']) {
-            echo $this->_('<p>Reindexing...</p>');
+            echo $this->_(('<p>Reindexing...</p>'));
 
             echo "<pre>Starting...\n";
             if ($params['r'] === 2) {
@@ -413,7 +413,7 @@ class Sellvana_CatalogIndex_Main extends BClass
                 'feed' => 'local',
                 'type' => 'progress',
                 'group' => 'catalog_indexing',
-                'content' => 'Task Running',
+                'content' => (('Task Running')),
                 'code' => "catalog_indexing",
             ];
         }

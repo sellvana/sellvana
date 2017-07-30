@@ -27,7 +27,7 @@ class Sellvana_Customer_Frontend_Controller_Account extends FCom_Frontend_Contro
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
         $this->layout('/customer/account');
         $this->view('customer/account')->set('customer', $customer);
-        $crumbs[] = ['label' => 'Account', 'active' => true];
+        $crumbs[] = ['label' => (('Account')), 'active' => true];
         $this->view('breadcrumbs')->set('crumbs', $crumbs);
     }
 

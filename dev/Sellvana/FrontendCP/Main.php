@@ -12,8 +12,8 @@ class Sellvana_FrontendCP_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'frontendcp' => 'Frontend Control Panel',
-            'frontendcp/edit' => 'Edit Page Content',
+            'frontendcp' => (('Frontend Control Panel')),
+            'frontendcp/edit' => (('Edit Page Content')),
         ]);
     }
 

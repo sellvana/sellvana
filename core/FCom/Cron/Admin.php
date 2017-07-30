@@ -13,7 +13,7 @@ class FCom_Cron_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/FCom_Cron' => 'Cron Settings',
+            'settings/FCom_Cron' => (('Cron Settings')),
         ]);
     }
 }

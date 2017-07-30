@@ -7,12 +7,12 @@ class Sellvana_Sales_Admin_Controller_Report_Hour extends FCom_Admin_Controller_
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Sales_Model_Order';
-    protected $_recordName = 'Order';
+    protected $_recordName = (('Order'));
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/hour';
     protected $_gridHref = 'sales/report/hour';
-    protected $_gridTitle = 'Hour';
+    protected $_gridTitle = (('Hour'));
 
 
     public function gridConfig()
@@ -46,18 +46,18 @@ class Sellvana_Sales_Admin_Controller_Report_Hour extends FCom_Admin_Controller_
     protected function _getFieldLabels()
     {
         return [
-            'hour' => 'Hour',
+            'hour' => (('Hour')),
             'pc_total_amount' => '% of Total',
             'order_count' => '# of Orders',
             'total_item_qty' => '# of Items',
-            'total_subtotal' => 'Subtotal',
-            'total_tax' => 'Tax',
-            'total_shipping' => 'Shipping',
-            'total_discount' => 'Discounts',
-            'total_amount' => 'Total',
-            'total_received' => 'Received',
-            'total_refunded' => 'Refunded',
-            'create_at' => 'Created',
+            'total_subtotal' => (('Subtotal')),
+            'total_tax' => (('Tax')),
+            'total_shipping' => (('Shipping')),
+            'total_discount' => (('Discounts')),
+            'total_amount' => (('Total')),
+            'total_received' => (('Received')),
+            'total_refunded' => (('Refunded')),
+            'create_at' => (('Created')),
         ];
     }
 

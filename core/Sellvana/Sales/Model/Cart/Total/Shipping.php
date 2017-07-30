@@ -8,7 +8,7 @@
 class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'shipping';
-    protected $_label = 'Shipping & Handling';
+    protected $_label = (('Shipping & Handling'));
     protected $_cartField = 'shipping_price';
     protected $_sortOrder = 40;
 

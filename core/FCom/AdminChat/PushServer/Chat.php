@@ -31,7 +31,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         //$this->_client->send($this->_message);
         $user = $this->FCom_Admin_Model_User->load($this->_message['user'], 'username');
         if (!$user) {
-            $this->reply(['signal' => 'error', 'description' => 'Unknown username']);
+            $this->reply(['signal' => 'error', 'description' => (('Unknown username'))]);
             return;
         }
         $chat = $this->FCom_AdminChat_Model_Chat->openWithUser($user);
@@ -72,7 +72,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $chat = $this->FCom_AdminChat_Model_Chat->findByChannel($chan);
         $channel = $this->FCom_PushServer_Model_Channel->getChannel($chan);
         if (!$chat) {
-            $channel->send(['signal' => 'error', 'description' => 'Chat not found']);
+            $channel->send(['signal' => 'error', 'description' => (('Chat not found'))]);
             return;
         }
         $user = $this->FCom_Admin_Model_User->sessionUser();

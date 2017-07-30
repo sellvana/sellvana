@@ -14,9 +14,9 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
 
     protected $_gridHref = 'orderstatecustom';
     protected $_modelClass = 'Sellvana_Sales_Model_StateCustom';
-    protected $_gridTitle = 'Order Custom States';
+    protected $_gridTitle = (('Order Custom States'));
     protected $_gridLayoutName = '/orderstatecustom';
-    protected $_recordName = 'Custom State';
+    protected $_recordName = (('Custom State'));
     protected $_mainTableAlias = 'oscs';
     protected $_formViewPrefix = 'order/customstates-form/';
 
@@ -32,13 +32,13 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
                 ['name' => 'edit'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'id', 'index' => 'oscs.id', 'label' => 'ID', 'width' => 40],
-            ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85,
+            ['name' => 'id', 'index' => 'oscs.id', 'label' => (('ID')), 'width' => 40],
+            ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => (('Entity Type')),'width' => 85,
                 'addable'=>true,'editable' => true, 'editor' => 'select', 'options' => $entityTypes,
                 'validation' => ['required' => true]],
-            ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true,
+            ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => (('Code')), 'width' =>  150, 'addable'=>true,
                 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-            ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true,
+            ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => (('Label')) ,'width' => 150, 'addable'=>true,
                 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
         ];
 

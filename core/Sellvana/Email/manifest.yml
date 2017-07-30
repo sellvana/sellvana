@@ -1,6 +1,6 @@
 modules:
     Sellvana_Email:
-        version: 0.6.0.0
+        version: 0.6.1.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.3 } }
         translations: { en: en.php }
@@ -26,8 +26,22 @@ modules:
 
             FCom_AdminSPA:
                 auto_use: [ layout ]
+                routing:
+                    - [ /mailing/campaigns/?.action, Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns ]
+                    - [ /mailing/campaigns/recipients/?.action, Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns_Recipients ]
+                    - [ /mailing/campaigns/links/?.action, Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns_Links ]
+
+                    - [ /mailing/lists/?.action, Sellvana_Email_AdminSPA_Controller_Mailing_Lists ]
+                    - [ /mailing/lists/recipients/?.action, Sellvana_Email_AdminSPA_Controller_Mailing_Lists_Recipients ]
+
+                    - [ /mailing/events/?.action, Sellvana_Email_AdminSPA_Controller_Mailing_Events ]
+                security:
+                    request_fields_whitelist:
+                        /mailing/campaigns/form_data:
+                            POST/campaign/template_html: "*"
 
             FCom_Frontend:
                 routing:
                     - [ /email/pref, Sellvana_Email_Frontend_Controller.pref ]
                     - [ /email/subscribe, Sellvana_Email_Frontend_Controller.subscribe ]
+                    - [ /mailings/?.action, Sellvana_Email_Frontend_Controller_Mailings ]

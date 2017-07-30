@@ -38,7 +38,7 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
         $layout->getView('catalog/compare')->set('products', $products);
 
         $layout->getView('breadcrumbs')->set('crumbs', ['home',
-            ['label' => 'Compare ' . sizeof($products) . ' products', 'active' => true]
+            ['label' => $this->_((('Compare %s products')), sizeof($products)), 'active' => true]
         ]);
     }
 
@@ -139,7 +139,7 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
         $response = [];
         $id = $this->BRequest->get('id');
         if (null == $id) {
-            $message = $this->_("Provide product to add.");
+            $message = $this->_(("Provide product to add."));
             $response['error'] = $message;
         } else {
             /** @var Sellvana_ProductCompare_Model_Set $set */
@@ -149,7 +149,7 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
             if (!empty($productDetails)) {
                 $response['product'] = $productDetails;
             } else {
-                $response['error'] = $this->_("There was problem adding product to compare");
+                $response['error'] = $this->_(("There was problem adding product to compare"));
             }
         }
 
@@ -161,7 +161,7 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
         $response = [];
         $id = $this->BRequest->get('id');
         if (null == $id) {
-            $message = $this->_("Provide product to remove.");
+            $message = $this->_(("Provide product to remove."));
             $response['error'] = $message;
             return;
         } else {
@@ -169,9 +169,9 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
             $set = $this->Sellvana_ProductCompare_Model_Set->sessionSet(true);
             $rm = $set->rmItem($id);
             if ($rm) {
-                $response['success'] = $this->_("Product removed from compare");
+                $response['success'] = $this->_(("Product removed from compare"));
             } else {
-                $response['error'] = $this->_("There was problem removing product from compare");
+                $response['error'] = $this->_(("There was problem removing product from compare"));
             }
         }
 

@@ -28,24 +28,24 @@ class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_
 
     protected $_valueLabels = [
         self::NA => 'N/A',
-        self::PENDING => 'Pending',
-        self::EXT_REDIRECTED => 'External Redirected',
-        self::EXT_RETURNED => 'External Returned',
-        self::ROOT_ORDER => 'Root Order', // not authorization or charge, a master payment to create authorizations from it
-        self::AUTHORIZING => 'Authorizing', // while in process
-        self::AUTHORIZED => 'Authorized',
-        self::REAUTHORIZED => 'Re-Authorized',
-        self::REFUSED => 'Refused',
-        self::EXPIRED => 'Expired',
-        self::CAPTURED => 'Captured',
-        self::PARTIAL_CAPTURED => 'Partial Captured',
-        self::DECLINED => 'Declined',
-        self::ERROR => 'Error',
-        self::CHARGEBACK => 'Charged Back',
-        self::REFUNDED => 'Refunded',
-        self::PARTIAL_REFUNDED => 'Partial Refunded',
-        self::VOID => 'Void',
-        self::CANCELED => 'Canceled',
+        self::PENDING => (('Pending')),
+        self::EXT_REDIRECTED => (('External Redirected')),
+        self::EXT_RETURNED => (('External Returned')),
+        self::ROOT_ORDER => (('Root Order')), // not authorization or charge, a master payment to create authorizations from it
+        self::AUTHORIZING => (('Authorizing')), // while in process
+        self::AUTHORIZED => (('Authorized')),
+        self::REAUTHORIZED => (('Re-Authorized')),
+        self::REFUSED => (('Refused')),
+        self::EXPIRED => (('Expired')),
+        self::CAPTURED => (('Captured')),
+        self::PARTIAL_CAPTURED => (('Partial Captured')),
+        self::DECLINED => (('Declined')),
+        self::ERROR => (('Error')),
+        self::CHARGEBACK => (('Charged Back')),
+        self::REFUNDED => (('Refunded')),
+        self::PARTIAL_REFUNDED => (('Partial Refunded')),
+        self::VOID => (('Void')),
+        self::CANCELED => (('Canceled')),
     ];
 
     protected $_defaultMethods = [

@@ -89,7 +89,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             $cfg[] = ['navButtonAdd',
                 'caption' => '',
                 //'modal' => true,
-                'title' => 'Customize Columns',
+                'title' => (('Customize Columns')),
                 'buttonicon' => 'ui-icon-calculator',
                 'onClickButton' => "function() { $('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
             ];
@@ -117,7 +117,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             }";
             $cfg[] = ['navButtonAdd',
                 'caption' => '',
-                'title' => 'Customize Columns',
+                'title' => (('Customize Columns')),
                 'buttonicon' => 'ui-icon-calculator',
                 'onClickButton' => "function() {
                     jQuery('#{$cfg['grid']['id']}').jqGrid('columnChooser', {
@@ -274,7 +274,7 @@ $('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'" . addslashes($cfg['custom
             }
             $cfg[] = ['navButtonAdd',
                 'caption' => '',
-                'title' => 'Export to CSV',
+                'title' => (('Export to CSV')),
                 'buttonicon' => 'ui-icon-copy',
                 'onClickButton' => "function() {
                     $('body').append('<iframe src=\"{$exportUrl}\" display=\"none\"></iframe');

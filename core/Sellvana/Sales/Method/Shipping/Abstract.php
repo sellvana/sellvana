@@ -287,7 +287,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         }
 
         if (empty($data['customer_context'])) {
-            $data['customer_context'] = 'Sellvana Rates Request';
+            $data['customer_context'] = (('Sellvana Rates Request'));
         }
 
         if (empty($data['services'])) {
@@ -339,7 +339,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
      */
     protected function _fetchRates($data)
     {
-        return ['error' => true, 'message' => 'Not implemented'];
+        return ['error' => true, 'message' => (('Not implemented'))];
     }
 
     /**
@@ -370,7 +370,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
      */
     public function fetchTrackingUpdates($args)
     {
-        return ['error' => true, 'message' => 'Not implemented'];
+        return ['error' => true, 'message' => (('Not implemented'))];
     }
 
     /**

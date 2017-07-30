@@ -115,9 +115,9 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
                 $review->notify();
             }
 
-            $successMessage = $this->_('Thank you for your review!');
+            $successMessage = $this->_(('Thank you for your review!'));
             if ($needApprove && $valid) {
-                $successMessage = $this->_('Thank you for your review! We will check and approve this review promptly.');
+                $successMessage = $this->_(('Thank you for your review! We will check and approve this review promptly.'));
             }
 
             if ($this->BRequest->xhr()) { //ajax request
@@ -151,14 +151,14 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
         }
 
         if (empty($post['rid'])) {
-            $this->BResponse->json(['error' => 'Invalid id']);
+            $this->BResponse->json(['error' => (('Invalid id'))]);
             return;
         }
 
         if (!empty($post['review_helpful'])) {
             $review = $this->Sellvana_ProductReviews_Model_Review->load($post['rid']);
             if (!$review) {
-                $this->BResponse->json(['error' => 'Invalid id']);
+                $this->BResponse->json(['error' => (('Invalid id'))]);
                 return;
             }
             $mark = 0;
@@ -180,7 +180,7 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
                 $review->helpful($mark, false);
                 $record->set('helpful', $mark)->save();
             } else {
-                $this->BResponse->json(['error' => "You've already rated this review"]);
+                $this->BResponse->json(['error' => (("You've already rated this review"))]);
             }
 
 
@@ -235,11 +235,11 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
         if ($r->xhr()) {
             $pid = $r->param('pid', true);
             if (!$pid) {
-                $this->BDebug->error($this->_('Invalid ID'));
+                $this->BDebug->error($this->_(('Invalid ID')));
                 die;
             }
             if (!($product = $this->Sellvana_Catalog_Model_Product->load($pid))) {
-                $this->BDebug->error($this->_('Cannot load product with this id'));
+                $this->BDebug->error($this->_(('Cannot load product with this id')));
                 die;
             }
             $reviews = $product->reviews();
@@ -310,9 +310,9 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
             $pr->set($post['review'])->save();
             //$pr->notify(); //todo: confirm about send notify
         }
-        $successMessage = $this->_('Your review updates have been submitted.');
+        $successMessage = $this->_(('Your review updates have been submitted.'));
         if ($needApprove) {
-            $successMessage = $this->_('Your review updates have been submitted. The changes will be visible as soon as they are approved.');
+            $successMessage = $this->_(('Your review updates have been submitted. The changes will be visible as soon as they are approved.'));
         }
         if ($this->BRequest->xhr()) { //ajax request
             if ($valid) {

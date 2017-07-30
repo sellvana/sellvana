@@ -26,21 +26,21 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
 
     protected static $_fieldOptions = [
         'transaction_type' => [
-            self::SALE => 'Sale',
-            self::ORDER => 'Order',
-            self::AUTHORIZATION => 'Authorization',
-            self::REAUTHORIZATION => 'Re-Authorization',
-            self::CAPTURE => 'Capture',
-            self::REFUND => 'Refund',
-            self::VOID => 'Void',
+            self::SALE => (('Sale')),
+            self::ORDER => (('Order')),
+            self::AUTHORIZATION => (('Authorization')),
+            self::REAUTHORIZATION => (('Re-Authorization')),
+            self::CAPTURE => (('Capture')),
+            self::REFUND => (('Refund')),
+            self::VOID => (('Void')),
         ],
 
         'transaction_status' => [
-            self::PENDING => 'Pending',
-            self::STARTED => 'Started',
-            self::COMPLETED => 'Completed',
-            self::VOID => 'Void',
-            self::EXPIRED => 'Expired',
+            self::PENDING => (('Pending')),
+            self::STARTED => (('Started')),
+            self::COMPLETED => (('Completed')),
+            self::VOID => (('Void')),
+            self::EXPIRED => (('Expired')),
         ],
     ];
 

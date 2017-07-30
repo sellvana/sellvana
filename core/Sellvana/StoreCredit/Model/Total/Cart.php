@@ -8,7 +8,7 @@
 class Sellvana_StoreCredit_Model_Total_Cart extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
     protected $_code      = 'store_credit';
-    protected $_label     = 'Store Credit';
+    protected $_label     = (('Store Credit'));
     protected $_cartField = 'store_credit';
     protected $_sortOrder = 110;
 

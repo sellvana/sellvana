@@ -198,7 +198,7 @@ class FCom_Core_ImportExport extends BClass
             $fe = $this->_getWriteHandle($toFile);
         } catch (BException $e) {
             $this->log([
-                'msg' => $this->_('Could not open file for writing, aborting export.'),
+                'msg' => $this->_(('Could not open file for writing, aborting export.')),
                 'data' => [
                     'file' => $toFile,
                 ],
@@ -231,7 +231,7 @@ class FCom_Core_ImportExport extends BClass
             $user = $this->getUser();
             if ($user && $user->getPermission($model) == false) {
                 $this->log([
-                    'msg' => $this->_('Cannot export model, permission denied.'),
+                    'msg' => $this->_(('Cannot export model, permission denied.')),
                     'data' => [
                         'user' => $this->getUser()->get('username'),
                         'model' => $model,
@@ -240,7 +240,7 @@ class FCom_Core_ImportExport extends BClass
                 continue;
             } elseif (empty($user)) {
                 $this->log([
-                    'msg' => $this->_('Please re-login'),
+                    'msg' => $this->_(('Please re-login')),
                 ], 'error');
                 break;
             }
@@ -256,7 +256,7 @@ class FCom_Core_ImportExport extends BClass
                 $sample = $this->BDb->ddlFieldInfo($model::table());
             } catch(Exception $e) {
                 $this->log([
-                    'msg' => $this->_('Error retrieving table fields info'),
+                    'msg' => $this->_(('Error retrieving table fields info')),
                     'data' => [
                         'model' => $model,
                         'table' => $model::table(),
@@ -348,7 +348,7 @@ class FCom_Core_ImportExport extends BClass
 
         if (!$fi) {
             $this->log([
-                'msg' => $this->_("Could not find file to import"),
+                'msg' => $this->_(("Could not find file to import")),
                 'data' => ['file_name' => $fromFile],
             ], 'error');
             return false;
@@ -361,7 +361,7 @@ class FCom_Core_ImportExport extends BClass
         $batchData = [];
         $this->log([
             'signal' => 'start',
-            'msg' => $this->_("Import started."),
+            'msg' => $this->_(("Import started.")),
             'data' => ['file_name' => $fromFile]
         ], 'info');
 
@@ -387,7 +387,7 @@ class FCom_Core_ImportExport extends BClass
 
         if (!feof($fi)) {
             $this->log([
-                'msg' => $this->_("Error: unexpected file fail"),
+                'msg' => $this->_(("Error: unexpected file fail")),
                 'line' => $line,
                 'cnt' => $cnt,
             ], 'error');
@@ -486,7 +486,7 @@ class FCom_Core_ImportExport extends BClass
                 if ($this->getUser()->getPermission($cm) == false) {
                     $this->_canImport = false;
                     $this->log([
-                        'msg' => $this->_('Permission denied.'),
+                        'msg' => $this->_(('Permission denied.')),
                         'data' => [
                             'user' => $this->getUser()->get('username'),
                             'model' => $model,
@@ -499,7 +499,7 @@ class FCom_Core_ImportExport extends BClass
                 $this->_changedModelsIds = [];
                 $this->log([
                     'signal' => 'info',
-                    'msg' => "Importing: {$cm}",
+                    'msg' => $this->_((("Importing: %s")), $cm),
                     'data' => ['start_model' => $cm]
                 ], 'info');
                 if (!isset($this->_importModels[$cm])) {
@@ -532,7 +532,7 @@ class FCom_Core_ImportExport extends BClass
                 }
                 if (!$this->_currentConfig) {
                     $this->log([
-                        'msg' => $msg = $this->_("Could not find I/E config for model."),
+                        'msg' => $msg = $this->_(("Could not find I/E config for model.")),
                         'data' => [
                             'model' => $cm,
                         ],
@@ -591,7 +591,7 @@ class FCom_Core_ImportExport extends BClass
             if ($cnt % $bs === 0) {
                 $this->log([
                     'signal' => 'info',
-                    'msg' => $this->_("Importing %s rows", $cnt),
+                    'msg' => $this->_((("Importing %s rows")), $cnt),
                     'data' => [
                         'current_model' => $this->_currentModel,
                         'models_statistics' => $this->_modelsStatistics[$this->_currentModel],
@@ -618,11 +618,11 @@ class FCom_Core_ImportExport extends BClass
 
         $this->log([
             'signal' => 'finished',
-            'msg'    => "Done in: " . round(microtime(true) - $start) . " sec.",
+            'msg'    => $this->_((("Done in: %s sec.")), round(microtime(true) - $start)),
             'data'   => [
-                'new_models'     => $this->_("Created %d new models", $this->_newModels),
-                'updated_models' => $this->_("Updated %d models", $this->_updatedModels),
-                'not_changed'    => $this->_("No changes for %d models", $this->_notChanged),
+                'new_models'     => $this->_((("Created %d new models")), $this->_newModels),
+                'updated_models' => $this->_((("Updated %d models")), $this->_updatedModels),
+                'not_changed'    => $this->_((("No changes for %d models")), $this->_notChanged),
                 'models_statistics' => $this->_modelsStatistics
             ]
         ], 'info');
@@ -695,7 +695,7 @@ class FCom_Core_ImportExport extends BClass
             if (!isset($data[$this->_currentModelIdField])) {
                 $this->_errors++;
                 $this->log([
-                    'msg' => $this->_("Invalid data"),
+                    'msg' => $this->_(("Invalid data")),
                     'data' => [
                         'id' => $id,
                         'row' => $data,
@@ -826,7 +826,7 @@ class FCom_Core_ImportExport extends BClass
             } catch (PDOException $e) {
                 //$this->BDebug->logException($e);
                 $this->log([
-                    'msg' => $this->_("Exception during batch process"),
+                    'msg' => $this->_(("Exception during batch process")),
                     'data' => [
                         'msg' => $e->getMessage(),
                         'config' => $this->_currentConfig,
@@ -847,7 +847,7 @@ class FCom_Core_ImportExport extends BClass
                 }
             } else {
                 $this->log([
-                    'msg' => $this->_("Invalid model"),
+                    'msg' => $this->_(("Invalid model")),
                     'data' => [
                         'id' => $id,
                         'row' => $ieData,
@@ -929,7 +929,7 @@ class FCom_Core_ImportExport extends BClass
     {
         if (isset($this->_tempSorted[$name])) {
             $this->log([
-                'msg' => $this->_("Circular reference"),
+                'msg' => $this->_(("Circular reference")),
                 'data' => [
                     'name' => $name,
                 ],
@@ -958,7 +958,7 @@ class FCom_Core_ImportExport extends BClass
 
                         if (!isset($tmpModel)) {
                             $this->log([
-                                'msg' => $this->_("Could not find valid configuration for model"),
+                                'msg' => $this->_(("Could not find valid configuration for model")),
                                 'data' => [
                                     'model' => $node,
                                 ],
@@ -1002,7 +1002,7 @@ class FCom_Core_ImportExport extends BClass
 
             if (!$written) { // if written is false or 0, there has been an error writing.
                 $this->log([
-                    'msg' => $this->_("Writing failed"),
+                    'msg' => $this->_(("Writing failed")),
                     'data' => [
                         'line' => $line,
                     ],
@@ -1196,7 +1196,7 @@ class FCom_Core_ImportExport extends BClass
         } else {
             $path = $this->getFullPath($toFile);
             if (!$path) {
-                throw new BException($this->_("Could not obtain export location."));
+                throw new BException($this->_(("Could not obtain export location.")));
             }
             if (!$this->BUtil->isPathWithinRoot($path, '@random_dir')) {
                 throw new BException('Invalid file location');
@@ -1250,12 +1250,12 @@ class FCom_Core_ImportExport extends BClass
                     $importID = $meta[static::STORE_UNIQUE_ID_KEY];
                     $this->log([
                         'signal' => 'info',
-                        'msg' => "Store id: $importID",
+                        'msg' => $this->_((("Store id: %s")), $importID),
                         'data' => ['store_id' => $importID],
                     ]);
                 } else {
                     $this->log([
-                        'msg' => $this->_("Unique store id is not found, using default as key"),
+                        'msg' => $this->_(("Unique store id is not found, using default as key")),
                         'data' => [
                             'id' => $importID
                         ]

@@ -11,7 +11,7 @@ class Sellvana_Wishlist_Admin_Controller_Report_WishlistItems extends FCom_Admin
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/wishlist_items';
     protected $_gridHref = 'catalog/report/wishlist_items';
-    protected $_gridTitle = 'Products in Wishlists';
+    protected $_gridTitle = (('Products in Wishlists'));
 
     public function gridConfig()
     {
@@ -42,17 +42,17 @@ class Sellvana_Wishlist_Admin_Controller_Report_WishlistItems extends FCom_Admin
     protected function _getFieldLabels()
     {
         return [
-            'create_at' => 'Date Added',
-            'days_in_wishlist' => 'Days in Wishlist',
-            'customer_name' => 'Customer Name',
-            'customer_group' => 'Customer Group',
-            'status' => 'Wishlist Status',
-            'wishlist_id' => 'Wishlist ID',
-            'product_name' => 'Product Name',
-            'product_sku' => 'Product SKU',
-            'comment' => 'Comment',
-            'qty_in_wishlist' => 'Qty in Wishlist',
-            'qty_in_stock' => 'Qty in Stock',
+            'create_at' => (('Date Added')),
+            'days_in_wishlist' => (('Days in Wishlist')),
+            'customer_name' => (('Customer Name')),
+            'customer_group' => (('Customer Group')),
+            'status' => (('Wishlist Status')),
+            'wishlist_id' => (('Wishlist ID')),
+            'product_name' => (('Product Name')),
+            'product_sku' => (('Product SKU')),
+            'comment' => (('Comment')),
+            'qty_in_wishlist' => (('Qty in Wishlist')),
+            'qty_in_stock' => (('Qty in Stock')),
         ];
     }
 

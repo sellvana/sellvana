@@ -27,7 +27,7 @@ class Sellvana_Feedback_Controller extends FCom_Core_Controller_Abstract
                 throw new Exception('Server error (' . $info['headers']['status'] . ')');
             }
         } catch (Exception $e) {
-            $result['msg'] = 'Sending Feedback: ' . $e->getMessage();
+            $result['msg'] = $this->_((('Sending Feedback: ')), $e->getMessage());
             $result['error'] = true;
         }
         if ($r->xhr()) {

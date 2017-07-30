@@ -18,7 +18,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_AdminLiveFeed' => 'Admin Live Feed Settings',
+            'settings/Sellvana_AdminLiveFeed' => (('Admin Live Feed Settings')),
         ]);
     }
 
@@ -47,7 +47,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                     'href' => 'catalog/products/form?id=' . $model->id(),
                     'content' => $this->_(
-                        'New %s of products have been added to catalog',
+                        (('New %s of products have been added to catalog')),
                         '#' . $model->id()
                     ),
                 ]);
@@ -64,7 +64,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_newsletter')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'content' => $model->email . ' ' . $this->_('has subscribed to newsletter'),
+                'content' => $model->email . ' ' . $this->_(('has subscribed to newsletter')),
             ]);
         }
     }
@@ -127,7 +127,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
             'href' => 'orders/form/?id=' . $order->id(),
             'content' => $this->_(
-                'Order #%s has been placed by %s',
+                (('Order #%s has been placed by %s')),
                 [$order->get('unique_id'), $order->fullName('billing')]
             ),
         ]);
@@ -140,7 +140,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         }
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'content' => $this->_('The term %s has been searched', $args['query']),
+                'content' => $this->_((('The term %s has been searched')), $args['query']),
             ]);
         }
     }
@@ -154,7 +154,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_wishlist')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'content' => $this->_('Item %s has been added to a wishlist', $model->product_name),
+                'content' => $this->_((('Item %s has been added to a wishlist')), $model->product_name),
             ]);
         }
     }

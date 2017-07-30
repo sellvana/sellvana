@@ -5,7 +5,7 @@ class Sellvana_MultiCurrency_RateProvider_YahooFinance extends Sellvana_MultiCur
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_label = 'Yahoo Finance';
+    protected $_label = (('Yahoo Finance'));
 
     protected $_apiUrl = 'http://quote.yahoo.com/d/quotes.csv';
 

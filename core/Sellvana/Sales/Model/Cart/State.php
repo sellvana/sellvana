@@ -6,8 +6,8 @@ class Sellvana_Sales_Model_Cart_State extends FCom_Core_Model_Abstract_State_Con
         PAYMENT = 'payment';
 
     protected $_stateLabels = [
-        self::OVERALL => 'Overall',
-        self::PAYMENT => 'Payment',
+        self::OVERALL => (('Overall')),
+        self::PAYMENT => (('Payment')),
     ];
 
     /**

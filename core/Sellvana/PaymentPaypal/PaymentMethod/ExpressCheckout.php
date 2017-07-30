@@ -11,7 +11,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
     protected static $_apiVersion = '72.0';
 
     protected $_code = 'paypal_express';
-    protected $_name = 'PayPal Express Checkout';
+    protected $_name = (('PayPal Express Checkout'));
 
     protected $_transaction;
 
@@ -115,23 +115,23 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
 
         $result = ['token' => $token, 'payer_id' => $payerId];
         if (!$this->BSession->get('last_order_id')) {
-            $result['error']['message'] = 'Session Expired';
+            $result['error']['message'] = (('Session Expired'));
             $this->_setErrorStatus($result, true);
             return $result;
         }
         if ($token !== $this->BSession->get('paypal/token')) {
-            $result['error']['message'] = 'Invalid PayPal Return Token';
+            $result['error']['message'] = (('Invalid PayPal Return Token'));
             $this->_setErrorStatus($result, true);
             return $result;
         }
         $payment = $this->Sellvana_Sales_Model_Order_Payment->load($token, 'transaction_token');
         if (!$payment) {
-            $result['error']['message'] = 'Payment associated with the token is not found';
+            $result['error']['message'] = (('Payment associated with the token is not found'));
             $this->_setErrorStatus($result, true);
             return $result;
         }
         if ($payment->get('order_id') !== $this->BSession->get('last_order_id')) {
-            $result['error']['message'] = "Order doesn't match the payment token";
+            $result['error']['message'] = (("Order doesn't match the payment token"));
             $this->_setErrorStatus($result, true);
             return $result;
         }
@@ -146,7 +146,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $r = $result['response'];
         $checkoutStatus = strtoupper($r['CHECKOUTSTATUS']);
         if ($checkoutStatus === 'PAYMENTACTIONCOMPLETED') {
-            $result['error']['message'] = "Order has been already paid";
+            $result['error']['message'] = (("Order has been already paid"));
             $this->_setErrorStatus($result, true);
             return $result;
         }
@@ -213,7 +213,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $this->_saveResultToTransaction($transaction, $result['response'], 0);
 
         if (!$transaction->getData('result/success')) {
-            $result['error']['message'] = "Your payment has not been accepted by PayPal";
+            $result['error']['message'] = (("Your payment has not been accepted by PayPal"));
             $this->Sellvana_Sales_Main->workflowAction('customerFailsCheckoutPayment', [
                 'payment' => $payment,
                 'transaction' => $transaction,
@@ -242,8 +242,8 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $config = $this->getConfig();
         $payment = $transaction->payment();
         if (!$config['multiple_auth'] && $transaction->get('amount') < $payment->get('amount_due')) {
-            $str = 'You can authorize only the whole amount because multiple authorization mode is disabled. ';
-            $str .= 'If you are sure that your account supports multiple authorizations, enable it in the settings.';
+            $str = (('You can authorize only the whole amount because multiple authorization mode is disabled. '));
+            $str .= (('If you are sure that your account supports multiple authorizations, enable it in the settings.'));
             $result = [
                 'error' => ['message' => $this->_($str)]
             ];
@@ -302,7 +302,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $this->_saveResultToTransaction($transaction, $result['response']);
 
         if (empty($result['success'])) {
-            $result['error']['message'] = "Your payment has not been accepted by PayPal";
+            $result['error']['message'] = (("Your payment has not been accepted by PayPal"));
             $this->Sellvana_Sales_Main->workflowAction('customerFailsCheckoutPayment', [
                 'payment' => $transaction->payment(),
             ]);
@@ -495,7 +495,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         }
 
         if (empty($result['response']['PAYERID'])) {
-            $result['error']['message'] = 'Payment action could not be initiated';
+            $result['error']['message'] = (('Payment action could not be initiated'));
         }
         return $result;
     }
@@ -638,7 +638,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $totalsAmount = (float)$order->get("shipping_price") + (float)$order->get("tax_amount");
         $roundDiff = round($payment->get("amount_due") - $itemsTotal - $totalsAmount, 2);
         if ($payment->get("amount_due") != ($itemsTotal + $totalsAmount) && $roundDiff != 0) {
-            $request["L_{$p}NAME{$i}"] = $this->_('Rounding correction');
+            $request["L_{$p}NAME{$i}"] = $this->_(('Rounding correction'));
             $request["L_{$p}AMT{$i}"] = $roundDiff;
             $request["L_{$p}QTY{$i}"] = 1;
             $request["L_{$p}TAXAMT{$i}"] = 0;
@@ -696,7 +696,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         $responseRaw = $this->BUtil->remoteHttp('GET', $this->getConfig('api_url'), $request, [], ['timeout' => 30]);
 
         if (!$responseRaw) {
-            return ['request' => $request, 'response' => false, 'error' => ['message' => 'No response from gateway']];
+            return ['request' => $request, 'response' => false, 'error' => ['message' => (('No response from gateway'))]];
         }
 
         parse_str($responseRaw, $response);

@@ -9,11 +9,11 @@ class Sellvana_Sales_Model_Order_Item_State_Cancel extends Sellvana_Sales_Model_
         CANCELED = 'canceled';
 
     protected $_valueLabels = [
-        self::NONE => 'None',
-        self::REQUESTED => 'Requested',
-        self::PROCESSING => 'Processing',
-        self::PARTIAL => 'Partial',
-        self::CANCELED => 'Canceled',
+        self::NONE => (('None')),
+        self::REQUESTED => (('Requested')),
+        self::PROCESSING => (('Processing')),
+        self::PARTIAL => (('Partial')),
+        self::CANCELED => (('Canceled')),
     ];
 
     protected $_defaultValue = self::NONE;

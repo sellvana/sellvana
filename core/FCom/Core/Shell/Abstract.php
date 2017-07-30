@@ -59,7 +59,7 @@ abstract class FCom_Core_Shell_Abstract extends BClass
 
     public function getLongHelp()
     {
-        return 'Help for this action is not available';
+        return (('Help for this action is not available'));
     }
 
     public function getAvailOptions()

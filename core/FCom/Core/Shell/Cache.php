@@ -23,7 +23,7 @@ class FCom_Core_Shell_Cache extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Cache management';
+        return (('Cache management'));
     }
 
     public function getLongHelp()

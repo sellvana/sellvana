@@ -71,7 +71,7 @@ class Sellvana_ProductReviews_Migrate extends BClass
         if (!$hlp->load('avg_rating', 'field_name')) {
             $hlp->create([
                 'field_name' => 'avg_rating',
-                'field_label' => 'Average Rating',
+                'field_label' => (('Average Rating')),
                 'field_type' => 'varchar',
                 'weight' => 0,
                 'source_type' => 'callback',
@@ -131,7 +131,7 @@ class Sellvana_ProductReviews_Migrate extends BClass
         if (!$hlp->load('avg_rating', 'field_name')) {
             $hlp->create([
                 'field_name' => 'avg_rating',
-                'field_label' => 'Average Rating',
+                'field_label' => (('Average Rating')),
                 'field_type' => 'varchar',
                 'weight' => 0,
                 'source_type' => 'callback',

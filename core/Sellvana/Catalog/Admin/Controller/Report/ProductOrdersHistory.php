@@ -11,7 +11,7 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory extends FCom
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/product_orders_history';
     protected $_gridHref = 'catalog/report/inventory/product_orders_history';
-    protected $_gridTitle = 'Product Orders History';
+    protected $_gridTitle = (('Product Orders History'));
 
     public function gridConfig()
     {
@@ -38,12 +38,12 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory extends FCom
     protected function _getFieldLabels()
     {
         return [
-            'create_at' => 'Order Date',
-            'product_sku' => 'SKU',
-            'unique_id' => 'Order #',
-            'qty_ordered' => 'Qty of ordered',
-            'price' => 'Unit Price',
-            'row_price' => 'Row Total',
+            'create_at' => (('Order Date')),
+            'product_sku' => (('SKU')),
+            'unique_id' => (('Order #')),
+            'qty_ordered' => (('Qty of ordered')),
+            'price' => (('Unit Price')),
+            'row_price' => (('Row Total')),
         ];
     }
 

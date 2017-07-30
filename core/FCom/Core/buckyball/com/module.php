@@ -312,10 +312,10 @@ class BModuleRegistry extends BClass
 
                     break;
                 default:
-                    throw new BException($this->_("Unknown manifest file format: %s", $file));
+                    throw new BException($this->_((("Unknown manifest file format: %s")), $file));
             }
             if (empty($manifest['modules']) && empty($manifest['include'])) {
-                throw new BException($this->_("Invalid or empty manifest file: %s", $file));
+                throw new BException($this->_((("Invalid or empty manifest file: %s")), $file));
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName => $params) {
@@ -1300,11 +1300,11 @@ if (!isset($o[0]) || !isset($o[1])) {
             require_once ($includeFile);
         }
         if (!empty($bb['callback'])) {
-            $start = BDebug::debug($this->_('Start BEFORE bootstrap for %s', [$this->name]));
+            $start = BDebug::debug($this->_((('Start BEFORE bootstrap for %s')), [$this->name]));
             $this->BUtil->call($bb['callback']);
             #$mod->run_status = BModule::LOADED;
             BDebug::profile($start);
-            BDebug::debug($this->_('End BEFORE bootstrap for %s', [$this->name]));
+            BDebug::debug($this->_((('End BEFORE bootstrap for %s')), [$this->name]));
         }
 
         return $this;
@@ -1341,11 +1341,11 @@ if (!isset($o[0]) || !isset($o[1])) {
                     require_once($includeFile);
                 }
                 if (!empty($bootstrap['callback'])) {
-                    $start = BDebug::debug($this->_('Start bootstrap for %s', [$this->name]));
+                    $start = BDebug::debug($this->_((('Start bootstrap for %s')), [$this->name]));
                     $this->BUtil->call($bootstrap['callback']);
                     #$mod->run_status = BModule::LOADED;
                     BDebug::profile($start);
-                    BDebug::debug($this->_('End bootstrap for %s', [$this->name]));
+                    BDebug::debug($this->_((('End bootstrap for %s')), [$this->name]));
                 }
             }
         }
@@ -1910,7 +1910,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // if schema doesn't exist, throw exception
         if (empty($mod['schema_version'])) {
-            throw new BException($this->_("Can't upgrade, module schema doesn't exist yet: %s", $this->BModuleRegistry->currentModuleName()));
+            throw new BException($this->_((("Can't upgrade, module schema doesn't exist yet: %s")), $this->BModuleRegistry->currentModuleName()));
         }
         $schemaVersion = $mod['schema_version'];
 
@@ -1994,7 +1994,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // if schema doesn't exist, throw exception
         if (empty($mod['schema_version'])) {
-            throw new BException($this->_("Can't downgrade, module schema doesn't exist: %s", $this->BModuleRegistry->currentModuleName()));
+            throw new BException($this->_((("Can't downgrade, module schema doesn't exist: %s")), $this->BModuleRegistry->currentModuleName()));
         }
         $schemaVersion = $mod['schema_version'];
 

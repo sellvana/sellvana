@@ -9,14 +9,14 @@ class Sellvana_Sales_Model_Order_History extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'entity_type' => [
-            'order' => 'Order',
-            'order_item' => 'Order Item',
-            'payment' => 'Payment',
-            'shipment' => 'Shipment',
-            'return' => 'Return',
-            'refund' => 'Refund',
-            'cancel' => 'Cancel',
-            'comment' => 'Comment',
+            'order' => (('Order')),
+            'order_item' => (('Order Item')),
+            'payment' => (('Payment')),
+            'shipment' => (('Shipment')),
+            'return' => (('Return')),
+            'refund' => (('Refund')),
+            'cancel' => (('Cancel')),
+            'comment' => (('Comment')),
         ],
     ];
 

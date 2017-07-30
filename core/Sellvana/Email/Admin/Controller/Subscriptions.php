@@ -10,8 +10,8 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'subscriptions';
     protected $_modelClass = 'Sellvana_Email_Model_Pref';
-    protected $_gridTitle = 'Subscriptions';
-    protected $_recordName = 'Subscription';
+    protected $_gridTitle = (('Subscriptions'));
+    protected $_recordName = (('Subscription'));
     protected $_mainTableAlias = 'e';
     protected $_navPath = 'customer/subscriptions';
     protected $_permission = 'subscriptions';
@@ -22,18 +22,18 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'e.id'],
-            ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'e.email', 'addable' => true, 'editable' => true,
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'e.id'],
+            ['type' => 'input', 'name' => 'email', 'label' => (('Email')), 'index' => 'e.email', 'addable' => true, 'editable' => true,
                   'validation' => ['required' => true, 'unique' => $this->BApp->href('subscriptions/unique')]],
-            ['type' => 'input', 'name' => 'unsub_all', 'label' => 'Un-subscribe all', 'index' => 'e.unsub_all',
-                  'addable' => true, 'editable' => true, 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['type' => 'input', 'name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
-                  'editable' => true, 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at', 'cell' => 'datetime'],
+            ['type' => 'input', 'name' => 'unsub_all', 'label' => (('Un-subscribe all')), 'index' => 'e.unsub_all',
+                  'addable' => true, 'editable' => true, 'multirow_edit' => true, 'options' => ['1' => (('Yes')), '0' => (('No'))], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'sub_newsletter', 'label' => (('Subscribe newsletter')), 'index' => 'e.sub_newsletter', 'addable' => true,
+                  'editable' => true, 'multirow_edit' => true, 'options' => ['1' => (('Yes')), '0' => (('No'))], 'editor' => 'select'],
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 'e.create_at', 'cell' => 'datetime'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
-            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
+            'new' => array('caption' => (('New Email Subscription')), 'modal' => true),
             'export' => true,
             'edit'   => true,
             'delete' => true

@@ -47,7 +47,7 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
                 'qtys' => $qtys,
             ]);
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Shipment has been created');
+            $result['message'] = $this->_(('Shipment has been created'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -97,7 +97,7 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
                 }
             }
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Shipment updates have been applied');
+            $result['message'] = $this->_(('Shipment updates have been applied'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -142,7 +142,7 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
             }
             $rates = $this->$methodClass->fetchCartRates($cart);
 
-            $result['message'] = $this->_('Shipping rates have been updated');
+            $result['message'] = $this->_(('Shipping rates have been updated'));
             $result['tabs']['main'] = (string)$this->view('order/orders-form/main')->set('model', $order);
         } catch (Exception $e) {
             $result['error'] = true;
@@ -216,13 +216,12 @@ class Sellvana_Sales_Admin_Controller_Shipments extends Sellvana_Sales_Admin_Con
                     $package->save();
                 }
             }
-            $result['message'] = $this->_('Tracking updates have been received.');
+            $result['message'] = $this->_(('Tracking updates have been received.'));
 
             foreach ($response as $method => $data) {
                 if (isset($data['error']) && $data['error']) {
                     $result['error'] = $data['error'];
-                    $result['message'] = 'Shipping method: "'
-                        . $carrierDescriptions[$method] . '" Response: "' . $data['message'] . '"';
+                    $result['message'] = $this->_((('Shipping method: "%s" Response: "%"')), [$carrierDescriptions[$method], $data['message']]);
                 }
             }
             $result = array_merge($this->_resetOrderTabs($order), $result);

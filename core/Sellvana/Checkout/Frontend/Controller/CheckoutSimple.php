@@ -83,7 +83,7 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
 
             $user = $customerModel->authenticate($login['email'], $login['password']);
             if (!$user) {
-                throw new Exception($this->_('Invalid email or password.'));
+                throw new Exception($this->_(('Invalid email or password.')));
             }
 
             $statusResult = $user->validateCustomerStatus();

@@ -11,7 +11,7 @@ class Sellvana_CustomerGroups_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'customer_groups' => "Customer Groups"
+            'customer_groups' => (("Customer Groups"))
         ]);
     }
 

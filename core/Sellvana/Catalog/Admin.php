@@ -57,19 +57,19 @@ class Sellvana_Catalog_Admin extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_Catalog' => 'Catalog Settings',
-            'catalog' => 'Catalog',
-            'catalog/products' => 'Manage Products',
-            'catalog/products-quick-add' => 'Quick Add Products',
-            'catalog/categories' => 'Manage Categories',
-            'catalog/families' => 'Manage Families',
-            'catalog/stocks' => 'Manage Stocks',
+            'settings/Sellvana_Catalog' => (('Catalog Settings')),
+            'catalog' => (('Catalog')),
+            'catalog/products' => (('Manage Products')),
+            'catalog/products-quick-add' => (('Quick Add Products')),
+            'catalog/categories' => (('Manage Categories')),
+            'catalog/families' => (('Manage Families')),
+            'catalog/stocks' => (('Manage Stocks')),
         ]);
     }
 
     public function onNavTreeForm($args)
     {
-        $args['node_types']['category'] = 'Category';
+        $args['node_types']['category'] = (('Category'));
     }
 
     public function getAvailableViews()

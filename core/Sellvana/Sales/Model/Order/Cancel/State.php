@@ -6,8 +6,8 @@ class Sellvana_Sales_Model_Order_Cancel_State extends FCom_Core_Model_Abstract_S
         CUSTOM = 'custom';
 
     protected $_stateLabels = [
-        self::OVERALL => 'Overall',
-        self::CUSTOM => 'Custom',
+        self::OVERALL => (('Overall')),
+        self::CUSTOM => (('Custom')),
     ];
 
     /**

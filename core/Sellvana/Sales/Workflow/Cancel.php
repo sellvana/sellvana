@@ -75,7 +75,7 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
     {
         $newState = $args['cancel']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
-        $args['cancel']->addHistoryEvent('custom_state', 'Admin user has changed custom cancel state to "' . $label . '"');
+        $args['cancel']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom cancel state to "%s"')), $label));
         $args['cancel']->save();
     }
 

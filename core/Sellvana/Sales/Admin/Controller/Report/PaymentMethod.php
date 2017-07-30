@@ -9,12 +9,12 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Sales_Model_Order';
-    protected $_recordName = 'Order';
+    protected $_recordName = (('Order'));
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/payment_method';
     protected $_gridHref = 'sales/report/payment_method';
-    protected $_gridTitle = 'Payment Methods';
+    protected $_gridTitle = (('Payment Methods'));
 
 
     public function gridConfig()
@@ -51,14 +51,14 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
     protected function _getFieldLabels()
     {
         return [
-            'payment_method' => 'Payment Type',
+            'payment_method' => (('Payment Type')),
             'order_count' => '# of Orders',
             'pc_orders' => '% of Orders',
-            'total_amount' => 'Total Amount',
+            'total_amount' => (('Total Amount')),
             'pc_total_amount' => '% of Total',
-            'received' => 'Received Amount',
+            'received' => (('Received Amount')),
             'pc_received' => '% of Received',
-            'create_at' => 'Created',
+            'create_at' => (('Created')),
         ];
     }
 

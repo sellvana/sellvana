@@ -12,8 +12,8 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
 
     protected $_gridHref = 'salestax/product-classes';
     protected $_modelClass = 'Sellvana_SalesTax_Model_ProductClass';
-    protected $_gridTitle = 'Product Tax Classes';
-    protected $_recordName = 'Product Tax Class';
+    protected $_gridTitle = (('Product Tax Classes'));
+    protected $_recordName = (('Product Tax Class'));
     protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'tp';
     protected $_navPath = 'sales/tax/product-classes';
@@ -23,12 +23,12 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
         $config = parent::gridConfig();
         //unset($config['form_url']);
         $config['id'] = 'product-class';
-        $config['caption'] = 'Product Class';
+        $config['caption'] = (('Product Class'));
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300,
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'width' => 300,
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/product-classes/unique')]],
         ];
@@ -108,15 +108,15 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
             'data_mode'          => 'local',
             'columns'            => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-                ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-                ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'product_name', 'label' => (('Name')), 'index' => 'p.product_name', 'width' => 400],
+                ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 200],
             ],
             'actions'            => [
                 #'add' => ['caption' => 'Add products'],
-                'delete'              => ['caption' => 'Remove'],
+                'delete'              => ['caption' => (('Remove'))],
                 'add-tax-product' => [
-                    'caption'  => 'Add Tax Products',
+                    'caption'  => (('Add Tax Products')),
                     'type'     => 'button',
                     'id'       => 'add-tax-product-from-grid',
                     'class'    => 'btn-primary',

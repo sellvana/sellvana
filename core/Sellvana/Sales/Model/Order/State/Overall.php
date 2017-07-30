@@ -17,17 +17,17 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
     protected static $_origClass = __CLASS__;
 
     protected $_valueLabels = [
-        self::PENDING => 'Pending',
-        self::PLACED => 'Placed',
-        self::REVIEW => 'Review',
-        self::FRAUD => 'Fraud',
-        self::LEGIT => 'Passed Verification',
-        self::PROCESSING => 'Processing',
-        self::BACKORDERED => 'Backordered',
-        self::COMPLETE => 'Complete',
-        self::CANCEL_REQUESTED => 'Cancel Requested',
-        self::CANCELED => 'Canceled',
-        self::ARCHIVED => 'Archived',
+        self::PENDING => (('Pending')),
+        self::PLACED => (('Placed')),
+        self::REVIEW => (('Review')),
+        self::FRAUD => (('Fraud')),
+        self::LEGIT => (('Passed Verification')),
+        self::PROCESSING => (('Processing')),
+        self::BACKORDERED => (('Backordered')),
+        self::COMPLETE => (('Complete')),
+        self::CANCEL_REQUESTED => (('Cancel Requested')),
+        self::CANCELED => (('Canceled')),
+        self::ARCHIVED => (('Archived')),
     ];
 
     protected $_setValueNotificationTemplates =[

@@ -202,7 +202,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     {
         $mod = $this->BModuleRegistry->module($moduleName);
         if (!$mod) {
-            return ['error' => true, 'message' => 'Invalid package: ' . $moduleName];
+            return ['error' => true, 'message' => $this->_((('Invalid package: %s')), $moduleName)];
         }
         $packageDir = $this->BApp->storageRandomDir() . '/marketclient/upload';
         $this->BUtil->ensureDir($packageDir);

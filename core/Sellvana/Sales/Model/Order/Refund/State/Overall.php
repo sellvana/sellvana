@@ -17,14 +17,14 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
         CANCELED = 'canceled';
 
     protected $_valueLabels = [
-        self::PENDING => 'Pending',
-        self::SUPERVISOR_PENDING => 'Pending Supervisor',
-        self::SUPERVISOR_AUTHORIZED => 'Supervisor Authorized',
-        self::SUPERVISOR_DENIED => 'Supervisor Denied',
-        self::PARTIAL => 'Partial',
-        self::REFUNDED => 'Refunded',
-        self::FAILED => 'Failed',
-        self::CANCELED => 'Canceled',
+        self::PENDING => (('Pending')),
+        self::SUPERVISOR_PENDING => (('Pending Supervisor')),
+        self::SUPERVISOR_AUTHORIZED => (('Supervisor Authorized')),
+        self::SUPERVISOR_DENIED => (('Supervisor Denied')),
+        self::PARTIAL => (('Partial')),
+        self::REFUNDED => (('Refunded')),
+        self::FAILED => (('Failed')),
+        self::CANCELED => (('Canceled')),
     ];
 
     protected $_defaultMethods = [

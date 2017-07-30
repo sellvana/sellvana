@@ -14,13 +14,13 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
         $model = $context->getModel();
 
         if ($this->getValue()) {
-            $comment = $this->_('%s state was changed from %s to %s', [
+            $comment = $this->_((('%s state was changed from %s to %s')), [
                 $context->getStateLabel($this->_type),
                 $this->getValueLabel(),
                 $newState->getValueLabel(),
             ]);
         } else {
-            $comment = $this->_('%s state was set to %s', [
+            $comment = $this->_((('%s state was set to %s')), [
                 $context->getStateLabel($this->_type),
                 $newState->getValueLabel(),
             ]);
@@ -33,7 +33,7 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
     public function invokeStateChange($value)
     {
         if (empty($this->_defaultMethods[$value])) {
-            throw new BException($this->_('Invalid state value: %s', $value));
+            throw new BException($this->_((('Invalid state value: %s')), $value));
         }
         $method = $this->_defaultMethods[$value];
         return $this->{$method}();

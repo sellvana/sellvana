@@ -23,7 +23,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
     public function action_products()
     {
         if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
 
             return;
         }
@@ -66,7 +66,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
     public function action_categories()
     {
         if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
 
             return;
         }
@@ -116,7 +116,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
     public function action_attributes_list()
     {
         if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
 
             return;
         }
@@ -133,8 +133,8 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
         $this->getCustomersFieldsList($term, $results, $limit, $offset);
 
         if ($type == 'cart') {
-            $results['items'][] = ['id' => 'cart.qty', 'text' => 'Total Qty (cart)', 'input' => 'number'];
-            $results['items'][] = ['id' => 'cart.amt', 'text' => 'Total Amount (cart)', 'input' => 'number'];
+            $results['items'][] = ['id' => 'cart.qty', 'text' => (('Total Qty (cart)')), 'input' => 'number'];
+            $results['items'][] = ['id' => 'cart.amt', 'text' => (('Total Amount (cart)')), 'input' => 'number'];
         }
 
         $base_product_fields = $this->_searchTableFields($this->Sellvana_Catalog_Model_Product, $term);
@@ -165,7 +165,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
     public function action_attributes_field()
     {
         if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
 
             return;
         }

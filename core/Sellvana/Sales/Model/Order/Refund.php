@@ -73,7 +73,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
 
         foreach ($amounts as $itemId => $amount) {
             if (empty($items[$itemId])) {
-                throw new BException($this->_('Invalid item id: %s', $itemId));
+                throw new BException($this->_((('Invalid item id: %s')), $itemId));
             }
             /** @var Sellvana_Sales_Model_Order_Item $item */
             $item = $items[$itemId];
@@ -81,7 +81,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
             if ($amount === true) {
                 $amount = $amountCanRefund;
             } elseif ($amount <= 0 || $amount > $amountCanRefund) {
-                throw new BException($this->_('Invalid amount to refund for %s: %s', [$item->get('product_sku'), $amount]));
+                throw new BException($this->_((('Invalid amount to refund for %s: %s')), [$item->get('product_sku'), $amount]));
             }
             $this->Sellvana_Sales_Model_Order_Refund_Item->create([
                 'order_id' => $order->id(),

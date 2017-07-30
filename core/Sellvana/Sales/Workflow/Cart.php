@@ -137,7 +137,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         foreach ($reqItems as $reqItem) {
             if (is_array($reqItem)) {
                 if (empty($reqItem['id']) || !is_numeric($reqItem['id'])) {
-                    $item['error'] = 'Invalid item to add to cart';
+                    $item['error'] = (('Invalid item to add to cart'));
                 }
                 $item = $reqItem;
                 if (empty($item['qty'])) {
@@ -169,7 +169,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             }
             if (empty($products[$item['id']])) {
                 $item['product'] = false;
-                $item['error'] = 'Invalid product to add to cart';
+                $item['error'] = (('Invalid product to add to cart'));
                 continue;
             }
             $p = $item['product'] = $products[$item['id']];
@@ -234,7 +234,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         if (!empty($post['remove'])) {
             foreach ($post['remove'] as $id => $arrVariant) {
                 if (empty($cartItems[$id])) {
-                    $items[$id] = 'Item to delete not found';
+                    $items[$id] = (('Item to delete not found'));
                     continue;
                 }
                 $item = $cartItems[$id];
@@ -254,7 +254,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                     continue;
                 }
                 if (empty($cartItems[$id])) {
-                    $items[$id] = 'Item to update not found';
+                    $items[$id] = (('Item to update not found'));
                     continue;
                 }
                 $item = $cartItems[$id];
@@ -318,7 +318,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
     public function action_customerAddsCouponCode($args)
     {
         if (empty($args['post']['coupon_code'])) {
-            $args['result']['error']['message'] = 'No coupon code provided';
+            $args['result']['error']['message'] = (('No coupon code provided'));
             return;
         }
 
@@ -331,7 +331,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $couponCode = $post['coupon_code'];
 
         if (in_array($couponCode, $cartCouponCodesArr)) {
-            $args['result']['error']['message'] = "Coupon code is already applied to your cart";
+            $args['result']['error']['message'] = (("Coupon code is already applied to your cart"));
             return;
         }
 
@@ -356,7 +356,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
     public function action_customerRemovesCouponCode($args)
     {
         if (empty($args['post']['coupon_code'])) {
-            $args['result']['error']['message'] = 'No coupon code provided';
+            $args['result']['error']['message'] = (('No coupon code provided'));
             return;
         }
 
@@ -371,7 +371,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $idx = array_search($couponCode, $cartCouponCodesArr);
 
         if (false === $idx) {
-            $args['result']['error']['message'] = "Coupon code was already removed";
+            $args['result']['error']['message'] = (("Coupon code was already removed"));
             return;
         }
 

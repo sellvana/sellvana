@@ -138,7 +138,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
     {
         $newState = $args['order']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
-        $args['order']->addHistoryEvent('custom_state', 'Admin user has changed custom order state to "' . $label . '"');
+        $args['order']->addHistoryEvent('custom_state', $this->_((('Admin user has changed custom order state to "%s"')), $label));
         $args['order']->save();
     }
 

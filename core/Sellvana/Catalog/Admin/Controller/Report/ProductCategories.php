@@ -11,7 +11,7 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductCategories extends FCom_Ad
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/integrity/product_categories';
     protected $_gridHref = 'catalog/report/integrity/product_categories';
-    protected $_gridTitle = 'Products Without Categories';
+    protected $_gridTitle = (('Products Without Categories'));
 
     public function gridConfig()
     {
@@ -32,8 +32,8 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductCategories extends FCom_Ad
     protected function _getFieldLabels()
     {
         $labels = [
-            'product_sku' => 'SKU',
-            'product_name' => 'Name',
+            'product_sku' => (('SKU')),
+            'product_name' => (('Name')),
         ];
 
         $labels = array_merge($labels, $this->_getProductCustomFieldLabels());

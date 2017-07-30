@@ -17,8 +17,8 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
 
     protected $_modelClass = 'Sellvana_SalesTax_Model_Rule';
     protected $_gridHref = 'salestax/rules';
-    protected $_gridTitle = 'Tax Rules';
-    protected $_recordName = 'Tax Rule';
+    protected $_gridTitle = (('Tax Rules'));
+    protected $_recordName = (('Tax Rule'));
     protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'r';
     protected $_navPath = 'sales/tax/rules';
@@ -35,22 +35,22 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title',
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')),
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/zones/unique')],
                 'editable' => true, 'addable' => true],
-            ['name' => 'zones_cnt', 'label' => 'Zones Cnt'],
-            ['name' => 'cust_class_cnt', 'label' => 'Customer Classes Cnt'],
-            ['name' => 'prod_class_cnt', 'label' => 'Product Classes Cnt'],
-            ['type' => 'input', 'name' => 'rule_rate_percent', 'label' => 'Rule Rate',
+            ['name' => 'zones_cnt', 'label' => (('Zones Cnt'))],
+            ['name' => 'cust_class_cnt', 'label' => (('Customer Classes Cnt'))],
+            ['name' => 'prod_class_cnt', 'label' => (('Product Classes Cnt'))],
+            ['type' => 'input', 'name' => 'rule_rate_percent', 'label' => (('Rule Rate')),
                 'editable' => true, 'addable' => true],
-            ['type' => 'input', 'name' => 'fpt_amount', 'label' => 'FPT Amount',
+            ['type' => 'input', 'name' => 'fpt_amount', 'label' => (('FPT Amount')),
                 'editable' => true, 'addable' => true],
-            ['type' => 'multiselect', 'name' => 'zones', 'label' => 'Zones',
+            ['type' => 'multiselect', 'name' => 'zones', 'label' => (('Zones')),
                 'options' => $zones, 'editable' => true, 'addable' => true],
-            ['type' => 'multiselect', 'name' => 'cust_classes', 'label' => 'Customer Classes',
+            ['type' => 'multiselect', 'name' => 'cust_classes', 'label' => (('Customer Classes')),
                 'options' => $custClasses, 'editable' => true, 'addable' => true],
-            ['type' => 'multiselect', 'name' => 'prod_classes', 'label' => 'Product Classes',
+            ['type' => 'multiselect', 'name' => 'prod_classes', 'label' => (('Product Classes')),
                 'options' => $prodClasses, 'editable' => true, 'addable' => true],
         ];
         $config['actions'] = [

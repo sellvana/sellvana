@@ -55,7 +55,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         $w = $this->BRequest->post('w');
         if (empty($w['agree']) || $w['agree'] !== 'Agree') {
-            $this->message('Please click "I Agree" checkbox before continuing with installation', 'error', 'install');
+            $this->message((('Please click "I Agree" checkbox before continuing with installation')), 'error', 'install');
             $this->BResponse->redirect('');
             return;
         }
@@ -204,8 +204,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function action_step3()
     {
         $this->view('step3')->set([
-            'debug_modes' => ['DEBUG' => 'DEBUG (default for alpha)', /*'PRODUCTION' => 'PRODUCTION', */],
-            'run_level_bundles' => ['all' => 'All Bundled', 'min' => 'Minimal'],
+            'debug_modes' => ['DEBUG' => (('DEBUG (default for alpha)')), /*'PRODUCTION' => 'PRODUCTION', */],
+            'run_level_bundles' => ['all' => (('All Bundled')), 'min' => (('Minimal'))],
         ]);
         $this->BLayout->applyLayout('/step3');
     }

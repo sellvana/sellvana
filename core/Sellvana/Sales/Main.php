@@ -16,15 +16,15 @@ class Sellvana_Sales_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'sales' => 'Sales',
-            'sales/orders' => 'Orders',
-            'sales/order_status' => 'Order Status',
-            'sales/order_custom_state' => 'Order Custom State',
-            'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports',
-            'settings/Sellvana_Sales' => 'Sales Settings',
-            'settings/Sellvana_SalesShipping' => 'Sales Shipping Settings',
-            'settings/Sellvana_SalesPaymentMethods' => 'Sales Payment Methods Settings',
+            'sales' => (('Sales')),
+            'sales/orders' => (('Orders')),
+            'sales/order_status' => (('Order Status')),
+            'sales/order_custom_state' => (('Order Custom State')),
+            'sales/carts' => (('Carts')),
+            'sales/reports' => (('Reports')),
+            'settings/Sellvana_Sales' => (('Sales Settings')),
+            'settings/Sellvana_SalesShipping' => (('Sales Shipping Settings')),
+            'settings/Sellvana_SalesPaymentMethods' => (('Sales Payment Methods Settings')),
         ]);
 
         foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal', 'AmountDue'] as $total) {
@@ -211,8 +211,8 @@ class Sellvana_Sales_Main extends BClass
             $args['items'][] = [
                 'feed' => 'local',
                 'type' => 'warning',
-                'group' => 'FCom Sales',
-                'content' => 'You have to enable at least one SHIPPING module',
+                'group' => (('FCom Sales')),
+                'content' => (('You have to enable at least one SHIPPING module')),
                 'code' => "sales_missing_shipping",
             ];
         }
@@ -220,8 +220,8 @@ class Sellvana_Sales_Main extends BClass
             $args['items'][] = [
                 'feed' => 'local',
                 'type' => 'warning',
-                'group' => 'FCom Sales',
-                'content' => 'You have to enable at least one PAYMENT module',
+                'group' => (('FCom Sales')),
+                'content' => (('You have to enable at least one PAYMENT module')),
                 'code' => "sales_missing_payment",
             ];
         }

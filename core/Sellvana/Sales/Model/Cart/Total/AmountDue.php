@@ -8,7 +8,7 @@
 class Sellvana_Sales_Model_Cart_Total_AmountDue extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
     protected $_code      = 'amount_due';
-    protected $_label     = 'Balance Due';
+    protected $_label     = (('Balance Due'));
     protected $_cartField = 'amount_due';
     protected $_sortOrder = 200;
 

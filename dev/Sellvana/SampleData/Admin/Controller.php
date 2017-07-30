@@ -19,7 +19,7 @@ class Sellvana_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $this->BConfig->set('db/logging', 0);
 
             $this->Sellvana_SampleData_Admin->loadProducts();
-            $msg    = $this->_('Sample products imported');
+            $msg    = $this->_(('Sample products imported'));
             $status = 'success';
         } catch (Exception $e) {
             $this->BDebug->logException($e);

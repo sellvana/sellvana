@@ -8,12 +8,12 @@ class Sellvana_Sales_Admin_Controller_Report_AbandonedCarts extends FCom_Admin_C
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Sales_Model_Cart';
-    protected $_recordName = 'Cart';
+    protected $_recordName = (('Cart'));
     protected $_mainTableAlias = 'c';
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/abandoned_carts';
     protected $_gridHref = 'sales/report/abandoned_carts';
-    protected $_gridTitle = 'Abandoned Carts';
+    protected $_gridTitle = (('Abandoned Carts'));
 
     public function gridConfig()
     {
@@ -43,16 +43,16 @@ class Sellvana_Sales_Admin_Controller_Report_AbandonedCarts extends FCom_Admin_C
     protected function _getFieldLabels()
     {
         return [
-            'id' => 'Cart ID',
-            'customer_name' => 'Customer Name',
-            'customer_email' => 'Customer Email',
-            'skus' => 'Inventory SKUs',
-            'item_qty' => 'Total Qty in Cart',
-            'subtotal' => 'Subtotal',
-            'coupon_code' => 'Applied Coupons',
-            'last_page' => 'Last Page Visited',
-            'create_at' => 'Date Created',
-            'update_at' => 'Last Updated Date',
+            'id' => (('Cart ID')),
+            'customer_name' => (('Customer Name')),
+            'customer_email' => (('Customer Email')),
+            'skus' => (('Inventory SKUs')),
+            'item_qty' => (('Total Qty in Cart')),
+            'subtotal' => (('Subtotal')),
+            'coupon_code' => (('Applied Coupons')),
+            'last_page' => (('Last Page Visited')),
+            'create_at' => (('Date Created')),
+            'update_at' => (('Last Updated Date')),
         ];
     }
 

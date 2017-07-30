@@ -27,11 +27,15 @@
 						<div v-if="flt.op.match(/^(equals|starts|ends|lt|lte|gt|gte)$/)" class="f-form-group-btn not-range">
 							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="f-input" v-model="flt.value">
 							<input v-if="flt.config.type === 'number'" type="number" :placeholder="'number'|_" class="f-input-number" v-model="flt.value">
-							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="f-input" v-model="flt.value"> </div>
+							<input v-if="flt.config.type === 'date'" type="date" :placeholder="'date'|_" class="f-input" v-model="flt.value">
+						</div>
 						<div v-if="flt.op.match(/^(contains|not_contains)$/)" class="f-form-group-btn not-range">
-							<input type="text" :placeholder="'value'|_" class="f-input" v-model="flt.value"> </div>
+							<input type="text" :placeholder="'value'|_" class="f-input" v-model="flt.value">
+						</div>
 						<div v-if="flt.op.match(/^(in|not_in)$/)" class="f-form-group-btn not-range">
-							<select2 class="f-input" v-model="flt.values" multiple aria-multiselectable="true" :options="select2Options(flt.config.options)"></select2>
+							<select2 class="f-input" v-model="flt.values" multiple aria-multiselectable="true">
+								<option v-for="o in select2Options(flt.config.options)" :value="o.id">{{o.text}}</option>
+							</select2>
 						</div>
 						<div v-if="flt.op.match(/^(between|not_between)$/)" class="f-form-group-btn range">
 							<input v-if="flt.config.type === 'text'" type="text" :placeholder="'text'|_" class="f-input" v-model="flt.from">

@@ -214,7 +214,7 @@ class BUtil extends BClass
                 return '[' . implode(',', $out) . ']';
             }
         }
-        return '"UNSUPPORTED TYPE"';
+        return '(("UNSUPPORTED TYPE"))';
     }
 
     /**
@@ -4659,39 +4659,39 @@ class BValidate extends BClass
     protected $_defaultRules = [
         'required' => [
             'rule'    => 'BValidate::ruleRequired',
-            'message' => 'Missing field: :field',
+            'message' => (('Missing field: :field')),
         ],
         'url'       => [
             'rule'    => '#(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(\#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?#',
-            'message' => 'Invalid URL',
+            'message' => (('Invalid URL')),
         ],
         'email'     => [
             'rule'    => 'BValidate::ruleEmail',
-            'message' => 'Invalid Email',
+            'message' => (('Invalid Email')),
         ],
         'string'    => [
             'rule'    => 'BValidate::ruleString',
-            'message' => 'Invalid string length', // this is default, actual message supplied by callback
+            'message' => (('Invalid string length')), // this is default, actual message supplied by callback
         ],
         'numeric'   => [
             'rule'    => 'BValidate::ruleNumeric',
-            'message' => 'Invalid number: :field',
+            'message' => (('Invalid number: :field')),
         ],
         'integer'   => [
             'rule'    => 'BValidate::ruleInteger',
-            'message' => 'Invalid integer: :field',
+            'message' => (('Invalid integer: :field')),
         ],
         'alphanum'  => [
             'rule'    => '/^[a-zA-Z0-9 ]+$/',
-            'message' => 'Invalid alphanumeric: :field',
+            'message' => (('Invalid alphanumeric: :field')),
         ],
         'alpha'  => [
             'rule'    => '/^[a-zA-Z ]+$/',
-            'message' => 'Invalid alphabet field: :field',
+            'message' => (('Invalid alphabet field: :field')),
         ],
         'password_confirm' => [
             'rule'    => 'BValidate::rulePasswordConfirm',
-            'message' => 'Password confirmation does not match',
+            'message' => (('Password confirmation does not match')),
             'args'    => ['original' => 'password'],
         ],
     ];
@@ -4699,7 +4699,7 @@ class BValidate extends BClass
     /**
      * @var string
      */
-    protected $_defaultMessage = "Validation failed for: :field";
+    protected $_defaultMessage = (('Validation failed for: :field'));
     /**
      * @var array
      */
@@ -4942,10 +4942,10 @@ class BValidate extends BClass
         }
         $value = $data[$args['field']];
         if (!empty($args['min']) && strlen($value) < $args['min']) {
-            return 'The field should be at least ' . $args['min'] . ' characters long: :field';
+            return $this->_((('The field should be at least %s characters long: :field')), $args['min']);
         }
         if (!empty($args['max']) && strlen($value) > $args['max']) {
-            return 'The field can not exceed ' . $args['max'] . ' characters: :field';
+            return $this->_((('The field can not exceed %s characters: :field')), $args['max']);
         }
         return true;
     }
@@ -5726,8 +5726,127 @@ function var_export54($var, $indent="") {
             }
             return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
         case "boolean":
-            return $var ? "TRUE" : "FALSE";
+            return $var ? (("TRUE")) : "FALSE";
         default:
             return var_export($var, TRUE);
+    }
+}
+
+/**
+ * Class UUID
+ *
+ * @see http://php.net/manual/en/function.uniqid.php#94959
+ */
+class UUID {
+    public static function v3($namespace, $name)
+    {
+        if (!self::isValid($namespace)) {
+            return false;
+        }
+
+        // Get hexadecimal components of namespace
+        $nhex = str_replace(array('-', '{','}'), '', $namespace);
+
+        // Binary Value
+        $nstr = '';
+
+        // Convert Namespace UUID to bits
+        for($i = 0; $i < strlen($nhex); $i += 2) {
+            $nstr .= chr(hexdec($nhex[$i] . $nhex[$i+1]));
+        }
+
+        // Calculate hash value
+        $hash = md5($nstr . $name);
+
+        return sprintf('%08s-%04s-%04x-%04x-%12s',
+
+            // 32 bits for "time_low"
+            substr($hash, 0, 8),
+
+            // 16 bits for "time_mid"
+            substr($hash, 8, 4),
+
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 3
+            (hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x3000,
+
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            (hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
+
+            // 48 bits for "node"
+            substr($hash, 20, 12)
+        );
+    }
+
+    public static function v4()
+    {
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+
+            // 32 bits for "time_low"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+
+            // 16 bits for "time_mid"
+            mt_rand(0, 0xffff),
+
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 4
+            mt_rand(0, 0x0fff) | 0x4000,
+
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            mt_rand(0, 0x3fff) | 0x8000,
+
+            // 48 bits for "node"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+    }
+
+    public static function v5($namespace, $name)
+    {
+        if(!self::isValid($namespace)) return false;
+
+        // Get hexadecimal components of namespace
+        $nhex = str_replace(array('-', '{', '}'), '', $namespace);
+
+        // Binary Value
+        $nstr = '';
+
+        // Convert Namespace UUID to bits
+        for($i = 0; $i < strlen($nhex); $i+=2) {
+            $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
+        }
+
+        // Calculate hash value
+        $hash = sha1($nstr . $name);
+
+        return sprintf('%08s-%04s-%04x-%04x-%12s',
+
+            // 32 bits for "time_low"
+            substr($hash, 0, 8),
+
+            // 16 bits for "time_mid"
+            substr($hash, 8, 4),
+
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 5
+            (hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x5000,
+
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            (hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
+
+            // 48 bits for "node"
+            substr($hash, 20, 12)
+        );
+    }
+
+    public static function isValid($uuid)
+    {
+        return preg_match('/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?'.
+                '[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i', $uuid) === 1;
     }
 }

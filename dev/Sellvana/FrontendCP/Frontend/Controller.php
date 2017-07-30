@@ -36,7 +36,7 @@ class Sellvana_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abst
 
             foreach ($request['content'] as $id => $params) {
                 if (empty($params['data']['entity']) || empty($handlers[$params['data']['entity']])) {
-                    $result['content'][$id] = ['error' => 'Missing or invalid entity'];
+                    $result['content'][$id] = ['error' => (('Missing or invalid entity'))];
                     continue;
                 }
                 $handler = $handlers[$params['data']['entity']];

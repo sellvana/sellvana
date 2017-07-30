@@ -27,7 +27,7 @@ class Sellvana_Sales_Admin_Controller_Refunds extends Sellvana_Sales_Admin_Contr
                 'amounts' => $amounts,
             ]);
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Refund has been created');
+            $result['message'] = $this->_(('Refund has been created'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -67,7 +67,7 @@ class Sellvana_Sales_Admin_Controller_Refunds extends Sellvana_Sales_Admin_Contr
                 }
             }
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Refund updates have been applied');
+            $result['message'] = $this->_(('Refund updates have been applied'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();

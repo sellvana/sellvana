@@ -10,8 +10,8 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
 
     protected $_gridHref = 'salestax/zones';
     protected $_modelClass = 'Sellvana_SalesTax_Model_Zone';
-    protected $_gridTitle = 'Tax Zones';
-    protected $_recordName = 'Tax Zone';
+    protected $_gridTitle = (('Tax Zones'));
+    protected $_recordName = (('Tax Zone'));
     protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'z';
     protected $_navPath = 'sales/tax/zones';
@@ -24,24 +24,24 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
         $zoneTypeOptions = $this->Sellvana_SalesTax_Model_Zone->fieldOptions('zone_type');
         $countries = $this->FCom_Core_Main->getAllowedCountries();
         $config['id'] = 'tax-zone';
-        $config['caption'] = 'Tax Zone';
+        $config['caption'] = (('Tax Zone'));
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50],
-            ['name' => 'title', 'label' => 'Title',
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50],
+            ['name' => 'title', 'label' => (('Title')),
                 'editable' => true, 'addable' => true],
-            ['name' => 'zone_type', 'label' => 'Zone Type', 'options' => $zoneTypeOptions,
+            ['name' => 'zone_type', 'label' => (('Zone Type')), 'options' => $zoneTypeOptions,
                 'editor' => 'select', 'editable' => true, 'addable' => true, 'type' => 'select'],
-            ['name' => 'country', 'label' => 'Country', 'options' => $countries,
+            ['name' => 'country', 'label' => (('Country')), 'options' => $countries,
                 'editor' => 'select', 'editable' => true, 'addable' => true, 'type' => 'select'],
-            ['name' => 'region', 'label' => 'Region',
+            ['name' => 'region', 'label' => (('Region')),
                 'editable' => true, 'addable' => true],
-            ['name' => 'postcode_from', 'label' => 'From Postcode',
+            ['name' => 'postcode_from', 'label' => (('From Postcode')),
                 'editable' => true, 'addable' => true],
-            ['name' => 'postcode_to', 'label' => 'To Postcode',
+            ['name' => 'postcode_to', 'label' => (('To Postcode')),
                 'editable' => true, 'addable' => true],
-            ['name' => 'zone_rate_percent', 'label' => 'Zone Rate',
+            ['name' => 'zone_rate_percent', 'label' => (('Zone Rate')),
                 'editable' => true, 'addable' => true],
         ];
         $config['actions'] = [

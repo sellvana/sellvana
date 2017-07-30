@@ -11,7 +11,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/product_history';
     protected $_gridHref = 'sales/report/product_history';
-    protected $_gridTitle = 'Product History';
+    protected $_gridTitle = (('Product History'));
 
     public function gridConfig()
     {
@@ -19,7 +19,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
 
         $config['columns'] = [
             ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => 'All time'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70, 'default' => (('All time'))],
             ['name' => 'product_sku', 'index' => 'product_sku'],
             ['name' => 'product_name', 'index' => 'product_name'],
             ['name' => 'qty_sold', 'index' => 'qty_sold'],
@@ -48,20 +48,20 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
     protected function _getFieldLabels()
     {
         return [
-            'period' => 'Period',
-            'product_sku' => 'Product SKU',
-            'product_name' => 'Product Name',
-            'qty_sold' => 'Qty',
-            'period_subtotal' => 'Subtotal Amount',
-            'period_discount' => 'Discount Amount',
-            'period_total' => 'Total Amount',
-            'period_received' => 'Received Amount',
-            'period_refunded' => 'Refunded Amount',
-            'avg_price' => 'Avg Sell Price',
-            'max_price' => 'Max Sell Price',
-            'min_price' => 'Min Sell Price',
-            'period_type' => 'Group by',
-            'create_at' => 'Created',
+            'period' => (('Period')),
+            'product_sku' => (('Product SKU')),
+            'product_name' => (('Product Name')),
+            'qty_sold' => (('Qty')),
+            'period_subtotal' => (('Subtotal Amount')),
+            'period_discount' => (('Discount Amount')),
+            'period_total' => (('Total Amount')),
+            'period_received' => (('Received Amount')),
+            'period_refunded' => (('Refunded Amount')),
+            'avg_price' => (('Avg Sell Price')),
+            'max_price' => (('Max Sell Price')),
+            'min_price' => (('Min Sell Price')),
+            'period_type' => (('Group by')),
+            'create_at' => (('Created')),
         ];
     }
 

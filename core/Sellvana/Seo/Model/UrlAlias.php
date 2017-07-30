@@ -27,12 +27,12 @@ class Sellvana_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
      */
     static protected $_fieldOptions = [
         'redirect_type' => [
-            'FWD' => 'Forward',
+            'FWD' => (('Forward')),
             '301' => '301 Permanent',
             '302' => '302 Temporary',
         ],
-        'is_active' => [0 => 'No', 1 => 'Yes'],
-        'is_regexp' => [0 => 'No', 1 => 'Yes'],
+        'is_active' => [0 => (('No')), 1 => (('Yes'))],
+        'is_regexp' => [0 => (('No')), 1 => (('Yes'))],
     ];
 
     /**

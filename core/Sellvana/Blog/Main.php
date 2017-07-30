@@ -10,8 +10,8 @@ class Sellvana_Blog_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_Blog' => 'Blog Settings',
-            'blog' => 'Blog',
+            'settings/Sellvana_Blog' => (('Blog Settings')),
+            'blog' => (('Blog')),
         ]);
     }
 }

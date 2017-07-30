@@ -8,7 +8,7 @@ class Sellvana_Disqus_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/disqus' => 'Disqus Settings',
+            'settings/disqus' => (('Disqus Settings')),
         ]);
     }
 

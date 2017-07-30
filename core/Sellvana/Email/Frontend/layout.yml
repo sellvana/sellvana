@@ -8,3 +8,6 @@ base:
 /email/subscribe:
     - { include: base }
     - { hook: main, views: subscription/email-subscribe }
+
+/mailings/unsubscribe:
+    - { root: mailings/unsubscribe }

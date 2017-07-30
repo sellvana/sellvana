@@ -195,7 +195,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         ) {
             $client->send([
                 'signal' => 'error',
-                'description' => 'Missing window_name or conn_id',
+                'description' => (('Missing window_name or conn_id')),
             ]);
             return;
         }

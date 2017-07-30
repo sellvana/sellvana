@@ -8,11 +8,11 @@
 abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_periodTypes = [
-        'day' => 'Day',
-        'week' => 'Week',
-        'month' => 'Month',
-        'quarter' => 'Quarter',
-        'year' => 'Year'
+        'day' => (('Day')),
+        'week' => (('Week')),
+        'month' => (('Month')),
+        'quarter' => (('Quarter')),
+        'year' => (('Year'))
     ];
 
     protected $_systemFields = [];

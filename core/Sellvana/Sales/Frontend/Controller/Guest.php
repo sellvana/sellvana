@@ -120,10 +120,10 @@ class Sellvana_Sales_Frontend_Controller_Guest extends FCom_Frontend_Controller_
     {
         $post = $this->BRequest->post('find');
         if (!$this->BValidate->validateInput($post, [
-            ['id', '@required', 'Order ID is required'],
-            ['email', '@required', 'Email is required'],
-            ['email', '@email', 'Email is invalid'],
-            ['postcode', '@required', 'Shipping Zip Code is required'],
+            ['id', '@required', (('Order ID is required'))],
+            ['email', '@required', (('Email is required'))],
+            ['email', '@email', (('Email is invalid'))],
+            ['postcode', '@required', (('Shipping Zip Code is required'))],
         ], 'find_order')) {
             $this->BResponse->redirect('guest/find_order');
             return;

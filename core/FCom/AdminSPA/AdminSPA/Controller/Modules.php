@@ -15,27 +15,27 @@ class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_C
     {
         return [
             'id' => 'modules',
-            'title' => 'Modules',
+            'title' => (('Modules')),
             'data_url' => 'modules/grid_data',
             'columns' => [
                 ['type' => 'row-select', 'width' => 80],
-                ['name' => 'toggle', 'label' => 'Toggle', 'datacell_component' => 'sv-page-modules-grid-datacell-run-level', 'sortable' => false],
-                ['name' => 'run_level', 'label' => 'Run Level'],
-                ['name' => 'run_status', 'label' => 'Status'],
-                ['name' => 'name', 'label' => 'Module Name'],
-                ['name' => 'description', 'label' => 'Description'],
-                ['name' => 'version', 'label' => 'Version'],
-                ['name' => 'channel', 'label' => 'Channel'],
-                ['name' => 'schema_version', 'label' => 'DB Version'],
-                ['name' => 'requires', 'label' => 'Requires', 'content_overflow' => true],
-                ['name' => 'required_by', 'label' => 'Required By', 'content_overflow' => true],
-                ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'content_overflow' => true],
+                ['name' => 'toggle', 'label' => (('Toggle')), 'datacell_component' => 'sv-page-modules-grid-datacell-run-level', 'sortable' => false],
+                ['name' => 'run_level', 'label' => (('Run Level'))],
+                ['name' => 'run_status', 'label' => (('Status'))],
+                ['name' => 'name', 'label' => (('Module Name'))],
+                ['name' => 'description', 'label' => (('Description'))],
+                ['name' => 'version', 'label' => (('Version'))],
+                ['name' => 'channel', 'label' => (('Channel'))],
+                ['name' => 'schema_version', 'label' => (('DB Version'))],
+                ['name' => 'requires', 'label' => (('Requires')), 'content_overflow' => true],
+                ['name' => 'required_by', 'label' => (('Required By')), 'content_overflow' => true],
+                ['name' => 'dep_errors', 'label' => (('Dependency Errors')), 'content_overflow' => true],
             ],
             'page_actions' => [
                 'default' => [/*'mobile_group' => 'actions', */'button_class' => 'button1'],
                 /*['name' => 'actions', 'label' => 'Actions'],*/
-                ['name' => 'migrate', 'label' => 'Run Migrations', 'group' => 'migrate'],
-                ['name' => 'reset_cache', 'label' => 'Reset Cache', 'group' => 'reset_cache'],
+                ['name' => 'migrate', 'label' => (('Run Migrations')), 'group' => 'migrate'],
+                ['name' => 'reset_cache', 'label' => (('Reset Cache')), 'group' => 'reset_cache'],
             ],
         ];
     }

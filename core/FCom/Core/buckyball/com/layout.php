@@ -492,7 +492,7 @@ class BLayout extends BClass
         if (is_array($viewName)) {
             foreach ($viewName as $i => $view) {
                 if (!is_numeric($i)) {
-                    throw new BException($this->_('Invalid argument: %s', print_r($viewName, 1)));
+                    throw new BException($this->_((('Invalid argument: %s')), print_r($viewName, 1)));
                 }
                 $this->addView($view[0], $view[1], $reset); // if self::view is possible to disappear better not use it.
             }
@@ -1332,7 +1332,7 @@ class BLayout extends BClass
         $rootView = $this->getRootView();
         BDebug::debug('LAYOUT.RENDER ' . var_export($rootView, 1));
         if (!$rootView) {
-            BDebug::error($this->_('Main view not found: %s', $this->_rootViewName));
+            BDebug::error($this->_((('Main view not found: %s')), $this->_rootViewName));
         }
         $result = $rootView->render($args);
 
@@ -1642,7 +1642,7 @@ class BView extends BClass
     public function view($viewName, $params = null)
     {
         if ($viewName === $this->getParam('view_name')) {
-            throw new BException($this->_('Circular reference detected: %s', $viewName));
+            throw new BException($this->_((('Circular reference detected: %s')), $viewName));
         }
 
         $view = $this->BLayout->getView($viewName);
@@ -2901,7 +2901,7 @@ class BViewList extends BView
         foreach ($this->_children as $child) {
             $childView = $layout->getView($child['name']);
             if (!$childView) {
-                throw new BException($this->_('Invalid view name: %s', $child['name']));
+                throw new BException($this->_((('Invalid view name: %s')), $child['name']));
             }
             $output[] = $childView->render($args);
         }

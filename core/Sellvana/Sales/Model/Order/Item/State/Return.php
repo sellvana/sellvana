@@ -9,11 +9,11 @@ class Sellvana_Sales_Model_Order_Item_State_Return extends Sellvana_Sales_Model_
         RETURNED = 'returned';
 
     protected $_valueLabels = [
-        self::NONE => 'None',
-        self::REQUESTED => 'Requested',
-        self::PROCESSING => 'Processing',
-        self::PARTIAL => 'Partial',
-        self::RETURNED => 'Returned',
+        self::NONE => (('None')),
+        self::REQUESTED => (('Requested')),
+        self::PROCESSING => (('Processing')),
+        self::PARTIAL => (('Partial')),
+        self::RETURNED => (('Returned')),
     ];
 
     protected $_defaultMethods = [

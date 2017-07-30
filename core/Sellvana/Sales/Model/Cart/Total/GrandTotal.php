@@ -3,7 +3,7 @@
 class Sellvana_Sales_Model_Cart_Total_GrandTotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'grand_total';
-    protected $_label = 'Grand Total';
+    protected $_label = (('Grand Total'));
     protected $_cartField = 'grand_total';
     protected $_sortOrder = 90;
 

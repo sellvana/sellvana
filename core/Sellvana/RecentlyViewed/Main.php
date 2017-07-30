@@ -11,13 +11,13 @@ class Sellvana_RecentlyViewed_Main extends BClass
     public function onLayoutEditorFetchLibrary($args)
     {
         $this->FCom_Core_LayoutEditor->addDeclaredWidget('recently_viewed', [
-            'title' => 'Recently Viewed Products',
+            'title' => (('Recently Viewed Products')),
             'view_name' => 'catalog/recently-viewed',
             'params' => [
                 'cnt' => [
                     'type' => 'input',
                     'args' => [
-                        'label' => 'Products Count',
+                        'label' => (('Products Count')),
                         'type' => 'number',
                         'value' => 6,
                     ],

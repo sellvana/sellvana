@@ -14,8 +14,8 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'customers';
     protected $_modelClass = 'Sellvana_Customer_Model_Customer';
-    protected $_gridTitle = 'Customers';
-    protected $_recordName = 'Customer';
+    protected $_gridTitle = (('Customers'));
+    protected $_recordName = (('Customer'));
     protected $_mainTableAlias = 'c';
     protected $_permission = 'customers/manage';
     protected $_navPath = 'customer/customers';
@@ -31,28 +31,28 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
-                    'title' => $this->_('Log in as customer'), 'target' => 'AdminCustomer'],
+                    'title' => $this->_(('Log in as customer')), 'target' => 'AdminCustomer'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'c.id'],
-            ['name' => 'firstname', 'label' => 'First Name', 'index' => 'c.firstname'],
-            ['name' => 'lastname', 'label' => 'Last Name', 'index' => 'c.lastname'],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'c.email'],
-            ['type' => 'input', 'name' => 'customer_group', 'label' => 'Customer Group', 'index' => 'c.customer_group',
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'c.id'],
+            ['name' => 'firstname', 'label' => (('First Name')), 'index' => 'c.firstname'],
+            ['name' => 'lastname', 'label' => (('Last Name')), 'index' => 'c.lastname'],
+            ['name' => 'email', 'label' => (('Email')), 'index' => 'c.email'],
+            ['type' => 'input', 'name' => 'customer_group', 'label' => (('Customer Group')), 'index' => 'c.customer_group',
                   'editor' => 'select', 'options' => $this->Sellvana_CustomerGroups_Model_Group->groupsOptions(),
                   'editable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
+            ['type' => 'input', 'name' => 'status', 'label' => (('Status')), 'index' => 'c.status', 'editor' => 'select',
                   'options' => $this->Sellvana_Customer_Model_Customer->fieldOptions('status'),
                   'editable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
-            ['name' => 'street1', 'label' => 'Address', 'index' => 'a.street1'],
-            ['name' => 'city', 'label' => 'City', 'index' => 'a.city', 'hidden' => true],
-            ['name' => 'region', 'label' => 'Region', 'index' => 'a.region', 'hidden' => true],
-            ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode', 'hidden' => true],
-            ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select', 'hidden' => true,
+            ['name' => 'street1', 'label' => (('Address')), 'index' => 'a.street1'],
+            ['name' => 'city', 'label' => (('City')), 'index' => 'a.city', 'hidden' => true],
+            ['name' => 'region', 'label' => (('Region')), 'index' => 'a.region', 'hidden' => true],
+            ['name' => 'postcode', 'label' => (('Postal Code')), 'index' => 'a.postcode', 'hidden' => true],
+            ['type' => 'input', 'name' => 'country', 'label' => (('Country')), 'index' => 'a.country', 'editor' => 'select', 'hidden' => true,
                     'options' => $this->BLocale->getAvailableCountries()],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at', 'cell' => 'datetime'],
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 'c.create_at', 'cell' => 'datetime'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
-            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true, 'cell' => 'datetime'],
+            ['name' => 'last_login', 'label' => (('Last Login')), 'index' => 'c.last_login', 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'export' => true,
@@ -113,18 +113,18 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
                 'a',
                 [
                     'class' => ['btn', 'btn-default'],
-                    'title' => $this->_('Redirect to frontend and create order'),
+                    'title' => $this->_(('Redirect to frontend and create order')),
                     'href' => $this->BApp->href('customers/start_session?id=' . $m->id()),
                 ],
                 [
-                    ['span', null, $this->_('Log in as Customer')],
+                    ['span', null, $this->_(('Log in as Customer'))],
                 ]
             ];
         }
         if ($m->id()) {
             $saleStatistics = $m->saleStatistics();
-            $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'], 'base')
-                . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg'], 'base');
+            $info = $this->_(('Lifetime Sales')) . ' ' . $this->BLocale->currency($saleStatistics['lifetime'], 'base')
+                . ' | ' . $this->_(('Avg. Sales')) . ' ' . $this->BLocale->currency($saleStatistics['avg'], 'base');
         } else {
             $info = '';
         }
@@ -213,13 +213,13 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         $config['id']      = 'group_all_customers_grid_' . $group->id;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'c.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'firstname', 'label' => (('Firstname')), 'index' => 'c.username', 'width' => 200],
+            ['name' => 'lastname', 'label' => (('Lastname')), 'index' => 'c.username', 'width' => 200],
+            ['name' => 'email', 'label' => (('Email')), 'index' => 'c.email', 'width' => 200],
         ];
         $config['actions'] = [
-            'add' => ['caption' => 'Add selected customers']
+            'add' => ['caption' => (('Add selected customers'))]
         ];
         $config['filters'] = [
             ['field' => 'firstname', 'type' => 'text'],

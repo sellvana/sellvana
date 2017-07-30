@@ -5,7 +5,7 @@ class Sellvana_MultiCurrency_RateProvider_OpenExchangeRates extends Sellvana_Mul
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_label = 'Open Exchange Rates';
+    protected $_label = (('Open Exchange Rates'));
 
     protected $_apiUrl = 'https://openexchangerates.org/api/latest.json';
 

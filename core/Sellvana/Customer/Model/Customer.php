@@ -40,10 +40,10 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'status' => [
-            'new'      => 'New',
-            'review'   => 'Review',
-            'active'   => 'Active',
-            'disabled' => 'Disabled',
+            'new'      => (('New')),
+            'review'   => (('Review')),
+            'active'   => (('Active')),
+            'disabled' => (('Disabled')),
         ],
     ];
     protected static $_importExportProfile = [
@@ -68,7 +68,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['email', '@required'],
-        ['email', 'BValidate::ruleFieldUnique', 'An account with this email address already exists'],
+        ['email', 'BValidate::ruleFieldUnique', (('An account with this email address already exists'))],
         ['firstname', '@required'],
         ['lastname', '@required'],
         //array('password', '@required'),
@@ -207,13 +207,13 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
                 $result['allow_login'] = true;
                 break;
             case 'review':
-                $result['error']['message'] = $this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
+                $result['error']['message'] = $this->_(('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.'));
                 break;
             case 'disabled':
-                $result['error']['message'] = $this->_('Your account is disabled. Please contact us for more details.');
+                $result['error']['message'] = $this->_(('Your account is disabled. Please contact us for more details.'));
                 break;
             default:
-                $result['error']['message'] = $this->_('Your account status has a problem. Please contact us for more details.');
+                $result['error']['message'] = $this->_(('Your account status has a problem. Please contact us for more details.'));
                 break;
         }
         return $result;
@@ -328,7 +328,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
         $password = $data[$args['field']];
         if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
-            return 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.';
+            return (('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.'));
         }
         return true;
     }
@@ -519,7 +519,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
                     $cust = static::$lastImportedCustomer;
                     $result['status'] = 'updated';
                 } else {
-                    $result = ['status' => 'error', 'message' => 'Missing email address'];
+                    $result = ['status' => 'error', 'message' => (('Missing email address'))];
                     return $result;
                 }
             } else {

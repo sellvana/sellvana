@@ -165,6 +165,7 @@
             - [ requireJs, sv-comp-grid-data-cell-row-select, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-row-select" ]
             - [ requireJs, sv-comp-grid-data-cell-actions, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions" ]
             - [ requireJs, sv-comp-grid-data-cell-actions-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/cell-actions.html" ]
+            - [ requireJs, sv-comp-grid-data-edit-dropdown, "@FCom_AdminSPA/AdminSPA/vue/component/grid/data/edit-dropdown" ]
 
             - [ requireJs, sv-comp-tree, "@FCom_AdminSPA/AdminSPA/vue/component/tree" ]
             - [ requireJs, sv-comp-tree-node-tpl, "@FCom_AdminSPA/AdminSPA/vue/component/tree/node.html" ]
@@ -188,6 +189,7 @@
             - [ requireJs, sv-page-default-form-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form.html" ]
             - [ requireJs, sv-page-default-form-tab, "@FCom_AdminSPA/AdminSPA/vue/page/default/form-tab" ]
             - [ requireJs, sv-page-default-form-tab-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form-tab.html" ]
+            - [ requireJs, sv-page-default-form-tab-grid-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/default/form-tab-grid.html" ]
 
             - [ requireJs, sv-page-dashboard, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard" ]
             - [ requireJs, sv-page-dashboard-tpl, "@FCom_AdminSPA/AdminSPA/vue/page/dashboard.html" ]

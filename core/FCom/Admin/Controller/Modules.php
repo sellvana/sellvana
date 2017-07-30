@@ -16,8 +16,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_modelClass = 'FCom_Core_Model_Module';
     protected $_gridHref = 'modules';
     protected $_gridLayoutName = '/modules';
-    protected $_gridTitle = 'Modules';
-    protected $_recordName = 'Product';
+    protected $_gridTitle = (('Modules'));
+    protected $_recordName = (('Product'));
     protected $_mainTableAlias = 'm';
 
     /**
@@ -117,12 +117,12 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                         array(
                             'type'=>'link','name'=>'required',
                             'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
-                            'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
+                            'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_(('Required'))
                         ),
                         array(
                             'type'=>'link','name'=>'ondemand',
                             'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
-                            'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
+                            'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_(('On Demand'))
                         ),
                     */
                     [
@@ -131,22 +131,22 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                     ],
                 ]
             ],
-            ['name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true],
-            ['name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true],
-            ['name' => 'version', 'label' => 'Version', 'width' => 80, 'overflow' => true],
-            ['name' => 'channel', 'label' => 'Channel', 'width' => 80, 'overflow' => true],
-            ['name' => 'schema_version', 'label' => 'DB Version', 'width' => 80,
+            ['name' => 'name', 'label' => (('Name')), 'index' => 'name', 'width' => 100, 'overflow' => true],
+            ['name' => 'description', 'label' => (('Description')), 'width' => 150, 'overflow' => true],
+            ['name' => 'version', 'label' => (('Version')), 'width' => 80, 'overflow' => true],
+            ['name' => 'channel', 'label' => (('Channel')), 'width' => 80, 'overflow' => true],
+            ['name' => 'schema_version', 'label' => (('DB Version')), 'width' => 80,
                 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true],
-            ['name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80,
+            ['name' => 'run_status', 'label' => (('Status')), 'options' => $runStatusOptions, 'width' => 80,
                 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true],
-            ['name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100,
+            ['name' => 'run_level', 'label' => (('Level')), 'options' => $coreRunLevelOptions, 'width' => 100,
                 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true],
-            ['type' => 'input', 'name' => 'run_level_core', 'label' => "Run Level (Core)", 'overflow' => true,
+            ['type' => 'input', 'name' => 'run_level_core', 'label' => (('Run Level (Core)')), 'overflow' => true,
                 'options' => $areaRunLevelOptions, 'width' => 200,  'validation' => ['required' => true],
                 'editable' => true, 'multirow_edit_show' => true, 'multirow_edit' => true, 'editor' => 'select'],
-            ['name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true],
-            ['name' => 'required_by', 'label' => 'Required By', 'width' => 300, 'overflow' => true],
-            ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300, 'overflow' => true,
+            ['name' => 'requires', 'label' => (('Requires')), 'width' => 250, 'overflow' => true],
+            ['name' => 'required_by', 'label' => (('Required By')), 'width' => 300, 'overflow' => true],
+            ['name' => 'dep_errors', 'label' => (('Dependency Errors')), 'width' => 300, 'overflow' => true,
                 'hidden' => true],
         ];
 
@@ -167,7 +167,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             ['field' => 'required_by', 'type' => 'multiselect', 'options' => $moduleNames],
         ];
         $config['actions'] = [
-            'edit' => ['caption' => 'Change Status']
+            'edit' => ['caption' => (('Change Status'))]
         ];
         $config['events'] = ['edit', 'mass-edit'];
         $config['grid_before_create'] = 'moduleGridRegister';
@@ -196,7 +196,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 'onclick' => "$('#util-form').attr('action', '{$this->BApp->href('modules/migrate')}').submit()",
             ],
             [
-                ['span', null, $this->_('Run Migration Scripts')]
+                ['span', null, $this->_(('Run Migration Scripts'))]
             ]
         ];
         unset($actions['new']);
@@ -281,7 +281,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         if (function_exists('opcache_reset')) {
             opcache_reset();
         }
-        echo "DONE";
+        echo (("DONE"));
         die;
     }
 }

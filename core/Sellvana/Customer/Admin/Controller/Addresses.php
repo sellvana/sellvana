@@ -9,8 +9,8 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'addresses';
     protected $_modelClass = 'Sellvana_Customer_Model_Address';
-    protected $_gridTitle = 'Addresses';
-    protected $_recordName = 'Address';
+    protected $_gridTitle = (('Addresses'));
+    protected $_recordName = (('Address'));
     protected $_mainTableAlias = 'a';
 
     public function gridConfig() {
@@ -56,53 +56,53 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115, 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditAddress', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'customer_id', 'label' => 'Customer ID', 'index' => 'a.customer_id', 'hidden' => true,
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => (('Actions')), 'sortable' => false, 'width' => 115, 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditAddress', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'a.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'customer_id', 'label' => (('Customer ID')), 'index' => 'a.customer_id', 'hidden' => true,
                 'form_hidden_label' => true, 'addable' => true, 'editable' => true,
                 'element_print' => '<input name="customer_id" id="customer_id" type="hidden" value="' . $customer->id . '" />',
                 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'firstname', 'label' => 'First Name', 'index' => 'a.firstname', 'width' => 200,
+            ['type' => 'input', 'name' => 'firstname', 'label' => (('First Name')), 'index' => 'a.firstname', 'width' => 200,
                 'addable' => true, 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'lastname', 'label' => 'Last Name', 'index' => 'a.lastname', 'width' => 200,
+            ['type' => 'input', 'name' => 'lastname', 'label' => (('Last Name')), 'index' => 'a.lastname', 'width' => 200,
                 'addable' => true, 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'company', 'label' => 'Company', 'index' => 'a.company', 'addable' => true,
+            ['type' => 'input', 'name' => 'company', 'label' => (('Company')), 'index' => 'a.company', 'addable' => true,
                 'editable' => true],
-            ['type' => 'input', 'name' => 'street1', 'label' => 'Address Line 1', 'index' => 'a.street1', 'width' => 200,
+            ['type' => 'input', 'name' => 'street1', 'label' => (('Address Line 1')), 'index' => 'a.street1', 'width' => 200,
                 'addable' => true, 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'street2', 'label' => 'Address Line 2', 'index' => 'a.street2', 'width' => 200,
+            ['type' => 'input', 'name' => 'street2', 'label' => (('Address Line 2')), 'index' => 'a.street2', 'width' => 200,
                 'hidden' => true, 'addable' => true, 'editable' => true],
-            ['type' => 'input', 'name' => 'street3', 'label' => 'Address Line 3', 'index' => 'a.street3', 'width' => 200,
+            ['type' => 'input', 'name' => 'street3', 'label' => (('Address Line 3')), 'index' => 'a.street3', 'width' => 200,
                 'hidden' => true, 'addable' => true, 'editable' => true],
-            ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
+            ['type' => 'input', 'name' => 'country', 'label' => (('Country')), 'index' => 'a.country', 'editor' => 'select',
                 'addable' => true, 'options' => $this->BLocale->getAvailableCountries(), 'editable' => true,
                 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'region', 'label' => 'State/Province/Region', 'index' => 'a.region',
+            ['type' => 'input', 'name' => 'region', 'label' => (('State/Province/Region')), 'index' => 'a.region',
                 'addable' => true, 'editable' => true, 'editor' => 'select',
                 'options' =>  $this->BLocale->getAvailableRegions(),
 //                'validation' => [ 'required' => true ],
             ],
-            ['type' => 'input', 'name' => 'city', 'label' => 'City', 'index' => 'a.city', 'addable' => true,
+            ['type' => 'input', 'name' => 'city', 'label' => (('City')), 'index' => 'a.city', 'addable' => true,
                 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'postcode', 'label' => 'Zip/Postal Code', 'index' => 'a.postcode',
+            ['type' => 'input', 'name' => 'postcode', 'label' => (('Zip/Postal Code')), 'index' => 'a.postcode',
                 'addable' => true, 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'phone', 'label' => 'Phone', 'index' => 'a.phone', 'addable' => true,
+            ['type' => 'input', 'name' => 'phone', 'label' => (('Phone')), 'index' => 'a.phone', 'addable' => true,
                 'editable' => true, 'hidden' => true],
-            ['type' => 'input', 'name' => 'fax', 'label' => 'Fax', 'index' => 'a.fax', 'addable' => true,
+            ['type' => 'input', 'name' => 'fax', 'label' => (('Fax')), 'index' => 'a.fax', 'addable' => true,
                 'editable' => true, 'hidden' => true],
-            ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'a.email', 'width' => 100,
+            ['type' => 'input', 'name' => 'email', 'label' => (('Email')), 'index' => 'a.email', 'width' => 100,
                 'addable' => true, 'editable' => true, 'validation' => ['email' => true]],
-            ['name' => 'is_default_billing', 'label' => 'Is Default Billing', 'display' => 'eval',
+            ['name' => 'is_default_billing', 'label' => (('Is Default Billing')), 'display' => 'eval',
                 'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_billing_id]\' "+(rc.row["is_default_billing"] == 1 ? checked=\'checked\' : \'\')+" />"'
             ],
-            ['name' => 'is_default_shipping', 'label' => 'Is Default Shipping', 'display' => 'eval',
+            ['name' => 'is_default_shipping', 'label' => (('Is Default Shipping')), 'display' => 'eval',
                 'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_shipping_id]\' "+(rc.row["is_default_shipping"] == 1 ? checked=\'checked\' : \'\')+" />"'
             ]
         ];
         $config['actions'] = [
             // 'new'    => ['caption' => 'Add New Address', 'modal' => true],
             'add-address' => [
-                'caption'  => 'Add New Address',
+                'caption'  => (('Add New Address')),
                 'type'     => 'button',
                 'id'       => 'add-address-from-grid',
                 'class'    => 'btn-primary',

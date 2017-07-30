@@ -14,7 +14,7 @@ class Sellvana_Catalog_Admin_Controller_Report_LowInventory extends FCom_Admin_C
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/low_inventory';
     protected $_gridHref = 'catalog/report/inventory/low_inventory';
-    protected $_gridTitle = 'Low Inventory';
+    protected $_gridTitle = (('Low Inventory'));
 
     protected $_statDays = [7, 30, 90, 180];
 
@@ -24,7 +24,7 @@ class Sellvana_Catalog_Admin_Controller_Report_LowInventory extends FCom_Admin_C
         $config['columns'] = [
             ['name' => 'inventory_sku', 'index' => 'i.inventory_sku'],
             ['name' => 'title', 'index' => 'i.title'],
-            ['name' => 'is_hidden', 'index' => 'p.is_hidden', 'options' => [1 => 'Inactive', 0 => 'Active']],
+            ['name' => 'is_hidden', 'index' => 'p.is_hidden', 'options' => [1 => (('Inactive')), 0 => (('Active'))]],
             ['name' => 'qty_in_stock', 'index' => 'i.qty_in_stock'],
 //            ['name' => 'out_of_stock_date', 'index' => 'out_of_stock_date'],
             ['name' => 'last_sold_date', 'index' => 'last_sold_date', 'cell' => 'datetime'],
@@ -47,16 +47,16 @@ class Sellvana_Catalog_Admin_Controller_Report_LowInventory extends FCom_Admin_C
     protected function _getFieldLabels()
     {
         return [
-            'inventory_sku' => 'SKU',
-            'title' => 'Name',
+            'inventory_sku' => (('SKU')),
+            'title' => (('Name')),
             'is_hidden' => 'Active/Inactive',
-            'qty_in_stock' => 'Qty in Stock',
-            'out_of_stock_date' => 'Date Went Out of Stock',
-            'last_sold_date' => 'Last Sold Date',
-            'qty_sold_7d' => 'Qty Sold Last 7 days',
-            'qty_sold_30d' => 'Qty Sold Last 30 days',
-            'qty_sold_90d' => 'Qty Sold Last 90 days',
-            'qty_sold_180d' => 'Qty Sold Last 180 days',
+            'qty_in_stock' => (('Qty in Stock')),
+            'out_of_stock_date' => (('Date Went Out of Stock')),
+            'last_sold_date' => (('Last Sold Date')),
+            'qty_sold_7d' => (('Qty Sold Last 7 days')),
+            'qty_sold_30d' => (('Qty Sold Last 30 days')),
+            'qty_sold_90d' => (('Qty Sold Last 90 days')),
+            'qty_sold_180d' => (('Qty Sold Last 180 days')),
         ];
     }
 

@@ -421,6 +421,9 @@
       vertical-align: middle;
       margin: 0 10px 0 0;
       text-align: left;
+      .f-tags__drop {
+            padding: 10px 12px 8px;
+      }
 }
 
 .f-tags__tag-content {
@@ -443,7 +446,7 @@
 
 .f-tags__remove {
       display: inline-block;
-      padding: 9px 6px;
+      padding: 9px 8px 9px;
       color: #2e4354;
       position: absolute;
       top: 0;

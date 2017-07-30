@@ -198,7 +198,7 @@ class FCom_Admin_Controller_Google2FA extends FCom_Admin_Controller_Abstract
             $result = ['success' => 1];
             $user->set('g2fa_status', 9)->save();
         } else {
-            $result = ['error' => 1, 'message' => $this->_('Invalid code, please try again')];
+            $result = ['error' => 1, 'message' => $this->_(('Invalid code, please try again'))];
         }
         $this->BResponse->json($result);
     }

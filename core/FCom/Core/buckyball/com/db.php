@@ -321,7 +321,7 @@ class BDb
         $res = [];
         foreach ((array)$rows as $i => $r) {
             if (!$r instanceof BModel) {
-                echo "Rows are not models: <pre>"; print_r($r);
+                echo (('Rows are not models: <pre>')); print_r($r);
                 BDebug::cleanBacktrace();
                 exit;
             }
@@ -3427,7 +3427,7 @@ class BModel extends Model
         }
         if (null !== $emptyValue && false !== $emptyValue) {
             if (true === $emptyValue) {
-                $emptyValue = 'Please select...';
+                $emptyValue = (('Please select...'));
             }
             if (is_scalar($emptyValue)) {
                 $emptyValue = ['' => $emptyValue];

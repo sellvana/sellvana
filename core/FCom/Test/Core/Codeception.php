@@ -327,11 +327,11 @@ class FCom_Test_Core_Codeception extends BClass
         // If Codeceptions not properly configured, the test won't be found
         // and it won't be run.
         if (!$this->ready()) {
-            $response['message'] = 'The Codeception configuration could not be loaded.';
+            $response['message'] = (('The Codeception configuration could not be loaded.'));
         }
         // If the test can't be found, we can't run the test.
         if (!$test = $this->getTest($type, $hash)) {
-            $response['message'] = 'The test could not be found.';
+            $response['message'] = (('The test could not be found.'));
         }
 
         // If there's no error message set yet, it means we're good to go!
@@ -362,9 +362,9 @@ class FCom_Test_Core_Codeception extends BClass
         $response['resource'] = $file;
 
         if (!file_exists($file)) {
-            $response['error'] = 'The Codeception executable could not be found.';
+            $response['error'] = (('The Codeception executable could not be found.'));
         } elseif (!is_executable($file) && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            $response['error'] = 'Codeception isn\'t executable. Have you set executable rights to the following (try chmod o+x).';
+            $response['error'] = (('Codeception isn\'))t executable. Have you set executable rights to the following (try chmod o+x).';
         }
 
         // If there wasn't an error, then it's good!

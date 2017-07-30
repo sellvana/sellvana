@@ -11,13 +11,13 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends Sellvana_Sales_Model
         PARTIAL = 'partial';
 
     protected $_valueLabels = [
-        self::FREE => 'Free',
-        self::UNPAID => 'Unpaid',
-        self::PROCESSING => 'Processing',
-        self::PAID => 'Paid',
-        self::OUTSTANDING => 'Outstanding',
-        self::CANCELED => 'Canceled',
-        self::PARTIAL => 'Partial',
+        self::FREE => (('Free')),
+        self::UNPAID => (('Unpaid')),
+        self::PROCESSING => (('Processing')),
+        self::PAID => (('Paid')),
+        self::OUTSTANDING => (('Outstanding')),
+        self::CANCELED => (('Canceled')),
+        self::PARTIAL => (('Partial')),
     ];
 
     protected $_defaultValue = self::UNPAID;

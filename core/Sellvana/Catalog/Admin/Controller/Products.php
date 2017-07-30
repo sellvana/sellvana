@@ -23,8 +23,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Catalog_Model_Product';
     protected $_gridHref = 'catalog/products';
-    protected $_gridTitle = 'Products';
-    protected $_recordName = 'Product';
+    protected $_gridTitle = (('Products'));
+    protected $_recordName = (('Product'));
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
     protected $_formLayoutName = '/catalog/products/form';
@@ -36,28 +36,28 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $bool = [0 => 'no', 1 => 'Yes'];
+        $bool = [0 => (('no')), 1 => (('Yes'))];
         $config['columns'] = [
             ['type' => 'row_select', 'width' => 55],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete']
             ]],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-            ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 55, 'hidden' => true],
+            ['display' => 'eval', 'name' => 'thumb_path', 'label' => (('Thumbnail')), 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
-            ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
-            ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
-            ['name' => 'is_hidden', 'label' => 'Hidden?', 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
-            ['name' => 'manage_inventory', 'label' => 'Manage Inv?', 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
+            ['name' => 'product_name', 'label' => (('Name')), 'width' => 250],
+            ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 100],
+            ['name' => 'short_description', 'label' => (('Description')),  'width' => 200],
+            ['name' => 'is_hidden', 'label' => (('Hidden?')), 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
+            ['name' => 'manage_inventory', 'label' => (('Manage Inv?')), 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
             //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
             //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
-            ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
-            ['name' => 'ship_weight', 'label' => 'Ship Weight',  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
-            ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100, 'cell' => 'datetime'],
-            ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'net_weight', 'label' => (('Net Weight')),  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
+            ['name' => 'ship_weight', 'label' => (('Ship Weight')),  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
+            ['name' => 'position', 'label' => (('Position')), 'index' => 'p.position', 'hidden' => true],
+            ['name' => 'create_at', 'label' => (('Created')), 'index' => 'p.create_at', 'width' => 100, 'cell' => 'datetime'],
+            ['name' => 'update_at', 'label' => (('Updated')), 'index' => 'p.update_at', 'width' => 100, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'refresh' => true,
@@ -153,7 +153,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'onclick' => 'return confirm(\'Are you sure?\')',
                 ],
                 [
-                    ['span', null, $this->_('Duplicate')],
+                    ['span', null, $this->_(('Duplicate'))],
                 ], 50
             ];
         }
@@ -235,10 +235,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config = $this->gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-            ['name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 55, 'hidden' => true],
+            ['name' => 'product_name', 'label'   => (('Name')), 'index'   => 'p.product_name',
                 'width' => 450, 'addable' => true],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 70],
+            ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 70],
         ];
 
 //        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
@@ -246,10 +246,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($gridId) {
             $config['id'] = $gridId;
         }
-        $config['caption'] = 'All products';
+        $config['caption'] = (('All products'));
 
         $config['actions'] = [
-            'add' => ['caption' => 'Add selected products']
+            'add' => ['caption' => (('Add selected products'))]
         ];
         $config['grid_before_create'] = 'prodLibGridRegister';
         //$config['custom']['autoresize'] = '#linked-products-layout';
@@ -270,29 +270,29 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config = [
             'config' => [
                 'id' => 'product_attachments',
-                'caption' => 'Product Attachments',
+                'caption' => (('Product Attachments')),
                 'data_mode' => 'local',
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
-                    ['name' => 'file_id', 'label' => 'File ID', 'width' => 400, 'hidden' => true],
-                    ['name' => 'product_id', 'label' => 'Product ID', 'width' => 400, 'hidden' => true, 'default' => $model->id()],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                    ['name' => 'id', 'label' => (('ID')), 'width' => 400, 'hidden' => true],
+                    ['name' => 'file_id', 'label' => (('File ID')), 'width' => 400, 'hidden' => true],
+                    ['name' => 'product_id', 'label' => (('Product ID')), 'width' => 400, 'hidden' => true, 'default' => $model->id()],
+                    ['name' => 'file_name', 'label' => (('File Name')), 'width' => 200, 'display' => 'eval',
                         'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
                             . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
+                    ['name' => 'file_size', 'label' => (('File Size')), 'width' => 200, 'display' => 'file_size'],
+                    ['type' => 'input', 'name' => 'label', 'label' => (('Label')), 'width' => 250, 'editable' => 'inline'],
+                    ['type' => 'input', 'name' => 'position', 'label' => (('Position')), 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200, 'cell' => 'datetime'],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200, 'cell' => 'datetime'],
+                    ['name' => 'create_at', 'label' => (('Created')), 'width' => 200, 'cell' => 'datetime'],
+                    ['name' => 'update_at', 'label' => (('Updated')), 'width' => 200, 'cell' => 'datetime'],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
                 ],
                 'actions' => [
                     // 'add' => ['caption' => 'Add attachments'],
-                    'delete' => ['caption' => 'Remove']
+                    'delete' => ['caption' => (('Remove'))]
                 ],
                 'grid_before_create' => 'attachmentGridRegister',
                 'filters' => [
@@ -305,7 +305,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $config['config']['actions'] += [
             'add-attachment' => [
-                'caption'  => 'Add attachments',
+                'caption'  => (('Add attachments')),
                 'type'     => 'button',
                 'id'       => 'add-attachment-from-grid',
                 'class'    => 'btn-primary',
@@ -343,50 +343,50 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config =  [
             'config' => [
                 'id' => 'product_images',
-                'caption' => 'Product Images',
+                'caption' => (('Product Images')),
                 'data_mode' => 'local',
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                    ['type' => 'btn_group', 'name' => '_actions', 'label' => (('Actions')), 'sortable' => false,
                         'buttons' => [['name' => 'delete']]],
                     ['name' => 'id', 'hidden' => true],
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
                     ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
-                    ['name' => 'file_name', 'label' => 'File Name'],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                    ['name' => 'file_name', 'label' => (('File Name'))],
+                    ['name' => 'prev_img', 'label' => (('Preview')), 'width' => 110, 'display' => 'eval',
                         'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
                             . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
                             . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
                         'sortable' => false],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 80, 'display' => 'file_size'],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
+                    ['name' => 'file_size', 'label' => (('File Size')), 'width' => 80, 'display' => 'file_size'],
+                    ['type' => 'input', 'name' => 'label', 'label' => (('Label')), 'width' => 250, 'editable' => 'inline'],
+                    ['type' => 'input', 'name' => 'position', 'label' => (('Position')), 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
-                    ['name' => 'is_default', 'label' => 'Image', 'width' => 50, 'display' => 'eval',
+                    ['name' => 'is_default', 'label' => (('Image')), 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
                             . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[is_default]\' '
                             . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"'],
-                    ['name' => 'is_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
+                    ['name' => 'is_thumb', 'label' => (('Thumbnail')), 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'is-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
                             . ' "+(rc.row["is_thumb"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[is_thumb]\' '
                             . 'data-is-thumb=\'"+rc.row["is_thumb"]+"\'/>"'],
-                    ['name' => 'is_rollover', 'label' => 'Rollover', 'width' => 50, 'display' => 'eval',
+                    ['name' => 'is_rollover', 'label' => (('Rollover')), 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'is-rollover\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
                             . ' "+(rc.row["is_rollover"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[is_rollover]\' '
                             . 'data-is-rollover=\'"+rc.row["is_rollover"]+"\'/>"'],
-                    ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
+                    ['name' => 'in_gallery', 'label' => (('In Gallery')), 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
                             . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images["+rc.row["id"]+"][in_gallery]\' '
                             . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200, 'cell' => 'datetime'],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200, 'cell' => 'datetime']
+                    ['name' => 'create_at', 'label' => (('Created')), 'width' => 200, 'cell' => 'datetime'],
+                    ['name' => 'update_at', 'label' => (('Updated')), 'width' => 200, 'cell' => 'datetime']
                 ],
                 'actions' => [
                     'refresh' => true,
@@ -394,11 +394,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'quick_add' => [
                         'html' => '<span id="dropzone" class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
-                                     <span>' . $this->_('Quick add images') . '</span>
+                                     <span>' . $this->_(('Quick add images')) . '</span>
                                      <input type="file" name="upload[]" id="quick-add-images" multiple="">
                                    </span>'
                     ],
-                    'delete' => ['caption' => 'Remove'],
+                    'delete' => ['caption' => (('Remove'))],
                 ],
                 'grid_before_create' => 'imagesGridRegister',
                 'grid_after_built' => 'afterBuiltImagesGrid',
@@ -415,7 +415,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $config['config']['actions'] += [
             'add-images' => [
-                'caption'  => 'Add images',
+                'caption'  => (('Add images')),
                 'type'     => 'button',
                 'id'       => 'add-image-from-grid',
                 'class'    => 'btn-primary',
@@ -463,14 +463,14 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config =  [
             'config' => [
                 'id' => 'product_videos',
-                'caption' => 'Product Videos',
+                'caption' => (('Product Videos')),
                 'data_mode' => 'local',
                 'data' => $this->_processMediaLink($data),
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'width' => 60, 'sortable' => false,
+                    ['type' => 'btn_group', 'name' => '_actions', 'label' => (('Actions')), 'width' => 60, 'sortable' => false,
                         'buttons' => [
-                            ['name' => 'edit-custom', 'callback' => 'showModalToPreviewVideo', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-eye-open ", 'title' => 'Preview'],
+                            ['name' => 'edit-custom', 'callback' => 'showModalToPreviewVideo', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-eye-open ", 'title' => (('Preview'))],
                             ['name' => 'delete']
                         ]
                     ],
@@ -478,21 +478,21 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 180],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 80, 'display' => 'eval', 'print' => $fileSizeEle],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
+                    ['name' => 'file_name', 'label' => (('File Name')), 'width' => 180],
+                    ['name' => 'file_size', 'label' => (('File Size')), 'width' => 80, 'display' => 'eval', 'print' => $fileSizeEle],
+                    ['type' => 'input', 'name' => 'label', 'label' => (('Label')), 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
+                    ['type' => 'input', 'name' => 'position', 'label' => (('Position')), 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
-                    ['name' => 'is_default', 'label' => 'Default', 'width' => 50, 'display' => 'eval',
+                    ['name' => 'is_default', 'label' => (('Default')), 'width' => 50, 'display' => 'eval',
                         'print' => $isDefaultEle],
-                    ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
+                    ['name' => 'in_gallery', 'label' => (('In Gallery')), 'width' => 50, 'display' => 'eval',
                         'print' => $inGalleryEle],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 130, 'cell' => 'datetime'],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 130, 'cell' => 'datetime']
+                    ['name' => 'create_at', 'label' => (('Created')), 'width' => 130, 'cell' => 'datetime'],
+                    ['name' => 'update_at', 'label' => (('Updated')), 'width' => 130, 'cell' => 'datetime']
                 ],
                 'actions' => [
                     'refresh' => true,
-                    'delete' => ['caption' => 'Remove'],
+                    'delete' => ['caption' => (('Remove'))],
                 ],
                 'grid_after_built' => 'afterBuiltImagesGrid',
                 'afterMassDelete' => 'afterMassDelete',
@@ -508,7 +508,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $config['config']['actions'] += [
             'add-videos' => [
-                'caption'  => 'Add Videos',
+                'caption'  => (('Add Videos')),
                 'type'     => 'button',
                 'id'       => 'add-video-from-grid',
                 'class'    => 'btn-primary',
@@ -545,9 +545,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config['data_mode'] = 'local';
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-            ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 55, 'hidden' => true],
+            ['name' => 'product_name', 'label' => (('Name')), 'index' => 'p.product_name', 'width' => 250],
+            ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 100],
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
@@ -586,22 +586,22 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config['config']['data_mode'] = 'local';
         $config['config']['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
-            ['name' => 'sort_order', 'label' => 'Position', 'index' => 'cp.sort_order', 'width' => 80,
+            ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'product_name', 'label' => (('Name')), 'index' => 'p.product_name', 'width' => 400],
+            ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 200],
+            ['name' => 'sort_order', 'label' => (('Position')), 'index' => 'cp.sort_order', 'width' => 80,
                 'editable' => 'inline', 'type' => 'input', 'cssClass' => 'js-sort_order'],
         ];
         $config['config']['actions'] = [
             #'add' => ['caption' => 'Add products'],
             'add-product' => [
-                'caption'  => 'Add Products',
+                'caption'  => (('Add Products')),
                 'type'     => 'button',
                 'id'       => 'add-product-from-grid',
                 'class'    => 'btn-primary',
                 'callback' => 'showModalToAddProduct'
             ],
-            'delete' => ['caption' => 'Remove']
+            'delete' => ['caption' => (('Remove'))]
         ];
         $config['config']['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
@@ -636,7 +636,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
 
             //TODO: flexibility for more types
-            $caption = $type == 'related' ? 'Related Products' : 'Similar Products';
+            $caption = $type == 'related' ? (('Related Products')) : (('Similar Products'));
             break;
 
             default:
@@ -654,17 +654,17 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             //'caption'      =>$caption,
             'columns'      => [
                 ['type' => 'row_select'],
-                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-                ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-                ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
+                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'product_name', 'label' => (('Name')), 'index' => 'p.product_name', 'width' => 400],
+                ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 200],
                 //['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
                 //['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
-                ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
+                ['name' => 'product_link_position', 'label' => (('Position')), 'index' => 'pl.position', 'width' => 50,
                     'editable' => 'inline', 'validation' => ['number' => true], 'type' => 'input'],
             ],
             'actions' => [
                 #'add' => ['caption' => 'Add products'],
-                'delete' => ['caption' => 'Remove']
+                'delete' => ['caption' => (('Remove'))]
             ],
             'filters' => [
                 ['field' => 'product_name', 'type' => 'text'],
@@ -678,7 +678,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             case 'related':
                 $config['config']['actions'] += [
                     'add-related-product' => [
-                        'caption'  => 'Add Related Products',
+                        'caption'  => (('Add Related Products')),
                         'type'     => 'button',
                         'id'       => $gridId,
                         'class'    => 'btn-primary',
@@ -689,7 +689,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             case 'similar':
                 $config['config']['actions'] += [
                     'add-similar-product' => [
-                        'caption'  => 'Add Similar Products',
+                        'caption'  => (('Add Similar Products')),
                         'type'     => 'button',
                         'id'       => $gridId,
                         'class'    => 'btn-primary',
@@ -700,7 +700,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             case 'cross_sell':
                 $config['config']['actions'] += [
                     'add-cross-product' => [
-                        'caption'  => 'Add Cross Sell Products',
+                        'caption'  => (('Add Cross Sell Products')),
                         'type'     => 'button',
                         'id'       => $gridId,
                         'class'    => 'btn-primary',

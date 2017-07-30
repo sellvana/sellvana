@@ -12,8 +12,8 @@ class Sellvana_CustomerSegments_Admin_Controller_Segments extends FCom_Admin_Con
 
     protected $_gridHref = 'customer-segments';
     protected $_modelClass = 'Sellvana_CustomerSegments_Model_Segment';
-    protected $_gridTitle = 'Customer Segments';
-    protected $_recordName = 'Customer Segment';
+    protected $_gridTitle = (('Customer Segments'));
+    protected $_recordName = (('Customer Segment'));
     protected $_mainTableAlias = 'cg';
     protected $_navPath = 'customer/customer-segments';
     protected $_permission = 'customer_segments';
@@ -26,15 +26,15 @@ class Sellvana_CustomerSegments_Admin_Controller_Segments extends FCom_Admin_Con
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 'cg.id'],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title',
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50, 'index' => 'cg.id'],
+            ['type' => 'input', 'name' => 'title', 'label' => (('Title')), 'width' => 300, 'index' => 'cg.title',
                 'editable' => true, 'addable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code',
+            ['type' => 'input', 'name' => 'code', 'label' => (('Code')), 'width' => 300, 'index' => 'cg.code',
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('customer-segments/unique')]],
         ];
         $config['actions'] = [
-            'new' => array('caption' => 'Add New Customer Segment', 'modal' => true),
+            'new' => array('caption' => (('Add New Customer Segment')), 'modal' => true),
             'edit' => true,
             'delete' => true
         ];
@@ -51,7 +51,7 @@ class Sellvana_CustomerSegments_Admin_Controller_Segments extends FCom_Admin_Con
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_segment" class="btn grid-new btn-primary _modal">'
-                     . $this->_('Add New Customer Segment') . '</button>']]);
+                     . $this->_(('Add New Customer Segment')) . '</button>']]);
     }
 
     public function formPostAfter($args)

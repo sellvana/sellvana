@@ -13,7 +13,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
     const SERVICE_SHIP  = 'Ship';
     const SERVICE_TRACK = 'Track';
 
-    protected $_name           = 'FedEx';
+    protected $_name           = (('FedEx'));
     protected $_code           = 'fedex';
     protected $_configPath     = 'modules/Sellvana_ShippingFedex';
     protected $_trackingUpdate = true;
@@ -124,7 +124,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         if (!isset($rates->RateReplyDetails)) {
             return [
                 'error' => 1,
-                'message' => $this->_('No rates available'),
+                'message' => $this->_(('No rates available')),
             ];
         }
         $rateReplyDetails = $rates->RateReplyDetails;
@@ -177,7 +177,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         $request = $this->_buildRequest();
         $request = array_merge($request, $this->_buildShipmentData($shipment));
         $request['RequestedShipment']['ServiceType'] = trim($shipment->get('service_code'), '_');
-        $request['TransactionDetail'] = ['CustomerTransactionId' => 'Process shipment request for order ID: ' . $shipment->order()->id()];
+        $request['TransactionDetail'] = ['CustomerTransactionId' => $this->_((('Process shipment request for order ID: %s')), $shipment->order()->id())];
         $result = $client->processShipment($request);
 
         if ($result->HighestSeverity == 'ERROR') {
@@ -307,7 +307,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         if (!$this->_data('access_key') || !$this->_data('password')) {
             $result = [
                 'error' => 1,
-                'message' => 'Incomplete FedEx User Authentication configuration',
+                'message' => (('Incomplete FedEx User Authentication configuration')),
             ];
             return $result;
         }
@@ -345,7 +345,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         if (count($dimensions) !== 3) {
             $result = [
                 'error' => 1,
-                'message' => 'Dimensions in wrong format',
+                'message' => (('Dimensions in wrong format')),
             ];
             return $result;
         }
@@ -527,40 +527,40 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
     public function getDropoffLocations()
     {
         return [
-            'BUSINESS_SERVICE_CENTER' => $this->_('Authorized FedEx business service center'),
-            'DROP_BOX' => $this->_('Drop box'),
-            'REGULAR_PICKUP' => $this->_('Regular scheduled pickup'),
-            'REQUEST_COURIER' => $this->_('Request a FedEx courier'),
-            'STATION' => $this->_('FedEx Station'),
+            'BUSINESS_SERVICE_CENTER' => $this->_(('Authorized FedEx business service center')),
+            'DROP_BOX' => $this->_(('Drop box')),
+            'REGULAR_PICKUP' => $this->_(('Regular scheduled pickup')),
+            'REQUEST_COURIER' => $this->_(('Request a FedEx courier')),
+            'STATION' => $this->_(('FedEx Station')),
         ];
     }
 
     public function getServices()
     {
         return [
-            '_INTERNATIONAL_PRIORITY' => 'International Priority',
+            '_INTERNATIONAL_PRIORITY' => (('International Priority')),
             '_INTERNATIONAL_PRIORITY_SATURDAY_DELIVERY' => 'International Priority (Saturday Delivery)',
-            '_INTERNATIONAL_ECONOMY' => 'International Economy',
-            '_INTERNATIONAL_FIRST' => 'International First',
-            '_INTERNATIONAL_PRIORITY_FREIGHT' => 'International Priority Freight',
-            '_INTERNATIONAL_ECONOMY_FREIGHT' => 'International Economy Freight',
-            '_INTERNATIONAL_GROUND' => 'International Ground',
-            '_PRIORITY_OVERNIGHT' => 'Priority Overnight',
+            '_INTERNATIONAL_ECONOMY' => (('International Economy')),
+            '_INTERNATIONAL_FIRST' => (('International First')),
+            '_INTERNATIONAL_PRIORITY_FREIGHT' => (('International Priority Freight')),
+            '_INTERNATIONAL_ECONOMY_FREIGHT' => (('International Economy Freight')),
+            '_INTERNATIONAL_GROUND' => (('International Ground')),
+            '_PRIORITY_OVERNIGHT' => (('Priority Overnight')),
             '_PRIORITY_OVERNIGHT_SATURDAY_DELIVERY' => 'Priority Overnight (Saturday Delivery)',
             '_FEDEX_2_DAY' => '2Day',
             '_FEDEX_2_DAY_SATURDAY_DELIVERY' => '2Day (Saturday Delivery)',
-            '_STANDARD_OVERNIGHT' => 'Standard Overnight',
-            '_FIRST_OVERNIGHT' => 'First Overnight',
+            '_STANDARD_OVERNIGHT' => (('Standard Overnight')),
+            '_FIRST_OVERNIGHT' => (('First Overnight')),
             '_FIRST_OVERNIGHT_SATURDAY_DELIVERY' => 'First Overnight (Saturday Delivery)',
-            '_FEDEX_EXPRESS_SAVER' => 'Express Saver',
+            '_FEDEX_EXPRESS_SAVER' => (('Express Saver')),
             '_FEDEX_1_DAY_FREIGHT' => '1 Day Freight',
             '_FEDEX_1_DAY_FREIGHT_SATURDAY_DELIVERY' => '1 Day Freight (Saturday Delivery)',
             '_FEDEX_2_DAY_FREIGHT' => '2 Day Freight',
             '_FEDEX_2_DAY_FREIGHT_SATURDAY_DELIVERY' => '2 Day Freight (Saturday Delivery)',
             '_FEDEX_3_DAY_FREIGHT' => '3 Day Freight',
             '_FEDEX_3_DAY_FREIGHT_SATURDAY_DELIVERY' => '3 Day Freight (Saturday Delivery)',
-            '_GROUND_HOME_DELIVERY' => 'Ground Home Delivery',
-            '_FEDEX_GROUND' => 'Ground',
+            '_GROUND_HOME_DELIVERY' => (('Ground Home Delivery')),
+            '_FEDEX_GROUND' => (('Ground')),
         ];
     }
 
@@ -684,7 +684,7 @@ class Sellvana_ShippingFedex_ShippingMethod extends Sellvana_Sales_Method_Shippi
         } catch (Exception $e) {
             return ['error' => true, 'message' => $e->getMessage(), 'states' => $states];
         }
-        return ['message' => 'Success', 'states' => $states];
+        return ['message' => (('Success')), 'states' => $states];
    }
 
 

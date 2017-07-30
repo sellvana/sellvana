@@ -79,7 +79,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         $result = $this->_processResponse($response, $transaction);
 
         if (empty($result['success'])) {
-            $result['error']['message'] = "Your payment has not been accepted by AuthorizeNet";
+            $result['error']['message'] = (("Your payment has not been accepted by AuthorizeNet"));
             $this->Sellvana_Sales_Main->workflowAction('customerFailsCheckoutPayment', [
                 'payment' => $transaction->payment(),
             ]);
@@ -95,7 +95,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         $result = $this->_processResponse($response, $transaction);
 
         if (empty($result['success'])) {
-            $result['error']['message'] = "Your payment has not been accepted by AuthorizeNet";
+            $result['error']['message'] = (("Your payment has not been accepted by AuthorizeNet"));
             $this->Sellvana_Sales_Main->workflowAction('customerFailsCheckoutPayment', [
                 'payment' => $transaction->payment(),
             ]);

@@ -10,12 +10,12 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
         PARTIAL = 'partial';
 
     protected $_valueLabels = [
-        self::VIRTUAL => 'Virtual',
-        self::PENDING => 'Pending',
-        self::PACKED => 'Packed',
-        self::SHIPPED => 'Shipped',
-        self::DELIVERED => 'Delivered',
-        self::PARTIAL => 'Partial',
+        self::VIRTUAL => (('Virtual')),
+        self::PENDING => (('Pending')),
+        self::PACKED => (('Packed')),
+        self::SHIPPED => (('Shipped')),
+        self::DELIVERED => (('Delivered')),
+        self::PARTIAL => (('Partial')),
     ];
 
     protected $_setValueNotificationTemplates = [

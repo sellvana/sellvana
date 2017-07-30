@@ -12,7 +12,7 @@ function ($, _, Vue, SvMixinCommon, Accounting, Moment, Sortable,
     String.prototype.supplant = function (o) {
         return this.replace(/\{([^{}]*)\}/g, function (a, b) {
             var r = o[b];
-console.log(a, b, o, o[b]);
+//console.log(a, b, o, o[b]);
             return typeof r === 'string' || typeof r === 'number' ? r : a;
         });
     };

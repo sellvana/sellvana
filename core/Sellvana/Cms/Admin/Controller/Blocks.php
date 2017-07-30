@@ -15,8 +15,8 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'cms/blocks';
     protected $_modelClass = 'Sellvana_Cms_Model_Block';
-    protected $_gridTitle = 'CMS Block';
-    protected $_recordName = 'CMS Block';
+    protected $_gridTitle = (('CMS Block'));
+    protected $_recordName = (('CMS Block'));
     protected $_formTitleField = 'handle';
 
     public function gridConfig()
@@ -28,19 +28,19 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
                 ['name' => 'edit'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'handle', 'label' => 'Handle'],
-            ['name' => 'description', 'label' => 'Description', 'editable' => true],
-            ['type' => 'input', 'name' => 'renderer', 'label' => 'Renderer', 'editor' => 'select',
+            ['name' => 'handle', 'label' => (('Handle'))],
+            ['name' => 'description', 'label' => (('Description')), 'editable' => true],
+            ['type' => 'input', 'name' => 'renderer', 'label' => (('Renderer')), 'editor' => 'select',
                   'options' => $this->BLayout->getAllRenderers(true), 'editable' => true, 'multirow_edit' => true],
-            ['name' => 'version', 'label' => 'Version'],
-            ['type' => 'input', 'name' => 'page_enabled', 'label' => 'Page Enable', 'editor' => 'select',
-                  'options' => ['1' => 'Yes', '0' => 'No'], 'editable' => true, 'multirow_edit' => true],
-            ['name' => 'page_url', 'label' => 'Page Url'],
-            ['name' => 'page_title', 'label' => 'Page Title'],
-            ['name' => 'meta_title', 'label' => 'Meta Title', 'hidden' => true],
-            ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
-            ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
-            ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true, 'cell' => 'datetime'],
+            ['name' => 'version', 'label' => (('Version'))],
+            ['type' => 'input', 'name' => 'page_enabled', 'label' => (('Page Enable')), 'editor' => 'select',
+                  'options' => ['1' => (('Yes')), '0' => (('No'))], 'editable' => true, 'multirow_edit' => true],
+            ['name' => 'page_url', 'label' => (('Page Url'))],
+            ['name' => 'page_title', 'label' => (('Page Title'))],
+            ['name' => 'meta_title', 'label' => (('Meta Title')), 'hidden' => true],
+            ['name' => 'meta_description', 'label' => (('Meta Description')), 'hidden' => true],
+            ['name' => 'meta_keywords', 'label' => (('Meta Keywords')), 'hidden' => true],
+            ['name' => 'modified_time', 'label' => (('Modified Time')), 'hidden' => true, 'cell' => 'datetime'],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -67,20 +67,20 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config['orm'] = null;
         $config['data'] = $data;
         $config['id'] = 'frontend-field-grid';
-        $config['caption'] = 'Frontend Field Grid';
+        $config['caption'] = (('Frontend Field Grid'));
         $config['data_mode'] = 'local';
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'width' => 30],
-            ['name' => 'name', 'label' => 'Field Name', 'width' => 200,],
-            ['name' => 'label', 'label' => 'Field Label', 'width' => 200,],
-            ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200,],
-            ['name' => 'required', 'label' => 'Required', 'width' => 150,],
-            ['name' => 'position', 'label' => 'Position', 'width' => 200,],
-            ['name' => 'options', 'label' => 'Options', 'width' => 200, 'hidden' => true],
+            ['name' => 'id', 'label' => (('ID')), 'width' => 30],
+            ['name' => 'name', 'label' => (('Field Name')), 'width' => 200,],
+            ['name' => 'label', 'label' => (('Field Label')), 'width' => 200,],
+            ['name' => 'input_type', 'label' => (('Field Type')), 'width' => 200,],
+            ['name' => 'required', 'label' => (('Required')), 'width' => 150,],
+            ['name' => 'position', 'label' => (('Position')), 'width' => 200,],
+            ['name' => 'options', 'label' => (('Options')), 'width' => 200, 'hidden' => true],
             ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], [
                 'name'     => 'edit-field',
-                'title'    => 'Edit',
+                'title'    => (('Edit')),
                 'type'     => 'button',
                 'cssClass' => 'btn-edit',
                 'icon'     => 'icon icon-pencil',
@@ -96,13 +96,13 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config['actions'] = [
             //'add' => ['caption' => 'Add Fields'],
             'add-form-field' => [
-                'caption' => 'Add Field',
+                'caption' => (('Add Field')),
                 'type' => 'button',
                 'id' => 'add-field-from-grid',
                 'class' => 'btn btn-primary',
                 'callback' => 'showModalToAddFormField'
             ],
-            'delete' => ['caption' => 'Remove']
+            'delete' => ['caption' => (('Remove'))]
         ];
         $config['callbacks'] = [
             'componentDidMount' => 'formFieldGridRegister'
@@ -124,20 +124,20 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config              = parent::gridConfig();
         $config['orm']       = $orm;
         $config['id']        = 'form-data-grid';
-        $config['caption']   = 'Form Data Grid';
+        $config['caption']   = (('Form Data Grid'));
         $config['columns']   = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'width' => 30],
-            ['name' => 'create_at', 'label' => 'Submitted On', 'width' => 200, 'cell' => 'datetime'],
-            ['name' => 'customer_id', 'label' => 'Customer ID', 'width' => 50,],
-            ['name' => 'post_status', 'label' => 'Post Status', 'width' => 200,],
-            ['name' => 'email', 'label' => 'Email', 'width' => 250,],
+            ['name' => 'id', 'label' => (('ID')), 'width' => 30],
+            ['name' => 'create_at', 'label' => (('Submitted On')), 'width' => 200, 'cell' => 'datetime'],
+            ['name' => 'customer_id', 'label' => (('Customer ID')), 'width' => 50,],
+            ['name' => 'post_status', 'label' => (('Post Status')), 'width' => 200,],
+            ['name' => 'email', 'label' => (('Email')), 'width' => 250,],
             [
                 'type'    => 'btn_group',
                 'buttons' => [
                     [
                         'name'     => 'details',
-                        'title'    => 'Details',
+                        'title'    => (('Details')),
                         'type'     => 'button',
                         'cssClass' => 'btn-details',
                         'icon'     => 'icon-pencil',
@@ -165,13 +165,13 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
                 'url' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
                 'edit_url' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
                 'columns' => [
-                    'id' => ['label' => 'ID', 'hidden' => true],
-                    'ts' => ['label' => 'TimeStamp', 'formatter' => 'date'],
-                    'version' => ['label' => 'Version'],
-                    'user_id' => ['type' => 'input', 'label' => 'User', 'editor' => 'select',
+                    'id' => ['label' => (('ID')), 'hidden' => true],
+                    'ts' => ['label' => (('TimeStamp')), 'formatter' => 'date'],
+                    'version' => ['label' => (('Version'))],
+                    'user_id' => ['type' => 'input', 'label' => (('User')), 'editor' => 'select',
                         'options' => $this->getAdminUsers()],
-                    'username' => ['Label' => 'User Name', 'hidden' => true],
-                    'comments' => ['labl' => 'Comments'],
+                    'username' => ['label' => (('User Name')), 'hidden' => true],
+                    'comments' => ['label' => (('Comments'))],
                 ],
             ],
             'custom' => ['personalize' => true],
@@ -185,10 +185,10 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
     public function getEmailOptions()
     {
         $emailOptions = [
-            'admin_email' => 'Admin Email',
-            'sales_email' => 'Sales Email',
-            'support_email' => 'Support Email',
-            'other' => 'Custom email'
+            'admin_email' => (('Admin Email')),
+            'sales_email' => (('Sales Email')),
+            'support_email' => (('Support Email')),
+            'other' => (('Custom email'))
         ];
 
         return $emailOptions;

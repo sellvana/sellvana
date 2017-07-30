@@ -11,13 +11,13 @@ class Sellvana_Sales_Model_Order_State_Comment extends Sellvana_Sales_Model_Orde
         AUTO_CLOSED = 'auto_closed';
 
     protected $_valueLabels = [
-        self::NONE => 'None',
-        self::RECEIVED => 'Received (Waiting for admin)',
-        self::PROCESSING => 'Processing',
-        self::DELEGATED => 'Delegated',
-        self::SENT => 'Sent (Waiting for customer)',
-        self::CLOSED => 'Closed',
-        self::AUTO_CLOSED => 'Auto-Closed',
+        self::NONE => (('None')),
+        self::RECEIVED => (('Received (Waiting for admin)')),
+        self::PROCESSING => (('Processing')),
+        self::DELEGATED => (('Delegated')),
+        self::SENT => (('Sent (Waiting for customer)')),
+        self::CLOSED => (('Closed')),
+        self::AUTO_CLOSED => (('Auto-Closed')),
     ];
 
     protected $_setValueNotificationTemplates = [

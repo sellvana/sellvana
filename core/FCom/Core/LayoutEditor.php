@@ -373,7 +373,7 @@ class FCom_Core_LayoutEditor extends BClass
         asort($templates);
 
         $this->addWidgetType('main', [
-            'title' => 'MAIN CONTENT',
+            'title' => (('MAIN CONTENT')),
             'persistent' => true,
             'box_class' => 'box-main-contents',
             'compile' => function ($args) {
@@ -385,7 +385,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('text', [
-            'title' => 'Text',
+            'title' => (('Text')),
             'pos' => 10,
             'compile' => function ($args) {
                 $w = $args['widget'];
@@ -400,7 +400,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('declared', [
-            'title' => 'Widget',
+            'title' => (('Widget')),
             'pos' => 20,
             'compile' => function ($args) {
                 $w = $args['widget'];
@@ -427,7 +427,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('template', [
-            'title' => 'Template',
+            'title' => (('Template')),
             'pos' => 30,
             'options' => $templates,
             'compile' => function ($args) {
@@ -446,7 +446,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('youtube', [
-            'title' => 'Video Embed (YouTube)',
+            'title' => (('Video Embed (YouTube)')),
             'pos' => 120,
             'source_view' => 'admin/layout-editor/video',
             'view_name'   => 'widgets/video',
@@ -478,7 +478,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('insert_media', [
-            'title'       => 'Insert Media',
+            'title'       => (('Insert Media')),
             'pos'         => 130,
             'source_view' => 'admin/layout-editor/media',
             'view_name'   => 'widgets/media',
@@ -506,7 +506,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('remove', [
-            'title' => 'Remove View',
+            'title' => (('Remove View')),
             'pos' => 100,
             'compile' => function ($args) {
                 $w = $args['widget'];
@@ -517,7 +517,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('split2', [
-            'title' => 'Split 2 Columns',
+            'title' => (('Split 2 Columns')),
             'pos' => 50,
             'compile' => function ($args) {
                 return [];
@@ -525,7 +525,7 @@ class FCom_Core_LayoutEditor extends BClass
         ]);
 
         $this->addWidgetType('split3', [
-            'title' => 'Split 3 Columns',
+            'title' => (('Split 3 Columns')),
             'pos' => 50,
             'compile' => function ($args) {
                 return [];

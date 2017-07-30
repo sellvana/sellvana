@@ -67,7 +67,7 @@ class BUtilTest extends \Codeception\TestCase\Test
     public function testSprintfn()
     {
         $format = 'Say %hi$s %bye$s!';
-        $args = ['hi' => 'Hi', 'bye' => 'Goodbye'];
+        $args = ['hi' => (('Hi')), 'bye' => (('Goodbye'))];
         $string = BUtil::i()->sprintfn($format, $args);
         $this->assertEquals('Say Hi Goodbye!', $string);
     }

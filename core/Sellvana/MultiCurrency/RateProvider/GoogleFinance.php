@@ -5,7 +5,7 @@ class Sellvana_MultiCurrency_RateProvider_GoogleFinance extends Sellvana_MultiCu
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_label = 'Google Finance';
+    protected $_label = (('Google Finance'));
 
     protected $_apiUrl = 'http://www.google.com/finance/converter';
 

@@ -30,7 +30,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Auth extends FCom_AdminSPA_AdminSPA_Cont
 
             $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
             if (!$user) {
-                throw new BException($this->_('Invalid user name or password.'));
+                throw new BException($this->_(('Invalid user name or password.')));
             }
 
             if ($user->get('g2fa_status') == 9) {

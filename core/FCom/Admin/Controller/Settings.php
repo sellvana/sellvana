@@ -77,7 +77,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!$xhr) {
                 $this->message('Settings updated');
             } else {
-                $result = ['message' => $this->_('Settings has been saved successfully'), 'status' => 'success'];
+                $result = ['message' => $this->_(('Settings has been saved successfully')), 'status' => 'success'];
             }
 
         } catch (Exception $e) {

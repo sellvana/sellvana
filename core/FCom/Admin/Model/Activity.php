@@ -33,17 +33,17 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'status' => [
-            'new' => 'New',
-            'recent' => 'Recent',
-            'archived' => 'Archived',
+            'new' => (('New')),
+            'recent' => (('Recent')),
+            'archived' => (('Archived')),
         ],
         'type' => [
-            'workflow' => 'Workflow',
-            'alert' => 'Alert',
+            'workflow' => (('Workflow')),
+            'alert' => (('Alert')),
         ],
         'feed' => [
-            'local' => 'Local',
-            'remote' => 'Remote',
+            'local' => (('Local')),
+            'remote' => (('Remote')),
         ],
     ];
 

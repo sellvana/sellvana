@@ -7,12 +7,12 @@ class Sellvana_Sales_Admin_Controller_Report_Day extends FCom_Admin_Controller_A
 {
     protected static $_origClass = __CLASS__;
     protected $_modelClass = 'Sellvana_Sales_Model_Order';
-    protected $_recordName = 'Order';
+    protected $_recordName = (('Order'));
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
     protected $_navPath = 'reports/sales/day';
     protected $_gridHref = 'sales/report/day';
-    protected $_gridTitle = 'Day of the Week';
+    protected $_gridTitle = (('Day of the Week'));
 
 
     public function gridConfig()
@@ -48,20 +48,20 @@ class Sellvana_Sales_Admin_Controller_Report_Day extends FCom_Admin_Controller_A
     protected function _getFieldLabels()
     {
         return [
-            'day' => 'Day',
+            'day' => (('Day')),
             'order_count' => '# of Orders',
             'pc_orders' => '% of Orders',
             'total_item_qty' => '# of Items',
             'pc_total_item_qty' => '% of Items',
-            'total_subtotal' => 'Subtotal',
-            'total_tax' => 'Tax',
-            'total_shipping' => 'Shipping',
-            'total_discount' => 'Discounts',
-            'total_amount' => 'Total',
+            'total_subtotal' => (('Subtotal')),
+            'total_tax' => (('Tax')),
+            'total_shipping' => (('Shipping')),
+            'total_discount' => (('Discounts')),
+            'total_amount' => (('Total')),
             'pc_total_amount' => '% of Total',
-            'total_received' => 'Received',
-            'total_refunded' => 'Refunded',
-            'create_at' => 'Created',
+            'total_received' => (('Received')),
+            'total_refunded' => (('Refunded')),
+            'create_at' => (('Created')),
         ];
     }
 

@@ -18,8 +18,8 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     ];
 
     protected static $_allPermissions = [
-        '/' => ['title' => 'All Permissions', 'level' => 0],
-        'admin' => ['title' => 'Admin Tasks', 'level' => 1],
+        '/' => ['title' => (('All Permissions')), 'level' => 0],
+        'admin' => ['title' => (('Admin Tasks')), 'level' => 1],
     ];
 
     protected static $_importExportProfile = [
@@ -28,7 +28,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     ];
 
     protected static $_fieldOptions = [
-        'status' => ['all' => 'All', 'none' => "None"],
+        'status' => ['all' => (('All')), 'none' => (("None"))],
     ];
 
     /**

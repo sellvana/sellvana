@@ -78,14 +78,14 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         $config = parent::gridConfig();
         $config['id'] = static::TESTS_GRID_ID;
         $config['data_mode'] = 'local';
-        $config['caption'] = 'Codeception Tests';
+        $config['caption'] = (('Codeception Tests'));
 
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'test', 'label' => "Select tests to run"],
-            ['name' => 'type', 'label' => 'Engine'],
-            ['name' => 'module', 'label' => 'Module'],
-            ['name' => 'status', 'label' => 'Status']
+            ['name' => 'test', 'label' => (("Select tests to run"))],
+            ['name' => 'type', 'label' => (('Engine'))],
+            ['name' => 'module', 'label' => (('Module'))],
+            ['name' => 'status', 'label' => (('Status'))]
         ];
         $config['filters'] = [['field' => 'test', 'type' => 'text']];
         $config['callbacks'] = [
@@ -93,7 +93,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         ];
         $config['actions'] = [
             'run-test-cgi' => [
-                'caption' => 'Run Test CGI',
+                'caption' => (('Run Test CGI')),
                 'type' => 'button',
                 'id' => 'run-test-cgi',
                 'class' => 'btn-primary',
@@ -162,7 +162,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
                     chmod($codecept, 0755); // make executable
                 }
             } else {
-                $this->BDebug->warning($this->_("Could not create $codecept file."));
+                $this->BDebug->warning($this->_(("Could not create $codecept file.")));
             }
         }
 

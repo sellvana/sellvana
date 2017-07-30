@@ -52,7 +52,7 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
         $link = $this->getData('import_download_link');
 
         if ($link === null){
-            throw new PDOException($this->_('Model does not have link to file for download it'));
+            throw new PDOException($this->_(('Model does not have link to file for download it')));
         }
 
         $this->file_size = 0;

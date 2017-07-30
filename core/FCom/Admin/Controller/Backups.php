@@ -5,8 +5,8 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
     protected $_permission = 'system/backups';
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'backups';
-    protected $_gridTitle = 'Backups';
-    protected $_recordName = 'Backup';
+    protected $_gridTitle = (('Backups'));
+    protected $_recordName = (('Backup'));
 
     public function gridConfig()
     {
@@ -14,10 +14,10 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
 
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'delete', 'caption' => 'Remove/Revert']]],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'delete', 'caption' => (('Remove/Revert'))]]],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
-            ['name' => 'file_name', 'label' => 'File Name', 'index' => 'file_name', 'width' => 100, 'overflow' => true],
-            ['name' => 'create_at', 'label' => 'Created At', 'index' => 'create_at', 'width' => 100],
+            ['name' => 'file_name', 'label' => (('File Name')), 'index' => 'file_name', 'width' => 100, 'overflow' => true],
+            ['name' => 'create_at', 'label' => (('Created At')), 'index' => 'create_at', 'width' => 100],
         ];
 
         $config['state'] = ['s' => 'create_time', 'sd' => 'desc'];
@@ -32,7 +32,7 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
             ['field' => 'create_at', 'type' => 'date-range'],
         ];
         $config['actions'] = [
-            'delete' => ['caption' => 'Delete'],
+            'delete' => ['caption' => (('Delete'))],
         ];
         $config['events'] = ['delete', 'mass-delete'];
 
@@ -61,7 +61,7 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
         $this->formViewBefore(['view' => $view, 'model' => $model]);
 
         $actions = $view->get('actions');
-        $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  $this->_('Remove/Revert') . '</span></button>';
+        $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  $this->_(('Remove/Revert')) . '</span></button>';
         $view->set('actions', $actions);
 
         $this->processFormTabs($view, $model, 'edit');

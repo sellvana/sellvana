@@ -12,7 +12,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
     public function action_form_data()
     {
         if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            $this->BResponse->status('403', (('Available only for XHR')), 'Available only for XHR');
             return;
         }
 
@@ -33,13 +33,13 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
             $result['form']['config']['tabs'] = $this->getFormTabs('/catalog/categories/form');
             $result['form']['config']['default_field'] = ['model' => 'category'];
             $result['form']['config']['fields'] = [
-                ['name' => 'node_name', 'label' => 'Label', 'required' => true, 'i18n' => true],
-                ['name' => 'url_key', 'label' => 'URL Key'],
-                ['name' => 'sort_order', 'input_type' => 'number', 'label' => 'Nav Sort Order'],
-                ['name' => 'page_title', 'label' => 'Page Title', 'i18n' => true],
-                ['name' => 'meta_title', 'label' => 'Meta Title', 'i18n' => true],
-                ['name' => 'meta_description', 'type' => 'textarea', 'label' => 'Meta Description', 'i18n' => true],
-                ['name' => 'meta_keywords', 'type' => 'textarea', 'label' => 'Meta Keywords', 'i18n' => true],
+                ['name' => 'node_name', 'label' => (('Label')), 'required' => true, 'i18n' => true],
+                ['name' => 'url_key', 'label' => (('URL Key'))],
+                ['name' => 'sort_order', 'input_type' => 'number', 'label' => (('Nav Sort Order'))],
+                ['name' => 'page_title', 'label' => (('Page Title')), 'i18n' => true],
+                ['name' => 'meta_title', 'label' => (('Meta Title')), 'i18n' => true],
+                ['name' => 'meta_description', 'type' => 'textarea', 'label' => (('Meta Description')), 'i18n' => true],
+                ['name' => 'meta_keywords', 'type' => 'textarea', 'label' => (('Meta Keywords')), 'i18n' => true],
             ];
             $result['form']['config']['validation'] = [
                 ['field' => 'node_name', 'required' => true],

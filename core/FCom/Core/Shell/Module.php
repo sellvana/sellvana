@@ -45,7 +45,7 @@ class FCom_Core_Shell_Module extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'Module management';
+        return (('Module management'));
     }
 
     public function getLongHelp()

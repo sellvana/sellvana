@@ -13,8 +13,8 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     protected $_permission = 'catalog/inventory';
     protected $_modelClass = 'Sellvana_Catalog_Model_InventorySku';
     protected $_gridHref = 'catalog/inventory';
-    protected $_gridTitle = 'Inventory Management';
-    protected $_recordName = 'Inventory SKU';
+    protected $_gridTitle = (('Inventory Management'));
+    protected $_recordName = (('Inventory SKU'));
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/inventory';
     protected $_formTitleField = 'inventory_sku';
@@ -27,7 +27,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     public function gridConfig()
     {
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
-//        $yesNo = [0 => 'no', 1 => 'YES'];
+//        $yesNo = [0 => (('no')), 1 => 'YES'];
         $config = parent::gridConfig();
         #$manInvOptions = $invHlp->fieldOptions('manage_inventory');
         $backorderOptions = $invHlp->fieldOptions('allow_backorder');
@@ -38,24 +38,24 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
                 ['name' => 'edit'],
                 ['name' => 'delete'],
             ]],
-            ['name' => 'id', 'label' => 'ID', 'width' => 50],
-            ['name' => 'title', 'label' => 'Title'],
-            ['name' => 'inventory_sku', 'label' => 'SKU'],
+            ['name' => 'id', 'label' => (('ID')), 'width' => 50],
+            ['name' => 'title', 'label' => (('Title'))],
+            ['name' => 'inventory_sku', 'label' => (('SKU'))],
             #['name' => 'manage_inventory', 'label' => 'Manage', 'options' => $manInvOptions, 'multirow_edit' => true],
-            ['name' => 'allow_backorder', 'label' => 'Allow Backorder', 'options' => $backorderOptions, 'multirow_edit' => true],
-            ['name' => 'pack_separate', 'label' => 'Pack Separate', 'options' => $packOptions, 'multirow_edit' => true],
-            ['name' => 'qty_in_stock', 'label' => 'Quantity In Stock', 'multirow_edit' => true],
-            ['name' => 'qty_reserved', 'label' => 'Qty Reserved', 'multirow_edit' => true],
-            ['name' => 'qty_buffer', 'label' => 'Qty Buffer', 'multirow_edit' => true],
-            ['name' => 'qty_warn_customer', 'label' => 'Qty to Warn Customer', 'multirow_edit' => true],
-            ['name' => 'qty_notify_admin', 'label' => 'Qty to Notify Admin', 'multirow_edit' => true],
-            ['name' => 'qty_cart_min', 'label' => 'Min Qty in Cart', 'multirow_edit' => true],
-            ['name' => 'qty_cart_max', 'label' => 'Max Qty in Cart', 'multirow_edit' => true],
-            ['name' => 'qty_cart_inc', 'label' => 'Cart Increment', 'multirow_edit' => true],
-            ['name' => 'unit_cost', 'label' => 'Unit Cost', 'multirow_edit' => true],
-            ['name' => 'net_weight', 'label' => 'Net Weight', 'multirow_edit' => true],
-            ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'multirow_edit' => true],
-            ['name' => 'shipping_size', 'label' => 'Ship Size', 'multirow_edit' => true],
+            ['name' => 'allow_backorder', 'label' => (('Allow Backorder')), 'options' => $backorderOptions, 'multirow_edit' => true],
+            ['name' => 'pack_separate', 'label' => (('Pack Separate')), 'options' => $packOptions, 'multirow_edit' => true],
+            ['name' => 'qty_in_stock', 'label' => (('Quantity In Stock')), 'multirow_edit' => true],
+            ['name' => 'qty_reserved', 'label' => (('Qty Reserved')), 'multirow_edit' => true],
+            ['name' => 'qty_buffer', 'label' => (('Qty Buffer')), 'multirow_edit' => true],
+            ['name' => 'qty_warn_customer', 'label' => (('Qty to Warn Customer')), 'multirow_edit' => true],
+            ['name' => 'qty_notify_admin', 'label' => (('Qty to Notify Admin')), 'multirow_edit' => true],
+            ['name' => 'qty_cart_min', 'label' => (('Min Qty in Cart')), 'multirow_edit' => true],
+            ['name' => 'qty_cart_max', 'label' => (('Max Qty in Cart')), 'multirow_edit' => true],
+            ['name' => 'qty_cart_inc', 'label' => (('Cart Increment')), 'multirow_edit' => true],
+            ['name' => 'unit_cost', 'label' => (('Unit Cost')), 'multirow_edit' => true],
+            ['name' => 'net_weight', 'label' => (('Net Weight')), 'multirow_edit' => true],
+            ['name' => 'shipping_weight', 'label' => (('Ship Weight')), 'multirow_edit' => true],
+            ['name' => 'shipping_size', 'label' => (('Ship Size')), 'multirow_edit' => true],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -108,22 +108,22 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         $config = [
             'config' => [
                 'id' => 'product_inventory_sku',
-                'caption' => 'Product Inventory SKU',
+                'caption' => (('Product Inventory SKU')),
                 'data_mode' => 'local',
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select', 'width' => 55],
-                    ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                    ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 55, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => (('Preview')), 'width' => 110, 'display' => 'eval',
                         'print' => '"<a href=\''.$downloadUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
                             . '<img src=\''.$thumbUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
                             . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
                         'sortable' => false],
-                    ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
-                    ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
-                    ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
-                    ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
-                    ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
+                    ['name' => 'product_name', 'label' => (('Name')), 'width' => 250],
+                    ['name' => 'product_sku', 'label' => (('SKU')), 'index' => 'p.product_sku', 'width' => 100],
+                    ['name' => 'short_description', 'label' => (('Description')),  'width' => 200],
+                    ['name' => 'create_at', 'label' => (('Created')), 'index' => 'p.create_at', 'width' => 100],
+                    ['name' => 'update_at', 'label' => (('Updated')), 'index' => 'p.update_at', 'width' => 100],
                 ],
                 'filters' => [
                     ['field' => 'product_name', 'type' => 'text'],
@@ -151,7 +151,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_sku" class="btn grid-new btn-primary _modal">'
-                . $this->_('New Sku') . '</button>']]);
+                . $this->_(('New Sku')) . '</button>']]);
     }
 
     /**

@@ -16,18 +16,18 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
         CHARGEDBACK = 'chargedback';
 
     protected $_valueLabels = [
-        self::PENDING => 'Pending',
-        self::OFFLINE => 'Offline Payment',
-        self::EXT_SENT => 'Sent to External Checkout',
-        self::EXT_RETURNED => 'Returned from External Checkout',
-        self::FAILED => 'Failed',
-        self::CANCELED => 'Canceled',
-        self::PROCESSING => 'Processing',
-        self::PARTIAL_PAID => 'Partial Paid',
-        self::PAID => 'Paid',
-        self::PARTIAL_REFUNDED => 'Partial Refunded',
-        self::REFUNDED => 'Refunded',
-        self::CHARGEDBACK => 'Charged Back',
+        self::PENDING => (('Pending')),
+        self::OFFLINE => (('Offline Payment')),
+        self::EXT_SENT => (('Sent to External Checkout')),
+        self::EXT_RETURNED => (('Returned from External Checkout')),
+        self::FAILED => (('Failed')),
+        self::CANCELED => (('Canceled')),
+        self::PROCESSING => (('Processing')),
+        self::PARTIAL_PAID => (('Partial Paid')),
+        self::PAID => (('Paid')),
+        self::PARTIAL_REFUNDED => (('Partial Refunded')),
+        self::REFUNDED => (('Refunded')),
+        self::CHARGEDBACK => (('Charged Back')),
     ];
 
     protected $_defaultMethods = [

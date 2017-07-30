@@ -88,7 +88,7 @@ class FCom_Core_Shell_Help extends FCom_Core_Shell_Abstract
 
     public function getShortHelp()
     {
-        return 'List all available actions';
+        return (('List all available actions'));
     }
 
     public function getLongHelp()

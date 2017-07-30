@@ -1,0 +1,20 @@
+<div class="f-content-block">
+    <button v-if="form.campaign.status == 'I' || form.campaign.status == 'C' || form.campaign.status == 'S'"
+            type="button" class="button button1" @click="startCampaign">{{'Start'|_}}</button>
+    <button v-if="form.campaign.status == 'R'" type="button" class="button button2" @click="pauseCampaign">{{'Pause'|_}}</button>
+    <button v-if="form.campaign.status == 'P'" type="button" class="button button2" @click="resumeCampaign">{{'Resume'|_}}</button>
+    <button v-if="form.campaign.status == 'R'" type="button" class="button button4" @click="stopCampaign">{{'Stop'|_}}</button>
+
+    <br><br>
+    <table>
+        <tr><th>{{'Status'|_}} </th><td>{{form.status_options[form.campaign.status]}}</td></tr>
+        <tr><th>{{'Progress'|_}} </th><td>{{progressPercent}}%</td></tr>
+        <tr><th>{{'Total'|_}} </th><td>{{form.campaign.cnt_total}}</td></tr>
+        <tr><th>{{'Sent:'|_}} </th><td>{{form.campaign.cnt_sent}}</td></tr>
+        <tr><th>{{'Success:'|_}} </th><td>{{form.campaign.cnt_success}}</td></tr>
+        <tr><th>{{'Error:'|_}} </th><td>{{form.campaign.cnt_error}}</td></tr>
+        <tr><th>{{'Opened Email:'|_}} </th><td>{{form.campaign.cnt_opened}}</td></tr>
+        <tr><th>{{'Clicked Links:'|_}} </th><td>{{form.campaign.cnt_clicked}}</td></tr>
+        <tr><th>{{'Unsubscribed:'|_}} </th><td>{{form.campaign.cnt_unsub}}</td></tr>
+    </table>
+</div>

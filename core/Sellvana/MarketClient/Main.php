@@ -11,10 +11,10 @@ class Sellvana_MarketClient_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_MarketClient' => 'Market Client Settings',
-            'market_client' => 'Market Client',
-            'market_client/install' => 'Market Client Install',
-            'market_client/publish' => 'Market Client Publish',
+            'settings/Sellvana_MarketClient' => (('Market Client Settings')),
+            'market_client' => (('Market Client')),
+            'market_client/install' => (('Market Client Install')),
+            'market_client/publish' => (('Market Client Publish')),
         ]);
 
     }
@@ -46,7 +46,7 @@ class Sellvana_MarketClient_Main extends BClass
         if (!$force && !empty($progress['status']) && in_array($progress['status'], ['ACTIVE'])) {
             return [
                 'error' => true,
-                'message' => 'Installation already in progress: ' . $progress['status'],
+                'message' => $this->_((('Installation already in progress: %s')), $progress['status']),
             ];
         }
         foreach ($modules as $modName => $modInfo) {
@@ -92,7 +92,7 @@ class Sellvana_MarketClient_Main extends BClass
             $this->progress([
                 'cur' => $i,
                 'modules' => [
-                    $modName => $this->_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
+                    $modName => $this->_((('[%d/%d] Downloading: %s...')), [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -100,10 +100,10 @@ class Sellvana_MarketClient_Main extends BClass
             if (!$filename) {
                 $this->progress([
                     'errors' => [
-                        'Could not download module package file: ' . $modName . ' (' . $modInfo['version'] . ')',
+                        $this->_((('Could not download module package file: %s (%s)')),  [$modName, $modInfo['version']]),
                     ],
                 ]);
-                $this->message('Could not download module package file: ' . $modName . ' (' . $modInfo['version'] . ')');
+                $this->message($this->_((('Could not download module package file: %s (%s)')), [$modName, $modInfo['version']]));
                 continue;
             }
             $modNameArr = explode('_', $modName);
@@ -112,7 +112,7 @@ class Sellvana_MarketClient_Main extends BClass
 
             $this->progress([
                 'modules' => [
-                    $modName => $this->_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
+                    $modName => $this->_((('[%d/%d] Downloading: %s... Installing...')), [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -131,10 +131,10 @@ class Sellvana_MarketClient_Main extends BClass
             if (!$this->BUtil->zipExtract($filename, $targetDir)) {
                 $this->progress([
                     'errors' => [
-                        'Could not extract module package file: ' . $modName . ' (' . $modInfo['version'] . ')',
+                        $this->_((('Could not extract module package file: %s (%s)')), [$modName, $modInfo['version']]),
                     ],
                 ]);
-                $this->message('Could not extract module package file: ' . $modName . ' (' . $modInfo['version'] . ')');
+                $this->message($this->_((('Could not extract module package file: %s (%s)')), [$modName, $modInfo['version']]));
                 continue;
             }
             if (!empty($modInfo['enable'])) {
@@ -143,7 +143,7 @@ class Sellvana_MarketClient_Main extends BClass
             }
             $this->progress([
                 'modules' => [
-                    $modName => $this->_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
+                    $modName => $this->_((('[%d/%d] Downloading: %s... Installing... DONE')), [$i, $cnt, $modName]),
                 ],
             ]);
         }

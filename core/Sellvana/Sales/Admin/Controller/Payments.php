@@ -16,8 +16,8 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'payments';
     protected $_modelClass = 'Sellvana_Sales_Model_Order_Payment';
-    protected $_gridTitle = 'Payments';
-    protected $_recordName = 'Payment';
+    protected $_gridTitle = (('Payments'));
+    protected $_recordName = (('Payment'));
     protected $_mainTableAlias = 'p';
     protected $_permission = 'sales/payments';
     protected $_navPath = 'sales/payments';
@@ -64,24 +64,24 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
 
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID'],
-            ['name' => 'order_unique_id', 'label' => 'Order #'],
-            ['name' => 'payment_method', 'label' => 'Method', 'options' => $methodOptions],
-            ['name' => 'amount_authorized', 'label' => 'Authorized', 'cell' => 'currency'],
-            ['name' => 'amount_due', 'label' => 'Due', 'cell' => 'currency'],
-            ['name' => 'amount_captured', 'label' => 'Captured', 'cell' => 'currency'],
-            ['name' => 'amount_refunded', 'label' => 'Refunded', 'cell' => 'currency'],
-            ['name' => 'state_overall', 'index' => 'p.state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
-            ['name' => 'state_custom', 'index' => 'p.state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-            ['name' => 'create_at', 'index' => 'p.create_at', 'label' => 'Created', 'cell' => 'datetime'],
-            ['name' => 'update_at', 'index' => 'p.update_at', 'label' => 'Updated', 'cell' => 'datetime'],
-            ['name' => 'transactions', 'label' => 'Transactions'],
+            ['name' => 'id', 'label' => (('ID'))],
+            ['name' => 'order_unique_id', 'label' => (('Order #'))],
+            ['name' => 'payment_method', 'label' => (('Method')), 'options' => $methodOptions],
+            ['name' => 'amount_authorized', 'label' => (('Authorized')), 'cell' => 'currency'],
+            ['name' => 'amount_due', 'label' => (('Due')), 'cell' => 'currency'],
+            ['name' => 'amount_captured', 'label' => (('Captured')), 'cell' => 'currency'],
+            ['name' => 'amount_refunded', 'label' => (('Refunded')), 'cell' => 'currency'],
+            ['name' => 'state_overall', 'index' => 'p.state_overall', 'label' => (('Overall Status')), 'options' => $stateOverallOptions],
+            ['name' => 'state_custom', 'index' => 'p.state_custom', 'label' => (('Custom Status')), 'options' => $stateCustomOptions],
+            ['name' => 'create_at', 'index' => 'p.create_at', 'label' => (('Created')), 'cell' => 'datetime'],
+            ['name' => 'update_at', 'index' => 'p.update_at', 'label' => (('Updated')), 'cell' => 'datetime'],
+            ['name' => 'transactions', 'label' => (('Transactions'))],
         ];
         $config['actions'] = [
             //'add' => ['caption' => 'Add payment'],
-            'delete' => ['caption' => 'Remove'],
+            'delete' => ['caption' => (('Remove'))],
             'mark_paid' => [
-                'caption'      => 'Mark as paid',
+                'caption'      => (('Mark as paid')),
                 'type'         => 'button',
                 'class'        => 'btn btn-primary',
                 'isMassAction' => true,
@@ -138,7 +138,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
                 'totals' => $totals,
             ]);
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Payment has been created');
+            $result['message'] = $this->_(('Payment has been created'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -188,7 +188,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
                 }
             }
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Payment updates have been applied');
+            $result['message'] = $this->_(('Payment updates have been applied'));
         } catch (Exception $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -234,7 +234,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
             }
 
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Transaction has been created');
+            $result['message'] = $this->_(('Transaction has been created'));
         } catch (BException $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();
@@ -281,7 +281,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends Sellvana_Sales_Admin_Cont
             }
 
             $result = $this->_resetOrderTabs($order);
-            $result['message'] = $this->_('Customer has been notified');
+            $result['message'] = $this->_(('Customer has been notified'));
         } catch (BException $e) {
             $result['error'] = true;
             $result['message'] = $e->getMessage();

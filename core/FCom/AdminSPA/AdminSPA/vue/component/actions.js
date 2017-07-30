@@ -9,17 +9,17 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-actions-tpl'], function (Vue, Sv
         template: actionsTpl,
         computed: {
             desktop_groups: function () {
-                console.log(this.groups);
+                //console.log(this.groups);
                 return this.groups ? this.groups.desktop : [];
             },
             mobile_groups: function () {
-                console.log(this.groups);
+                //console.log(this.groups);
                 return this.groups ? this.groups.mobile : [];
             }
         },
         methods: {
             doAction: function (action) {
-                console.log(action);
+                console.log(this.eventName, action);
                 this.$emit('event', this.eventName, action);
             }
         }
