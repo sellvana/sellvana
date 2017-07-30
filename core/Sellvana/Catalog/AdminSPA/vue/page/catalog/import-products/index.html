@@ -20,11 +20,11 @@
                         <button class="button button2" v-if="currentState == states.import" @click.prevent="reConfigure">Re-Configure</button>
                   </div>
                   <div class="f-controls-right text-right">
-                        <button class="button button1">Start Upload</button>
+                        <button class="button button1" v-if="currentState == states.configure">Start Import</button>
                   </div>
             </div>
             <sv-csv-imp-upload v-if="currentState == states.upload" @uploaded="onUploadComplete"></sv-csv-imp-upload>
-            <sv-csv-imp-configure v-if="currentState == states.configure"></sv-csv-imp-configure>
+            <sv-csv-imp-configure v-if="currentState == states.configure" :file="fileConfig"></sv-csv-imp-configure>
             <sv-csv-imp-import v-if="currentState == states.import"></sv-csv-imp-import>
             <sv-csv-imp-status v-if="currentState == states.status"></sv-csv-imp-status>
 

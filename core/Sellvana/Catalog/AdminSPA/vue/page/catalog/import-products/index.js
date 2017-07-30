@@ -28,7 +28,7 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
             }
         }
     });
-    console.log(store.state.csvImport);
+
     var Component = {
         data: function () {
             return {
@@ -39,6 +39,9 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
         computed: {
             currentState: function () {
                 return store.state.csvImport.currentState;
+            },
+            fileConfig: function () {
+                return this.file.files ? this.file.files[0] : {};
             }
         },
         methods: {
@@ -49,7 +52,6 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
                 this.$store.commit('setCurrentState', "upload");
             },
             onUploadComplete: function (result) {
-                console.log(result);
                 _.assign(this.file, result);
                 this.$store.commit('setCurrentState', "configure");
             },
