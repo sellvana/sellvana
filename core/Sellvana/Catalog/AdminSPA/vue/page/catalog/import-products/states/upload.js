@@ -1,5 +1,6 @@
 define(['sv-mixin-common', 'vue-dropzone', 'text!sv-page-catalog-import-products-upload-tpl'], function (SvMixinCommon, VueDropzone, tpl) {
-
+    var uploadedEventName = 'uploaded';
+    var uploadingEventName = 'uploading';
     return {
         mixins: [SvMixinCommon],
         data: function () {
@@ -19,12 +20,11 @@ define(['sv-mixin-common', 'vue-dropzone', 'text!sv-page-catalog-import-products
             dropzone: VueDropzone
         },
         methods: {
-
             dropzoneSending: function (file, xhr, formData) {
-                console.log(file, xhr, formData);
+                this.$emit(uploadingEventName, file);
             },
-            dropzoneSuccess: function () {
-
+            dropzoneSuccess: function (file, result) {
+                this.$emit(uploadedEventName, result)
             }
         },
         template: tpl

@@ -9,21 +9,21 @@
             <div class="f-steps-block">
                   <div class="f-import-switch">
                         <div class="f-import-switch__container">
-                              <div class="f-switch f-switch1">1</div>
-                              <div class="f-switch f-switch2 active">2</div>
-                              <div class="f-switch f-switch3">3</div>
+                              <div :class="switchClass(1)">1</div>
+                              <div :class="switchClass(2)">2</div>
+                              <div :class="switchClass(3)">3</div>
                         </div>
 
                   </div>
                   <div class="f-controls-left">
-                        <button class="button button2">Upload different file</button>
-                        <button class="button button2">Re-Configure</button>
+                        <button class="button button2" v-if="currentState == states.configure" @click.prevent="startOver">Upload different file</button>
+                        <button class="button button2" v-if="currentState == states.import" @click.prevent="reConfigure">Re-Configure</button>
                   </div>
                   <div class="f-controls-right text-right">
                         <button class="button button1">Start Upload</button>
                   </div>
             </div>
-            <sv-csv-imp-upload v-if="currentState == states.upload"></sv-csv-imp-upload>
+            <sv-csv-imp-upload v-if="currentState == states.upload" @uploaded="onUploadComplete"></sv-csv-imp-upload>
             <sv-csv-imp-configure v-if="currentState == states.configure"></sv-csv-imp-configure>
             <sv-csv-imp-import v-if="currentState == states.import"></sv-csv-imp-import>
             <sv-csv-imp-status v-if="currentState == states.status"></sv-csv-imp-status>
