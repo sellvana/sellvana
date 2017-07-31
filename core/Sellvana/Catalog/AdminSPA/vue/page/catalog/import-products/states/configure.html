@@ -1,70 +1,28 @@
 <div>
     <div class="f-options-title">
-        <p class="f-options-title__text" v-text="_('Configure columns and other options')"></p>
+        <p class="f-options-title__text">{{ 'Configure columns and other options'|_ }}</p>
     </div>
-    <div class="row">
+    <div class="row" v-if="isLoaded">
         <div class="col-md-3">
-            <div class="f-column-name">Field</div>
+            <div class="f-column-name">{{ 'Field'|_ }}</div>
             <fieldset class="f-form-container f-import-forms">
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Field Delimiter</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Skip First Lines</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Batch Size</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Multi Value Delimiter</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Nesting Level Delimiter</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
+                <div class="f-form-group row" v-for="fc in fileConfig">
+                    <label class="col-sm-5 f-form-label" for="id7">{{ fc.label }}</label>
+                    <div class="col-sm-7"> <input class="f-input" type="text" v-model="config[fc.field]" :value="config[fc.field] || fc.default"> </div>
+                </div>
             </fieldset>
         </div>
         <div class="col-md-3">
-            <div class="f-column-name">Column ContentDB Field</div>
+            <div class="f-column-name">{{ 'Column ContentDB Field'|_ }}</div>
             <fieldset class="f-form-container f-import-forms">
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Given Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Additional Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Family Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Yomi Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Given Name Yomi</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Additional Name Yomi</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Family Name Yomi</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Name Prefix</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Name Suffix</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Initials</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Nickname</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Short Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Maiden Name</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">   Birthday</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Gender</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Location</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Billing Information</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Directory Server</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Mileage</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Occupation</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Hobby</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Sensitivity</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Priority</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Subject</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Notes</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Group Membership</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  E-mail 1 - Type</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">E-mail 1 - Value</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Phone 1 - Type</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Phone 1 - Value</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">  Work</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Kyiv</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Kyiv</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Address 1 - PO Box</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">Address 1 - Region</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7">   Address 1 - Postal Code</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Address 1 - Country</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
-                <div class="f-form-group row"> <label class="col-sm-5 f-form-label" for="id7"> Address 1 - Extended Address</label> <div class="col-sm-7"> <input class="f-input" type="text" id="id7"/> </div> </div>
+                <div class="f-form-group row" v-for="field in config.first_row">
+                    <label class="col-sm-5 f-form-label" :for="'id' + field">{{ field }}</label>
+                    <div class="col-sm-7"> <input class="f-input" type="text" :id="'id' + field" :value="field"> </div>
+                </div>
             </fieldset>
         </div>
         <div class="col-md-6">
-            <div class="f-column-name">DB FieldDefault</div>
+            <div class="f-column-name">{{ 'DB FieldDefault'|_ }}</div>
             <fieldset class="f-form-container f-import-forms">
                 <div class="f-form-group row">
                     <label class="col-sm-5 f-form-label" for="id7">
@@ -104,4 +62,6 @@
             </fieldset>
         </div>
     </div>
+    <div class="row" v-else-if="isError">{{ error }}</div>
+    <div class="row" v-else></div>
 </div>
