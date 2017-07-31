@@ -2,6 +2,7 @@
 
 /**
  * @property FCom_Admin_Controller_MediaLibrary $FCom_Admin_Controller_MediaLibrary
+ * @property Sellvana_Catalog_ProductsImport $Sellvana_Catalog_ProductsImport
  */
 class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_AdminSPA_Controller_Abstract
 {
@@ -37,5 +38,29 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
             $this->BResponse->status(400, $e->getMessage());
         }
         $this->respond($result);
+    }
+
+    public function action_start__POST()
+    {
+        $this->Sellvana_Catalog_ProductsImport->run();
+        return $this->BResponse->json($this->getCurrentImportConfig());
+    }
+
+    public function action_stop__POST()
+    {
+        return $this->BResponse->json($this->Sellvana_Catalog_ProductsImport->config(['status' => 'stopped'], true));
+    }
+
+    public function action_status()
+    {
+        return $this->BResponse->json($this->getCurrentImportConfig());
+    }
+
+    /**
+     * @return array|bool|mixed
+     */
+    protected function getCurrentImportConfig()
+    {
+        return $this->Sellvana_Catalog_ProductsImport->config();
     }
 }

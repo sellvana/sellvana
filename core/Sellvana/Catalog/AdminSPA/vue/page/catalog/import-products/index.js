@@ -49,7 +49,6 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
                 this.$store.commit('setCurrentState', "upload");
             },
             onUploadComplete: function (result) {
-                console.log(result);
                 _.assign(this.file, result);
                 this.$store.commit('setCurrentState', "configure");
             },
