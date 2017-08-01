@@ -9,5 +9,5 @@
         </div>
         <button class="button button1 f-stop-button" @click.prevent="stopImport">{{'Stop'|_}}</button>
     </div>
-    <sv-csv-imp-status>Status</sv-csv-imp-status>
+    <sv-csv-imp-status :c="config">Status</sv-csv-imp-status>
 </div>
