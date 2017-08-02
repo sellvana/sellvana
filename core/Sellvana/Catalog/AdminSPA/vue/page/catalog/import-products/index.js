@@ -33,6 +33,7 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
         data: function () {
             return {
                 states: store.state.csvImport.states,
+                isUploaded: false,
                 file: {}
             }
         },
@@ -42,18 +43,26 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
             },
             fileConfig: function () {
                 return this.file.files ? this.file.files[0] : {};
+            },
+            hasPreviousImport: function () {
+                return true;
             }
         },
         methods: {
-            reConfigure: function () {
+            showStatus: function () {
+                this.$store.commit('setCurrentState', "status");
+            },
+            onConfigure: function () {
                 this.$store.commit('setCurrentState', "configure");
             },
             startOver: function () {
                 this.$store.commit('setCurrentState', "upload");
+                this.isUploaded = false;
             },
             onUploadComplete: function (result) {
                 _.assign(this.file, result);
-                this.$store.commit('setCurrentState', "configure");
+                this.isUploaded = true;
+                // this.$store.commit('setCurrentState', "configure");
             },
             switchClass: function (step) {
                 var className = 'f-switch f-switch' + step;

@@ -17,6 +17,7 @@
             <fieldset class="f-form-container f-import-forms">
                 <div class="f-form-group row" v-for="field in config.first_row">
                     <label class="col-sm-5 f-form-label" :for="'id' + field">{{ field }}</label>
+                    <select2 v-model="field" :params="addFilterSelect2Params" :options="availableFilters"></select2>
                     <div class="col-sm-7"> <input class="f-input" type="text" :id="'id' + field" :value="field"> </div>
                 </div>
             </fieldset>
