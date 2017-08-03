@@ -13,11 +13,19 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-confi
                     {label: 'Nesting Level Delimiter', field: 'nesting_separator', 'default': '>'}
                 ],
                 config: {
-                    'delim': ',',
-                    'skip_first': 1,
-                    'batch_size': 100,
-                    'multivalue_separator': ';',
-                    'nesting_separator': '>'
+                    defaults: {},
+                    delim: ',',
+                    skip_first: 1,
+                    batch_size: 100,
+                    multivalue_separator: ';',
+                    nesting_separator: '>',
+                    field_options: {},
+                    field_data: {},
+                    first_row: [],
+                    columns: []
+                },
+                select2params: {
+                    allowClear: true
                 }
             }
         },
@@ -38,9 +46,26 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-confi
                 this.onConfigError.bind(this)
             );
         },
+        computed: {
+            select2options: function () {
+                var options = [];
+                if (this.config.field_options) {
+                    options = this.config.field_options;
+                }
+                return options;
+            }
+        },
         methods: {
+            setColumn: function (col, ev) {
+                this.config.columns[col] = ev.target.value;
+            },
             onConfig: function (result) {
                 this.isLoaded = true;
+                console.log(result);
+                if (!_.isUndefined(result.defaults)) {
+                    result.defaults = {};
+                }
+
                 _.assign(this.config, result);
                 if (this.config.skip_first === true) {
                     this.config.skip_first = 1;
