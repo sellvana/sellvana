@@ -32,6 +32,9 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
             return $this->respond(['status' => 'error']);
         }
 
+        $info['field_options'] = $hlp->getFieldOptions();
+        $info['field_data'] = $hlp->getFieldData();
+
         return $this->respond($info);
     }
 
@@ -66,12 +69,12 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
 
     public function action_stop__POST()
     {
-        return $this->BResponse->json($this->Sellvana_Catalog_ProductsImport->config(['status' => 'stopped'], true));
+        return $this->respond($this->Sellvana_Catalog_ProductsImport->config(['status' => 'stopped'], true));
     }
 
     public function action_status()
     {
-        return $this->BResponse->json($this->getCurrentImportConfig());
+        return $this->respond($this->getCurrentImportConfig());
     }
 
     /**
