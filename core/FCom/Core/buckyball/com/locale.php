@@ -1404,11 +1404,12 @@ class BLocale extends BClass
 
     public function currency($value, $currency = null)
     {
-        if (empty(self::$_formatters[self::FORMAT_CURRENCY])) {
-            return $value;
+        if (!empty(self::$_formatters[self::FORMAT_CURRENCY])) {
+            $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
+        } else {
+            $formatter = null;
         }
         
-        $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
         if ($currency == 'base') {
             $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
         }
@@ -1425,7 +1426,12 @@ class BLocale extends BClass
         }
 
         $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency, 'formatter' => &$formatter]);
-        $value = $formatter->formatCurrency($value, $currency);
+
+        if ($formatter) {
+            $value = $formatter->formatCurrency($value, $currency);
+        } else {
+            $value = $symbol . $value;
+        }
 
         return $value;
     }
