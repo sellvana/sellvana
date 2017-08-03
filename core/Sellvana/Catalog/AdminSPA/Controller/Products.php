@@ -21,95 +21,96 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $countries = $this->BLocale->getAvailableCountries();
 
         $editPopupConfig = [
-            'title' => (('Bulk Update Selected Products')),
-            'form' => $this->normalizeFormConfig([
-                'config' => [
-                    'default_field' => ['tab' => 'main', 'model' => 'product'],
-                    'fields' => [
-                        ['name' => 'product_name', 'label' => (('Product Name'))],
-                        ['name' => 'short_description', 'label' => (('Short Description')), 'type' => 'textarea'],
-                        ['name' => 'description', 'label' => (('Description')), 'type' => 'textarea'],
-                        ['name' => 'is_hidden', 'label' => (('Hidden?')), 'type' => 'checkbox'],
-                        ['name' => 'is_featured', 'label' => (('Featured?')), 'type' => 'checkbox'],
-                        ['name' => 'is_popular', 'label' => (('Popular?')), 'type' => 'checkbox'],
-                        ['name' => 'manage_inventory', 'label' => (('Manage Inventory?')), 'type' => 'checkbox'],
-                        ['name' => 'inventory_sku', 'label' => (('Inventory SKU')), 'type' => 'checkbox'],
-                        ['name' => 'unit_cost', 'label' => (('Unit Cost')), 'model' => 'inventory'],
-                        ['name' => 'net_weight', 'label' => (('Net Weight')), 'model' => 'inventory'],
-                        ['name' => 'shipping_weight', 'label' => (('Shipping Weight')), 'model' => 'inventory'],
-                        ['name' => 'shipping_size', 'label' => (('Shipping Size')), 'model' => 'inventory'],
-                        ['name' => 'pack_separate', 'label' => (('Pack Separate?')), 'model' => 'inventory', 'type' => 'checkbox'],
-                        ['name' => 'qty_in_stock', 'label' => (('Qty In Stock')), 'model' => 'inventory'],
-                        ['name' => 'qty_warn_customer', 'label' => (('Qty To Warn Customer')), 'model' => 'inventory'],
-                        ['name' => 'qty_notify_admin', 'label' => (('Qty To Notify Admin')), 'model' => 'inventory'],
-                        ['name' => 'qty_cart_min', 'label' => (('Minimum Qty In Cart')), 'model' => 'inventory'],
-                        ['name' => 'qty_cart_max', 'label' => (('Maximum Qty In Cart')), 'model' => 'inventory'],
-                        ['name' => 'qty_cart_inc', 'label' => (('Qty Increment')), 'model' => 'inventory'],
-                        ['name' => 'qty_buffer', 'label' => (('Qty Increment')), 'model' => 'inventory'],
-                        ['name' => 'qty_reserved', 'label' => (('Qty Increment')), 'model' => 'inventory'],
-                        ['name' => 'allow_backorder', 'label' => (('Allow Backorder')), 'model' => 'inventory', 'type' => 'checkbox'],
-                        ['name' => 'hs_tariff_number', 'label' => (('HS Tariff Number')), 'model' => 'inventory'],
-                        ['name' => 'origin_country', 'label' => (('Origin Country')), 'model' => 'inventory', 'type' => 'select2', 'options' => $countries],
+            static::TITLE => (('Bulk Update Selected Products')),
+            static::FORM => $this->normalizeFormConfig([
+                static::CONFIG => [
+                    static::FIELDS => [
+                        static::DEFAULT_FIELD => [static::TAB => 'main', static::MODEL => 'product'],
+                        [static::NAME => 'product_name', static::LABEL => (('Product Name'))],
+                        [static::NAME => 'short_description', static::LABEL => (('Short Description')), static::TYPE => 'textarea'],
+                        [static::NAME => 'description', static::LABEL => (('Description')), static::TYPE => 'textarea'],
+                        [static::NAME => 'is_hidden', static::LABEL => (('Hidden?')), static::TYPE => 'checkbox'],
+                        [static::NAME => 'is_featured', static::LABEL => (('Featured?')), static::TYPE => 'checkbox'],
+                        [static::NAME => 'is_popular', static::LABEL => (('Popular?')), static::TYPE => 'checkbox'],
+                        [static::NAME => 'manage_inventory', static::LABEL => (('Manage Inventory?')), static::TYPE => 'checkbox'],
+                        [static::NAME => 'inventory_sku', static::LABEL => (('Inventory SKU')), static::TYPE => 'checkbox'],
+                        [static::NAME => 'unit_cost', static::LABEL => (('Unit Cost')), static::MODEL => 'inventory'],
+                        [static::NAME => 'net_weight', static::LABEL => (('Net Weight')), static::MODEL => 'inventory'],
+                        [static::NAME => 'shipping_weight', static::LABEL => (('Shipping Weight')), static::MODEL => 'inventory'],
+                        [static::NAME => 'shipping_size', static::LABEL => (('Shipping Size')), static::MODEL => 'inventory'],
+                        [static::NAME => 'pack_separate', static::LABEL => (('Pack Separate?')), static::MODEL => 'inventory', static::TYPE => 'checkbox'],
+                        [static::NAME => 'qty_in_stock', static::LABEL => (('Qty In Stock')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_warn_customer', static::LABEL => (('Qty To Warn Customer')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_notify_admin', static::LABEL => (('Qty To Notify Admin')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_cart_min', static::LABEL => (('Minimum Qty In Cart')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_cart_max', static::LABEL => (('Maximum Qty In Cart')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_cart_inc', static::LABEL => (('Qty Increment')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_buffer', static::LABEL => (('Qty Increment')), static::MODEL => 'inventory'],
+                        [static::NAME => 'qty_reserved', static::LABEL => (('Qty Increment')), static::MODEL => 'inventory'],
+                        [static::NAME => 'allow_backorder', static::LABEL => (('Allow Backorder')), static::MODEL => 'inventory', static::TYPE => 'checkbox'],
+                        [static::NAME => 'hs_tariff_number', static::LABEL => (('HS Tariff Number')), static::MODEL => 'inventory'],
+                        [static::NAME => 'origin_country', static::LABEL => (('Origin Country')), static::MODEL => 'inventory', static::TYPE => 'select2', static::OPTIONS => $countries],
                     ],
                 ],
             ]),
-            'actions' => [
-                ['name' => 'cancel', 'label' => (('Cancel')), 'class' => 'button2'],
-                ['name' => 'bulk_update', 'label' => (('Update Selected Products')), 'class' => 'button1'],
+            static::ACTIONS => [
+                [static::NAME => 'cancel', static::LABEL => (('Cancel')), 'class' => 'button2'],
+                [static::NAME => 'bulk_update', static::LABEL => (('Update Selected Products')), 'class' => 'button1'],
             ],
         ];
 
         $deletePopupConfig = [
-            'title' => (('Are you sure you want to delete selected products?')),
-            'actions' => [
-                ['name' => 'cancel', 'label' => (('Cancel')), 'class' => 'button2'],
-                ['name' => 'bulk_delete', 'label' => (('Delete Selected Products')), 'class' => 'button4'],
+            static::TITLE => (('Are you sure you want to delete selected products?')),
+            static::ACTIONS => [
+                [static::NAME => 'cancel', static::LABEL => (('Cancel')), 'class' => 'button2'],
+                [static::NAME => 'bulk_delete', static::LABEL => (('Delete Selected Products')), 'class' => 'button4'],
             ],
         ];
 
         return [
-            'id' => 'products',
-            'title' => (('Products')),
-            'data_url' => 'products/grid_data',
-            'columns' => [
-                ['type' => 'row-select', 'width' => 55],
-                ['name' => 'id', 'label' => (('ID')), 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-                ['name' => 'thumb_path', 'label' => (('Thumbnail')), 'width' => 48, 'sortable' => false,
-                    'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
-                ['name' => 'product_name', 'label' => (('Name')), 'width' => 250,
-                    'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id">{{row.product_name}}</a></td>'],
-                ['name' => 'product_sku', 'label' => (('Product SKU')), 'width' => 100],
-                ['name' => 'short_description', 'label' => (('Description')),  'width' => 200, 'hidden' => true],
-                ['name' => 'is_hidden', 'label' => (('Hidden?')), 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
-                ['name' => 'manage_inventory', 'label' => (('Manage Inv?')), 'width' => 50, 'options' => $bool, 'multirow_edit' => true],
-                //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
-                //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
-                ['name' => 'net_weight', 'label' => (('Net Weight')),  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
-                ['name' => 'shipping_weight', 'label' => (('Ship Weight')),  'width' => 100, 'hidden' => true, 'multirow_edit' => true],
-                ['name' => 'position', 'label' => (('Position')), 'hidden' => true],
-                ['name' => 'create_at', 'label' => (('Created')), 'width' => 100, 'cell' => 'datetime'],
-                ['name' => 'update_at', 'label' => (('Updated')), 'width' => 100, 'cell' => 'datetime'],
+            static::ID => 'products',
+            static::TITLE => (('Products')),
+            static::DATA_URL => 'products/grid_data',
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT, static::WIDTH => 55],
+                [static::NAME => 'id', static::LABEL => (('ID')), 'index' => 'p.id', static::WIDTH => 55, static::HIDDEN => true],
+                [static::NAME => 'thumb_path', static::LABEL => (('Thumbnail')), static::WIDTH => 48, 'sortable' => false,
+                    static::DATACELL_TEMPLATE => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
+                [static::NAME => 'product_name', static::LABEL => (('Name')), static::WIDTH => 250,
+                    static::DATACELL_TEMPLATE => '<td><a :href="\'#/catalog/products/form?id=\'+row.id">{{row.product_name}}</a></td>'],
+                [static::NAME => 'product_sku', static::LABEL => (('Product SKU')), static::WIDTH => 100],
+                [static::NAME => 'short_description', static::LABEL => (('Description')),  static::WIDTH => 200, static::HIDDEN => true],
+                [static::NAME => 'is_hidden', static::LABEL => (('Hidden?')), static::WIDTH => 50, static::OPTIONS => $bool, 'multirow_edit' => true],
+                [static::NAME => 'manage_inventory', static::LABEL => (('Manage Inv?')), static::WIDTH => 50, static::OPTIONS => $bool, 'multirow_edit' => true],
+                //[static::NAME => 'base_price', static::LABEL => 'Base Price',  static::WIDTH => 100, static::HIDDEN => true],
+                //[static::NAME => 'sale_price', static::LABEL => 'Sale Price',  static::WIDTH => 100, static::HIDDEN => true],
+                [static::NAME => 'net_weight', static::LABEL => (('Net Weight')),  static::WIDTH => 100, static::HIDDEN => true, 'multirow_edit' => true],
+                [static::NAME => 'shipping_weight', static::LABEL => (('Ship Weight')),  static::WIDTH => 100, static::HIDDEN => true, 'multirow_edit' => true],
+                [static::NAME => 'position', static::LABEL => (('Position')), static::HIDDEN => true],
+                [static::NAME => 'create_at', static::LABEL => (('Created')), static::WIDTH => 100, 'cell' => 'datetime'],
+                [static::NAME => 'update_at', static::LABEL => (('Updated')), static::WIDTH => 100, 'cell' => 'datetime'],
             ],
-            'filters' => [
-                ['name' => 'id', 'type' => 'number'],
-                ['name' => 'product_name'],
-                ['name' => 'product_sku'],
-                ['name' => 'short_description'],
-                ['name' => 'is_hidden'],
-                ['name' => 'net_weight', 'type' => 'number'],
-                ['name' => 'ship_weight', 'type' => 'number'],
-                ['name' => 'position', 'type' => 'number'],
-                ['name' => 'create_at', 'type' => 'date'],
-                ['name' => 'update_at', 'type' => 'date'],
+            static::FILTERS => [
+                [static::NAME => 'id', static::TYPE => 'number'],
+                [static::NAME => 'product_name'],
+                [static::NAME => 'product_sku'],
+                [static::NAME => 'short_description'],
+                [static::NAME => 'is_hidden'],
+                [static::NAME => 'net_weight', static::TYPE => 'number'],
+                [static::NAME => 'ship_weight', static::TYPE => 'number'],
+                [static::NAME => 'position', static::TYPE => 'number'],
+                [static::NAME => 'create_at', static::TYPE => 'date'],
+                [static::NAME => 'update_at', static::TYPE => 'date'],
             ],
-            'export' => true,
-            'pager' => true,
-            'bulk_actions' => [
-                ['name' => 'edit_products', 'label' => (('Edit Products')), 'popup' => $editPopupConfig],
-                ['name' => 'delete_products', 'label' => (('Delete Products')), 'popup' => $deletePopupConfig],
+            static::EXPORT => true,
+            static::PAGER => true,
+            static::BULK_ACTIONS => [
+                [static::NAME => 'edit_products', static::LABEL => (('Edit Products')), 'popup' => $editPopupConfig],
+                [static::NAME => 'delete_products', static::LABEL => (('Delete Products')), 'popup' => $deletePopupConfig],
             ],
-            'page_actions' => [
-                ['name' => 'new', 'label' => (('Add New Product')), 'button_class' => 'button1', 'link' => '/catalog/products/form', 'group' => 'new'],
+            static::PAGE_ACTIONS => [
+                [static::NAME => 'new', static::LABEL => (('Add New Product')), static::BUTTON_CLASS => 'button1',
+                    static::LINK => '/catalog/products/form', static::GROUP => 'new'],
             ],
         ];
     }
@@ -186,82 +187,82 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
         $result = [];
 
-        $result['form']['product'] = $product->as_array();
-        $result['form']['config']['title'] = $product->get('product_name');
-        $result['form']['config']['thumb_url'] = $product->thumbUrl(100);
+        $result[static::FORM]['product'] = $product->as_array();
+        $result[static::FORM][static::CONFIG][static::TITLE] = $product->get('product_name');
+        $result[static::FORM][static::CONFIG][static::THUMB_URL] = $product->thumbUrl(100);
 
         $invModel = $product->getInventoryModel();
         if ($invModel) {
-            $result['form']['inventory'] = $invModel->as_array();
+            $result[static::FORM]['inventory'] = $invModel->as_array();
         }
 
         $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$product]);
 
         $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
-        $result['form']['prices'] = $priceHlp->getProductPrices($product);
-        $result['form']['config']['options']['price_types'] = $this->BUtil->arrayMapToSeq($product->priceTypeOptions());
-        $result['form']['config']['options']['price_relations'] = $priceHlp->fieldOptions('price_relation_options');
-        $result['form']['config']['options']['price_operations'] = $priceHlp->fieldOptions('operation_options');
+        $result[static::FORM]['prices'] = $priceHlp->getProductPrices($product);
+        $result[static::FORM][static::CONFIG][static::OPTIONS]['price_types'] = $this->BUtil->arrayMapToSeq($product->priceTypeOptions());
+        $result[static::FORM][static::CONFIG][static::OPTIONS]['price_relations'] = $priceHlp->fieldOptions('price_relation_options');
+        $result[static::FORM][static::CONFIG][static::OPTIONS]['price_operations'] = $priceHlp->fieldOptions('operation_options');
         if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
             $groups =  $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();;
             if ($groups) {
-                $result['form']['config']['options']['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
+                $result[static::FORM][static::CONFIG][static::OPTIONS]['customer_groups'] = $this->BUtil->arrayMapToSeq($groups);
             }
         }
         if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
             $sites = $this->Sellvana_MultiSite_Model_Site->siteOptions();
             if ($sites) {
-                $result['form']['config']['options']['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
+                $result[static::FORM][static::CONFIG][static::OPTIONS]['multi_site'] = $this->BUtil->arrayMapToSeq($sites);
             }
         }
         if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
             $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
             if ($currencies) {
-                $result['form']['config']['options']['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
+                $result[static::FORM][static::CONFIG][static::OPTIONS]['multi_currency'] = $this->BUtil->arrayMapToSeq($currencies);
             }
         }
 
-        $result['form']['config']['page_actions'] = [
-            'default' => ['mobile_group' => 'actions'],
-            ['name' => 'actions', 'label' => (('Actions'))],
-            ['name' => 'back', 'label' => (('Back')), 'group' => 'back', 'button_class' => 'button2'],
-            ['name' => 'delete', 'label' => (('Delete')), 'desktop_group' => 'delete', 'button_class' => 'button4', 'if' => 'product.id'],
-            ['name' => 'save', 'label' => (('Save')), 'desktop_group' => 'save', 'button_class' => 'button1'],
-            ['name' => 'save-continue', 'label' => (('Save & Continue')), 'desktop_group' => 'save', 'button_class' => 'button1'],
+        $result[static::FORM][static::CONFIG][static::PAGE_ACTIONS] = [
+            static::DEFAULT_FIELD => [static::MOBILE_GROUP => 'actions'],
+            [static::NAME => 'actions', static::LABEL => (('Actions'))],
+            [static::NAME => 'back', static::LABEL => (('Back')), static::GROUP => 'back', static::BUTTON_CLASS => 'button2'],
+            [static::NAME => 'delete', static::LABEL => (('Delete')), static::DESKTOP_GROUP => 'delete', static::BUTTON_CLASS => 'button4', 'if' => 'product.id'],
+            [static::NAME => 'save', static::LABEL => (('Save')), static::DESKTOP_GROUP => 'save', static::BUTTON_CLASS => 'button1'],
+            [static::NAME => 'save-continue', static::LABEL => (('Save & Continue')), static::DESKTOP_GROUP => 'save', static::BUTTON_CLASS => 'button1'],
         ];
 
-        $result['form']['config']['tabs'] = '/catalog/products/form';
-        $result['form']['config']['default_field'] = ['model' => 'product'];
-        $result['form']['config']['fields'] = [
-            ['name' => 'product_name', 'label' => (('Product Name')), 'i18n' => true, 'required' => true],
-            ['name' => 'url_key', 'label' => 'URL Key (optional)', 'validate' => ['pattern' => '/^[a-z0-9-]+$/']],
-            ['name' => 'product_sku', 'label' => (('Product SKU')), 'required' => true],
-            ['name' => 'short_description', 'type' => 'textarea', 'label' => (('Short Description')), 'i18n' => true, 'required' => true],
-            ['name' => 'description', 'type' => 'wysiwyg', 'label' => (('Long Description')), 'i18n' => true, 'required' => true],
-            ['name' => 'is_hidden', 'label' => (('Hide Product')), 'type' => 'checkbox'],
-            ['name' => 'is_featured', 'label' => (('Featured Product')), 'type' => 'checkbox'],
-            ['name' => 'is_popular', 'label' => (('Popular Product')), 'type' => 'checkbox'],
+        $result[static::FORM][static::CONFIG][static::TABS] = '/catalog/products/form';
+        $result[static::FORM][static::CONFIG][static::FIELDS] = [
+            static::DEFAULT_FIELD => [static::MODEL => 'product'],
+            [static::NAME => 'product_name', static::LABEL => (('Product Name')), static::I18N => true, static::REQUIRED => true],
+            [static::NAME => 'url_key', static::LABEL => 'URL Key (optional)', static::VALIDATE => ['pattern' => '/^[a-z0-9-]+$/']],
+            [static::NAME => 'product_sku', static::LABEL => (('Product SKU')), static::REQUIRED => true],
+            [static::NAME => 'short_description', static::TYPE => 'textarea', static::LABEL => (('Short Description')), static::I18N => true, static::REQUIRED => true],
+            [static::NAME => 'description', static::TYPE => 'wysiwyg', static::LABEL => (('Long Description')), static::I18N => true, static::REQUIRED => true],
+            [static::NAME => 'is_hidden', static::LABEL => (('Hide Product')), static::TYPE => 'checkbox'],
+            [static::NAME => 'is_featured', static::LABEL => (('Featured Product')), static::TYPE => 'checkbox'],
+            [static::NAME => 'is_popular', static::LABEL => (('Popular Product')), static::TYPE => 'checkbox'],
 
-            ['name' => 'manage_inventory', 'label' => (('Manage Inventory')), 'tab' => 'inventory', 'type' => 'checkbox'],
-            ['name' => 'inventory_sku', 'label' => (('Inventory SKU')), 'tab' => 'inventory', 'notes' => (('Leave empty to use Product SKU'))],
-            ['name' => 'qty_in_stock', 'label' => (('Qty In Stock')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'unit_cost', 'label' => (('Inventory Unit Cost')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'allow_backorder', 'label' => (('Allow Backorders')), 'model' => 'inventory', 'tab' => 'inventory', 'type' => 'checkbox'],
-            ['name' => 'qty_warn_customer', 'label' => (('Minimal Qty to warn customer on frontend')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'qty_notify_admin', 'label' => (('Minimal Qty to notify admin')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'qty_cart_min', 'label' => (('Minimum Qty In Cart')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'qty_cart_max', 'label' => (('Maximum Qty In Cart')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'qty_cart_inc', 'label' => (('Qty In Cart Increment')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'qty_buffer', 'label' => (('Buffer Qty In Stock')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'pack_separate', 'label' => (('Pack Separately for Shipment')), 'model' => 'inventory', 'tab' => 'inventory', 'type' => 'checkbox'],
-            ['name' => 'net_weight', 'label' => (('Net Weight')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'shipping_weight', 'label' => (('Shipping Weight')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'shipping_size', 'label' => (('Shipping Size')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'hs_tariff_number', 'label' => (('Harmonized Tariff Number')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
-            ['name' => 'origin_country', 'label' => (('Country of Origin')), 'model' => 'inventory', 'tab' => 'inventory', 'input_type' => 'number'],
+            [static::NAME => 'manage_inventory', static::LABEL => (('Manage Inventory')), static::TAB => 'inventory', static::TYPE => 'checkbox'],
+            [static::NAME => 'inventory_sku', static::LABEL => (('Inventory SKU')), static::TAB => 'inventory', static::NOTES => (('Leave empty to use Product SKU'))],
+            [static::NAME => 'qty_in_stock', static::LABEL => (('Qty In Stock')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'unit_cost', static::LABEL => (('Inventory Unit Cost')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'allow_backorder', static::LABEL => (('Allow Backorders')), static::MODEL => 'inventory', static::TAB => 'inventory', static::TYPE => 'checkbox'],
+            [static::NAME => 'qty_warn_customer', static::LABEL => (('Minimal Qty to warn customer on frontend')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'qty_notify_admin', static::LABEL => (('Minimal Qty to notify admin')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'qty_cart_min', static::LABEL => (('Minimum Qty In Cart')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'qty_cart_max', static::LABEL => (('Maximum Qty In Cart')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'qty_cart_inc', static::LABEL => (('Qty In Cart Increment')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'qty_buffer', static::LABEL => (('Buffer Qty In Stock')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'pack_separate', static::LABEL => (('Pack Separately for Shipment')), static::MODEL => 'inventory', static::TAB => 'inventory', static::TYPE => 'checkbox'],
+            [static::NAME => 'net_weight', static::LABEL => (('Net Weight')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'shipping_weight', static::LABEL => (('Shipping Weight')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'shipping_size', static::LABEL => (('Shipping Size')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'hs_tariff_number', static::LABEL => (('Harmonized Tariff Number')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
+            [static::NAME => 'origin_country', static::LABEL => (('Country of Origin')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
         ];
 
-        $result['form']['i18n'] = 'product';
+        $result[static::FORM][static::I18N] = 'product';
 
         return $result;
     }
@@ -293,10 +294,10 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
             if ($validated) {
                 $model->save();
-                $this->BEvents->fire("{$eventName}:after", ['data' => $data, 'model' => $model]);
+                $this->BEvents->fire("{$eventName}:after", ['data' => $data, static::MODEL => $model]);
 
                 $result = $this->getFormData();
-                $result['form'] = $this->normalizeFormConfig($result['form']);
+                $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
                 $this->ok()->addMessage('Product was saved successfully', 'success');
             } else {
                 $result = ['status' => 'error'];
@@ -344,7 +345,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             if ($result) {
                 $args['result']['product'] = [
                     'priority' => 1,
-                    'link' => '/catalog/products/form?id=' . $result->id(),
+                    static::LINK => '/catalog/products/form?id=' . $result->id(),
                 ];
             }
         }

@@ -177,7 +177,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
 
         $args['forms'] = array_merge_recursive($args['forms'], [
             '/areas/core/website' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Core'],
                         ['name' => 'company_name', 'label' => (('Company Name'))],
@@ -192,7 +192,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/core/l10n' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Core'],
                         ['name' => 'limit_countries', 'label' => (('Limit Countries')), 'type' => 'checkbox'],
@@ -207,7 +207,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/core/session' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'cookie'],
                         ['name' => 'session_handler', 'label' => (('Session Handler')), 'options' => $sessionHandlers],
@@ -225,7 +225,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/core/db' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'db'],
                         ['name' => 'host', 'label' => (('Host'))],
@@ -240,7 +240,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/core/cache' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'core/cache'],
                         ['name' => 'manifest_files', 'label' => (('Module Manifest Files Cache')), 'options' => $cacheOptions],
@@ -256,7 +256,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
             ],
 
             '/areas/frontend/html' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Frontend'],
                         ['name' => 'theme', 'label' => (('Theme')), 'options' => $this->BLayout->getThemes('FCom_Frontend', true)],
@@ -268,7 +268,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/frontend/session' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Frontend'],
                         ['name' => 'session_handler', 'label' => (('Session Handler')), 'options' => $sessionHandlers],
@@ -286,7 +286,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/frontend/web_security' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Frontend/web'],
                         ['name' => 'hide_script_name', 'label' => (('Hide script file name in URL')), 'options' => ['' => '', 0 => (('No')), 1 => (('Automatic')), 2 => (('FORCE'))]],
@@ -300,7 +300,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/frontend/area' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Frontend'],
                         ['name' => 'FCom_Frontend', 'label' => (('IP: Mode')), 'type' => 'component',
@@ -310,7 +310,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/frontend/custom_tags' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Frontend'],
                         ['name' => 'custom_tags_homepage', 'label' => 'Home Page', 'type' => 'textarea'],
@@ -325,7 +325,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
             ],
 
             '/areas/admin/html' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Admin'],
                         ['name' => 'theme', 'label' => (('Theme')), 'options' => $this->BLayout->getThemes('FCom_Admin', true)],
@@ -337,7 +337,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/admin/area' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Admin'],
                         ['name' => 'FCom_Admin', 'label' => (('IP: Mode')), 'type' => 'component',
@@ -351,7 +351,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/admin/dashboard' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Admin'],
                         ['name' => 'default_dashboard_widget_limit', 'label' => (('Default Widgets Rows Limit'))],
@@ -359,7 +359,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/admin/user_security' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Admin'],
                         ['name' => 'password_strength', 'label' => (('Strong Password Security')), 'type' => 'checkbox'],
@@ -372,7 +372,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
             ],
 
             '/areas/cron/area' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Cron'],
                         ['name' => 'FCom_Cron', 'label' => (('IP: Mode')), 'type' => 'component',
@@ -381,7 +381,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
                 ],
             ],
             '/areas/cron/dispatch' => [
-                'config' => [
+                static::CONFIG => [
                     'fields' => [
                         'default' => ['root' => 'modules/FCom_Cron'],
                         ['name' => 'leeway_mins', 'label' => (('Leeway Minutes')), 'input_type' => 'number'],

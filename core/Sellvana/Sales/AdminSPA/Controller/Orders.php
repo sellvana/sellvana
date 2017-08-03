@@ -21,52 +21,52 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $stateOverallOptions = $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels();
 
         return [
-            'id' => 'orders',
-            'title' => (('Orders')),
-            'data_url' => 'orders/grid_data',
-            'columns' => [
-                ['type' => 'row-select'],
-//                ['type' => 'actions', 'actions' => [
-//                    ['type' => 'edit', 'link' => '/sales/orders/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-//                    //['type' => 'delete', 'delete_url' => 'orders/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
+            static::ID => 'orders',
+            static::TITLE => (('Orders')),
+            static::DATA_URL => 'orders/grid_data',
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT],
+//                [static::TYPE => 'actions', static::ACTIONS => [
+//                    [static::TYPE => 'edit', static::LINK => '/sales/orders/form?id={id}', 'icon_class' => 'fa fa-pencil'],
+//                    //[static::TYPE => 'delete', 'delete_url' => 'orders/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
 //                ]],
-                ['name' => 'id', 'label' => (('Internal ID'))],
-                ['name' => 'unique_id', 'label' => (('Order ID')), 'datacell_template' => '<td><a :href="\'#/sales/orders/form?id=\'+row.id">{{row.unique_id}}</a></td>'],
-                ['name' => 'state_overall', 'label' => (('Overall State')), 'options' => $stateOverallOptions],
-                ['name' => 'customer_email', 'label' => (('Email'))],
+                [static::NAME => 'id', static::LABEL => (('Internal ID'))],
+                [static::NAME => 'unique_id', static::LABEL => (('Order ID')), static::DATACELL_TEMPLATE => '<td><a :href="\'#/sales/orders/form?id=\'+row.id">{{row.unique_id}}</a></td>'],
+                [static::NAME => 'state_overall', static::LABEL => (('Overall State')), static::OPTIONS => $stateOverallOptions],
+                [static::NAME => 'customer_email', static::LABEL => (('Email'))],
 
-                ['name' => 'billing_firstname', 'label' => (('Billing Last Name'))],
-                ['name' => 'billing_lastname', 'label' => (('Billing Last Name'))],
-                ['name' => 'billing_street1', 'label' => (('Billing Street'))],
-                ['name' => 'billing_city', 'label' => (('Billing Street'))],
-                ['name' => 'billing_region', 'label' => (('Billing State'))],
-                ['name' => 'billing_postcode', 'label' => (('Billing Zip'))],
-                ['name' => 'billing_country', 'label' => (('Billing Country'))],
-                ['name' => 'billing_phone', 'label' => (('Billing Phone'))],
-                ['name' => 'billing_fax', 'label' => (('Billing Fax'))],
+                [static::NAME => 'billing_firstname', static::LABEL => (('Billing Last Name'))],
+                [static::NAME => 'billing_lastname', static::LABEL => (('Billing Last Name'))],
+                [static::NAME => 'billing_street1', static::LABEL => (('Billing Street'))],
+                [static::NAME => 'billing_city', static::LABEL => (('Billing Street'))],
+                [static::NAME => 'billing_region', static::LABEL => (('Billing State'))],
+                [static::NAME => 'billing_postcode', static::LABEL => (('Billing Zip'))],
+                [static::NAME => 'billing_country', static::LABEL => (('Billing Country'))],
+                [static::NAME => 'billing_phone', static::LABEL => (('Billing Phone'))],
+                [static::NAME => 'billing_fax', static::LABEL => (('Billing Fax'))],
 
-                ['name' => 'shipping_firstname', 'label' => (('Shipping Last Name'))],
-                ['name' => 'shipping_lastname', 'label' => (('Shipping Last Name'))],
-                ['name' => 'shipping_street1', 'label' => (('Shipping Street'))],
-                ['name' => 'shipping_city', 'label' => (('Shipping Street'))],
-                ['name' => 'shipping_region', 'label' => (('Shipping State'))],
-                ['name' => 'shipping_postcode', 'label' => (('Shipping Zip'))],
-                ['name' => 'shipping_country', 'label' => (('Shipping Country'))],
-                ['name' => 'shipping_phone', 'label' => (('Shipping Phone'))],
-                ['name' => 'shipping_fax', 'label' => (('Shipping Fax'))],
+                [static::NAME => 'shipping_firstname', static::LABEL => (('Shipping Last Name'))],
+                [static::NAME => 'shipping_lastname', static::LABEL => (('Shipping Last Name'))],
+                [static::NAME => 'shipping_street1', static::LABEL => (('Shipping Street'))],
+                [static::NAME => 'shipping_city', static::LABEL => (('Shipping Street'))],
+                [static::NAME => 'shipping_region', static::LABEL => (('Shipping State'))],
+                [static::NAME => 'shipping_postcode', static::LABEL => (('Shipping Zip'))],
+                [static::NAME => 'shipping_country', static::LABEL => (('Shipping Country'))],
+                [static::NAME => 'shipping_phone', static::LABEL => (('Shipping Phone'))],
+                [static::NAME => 'shipping_fax', static::LABEL => (('Shipping Fax'))],
 
-                ['name' => 'create_at', 'label' => (('Created')), 'type' => 'date']
+                [static::NAME => 'create_at', static::LABEL => (('Created')), static::TYPE => 'date']
             ],
-            'filters' => [
-                ['name' => 'id', 'type' => 'number'],
-                ['name' => 'unique_id'],
-                ['name' => 'state_overall'],
-                ['name' => 'create_at'],
+            static::FILTERS => [
+                [static::NAME => 'id', static::TYPE => 'number'],
+                [static::NAME => 'unique_id'],
+                [static::NAME => 'state_overall'],
+                [static::NAME => 'create_at'],
             ],
-            'export' => true,
-            'pager' => true,
-            'bulk_actions' => [
-                ['name' => 'custom_state', 'label' => (('Change Custom State'))],
+            static::EXPORT => true,
+            static::PAGER => true,
+            static::BULK_ACTIONS => [
+                [static::NAME => 'custom_state', static::LABEL => (('Change Custom State'))],
             ],
             'state' => [
                 's' => 'id',
@@ -93,13 +93,13 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         }
         $form = [];
 
-        $form['config']['title'] = [(('Sales Order #{id}')), 'id' => $order->get('unique_id')];
-        $form['config']['tabs'] = $this->getFormTabs('/sales/orders/form');
-        $form['config']['page_actions'] = [
-            ['name' => 'back', 'label' => (('Back')), 'group' => 'back', 'button_class' => 'button2'],
+        $form[static::CONFIG][static::TITLE] = [(('Sales Order #{id}')), static::ID => $order->get('unique_id')];
+        $form[static::CONFIG][static::TABS] = $this->getFormTabs('/sales/orders/form');
+        $form[static::CONFIG][static::PAGE_ACTIONS] = [
+            [static::NAME => 'back', static::LABEL => (('Back')), static::GROUP => 'back', static::BUTTON_CLASS => 'button2'],
         ];
 
-        $form['config']['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
+        $form[static::CONFIG]['details_sections'] = $this->view('sales/orders/form')->getDetailsSections();
 
         $form['order'] = $this->_getOrderData($order);
         if ($order->get('customer_id')) {
@@ -122,7 +122,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
         $form['comments'] = $this->_getComments($order);
 
-        $form['options'] = [
+        $form[static::OPTIONS] = [
             'order_state_overall' => $order->state()->overall()->getAllValueLabels(),
             'order_state_delivery' => $order->state()->delivery()->getAllValueLabels(),
             'order_state_payment' => $order->state()->payment()->getAllValueLabels(),
@@ -143,7 +143,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
 
         $form['updates'] = new stdClass;
 
-        $this->BEvents->fire(__METHOD__, ['form' => &$form]);
+        $this->BEvents->fire(__METHOD__, [static::FORM => &$form]);
         
         return $form;
     }
@@ -153,7 +153,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $result = [];
         try {
             $orderId        = $this->BRequest->get('id');
-            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -333,7 +333,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $result = [];
         foreach ($methods as $methodCode => $method) {
             $result[] = [
-                'id' => $methodCode,
+                static::ID => $methodCode,
                 'text' => $method->getName(),
                 'services' => $method->getServices(['no_remote' => true]),
             ];
@@ -349,25 +349,25 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $itemStateCustomOptions = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
 
         $config = [
-            'id' => 'order_items',
+            static::ID => 'order_items',
             'columns' =>  [
-                ['type' => 'row-select'],
-                //['type' => 'actions'],
-                ['name' => 'id', 'label' => (('ID'))],
-                ['name' => 'thumb_path', 'label' => (('Thumbnail')), 'width' => 48, 'sortable' => false,
-                    'datacell_template' => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
-                ['name' => 'product_name', 'label' => (('Product Name'))],
-                ['name' => 'product_sku', 'label' => (('Product SKU'))],
-                ['name' => 'price', 'label' => (('Price'))],
-                ['name' => 'qty_ordered', 'label' => (('Qty'))],
-                ['name' => 'row_total', 'label' => (('Total'))],
-                ['name' => 'state_overall', 'label' => (('Overall')), 'options' => $itemStateOverallOptions],
-                ['name' => 'state_payment', 'label' => (('Payment')), 'options' => $itemStatePaymentOptions],
-                ['name' => 'state_delivery', 'label' => (('Delivery')), 'options' => $itemStateDeliveryOptions],
-                ['name' => 'state_custom', 'label' => (('Custom')), 'options' => $itemStateCustomOptions],
+                [static::TYPE => static::ROW_SELECT],
+                //[static::TYPE => 'actions'],
+                [static::NAME => 'id', static::LABEL => (('ID'))],
+                [static::NAME => 'thumb_path', static::LABEL => (('Thumbnail')), static::WIDTH => 48, 'sortable' => false,
+                    static::DATACELL_TEMPLATE => '<td><a :href="\'#/catalog/products/form?id=\'+row.id"><img :src="row.thumb_url" :alt="row.product_name"></a></td>'],
+                [static::NAME => 'product_name', static::LABEL => (('Product Name'))],
+                [static::NAME => 'product_sku', static::LABEL => (('Product SKU'))],
+                [static::NAME => 'price', static::LABEL => (('Price'))],
+                [static::NAME => 'qty_ordered', static::LABEL => (('Qty'))],
+                [static::NAME => 'row_total', static::LABEL => (('Total'))],
+                [static::NAME => 'state_overall', static::LABEL => (('Overall')), static::OPTIONS => $itemStateOverallOptions],
+                [static::NAME => 'state_payment', static::LABEL => (('Payment')), static::OPTIONS => $itemStatePaymentOptions],
+                [static::NAME => 'state_delivery', static::LABEL => (('Delivery')), static::OPTIONS => $itemStateDeliveryOptions],
+                [static::NAME => 'state_custom', static::LABEL => (('Custom')), static::OPTIONS => $itemStateCustomOptions],
             ],
-            'bulk_actions' => [
-                ['name' => 'delete', 'label' => (('Delete Items'))],
+            static::BULK_ACTIONS => [
+                [static::NAME => 'delete', static::LABEL => (('Delete Items'))],
             ],
         ];
 
@@ -418,7 +418,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 
@@ -438,7 +438,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 
@@ -479,7 +479,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     $result['new_entity_id'] = $r['new_payment']->id();
                 }
             }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $result[static::FORM] = $this->_getFullOrderFormData($orderId);
             $this->ok()->addMessage('Payment has been created', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
@@ -516,7 +516,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
 
         $this->respond($result);
     }
@@ -572,7 +572,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 
@@ -602,7 +602,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 
@@ -634,7 +634,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 
@@ -668,7 +668,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         } catch (Exception $e) {
             $this->addMessage($e);
         }
-        $result['form'] = $this->_getFullOrderFormData($orderId);
+        $result[static::FORM] = $this->_getFullOrderFormData($orderId);
         $this->respond($result);
     }
 
@@ -693,7 +693,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     $result['new_entity_id'] = $r['new_refund']->id();
                 }
             }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $result[static::FORM] = $this->_getFullOrderFormData($orderId);
             $this->ok()->addMessage('Refund has been created', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
@@ -730,7 +730,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     $result['new_entity_id'] = $r['new_return']->id();
                 }
             }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $result[static::FORM] = $this->_getFullOrderFormData($orderId);
             $this->ok()->addMessage('Return has been created', 'success');
         } catch (Exception $e) {
             $this->addMessage($e);
@@ -767,7 +767,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     $result['new_entity_id'] = $r['new_cancel']->id();
                 }
             }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $result[static::FORM] = $this->_getFullOrderFormData($orderId);
             $this->ok()->addMessage('Cancellation has been created', 'success');
         } catch (Exception $e) {
             $this->addMessage($e, 'error');
@@ -827,7 +827,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
                     ]);
                     break;
             }
-            $result['form'] = $this->_getFullOrderFormData($orderId);
+            $result[static::FORM] = $this->_getFullOrderFormData($orderId);
             $this->ok()->addMessage($type . ' has been deleted successfully.', 'success');
         } catch (Exception $e) {
             $this->addMessage($e, 'error');
@@ -854,7 +854,7 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
             if ($result) {
                 $args['result']['order'] = [
                     'priority' => 20,
-                    'link' => '/sales/orders/form?id=' . $result->id(),
+                    static::LINK => '/sales/orders/form?id=' . $result->id(),
                 ];
             }
         }

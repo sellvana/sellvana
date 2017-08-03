@@ -26,13 +26,13 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_Report extends FCom_Ad
     {
         $view = parent::gridView();
         $grid = $view->get('grid');
-        $config = $grid['config'];
+        $config = $grid[static::CONFIG];
 
         $labels = $this->_getFieldLabels();
         $this->BEvents->fire(static::$_origClass . '::fieldLabels', ['data' => &$labels]);
 
         $this->_selectAllFields($config['orm']);
-        foreach ($config['columns'] as &$column) {
+        foreach ($config[static::COLUMNS] as &$column) {
             $column['label'] = $column['name'];
             if (!empty($column['name']) && !empty($labels[$column['name']])) {
                 $column['label'] = $labels[$column['name']];
@@ -50,7 +50,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_Report extends FCom_Ad
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['columns'] = array_merge($config['columns'], $this->_addAllColumns());
+        $config[static::COLUMNS] = array_merge($config[static::COLUMNS], $this->_addAllColumns());
         return $config;
     }
 
@@ -128,19 +128,19 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_Report extends FCom_Ad
         $request = $this->BRequest->request();
         if (!empty($request['hash'])) {
             $request = (array)$this->BUtil->fromJson(base64_decode($request['hash']));
-        } elseif (!empty($request['filters'])) {
-            $request['filters'] = $this->BUtil->fromJson($request['filters']);
+        } elseif (!empty($request[static::FILTERS])) {
+            $request[static::FILTERS] = $this->BUtil->fromJson($request[static::FILTERS]);
         }
 
         /** @var FCom_Core_View_BackboneGrid $view */
-        if (!empty($request['filters'])) {
-            return $request['filters'];
+        if (!empty($request[static::FILTERS])) {
+            return $request[static::FILTERS];
         } else {
             $pers = $this->FCom_Admin_Model_User->personalize();
             $gridId = $this->origClass();
-            $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : [];
-            if (!empty($persState['filters'])) {
-                return $persState['filters'];
+            $persState = !empty($pers[static::GRID][$gridId]['state']) ? $pers[static::GRID][$gridId]['state'] : [];
+            if (!empty($persState[static::FILTERS])) {
+                return $persState[static::FILTERS];
             }
         }
 
@@ -163,9 +163,9 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_Report extends FCom_Ad
                 $fieldName = $alias . '_' . $fieldId;
                 if (!in_array($fieldName, $this->_systemFields)) {
                     $columns[] = [
-                        'name' => $fieldName,
+                        static::NAME => $fieldName,
                         'index' => $alias . '.' . $fieldId,
-                        'hidden' => (!in_array($fieldName, $this->_visibleFields)),
+                        static::HIDDEN => (!in_array($fieldName, $this->_visibleFields)),
                         'cell' => !empty($cellFormats[$fieldName]) ? $cellFormats[$fieldName] : ''
                     ];
                 }
@@ -198,8 +198,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract_Report extends FCom_Ad
             if (substr($field->get('table_field_type'), 0, 3) == 'int') {
                 $type = 'number-range';
             }
-            $config['columns'][] = ['name' => $field->get('field_code'), 'index' => $field->get('field_code'), 'hidden' => true];
-            $config['filters'][] = ['field' => $field->get('field_code'), 'type' => $type, 'hidden' => true];
+            $config[static::COLUMNS][] = [static::NAME => $field->get('field_code'), 'index' => $field->get('field_code'), static::HIDDEN => true];
+            $config[static::FILTERS][] = ['field' => $field->get('field_code'), static::TYPE => $type, static::HIDDEN => true];
         }
 
         return $config;

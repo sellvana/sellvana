@@ -19,8 +19,8 @@ class FCom_AdminSPA_AdminSPA_Controller_Favorites extends FCom_AdminSPA_AdminSPA
             $userId = $this->FCom_Admin_Model_User->sessionUserId();
             $data = [
                 'user_id' => $userId,
-                'label' => $post['label'],
-                'link' => $post['link'],
+                static::LABEL => $post['label'],
+                static::LINK => $post['link'],
             ];
             $custData = $this->BUtil->arrayMask($post, ['label', 'link'], true);
             $this->FCom_Admin_Model_Favorite->create($data)->setData($custData)->save();

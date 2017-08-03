@@ -7,7 +7,6 @@
  */
 trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 {
-
     protected $_filterOpsByType = [
         'text' => [
             'equals' => 'equals',
@@ -80,8 +79,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     {
         $config = $this->getNormalizedGridConfig();
 
-        if (!empty($config['state']['filters'])) {
-            foreach ($config['state']['filters'] as &$f) {
+        if (!empty($config['state'][static::FILTERS])) {
+            foreach ($config['state'][static::FILTERS] as &$f) {
                 if (is_array($f['val'])) {
                     $f['values'] = $f['val'];
                 } else {
@@ -99,7 +98,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     {
         $config = $this->getNormalizedGridConfig();
         $config = $this->processGridStatePersonalization($config);
-        $filters = isset($config['state']['filters']) ? $config['state']['filters'] : null;
+        $filters = isset($config['state'][static::FILTERS]) ? $config['state'][static::FILTERS] : null;
         $data = $this->getGridRequestOrm()->paginate($config['state']);
         $data = $this->processGridPageData($data);
 
@@ -115,7 +114,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             unset($f);
         }
 
-        $data['state']['filters'] = $filters;
+        $data['state'][static::FILTERS] = $filters;
         $result = [
             'rows' => $data['rows'],
             'state' => $data['state'],
@@ -169,11 +168,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             }
             switch ($r['do']) {
                 case 'grid.col.hidden':
-                    if (empty($r['grid']) || empty($r['col']) || !isset($r['hidden'])) {
+                    if (empty($r[static::GRID]) || empty($r['col']) || !isset($r['hidden'])) {
                         break;
                     }
-                    $columns = [$r['col'] => ['hidden' => !empty($r['hidden']) && $r['hidden'] !== 'false']];
-                    $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
+                    $columns = [$r['col'] => [static::HIDDEN => !empty($r['hidden']) && $r['hidden'] !== 'false']];
+                    $data = [static::GRID => [$r[static::GRID] => ['columns' => $columns]]];
 
                     break;
 
@@ -191,7 +190,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         }
                         $columns[$col['name']] = ['position' => $col['position']];
                     }
-                    $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
+                    $data = [static::GRID => [$r[static::GRID] => ['columns' => $columns]]];
 
                     break;
             }
@@ -223,7 +222,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         $config = $this->getGridConfig();
         $config = $this->normalizeGridConfig($config);
         $orm = $this->getGridOrm();
-        $filters = !empty($config['state']['filters']) ? $config['state']['filters'] : $this->BRequest->request('filters');
+        $filters = !empty($config['state'][static::FILTERS]) ? $config['state'][static::FILTERS] : $this->BRequest->request('filters');
         if ($filters) {
             if (is_string($filters)) {
                 $filters = $this->BUtil->fromJson($filters);
@@ -245,12 +244,12 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         $gridOrm = $this->getGridOrm();
         $indexPrefix = $gridOrm ? $gridOrm->table_alias() . '.' : '';
 
-        if (!empty($config['data_url']) && empty($config['personalize_url'])) {
-            $config['personalize_url'] = str_replace('grid_data', 'grid_personalize', $config['data_url']);
+        if (!empty($config[static::DATA_URL]) && empty($config['personalize_url'])) {
+            $config['personalize_url'] = str_replace('grid_data', 'grid_personalize', $config[static::DATA_URL]);
         }
 
         $colsByName = [];
-        foreach ($config['columns'] as $i => &$col) {
+        foreach ($config[static::COLUMNS] as $i => &$col) {
             if (!isset($col['sortable'])) {
                 $col['sortable'] = true;
             }
@@ -269,8 +268,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             }
             if (!empty($col['type'])) {
                 switch ($col['type']) {
-                    case 'row-select':
-                    case 'row_select':
+                    case static::ROW_SELECT:
+                    case static::ROW_SELECT:
                         if (empty($col['header_component'])) {
                             $col['header_component'] = 'sv-comp-grid-header-cell-row-select';
                         }
@@ -278,7 +277,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                             $col['datacell_component'] = 'sv-comp-grid-data-cell-row-select';
                         }
                         if (empty($col['name'])) {
-                            $col['name'] = 'row-select';
+                            $col['name'] = static::ROW_SELECT;
                         }
                         if (empty($col['label'])) {
                             $col['label'] = (('Selection'));
@@ -302,23 +301,23 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         if (empty($col['label'])) {
                             $col['label'] = (('Actions'));
                         }
-                        if (empty($col['actions'])) {
+                        if (empty($col[static::ACTIONS])) {
                             if (!empty($config['edit_link'])) {
-                                $col['actions'][] = ['type' => 'edit', 'link' => $config['edit_link']];
+                                $col[static::ACTIONS][] = [static::TYPE => 'edit', static::LINK => $config['edit_link']];
                             }
                             if (!empty($config['delete_link'])) {
-                                $col['actions'][] = ['type' => 'delete', 'link' => $config['delete_link']];
+                                $col[static::ACTIONS][] = [static::TYPE => 'delete', static::LINK => $config['delete_link']];
                             }
                         }
-                        if (!empty($col['actions'])) {
-                            foreach ($col['actions'] as $j => $a) {
+                        if (!empty($col[static::ACTIONS])) {
+                            foreach ($col[static::ACTIONS] as $j => $a) {
                                 if (empty($a['icon_class']) && !empty($a['type'])) {
                                     switch ($a['type']) {
                                         case 'edit':
-                                            $col['actions'][$j]['icon_class'] = 'fa fa-pencil';
+                                            $col[static::ACTIONS][$j]['icon_class'] = 'fa fa-pencil';
                                             break;
                                         case 'delete':
-                                            $col['actions'][$j]['icon_class'] = 'fa fa-trash';
+                                            $col[static::ACTIONS][$j]['icon_class'] = 'fa fa-trash';
                                             break;
                                     }
                                 }
@@ -332,17 +331,17 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         }
         unset($col);
 
-        if (!empty($config['filters'])) {
-            if ($config['filters'] === true) {
-                $config['filters'] = [];
-                foreach ($config['columns'] as $col) {
-                    if (!empty($col['type']) && in_array($col['type'], ['row-select', 'actions'])) {
+        if (!empty($config[static::FILTERS])) {
+            if ($config[static::FILTERS] === true) {
+                $config[static::FILTERS] = [];
+                foreach ($config[static::COLUMNS] as $col) {
+                    if (!empty($col['type']) && in_array($col['type'], [static::ROW_SELECT, 'actions'])) {
                         continue;
                     }
-                    $config['filters'][] = ['name' => $col['name']];
+                    $config[static::FILTERS][] = [static::NAME => $col['name']];
                 }
             }
-            foreach ($config['filters'] as &$flt) {
+            foreach ($config[static::FILTERS] as &$flt) {
                 /** @deprecated TODO: one convention */
                 if (empty($flt['field']) && !empty($flt['name'])) {
                     $flt['field'] = $flt['name'];
@@ -352,16 +351,16 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                 $col = !empty($colsByName[$flt['name']]) ? $colsByName[$flt['name']] : [];
 
 
-                if (empty($flt['options'])) {
-                    if (!empty($col['options'])) {
-                        $flt['options'] = $col['options'];
+                if (empty($flt[static::OPTIONS])) {
+                    if (!empty($col[static::OPTIONS])) {
+                        $flt[static::OPTIONS] = $col[static::OPTIONS];
                     }
                 }
                 if (empty($flt['type'])) {
                     if (!empty($col['type'])) {
                         $flt['type'] = $col['type'];
                     } else {
-                        $flt['type'] = !empty($flt['options']) ? 'select' : 'text';
+                        $flt['type'] = !empty($flt[static::OPTIONS]) ? 'select' : 'text';
                     }
                 }
                 if (empty($flt['index']) && !empty($col)) {
@@ -390,25 +389,25 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             unset($flt);
         }
 
-        if (!empty($config['page_actions'])) {
-            $config['page_actions_groups'] = $this->getActionsGroups($config['page_actions']);
+        if (!empty($config[static::PAGE_ACTIONS])) {
+            $config['page_actions_groups'] = $this->getActionsGroups($config[static::PAGE_ACTIONS]);
         }
 
-        if (!empty($config['panel_actions'])) {
-            $config['panel_actions_groups'] = $this->getActionsGroups($config['panel_actions']);
+        if (!empty($config[static::PANEL_ACTIONS])) {
+            $config['panel_actions_groups'] = $this->getActionsGroups($config[static::PANEL_ACTIONS]);
         }
 
-        if (!empty($config['pager']) && $config['pager'] === true) {
-            $config['pager'] = [
+        if (!empty($config[static::PAGER]) && $config[static::PAGER] === true) {
+            $config[static::PAGER] = [
                 'pagesize_options' => [5, 10, 20, 50, 100],
             ];
         }
 
-        if (!empty($config['export']) && $config['export'] === true) {
-            $config['export'] = [
+        if (!empty($config[static::EXPORT]) && $config[static::EXPORT] === true) {
+            $config[static::EXPORT] = [
                 'url' => 'orders/grid_export',
                 'format_options' => [
-                    ['value' => 'csv', 'label' => (('CSV'))],
+                    ['value' => 'csv', static::LABEL => (('CSV'))],
                 ],
             ];
         }
@@ -461,9 +460,9 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     public function processGridFilters(&$config, $filters, $orm)
     {
         $configFilterFields = [];
-        if (!empty($config['filters'])) {
-            $indexes = $this->BUtil->arraySeqToMap($config['filters'], 'field', 'index');
-            $types = $this->BUtil->arraySeqToMap($config['filters'], 'field', 'type');
+        if (!empty($config[static::FILTERS])) {
+            $indexes = $this->BUtil->arraySeqToMap($config[static::FILTERS], 'field', 'index');
+            $types = $this->BUtil->arraySeqToMap($config[static::FILTERS], 'field', 'type');
 
             foreach ($filters as $fId => &$f) {
                 if (is_array($f)) {
@@ -482,14 +481,14 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             }
             unset($f);
 
-            foreach ($config['filters'] as $fId => $f) {
+            foreach ($config[static::FILTERS] as $fId => $f) {
                 if ($fId === '_quick') {
                     if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
                         $args = [];
                         foreach ($f['args'] as $a) {
                             $args[] = str_replace('?', $filters['_quick'], $a);
                         }
-                        $orm->where_raw('(' . $config['filters']['_quick']['expr'] . ')', $args);
+                        $orm->where_raw('(' . $config[static::FILTERS]['_quick']['expr'] . ')', $args);
                     }
                     break;
                 } elseif (!empty($f['field'])) {
@@ -510,7 +509,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             }
 
             $stop = false;
-            $fieldConfig = $config['filters'][$configFilterFields[$f['field']]];
+            $fieldConfig = $config[static::FILTERS][$configFilterFields[$f['field']]];
             if (!empty($fieldConfig['callback'])) {
                 $gridId = $config['id'];
                 $stop = $this->{$gridId}->{$fieldConfig['callback']}($fieldConfig, $filters[$fId]['val'], $orm);
@@ -672,7 +671,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         if (!empty($col['cell']) || (!empty($col['type']) && $col['type'] === 'thumb')) {
             return true;
         }
-        if (!empty($col['type']) && in_array($col['type'], ['actions', 'row-select'])) {
+        if (!empty($col['type']) && in_array($col['type'], ['actions', static::ROW_SELECT])) {
             return true;
         }
         return false;
@@ -681,7 +680,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     public function buildExportHeaders($config)
     {
         $headers = [];
-        foreach ($config['columns'] as $i => $col) {
+        foreach ($config[static::COLUMNS] as $i => $col) {
             if ($this->callbackSkipColumn($col)) {
                 continue;
             }
@@ -693,7 +692,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     public function buildExportDataRow($row, $config)
     {
         $data = [];
-        foreach ($config['columns'] as $col) {
+        foreach ($config[static::COLUMNS] as $col) {
             if ($this->callbackSkipColumn($col)) {
                 continue;
             }
@@ -702,8 +701,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             if ($val === null) {
                 $val = '';
             }
-            if (isset($col['options'][$val])) {
-                $val = $col['options'][$val];
+            if (isset($col[static::OPTIONS][$val])) {
+                $val = $col[static::OPTIONS][$val];
             }
             $data[] = $val;
         }
@@ -713,24 +712,24 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     public function applyGridPersonalization($config)
     {
         $pers = $this->FCom_Admin_Model_User->personalize();
-        if (empty($pers['grid'][$config['id']])) {
+        if (empty($pers[static::GRID][$config['id']])) {
             return $config;
         }
-        $p = $pers['grid'][$config['id']];
+        $p = $pers[static::GRID][$config['id']];
         if (!empty($p['state'])) {
             $config['state'] = $p['state'];
         }
-        if (!empty($p['columns'])) {
-            foreach ($config['columns'] as &$col) {
-                if (isset($p['columns'][$col['name']]['hidden'])) {
-                    $col['hidden'] = $p['columns'][$col['name']]['hidden'];
+        if (!empty($p[static::COLUMNS])) {
+            foreach ($config[static::COLUMNS] as &$col) {
+                if (isset($p[static::COLUMNS][$col['name']]['hidden'])) {
+                    $col['hidden'] = $p[static::COLUMNS][$col['name']]['hidden'];
                 }
-                if (isset($p['columns'][$col['name']]['position'])) {
-                    $col['position'] = $p['columns'][$col['name']]['position'];
+                if (isset($p[static::COLUMNS][$col['name']]['position'])) {
+                    $col['position'] = $p[static::COLUMNS][$col['name']]['position'];
                 }
             }
             unset($col);
-            usort($config['columns'], function ($c1, $c2) {
+            usort($config[static::COLUMNS], function ($c1, $c2) {
                 $d1 = !empty($c1['position']) ? $c1['position'] : 999;
                 $d2 = !empty($c2['position']) ? $c2['position'] : 999;
                 return $d1 < $d2 ? -1 : ($d1 > $d2 ? 1 : 0);
@@ -745,8 +744,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
         if (null === $state) {
             $state = $this->BRequest->request();
         }
-        if (isset($state['filters']) && is_string($state['filters'])) {
-            $state['filters'] = $this->BUtil->fromJson($state['filters']);
+        if (isset($state[static::FILTERS]) && is_string($state[static::FILTERS])) {
+            $state[static::FILTERS] = $this->BUtil->fromJson($state[static::FILTERS]);
         }
         $this->FCom_Admin_Model_User->personalize(["grid/{$config['id']}/state" => $state], true);
         $config['state'] = $state;
@@ -756,11 +755,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     protected function _addFilterConfigToState($config)
     {
-        if (!empty($config['state']['filters']) && !empty($config['filters'])) {
-            foreach ($config['state']['filters'] as &$f) {
-                foreach ($config['filters'] as $flt) {
+        if (!empty($config['state'][static::FILTERS]) && !empty($config[static::FILTERS])) {
+            foreach ($config['state'][static::FILTERS] as &$f) {
+                foreach ($config[static::FILTERS] as $flt) {
                     if ($flt['field'] === $f['field']) {
-                        $f['config'] = $flt;
+                        $f[static::CONFIG] = $flt;
                         break;
                     }
                 }
@@ -774,11 +773,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
     {
         $gridConfig = $this->getNormalizedGridConfig();
         $fields = [];
-        foreach ($gridConfig['bulk_actions'] as $action) {
+        foreach ($gridConfig[static::BULK_ACTIONS] as $action) {
             if (null !== $bulkAction && $action['name'] !== $bulkAction) {
                 continue;
             }
-            foreach ($action['popup']['form']['config']['fields'] as $field) {
+            foreach ($action['popup'][static::FORM][static::CONFIG][static::FIELDS] as $field) {
                 if (null === $bulkAction) {
                     $fields[$action['name']][$field['model']] = $field['name'];
                 } elseif (null === $model) {

@@ -18,34 +18,34 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns extends FCom_AdminSPA
         $statusOptions = $this->Sellvana_Email_Model_Mailing_Campaign->fieldOptions('status');
         $listOptions = $this->Sellvana_Email_Model_Mailing_List->orm()->find_many_assoc('id', 'title');
         $config = [
-            'id' => 'mailing_campaigns',
-            'data_url' => 'mailing/campaigns/grid_data',
-            'title' => (('Mailing Campaigns')),
-            'columns' => [
-                ['type' => 'row-select'],
-                ['name' => 'id', 'label' => (('ID')), 'hidden' => true],
-                ['name' => 'title', 'label' => (('Title')), 'datacell_template' => '<td><a :href="\'#/mailing/campaigns/form?id=\'+row.id">{{row.title}}</a></td>'],
-                ['name' => 'list_id', 'label' => (('List')), 'options' => $listOptions],
-                ['name' => 'status', 'label' => (('Status')), 'options' => $statusOptions],
-                ['name' => 'sender_name', 'label' => (('Sender Name'))],
-                ['name' => 'sender_email', 'label' => (('Sender Email'))],
-                ['name' => 'subject', 'label' => (('Subject'))],
-                ['name' => 'cnt_total', 'label' => (('# Total'))],
-                ['name' => 'cnt_sent', 'label' => (('# Sent'))],
-                ['name' => 'cnt_success', 'label' => (('# Success'))],
-                ['name' => 'cnt_error', 'label' => (('# Error'))],
-                ['name' => 'cnt_opened', 'label' => (('# Received'))],
-                ['name' => 'cnt_clicked', 'label' => (('# Clicked'))],
-                ['name' => 'cnt_unsub', 'label' => (('# Unsubscribed'))],
-                ['name' => 'create_at', 'label' => (('Created At'))],
-                ['name' => 'update_at', 'label' => (('Updated At'))],
+            static::ID => 'mailing_campaigns',
+            static::DATA_URL => 'mailing/campaigns/grid_data',
+            static::TITLE => (('Mailing Campaigns')),
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT],
+                [static::NAME => 'id', static::LABEL => (('ID')), static::HIDDEN => true],
+                [static::NAME => 'title', static::LABEL => (('Title')), static::DATACELL_TEMPLATE => '<td><a :href="\'#/mailing/campaigns/form?id=\'+row.id">{{row.title}}</a></td>'],
+                [static::NAME => 'list_id', static::LABEL => (('List')), static::OPTIONS => $listOptions],
+                [static::NAME => 'status', static::LABEL => (('Status')), static::OPTIONS => $statusOptions],
+                [static::NAME => 'sender_name', static::LABEL => (('Sender Name'))],
+                [static::NAME => 'sender_email', static::LABEL => (('Sender Email'))],
+                [static::NAME => 'subject', static::LABEL => (('Subject'))],
+                [static::NAME => 'cnt_total', static::LABEL => (('# Total'))],
+                [static::NAME => 'cnt_sent', static::LABEL => (('# Sent'))],
+                [static::NAME => 'cnt_success', static::LABEL => (('# Success'))],
+                [static::NAME => 'cnt_error', static::LABEL => (('# Error'))],
+                [static::NAME => 'cnt_opened', static::LABEL => (('# Received'))],
+                [static::NAME => 'cnt_clicked', static::LABEL => (('# Clicked'))],
+                [static::NAME => 'cnt_unsub', static::LABEL => (('# Unsubscribed'))],
+                [static::NAME => 'create_at', static::LABEL => (('Created At'))],
+                [static::NAME => 'update_at', static::LABEL => (('Updated At'))],
             ],
-            'page_actions' => [
-                ['name' => 'new', 'label' => (('Create New Campaign')), 'button_class' => 'button1', 'link' => '/mailing/campaigns/form'],
+            static::PAGE_ACTIONS => [
+                [static::NAME => 'new', static::LABEL => (('Create New Campaign')), static::BUTTON_CLASS => 'button1', static::LINK => '/mailing/campaigns/form'],
             ],
-            'filters' => true,
-            'pager' => true,
-            'export' => true,
+            static::FILTERS => true,
+            static::PAGER => true,
+            static::EXPORT => true,
         ];
 
         return $config;
@@ -71,26 +71,26 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns extends FCom_AdminSPA
 
 
         $result = [];
-        $result['form']['campaign'] = $campaign->as_array();
-        $result['form']['config']['title'] = $campaignId ? $campaign->get('title') : (('New Campaign'));
-        $result['form']['config']['tabs'] = '/mailing/campaigns/form';
-        $result['form']['config']['fields'] = [
-            'default' => ['model' => 'campaign', 'tab' => 'main'],
-            ['name' => 'title', 'label' => (('Title')), 'required' => true],
-            ['name' => 'list_id', 'label' => (('List')), 'required' => true, 'type' => 'select2', 'options' => $listOptions],
-            ['name' => 'sender_name', 'label' => (('Sender Name')), 'required' => true],
-            ['name' => 'sender_email', 'label' => (('Sender Email')), 'required' => true, 'input_type' => 'email'],
-            ['name' => 'subject', 'label' => (('Subject')), 'required' => true],
-            ['name' => 'template_html', 'label' => (('Template HTML')), 'required' => true, 'type' => 'textarea'],
+        $result[static::FORM]['campaign'] = $campaign->as_array();
+        $result[static::FORM][static::CONFIG][static::TITLE] = $campaignId ? $campaign->get('title') : (('New Campaign'));
+        $result[static::FORM][static::CONFIG][static::TABS] = '/mailing/campaigns/form';
+        $result[static::FORM][static::CONFIG][static::FIELDS] = [
+            static::DEFAULT_FIELD => [static::MODEL => 'campaign', static::TAB => 'main'],
+            [static::NAME => 'title', static::LABEL => (('Title')), static::REQUIRED => true],
+            [static::NAME => 'list_id', static::LABEL => (('List')), static::REQUIRED => true, static::TYPE => 'select2', static::OPTIONS => $listOptions],
+            [static::NAME => 'sender_name', static::LABEL => (('Sender Name')), static::REQUIRED => true],
+            [static::NAME => 'sender_email', static::LABEL => (('Sender Email')), static::REQUIRED => true, static::INPUT_TYPE => 'email'],
+            [static::NAME => 'subject', static::LABEL => (('Subject')), static::REQUIRED => true],
+            [static::NAME => 'template_html', static::LABEL => (('Template HTML')), static::REQUIRED => true, static::TYPE => 'textarea'],
         ];
         if ($campaign->id()) {
-            #$result['form']['config']['fields'][] = ['name' => 'status', 'label' => (('Status')), 'options' => $statusOptions];
+            #$result[static::FORM][static::CONFIG][static::FIELDS][] = [static::NAME => 'status', static::LABEL => (('Status')), static::OPTIONS => $statusOptions];
         }
-        $result['form']['status_options'] = $statusOptions;
+        $result[static::FORM]['status_options'] = $statusOptions;
 
-        $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
+        $result[static::FORM][static::CONFIG][static::PAGE_ACTIONS] = $this->getDefaultFormPageActions();
 
-        $result['form']['recipients_grid']['config'] =
+        $result[static::FORM]['recipients_grid'][static::CONFIG] =
             $this->Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns_Recipients->getNormalizedGridConfig();
 
         return $result;
@@ -170,7 +170,7 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns extends FCom_AdminSPA
             $campaignId = $this->BRequest->request('id');
             $data = $this->Sellvana_Email_Model_Mailing_Campaign->load($campaignId)->as_array();
             unset($data['data_serialized'], $data['template_html']);
-            $result['form']['campaign'] = $data;
+            $result[static::FORM]['campaign'] = $data;
             $this->ok();
         } catch (Exception $e) {
             $this->addMessage($e);

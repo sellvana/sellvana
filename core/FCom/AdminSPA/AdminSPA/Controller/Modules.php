@@ -14,28 +14,28 @@ class FCom_AdminSPA_AdminSPA_Controller_Modules extends FCom_AdminSPA_AdminSPA_C
     public function getGridConfig()
     {
         return [
-            'id' => 'modules',
-            'title' => (('Modules')),
-            'data_url' => 'modules/grid_data',
-            'columns' => [
-                ['type' => 'row-select', 'width' => 80],
-                ['name' => 'toggle', 'label' => (('Toggle')), 'datacell_component' => 'sv-page-modules-grid-datacell-run-level', 'sortable' => false],
-                ['name' => 'run_level', 'label' => (('Run Level'))],
-                ['name' => 'run_status', 'label' => (('Status'))],
-                ['name' => 'name', 'label' => (('Module Name'))],
-                ['name' => 'description', 'label' => (('Description'))],
-                ['name' => 'version', 'label' => (('Version'))],
-                ['name' => 'channel', 'label' => (('Channel'))],
-                ['name' => 'schema_version', 'label' => (('DB Version'))],
-                ['name' => 'requires', 'label' => (('Requires')), 'content_overflow' => true],
-                ['name' => 'required_by', 'label' => (('Required By')), 'content_overflow' => true],
-                ['name' => 'dep_errors', 'label' => (('Dependency Errors')), 'content_overflow' => true],
+            static::ID => 'modules',
+            static::TITLE => (('Modules')),
+            static::DATA_URL => 'modules/grid_data',
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT, static::WIDTH => 80],
+                [static::NAME => 'toggle', static::LABEL => (('Toggle')), 'datacell_component' => 'sv-page-modules-grid-datacell-run-level', 'sortable' => false],
+                [static::NAME => 'run_level', static::LABEL => (('Run Level'))],
+                [static::NAME => 'run_status', static::LABEL => (('Status'))],
+                [static::NAME => 'name', static::LABEL => (('Module Name'))],
+                [static::NAME => 'description', static::LABEL => (('Description'))],
+                [static::NAME => 'version', static::LABEL => (('Version'))],
+                [static::NAME => 'channel', static::LABEL => (('Channel'))],
+                [static::NAME => 'schema_version', static::LABEL => (('DB Version'))],
+                [static::NAME => 'requires', static::LABEL => (('Requires')), 'content_overflow' => true],
+                [static::NAME => 'required_by', static::LABEL => (('Required By')), 'content_overflow' => true],
+                [static::NAME => 'dep_errors', static::LABEL => (('Dependency Errors')), 'content_overflow' => true],
             ],
-            'page_actions' => [
-                'default' => [/*'mobile_group' => 'actions', */'button_class' => 'button1'],
-                /*['name' => 'actions', 'label' => 'Actions'],*/
-                ['name' => 'migrate', 'label' => (('Run Migrations')), 'group' => 'migrate'],
-                ['name' => 'reset_cache', 'label' => (('Reset Cache')), 'group' => 'reset_cache'],
+            static::PAGE_ACTIONS => [
+                static::DEFAULT_FIELD => [/*static::MOBILE_GROUP => 'actions', */static::BUTTON_CLASS => 'button1'],
+                /*[static::NAME => 'actions', static::LABEL => 'Actions'],*/
+                [static::NAME => 'migrate', static::LABEL => (('Run Migrations')), static::GROUP => 'migrate'],
+                [static::NAME => 'reset_cache', static::LABEL => (('Reset Cache')), static::GROUP => 'reset_cache'],
             ],
         ];
     }
@@ -102,7 +102,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Modules extends FCom_AdminSPA_AdminSPA_C
 
         $gridId = 'modules';
         $pers = $this->FCom_Admin_Model_User->personalize();
-        $s = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : [];
+        $s = !empty($pers[static::GRID][$gridId]['state']) ? $pers[static::GRID][$gridId]['state'] : [];
 
         //$this->BDebug->dump($pers); exit;
         if (!empty($s['s'])) {

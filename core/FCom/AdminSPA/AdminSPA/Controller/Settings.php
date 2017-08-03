@@ -87,14 +87,14 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
         foreach ((array)$forms as $path => $form) {
 
-            if (!empty($form['config']['default_field'])) {
-                $root = !empty($form['config']['default_field']['root']) ? $form['config']['default_field']['root'] : '';
-                $form['config']['default_field']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
-                $form['config']['default_field']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
-            } elseif (!empty($form['config']['fields']['default'])) {
-                $root = !empty($form['config']['fields']['default']['root']) ? $form['config']['fields']['default']['root'] : '';
-                $form['config']['fields']['default']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
-                $form['config']['fields']['default']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
+            if (!empty($form[static::CONFIG]['default_field'])) {
+                $root = !empty($form[static::CONFIG]['default_field']['root']) ? $form[static::CONFIG]['default_field']['root'] : '';
+                $form[static::CONFIG]['default_field']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
+                $form[static::CONFIG]['default_field']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
+            } elseif (!empty($form[static::CONFIG][static::FIELDS]['default'])) {
+                $root = !empty($form[static::CONFIG][static::FIELDS]['default']['root']) ? $form[static::CONFIG][static::FIELDS]['default']['root'] : '';
+                $form[static::CONFIG][static::FIELDS]['default']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
+                $form[static::CONFIG][static::FIELDS]['default']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
             }
 
             $forms[$path] = $this->normalizeFormConfig($form, $path);
@@ -112,13 +112,13 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
         //TODO: permissions
         foreach ($forms as $path => $form) {
-            if (empty($form['config']['fields'])) {
+            if (empty($form[static::CONFIG][static::FIELDS])) {
                 continue;
             }
-            if (!empty($form['config']['default_field']['root']) || !empty($form['config']['fields']['default']['root'])) {
-                $roots[$form['config']['default_field']['root']] = true;
+            if (!empty($form[static::CONFIG]['default_field']['root']) || !empty($form[static::CONFIG][static::FIELDS]['default']['root'])) {
+                $roots[$form[static::CONFIG]['default_field']['root']] = true;
             }
-            foreach ((array)$form['config']['fields'] as $field) {
+            foreach ((array)$form[static::CONFIG][static::FIELDS] as $field) {
                 if (!empty($field['root'])) {
                     $roots[$field['root']] = true;
                 }

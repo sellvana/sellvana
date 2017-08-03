@@ -9,24 +9,24 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Lists_Recipients extends FCom_A
     public function getGridConfig()
     {
         $config = [
-            'id' => 'mailing_lists_recipients',
-            'data_url' => 'mailing/lists/recipients/grid_data?id=' . $this->BRequest->get('id'),
-            'title' => (('Mailing List Recipients')),
-            'columns' => [
-                ['type' => 'row-select'],
-                ['name' => 'id', 'label' => (('ID')), 'hidden' => true],
-                ['name' => 'email', 'label' => (('Email'))],
-                ['name' => 'firstname', 'label' => (('First Name'))],
-                ['name' => 'lastname', 'label' => (('Last Name'))],
-                ['name' => 'company', 'label' => (('Company'))],
-                ['name' => 'create_at', 'label' => (('Created At'))],
-                ['name' => 'update_at', 'label' => (('Updated At'))],
+            static::ID => 'mailing_lists_recipients',
+            static::DATA_URL => 'mailing/lists/recipients/grid_data?id=' . $this->BRequest->get('id'),
+            static::TITLE => (('Mailing List Recipients')),
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT],
+                [static::NAME => 'id', static::LABEL => (('ID')), static::HIDDEN => true],
+                [static::NAME => 'email', static::LABEL => (('Email'))],
+                [static::NAME => 'firstname', static::LABEL => (('First Name'))],
+                [static::NAME => 'lastname', static::LABEL => (('Last Name'))],
+                [static::NAME => 'company', static::LABEL => (('Company'))],
+                [static::NAME => 'create_at', static::LABEL => (('Created At'))],
+                [static::NAME => 'update_at', static::LABEL => (('Updated At'))],
             ],
-            'filters' => true,
-            'pager' => true,
-            'export' => true,
-            'bulk_actions' => [
-                ['name' => 'remove', 'label' => (('Remove'))],
+            static::FILTERS => true,
+            static::PAGER => true,
+            static::EXPORT => true,
+            static::BULK_ACTIONS => [
+                [static::NAME => 'remove', static::LABEL => (('Remove'))],
             ],
         ];
 

@@ -15,27 +15,27 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields_Options
 	{
 		$fieldId = $this->BRequest->get('id');
 		return [
-			'id' => 'field_options',
-			'data_url' => 'catalogfields/options/grid_data?id=' . $fieldId,
-			'columns' => [
-				['type' => 'row-select', 'width' => 55],
-				['type' => 'actions', 'actions' => [
-					['type' => 'edit', 'link' => '/catalogfields/options/form?id={id}', 'icon_class' => 'fa fa-pencil'],
-					['type' => 'delete', 'delete_url' => 'catalogfields/options/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
+			static::ID => 'field_options',
+			static::DATA_URL => 'catalogfields/options/grid_data?id=' . $fieldId,
+			static::COLUMNS => [
+				[static::TYPE => static::ROW_SELECT, static::WIDTH => 55],
+				[static::TYPE => 'actions', static::ACTIONS => [
+					[static::TYPE => 'edit', static::LINK => '/catalogfields/options/form?id={id}', 'icon_class' => 'fa fa-pencil'],
+					[static::TYPE => 'delete', 'delete_url' => 'catalogfields/options/grid_delete?id={id}', 'icon_class' => 'fa fa-trash'],
 				]],
-				['name' => 'id', 'label' => (('ID')), 'width' => 55, 'hidden' => true],
-				['name' => 'label', 'label' => (('Label')), 'width' => 100],
-				['name' => 'locale', 'label' => (('Locale')), 'width' => 100],
-				['name' => 'swatch_info', 'label' => (('Swatch info')), 'width' => 100],
+				[static::NAME => 'id', static::LABEL => (('ID')), static::WIDTH => 55, static::HIDDEN => true],
+				[static::NAME => 'label', static::LABEL => (('Label')), static::WIDTH => 100],
+				[static::NAME => 'locale', static::LABEL => (('Locale')), static::WIDTH => 100],
+				[static::NAME => 'swatch_info', static::LABEL => (('Swatch info')), static::WIDTH => 100],
 			],
-			'filters' => [
-				['name' => 'id', 'type' => 'number'],
-				['name' => 'label'],
-				['name' => 'locale'],
-				['name' => 'swatch_info'],
+			static::FILTERS => [
+				[static::NAME => 'id', static::TYPE => 'number'],
+				[static::NAME => 'label'],
+				[static::NAME => 'locale'],
+				[static::NAME => 'swatch_info'],
 			],
-			'export' => false,
-			'pager' => true,
+			static::EXPORT => false,
+			static::PAGER => true,
 		];
 	}
 
