@@ -2,7 +2,7 @@ modules:
     Sellvana_CurrencyManager:
         version: 0.6.0.0
         channel: beta
-        require: { module: { Sellvana_MultiCurrency: 0.6.0 } }
+        require: { module: { Sellvana_MultiCurrency: 0.6.0 }, php_ext: [ intl ] }
         translations: { en: en.php }
         description: Currency format tweaks
         auto_use: [ bootstrap, layout, views ]

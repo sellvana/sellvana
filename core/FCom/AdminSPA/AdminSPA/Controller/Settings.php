@@ -10,13 +10,6 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
         $forms = $this->collectFormConfig();
 
-        foreach ((array)$forms as $path => $form) {
-            $root = !empty($form['config']['default_field']['root']) ? $form['config']['default_field']['root'] : '';
-            $form['config']['default_field']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
-            $form['config']['default_field']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
-            $forms[$path] = $this->normalizeFormConfig($form);
-        }
-
         $result['forms'] = $forms;
         $result['nav'] = $this->collectNavConfig();
 
@@ -80,9 +73,32 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
     public function collectFormConfig()
     {
+        $navs = [];
         $forms = [];
 
-        $this->BEvents->fire(__METHOD__, ['forms' => &$forms]);
+        $this->BEvents->fire(__METHOD__, ['navs' => &$navs, 'forms' => &$forms]);
+
+        /** @var FCom_AdminSPA_AdminSPA_View_App $appView */
+        $appView = $this->view('app');
+        foreach ((array)$navs as $path => $nav) {
+            $nav['path'] = $path;
+            $appView->addNav($nav);
+        }
+
+        foreach ((array)$forms as $path => $form) {
+
+            if (!empty($form['config']['default_field'])) {
+                $root = !empty($form['config']['default_field']['root']) ? $form['config']['default_field']['root'] : '';
+                $form['config']['default_field']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
+                $form['config']['default_field']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
+            } elseif (!empty($form['config']['fields']['default'])) {
+                $root = !empty($form['config']['fields']['default']['root']) ? $form['config']['fields']['default']['root'] : '';
+                $form['config']['fields']['default']['model'] = trim(str_replace(['.', '/'], '-', $root), '-');
+                $form['config']['fields']['default']['tab']   = trim(str_replace(['.', '/'], '-', $path), '-');
+            }
+
+            $forms[$path] = $this->normalizeFormConfig($form, $path);
+        }
 
         return $forms;
     }
@@ -99,7 +115,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
             if (empty($form['config']['fields'])) {
                 continue;
             }
-            if (!empty($form['config']['default_field']['root'])) {
+            if (!empty($form['config']['default_field']['root']) || !empty($form['config']['fields']['default']['root'])) {
                 $roots[$form['config']['default_field']['root']] = true;
             }
             foreach ((array)$form['config']['fields'] as $field) {

@@ -273,33 +273,34 @@ sv-app-data-js:
             - [ addRoute, { path: /roles/form, require: [sv-page-roles-form, text!sv-page-default-form-tpl ]}]
 
 
-sv-app-setings-config:
-    - view: app
-        do:
-            - [ addNav, { path: /areas, label: Areas, pos: 10 }]
-            - [ addNav, { path: /areas/core, label: Core Settings, pos: 10 }]
-            # {FCom_AdminSPA}/AdminSPA/vue/page/settings/{areas/core/website}.(js|html)
-            - [ addNav, { path: /areas/core/website, label: Website, pos: 10 }]
-            - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20 }]
-            - [ addNav, { path: /areas/core/session, label: Session, pos: 30 }]
-            - [ addNav, { path: /areas/core/db, label: DB, pos: 40, hide_for_site: true }]
-            - [ addNav, { path: /areas/core/cache, label: Cache, pos: 50 }]
-            - [ addNav, { path: /areas/core/dev, label: Developer, pos: 60 }]
-            - [ addNav, { path: /areas/core/web, label: Web Settings, pos: 70 }]
-            - [ addNav, { path: /areas/core/staging, label: Staging, pos: 80 }]
-
-            - [ addNav, { path: /areas/frontend, label: Frontend Settings, pos: 20 }]
-            - [ addNav, { path: /areas/frontend/area, label: Area Settings, pos: 10 }]
-
-            - [ addNav, { path: /areas/admin, label: Admin Settings, pos: 30 }]
-            - [ addNav, { path: /areas/admin/area, label: Area Settings, pos: 10 }]
-
-            - [ addNav, { path: /areas/cron, label: Cron Settings, pos: 30 }]
-            - [ addNav, { path: /areas/cron/area, label: Area Settings, pos: 10 }]
-
-            - [ addNav, { path: /themes, label: Themes, pos: 80 }]
-
-            - [ addNav, { path: /other, label: Other, pos: 90 }]
+#sv-app-setings-config:
+#    - view: app
+#        do:
+#            - [ addNav, { path: /areas, label: Areas, pos: 10 }]
+#            - [ addNav, { path: /areas/core, label: Core Settings, pos: 10 }]
+#            # {FCom_AdminSPA}/AdminSPA/vue/page/settings/{areas/core/website}.(js|html)
+#            - [ addNav, { path: /areas/core/website, label: Website, pos: 10 }]
+#            - [ addNav, { path: /areas/core/l10n, label: Localization, pos: 20 }]
+#            - [ addNav, { path: /areas/core/session, label: Session, pos: 30 }]
+#            - [ addNav, { path: /areas/core/db, label: DB, pos: 40, hide_for_site: true }]
+#            - [ addNav, { path: /areas/core/cache, label: Cache, pos: 50 }]
+#            - [ addNav, { path: /areas/core/dev, label: Developer, pos: 60 }]
+#            - [ addNav, { path: /areas/core/web, label: Web Settings, pos: 70 }]
+#            - [ addNav, { path: /areas/core/staging, label: Staging, pos: 80 }]
+#
+#            - [ addNav, { path: /areas/frontend, label: Frontend Settings, pos: 20 }]
+#            - [ addNav, { path: /areas/frontend/area, label: Area Settings, pos: 10 }]
+#
+#            - [ addNav, { path: /areas/admin, label: Admin Settings, pos: 30 }]
+#            - [ addNav, { path: /areas/admin/html, label: HTML, pos: 10 }]
+#            - [ addNav, { path: /areas/admin/area, label: Area Settings, pos: 20 }]
+#
+#            - [ addNav, { path: /areas/cron, label: Cron Settings, pos: 30 }]
+#            - [ addNav, { path: /areas/cron/area, label: Area Settings, pos: 10 }]
+#
+#            - [ addNav, { path: /themes, label: Themes, pos: 80 }]
+#
+#            - [ addNav, { path: /other, label: Other, pos: 90 }]
 
 sv-page-dashboard-config:
     - view: dashboard
