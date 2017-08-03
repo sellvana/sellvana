@@ -145,8 +145,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                 $field = array_merge($def, $field);
                 if (!empty($field['options'])) {
                     if (empty($field['type']) || $field['type'] === 'input') {
-//                        $field['type'] = 'v-multiselect';
-                        $field['type'] = !empty($field['multiple']) ? 'v-multiselect' : 'select';
+                        $field['type'] = 'select2';
+//                        $field['type'] = !empty($field['multiple']) ? 'v-multiselect' : 'select';
                     }
                     if (empty($field['options'][0])) {
                         $field['options'] = $this->BUtil->arrayMapToSeq($field['options']);

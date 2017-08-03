@@ -489,7 +489,7 @@ console.log(filters, result);
                     return colOptions;
                 },
                 visibleRows: function () {
-                    var q = _.get(this.grid, 'state.quickSearch', '');
+                    var q = _.get(this.grid, 'config.state.quickSearch', '');
                     if (q === '') {
                         this.cntVisible = this.grid.rows ? this.grid.rows.length : 0;
                         return this.grid.rows;

@@ -201,9 +201,9 @@ class FCom_Core_Main extends BClass
 
         $extLoaded = array_flip(get_loaded_extensions());
         foreach ([
-            /*'bcmath', */
+            /*'bcmath', 'intl', */
             'date', 'hash', 'iconv', 'json', 'SPL', 'pcre', 'session',
-            'zip', 'pdo_mysql', 'curl', 'gd', 'intl', 'mbstring', 'soap', 'xml', 'bcmath',
+            'zip', 'pdo_mysql', 'curl', 'gd', 'mbstring', 'soap', 'xml', 'bcmath',
         ] as $ext) {
             if (empty($extLoaded[$ext])) {
                 $errors['phpext'][] = $ext;

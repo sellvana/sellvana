@@ -53,7 +53,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
     public function addMessage($text, $type = null)
     {
         if ($text instanceof Exception) {
-            $text = $text->getMessage() . "\n" . $text->getTraceAsString();
+            $text = $text->getMessage();# . "\n" . $text->getTraceAsString();
             if (!$type) {
                 $type = 'error';
             }

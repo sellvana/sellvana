@@ -62,7 +62,11 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         /** @var Sellvana_Customer_Model_Customer $c */
         $c      = $args['model'];
-        $this->Sellvana_CustomerFields_Model_CustomerFieldData->saveModelsFieldData([$c]);
+
+        if (!$this->isDisabled()) {
+            $this->Sellvana_CustomerFields_Model_CustomerFieldData->saveModelsFieldData([$c]);
+        }
+
         //$data   = $c->as_array();
         //$fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
         //if (array_intersect($fields, array_keys($data))) {
@@ -173,7 +177,7 @@ class Sellvana_CustomerFields_Main extends BClass
         }
 
         //find intersection of custom fields with data fields
-        $cfFields       = $this->FCom_Core_Model_Field->getAllFields('field_code','customer');
+        $cfFields       = $this->FCom_Core_Model_Field->getAllFields('customer');
         $cfKeys         = array_keys($cfFields);
         $dataKeys       = array_keys($data);
         $cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -248,7 +252,7 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         //$info = $args['info'];
         $object   = $args['object'];
-        $cfFields = $this->FCom_Core_Model_Field->getAllFields('field_code', 'customer');
+        $cfFields = $this->FCom_Core_Model_Field->getAllFields('customer');
         $cfKeys   = array_keys($cfFields);
         //$dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);

@@ -7,13 +7,11 @@ define(['sv-mixin-form-tab', 'text!sv-page-mailing-campaigns-form-status-tpl'], 
                 progressTimer: false
             }
         },
-        computed: {
-            progressPercent: function () {
-                var c = this.form.campaign;
-                return c.cnt_total ? Math.ceil(c.cnt_sent / c.cnt_total * 100) : 0;
-            }
-        },
         methods: {
+            percent: function (valField, totalField) {
+                var c = this.form.campaign;
+                return c['cnt_' + totalField] ? Math.ceil(c['cnt_' + valField] / c['cnt_' + totalField] * 10000) / 100 : 0;
+            },
             startCampaign: function () {
                 var vm = this;
                 this.sendRequest('POST', 'mailing/campaigns/start', {id: this.form.campaign.id}, function (response) {

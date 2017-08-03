@@ -7,7 +7,7 @@
  * @property FCom_Core_Model_Module $FCom_Core_Model_Module
  */
 
-class FCom_AdminSpa_AdminSpa_Controller_Modules extends FCom_AdminSpa_AdminSpa_Controller_Abstract_GridForm
+class FCom_AdminSPA_AdminSPA_Controller_Modules extends FCom_AdminSPA_AdminSPA_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
 
