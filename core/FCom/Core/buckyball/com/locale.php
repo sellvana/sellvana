@@ -1404,6 +1404,10 @@ class BLocale extends BClass
 
     public function currency($value, $currency = null)
     {
+        if (empty(self::$_formatters[self::FORMAT_CURRENCY])) {
+            return $value;
+        }
+        
         $formatter = clone self::$_formatters[self::FORMAT_CURRENCY];
         if ($currency == 'base') {
             $currency = $this->BConfig->get('modules/FCom_Core/base_currency');
