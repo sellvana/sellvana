@@ -299,7 +299,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function onAfterSave()
     {
-        if (!parent::onAfterSave()) return false;
+        if (!parent::onAfterSave()) {
+            return false;
+        }
 
         $saveAgain = false;
 

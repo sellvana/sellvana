@@ -85,12 +85,12 @@ class FCom_Core_Model_Field extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param string $key
      * @param string $fieldType
+     * @param string $key
      *
      * @return FCom_Core_Model_Field[]
      */
-    public function getAllFields($key = 'field_code', $fieldType = null)
+    public function getAllFields($fieldType = null, $key = 'field_code')
     {
         $ft = $fieldType ?: 'ALL';
         if (!isset(static::$_fieldsCache[$ft][$key])) {

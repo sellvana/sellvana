@@ -54,14 +54,13 @@ class Sellvana_CatalogFields_Main extends BClass
         if ($this->_disabled) {
             return;
         }
-        $m = $args['result'];
-        if(!$m){
+        if (empty($args['result'])) {
             return;
         }
-        if(!is_array($m)){
+        $m = $args['result'];
+        if (!is_array($m)) {
             $m = [$m];
         }
-
         foreach ($m as $model) {
             /** @var Sellvana_CatalogFields_Model_ProductVariant $model */
             $model->onAfterLoad();
@@ -217,7 +216,7 @@ class Sellvana_CatalogFields_Main extends BClass
 
 
         if (empty($groups) && empty($currentFilter)) {
-            return;
+            return '';
         }
         $this->BLayout->getView('catalogfields/filters')->selected_filters = $currentFilter;
         $this->BLayout->getView('catalogfields/filters')->groups = $groups;
@@ -239,7 +238,7 @@ class Sellvana_CatalogFields_Main extends BClass
             return;
         }
         //find intersection of custom fields with data fields
-        $cfFields = $this->FCom_Core_Model_Field->getAllFields('field_code', 'product');
+        $cfFields = $this->FCom_Core_Model_Field->getAllFields('product');
         $cfKeys = array_keys($cfFields);
         $dataKeys = array_keys($data);
         $cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -311,7 +310,7 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         //$info = $args['info'];
         $object = $args['object'];
-        $cfFields = $this->FCom_Core_Model_Field->getAllFields('field_code', 'product');
+        $cfFields = $this->FCom_Core_Model_Field->getAllFields('product');
         $cfKeys = array_keys($cfFields);
         //$dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);

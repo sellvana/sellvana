@@ -43,7 +43,7 @@ class Sellvana_MultiSite_Main extends BClass
      */
     public function saveProductsFieldSiteData($products)
     {
-        $fields = $this->FCom_Core_Model_Field->getAllFields('id', 'product');
+        $fields = $this->FCom_Core_Model_Field->getAllFields('product', 'id');
 
         $pIds = $this->BUtil->arrayToOptions($products, '.id');
         if (!$pIds) {

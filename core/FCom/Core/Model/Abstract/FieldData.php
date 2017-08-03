@@ -87,10 +87,6 @@ abstract class FCom_Core_Model_Abstract_FieldData extends FCom_Core_Model_Abstra
      */
     public function saveModelsFieldData($models)
     {
-        if ($this->Sellvana_CatalogFields_Main->isDisabled()) {
-            return $this;
-        }
-
         $defaultSet = $this->FCom_Core_Model_Fieldset->loadWhere([
             'set_code' => 'default',
             'set_type' => static::$_fieldType,
@@ -132,6 +128,7 @@ abstract class FCom_Core_Model_Abstract_FieldData extends FCom_Core_Model_Abstra
             $pId = $model->id();
             $pData = $model->as_array();
             $saveModel = false;
+
             foreach ($pData as $fieldCode => $value) { // go over all model fields data
                 if (empty($fields[$fieldCode])) {
                     continue;
