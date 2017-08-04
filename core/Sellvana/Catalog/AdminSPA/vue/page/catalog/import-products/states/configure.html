@@ -7,8 +7,8 @@
             <div class="f-column-name">{{ 'Field'|_ }}</div>
             <fieldset class="f-form-container f-import-forms">
                 <div class="f-form-group row" v-for="fc in fileConfig">
-                    <label class="col-sm-5 f-form-label" for="id7">{{ fc.label }}</label>
-                    <div class="col-sm-7"> <input class="f-input" type="text" v-model="config[fc.field]" :value="config[fc.field] || fc.default"> </div>
+                    <label class="col-sm-5 f-form-label" :for="fc.field">{{ fc.label }}</label>
+                    <div class="col-sm-7"> <input class="f-input" :id="fc.field" type="text" v-model="config[fc.field]" :value="config[fc.field] || fc.default"> </div>
                 </div>
             </fieldset>
         </div>

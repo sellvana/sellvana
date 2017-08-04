@@ -2,7 +2,7 @@
       <div class="f-control-panel">
             <h1>{{ currentState }}</h1>
             <div class="f-control-panel__elem">
-                  <div class="f-form-title"><p class="f-form-title__text hidden-xs">Upload and Import Products</p></div>
+                  <div class="f-form-title"><p class="f-form-title__text hidden-xs">{{ 'Upload and Import Products'|_ }}</p></div>
             </div>
       </div>
       <div class="f-content-block">
@@ -13,23 +13,23 @@
                               <div :class="switchClass(2)">2</div>
                               <div :class="switchClass(3)">3</div>
                         </div>
-
                   </div>
                   <div class="f-controls-left">
                         <button class="button button2" v-if="hasPreviousImport" @click.prevent="showStatus">{{ "Show prev results"|_ }}</button>
-                        <button class="button button2" v-if="currentState == states.configure" @click.prevent="startOver">{{ "Upload different file"|_ }}</button>
-                        <button class="button button2" v-if="currentState == states.import" @click.prevent="onConfigure">{{ "Re-Configure"|_ }}</button>
+                        <button class="button button2" v-if="stateConfigure" @click.prevent="startOver">{{ "Upload different file"|_ }}</button>
+                        <button class="button button2" v-if="stateImport" @click.prevent="onConfigure">{{ "Re-Configure"|_ }}</button>
                   </div>
                   <div class="f-controls-right text-right">
-                      <button class="button button2" v-if="currentState == states.upload" :disabled="!isUploaded" @click.prevent="onConfigure">{{ "Upload and Configure"|_ }}</button>
-                      <button class="button button1" v-if="currentState == states.configure">Start Import</button>
+                      <button class="button button2" v-if="stateUpload" :disabled="!isUploaded"
+                              @click.prevent="onConfigure">{{ "Upload and Configure"|_ }}</button>
+                      <button class="button button1" v-if="stateConfigure" @click.prevent="onImportStart">Start Import</button>
                   </div>
             </div>
-            <sv-csv-imp-upload v-if="currentState == states.upload" @uploaded="onUploadComplete"></sv-csv-imp-upload>
-            <sv-csv-imp-configure v-if="currentState == states.configure" :file="fileConfig"></sv-csv-imp-configure>
-            <sv-csv-imp-import v-if="currentState == states.import"></sv-csv-imp-import>
-            <sv-csv-imp-status v-if="currentState == states.status"></sv-csv-imp-status>
-
-
+            <sv-csv-imp-upload v-if="stateUpload" @uploaded="onUploadComplete"></sv-csv-imp-upload>
+            <sv-csv-imp-configure v-if="stateConfigure" :file="fileConfig"></sv-csv-imp-configure>
+            <sv-csv-imp-import v-if="stateImport" :base-url="baseUrl"
+                               @import-complete="onImportComplete" @status="fetchStatus"
+                               :config="config"></sv-csv-imp-import>
+            <sv-csv-imp-status v-if="stateStatus" :config="config"></sv-csv-imp-status>
       </div>
 </div>

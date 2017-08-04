@@ -74,7 +74,11 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
 
     public function action_status()
     {
-        return $this->respond($this->getCurrentImportConfig());
+        $result = $this->getCurrentImportConfig();
+        if (is_bool($result)) {
+            $result = [];
+        }
+        return $this->respond($result);
     }
 
     /**

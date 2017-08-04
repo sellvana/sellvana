@@ -142,7 +142,7 @@ class BImport extends BClass
                 $config['status'] = 'idle';
             }
             return (boolean) file_put_contents($filename, $this->BUtil->toJson($config));
-        } elseif ($config === false) { // remove config lock
+        } else if ($config === false) { // remove config lock
             unlink($filename);
             return true;
         } elseif (!file_exists($filename)) { // no config

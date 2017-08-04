@@ -1,8 +1,8 @@
 define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
-'sv-page-catalog-import-products-upload',
-'sv-page-catalog-import-products-configure',
-'sv-page-catalog-import-products-import',
-'sv-page-catalog-import-products-status'
+    'sv-page-catalog-import-products-upload',
+    'sv-page-catalog-import-products-configure',
+    'sv-page-catalog-import-products-import',
+    'sv-page-catalog-import-products-status'
 ], function (_, SvMixinCommon, tpl, SvCsvImpUpload, SvCsvImpConfigure, SvCsvImpImport, SvCsvImpStatus) {
     var store = SvMixinCommon.store;
 
@@ -32,10 +32,15 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
     var Component = {
         data: function () {
             return {
+                baseUrl: 'import-products',
+                config: {},
                 states: store.state.csvImport.states,
                 isUploaded: false,
                 file: {}
             }
+        },
+        mounted: function () {
+            this.fetchStatus();
         },
         computed: {
             currentState: function () {
@@ -45,7 +50,19 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
                 return this.file.files ? this.file.files[0] : {};
             },
             hasPreviousImport: function () {
-                return true;
+                return Object.keys(this.config).length > 0;
+            },
+            stateConfigure: function () {
+                return this.currentState === states.configure;
+            },
+            stateUpload: function () {
+                return this.currentState === states.upload;
+            },
+            stateImport: function () {
+                return this.currentState === states.import;
+            },
+            stateStatus: function () {
+                return this.currentState === states.status;
             }
         },
         methods: {
@@ -64,12 +81,39 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
                 this.isUploaded = true;
                 // this.$store.commit('setCurrentState', "configure");
             },
+            onImportComplete: function () {
+                console.log('complete');
+
+                this.$store.commit('setCurrentState', "status");
+                this.fetchStatus();
+            },
+            onImportStart: function () {
+                this.$store.commit('setCurrentState', "import");
+            },
+            fetchStatus: function () {
+                // fetch status from admin and update config
+                var url = this.baseUrl + '/status';
+                var self = this;
+                console.log(url);
+
+                this.sendRequest('GET', url, {})
+                    .done(function (result) {
+                        console.log(result);
+
+                        if (result) {
+                            self.config = result;
+                        }
+                    })
+                    .fail(function (error) {
+                        console.error('ADMIN-SPA', error);
+                    });
+            },
             switchClass: function (step) {
                 var className = 'f-switch f-switch' + step;
                 if (
-                    this.currentState === states.upload && step == 1
-                    || this.currentState === states.configure && step == 2
-                    || (this.currentState === states.import || this.currentState === states.status ) && step == 3
+                    this.currentState === states.upload && step === 1
+                    || this.currentState === states.configure && step === 2
+                    || (this.currentState === states.import || this.currentState === states.status ) && step === 3
                 ) {
                     className += ' active'
                 }
