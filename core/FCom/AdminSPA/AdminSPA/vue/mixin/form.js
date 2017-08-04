@@ -1,6 +1,5 @@
-define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], function (_, Vue, SvMixinCommon, svPageDefaultFormTpl) {
+define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svPageDefaultFormTpl) {
     var formMixin = {
-        mixins: [SvMixinCommon],
         template: svPageDefaultFormTpl,
         data: function () {
             return {
@@ -156,7 +155,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
 
                     default:
                         console.log(type, args);
-                        this.$emit('event', type, args);
+                        this.emitEvent(type, args);
                 }
             },
 

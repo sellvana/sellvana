@@ -175,6 +175,10 @@ define(['lodash', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], f
                 if (response._redirect) {
                     router.push(response._redirect);
                 }
+            },
+
+            emitEvent: function (type, args) {
+                this.$emit('event', type, args);
             }
         }
     };

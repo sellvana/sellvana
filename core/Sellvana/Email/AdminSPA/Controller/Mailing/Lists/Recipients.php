@@ -10,7 +10,7 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Lists_Recipients extends FCom_A
     {
         $config = [
             static::ID => 'mailing_lists_recipients',
-            static::DATA_URL => 'mailing/lists/recipients/grid_data?id=' . $this->BRequest->get('id'),
+            static::DATA_URL => 'mailing/lists/recipients/grid_data?id=' . (int)$this->BRequest->get('id'),
             static::TITLE => (('Mailing List Recipients')),
             static::COLUMNS => [
                 [static::TYPE => static::ROW_SELECT],
@@ -36,7 +36,7 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Lists_Recipients extends FCom_A
     public function getGridOrm()
     {
         $orm = $this->{static::$_modelClass}->orm('r')
-			->where('campaign_id', $this->BRequest->get('id'))
+			->where('list_id', (int)$this->BRequest->get('id'))
             ->join('Sellvana_Email_Model_Mailing_Subscriber', ['r.subscriber_id', '=', 's.id'], 's')
             ->select(['r.*', 's.email', 's.firstname', 's.lastname', 's.company']);
         return $orm;

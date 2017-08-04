@@ -1,6 +1,5 @@
-define(['vue', 'sv-mixin-common', 'text!sv-comp-nav-tpl'], function(Vue, SvMixinCommon, navTpl) {
+define(['vue', 'text!sv-comp-nav-tpl'], function(Vue, navTpl) {
     var SvCompNav = {
-        mixins: [SvMixinCommon],
         template: navTpl,
         data: function () {
             return {

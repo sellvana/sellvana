@@ -1,7 +1,6 @@
-define(['vue', 'sv-mixin-common'], function (Vue, SvMixinCommon) {
+define(['lodash'], function (_) {
 
     return {
-        mixins: [SvMixinCommon],
         props: ['grid', 'col'],
         template: '<th>'
 		    + '<a v-if="col.sortable" href="#" :class="anchorClass" @click.prevent="toggleSort()" class="f-main-grid__header-link">{{col.label|_}}'
@@ -32,7 +31,7 @@ define(['vue', 'sv-mixin-common'], function (Vue, SvMixinCommon) {
                     return;
                 }
                 if (!this.grid.config.state) {
-                    Vue.set(this.grid.config, 'state', {});
+                    this.$set(this.grid.config, 'state', {});
                 }
                 var s = this.col.field, sd = 'asc';
                 if (this.grid.config.state.s === s) {
@@ -43,9 +42,13 @@ define(['vue', 'sv-mixin-common'], function (Vue, SvMixinCommon) {
                         sd = false;
                     }
                 }
-                Vue.set(this.grid.config.state, 's', s);
-                Vue.set(this.grid.config.state, 'sd', sd);
-                this.$emit('event', 'fetch-data');
+                this.$set(this.grid.config.state, 's', s);
+                this.$set(this.grid.config.state, 'sd', sd);
+                if (this.grid.config.data_url) {
+                    this.emitEvent('fetch-data');
+                } else if (s) {
+                    this.$set(this.grid, 'rows', _.orderBy(this.grid.rows, [s], [sd]));
+                }
             }
         }
     };

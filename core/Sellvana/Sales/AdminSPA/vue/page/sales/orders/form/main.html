@@ -212,7 +212,7 @@
                         </div>
                   </a>
                   <div class="f-information-block__content box-no-padding" @click.stop>
-                        <sv-comp-grid :grid="itemsGrid" @event="onEvent"></sv-comp-grid>
+                        <sv-comp-grid v-if="itemsGrid.config" :grid="itemsGrid" @event="onEvent"></sv-comp-grid>
                   </div>
             </div>
             <div class="f-information-block text-right" :class="{open:ddOpen('info-block3')}">

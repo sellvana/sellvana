@@ -1,4 +1,4 @@
-define(['sv-mixin-grid', 'sv-comp-grid', 'json!sv-page-catalog-fields-grid-config'], function (SvMixinGrid, SvCompGrid, gridConfig) {
+define(['sv-mixin-grid', 'json!sv-page-catalog-fields-grid-config'], function (SvMixinGrid, gridConfig) {
     var Component = {
         mixins: [SvMixinGrid],
         data: function () {
@@ -7,9 +7,6 @@ define(['sv-mixin-grid', 'sv-comp-grid', 'json!sv-page-catalog-fields-grid-confi
                     config: gridConfig
                 }
             }
-        },
-        components: {
-            'sv-comp-grid': SvCompGrid
         },
         created: function () {
             this.$store.commit('setData', {curPage: {

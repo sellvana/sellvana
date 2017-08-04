@@ -1,6 +1,5 @@
-define(['sv-mixin-common', 'text!sv-page-catalog-products-form-customfields-tpl'], function (SvMixinCommon, tpl) {
+define(['text!sv-page-catalog-products-form-customfields-tpl'], function (tpl) {
     var SvPageCatalogProductsFormCustomFields = {
-        mixins: [SvMixinCommon],
         template: tpl,
         computed: {
 

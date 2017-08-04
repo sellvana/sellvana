@@ -11,6 +11,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         CONFIG = 'config',
         GRID = 'grid',
         ID = 'id',
+        DATA = 'data',
         DATA_URL = 'data_url',
         COLUMNS = 'columns',
         ROW_SELECT = 'row-select',
@@ -46,7 +47,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         INPUT_TYPE = 'input_type',
         NOTES = 'notes',
         THUMB_URL = 'thumb_url',
-        I18N = 'i18n'
+        I18N = 'i18n',
+        EDIT = 'edit'
     ;
 
     public function authenticate($args = [])

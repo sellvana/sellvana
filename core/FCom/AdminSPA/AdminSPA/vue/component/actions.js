@@ -1,6 +1,5 @@
-define(['vue', 'sv-mixin-common', 'text!sv-comp-actions-tpl'], function (Vue, SvMixinCommon, actionsTpl) {
-    var SvCompFormActions = {
-        mixins: [SvMixinCommon],
+define(['vue', 'text!sv-comp-actions-tpl'], function (Vue, actionsTpl) {
+    var SvCompActions = {
         props: {
             'groups': {type: Object},
             'container-class': {type: String},
@@ -20,12 +19,12 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-actions-tpl'], function (Vue, Sv
         methods: {
             doAction: function (action) {
                 console.log(this.eventName, action);
-                this.$emit('event', this.eventName, action);
+                this.emitEvent(this.eventName, action);
             }
         }
     };
 
-    Vue.component('sv-comp-actions', SvCompFormActions);
+    Vue.component('sv-comp-actions', SvCompActions);
 
-    return SvCompFormActions;
+    return SvCompActions;
 });

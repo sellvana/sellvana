@@ -7,6 +7,8 @@ function ($, _, Vue, SvMixinCommon, Accounting, Moment, Sortable,
           VuePassword, SvCompFormField
 ) {
 
+    Vue.mixin(SvMixinCommon);
+
     // String extensions
 
     String.prototype.supplant = function (o) {
@@ -128,7 +130,6 @@ function ($, _, Vue, SvMixinCommon, Accounting, Moment, Sortable,
     });
 
     Vue.component('dropdown', {
-        mixins: [SvMixinCommon],
         props: ['id', 'label'],
         template: '<div class="dropdown action" :class="{open:ddOpen(id)}">' +
         '<a href="#" class="dropdown-toggle" @click.prevent.stop="ddToggle(id)">' +

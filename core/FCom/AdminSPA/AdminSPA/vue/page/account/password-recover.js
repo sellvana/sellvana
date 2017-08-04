@@ -1,6 +1,5 @@
-define(['sv-mixin-common'], function(SvMixinCommon) {
+define([], function() {
     return {
-        mixins: [SvMixinCommon],
         data: function () {
             return {
                 username: 'USERNAME',

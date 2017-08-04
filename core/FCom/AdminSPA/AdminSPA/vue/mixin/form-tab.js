@@ -1,8 +1,7 @@
-define(['lodash', 'vue', 'sv-app-data', 'sv-mixin-common', 'sv-comp-form-field', 'text!sv-page-default-form-tab-tpl'],
-    function (_, Vue, SvAppData, SvMixinCommon, SvCompFormField, svPageDefaultFormTabTpl) {
+define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-default-form-tab-tpl'],
+    function (_, Vue, SvAppData, SvCompFormField, svPageDefaultFormTabTpl) {
 
     var formTabMixin = {
-        mixins: [SvMixinCommon],
         template: svPageDefaultFormTabTpl,
         components: {
             'sv-comp-form-field': SvCompFormField
@@ -87,15 +86,6 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-mixin-common', 'sv-comp-form-field',
                 result = eval(cond);
 
                 return result;
-            },
-            onEvent: function (eventType, args) {
-                switch (eventType) {
-                    case 'panel-action':
-                        this.doPanelAction(args);
-
-                    default:
-                        this.$emit('event', eventType, args);
-                }
             }
         }
     };

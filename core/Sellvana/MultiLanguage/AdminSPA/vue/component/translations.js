@@ -44,7 +44,7 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
                 this.calcAvailableLocales();
             },
             close: function () {
-                this.$emit('event', 'close');
+                this.emitEvent('close');
                 this.$store.commit('overlay', false);
             }
         },
@@ -73,13 +73,13 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
             },
             translations: {
                 handler: function (translations) {
-                    this.$emit('event', 'update', {field: this.field, translations: translations});
+                    this.emitEvent('update', {field: this.field, translations: translations});
                 },
                 deep: true
             },
             '$store.state.ui.overlayActive': function (overlayActive) {
                 if (!overlayActive) {
-                    this.$emit('event', 'close');
+                    this.emitEvent('close');
                 }
             }
         }
