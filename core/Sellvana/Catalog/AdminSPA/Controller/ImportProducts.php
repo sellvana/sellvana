@@ -24,7 +24,7 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
         $file = $this->BRequest->get('file');
         $info = $hlp->getFileInfo($dir . '/' . $file);
 
-        $invalidMsg = $this->_('Invalid file format, please go back and select another file');
+        $invalidMsg = $this->_(('Invalid file format, please go back and select another file'));
         if (!$info) {
             $this->error()->message($invalidMsg);
             $this->BResponse->status(400, $invalidMsg);
