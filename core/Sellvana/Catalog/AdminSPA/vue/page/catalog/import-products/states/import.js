@@ -6,11 +6,22 @@ define(['sv-mixin-common',
         mixins: [SvMixinCommon],
         data: function () {
             return {
-                config: {},
-                start: true
+                start: true,
+                c: {}
             };
         },
+        props: {
+            baseUrl: {
+                type: String,
+                required: true
+            },
+            config: {
+                type: Object,
+                required: true
+            }
+        },
         mounted: function () {
+            this.c = this.config;
             if (this.start) {
                 this.startImport();
             }
@@ -18,14 +29,19 @@ define(['sv-mixin-common',
         },
         methods: {
             startImport: function () {
-                // todo
                 // start import on admin, upon completion emit import:complete event
                 var url = baseUrl + '/start';
-
+                var self = this;
                 this.sendRequest('POST', url, {})
                     .done(function (result) {
+                        console.log(result);
+
                         if (result) {
-                            this.config = result;
+                            self.c = result;
+                        }
+
+                        if ( result.status === 'stopped' || result.status === 'done') {
+                            self.$emit('import-complete')
                         }
                     })
                     .fail(function (error) {
@@ -40,7 +56,7 @@ define(['sv-mixin-common',
                 this.sendRequest('POST', url, {})
                     .done(function (result) {
                         if (result) {
-                            this.config = result;
+                            this.c = result;
                         }
                     })
                     .fail(function (error) {
@@ -49,17 +65,9 @@ define(['sv-mixin-common',
             },
 
             fetchStatus: function () {
-                // fetch status from admin and update config
-                var url = baseUrl + '/status';
-                this.sendRequest('GET', url, {})
-                    .done(function (result) {
-                        if (result) {
-                            this.config = result;
-                        }
-                    })
-                    .fail(function (error) {
-                        console.error('ADMIN-SPA', error);
-                    });
+                console.log('fetching status');
+
+                this.$emit('status');
             }
         },
         computed: {

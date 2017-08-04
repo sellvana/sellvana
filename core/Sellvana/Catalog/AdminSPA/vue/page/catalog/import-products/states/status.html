@@ -1,88 +1,88 @@
 <div class="f-bordered-block">
     <div class="f-bordered-block__title">
-        <p>{{ 'Status'|_ }}{{ c.status }}</p>
+        <p>{{ 'Status: "%s"'|_([c.status]) }}</p>
     </div>
     <div class="row">
         <div class="col-md-4">
             <div class="scrollable-area">
                 <table class="f-total-table f-striped-table">
                     <tr>
-                        <td>Rows Found</td>
-                        <th>{{ c.rows_total }}</th>
+                        <td>{{ 'Rows Found'|_ }}</td>
+                        <th>{{ c.rows_total | int }}</th>
                     </tr>
                     <tr>
-                        <td>Rows Processed</td>
-                        <th>{{ c.rows_processed }}</th>
+                        <td>{{ 'Rows Processed'|_ }}</td>
+                        <th>{{ c.rows_processed | int }}</th>
                     </tr>
                     <tr>
-                        <td>Rows Succeccful</td>
+                        <td>{{ 'Rows Succeccful'|_ }}</td>
                         <th>{{ successful }}</th>
                     </tr>
                     <tr>
-                        <td>Rows Depends</td>
-                        <th>{{ c.rows_skipped }}</th>
+                        <td>{{ 'Rows Depends'|_ }}</td>
+                        <th>{{ c.rows_skipped | int  }}</th>
                     </tr>
                     <tr>
-                        <td>Rows Not Changed</td>
-                        <th>{{ c.rows_nochange }}</th>
+                        <td>{{ 'Rows Not Changed'|_ }}</td>
+                        <th>{{ c.rows_nochange | int  }}</th>
+                    </tr>
+                    <tr v-if="c.rows_empty">
+                        <td>{{ 'Rows Empty/Comment'|_ }}</td>
+                        <th>{{ c.rows_empty| int }}</th>
                     </tr>
                     <tr>
-                        <td>Rows Empty/Comment</td>
-                        <th>0</th>
+                        <td>{{ 'Rows With Errors'|_ }}</td>
+                        <th>{{ c.rows_error | int }}</th>
                     </tr>
                     <tr>
-                        <td>Rows With Errors:</td>
-                        <th>{{ c.rows_error }}</th>
+                        <td>{{ 'Total Errors'|_ }}</td>
+                        <th>{{ totalErrors }}</th>
                     </tr>
                     <tr>
-                        <td>Total Errors:</td>
-                        <th>{{ c.errors.length }}</th>
+                        <td>{{ 'Total Warnings'|_ }}</td>
+                        <th>{{ totalWarnings }}</th>
                     </tr>
                     <tr>
-                        <td>Total Warnings:</td>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <td>Running For</td>
+                        <td>{{ 'Running For'|_ }}</td>
                         <th class="f-status-td">{{ c.run_time }} <span class="f-line-valid"></span></th>
                     </tr>
                     <tr>
-                        <td>Crunch Rate:</td>
-                        <th class="f-status-td">{{ c.run_time ? (c.rows_processed / c.run_time)|number_format(2) : 0 }} row/sec <span class="f-line-warning"></span></th>
+                        <td>{{ 'Crunch Rate'|_ }}</td>
+                        <th class="f-status-td">{{ crunchRate }} row/sec <span class="f-line-warning"></span></th>
                     </tr>
                     <tr>
-                        <td>Estimate Run Time</td>
-                        <th>154 second (s)</th>
+                        <td>{{ 'Estimate Run Time'|_ }}</td>
+                        <th>{{ estimatedRunTime }}</th>
                     </tr>
                     <tr>
-                        <td>Estimate Finish</td>
-                        <th>35127</th>
+                        <td>{{ 'Estimate Finish'|_ }}</td>
+                        <th>{{ estimatedFinish }}</th>
                     </tr>
-                    <tr>
-                        <td>Memory Used</td>
-                        <th>351273296</th>
+                    <tr v-if="c.memory_usage">
+                        <td>{{ 'Memory Used'|_ }}</td>
+                        <th>{{ memoryUsage }}</th>
                     </tr>
-                    <tr>
-                        <td>Peak Memory Used</td>
-                        <th>351273296</th>
+                    <tr v-if="peakMemoryUsage">
+                        <td>{{ 'Peak Memory Used'|_ }}</td>
+                        <th>{{ peakMemoryUsage }}</th>
                     </tr>
                 </table>
             </div>
         </div>
         <div class="col-md-7 col-lg-offset-1">
             <div class="scrollable-area">
-                <table class="f-total-table f-striped-table f-errors-table" v-if="c.errors.length">
+                <table class="f-total-table f-striped-table f-errors-table" v-if="totalErrors">
                     <thead>
                     <tr>
-                        <th>Type</th>
-                        <th>Line</th>
-                        <th>Column</th>
-                        <th>Message</th>
+                        <th>{{ 'Type'|_ }}</th>
+                        <th>{{ 'Line'|_ }}</th>
+                        <th>{{ 'Column'|_ }}</th>
+                        <th>{{ 'Message'|_ }}</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="e in c.errors">
-                        <td class="f-status-td">ERROR <span class="f-line-error"></span></td>
+                        <td class="f-status-td">{{ 'ERROR'|_ }} <span class="f-line-error"></span></td>
                         <th>{{ e.line }}</th>
                         <th>{{ e.col }}</th>
                         <td>{{ e.message }}</td>
