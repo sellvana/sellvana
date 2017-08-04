@@ -11,25 +11,25 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns_Recipients extends FC
         $statusOptions = $this->Sellvana_Email_Model_Mailing_CampaignRecipient->fieldOptions('status');
 
         $config = [
-            'id' => 'mailing_campaigns_recipients',
-            'data_url' => 'mailing/campaigns/recipients/grid_data',
-            'title' => (('Mailing Campaign Recipients')),
-            'columns' => [
-                ['type' => 'row-select'],
-                ['name' => 'id', 'label' => (('ID')), 'hidden' => true],
-                ['name' => 'email', 'label' => (('Email'))],
-                ['name' => 'firstname', 'label' => (('First Name'))],
-                ['name' => 'lastname', 'label' => (('Last Name'))],
-                ['name' => 'company', 'label' => (('Company'))],
-                ['name' => 'status', 'label' => (('Status')), 'options' => $statusOptions],
-                ['name' => 'create_at', 'label' => (('Created At'))],
-                ['name' => 'update_at', 'label' => (('Updated At'))],
+            static::ID => 'mailing_campaigns_recipients',
+            static::DATA_URL => 'mailing/campaigns/recipients/grid_data',
+            static::TITLE => (('Mailing Campaign Recipients')),
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT],
+                [static::NAME => 'id', static::LABEL => (('ID')), static::HIDDEN => true],
+                [static::NAME => 'email', static::LABEL => (('Email'))],
+                [static::NAME => 'firstname', static::LABEL => (('First Name'))],
+                [static::NAME => 'lastname', static::LABEL => (('Last Name'))],
+                [static::NAME => 'company', static::LABEL => (('Company'))],
+                [static::NAME => 'status', static::LABEL => (('Status')), static::OPTIONS => $statusOptions],
+                [static::NAME => 'create_at', static::LABEL => (('Created At'))],
+                [static::NAME => 'update_at', static::LABEL => (('Updated At'))],
             ],
-            'filters' => true,
-            'pager' => true,
-            'export' => true,
-//            'panel_actions' => [
-//                ['name' => 'import_from_list', 'label' => (('Import From List')), 'button_class' => 'button2'],
+            static::FILTERS => true,
+            static::PAGER => true,
+            static::EXPORT => true,
+//            static::PANEL_ACTIONS => [
+//                [static::NAME => 'import_from_list', static::LABEL => (('Import From List')), static::BUTTON_CLASS => 'button2'],
 //            ],
         ];
 

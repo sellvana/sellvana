@@ -28,26 +28,26 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
                 throw new BException('Category not found');
             }
 
-            $result['form']['category'] = $category->as_array();
+            $result[static::FORM]['category'] = $category->as_array();
 
-            $result['form']['config']['tabs'] = $this->getFormTabs('/catalog/categories/form');
-            $result['form']['config']['default_field'] = ['model' => 'category'];
-            $result['form']['config']['fields'] = [
-                ['name' => 'node_name', 'label' => (('Label')), 'required' => true, 'i18n' => true],
-                ['name' => 'url_key', 'label' => (('URL Key'))],
-                ['name' => 'sort_order', 'input_type' => 'number', 'label' => (('Nav Sort Order'))],
-                ['name' => 'page_title', 'label' => (('Page Title')), 'i18n' => true],
-                ['name' => 'meta_title', 'label' => (('Meta Title')), 'i18n' => true],
-                ['name' => 'meta_description', 'type' => 'textarea', 'label' => (('Meta Description')), 'i18n' => true],
-                ['name' => 'meta_keywords', 'type' => 'textarea', 'label' => (('Meta Keywords')), 'i18n' => true],
+            $result[static::FORM][static::CONFIG][static::TABS] = $this->getFormTabs('/catalog/categories/form');
+            $result[static::FORM][static::CONFIG][static::FIELDS] = [
+                static::DEFAULT_FIELD => [static::MODEL => 'category'],
+                [static::NAME => 'node_name', static::LABEL => (('Label')), static::REQUIRED => true, static::I18N => true],
+                [static::NAME => 'url_key', static::LABEL => (('URL Key'))],
+                [static::NAME => 'sort_order', static::INPUT_TYPE => 'number', static::LABEL => (('Nav Sort Order'))],
+                [static::NAME => 'page_title', static::LABEL => (('Page Title')), static::I18N => true],
+                [static::NAME => 'meta_title', static::LABEL => (('Meta Title')), static::I18N => true],
+                [static::NAME => 'meta_description', static::TYPE => 'textarea', static::LABEL => (('Meta Description')), static::I18N => true],
+                [static::NAME => 'meta_keywords', static::TYPE => 'textarea', static::LABEL => (('Meta Keywords')), static::I18N => true],
             ];
-            $result['form']['config']['validation'] = [
-                ['field' => 'node_name', 'required' => true],
+            $result[static::FORM][static::CONFIG]['validation'] = [
+                ['field' => 'node_name', static::REQUIRED => true],
             ];
 
-            $result['form']['i18n'] = $this->getModelTranslations('category', $category->id());
+            $result[static::FORM][static::I18N] = $this->getModelTranslations('category', $category->id());
 
-            $result['form'] = $this->normalizeFormConfig($result['form']);
+            $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
 
             $this->ok();
         } catch (Exception $e) {
@@ -87,7 +87,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
                 'id'        => $c->id(),
                 'open'      => $numChildren ? ($depth === 0 ? true : false) : null,
                 'children'  => $numChildren ? $this->_nodeChildren($c, $depth + 1) : null,
-                //'attr'     => ['id' => $c->id()],
+                //'attr'     => [static::ID => $c->id()],
                 //'rel'      => $node ? 'root' : ($numChildren ? 'parent' : 'leaf'),
                 //'position' => $c->get('sort_order'),
             ];

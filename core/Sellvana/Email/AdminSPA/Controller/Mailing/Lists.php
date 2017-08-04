@@ -9,22 +9,22 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Lists extends FCom_AdminSPA_Adm
     public function getGridConfig()
     {
         $config = [
-            'id' => 'mailing_lists',
-            'data_url' => 'mailing/lists/grid_data',
-            'title' => (('Mailing Lists')),
-            'columns' => [
-                ['type' => 'row-select'],
-                ['name' => 'id', 'label' => (('ID')), 'hidden' => true],
-                ['name' => 'title', 'label' => (('Title')), 'datacell_template' => '<td><a :href="\'#/mailing/lists/form?id=\'+row.id">{{row.title}}</a></td>'],
-                ['name' => 'create_at', 'label' => (('Created At'))],
-                ['name' => 'update_at', 'label' => (('Updated At'))],
+            static::ID => 'mailing_lists',
+            static::DATA_URL => 'mailing/lists/grid_data',
+            static::TITLE => (('Mailing Lists')),
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT],
+                [static::NAME => 'id', static::LABEL => (('ID')), static::HIDDEN => true],
+                [static::NAME => 'title', static::LABEL => (('Title')), static::DATACELL_TEMPLATE => '<td><a :href="\'#/mailing/lists/form?id=\'+row.id">{{row.title}}</a></td>'],
+                [static::NAME => 'create_at', static::LABEL => (('Created At'))],
+                [static::NAME => 'update_at', static::LABEL => (('Updated At'))],
             ],
-            'page_actions' => [
-                ['name' => 'new', 'label' => (('Create New Mailing List')), 'button_class' => 'button1', 'link' => '/mailing/lists/form'],
+            static::PAGE_ACTIONS => [
+                [static::NAME => 'new', static::LABEL => (('Create New Mailing List')), static::BUTTON_CLASS => 'button1', static::LINK => '/mailing/lists/form'],
             ],
-            'filters' => true,
-            'pager' => true,
-            'export' => true,
+            static::FILTERS => true,
+            static::PAGER => true,
+            static::EXPORT => true,
         ];
 
         return $config;
@@ -44,21 +44,21 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Lists extends FCom_AdminSPA_Adm
         }
 
         $result = [];
-        $result['form']['list'] = $list->as_array();
-        $result['form']['config']['title'] = $listId ? $list->get('title') : (('New List'));
-        $result['form']['config']['tabs'] = '/mailing/lists/form';
-        $result['form']['config']['fields'] = [
-            'default' => ['model' => 'list', 'tab' => 'main'],
-            ['name' => 'title', 'label' => (('Title')), 'required' => true],
-            ['name' => 'import_recipients', 'label' => (('Paste Here')), 'type' => 'textarea', 'tab' => 'import',
-                'notes' => (('Email, First Name, Last Name, Company'))],
+        $result[static::FORM]['list'] = $list->as_array();
+        $result[static::FORM][static::CONFIG][static::TITLE] = $listId ? $list->get('title') : (('New List'));
+        $result[static::FORM][static::CONFIG][static::TABS] = '/mailing/lists/form';
+        $result[static::FORM][static::CONFIG][static::FIELDS] = [
+            static::DEFAULT_FIELD => [static::MODEL => 'list', static::TAB => 'main'],
+            [static::NAME => 'title', static::LABEL => (('Title')), static::REQUIRED => true],
+            [static::NAME => 'import_recipients', static::LABEL => (('Paste Here')), static::TYPE => 'textarea', static::TAB => 'import',
+                static::NOTES => (('Email, First Name, Last Name, Company'))],
         ];
         if ($list->id()) {
-            #$result['form']['config']['fields'][] = ['name' => 'status', 'label' => (('Status')), 'options' => $statusOptions];
+            #$result[static::FORM][static::CONFIG][static::FIELDS][] = [static::NAME => 'status', static::LABEL => (('Status')), static::OPTIONS => $statusOptions];
         }
-        $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
+        $result[static::FORM][static::CONFIG][static::PAGE_ACTIONS] = $this->getDefaultFormPageActions();
 
-        $result['form']['recipients_grid']['config'] =
+        $result[static::FORM]['recipients_grid'][static::CONFIG] =
             $this->Sellvana_Email_AdminSPA_Controller_Mailing_Lists_Recipients->getNormalizedGridConfig();
 
         return $result;

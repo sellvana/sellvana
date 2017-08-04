@@ -16,25 +16,25 @@ class FCom_AdminSPA_AdminSPA_Controller_Account extends FCom_AdminSPA_AdminSPA_C
 
         $form = [];
 
-        $form['config']['tabs'] = '/catalog/products/form';
-        $form['config']['default_field'] = ['model' => 'user', 'tab' => 'account'];
-        $form['config']['fields'] = [
-            ['name' => 'username', 'label' => (('Username'))],
-            ['name' => 'email', 'label' => (('Email'))],
-            ['name' => 'current_password', 'label' => (('Current Password')), 'input_type' => 'password'],
-            ['name' => 'change_password', 'label' => (('Change Password?')), 'type' => 'checkbox'],
-            ['name' => 'new_password', 'label' => (('New Password')), 'input_type' => 'password', 'if' => '{change_password}'],
-            ['name' => 'confirm_password', 'label' => (('Confirm Password')), 'input_type' => 'password', 'if' => '{change_password}'],
+        $form[static::CONFIG][static::TABS] = '/catalog/products/form';
+        $form[static::CONFIG][static::FIELDS] = [
+            static::DEFAULT_FIELD => [static::MODEL => 'user', static::TAB => 'account'],
+            [static::NAME => 'username', static::LABEL => (('Username'))],
+            [static::NAME => 'email', static::LABEL => (('Email'))],
+            [static::NAME => 'current_password', static::LABEL => (('Current Password')), static::INPUT_TYPE => 'password'],
+            [static::NAME => 'change_password', static::LABEL => (('Change Password?')), static::TYPE => 'checkbox'],
+            [static::NAME => 'new_password', static::LABEL => (('New Password')), static::INPUT_TYPE => 'password', 'if' => '{change_password}'],
+            [static::NAME => 'confirm_password', static::LABEL => (('Confirm Password')), static::INPUT_TYPE => 'password', 'if' => '{change_password}'],
 
-            ['name' => 'lastname', 'label' => (('Last Name')), 'tab' => 'personal'],
-            ['name' => 'firstname', 'label' => (('First Name')), 'tab' => 'personal'],
-            ['name' => 'bio', 'label' => (('Short Bio')), 'tab' => 'personal'],
-            ['name' => 'locale', 'label' => (('Locale')), 'tab' => 'personal', 'options' => $locales],
-            ['name' => 'tz', 'label' => (('Time Zone')), 'tab' => 'personal', 'options' => $timezones],
+            [static::NAME => 'lastname', static::LABEL => (('Last Name')), static::TAB => 'personal'],
+            [static::NAME => 'firstname', static::LABEL => (('First Name')), static::TAB => 'personal'],
+            [static::NAME => 'bio', static::LABEL => (('Short Bio')), static::TAB => 'personal'],
+            [static::NAME => 'locale', static::LABEL => (('Locale')), static::TAB => 'personal', static::OPTIONS => $locales],
+            [static::NAME => 'tz', static::LABEL => (('Time Zone')), static::TAB => 'personal', static::OPTIONS => $timezones],
         ];
 
         $form = $this->normalizeFormConfig($form);
 
-        $this->respond($form['config']);
+        $this->respond($form[static::CONFIG]);
     }
 }

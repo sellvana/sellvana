@@ -16,49 +16,49 @@ class Sellvana_Customer_AdminSPA_Controller_Customers extends FCom_AdminSPA_Admi
         $countries = $this->BLocale->getAvailableCountries();
 
         return [
-            'id' => 'customers',
-            'data_url' => 'customers/grid_data',
-            'columns' => [
-                ['type' => 'row-select'],
-                ['type' => 'actions', 'actions' => [
-                    ['type' => 'edit', 'link' => '/customers/form?id={id}'],
-                    ['name' => 'login', 'template' => "<a :href=\"'{$logInAsUrl}'+row.id\" target=\"AdminCustomer\" :title=\"(('Log in as customer'))|_\"><i class=\"fa fa-user\"></i></a>"],
-                    ['type' => 'delete', 'delete_url' => 'customers/grid_delete'],
+            static::ID => 'customers',
+            static::DATA_URL => 'customers/grid_data',
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT],
+                [static::TYPE => 'actions', static::ACTIONS => [
+                    [static::TYPE => 'edit', static::LINK => '/customers/form?id={id}'],
+                    [static::NAME => 'login', 'template' => "<a :href=\"'{$logInAsUrl}'+row.id\" target=\"AdminCustomer\" :title=\"(('Log in as customer'))|_\"><i class=\"fa fa-user\"></i></a>"],
+                    [static::TYPE => 'delete', 'delete_url' => 'customers/grid_delete'],
                 ]],
-                ['name' => 'thumb_url', 'label' => (('Thumbnail')), 'datacell_template' => '<td><img :src="row.thumb_url"></td>', 'sortable' => false],
-                ['name' => 'id', 'label' => (('ID')), 'index' => 'c.id'],
-                ['name' => 'firstname', 'label' => (('First Name')), 'index' => 'c.firstname'],
-                ['name' => 'lastname', 'label' => (('Last Name')), 'index' => 'c.lastname'],
-                ['name' => 'email', 'label' => (('Email')), 'index' => 'c.email'],
-                ['name' => 'customer_group', 'label' => (('Customer Group')), 'index' => 'c.customer_group', 'options' => $custGroupOptions,
-                    'edit' => ['bulk' => true, 'validation' => ['required' => true]],
+                [static::NAME => 'thumb_url', static::LABEL => (('Thumbnail')), static::DATACELL_TEMPLATE => '<td><img :src="row.thumb_url"></td>', 'sortable' => false],
+                [static::NAME => 'id', static::LABEL => (('ID')), 'index' => 'c.id'],
+                [static::NAME => 'firstname', static::LABEL => (('First Name')), 'index' => 'c.firstname'],
+                [static::NAME => 'lastname', static::LABEL => (('Last Name')), 'index' => 'c.lastname'],
+                [static::NAME => 'email', static::LABEL => (('Email')), 'index' => 'c.email'],
+                [static::NAME => 'customer_group', static::LABEL => (('Customer Group')), 'index' => 'c.customer_group', static::OPTIONS => $custGroupOptions,
+                    'edit' => ['bulk' => true, 'validation' => [static::REQUIRED => true]],
                 ],
-                ['name' => 'status', 'label' => (('Status')), 'index' => 'c.status', 'options' => $custStatusOptions,
-                    'edit' => ['bulk' => true, 'validation' => ['required' => true]]
+                [static::NAME => 'status', static::LABEL => (('Status')), 'index' => 'c.status', static::OPTIONS => $custStatusOptions,
+                    'edit' => ['bulk' => true, 'validation' => [static::REQUIRED => true]]
                 ],
-                ['name' => 'street1', 'label' => (('Address')), 'index' => 'a.street1'],
-                ['name' => 'city', 'label' => (('City')), 'index' => 'a.city', 'hidden' => true],
-                ['name' => 'region', 'label' => (('Region')), 'index' => 'a.region', 'hidden' => true],
-                ['name' => 'postcode', 'label' => (('Postal Code')), 'index' => 'a.postcode', 'hidden' => true],
-                ['name' => 'country', 'label' => (('Country')), 'index' => 'a.country', 'hidden' => true, 'options' => $countries],
-                ['name' => 'create_at', 'label' => (('Created')), 'index' => 'c.create_at', 'format' => 'datetime'],
-                ['name' => 'last_login', 'label' => (('Last Login')), 'index' => 'c.last_login', 'hidden' => true, 'format' => 'datetime'],
+                [static::NAME => 'street1', static::LABEL => (('Address')), 'index' => 'a.street1'],
+                [static::NAME => 'city', static::LABEL => (('City')), 'index' => 'a.city', static::HIDDEN => true],
+                [static::NAME => 'region', static::LABEL => (('Region')), 'index' => 'a.region', static::HIDDEN => true],
+                [static::NAME => 'postcode', static::LABEL => (('Postal Code')), 'index' => 'a.postcode', static::HIDDEN => true],
+                [static::NAME => 'country', static::LABEL => (('Country')), 'index' => 'a.country', static::HIDDEN => true, static::OPTIONS => $countries],
+                [static::NAME => 'create_at', static::LABEL => (('Created')), 'index' => 'c.create_at', 'format' => 'datetime'],
+                [static::NAME => 'last_login', static::LABEL => (('Last Login')), 'index' => 'c.last_login', static::HIDDEN => true, 'format' => 'datetime'],
             ],
-            'filters' => [
-                ['name' => 'firstname'],
-                ['name' => 'lastname'],
-                ['name' => 'email'],
-                ['name' => 'customer_group'],
-                ['name' => 'street1'],
-                ['name' => 'city'],
-                ['name' => 'region'],
-                ['name' => 'postcode'],
-                ['name' => 'create_at', 'type' => 'date'],
-                ['name' => 'last_login', 'type' => 'date'],
-                ['name' => 'country'],
-                ['name' => 'status'],
+            static::FILTERS => [
+                [static::NAME => 'firstname'],
+                [static::NAME => 'lastname'],
+                [static::NAME => 'email'],
+                [static::NAME => 'customer_group'],
+                [static::NAME => 'street1'],
+                [static::NAME => 'city'],
+                [static::NAME => 'region'],
+                [static::NAME => 'postcode'],
+                [static::NAME => 'create_at', static::TYPE => 'date'],
+                [static::NAME => 'last_login', static::TYPE => 'date'],
+                [static::NAME => 'country'],
+                [static::NAME => 'status'],
             ],
-            'bulk_actions' => [
+            static::BULK_ACTIONS => [
                 'edit'   => true,
                 'delete' => true
             ]
@@ -92,9 +92,9 @@ class Sellvana_Customer_AdminSPA_Controller_Customers extends FCom_AdminSPA_Admi
             if (!$customer) {
                 throw new BException('Customer not found');
             }
-            $result['form']['config']['tabs'] = $this->getFormTabs('/customers/form');
-            $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
-            $result['form']['customer'] = $customer->as_array();
+            $result[static::FORM][static::CONFIG][static::TABS] = $this->getFormTabs('/customers/form');
+            $result[static::FORM][static::CONFIG][static::PAGE_ACTIONS] = $this->getDefaultFormPageActions();
+            $result[static::FORM]['customer'] = $customer->as_array();
 
         } catch (Exception $e) {
             $this->addMessage($e);
@@ -130,7 +130,7 @@ class Sellvana_Customer_AdminSPA_Controller_Customers extends FCom_AdminSPA_Admi
             if ($result) {
                 $args['result']['customer'] = [
                     'priority' => 10,
-                    'link' => '/customers/form?id=' . $result->id(),
+                    static::LINK => '/customers/form?id=' . $result->id(),
                 ];
             }
         }

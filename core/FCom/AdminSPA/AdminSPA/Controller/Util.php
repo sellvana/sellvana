@@ -13,11 +13,11 @@ class FCom_AdminSPA_AdminSPA_Controller_Util extends FCom_AdminSPA_AdminSPA_Cont
         }
         switch ($r['do']) {
             case 'grid.col.hidden':
-                if (empty($r['grid']) || empty($r['col']) || !isset($r['hidden'])) {
+                if (empty($r[static::GRID]) || empty($r['col']) || !isset($r['hidden'])) {
                     break;
                 }
-                $columns = [$r['col'] => ['hidden' => !empty($r['hidden']) && $r['hidden'] !== 'false']];
-                $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
+                $columns = [$r['col'] => [static::HIDDEN => !empty($r['hidden']) && $r['hidden'] !== 'false']];
+                $data = [static::GRID => [$r[static::GRID] => ['columns' => $columns]]];
 
                 break;
 
@@ -35,7 +35,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Util extends FCom_AdminSPA_AdminSPA_Cont
                     }
                     $columns[$col['name']] = ['position' => $col['position']];
                 }
-                $data = ['grid' => [$r['grid'] => ['columns' => $columns]]];
+                $data = [static::GRID => [$r[static::GRID] => ['columns' => $columns]]];
 
                 break;
 

@@ -7,6 +7,48 @@
  */
 abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Controller_Abstract
 {
+    const
+        CONFIG = 'config',
+        GRID = 'grid',
+        ID = 'id',
+        DATA_URL = 'data_url',
+        COLUMNS = 'columns',
+        ROW_SELECT = 'row-select',
+        FILTERS = 'filters',
+        PAGER = 'pager',
+        EXPORT = 'export',
+        ACTIONS = 'actions',
+        BULK_ACTIONS = 'bulk_actions',
+        PAGE_ACTIONS = 'page_actions',
+        PANEL_ACTIONS = 'panel_actions',
+        TITLE = 'title',
+        FORM = 'form',
+        NAME = 'name',
+        LABEL = 'label',
+        TYPE = 'type',
+        OPTIONS = 'options',
+        HIDDEN = 'hidden',
+        DATACELL_TEMPLATE = 'datacell_template',
+        FIELDS = 'fields',
+        DEFAULT_FIELD = 'default',
+        TAB = 'tab',
+        TABS = 'tabs',
+        MODEL = 'model',
+        WIDTH = 'width',
+        MULTIPLE = 'multiple',
+        BUTTON_CLASS = 'button_class',
+        LINK = 'link',
+        GROUP = 'group',
+        DESKTOP_GROUP = 'desktop_group',
+        MOBILE_GROUP = 'mobile_group',
+        REQUIRED = 'required',
+        VALIDATE = 'validate',
+        INPUT_TYPE = 'input_type',
+        NOTES = 'notes',
+        THUMB_URL = 'thumb_url',
+        I18N = 'i18n'
+    ;
+
     public function authenticate($args = [])
     {
         $result = parent::authenticate();
@@ -66,7 +108,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
             throw new BException('Invalid message text type');
         }
         $this->addResponses(['_messages' => [
-            ['type' => $type, 'text' => $text],
+            [static::TYPE => $type, 'text' => $text],
         ]]);
         return $this;
     }

@@ -21,7 +21,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         $result = [];
         try {
             $result = $this->getFormData();
-            $result['form'] = $this->normalizeFormConfig($result['form']);
+            $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
         } catch (Exception $e) {
             $this->addMessage($e);
         }
@@ -63,7 +63,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
             $model->set($data)->save();
 
-            $args = ['data' => $data, 'model' => $model];
+            $args = ['data' => $data, static::MODEL => $model];
             $this->onAfterFormDataPost($args);
             $this->BEvents->fire("{$eventName}:after", $args);
 
@@ -111,13 +111,13 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
     public function getDefaultFormPageActions()
     {
         return [
-            'default' => ['mobile_group' => 'actions'],
-            ['name' => 'actions', 'label' => (('Actions'))],
-            ['name' => 'back', 'label' => (('Back')), 'group' => 'back', 'button_class' => 'button2'],
-            ['name' => 'delete', 'label' => (('Delete')), 'desktop_group' => 'delete', 'button_class' => 'button4',
+            static::DEFAULT_FIELD => [static::MOBILE_GROUP => 'actions'],
+            [static::NAME => 'actions', static::LABEL => (('Actions'))],
+            [static::NAME => 'back', static::LABEL => (('Back')), static::GROUP => 'back', static::BUTTON_CLASS => 'button2'],
+            [static::NAME => 'delete', static::LABEL => (('Delete')), static::DESKTOP_GROUP => 'delete', static::BUTTON_CLASS => 'button4',
                 'if' => static::$_modelName . '.id'],
-            ['name' => 'save', 'label' => (('Save')), 'desktop_group' => 'save', 'button_class' => 'button1'],
-            ['name' => 'save-continue', 'label' => (('Save & Continue')), 'desktop_group' => 'save', 'button_class' => 'button1'],
+            [static::NAME => 'save', static::LABEL => (('Save')), static::DESKTOP_GROUP => 'save', static::BUTTON_CLASS => 'button1'],
+            [static::NAME => 'save-continue', static::LABEL => (('Save & Continue')), static::DESKTOP_GROUP => 'save', static::BUTTON_CLASS => 'button1'],
         ];
     }
 
@@ -125,31 +125,31 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
     {
         $eventName = $this->origClass() . '::normalizeFormConfig:before';
 
-        $this->BEvents->fire($eventName, ['form' => &$form]);
+        $this->BEvents->fire($eventName, [static::FORM => &$form]);
 
-        if (!empty($form['config']['tabs']) && is_string($form['config']['tabs'])) {
-            $form['config']['tabs'] = $this->getFormTabs($form['config']['tabs']);
+        if (!empty($form[static::CONFIG][static::TABS]) && is_string($form[static::CONFIG][static::TABS])) {
+            $form[static::CONFIG][static::TABS] = $this->getFormTabs($form[static::CONFIG][static::TABS]);
         }
         
-        if (!empty($form['config']['fields'])) {
+        if (!empty($form[static::CONFIG][static::FIELDS])) {
             $models = [];
-            if (!empty($form['config']['default_field'])) {
-                $def = array_merge(static::$_defaultFieldConfig, $form['config']['default_field']);
-            } elseif (!empty($form['config']['fields']['default'])) {
-                $def = array_merge(static::$_defaultFieldConfig, $form['config']['fields']['default']);
-                unset($form['config']['fields']['default']);
+            if (!empty($form[static::CONFIG]['default_field'])) {
+                $def = array_merge(static::$_defaultFieldConfig, $form[static::CONFIG]['default_field']);
+            } elseif (!empty($form[static::CONFIG][static::FIELDS]['default'])) {
+                $def = array_merge(static::$_defaultFieldConfig, $form[static::CONFIG][static::FIELDS]['default']);
+                unset($form[static::CONFIG][static::FIELDS]['default']);
             } else {
                 $def = static::$_defaultFieldConfig;
             }
-            foreach ($form['config']['fields'] as &$field) {
+            foreach ($form[static::CONFIG][static::FIELDS] as &$field) {
                 $field = array_merge($def, $field);
-                if (!empty($field['options'])) {
+                if (!empty($field[static::OPTIONS])) {
                     if (empty($field['type']) || $field['type'] === 'input') {
                         $field['type'] = 'select2';
 //                        $field['type'] = !empty($field['multiple']) ? 'v-multiselect' : 'select';
                     }
-                    if (empty($field['options'][0])) {
-                        $field['options'] = $this->BUtil->arrayMapToSeq($field['options']);
+                    if (empty($field[static::OPTIONS][0])) {
+                        $field[static::OPTIONS] = $this->BUtil->arrayMapToSeq($field[static::OPTIONS]);
                     }
                 }
                 if (!empty($field['model'])) {
@@ -166,14 +166,14 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
         }
 
-        if (!empty($form['config']['page_actions'])) {
-            $form['config']['page_actions_groups'] = $this->getActionsGroups($form['config']['page_actions'], $form);
+        if (!empty($form[static::CONFIG][static::PAGE_ACTIONS])) {
+            $form[static::CONFIG]['page_actions_groups'] = $this->getActionsGroups($form[static::CONFIG][static::PAGE_ACTIONS], $form);
         }
 
-        if (!empty($form['i18n']) && is_string($form['i18n'])) {
-            $modelName = $form['i18n'];
+        if (!empty($form[static::I18N]) && is_string($form[static::I18N])) {
+            $modelName = $form[static::I18N];
             if (!empty($form[$modelName]['id'])) {
-                $form['i18n'] = $this->getModelTranslations($modelName, $form[$modelName]['id']);
+                $form[static::I18N] = $this->getModelTranslations($modelName, $form[$modelName]['id']);
             }
         }
 

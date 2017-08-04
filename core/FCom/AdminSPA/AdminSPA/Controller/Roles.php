@@ -14,25 +14,25 @@ class FCom_AdminSPA_AdminSPA_Controller_Roles extends FCom_AdminSPA_AdminSPA_Con
     public function getGridConfig()
     {
         return [
-            'id' => 'roles',
-            'title' => (('Roles & Permissions')),
-            'data_url' => 'roles/grid_data',
-            'columns' => [
-                ['type' => 'row-select', 'width' => 80],
-                ['name' => 'id', 'label' => (('ID'))],
-                ['name' => 'role_name', 'label' => (('Role Name')), 'width' => 250,
-                    'datacell_template' => '<td><a :href="\'#/roles/form?id=\'+row.id">{{row.role_name}}</a></td>'],
-                ['name' => 'create_at', 'label' => (('Created At'))],
-                ['name' => 'update_at', 'label' => (('Updated At'))],
+            static::ID => 'roles',
+            static::TITLE => (('Roles & Permissions')),
+            static::DATA_URL => 'roles/grid_data',
+            static::COLUMNS => [
+                [static::TYPE => static::ROW_SELECT, static::WIDTH => 80],
+                [static::NAME => 'id', static::LABEL => (('ID'))],
+                [static::NAME => 'role_name', static::LABEL => (('Role Name')), static::WIDTH => 250,
+                    static::DATACELL_TEMPLATE => '<td><a :href="\'#/roles/form?id=\'+row.id">{{row.role_name}}</a></td>'],
+                [static::NAME => 'create_at', static::LABEL => (('Created At'))],
+                [static::NAME => 'update_at', static::LABEL => (('Updated At'))],
             ],
-            'filters' => true,
-            'export' => true,
-            'pager' => true,
-            'bulk_actions' => [
-                ['name' => 'delete', 'label' => (('Delete'))],
+            static::FILTERS => true,
+            static::EXPORT => true,
+            static::PAGER => true,
+            static::BULK_ACTIONS => [
+                [static::NAME => 'delete', static::LABEL => (('Delete'))],
             ],
-            'page_actions' => [
-                ['name' => 'new', 'label' => (('Add New Role')), 'button_class' => 'button1', 'link' => '/roles/form', 'group' => 'new'],
+            static::PAGE_ACTIONS => [
+                [static::NAME => 'new', static::LABEL => (('Add New Role')), static::BUTTON_CLASS => 'button1', static::LINK => '/roles/form', static::GROUP => 'new'],
             ],
             'state' => [
                 'sc' => 'role_name asc'
@@ -57,24 +57,24 @@ class FCom_AdminSPA_AdminSPA_Controller_Roles extends FCom_AdminSPA_AdminSPA_Con
         $allPermissions = $this->FCom_Admin_Model_Role->getAllPermissions();
         $permOptions = [];
         foreach ($allPermissions as $path => $perm) {
-            $permOptions[] = ['id' => $path, 'text' => $path . ' - ' . $perm['title']];
+            $permOptions[] = [static::ID => $path, 'text' => $path . ' - ' . $perm[static::TITLE]];
         }
 
         $result = [];
-        $result['form']['role'] = [
-            'id' => $role->id(),
+        $result[static::FORM]['role'] = [
+            static::ID => $role->id(),
             'role_name' => $role->get('role_name'),
             'permissions' => explode("\n", $role->get('permissions_data')),
         ];
-        $result['form']['config']['title'] = $roleId ? $role->get('role_name') : (('New Role'));
-        $result['form']['config']['tabs'] = '/roles/form';
-        $result['form']['config']['fields'] = [
-            'default' => ['model' => 'role', 'tab' => 'main'],
-            ['name' => 'role_name', 'label' => (('Role Name')), 'required' => true],
-            ['name' => 'permissions', 'label' => (('Permissions')), 'options' => $permOptions, 'type' => 'select2', 'multiple' => true],
+        $result[static::FORM][static::CONFIG][static::TITLE] = $roleId ? $role->get('role_name') : (('New Role'));
+        $result[static::FORM][static::CONFIG][static::TABS] = '/roles/form';
+        $result[static::FORM][static::CONFIG][static::FIELDS] = [
+            static::DEFAULT_FIELD => [static::MODEL => 'role', static::TAB => 'main'],
+            [static::NAME => 'role_name', static::LABEL => (('Role Name')), static::REQUIRED => true],
+            [static::NAME => 'permissions', static::LABEL => (('Permissions')), static::OPTIONS => $permOptions, static::TYPE => 'select2', static::MULTIPLE => true],
         ];
 
-        $result['form']['config']['page_actions'] = $this->getDefaultFormPageActions();
+        $result[static::FORM][static::CONFIG][static::PAGE_ACTIONS] = $this->getDefaultFormPageActions();
 
         return $result;
     }

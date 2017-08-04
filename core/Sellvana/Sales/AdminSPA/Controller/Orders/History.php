@@ -14,31 +14,31 @@ class Sellvana_Sales_AdminSPA_Controller_Orders_History extends FCom_AdminSPA_Ad
         $entityTypes = $this->Sellvana_Sales_Model_Order_History->fieldOptions('entity_type');
         $userOptions = $this->FCom_Admin_Model_User->options();
         return [
-            'id' => 'order_history',
-            'data_url' => '/orders/form/history/grid_data?id={id}',
-            'columns' => [
-                ['name' => 'create_at', 'label' => (('Created')), 'format' => 'datetime'],
-                ['name' => 'id', 'label' => (('ID')), 'hidden' => true],
-                ['name' => 'order_item_id', 'label' => (('Item ID')), 'hidden' => true],
-                ['name' => 'user_id', 'label' => (('User')), 'options' => $userOptions],
-                ['name' => 'entity_type', 'label' => (('Entity Type')), 'options' => $entityTypes],
-                ['name' => 'entity_id', 'label' => (('Entity ID'))],
-                ['name' => 'event_type', 'label' => (('Event Type')), 'hidden' => true],
-                ['name' => 'event_description', 'label' => (('Description'))],
+            static::ID => 'order_history',
+            static::DATA_URL => '/orders/form/history/grid_data?id={id}',
+            static::COLUMNS => [
+                [static::NAME => 'create_at', static::LABEL => (('Created')), 'format' => 'datetime'],
+                [static::NAME => 'id', static::LABEL => (('ID')), static::HIDDEN => true],
+                [static::NAME => 'order_item_id', static::LABEL => (('Item ID')), static::HIDDEN => true],
+                [static::NAME => 'user_id', static::LABEL => (('User')), static::OPTIONS => $userOptions],
+                [static::NAME => 'entity_type', static::LABEL => (('Entity Type')), static::OPTIONS => $entityTypes],
+                [static::NAME => 'entity_id', static::LABEL => (('Entity ID'))],
+                [static::NAME => 'event_type', static::LABEL => (('Event Type')), static::HIDDEN => true],
+                [static::NAME => 'event_description', static::LABEL => (('Description'))],
             ],
-            'filters' => [
-                ['name' => 'create_at', 'type' => 'date'],
-                ['name' => 'id', 'type' => 'number'],
-                ['name' => 'order_item_id', 'type' => 'number'],
-                ['name' => 'user_id', 'type' => 'select'],
-                ['name' => 'entity_type', 'type' => 'select'],
-                ['name' => 'entity_id', 'type' => 'number'],
-                ['name' => 'event_type'],
-                ['name' => 'event_description'],
+            static::FILTERS => [
+                [static::NAME => 'create_at', static::TYPE => 'date'],
+                [static::NAME => 'id', static::TYPE => 'number'],
+                [static::NAME => 'order_item_id', static::TYPE => 'number'],
+                [static::NAME => 'user_id', static::TYPE => 'select'],
+                [static::NAME => 'entity_type', static::TYPE => 'select'],
+                [static::NAME => 'entity_id', static::TYPE => 'number'],
+                [static::NAME => 'event_type'],
+                [static::NAME => 'event_description'],
             ],
             'state' => ['s' => 'create_at', 'sd' => 'desc'],
-            'pager' => true,
-            'export' => true,
+            static::PAGER => true,
+            static::EXPORT => true,
         ];
     }
 
