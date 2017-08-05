@@ -105,7 +105,8 @@ define(['vue', 'vuex', 'sv-app-data'], function (Vue, Vuex, SvAppData) {
             mainNavOpen: true,
             overlayActive: false,
             windowWidth: null,
-            pageClickCounter: 0
+            pageClickCounter: 0,
+            actionInProgress: false
         },
         mutations: {
             ddToggle: function (state, ddName) {
@@ -123,6 +124,9 @@ define(['vue', 'vuex', 'sv-app-data'], function (Vue, Vuex, SvAppData) {
             },
             overlay: function (state, active) {
                 state.overlayActive = active;
+            },
+            actionInProgress: function (state, action) {
+                state.actionInProgress = action;
             }
         }
     });

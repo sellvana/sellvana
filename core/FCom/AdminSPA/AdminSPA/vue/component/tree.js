@@ -18,7 +18,7 @@ define(['vue', 'text!sv-comp-tree-node-tpl'], function (Vue, treeNodeTpl) {
         methods: {
             toggle: function () {
                 if (this.isFolder) {
-                    Vue.set(this.node, 'open', !this.node.open);
+                    this.$set(this.node, 'open', !this.node.open);
                     this.emitEvent({type: 'toggle', node: this.node});
                 }
             },

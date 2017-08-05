@@ -13,70 +13,12 @@ define(['lodash', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], f
     var commonMixin = {
         store: store,
         router: router,
-        data: function () {
-            return {
-                action_in_progress: ''
-            };
-        },
         computed: {
-            ////////////////////// UI URLS
-            assetUrl: function () {
-                var vm = this;
-                return function (module, path) {
-                    var modules = SvAppData.modules;
-                    return modules[module] ? modules[module].src_root + '/AdminSPA/' + path : '';
-                }
+            action_in_progress: function () {
+                return store.state.ui.actionInProgress;
             },
-            componentUrl: function() {
-                var vm = this;
-                return function (module, path, type) {
-                    var modules = SvAppData.modules;
-                    type = type || 'component';
-                    var url = modules[module].src_root + '/AdminSPA/vue/' + type + '/' + path;
-                    if (path.match(/\.html$/)) {
-                        url = 'text!' + url;
-                    }
-                    return url;
-                }
-            },
-
-            //////////////////////// UI COMPONENTS
-            ddOpen: function () {
-                return function(ddName, ddRoot) {
-                    ddRoot = ddRoot || store.state.ui;
-                    return ddRoot.ddCurrent === ddName;
-                };
-            },
-            pageClickCounter: function () {
+            page_click_counter: function () {
                 return store.state.ui.pageClickCounter;
-            },
-
-            ///////////////////////// MISC
-            select2Options: function () {
-                return function (options) {
-                    var kvs = [], i;
-                    for (i in options) {
-                        kvs.push({id: i, text: options[i]});
-                    }
-                    return kvs;
-                }
-            },
-            length: function () {
-                return function (value) {
-                    if (typeof value === 'object') {
-                        return Object.keys(value).length;
-                    } else if (value.isArray()) {
-                        return value.length;
-                    } else {
-                        return 1;
-                    }
-                }
-            },
-            svgIconLink: function () {
-                return function (icon) {
-                    return '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' +
-                        SvAppData.modules.FCom_AdminSPA.src_root + '/AdminSPA/img/icons.svg#' + icon + '"></use>';
-                }
             }
         },
         methods: {
@@ -89,6 +31,49 @@ define(['lodash', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], f
                 return translated.supplant(args);
             },
 
+            ////////////////////// UI URLS
+            assetUrl: function (module, path) {
+                var modules = SvAppData.modules;
+                return modules[module] ? modules[module].src_root + '/AdminSPA/' + path : '';
+            },
+            componentUrl: function (module, path, type) {
+                var modules = SvAppData.modules;
+                type = type || 'component';
+                var url = modules[module].src_root + '/AdminSPA/vue/' + type + '/' + path;
+                if (path.match(/\.html$/)) {
+                    url = 'text!' + url;
+                }
+                return url;
+            },
+
+            ///////////////////////// MISC
+            select2Options: function (options) {
+                var kvs = [], i;
+                for (i in options) {
+                    kvs.push({id: i, text: options[i]});
+                }
+                return kvs;
+            },
+            length: function (value) {
+                if (typeof value === 'object') {
+                    return Object.keys(value).length;
+                } else if (value.isArray()) {
+                    return value.length;
+                } else {
+                    return 1;
+                }
+            },
+            svgIconLink: function (icon) {
+                return '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' +
+                    SvAppData.modules.FCom_AdminSPA.src_root + '/AdminSPA/img/icons.svg#' + icon + '"></use>';
+            },
+
+            //////////////////////// UI COMPONENTS
+            ddOpen: function (ddName, ddRoot) {
+                ddRoot = ddRoot || store.state.ui;
+                return ddRoot.ddCurrent === ddName;
+            },
+
             ddToggle: function (ddName, ddRoot) {
                 if (ddRoot) {
                     Vue.set(ddRoot, 'ddCurrent', ddRoot.ddCurrent === ddName ? false : ddName);
@@ -98,7 +83,7 @@ define(['lodash', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], f
             },
             ddStay: function () { /* dummy */ },
 
-            sendRequest: function(method, path, request, success, error, lastTry) {
+            sendRequest: function (method, path, request, success, error, lastTry) {
                 var vm = this, data = request;
                 if (!_.isObject(data) || _.isArrayLike(data)) {
                     console.log('Invalid request', request);

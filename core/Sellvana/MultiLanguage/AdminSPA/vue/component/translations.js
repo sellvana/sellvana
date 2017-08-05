@@ -35,7 +35,7 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
                 this.avail_locales = locales;
             },
             addTranslation: function () {
-                Vue.set(this.translations, this.new_locale, '');
+                this.$set(this.translations, this.new_locale, '');
                 this.new_locale = '';
                 this.calcAvailableLocales();
             },
@@ -49,7 +49,7 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
             }
         },
         created: function () {
-            Vue.set(this, 'translations', this.form.i18n[this.field.name] || {});
+            this.$set(this, 'translations', this.form.i18n[this.field.name] || {});
             this.calcAvailableLocales();
         },
         mounted: function () {
@@ -61,7 +61,7 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
         watch: {
             field: {
                 handler: function (field) {
-                    Vue.set(this, 'translations', this.form.i18n[this.field.name] || {});
+                    this.$set(this, 'translations', this.form.i18n[this.field.name] || {});
                     this.calcAvailableLocales();
                 },
                 deep: true

@@ -54,10 +54,10 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
 
                         }
                         for (var i in response.form) {
-                            Vue.set(vm.form, i, response.form[i]);
+                            vm.$set(vm.form, i, response.form[i]);
                         }
                         if (!vm.form.updates) {
-                            Vue.set(vm.form, 'updates', {});
+                            vm.$set(vm.form, 'updates', {});
                         }
                         if (!stayOnPage) {
                             vm.$router.push('/vendors');

@@ -41,10 +41,10 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
             },
             save: function (stayOnPage) {
                 var vm = this;
-                this.action_in_progress = stayOnPage ? 'save-continue' : 'save';
+                this.$store.commit('actionInProgress', stayOnPage ? 'save-continue' : 'save');
 
                 if (!this.validateForm()) {
-                    vm.action_in_progress = false;
+                    this.$store.commit('actionInProgress', false);
                     return;
                 }
                 this.sendRequest('POST', 'inventory/form_data?id=' + this.form.inventory.id, this.form.inventory, function (response) {
@@ -61,7 +61,7 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
                     if (!stayOnPage) {
                         vm.$router.push('/catalog/inventory');
                     }
-                    vm.action_in_progress = false;
+                    vm.$store.commit('actionInProgress', false);
                 })
             }
 		}

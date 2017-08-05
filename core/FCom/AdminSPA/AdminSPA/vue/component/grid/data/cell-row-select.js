@@ -16,14 +16,14 @@ define(['vue'], function (Vue) {
         methods: {
             selectRow: function (col) {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var rowId = this.row[col.id_field], rowsSel = this.grid.rows_selected;
                 // Vue.set(this.grid.rows_selected, rowId, !rowsSel[rowId]);
                 if (rowsSel[rowId]) {
                     Vue.delete(this.grid.rows_selected, rowId);
                 } else {
-                    Vue.set(this.grid.rows_selected, rowId, this.row);
+                    this.$set(this.grid.rows_selected, rowId, this.row);
                 }
             }
         }

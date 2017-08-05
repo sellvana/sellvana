@@ -39,7 +39,7 @@ define(['vue', 'text!sv-comp-nav-tpl'], function(Vue, navTpl) {
         },
         methods: {
             navToggle: function (path) {
-                Vue.set(this.navTreeOpen, path, !this.navTreeOpen[path]);
+                this.$set(this.navTreeOpen, path, !this.navTreeOpen[path]);
             },
             clickRouterLink: function(node) {
                 if (this.$store.state.ui.windowWidth <= 1024) {

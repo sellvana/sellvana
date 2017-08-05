@@ -42,8 +42,8 @@ define(['lodash', 'vue', 'sv-comp-grid', 'text!sv-page-default-grid-tpl'],
                         var postData = {do: act.name, ids: ids, data: data};
                         this.sendRequest('POST', this.grid.config.data_url, postData, function (response) {
                             console.log(response);
-                            Vue.set(vm.grid, 'popup', null);
-                            Vue.set(vm.grid, 'fetch_data_flag', true);
+                            vm.$set(vm.grid, 'popup', null);
+                            vm.$set(vm.grid, 'fetch_data_flag', true);
                         });
                         break;
 

@@ -108,8 +108,8 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
             methods: {
                 toggleItem: function (item) {
                     var id = item.id || item.name;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'amount_to_pay', this.items_selected[id] ? (item.amount_due || item.value) : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'amount_to_pay', this.items_selected[id] ? (item.amount_due || item.value) : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -194,7 +194,7 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
                     });
                 },
                 doTransactionAction: function (transaction, action) {
-                    this.action_in_progress = action + '-' + transaction.id;
+                    this.$store.commit('actionInProgress', action + '-' + transaction.id);
                     console.log(transaction, action);
                     var vm = this, postData = {
                         order_id: this.form.order.id,
@@ -210,7 +210,7 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
                         if (response.ok) {
                             vm.$emit('action', {type: 'switch-entity', entity_type: 'payment', entity_id: vm.entity.id});
                         }
-                        vm.action_in_progress = '';
+                        vm.$store.commit('actionInProgress', '');
                     });
                 }
             }
@@ -265,8 +265,8 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
             methods: {
                 toggleItem: function (item) {
                     var id = item.id;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'qty_to_ship', this.items_selected[id] ? item.qty_can_ship : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'qty_to_ship', this.items_selected[id] ? item.qty_can_ship : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -389,8 +389,8 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
             methods: {
                 toggleItem: function (item) {
                     var id = item.id;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'qty_to_return', this.items_selected[id] ? item.qty_can_return : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'qty_to_return', this.items_selected[id] ? item.qty_can_return : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -445,8 +445,8 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
             methods: {
                 toggleItem: function (item) {
                     var id = item.id;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'qty_to_cancel', this.items_selected[id] ? item.qty_can_cancel : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'qty_to_cancel', this.items_selected[id] ? item.qty_can_cancel : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {

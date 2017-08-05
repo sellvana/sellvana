@@ -35,7 +35,7 @@ define(['lodash', 'vue', 'sv-mixin-form'], function (_, Vue, SvMixinForm) {
                 var vm = this;
                 this.sendRequest('POST', 'mailing/campaigns/form_data', {campaign: this.form.campaign}, function (response) {
                     for (var i in response.form) {
-                        Vue.set(vm.form, i, response.form[i]);
+                        vm.$set(vm.form, i, response.form[i]);
                     }
                     if (response.ok && !stayOnPage) {
                         vm.$router.push('/mailing/campaigns');

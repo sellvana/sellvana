@@ -13,7 +13,7 @@ define(['vue', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, g
             },
             hasSelectedOnPage: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, rowId;
                 for (i in this.grid.rows) {
@@ -26,7 +26,7 @@ define(['vue', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, g
             },
             hasUnselectedOnPage: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, rowId;
                 for (i in this.grid.rows) {
@@ -41,19 +41,19 @@ define(['vue', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, g
         methods: {
             selectVisible: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, row, rowId;
 
                 for (i in this.grid.rows) {
                     row = this.grid.rows[i];
                     rowId = row[this.col.id_field];
-                    Vue.set(this.grid.rows_selected, rowId, row);
+                    this.$set(this.grid.rows_selected, rowId, row);
                 }
             },
             unselectVisible: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, rowId;
                 for (i in this.grid.rows) {
@@ -62,7 +62,7 @@ define(['vue', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, g
                 }
             },
             unselectAll: function () {
-                Vue.set(this.grid, 'rows_selected', {});
+                this.$set(this.grid, 'rows_selected', {});
             },
             viewAll: function () {
 

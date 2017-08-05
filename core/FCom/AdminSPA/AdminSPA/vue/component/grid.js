@@ -194,22 +194,22 @@ console.log(filters, result);
             methods: {
                 setPagesize: function (ps) {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'ps', ps);
+                    this.$set(this.grid.config.state, 'ps', ps);
                     this.emitEvent('fetch-data');
                 },
                 goPage: function (p) {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'p',  p);
+                    this.$set(this.grid.config.state, 'p',  p);
                     this.emitEvent('fetch-data');
                 },
                 goPrevPage: function () {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'p', Math.max(this.grid.config.state.p * 1 - 1, 1));
+                    this.$set(this.grid.config.state, 'p', Math.max(this.grid.config.state.p * 1 - 1, 1));
                     this.emitEvent('fetch-data');
                 },
                 goNextPage: function () {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'p', Math.min(this.grid.config.state.p * 1 + 1, this.grid.config.state.mp));
+                    this.$set(this.grid.config.state, 'p', Math.min(this.grid.config.state.p * 1 + 1, this.grid.config.state.mp));
                     this.emitEvent('fetch-data');
                 }
             }
@@ -227,7 +227,7 @@ console.log(filters, result);
             },
             methods: {
                 toggleColumn: function (col) {
-                    Vue.set(col, 'hidden', !col.hidden);
+                    this.$set(col, 'hidden', !col.hidden);
                     //this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
 
                     if (!this.grid.config.personalize_url) {
@@ -248,7 +248,7 @@ console.log(filters, result);
                     var vm = this, i, l, cols = [], col;
                     for (i = 0, l = this.grid.config.columns.length; i < l; i++) {
                         col = this.grid.config.columns[i];
-                        Vue.set(col, 'position', i + 1);
+                        this.$set(col, 'position', i + 1);
                         cols.push({name: col.name, position: i + 1});
                     }
                     var postData = {
@@ -349,7 +349,7 @@ console.log(filters, result);
                     this.ddOpCurrent = '';
                 },
                 switchOp: function (flt, op) {
-                    Vue.set(flt, 'op', op);
+                    this.$set(flt, 'op', op);
                     this.ddOpClear();
                 },
                 applyFilters: function () {
@@ -366,7 +366,7 @@ console.log(filters, result);
                 }
             },
             watch: {
-                pageClickCounter: function () {
+                page_click_counter: function () {
                     this.ddOpClear();
                 },
                 filterToAdd: function (value) {
@@ -466,7 +466,7 @@ console.log(filters, result);
             template: gridPanelTpl,
             watch: {
                 quickSearch: function (value) {
-                    Vue.set(this.grid.config.state, 'quickSearch', value);
+                    this.$set(this.grid.config.state, 'quickSearch', value);
                 }
             }
         };
@@ -563,12 +563,12 @@ console.log(filters, result);
                     var data = grid.config.data, state = {};
 
                     //Vue.set(grid, 'state', state);
-                    Vue.set(grid, 'rows', data);
+                    this.$set(grid, 'rows', data);
                     initGridState(grid);
                 },
                 applyFilters: function (filters) {
                     var oldFilters = _.get(this.grid, 'config.state.filters', []) || [];
-                    Vue.set(this.grid.config.state, 'filters', oldFilters.concat(filters));
+                    this.$set(this.grid.config.state, 'filters', oldFilters.concat(filters));
                     this.fetchData();
                 },
                 removeFilter: function (i) {
@@ -583,7 +583,7 @@ console.log(filters, result);
                     if (!this.grid || !this.grid.config || !this.grid.config.state || !this.grid.config.state.filters) {
                         return;
                     }
-                    Vue.set(this.grid.config.state, 'filters', []);
+                    this.$set(this.grid.config.state, 'filters', []);
                     this.fetchData();
                 },
                 doBulkAction: function (act) {
@@ -594,7 +594,7 @@ console.log(filters, result);
                     this.emitEvent('bulk-action', act);
                     console.log(act);
                     if (act.popup) {
-                        Vue.set(this.grid, act.action_type || 'popup', act.popup);
+                        this.$set(this.grid, act.action_type || 'popup', act.popup);
                         // this.grid.popup.grid = this.grid;
                         // this.grid.popup.open = true;
                     }
@@ -606,7 +606,7 @@ console.log(filters, result);
                     this.emitEvent('row-action', act);
                 },
                 updateConfig: function (config) {
-                    Vue.set(this.grid, 'config', config);
+                    this.$set(this.grid, 'config', config);
                 }
             },
             created: function () {

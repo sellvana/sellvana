@@ -29,7 +29,13 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
             }
         },
         components: {
-            empty: {template:'<td></td>'}
+            empty: {template: '<td></td>'}
+        },
+        watch: {
+            row: function (row, oldRow) {
+                console.log('row-update', row, oldRow);
+                this.emitEvent('row-update', {row: row, old: oldRow});
+            }
         }
     };
 });

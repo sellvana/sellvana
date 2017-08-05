@@ -29,13 +29,7 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-defa
                 if (!config.fields || !config.fields[field]) {
                     return;
                 }
-                var tab = config.fields[field].tab;
-                for (var i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                    if (this.form.config.tabs[i].name === tab) {
-                        Vue.set(this.form.config.tabs[i], 'edited', true);
-                        break;
-                    }
-                }
+                this.setTabFlag('edited', true);
             },
             processFieldEvent: function (type, args) {
                 switch (type) {
@@ -55,7 +49,7 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-defa
                 switch (type) {
                     case 'update':
                         // args: field, translations
-                        Vue.set(this.form.i18n, args.field.name, args.translations);
+                        this.$set(this.form.i18n, args.field.name, args.translations);
                         break;
 
                     case 'close':
@@ -86,6 +80,36 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-defa
                 result = eval(cond);
 
                 return result;
+            },
+
+            setTabFlag: function (flag, value) {
+                for (var i = 0, l = this.form.config.tabs.length, tab; tab = this.form.config.tabs[i], i < l; i++) {
+                    if (tab.name === this.tab) {
+                        this.$set(tab, flag, value);
+                        break;
+                    }
+                }
+            },
+
+            removeSelectedLocalRows: function () {
+                var rows = [];
+                for (var i = 0, l = this.grid.rows.length, r; r = this.grid.rows[i], i < l; i++) {
+                    if (!this.grid.rows_selected[r.id]) {
+                        rows.push(r);
+                    }
+                }
+                this.$set(this.grid, 'rows', rows);
+                this.$set(this.grid, 'rows_selected', {});
+            },
+            removeCurrentLocalRow: function (idValue, idField) {
+                var rows = [];
+                idField = idField || 'id';
+                for (var i = 0, l = this.grid.rows.length, r; r = this.grid.rows[i], i < l; i++) {
+                    if (r[idField] !== idValue) {
+                        rows.push(r);
+                    }
+                }
+                this.$set(this.grid, 'rows', rows);
             }
         }
     };
