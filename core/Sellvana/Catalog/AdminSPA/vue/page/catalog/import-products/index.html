@@ -16,13 +16,13 @@
                   </div>
                   <div class="f-controls-left">
                         <button class="button button2" v-if="hasPreviousImport" @click.prevent="showStatus">{{ "Show prev results"|_ }}</button>
-                        <button class="button button2" v-if="stateConfigure" @click.prevent="startOver">{{ "Upload different file"|_ }}</button>
+                        <button class="button button2" v-if="canUpload" @click.prevent="startOver">{{ "Upload different file"|_ }}</button>
                         <button class="button button2" v-if="stateImport" @click.prevent="onConfigure">{{ "Re-Configure"|_ }}</button>
                   </div>
                   <div class="f-controls-right text-right">
                       <button class="button button2" v-if="stateUpload" :disabled="!isUploaded"
                               @click.prevent="onConfigure">{{ "Upload and Configure"|_ }}</button>
-                      <button class="button button1" v-if="stateConfigure" @click.prevent="onImportStart">Start Import</button>
+                      <button class="button button1" v-if="stateConfigure" @click.prevent="onImportStart">{{ 'Start Import'|_ }}</button>
                   </div>
             </div>
             <sv-csv-imp-upload v-if="stateUpload" @uploaded="onUploadComplete"></sv-csv-imp-upload>

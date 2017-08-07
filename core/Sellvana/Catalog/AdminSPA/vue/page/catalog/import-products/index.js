@@ -55,6 +55,9 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
             stateConfigure: function () {
                 return this.currentState === states.configure;
             },
+            canUpload: function () {
+                return this.stateConfigure || this.stateStatus;
+            },
             stateUpload: function () {
                 return this.currentState === states.upload;
             },
