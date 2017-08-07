@@ -52,6 +52,9 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
             hasPreviousImport: function () {
                 return Object.keys(this.config).length > 0;
             },
+            canShowPreviousImport: function () {
+                return this.hasPreviousImport && !this.stateStatus;
+            },
             stateConfigure: function () {
                 return this.currentState === states.configure;
             },
@@ -91,7 +94,10 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
                 this.fetchStatus();
             },
             onImportStart: function () {
-                this.$store.commit('setCurrentState', "import");
+                this.$emit('import-start'); // notify components that import has to start
+            },
+            onConfigComplete: function () {
+                this.$store.commit('setCurrentState', "import"); // start import when config is saved
             },
             fetchStatus: function () {
                 // fetch status from admin and update config

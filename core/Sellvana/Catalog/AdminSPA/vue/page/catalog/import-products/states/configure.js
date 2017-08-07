@@ -1,4 +1,5 @@
 define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-configure-tpl'], function (_, SvMixinCommon, tpl) {
+    var configRoute = 'import-products/config';
     return {
         data: function () {
             return {
@@ -40,11 +41,19 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-confi
         },
         template: tpl,
         mounted: function () {
-            this.sendRequest('GET', 'import-products/config',
+            this.sendRequest('GET', configRoute,
                 {file: this.file.file_name},
                 this.onConfig.bind(this),
                 this.onConfigError.bind(this)
             );
+            this.$on('import-start', function () {
+                // save config and signal start import
+                this.sendRequest('POST', configRoute, {
+                    config: this.config
+                }).done(function (result) {
+                    this.$emit('config-saved');
+                }.bind(this))
+            }.bind(this))
         },
         computed: {
             select2options: function () {

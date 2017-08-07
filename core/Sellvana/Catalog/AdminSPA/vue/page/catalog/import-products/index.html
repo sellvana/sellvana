@@ -15,7 +15,7 @@
                         </div>
                   </div>
                   <div class="f-controls-left">
-                        <button class="button button2" v-if="hasPreviousImport" @click.prevent="showStatus">{{ "Show prev results"|_ }}</button>
+                        <button class="button button2" v-if="canShowPreviousImport" @click.prevent="showStatus">{{ "Show prev results"|_ }}</button>
                         <button class="button button2" v-if="canUpload" @click.prevent="startOver">{{ "Upload different file"|_ }}</button>
                         <button class="button button2" v-if="stateImport" @click.prevent="onConfigure">{{ "Re-Configure"|_ }}</button>
                   </div>
@@ -26,7 +26,8 @@
                   </div>
             </div>
             <sv-csv-imp-upload v-if="stateUpload" @uploaded="onUploadComplete"></sv-csv-imp-upload>
-            <sv-csv-imp-configure v-if="stateConfigure" :file="fileConfig"></sv-csv-imp-configure>
+            <sv-csv-imp-configure v-if="stateConfigure" @config-saved="onConfigComplete"
+                                  :file="fileConfig"></sv-csv-imp-configure>
             <sv-csv-imp-import v-if="stateImport" :base-url="baseUrl"
                                @import-complete="onImportComplete" @status="fetchStatus"
                                :config="config"></sv-csv-imp-import>
