@@ -1,10 +1,12 @@
-define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
+define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
     'sv-page-catalog-import-products-upload',
     'sv-page-catalog-import-products-configure',
     'sv-page-catalog-import-products-import',
     'sv-page-catalog-import-products-status'
-], function (_, SvMixinCommon, tpl, SvCsvImpUpload, SvCsvImpConfigure, SvCsvImpImport, SvCsvImpStatus) {
+], function (_, Vue, SvMixinCommon, tpl, SvCsvImpUpload, SvCsvImpConfigure, SvCsvImpImport, SvCsvImpStatus) {
     var store = SvMixinCommon.store;
+
+    window.$importBus = new Vue();
 
     var states = {
         "upload": 'Upload file',
@@ -94,7 +96,8 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-tpl',
                 this.fetchStatus();
             },
             onImportStart: function () {
-                this.$emit('import-start'); // notify components that import has to start
+                console.log('import-start');
+                window.$importBus.$emit('import-start'); // notify components that import has to start
             },
             onConfigComplete: function () {
                 this.$store.commit('setCurrentState', "import"); // start import when config is saved

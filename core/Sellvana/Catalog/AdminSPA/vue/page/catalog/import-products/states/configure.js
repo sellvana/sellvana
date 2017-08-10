@@ -46,7 +46,7 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-confi
                 this.onConfig.bind(this),
                 this.onConfigError.bind(this)
             );
-            this.$on('import-start', function () {
+            window.$importBus.$on('import-start', function () {
                 // save config and signal start import
                 this.sendRequest('POST', configRoute, {
                     config: this.config

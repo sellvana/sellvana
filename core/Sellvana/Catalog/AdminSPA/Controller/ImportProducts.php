@@ -23,6 +23,7 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
         $dir  = $hlp->getImportDir();
         $file = $this->BRequest->get('file');
         $info = $hlp->getFileInfo($dir . '/' . $file);
+        $info['filename'] = $file;
 
         $invalidMsg = $this->_(('Invalid file format, please go back and select another file'));
         if (!$info) {
@@ -36,6 +37,14 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
         $info['field_data'] = $hlp->getFieldData();
 
         return $this->respond($info);
+    }
+
+    public function action_config__POST()
+    {
+        if ($this->Sellvana_Catalog_ProductsImport->config($this->BRequest->post('config'))) {
+            return $this->respond(['success' => true, 'status' => 'success']);
+        }
+        return $this->respond(['status' => 'error']);
     }
 
     public function action_upload__POST()

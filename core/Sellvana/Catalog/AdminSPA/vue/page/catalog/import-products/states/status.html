@@ -20,7 +20,7 @@
                     </tr>
                     <tr>
                         <td>{{ 'Rows Depends'|_ }}</td>
-                        <th>{{ c.rows_skipped | int  }}</th>
+                        <th>{{ c.rows_depends | int  }}</th>
                     </tr>
                     <tr>
                         <td>{{ 'Rows Not Changed'|_ }}</td>
@@ -44,7 +44,7 @@
                     </tr>
                     <tr>
                         <td>{{ 'Running For'|_ }}</td>
-                        <th class="f-status-td">{{ c.run_time }} <span class="f-line-valid"></span></th>
+                        <th class="f-status-td">{{ runTime }} <span class="f-line-valid"></span></th>
                     </tr>
                     <tr>
                         <td>{{ 'Crunch Rate'|_ }}</td>
