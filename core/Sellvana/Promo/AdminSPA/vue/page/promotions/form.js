@@ -1,7 +1,6 @@
-define(['sv-mixin-common'], function (SvMixinCommon, formTpl) {
+define([], function (formTpl) {
     var SvPagePromoForm = {
-        mixins: [SvMixinCommon],
-        // template: formTpl
+                // template: formTpl
         methods: {
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {

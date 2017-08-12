@@ -35,7 +35,7 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
                 this.avail_locales = locales;
             },
             addTranslation: function () {
-                Vue.set(this.translations, this.new_locale, '');
+                this.$set(this.translations, this.new_locale, '');
                 this.new_locale = '';
                 this.calcAvailableLocales();
             },
@@ -44,12 +44,12 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
                 this.calcAvailableLocales();
             },
             close: function () {
-                this.$emit('event', 'close');
+                this.emitEvent('close');
                 this.$store.commit('overlay', false);
             }
         },
         created: function () {
-            Vue.set(this, 'translations', this.form.i18n[this.field.name] || {});
+            this.$set(this, 'translations', this.form.i18n[this.field.name] || {});
             this.calcAvailableLocales();
         },
         mounted: function () {
@@ -61,7 +61,7 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
         watch: {
             field: {
                 handler: function (field) {
-                    Vue.set(this, 'translations', this.form.i18n[this.field.name] || {});
+                    this.$set(this, 'translations', this.form.i18n[this.field.name] || {});
                     this.calcAvailableLocales();
                 },
                 deep: true
@@ -73,13 +73,13 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
             },
             translations: {
                 handler: function (translations) {
-                    this.$emit('event', 'update', {field: this.field, translations: translations});
+                    this.emitEvent('update', {field: this.field, translations: translations});
                 },
                 deep: true
             },
             '$store.state.ui.overlayActive': function (overlayActive) {
                 if (!overlayActive) {
-                    this.$emit('event', 'close');
+                    this.emitEvent('close');
                 }
             }
         }

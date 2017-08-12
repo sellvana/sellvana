@@ -1,11 +1,9 @@
-define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], function (_, Vue, SvMixinCommon, svPageDefaultFormTpl) {
+define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svPageDefaultFormTpl) {
     var formMixin = {
-        mixins: [SvMixinCommon],
         template: svPageDefaultFormTpl,
         data: function () {
             return {
                 tab: false,
-                action_in_progress: null,
                 form: {
                     config: {
                         options: {},
@@ -84,7 +82,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
             },
 
             addUpdates: function (part) {
-                Vue.set(this.form, 'updates', _.extend({}, this.form.updates, part));
+                this.$set(this.form, 'updates', _.extend({}, this.form.updates, part));
             },
 
             processFormDataResponse: function (response) {
@@ -107,13 +105,13 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
                 require(deps, function () {
                     var tabs = response.form.config.tabs;
                     for (i = 0, l = response.form.config.tabs.length; i < l; i++) {
-                        Vue.set(vm.form.config.tabs[i], 'component_config', arguments[i]);
+                        vm.$set(vm.form.config.tabs[i], 'component_config', arguments[i]);
                     }
                     if (!this.tab) {
                         vm.switchTab(response.form.config.tabs[0]);
                     }
                 });
-                Vue.set(this, 'form', response.form);
+                this.$set(this, 'form', response.form);
 
                 if (response.form.config.fields) {
                     for (i = 0, l = response.form.config.fields.length; i < l; i++) {
@@ -123,7 +121,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
                 }
 
                 _.forEach(watchModels, function (flag, model) {
-                    Vue.set(vm.form, model + '_old', _.cloneDeep(response.form[model]));
+                    vm.$set(vm.form, model + '_old', _.cloneDeep(response.form[model]));
                     vm.$watch('form.' + model, function (n, o) {
                         vm.processModelDiff(n, o, model);
                         vm.validateForm();
@@ -156,7 +154,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
 
                     default:
                         console.log(type, args);
-                        this.$emit('event', type, args);
+                        this.emitEvent(type, args);
                 }
             },
 
@@ -209,7 +207,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
                         if (this.form.errors) {
                             errors = _.extend({}, this.form.errors, errors);
                         }
-                        Vue.set(this.form, 'errors', errors);
+                        this.$set(this.form, 'errors', errors);
                     } else if (_.get(this.form, 'errors[' + f.model + '][' + f.name + ']')) {
                         Vue.delete(this.form.errors[f.model], f.name);
                     }
@@ -224,7 +222,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
             },
 
             validateForm: function () {
-                var i, l, f, e, tabErrors = {}, errors = {};
+                var i, l, f, e, tabErrors = {}, errors = {}, otherErrors = false;
 
                 for (i = 0, l = this.form.config.fields.length; i < l; i++) {
                     f = this.form.config.fields[i];
@@ -235,19 +233,28 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
                         }
                         errors[f.model][f.name] = e;
                         tabErrors[f.tab] = true;
+                    } else if (!tabErrors[f.tab]) {
+                        tabErrors[f.tab] = false;
                     }
                 }
 
-                Vue.set(this.form, 'errors', errors);
+                this.$set(this.form, 'errors', errors);
                 for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                    Vue.set(this.form.config.tabs[i], 'errors', tabErrors[this.form.config.tabs[i].name]);
+                    e = tabErrors[this.form.config.tabs[i].name];
+                    if (e === true || e === false) {
+                        this.$set(this.form.config.tabs[i], 'errors', e);
+                    }
+                    if (this.form.config.tabs[i].errors) {
+                        otherErrors = true;
+                    }
                 }
-                return _.isEmpty(errors);
+                return _.isEmpty(errors) && !otherErrors;
             },
 
             clearTabsFlags: function () {
                 for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
-                    Vue.set(this.form.config.tabs[i], 'edited', false);
+                    this.$set(this.form.config.tabs[i], 'edited', false);
+                    this.$set(this.form.config.tabs[i], 'errors', false);
                 }
             },
             processModelDiff: function (newModel, oldModel, model) {
@@ -277,7 +284,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-default-form-tpl'], fu
                 if (update) {
                     for (i = 0, l = this.form.config.tabs.length; i < l; i++) {
                         if (tabs[this.form.config.tabs[i].name]) {
-                            Vue.set(this.form.config.tabs[i], 'edited', true);
+                            this.$set(this.form.config.tabs[i], 'edited', true);
                         }
                     }
                 }

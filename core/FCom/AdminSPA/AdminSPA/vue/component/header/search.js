@@ -1,7 +1,6 @@
-define(['sv-mixin-common', 'text!sv-comp-header-search-tpl'], function (SvMixinCommon, headerSearchTpl) {
+define(['text!sv-comp-header-search-tpl'], function (headerSearchTpl) {
     var SvCompHeaderSearch = {
         props: ['mobile'],
-        mixins: [SvMixinCommon],
         template: headerSearchTpl,
         data: function () {
             return {

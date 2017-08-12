@@ -1,6 +1,5 @@
-define(['sv-mixin-common'], function(SvMixinCommon) {
+define([], function() {
     return {
-        mixins: [SvMixinCommon],
         computed: {
             isLoggedIn: function () {
                 return this.$store.state.user && this.$store.state.user.id;

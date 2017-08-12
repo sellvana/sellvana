@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-details-tpl',
+define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
         // 'sv-page-sales-orders-form-details-payment-add',
         // 'sv-page-sales-orders-form-details-payment-edit',
         // 'sv-page-sales-orders-form-details-shipment-add',
@@ -25,7 +25,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
         'text!sv-page-sales-orders-form-details-cancellations-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-add-tpl',
         'text!sv-page-sales-orders-form-details-cancellations-edit-tpl'
-    ], function (_, Vue, SvMixinCommon, tabDetailsTpl,
+    ], function (_, Vue, tabDetailsTpl,
          // PaymentAdd, PaymentEdit, ShipmentAdd, ShipmentEdit, RefundAdd, RefundEdit, ReturnAdd, ReturnEdit, CancellationAdd, CancellationEdit,
         paymentsTpl, paymentsAddTpl, paymentsEditTpl,
         shipmentsTpl, shipmentsAddTpl, shipmentsEditTpl,
@@ -46,12 +46,10 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
     }
 
     var EntityListMixin = {
-        mixins: [SvMixinCommon],
         props: ['form', 'entity']
     };
 
     var EntityAddMixin = {
-        mixins: [SvMixinCommon],
         props: ['form', 'entity'],
         data: function () {
             return {
@@ -69,7 +67,6 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
     };
 
     var EntityEditMixin = {
-        mixins: [SvMixinCommon],
         props: ['form', 'entity'],
         computed: {
             orderItem: function () {
@@ -111,8 +108,8 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
             methods: {
                 toggleItem: function (item) {
                     var id = item.id || item.name;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'amount_to_pay', this.items_selected[id] ? (item.amount_due || item.value) : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'amount_to_pay', this.items_selected[id] ? (item.amount_due || item.value) : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -197,7 +194,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
                     });
                 },
                 doTransactionAction: function (transaction, action) {
-                    this.action_in_progress = action + '-' + transaction.id;
+                    this.$store.commit('actionInProgress', action + '-' + transaction.id);
                     console.log(transaction, action);
                     var vm = this, postData = {
                         order_id: this.form.order.id,
@@ -213,7 +210,7 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
                         if (response.ok) {
                             vm.$emit('action', {type: 'switch-entity', entity_type: 'payment', entity_id: vm.entity.id});
                         }
-                        vm.action_in_progress = '';
+                        vm.$store.commit('actionInProgress', '');
                     });
                 }
             }
@@ -268,8 +265,8 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
             methods: {
                 toggleItem: function (item) {
                     var id = item.id;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'qty_to_ship', this.items_selected[id] ? item.qty_can_ship : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'qty_to_ship', this.items_selected[id] ? item.qty_can_ship : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -392,8 +389,8 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
             methods: {
                 toggleItem: function (item) {
                     var id = item.id;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'qty_to_return', this.items_selected[id] ? item.qty_can_return : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'qty_to_return', this.items_selected[id] ? item.qty_can_return : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -448,8 +445,8 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
             methods: {
                 toggleItem: function (item) {
                     var id = item.id;
-                    Vue.set(this.items_selected, id, !this.items_selected[id]);
-                    Vue.set(item, 'qty_to_cancel', this.items_selected[id] ? item.qty_can_cancel : '');
+                    this.$set(this.items_selected, id, !this.items_selected[id]);
+                    this.$set(item, 'qty_to_cancel', this.items_selected[id] ? item.qty_can_cancel : '');
                 },
                 submit: function () {
                     var vm = this, i, l, item, postData = {
@@ -501,7 +498,6 @@ define(['lodash', 'vue', 'sv-mixin-common', 'text!sv-page-sales-orders-form-deta
     }
 
     return {
-        mixins: [SvMixinCommon],
         props: {
             form: {
                 type: Object

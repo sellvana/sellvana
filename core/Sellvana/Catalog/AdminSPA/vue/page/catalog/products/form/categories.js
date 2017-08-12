@@ -1,24 +1,10 @@
-define(['sv-comp-grid', 'text!sv-page-catalog-categories-form-products-tpl', 'json!sv-page-catalog-categories-form-products-config'], function (SvCompGrid, tabCategoriesTpl, categoriesGridConfig) {
-
+define(['sv-mixin-form-tab-grid'], function (SvMixinFormTabGrid) {
     return {
-        props: {
-            form: {
-                type: Object
-            }
-        },
+        mixins: [SvMixinFormTabGrid],
         data: function () {
-            if (categoriesGridConfig.data_url && this.form.order && this.form.order.id) {
-                categoriesGridConfig.data_url = categoriesGridConfig.data_url.supplant({id: this.form.order.id});
-            }
             return {
-                grid: {
-                    config: categoriesGridConfig
-                }
+                grid: this.form.categories_grid
             }
-        },
-        template: tabCategoriesTpl,
-        components: {
-            'sv-comp-grid': SvCompGrid
         }
     };
 });

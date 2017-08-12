@@ -262,6 +262,8 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
             [static::NAME => 'origin_country', static::LABEL => (('Country of Origin')), static::MODEL => 'inventory', static::TAB => 'inventory', static::INPUT_TYPE => 'number'],
         ];
 
+        $result[static::FORM]['categories_grid']['config'] = $this->Sellvana_Catalog_AdminSPA_Controller_Products_Categories->getNormalizedGridConfig();
+
         $result[static::FORM][static::I18N] = 'product';
 
         return $result;

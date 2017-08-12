@@ -1,12 +1,6 @@
-define(['sv-mixin-form-tab', 'text!sv-page-default-form-tab-grid-tpl'], function (SvMixinFormTab, tpl) {
+define(['sv-mixin-form-tab-grid'], function (SvMixinFormTabGrid) {
     var Component = {
-        mixins: [SvMixinFormTab],
-        template: tpl,
-        props: {
-            form: {
-                type: Object
-            }
-        },
+        mixins: [SvMixinFormTabGrid],
         data: function () {
             return {
                 grid: this.form.recipients_grid

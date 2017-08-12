@@ -109,6 +109,7 @@
             - [ requireJs, sv-mixin-grid, "@FCom_AdminSPA/AdminSPA/vue/mixin/grid" ]
             - [ requireJs, sv-mixin-form, "@FCom_AdminSPA/AdminSPA/vue/mixin/form" ]
             - [ requireJs, sv-mixin-form-tab, "@FCom_AdminSPA/AdminSPA/vue/mixin/form-tab" ]
+            - [ requireJs, sv-mixin-form-tab-grid, "@FCom_AdminSPA/AdminSPA/vue/mixin/form-tab-grid" ]
 
             - [ requireJs, sv-comp-messages, "@FCom_AdminSPA/AdminSPA/vue/component/messages" ]
 

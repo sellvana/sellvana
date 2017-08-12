@@ -1,4 +1,4 @@
-define(['vue', 'sv-mixin-common', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
+define(['vue', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-popup',
         'sv-comp-grid-header-row', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-header-cell-row-select',
         'sv-comp-grid-data-row', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-cell-row-select', 'sv-comp-grid-data-cell-actions',
         'text!sv-comp-grid-tpl', 'text!sv-comp-grid-header-cell-row-select-tpl',
@@ -7,7 +7,7 @@ define(['vue', 'sv-mixin-common', 'jquery', 'lodash', 'vue-draggable', 'sv-comp-
         'text!sv-comp-grid-panel-columns-tpl', 'text!sv-comp-grid-panel-filters-tpl',
         'text!sv-comp-grid-panel-export-tpl', 'text!sv-comp-grid-bulk-actions-tpl'
     ],
-    function(Vue, SvMixinCommon, $, _, VueDraggable, SvCompPopup,
+    function(Vue, $, _, VueDraggable, SvCompPopup,
              SvCompGridHeaderRow, SvCompGridHeaderCellDefault, SvCompGridHeaderCellRowSelect,
              SvCompGridDataRow, SvCompGridDataCellDefault, SvCompGridDataCellRowSelect, SvCompGridDataCellActions,
              gridTpl, gridHeaderCellRowSelectTpl,
@@ -78,6 +78,9 @@ console.log(filters, result);
                 var s = state.sc.split(' ');
                 state.s = s[0];
                 state.sd = s[1];
+            }
+            if (!grid.config) {
+                Vue.set(grid, 'config', {});
             }
             Vue.set(grid.config, 'state', state);
         }
@@ -168,7 +171,6 @@ console.log(filters, result);
         }
 
         var SvCompGridPagerList = {
-            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPagerListTpl,
             computed: {
@@ -192,23 +194,23 @@ console.log(filters, result);
             methods: {
                 setPagesize: function (ps) {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'ps', ps);
-                    this.$emit('event', 'fetch-data');
+                    this.$set(this.grid.config.state, 'ps', ps);
+                    this.emitEvent('fetch-data');
                 },
                 goPage: function (p) {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'p',  p);
-                    this.$emit('event', 'fetch-data');
+                    this.$set(this.grid.config.state, 'p',  p);
+                    this.emitEvent('fetch-data');
                 },
                 goPrevPage: function () {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'p', Math.max(this.grid.config.state.p * 1 - 1, 1));
-                    this.$emit('event', 'fetch-data');
+                    this.$set(this.grid.config.state, 'p', Math.max(this.grid.config.state.p * 1 - 1, 1));
+                    this.emitEvent('fetch-data');
                 },
                 goNextPage: function () {
                     initGridState(this.grid);
-                    Vue.set(this.grid.config.state, 'p', Math.min(this.grid.config.state.p * 1 + 1, this.grid.config.state.mp));
-                    this.$emit('event', 'fetch-data');
+                    this.$set(this.grid.config.state, 'p', Math.min(this.grid.config.state.p * 1 + 1, this.grid.config.state.mp));
+                    this.emitEvent('fetch-data');
                 }
             }
         };
@@ -218,7 +220,6 @@ console.log(filters, result);
         var SvCompGridPagerDropdown = $.extend({}, SvCompGridPagerList, {template: gridPagerDropdownTpl});
 
         var SvCompGridPanelColumns = {
-            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPanelColumnsTpl,
             components: {
@@ -226,8 +227,13 @@ console.log(filters, result);
             },
             methods: {
                 toggleColumn: function (col) {
-                    Vue.set(col, 'hidden', !col.hidden);
+                    this.$set(col, 'hidden', !col.hidden);
                     //this.$store.commit('personalizeGridColumn', {grid:this.grid, col:col});
+
+                    if (!this.grid.config.personalize_url) {
+                        console.error('No personalize_url set');
+                        return;
+                    }
                     var vm = this, postData = {
                         do: 'grid.col.hidden',
                         grid: this.grid.config.id,
@@ -242,7 +248,7 @@ console.log(filters, result);
                     var vm = this, i, l, cols = [], col;
                     for (i = 0, l = this.grid.config.columns.length; i < l; i++) {
                         col = this.grid.config.columns[i];
-                        Vue.set(col, 'position', i + 1);
+                        this.$set(col, 'position', i + 1);
                         cols.push({name: col.name, position: i + 1});
                     }
                     var postData = {
@@ -258,7 +264,6 @@ console.log(filters, result);
         };
 
         var SvCompGridPanelFilters = {
-            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPanelFiltersTpl,
             data: function () {
@@ -344,12 +349,12 @@ console.log(filters, result);
                     this.ddOpCurrent = '';
                 },
                 switchOp: function (flt, op) {
-                    Vue.set(flt, 'op', op);
+                    this.$set(flt, 'op', op);
                     this.ddOpClear();
                 },
                 applyFilters: function () {
                     var filters = this.addedFilters;
-                    this.$emit('event', 'apply-filters', filters);
+                    this.emitEvent('apply-filters', filters);
                     this.resetFilters();
                     this.closeDropdown();
                 },
@@ -361,7 +366,7 @@ console.log(filters, result);
                 }
             },
             watch: {
-                pageClickCounter: function () {
+                page_click_counter: function () {
                     this.ddOpClear();
                 },
                 filterToAdd: function (value) {
@@ -375,7 +380,6 @@ console.log(filters, result);
         };
 
         var SvCompGridPanelExport = {
-            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridPanelExportTpl,
             data: function () {
@@ -406,7 +410,6 @@ console.log(filters, result);
         };
 
         var SvCompGridBulkActions = {
-            mixins: [SvMixinCommon],
             props: ['grid'],
             template: gridBulkActionsTpl,
             computed: {
@@ -415,14 +418,13 @@ console.log(filters, result);
                 }
             },
             methods: {
-                bulkAction: function (o) {
-                    this.$emit('event', 'bulk-action', o);
+                doBulkAction: function (act) {
+                    this.emitEvent('bulk-action', act);
                 }
             }
         };
 
         var SvCompGridPanel = {
-            mixins: [SvMixinCommon],
             props: ['grid', 'cnt-visible'],
             components: {
                 'sv-comp-grid-pager-list': SvCompGridPagerList,
@@ -440,7 +442,11 @@ console.log(filters, result);
             },
             computed: {
                 cntTotal: function () {
-                    return _.get(this.grid, 'config.state.c', 0);
+                    var cnt = _.get(this.grid, 'config.state.c', 0);
+                    if (!cnt && this.grid.rows) {
+                        cnt = this.grid.rows.length;
+                    }
+                    return cnt;
                 },
                 currentFilters: function () {
                     return _.get(this.grid, 'config.state.filters', []);
@@ -450,8 +456,8 @@ console.log(filters, result);
                 }
             },
             methods: {
-                onEvent: function (event, arg) {
-                    this.$emit('event', event, arg);
+                onEvent: function (event, args) {
+                    this.emitEvent(event, args);
                 },
                 setSettingsTab: function (tab) {
                     this.settingsTab = tab;
@@ -460,14 +466,13 @@ console.log(filters, result);
             template: gridPanelTpl,
             watch: {
                 quickSearch: function (value) {
-                    Vue.set(this.grid.config.state, 'quickSearch', value);
+                    this.$set(this.grid.config.state, 'quickSearch', value);
                 }
             }
         };
 
         var SvCompGrid = {
             props: ['grid'],
-            mixins: [SvMixinCommon],
             data: function() {
                 return {
                     cntVisible: 0
@@ -531,10 +536,11 @@ console.log(filters, result);
                         case 'apply-filters': this.applyFilters(arg); break;
                         case 'remove-filter': this.removeFilter(arg); break;
                         case 'remove-all-filters': this.removeAllFilters(arg); break;
-                        case 'bulk-action': this.bulkAction(arg); break;
                         case 'update-config': this.updateConfig(arg); break;
-                        case 'panel-action': this.panelAction(arg); break;
-                        default: this.$emit('event', event, arg);
+                        case 'bulk-action': this.doBulkAction(arg); break;
+                        case 'panel-action': this.doPanelAction(arg); break;
+                        case 'row-action': this.doRowAction(arg); break;
+                        default: this.emitEvent(event, arg);
                     }
                 },
                 fetchData: function (grid) {
@@ -557,12 +563,12 @@ console.log(filters, result);
                     var data = grid.config.data, state = {};
 
                     //Vue.set(grid, 'state', state);
-                    Vue.set(grid, 'rows', data);
+                    this.$set(grid, 'rows', data);
                     initGridState(grid);
                 },
                 applyFilters: function (filters) {
                     var oldFilters = _.get(this.grid, 'config.state.filters', []) || [];
-                    Vue.set(this.grid.config.state, 'filters', oldFilters.concat(filters));
+                    this.$set(this.grid.config.state, 'filters', oldFilters.concat(filters));
                     this.fetchData();
                 },
                 removeFilter: function (i) {
@@ -577,26 +583,30 @@ console.log(filters, result);
                     if (!this.grid || !this.grid.config || !this.grid.config.state || !this.grid.config.state.filters) {
                         return;
                     }
-                    Vue.set(this.grid.config.state, 'filters', []);
+                    this.$set(this.grid.config.state, 'filters', []);
                     this.fetchData();
                 },
-                bulkAction: function (act) {
+                doBulkAction: function (act) {
                     if (!Object.keys(this.grid.rows_selected).length) {
                         alert(this._(('Please select some rows first')));
                         return;
                     }
+                    this.emitEvent('bulk-action', act);
                     console.log(act);
                     if (act.popup) {
-                        Vue.set(this.grid, act.action_type || 'popup', act.popup);
+                        this.$set(this.grid, act.action_type || 'popup', act.popup);
                         // this.grid.popup.grid = this.grid;
                         // this.grid.popup.open = true;
                     }
                 },
-                panelAction: function (act) {
-                    this.$emit('event', 'panel-action', act);
+                doPanelAction: function (act) {
+                    this.emitEvent('panel-action', act);
+                },
+                doRowAction: function (act) {
+                    this.emitEvent('row-action', act);
                 },
                 updateConfig: function (config) {
-                    Vue.set(this.grid, 'config', config);
+                    this.$set(this.grid, 'config', config);
                 }
             },
             created: function () {

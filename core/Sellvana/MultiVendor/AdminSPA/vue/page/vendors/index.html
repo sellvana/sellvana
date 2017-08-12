@@ -5,7 +5,7 @@
             </button>
       </div>
       <div class="f-content-block box-no-padding">
-            <sv-comp-grid :grid="grid"></sv-comp-grid>
+            <sv-comp-grid v-if="grid.config" :grid="grid"></sv-comp-grid>
       </div>
 </div>
 

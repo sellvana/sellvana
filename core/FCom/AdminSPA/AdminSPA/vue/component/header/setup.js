@@ -1,6 +1,5 @@
-define(['jquery', 'sv-mixin-common', 'text!sv-comp-header-setup-tpl'], function ($, SvMixinCommon, svCompHeaderSetupTpl) {
+define(['jquery', 'text!sv-comp-header-setup-tpl'], function ($, svCompHeaderSetupTpl) {
     var SvCompHeaderSetup = {
-        mixins: [SvMixinCommon],
         template: svCompHeaderSetupTpl,
         data: function () {
             return {

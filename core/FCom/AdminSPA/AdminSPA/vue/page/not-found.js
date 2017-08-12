@@ -1,6 +1,5 @@
-define(['sv-mixin-common'], function (SvMixinCommon) {
+define([], function () {
     return {
-        mixins: [SvMixinCommon],
         mounted: function () {
             this.$store.commit('setData', {curPage: {
                 link: '/not-found',

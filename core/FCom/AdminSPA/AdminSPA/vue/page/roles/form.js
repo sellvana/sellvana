@@ -36,12 +36,12 @@ define(['lodash', 'vue', 'sv-mixin-form'], function (_, Vue, SvMixinForm) {
                 var vm = this;
                 this.sendRequest('POST', 'roles/form_data', {role: this.form.role}, function (response) {
                     for (var i in response.form) {
-                        Vue.set(vm.form, i, response.form[i]);
+                        vm.$set(vm.form, i, response.form[i]);
                     }
                     if (response.ok && !stayOnPage) {
                         vm.$router.push('/roles');
                     }
-                    vm.action_in_progress = false;
+                    vm.$store.commit('actionInProgress', false);
                 })
             }
         }

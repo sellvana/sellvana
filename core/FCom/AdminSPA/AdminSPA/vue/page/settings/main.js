@@ -44,7 +44,7 @@ define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-mixin-form', 'json!sv-page-s
                 }
                 if (!from) {
                     this.sendRequest('GET', 'settings/form_data', {}, function (response) {
-                        Vue.set(vm.settings, 'data', response.data);
+                        vm.$set(vm.settings, 'data', response.data);
                         // Vue.set(vm.settings, 'data_old', _.extend({}, response.data));
                         vm.updateBreadcrumbs();
                     });
@@ -69,7 +69,7 @@ define(['lodash', 'jquery', 'deep-diff', 'vue', 'sv-mixin-form', 'json!sv-page-s
                 // }});
             },
             togglePanel: function (panel, force) {
-                Vue.set(this.panelsOpen, panel.path, force ? true : !this.panelsOpen[panel.path]);
+                this.$set(this.panelsOpen, panel.path, force ? true : !this.panelsOpen[panel.path]);
             },
             searchLimitText: function (count) {
                 return this._((('and {count} other results')), {count:count});

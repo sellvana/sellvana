@@ -1,6 +1,5 @@
-define(['sv-mixin-common', 'text!sv-comp-grid-data-cell-actions-tpl'], function (SvMixinCommon, actionsTpl) {
+define(['text!sv-comp-grid-data-cell-actions-tpl'], function (actionsTpl) {
     return {
-        mixins: [SvMixinCommon],
         props: ['grid', 'row', 'col'],
         template: actionsTpl,
         computed: {

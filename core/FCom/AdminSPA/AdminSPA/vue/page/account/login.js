@@ -1,6 +1,5 @@
-define(['jquery', 'sv-mixin-common'], function($, SvMixinCommon) {
+define(['jquery'], function($) {
     return {
-        mixins: [SvMixinCommon],
         data: function () {
             return {
                 username: '',

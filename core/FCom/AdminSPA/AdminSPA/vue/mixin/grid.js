@@ -1,8 +1,7 @@
-define(['lodash', 'vue', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-page-default-grid-tpl'],
-    function (_, Vue, SvMixinCommon, SvCompGrid, svPageDefaultGridTpl) {
+define(['lodash', 'vue', 'sv-comp-grid', 'text!sv-page-default-grid-tpl'],
+    function (_, Vue, SvCompGrid, svPageDefaultGridTpl) {
 
     var gridMixin = {
-        mixins: [SvMixinCommon],
         template: svPageDefaultGridTpl,
         methods: {
             onEvent: function (type, args) {
@@ -15,16 +14,21 @@ define(['lodash', 'vue', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-page-defaul
                         this.doGridAction(args);
                         break;
 
-                    case 'popup-action':
+                    case 'bulk-action':
                         this.doBulkAction(args);
                         break;
+
+                    case 'popup-action':
+                        this.doPopupAction(args);
+                        break;
+
                     case 'panel-action':
                         this.doPanelAction(args);
                         break;
 
                     default:
                         console.log(type, args);
-                        this.$emit('event', type, args);
+                        this.emitEvent(type, args);
                 }
             },
             doDefaultBulkAction: function (act) {
@@ -38,8 +42,8 @@ define(['lodash', 'vue', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-page-defaul
                         var postData = {do: act.name, ids: ids, data: data};
                         this.sendRequest('POST', this.grid.config.data_url, postData, function (response) {
                             console.log(response);
-                            Vue.set(vm.grid, 'popup', null);
-                            Vue.set(vm.grid, 'fetch_data_flag', true);
+                            vm.$set(vm.grid, 'popup', null);
+                            vm.$set(vm.grid, 'fetch_data_flag', true);
                         });
                         break;
 
@@ -53,6 +57,9 @@ define(['lodash', 'vue', 'sv-mixin-common', 'sv-comp-grid', 'text!sv-page-defaul
                 console.log(act);
             },
             doPanelAction: function (act) {
+                console.log(act);
+            },
+            doPopupAction: function (act) {
                 console.log(act);
             }
         },

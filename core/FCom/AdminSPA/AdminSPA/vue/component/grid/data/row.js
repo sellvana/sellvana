@@ -6,7 +6,6 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
     // Vue.component('sv-comp-grid-data-cell-actions', SvCompGridDataCellActions);
 
     return {
-        //mixins: [SvMixinCommon],
         props: ['grid', 'row'],
         template: '<tr><component v-for="col in columns" :key="col.name" v-if="!col.hidden" :is="cellComponent(col)" '
             + ':name="col.name" :grid="grid" :row="row" :col="col" @event="onEvent"></component></tr>',
@@ -26,11 +25,17 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
         },
         methods: {
             onEvent: function (event, arg) {
-                this.$emit('event', event, arg);
+                this.emitEvent(event, arg);
             }
         },
         components: {
-            empty: {template:'<td></td>'}
+            empty: {template: '<td></td>'}
+        },
+        watch: {
+            row: function (row, oldRow) {
+                console.log('row-update', row, oldRow);
+                this.emitEvent('row-update', {row: row, old: oldRow});
+            }
         }
     };
 });

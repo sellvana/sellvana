@@ -37,7 +37,7 @@ define(['vue', 'sv-mixin-form-tab', 'text!sv-comp-popup-tpl'], function (Vue, Sv
         },
         methods: {
             closePopup: function () {
-                this.$emit('event', 'popup-action', {name: 'cancel'});
+                this.emitEvent('popup-action', {name: 'cancel'});
             },
             processFieldEvent: function (type, args) {
                 var i, l, f;
@@ -51,13 +51,13 @@ define(['vue', 'sv-mixin-form-tab', 'text!sv-comp-popup-tpl'], function (Vue, Sv
                         }
                         break;
                 }
-                this.$emit('event', type, args); // field-event?
+                this.emitEvent(type, args); // field-event?
             },
             processComponentEvent: function (type, args) {
-                this.$emit('event', type, args);
+                this.emitEvent(type, args);
             },
             doAction: function (act) {
-                this.$emit('event', 'popup-action', act);
+                this.emitEvent('popup-action', act);
             },
             addFields: function () {
                 var i, l, af, j, m, f;

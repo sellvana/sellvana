@@ -7,5 +7,5 @@
             </div>
             <sv-comp-actions :groups="grid.config.page_actions_groups" container-class="f-control-panel__elem" event-name="page-action" @event="onEvent"></sv-comp-actions>
       </div>
-      <sv-comp-grid :grid="grid" @event="onEvent"></sv-comp-grid>
+      <sv-comp-grid v-if="grid.config" :grid="grid" @event="onEvent"></sv-comp-grid>
 </div>

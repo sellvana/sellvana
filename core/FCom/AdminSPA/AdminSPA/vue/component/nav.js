@@ -1,6 +1,5 @@
-define(['vue', 'sv-mixin-common', 'text!sv-comp-nav-tpl'], function(Vue, SvMixinCommon, navTpl) {
+define(['vue', 'text!sv-comp-nav-tpl'], function(Vue, navTpl) {
     var SvCompNav = {
-        mixins: [SvMixinCommon],
         template: navTpl,
         data: function () {
             return {
@@ -40,7 +39,7 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-nav-tpl'], function(Vue, SvMixin
         },
         methods: {
             navToggle: function (path) {
-                Vue.set(this.navTreeOpen, path, !this.navTreeOpen[path]);
+                this.$set(this.navTreeOpen, path, !this.navTreeOpen[path]);
             },
             clickRouterLink: function(node) {
                 if (this.$store.state.ui.windowWidth <= 1024) {

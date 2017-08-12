@@ -7,12 +7,12 @@ define(['vue'], function (Vue) {
             onInput: function (value) {
                 console.log(value);
                 if (!this.grid.edited_data) {
-                    Vue.set(this.grid, 'edited_data', {});
+                    this.$set(this.grid, 'edited_data', {});
                 }
                 if (!this.grid.edited_data[this.row.id]) {
-                    Vue.set(this.grid.edited_data, this.row.id, {});
+                    this.$set(this.grid.edited_data, this.row.id, {});
                 }
-                Vue.set(this.grid.edited_data[this.row.id], this.col.name, value);
+                this.$set(this.grid.edited_data[this.row.id], this.col.name, value);
             }
         }
     };

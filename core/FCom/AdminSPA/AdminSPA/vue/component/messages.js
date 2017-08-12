@@ -1,6 +1,5 @@
-define(['vue', 'sv-mixin-common'], function (Vue, SvMixinCommon) {
+define(['vue'], function (Vue) {
     var SvCompMessages = {
-        mixins: [SvMixinCommon],
         template: '<div class="notifications-block"><div class="notifications-block__container">'
             + '<div v-for="m in messages" class="notifications-block__text" :class="m.type + \'-notification\'" @click="closeMessage(m)">'
                 + '<span v-html="m.text"></span>'

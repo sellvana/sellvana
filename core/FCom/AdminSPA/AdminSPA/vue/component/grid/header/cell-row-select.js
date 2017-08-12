@@ -1,6 +1,5 @@
-define(['vue', 'sv-mixin-common', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, SvMixinCommon, gridHeaderCellRowSelectTpl) {
+define(['vue', 'text!sv-comp-grid-header-cell-row-select-tpl'], function (Vue, gridHeaderCellRowSelectTpl) {
     return {
-        mixins: [SvMixinCommon],
         props: ['grid', 'col'],
         data: function () {
             return {
@@ -14,7 +13,7 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-grid-header-cell-row-select-tpl'
             },
             hasSelectedOnPage: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, rowId;
                 for (i in this.grid.rows) {
@@ -27,7 +26,7 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-grid-header-cell-row-select-tpl'
             },
             hasUnselectedOnPage: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, rowId;
                 for (i in this.grid.rows) {
@@ -42,19 +41,19 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-grid-header-cell-row-select-tpl'
         methods: {
             selectVisible: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, row, rowId;
 
                 for (i in this.grid.rows) {
                     row = this.grid.rows[i];
                     rowId = row[this.col.id_field];
-                    Vue.set(this.grid.rows_selected, rowId, row);
+                    this.$set(this.grid.rows_selected, rowId, row);
                 }
             },
             unselectVisible: function () {
                 if (!this.grid.rows_selected) {
-                    Vue.set(this.grid, 'rows_selected', {});
+                    this.$set(this.grid, 'rows_selected', {});
                 }
                 var i, rowId;
                 for (i in this.grid.rows) {
@@ -63,7 +62,7 @@ define(['vue', 'sv-mixin-common', 'text!sv-comp-grid-header-cell-row-select-tpl'
                 }
             },
             unselectAll: function () {
-                Vue.set(this.grid, 'rows_selected', {});
+                this.$set(this.grid, 'rows_selected', {});
             },
             viewAll: function () {
 

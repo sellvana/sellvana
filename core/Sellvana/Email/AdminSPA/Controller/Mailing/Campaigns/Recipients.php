@@ -12,7 +12,7 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns_Recipients extends FC
 
         $config = [
             static::ID => 'mailing_campaigns_recipients',
-            static::DATA_URL => 'mailing/campaigns/recipients/grid_data',
+            static::DATA_URL => 'mailing/campaigns/recipients/grid_data?id=' . (int)$this->BRequest->get('id'),
             static::TITLE => (('Mailing Campaign Recipients')),
             static::COLUMNS => [
                 [static::TYPE => static::ROW_SELECT],
@@ -39,6 +39,7 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns_Recipients extends FC
     public function getGridOrm()
     {
         $orm = $this->{static::$_modelClass}->orm('r')
+            ->where('campaign_id', (int)$this->BRequest->get('id'))
             ->join('Sellvana_Email_Model_Mailing_Subscriber', ['r.subscriber_id', '=', 's.id'], 's')
             ->select(['r.*', 's.email', 's.firstname', 's.lastname', 's.company']);
         return $orm;
