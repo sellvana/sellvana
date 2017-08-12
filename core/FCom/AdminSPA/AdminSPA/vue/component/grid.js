@@ -274,16 +274,6 @@ console.log(filters, result);
                 }
             },
             computed: {
-                ddName: function () {
-                    return function (flt) {
-                        return this.grid.config.id + '/panel-filters/' + flt.config.name;
-                    }
-                },
-                ddOpOpen: function () {
-                    return function (flt) {
-                        return this.ddOpCurrent === flt.config.name;
-                    }
-                },
                 availableFilters: function () {
                     var availFilters = [{id:'', text:''}];
                     if (!_.get(this.grid, 'config.filters')) {
@@ -311,6 +301,12 @@ console.log(filters, result);
                 }
             },
             methods: {
+                ddName: function  (flt) {
+                    return this.grid.config.id + '/panel-filters/' + flt.config.name;
+                },
+                ddOpOpen: function  (flt) {
+                    return this.ddOpCurrent === flt.config.name;
+                },
                 addFilter: function () {
                     if (!this.filterToAdd) {
                         return;
@@ -629,6 +625,11 @@ console.log(filters, result);
                         this.fetchData();
                         this.grid.fetch_data_flag = false;
                     }
+                }
+            },
+            events: {
+                fetchData: function () {
+                    this.fetchData();
                 }
             }
         };

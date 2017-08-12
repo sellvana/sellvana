@@ -6,14 +6,10 @@ define(['vue'], function (Vue) {
             + '<span><i class="fa fa-check" aria-hidden="true"></i></span></label>'
             + '</th>',
 
-        computed: {
-            isRowSelected: function () {
-                return function (col) {
-                    return this.grid.rows_selected && this.grid.rows_selected[this.row[col.id_field]];
-                }
-            }
-        },
         methods: {
+            isRowSelected: function n (col) {
+                return this.grid.rows_selected && this.grid.rows_selected[this.row[col.id_field]];
+            },
             selectRow: function (col) {
                 if (!this.grid.rows_selected) {
                     this.$set(this.grid, 'rows_selected', {});

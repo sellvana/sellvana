@@ -11,10 +11,22 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories_Products extends FCom_Admi
     public function getGridConfig()
     {
         $catId = $this->BRequest->get('id');
+        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
+            ->select('p.*')
+            ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
+            ->select('cp.sort_order')
+            ->where('cp.category_id', $catId)
+            ->find_many();
+        if ($products) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+            foreach ($products as $row) {
+                $row->set('thumb_url', $row->thumbUrl(48));
+            }
+        }
         $bool = [0 => (('no')), 1 => (('Yes'))];
         return [
             static::ID => 'category_products',
-            static::DATA_URL => 'categories/form/products/grid_data?id=' . $catId,
+            static::DATA => $products ? $this->BDb->many_as_array($products) : [],
             static::COLUMNS => [
                 [static::TYPE => static::ROW_SELECT, static::WIDTH => 55],
                 [static::NAME => 'id', static::LABEL => (('ID')), 'index' => 'p.id', static::WIDTH => 55, static::HIDDEN => true],
@@ -50,24 +62,4 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories_Products extends FCom_Admi
             static::PAGER => true,
         ];
     }
-
-    public function getGridOrm()
-    {
-        $catId = $this->BRequest->get('id');
-        return $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->select('p.*')
-            ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
-            ->select('cp.sort_order')
-            ->where('cp.category_id', $catId);
-    }
-
-    public function processGridPageData($data)
-    {
-        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($data['rows']);
-        foreach ($data['rows'] as $row) {
-            $row->set('thumb_url', $row->thumbUrl(48));
-        }
-        return parent::processGridPageData($data);
-    }
-
 }

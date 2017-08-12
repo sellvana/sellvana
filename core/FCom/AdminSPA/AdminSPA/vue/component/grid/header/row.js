@@ -11,20 +11,17 @@ define(['lodash', 'vue', 'sv-comp-grid-header-cell-default', 'sv-comp-grid-heade
         computed: {
             columns: function () {
                 return _.get(this.grid, 'config.columns', []);
-            },
-            cellComponent: function () {
-                var vm = this;
-                return function (col) {
-                    if (!(this.grid && this.grid.components)) {
-                        return 'empty';//SvCompGridHeaderCellDefault;
-                    }
-                    return this.grid.components.header_columns[col.name];
-                }
             }
         },
         methods: {
             onEvent: function (event, arg) {
                 this.emitEvent(event, arg);
+            },
+            cellComponent: function (col) {
+                if (!(this.grid && this.grid.components)) {
+                    return 'empty';//SvCompGridHeaderCellDefault;
+                }
+                return this.grid.components.header_columns[col.name];
             }
         },
         components: {

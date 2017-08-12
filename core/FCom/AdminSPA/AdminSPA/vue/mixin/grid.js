@@ -6,10 +6,15 @@ define(['lodash', 'vue', 'sv-comp-grid', 'text!sv-page-default-grid-tpl'],
         methods: {
             onEvent: function (type, args) {
                 if (args.link) {
-                    window.location = '#' + args.link;
+                    console.log(type, args);
+                    this.$router.push(args.link);
                     return;
                 }
                 switch (type) {
+                    case 'page-action':
+                        this.doPageAction(args);
+                        break;
+
                     case 'grid-action':
                         this.doGridAction(args);
                         break;
@@ -51,6 +56,9 @@ define(['lodash', 'vue', 'sv-comp-grid', 'text!sv-page-default-grid-tpl'],
                         this.grid.popup = null;
                         break;
                 }
+            },
+            doPageAction: function (act) {
+                console.log(act);
             },
             doBulkAction: function (act) {
                 this.doDefaultBulkAction(act);

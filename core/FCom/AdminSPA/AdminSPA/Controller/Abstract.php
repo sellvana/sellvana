@@ -30,6 +30,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         OPTIONS = 'options',
         HIDDEN = 'hidden',
         DATACELL_TEMPLATE = 'datacell_template',
+        DATACELL_COMPONENT = 'datacell_component',
         FIELDS = 'fields',
         DEFAULT_FIELD = 'default',
         TAB = 'tab',
@@ -48,7 +49,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         NOTES = 'notes',
         THUMB_URL = 'thumb_url',
         I18N = 'i18n',
-        EDIT = 'edit'
+        EDIT = 'edit',
+        STATE = 'state'
     ;
 
     public function authenticate($args = [])
@@ -97,7 +99,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
     public function addMessage($text, $type = null)
     {
         if ($text instanceof Exception) {
-            $text = $text->getMessage();# . "\n" . $text->getTraceAsString();
+//            $text = $text->getMessage();# . "\n" . $text->getTraceAsString();
+            $text = $text->getMessage() . "\n" . $text->getTraceAsString();
             if (!$type) {
                 $type = 'error';
             }

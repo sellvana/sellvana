@@ -2,16 +2,12 @@ define(['text!sv-comp-grid-data-cell-actions-tpl'], function (actionsTpl) {
     return {
         props: ['grid', 'row', 'col'],
         template: actionsTpl,
-        computed: {
-            rowActionLink: function () {
-                return function (row, act) {
-                    return act.link.replace(/\{([a-z0-9_]+)\}/, function (a, b) {
-                        return row[b];
-                    });
-                }
-            }
-        },
         methods: {
+            rowActionLink: function  (row, act) {
+                return act.link.replace(/\{([a-z0-9_]+)\}/, function (a, b) {
+                    return row[b];
+                });
+            },
             deleteRow: function (row, act) {
                 if (!confirm(this._(('Are you sure you want to delete the row?')))) {
                     return;

@@ -25,6 +25,10 @@ class Sellvana_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
            "refund" => (("Refund"))
         ],
     ];
+
+    protected static $_fieldDefaults = [
+        'entity_type' => 'order',
+    ];
     
     protected static $_optionsByType;
 

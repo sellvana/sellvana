@@ -26,12 +26,12 @@
                   </div>
                   <!--Actions buttons for desktop-->
 
-                  <sv-comp-actions :config="form.config" container-class="f-control-panel__elem" @event="onEvent"></sv-comp-actions>
+                  <sv-comp-actions :groups="form.config.page_actions_groups" container-class="f-control-panel__elem" @event="onEvent"></sv-comp-actions>
             </div>
             <div class="row">
                   <div class="col-xs-12">
                         <div class="f-control-panel">
-                              <sv-comp-tabs :groups="form.config.page_actions_groups" :tab="tab" container-class="" @event="onEvent"></sv-comp-tabs>
+                              <sv-comp-tabs :config="form.config" :tab="tab" container-class="" @event="onEvent"></sv-comp-tabs>
                         </div>
                   </div>
             </div>

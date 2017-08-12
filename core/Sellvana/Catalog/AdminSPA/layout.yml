@@ -17,8 +17,8 @@
 			- [ requireJs, sv-page-catalog-products-form-prices, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices" ]
 			- [ requireJs, sv-page-catalog-products-form-prices-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/prices.html" ]
 			- [ requireJs, sv-page-catalog-products-form-categories, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/categories" ]
-			- [ requireJs, sv-page-catalog-products-form-categories-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/categories.html" ]
-			- [ requireJs, sv-page-catalog-products-form-categories-config, "~/products/form/categories/grid_config" ]
+			#- [ requireJs, sv-page-catalog-products-form-categories-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/categories.html" ]
+			- [ requireJs, sv-page-catalog-products-form-categories-dropdown, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/categories/dropdown" ]
 			- [ requireJs, sv-page-catalog-products-form-merchandizing, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing" ]
 			- [ requireJs, sv-page-catalog-products-form-merchandizing-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/merchandizing.html" ]
 			- [ requireJs, sv-page-catalog-products-form-images, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/products/form/images" ]
@@ -131,7 +131,7 @@ sv-app-data-js:
             - [ addFormTab, { path: /catalog/categories/form, name: content, label: Page Content, pos: 20 } ]
             - [ addFormTab, { path: /catalog/categories/form, name: images, label: Images, pos: 30 } ]
             - [ addFormTab, { path: /catalog/categories/form, name: products, label: Products, pos: 40 } ]
-            - [ addFormTab, { path: /catalog/categories/form, name: layout, label: Layout, pos: 50 } ]
+#            - [ addFormTab, { path: /catalog/categories/form, name: layout, label: Layout, pos: 50 } ]
 
 sv-page-dashboard-config:
     - view: dashboard

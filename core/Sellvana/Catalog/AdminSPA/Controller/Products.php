@@ -296,6 +296,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
             if ($validated) {
                 $model->save();
+
                 $this->BEvents->fire("{$eventName}:after", ['data' => $data, static::MODEL => $model]);
 
                 $result = $this->getFormData();

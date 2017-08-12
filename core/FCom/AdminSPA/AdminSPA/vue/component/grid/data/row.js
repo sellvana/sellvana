@@ -12,20 +12,17 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
         computed: {
             columns: function () {
                 return _.get(this.grid, 'config.columns', []);
-            },
-            cellComponent: function () {
-                var vm = this;
-                return function (col) {
-                    if (!(this.grid && this.grid.components)) {
-                        return 'empty';//SvCompGridDataCellDefault;
-                    }
-                    return this.grid.components.datacell_columns[col.name];
-                }
             }
         },
         methods: {
             onEvent: function (event, arg) {
                 this.emitEvent(event, arg);
+            },
+            cellComponent: function (col) {
+                if (!(this.grid && this.grid.components)) {
+                    return 'empty';//SvCompGridDataCellDefault;
+                }
+                return this.grid.components.datacell_columns[col.name];
             }
         },
         components: {

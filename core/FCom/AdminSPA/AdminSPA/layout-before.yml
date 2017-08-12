@@ -70,6 +70,7 @@
             - [ requireJs, vue, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-2.3.3" ]
             - [ requireJs, vuex, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vuex-2.3.1" ]
             - [ requireJs, vue-router, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-router-2.5.3" ]
+            - [ requireJs, vue-resource, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-resource-1.3.4" ]
 
             - [ requireJs, axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/axios-0.15.3" ]
             - [ requireJs, vue-axios, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-axios-1.2.2.min" ]
@@ -85,7 +86,7 @@
             - [ requireJs, dropzone, "@FCom_AdminSPA/AdminSPA/js/lib/dropzone" ]
             - [ requireJs, vue-dropzone, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue2-dropzone" ]
 
-            - [ requireJs, vue-select, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select-2.1.8" ]
+            - [ requireJs, vue-select, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-select-2.2.0" ]
             #- [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect" ]
             - [ requireJs, vue-multiselect, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect.min" ]
             - [ css, "@FCom_AdminSPA/AdminSPA/js/lib/vue/vue-multiselect.min.css" ]

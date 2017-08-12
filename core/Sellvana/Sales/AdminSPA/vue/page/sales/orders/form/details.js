@@ -56,24 +56,19 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
                 items_selected: {}
             }
         },
-        computed: {
-            isItemSelected: function () {
-                return function (item) {
-                    var id = item.id || item.name;
-                    return this.items_selected[id];
-                }
+        methods: {
+            isItemSelected: function (item) {
+                var id = item.id || item.name;
+                return this.items_selected[id];
             }
         }
     };
 
     var EntityEditMixin = {
         props: ['form', 'entity'],
-        computed: {
-            orderItem: function () {
-                var vm = this;
-                return function (entityItem) {
-                    return getOrderItem(vm.form, entityItem);
-                }
+        methods: {
+            orderItem: function (entityItem) {
+                return getOrderItem(this.form, entityItem);
             }
         }
     };
@@ -157,15 +152,12 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
                 isRootTransactionNeeded: function () {
                     var meta = this.paymentMethod.meta;
                     return meta && meta.is_root_transaction_needed && meta.capabilities.pay_by_url;
-                },
-                transactionStatus: function () {
-                    var vm = this;
-                    return function (t) {
-                        return t.transaction_status == 'completed' ? 'Success' : (t.transaction_status == 'void') ? 'Void' : 'Failure';
-                    }
                 }
             },
             methods: {
+                transactionStatus: function (t) {
+                    return t.transaction_status == 'completed' ? 'Success' : (t.transaction_status == 'void') ? 'Void' : 'Failure';
+                },
                 sendRootTransactionUrl: function () {
                     var vm = this, postData = {
                         order_id: this.form.order.id,
@@ -322,20 +314,14 @@ define(['lodash', 'vue', 'text!sv-page-sales-orders-form-details-tpl',
         refundEdit: {
             mixins: [EntityEditMixin],
             template: refundsEditTpl,
-            computed: {
-                totalItemLabel: function () {
-                    var vm = this;
-                    return function (rItem) {
-                        var pItem = vm.orderItem(rItem);
-                        return pItem ? pItem.data_custom.custom_label : 'Refunded Item';
-                    }
+            methods: {
+                totalItemLabel: function (rItem) {
+                    var pItem = this.orderItem(rItem);
+                    return pItem ? pItem.data_custom.custom_label : (('Refunded Item'));
                 },
-                totalItemAmountPaid: function () {
-                    var vm = this;
-                    return function (rItem) {
-                        var pItem = vm.orderItem(rItem);
-                        return pItem ? pItem.amount : 0;
-                    }
+                totalItemAmountPaid: function (rItem) {
+                    var pItem = this.orderItem(rItem);
+                    return pItem ? pItem.amount : 0;
                 }
             }
         },

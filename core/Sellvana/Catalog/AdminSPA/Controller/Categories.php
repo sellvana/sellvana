@@ -9,6 +9,11 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
 {
     use FCom_AdminSPA_AdminSPA_Controller_Trait_Form;
 
+    public function getFormConfig()
+    {
+
+    }
+
     public function action_form_data()
     {
         if (!$this->BRequest->xhr()) {
@@ -46,6 +51,9 @@ class Sellvana_Catalog_AdminSPA_Controller_Categories extends FCom_AdminSPA_Admi
             ];
 
             $result[static::FORM][static::I18N] = $this->getModelTranslations('category', $category->id());
+
+            $result[static::FORM]['products_grid']['config'] =
+                $this->Sellvana_Catalog_AdminSPA_Controller_Categories_Products->getNormalizedGridConfig();
 
             $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
 

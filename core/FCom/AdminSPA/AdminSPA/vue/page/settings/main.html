@@ -55,9 +55,9 @@
             </div>
             <div class="f-control-panel__elem hidden-sm hidden-xs">
                   <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading"
-                                 label="label" :placeholder="'Search Settings...'|_" :clear-on-select="true"
+                                 label="label" :placeholder="'Search Settings...'|_" :clear-on-select="true" :show-labels="false" :reset-after="true"
                                  :close-on-select="true" :options-limit="200" :limit="3" :limit-text="searchLimitText"
-                                 @search-change="search" @input="searchSelect(arguments[0])"></v-multiselect>
+                                 @search-change="search" @input="searchSelect"></v-multiselect>
                   <!--<select2 @input="searchSelect(arguments[0])">-->
                         <!--<option v-for="o in search_options" :value="o">{{o.label}}</option>-->
                   <!--</select2>-->
@@ -68,7 +68,10 @@
 
       <div class="hidden-lg hidden-md">
             <div class="f-buttons-block">
-                  <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading" label="label" :placeholder="'Search Settings...'|_" :clear-on-select="true" :close-on-select="true" :options-limit="200" :limit="3" :limit-text="searchLimitText" @search-change="search" @input="searchSelect(arguments[0])"></v-multiselect>
+                  <v-multiselect :internal-search="true" :options="search_options" :loading="search_loading"
+                                 label="label" :placeholder="'Search Settings...'|_" :clear-on-select="true" :show-labels="false" :reset-after="true"
+                                 :close-on-select="true" :options-limit="200" :limit="3" :limit-text="searchLimitText"
+                                 @search-change="search" @input="searchSelect"></v-multiselect>
             </div>
       </div>
 

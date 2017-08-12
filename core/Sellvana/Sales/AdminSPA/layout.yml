@@ -67,6 +67,13 @@
             #- [ requireJs, sv-page-sales-orders-form-shipments, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/shipments" ]
             #- [ requireJs, sv-page-sales-orders-form-shipments-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/orders/form/shipments.html" ]
 
+
+            - [ requireJs, sv-page-sales-custom-states, "@Sellvana_Sales/AdminSPA/vue/page/sales/custom-states/index" ]
+            - [ requireJs, sv-page-sales-custom-states-tpl, "@Sellvana_Sales/AdminSPA/vue/page/sales/custom-states/index.html" ]
+            - [ requireJs, sv-page-sales-custom-states-grid-config, "~/custom_states/grid_config" ]
+            - [ requireJs, sv-page-sales-custom-states-form, "@Sellvana_Sales/AdminSPA/vue/page/sales/custom-states/form" ]
+            #- [ requireJs, sv-page-sales-custom-states-form-main, "@Sellvana_Sales/AdminSPA/vue/page/sales/custom-states/form/main" ]
+
             - [ requireJs, sv-comp-dashboard-avg-order-value-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/avg-order-value.html ]
             - [ requireJs, sv-comp-dashboard-orders-late-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/orders-late.html ]
             - [ requireJs, sv-comp-dashboard-orders-list-tpl, @Sellvana_Sales/AdminSPA/vue/component/dashboard/orders-list.html ]
@@ -99,6 +106,9 @@ sv-app-data-js:
             - [ addRoute, { path: /sales/orders, require: [ sv-page-sales-orders, text!sv-page-default-grid-tpl, json!sv-page-sales-orders-grid-config ] } ]
             - [ addRoute, { path: /sales/orders/form, require: [ sv-page-sales-orders-form, text!sv-page-default-form-tpl ] } ]
 
+            - [ addRoute, { path: /sales/custom-states, require: [ sv-page-sales-custom-states, text!sv-page-default-grid-tpl, json!sv-page-sales-custom-states-grid-config ] } ]
+            - [ addRoute, { path: /sales/custom-states/form, require: [ sv-page-sales-custom-states-form, text!sv-page-default-form-tpl ] } ]
+
 
 
 
@@ -120,6 +130,10 @@ sv-app-data-js:
 #            - [ addDetailsSection, { name: returns, pos: 40 } ]
 #            - [ addDetailsSection, { name: cancellations, pos: 50 } ]
 
+/sales/custom-states/form:
+    - view: app
+        do:
+            - [ addFormTab, { path: /sales/custom-states/form, name: main, label: Custom State, pos: 10, component: default } ]
 
 
 sv-page-dashboard-config:

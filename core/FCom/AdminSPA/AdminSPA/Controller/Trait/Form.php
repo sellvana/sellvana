@@ -63,7 +63,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
             $model->set($data)->save();
 
-            $args = ['data' => $data, static::MODEL => $model];
+            $args = [static::DATA => $data, static::MODEL => $model];
             $this->onAfterFormDataPost($args);
             $this->BEvents->fire("{$eventName}:after", $args);
 

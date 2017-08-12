@@ -54,7 +54,7 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
         $parentId = $child->get($parentField);
         if ($parentId) {
             $lastUniqueId = $child->orm()->where($parentField, $parentId)->select('unique_id')
-                ->order_by_asc('(length(unique_id))')->order_by_asc('unique_id')
+                ->order_by_desc('(length(unique_id))')->order_by_desc('unique_id')
                 ->find_one();
             if (!$lastUniqueId) {
                 /** @var FCom_Core_Model_Abstract $parent */

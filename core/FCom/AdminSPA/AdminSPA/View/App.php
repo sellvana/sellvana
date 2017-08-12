@@ -12,6 +12,12 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
 
     public function addRoute($route)
     {
+        foreach ($this->_routes as $i => $t) {
+            if ($t['path'] === $route['path']) {
+                $this->_routes[$i] = $route;
+                return $this;
+            }
+        }
         $this->_routes[] = $route;
         return $this;
     }
@@ -129,6 +135,12 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
 
     public function addFormTab($tab)
     {
+        foreach ($this->_formTabs as $i => $t) {
+            if ($t['name'] === $tab['name']) {
+                $this->_formTabs[$i] = $tab;
+                return $this;
+            }
+        }
         $this->_formTabs[] = $tab;
         return $this;
     }

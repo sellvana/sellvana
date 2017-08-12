@@ -12,15 +12,13 @@ define(['lodash', 'jquery', 'vue', 'sv-app-data', 'text!sv-comp-form-translation
         computed: {
             all_locales: function () {
                 return SvAppData.locales_seq;
-            },
-            field_id: function () {
-                var vm = this, f = this.field;
-                return function (locale) {
-                    return 'translation-' + f.model + '-' + f.tab + '-' + f.name + '-' + locale;
-                }
             }
         },
         methods: {
+            field_id: function (locale) {
+                var f = this.field;
+                return 'translation-' + f.model + '-' + f.tab + '-' + f.name + '-' + locale;
+            },
             calcAvailableLocales: function () {
                 var usedLocales = {}, locales = [], i, l, loc;
                 for (i = 0, l = this.translations.length; i < l; i++) {

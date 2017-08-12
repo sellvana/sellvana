@@ -39,6 +39,7 @@
 		<div class="f-grid-panel">
 			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="visible-xs f-filter__elem"></sv-comp-grid-pager-dropdown>
 
+			<span v-if="grid.config.data_url"><a href="#" @click.prevent="emitEvent('fetch-data')">&#8635;</a></span>
 			<span v-if="cntTotal" class="amount-rows f-filter__elem"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
 			<span v-else="cntTotal" class="amount-rows f-filter__elem"> {{'No requested data found'|_}} </span>
 

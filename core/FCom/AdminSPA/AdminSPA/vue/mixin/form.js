@@ -26,18 +26,6 @@ define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svP
                 return this.form && this.form.config && this.form.config.tabs || [];
             },
 
-            getOption: function () {
-                return function (type, value) {
-                    if (!this.form.options[type]) {
-                        return {};
-                    }
-                    if (!value) {
-                        return this.form.options[type];
-                    }
-                    return this.form.options[type][value];
-                }
-            },
-
             formTabLabel: function () {
                 if (!this.form || !this.form.config || !this.form.config.tabs || _.isEmpty(this.form.config.tabs)) {
                     return '';
@@ -54,6 +42,16 @@ define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svP
             }
         },
         methods: {
+            getOption: function (type, value) {
+                if (!this.form.options[type]) {
+                    return {};
+                }
+                if (!value) {
+                    return this.form.options[type];
+                }
+                return this.form.options[type][value];
+            },
+
             doFormAction: function (act) {
                 if (act.method) {
                     this[act.method]();
@@ -73,6 +71,14 @@ define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svP
             },
 
             switchTab: function (tab) { // tab: object
+                if (false && _.isString(tab)) {
+                    for (var i = 0, l = this.form.config.tabs.length, t; t=this.form.config.tabs[i], i < l; i++) {
+                        if (t.name === tab) {
+                            tab = t;
+                            break;
+                        }
+                    }
+                }
                 this.tab = tab;
                 //this.$router.go({query: {tab: tab}});
             },
@@ -129,7 +135,7 @@ define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svP
                 });
             },
             onEvent: function (type, args) {
-                if (args.link) {
+                if (args && args.link) {
                     window.location = '#' + args.link;
                     return;
                 }

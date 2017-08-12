@@ -1,8 +1,9 @@
 <div class="">
-      <div class="f-content-block box-no-padding" :class="{editable:ddOpen('editable')}">
+      <div class="f-content-block box-no-padding">
             <div class="f-buttons-block text-right">
-                  <button type="button" class="button button2">{{'Generate POs'|_}}</button>
-                  <button type="button" class="button button1" @click.prevent.stop="ddToggle('editable')">{{'Edit'|_}}</button>
+                  <button v-if="!edit_mode" type="button" class="button button2" @click="generatePOs">{{'Generate POs'|_}}</button>
+                  <button v-if="!edit_mode" type="button" class="button button1" @click="enterEditMode">{{'Edit'|_}}</button>
+                  <button v-if="edit_mode" type="button" class="button button1" @click="saveEditChanges">{{'Save Changes'|_}}</button>
             </div>
             <div class="f-information-block" :class="{open:ddOpen('info-block1')}">
                   <a href="#" class="f-information-block__toggle" @click.prevent.stop="ddToggle('info-block1')">{{'Details'|_}}
@@ -11,65 +12,48 @@
                         </div>
                   </a>
                   <div class="f-information-block__content" @click.stop>
-                        <div class="f-edited-block f-bordered-block" :class="{on:editing.customer}">
+                        <div class="f-edited-block f-bordered-block">
                               <div class="f-bordered-block__title">
                                     <p>{{'Order'|_}}</p>
-                                    <!--<a href="#" @click.prevent="toggleEditing('customer')">
-                                          <i class="fa fa-pencil editor" aria-hidden="true"></i>
-                                          <i class="fa fa-eye close-editor" aria-hidden="true"></i>
-                                    </a>-->
                               </div>
-                              <div class="section-view">
+                              <div>
+                                    <label>{{'Overall Status:'|_}}</label>
+                                    {{form.options.order_state_overall[form.order.state_overall]}}
+                              </div>
+                              <div v-if="!edit_mode">
                                     <p v-if="form.order.customer_id">
+                                          <label>{{'Customer Email:'|_}}</label>
                                           <a :href="'#/customers/form?id='+form.order.customer_id"> {{form.customer.email}} </a>
                                     </p>
-                                    <!--<p>
-                                          <label>{{'Email:'|_}}</label>
+                                    <p v-if="!form.order.customer_id">
+                                          <label>{{'Customer Email:'|_}}</label>
                                           {{form.order.customer_email}}
-                                    </p>-->
-                                    <div>
-                                          <strong>{{'Status:'|_}}</strong>
+                                    </p>
+                                    <div v-if="form.order.state_custom">
+                                          <label>{{'Custom Status:'|_}}</label>
+                                          {{form.options.order_state_custom[form.order.state_custom]}}
                                     </div>
                               </div>
-                              <div class="section-edit">
+                              <div v-if="edit_mode">
                                     <label>{{'Email:'|_}}</label>
-                                    <input type="text" class="f-input" v-model="form.order.customer_email" :placeholder="'Customer Email'|_">
+                                    <input type="text" class="f-input" v-model="form.order.customer_email" :placeholder="(('Customer Email'))|_">
+                                    <label>{{'Custom Status:'|_}}</label>
+                                    <select2 v-model="form.order.state_custom">
+                                          <option v-for="(label, o) in form.options.order_state_custom" :value="o">{{label}}</option>
+                                    </select2>
                               </div>
                         </div>
                         <div class="f-edited-block f-bordered-block">
                               <div class="f-bordered-block__title">
                                     <p>{{'Shipping'|_}}</p>
-                                    <!--<a href="#" @click.prevent="toggleEditing('customer')">
-      <i class="fa fa-pencil editor" aria-hidden="true"></i>
-      <i class="fa fa-eye close-editor" aria-hidden="true"></i>
-      </a>-->
                               </div>
-                              <div class="section-view">
-                                    <div>
-                                          <strong>{{'Status:'|_}}</strong> <span class="f-edited-block__info">Pending</span>
-                                          <span class="f-edited-block__info">Plain</span> <span class="f-edited-block__info">Shipping</span>
-                                    </div>
-                                    <!--<p>
-      <label>{{'Email:'|_}}</label>
-      {{form.order.customer_email}}
-      </p>-->
-                                    <div>
-                                          <strong>{{'Status:'|_}}</strong>
-                                    </div>
-                              </div>
-                              <div class="section-edit">
-
-                              </div>
+                              <label>{{'Status:'|_}}</label> <span class="f-edited-block__info">{{form.options.order_state_delivery[form.order.state_delivery]}}</span>
                         </div>
                         <div class="f-edited-block f-bordered-block" :class="{on:editing.shipping}">
                               <div class="f-bordered-block__title">
                                     <p>{{'Shipping Address'|_}}</p>
-                                    <!--<a href="#" @click.prevent="toggleEditing('shipping')">
-                                          <i class="fa fa-pencil editor" aria-hidden="true"></i>
-                                          <i class="fa fa-eye close-editor" aria-hidden="true"></i>
-                                    </a>-->
                               </div>
-                              <div class="section-view">
+                              <div v-if="!edit_mode">
                                     <p>{{form.order.shipping_firstname}} {{form.order.shipping_lastname}}</p>
                                     <div class="adr">
                                           <span class="street-address">{{form.order.shipping_street1}}</span>
@@ -79,7 +63,7 @@
                                           <div class="country-name">{{dict.countries[form.order.shipping_country]}}</div>
                                     </div>
                               </div>
-                              <div class="section-edit">
+                              <div v-if="edit_mode">
                                     <div class="row no-gutter">
                                           <div class="col-md-6">
                                                 <input type="text" class="f-input" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.shipping_firstname">
@@ -126,12 +110,8 @@
                         <div class="f-edited-block f-bordered-block" :class="{on:editing.billing}">
                               <div class="f-bordered-block__title">
                                     <p>{{'Billing'|_}}</p>
-                                    <!--<a href="#" @click.prevent="toggleEditing('billing')">
-                                          <i class="fa fa-pencil editor" aria-hidden="true"></i>
-                                          <i class="fa fa-eye close-editor" aria-hidden="true"></i>
-                                    </a>-->
                               </div>
-                              <div class="section-view">
+                              <div v-if="!edit_mode">
                                     <p>{{form.order.billing_firstname}} {{form.order.billing_lastname}}</p>
                                     <div class="adr">
                                           <span class="street-address f-edited-block__info">{{form.order.billing_street1}}</span>
@@ -142,7 +122,7 @@
                                           <div class="country-name">{{dict.countries[form.order.billing_country]}}</div>
                                     </div>
                               </div>
-                              <div class="section-edit">
+                              <div v-if="edit_mode">
                                     <div class="row no-gutter">
                                           <div class="col-md-6">
                                                 <input type="text" class="f-input" :title="'First Name'|_" :placeholder="'First Name'|_" v-model="form.order.billing_firstname">
@@ -189,14 +169,19 @@
                         <div class="f-edited-block f-bordered-block">
                               <div class="f-bordered-block__title">
                                     <p>{{'Payment'|_}}</p>
-                                    <!--<a href="#" @click.prevent="$emit('tab', 'details')">
-                                          <i class="fa fa-pencil editor" aria-hidden="true"></i>
-                                    </a>-->
                               </div>
+                              <label>{{'Status:'|_}}</label> <span class="f-edited-block__info">{{form.options.order_state_payment[form.order.state_payment]}}</span>
+
                               <div v-for="p in form.payments">
-                                    <strong>{{p.payment_method}}</strong> <span :class="'status-' + p.state_overall" class="f-edited-block__info">{{form.options.payment_state_overall[p.state_overall]}}</span>
+                                    <label>{{'Method:'|_}}</label>{{p.payment_method}}
+                                    <br>
+                                    <label>{{'Status:'|_}}</label>
+                                    <span :class="'status-' + p.state_overall" class="f-edited-block__info">{{form.options.payment_state_overall[p.state_overall]}}</span>
+                                    <br>
+                                    <label>{{'Captured:'|_}}</label>
                                     <span class="f-edited-block__info">{{p.amount_captured|currency(form.order.store_currency_code)}}</span>
-                                    <span class="f-edited-block__info">({{p.amount_due|currency(form.order.store_currency_code)}})</span>
+                                    <br>
+                                    <label>{{'Due:'|_}}</label><span class="f-edited-block__info">({{p.amount_due|currency(form.order.store_currency_code)}})</span>
                               </div>
                               <div v-for="r in form.refunds">
                                     <strong>{{'REFUND: '|_}}</strong> <span :class="'status-' + r.state_overall" class="f-edited-block__info">{{form.options.refund_state_overall[r.state_overall]}}</span>
@@ -273,7 +258,7 @@
                           <a href="#" @click.prevent="toggleEditing('order')"> <i class="fa fa-pencil editor" aria-hidden="true"></i>
                                 <i class="fa fa-eye close-editor" aria-hidden="true"></i> </a>
                     </div>
-                    <div class="section-view">
+                    <div>
                           <p v-if="form.order.state_custom" :class="'status-'+form.order.state_custom">
                                 {{form.options.order_state_custom[form.order.state_custom]}}</p>
                           <p>
@@ -281,7 +266,7 @@
                           <p>
                                 <label>{{'Updated:'|_}}</label> <strong>{{form.order.update_at|date}}</strong></p>
                     </div>
-                    <div class="section-edit">
+                    <div>
                           <select2 v-model="form.order.state_custom">
                                 <option v-if="form.options.order_state_custom|length"></option>
                                 <option v-else value="" selected>{{'No Custom Order States Defined'|_}}</option>

@@ -1,16 +1,37 @@
 <div class="f-content-block">
       <div class="row">
             <div class="col-md-12">
-                  <fieldset class="f-section">
-                        <select v-model="view_mode">
-                              <option value="simple">{{'Simple'|_}}</option>
-                              <option value="table">{{'Advanced (grid)'|_}}</option>
-                              <option value="text">{{'Advanced (text)'|_}}</option>
-                        </select>
-                        <sv-comp-form-field
-                        <sv-comp-form-catalog-prices
-                              :options="form.config.options"
-                              :prices="form.prices"></sv-comp-form-catalog-prices>
+                  <fieldset class="f-form-container">
+                        <div class="f-form-group row" :class="{required: true}">
+                              <label class="f-form-label" for="price_view_mode">{{'View Mode'|_}}</label>
+                              <select v-model="view_mode" class="form-control" id="price_view_mode">
+                                    <option value="simple">{{'Simple'|_}}</option>
+                                    <option value="table">{{'Advanced (grid)'|_}}</option>
+                                    <option value="text">{{'Advanced (text)'|_}}</option>
+                              </select>
+                        </div>
+
+                        <div v-if="view_mode == 'simple'">
+                              <div class="f-form-group row" :class="{required: true}">
+                                    <label class="f-form-label" for="simple_base_price">{{'Base Price'|_}}</label>
+                                    <input type="number" v-model="form.product.base_price" id="simple_base_price" step=".01" class="f-input" :required="true">
+                              </div>
+                              <div class="f-form-group row" :class="{required: true}">
+                                    <label class="f-form-label" for="simple_sale_price">{{'Sale Price'|_}}</label>
+                                    <input type="number" v-model="form.product.sale_price" id="simple_sale_price" step=".01" class="f-input">
+                              </div>
+                              <div class="f-form-group row" :class="{required: true}">
+                                    <label class="f-form-label" for="simple_sale_from_date">{{'Sale From Date'|_}}</label>
+                                    <input type="date" v-model="form.product.sale_price_from_date" id="simple_sale_from_date" class="f-input">
+                              </div>
+                              <div class="f-form-group row" :class="{required: true}">
+                                    <label class="f-form-label" for="simple_sale_to_date">{{'Sale To Date'|_}}</label>
+                                    <input type="date" v-model="form.product.sale_price_to_date" id="simple_sale_to_date" class="f-input">
+                              </div>
+                        </div>
+
+                        <sv-comp-form-catalog-prices v-if="view_mode != 'simple'" :view_mode="view_mode"
+                              :options="form.config.options" :prices="form.prices"></sv-comp-form-catalog-prices>
                   </fieldset>
             </div>
       </div>

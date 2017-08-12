@@ -1,12 +1,13 @@
-define(['jquery', 'lodash', 'vue', 'sv-mixin-common', 'accounting', 'moment', 'sortablejs',
+define(['jquery', 'lodash', 'vue', 'vue-resource', 'sv-mixin-common', 'accounting', 'moment', 'sortablejs',
     'vue-ckeditor', 'vue-select', 'vue-multiselect', 'vue-select2', 'spin', 'ladda', 'nprogress', 'perfect-scrollbar',
     'vue-password-strength-meter', 'sv-comp-form-field'
 ],
-function ($, _, Vue, SvMixinCommon, Accounting, Moment, Sortable,
+function ($, _, Vue, VueResource, SvMixinCommon, Accounting, Moment, Sortable,
           VueCkeditor, VueSelect, VueMultiselect, VueSelect2, Spin, Ladda, NProgress, PerfectScrollbar,
           VuePassword, SvCompFormField
 ) {
 
+    Vue.use(VueResource);
     Vue.mixin(SvMixinCommon);
 
     // String extensions
@@ -72,6 +73,7 @@ function ($, _, Vue, SvMixinCommon, Accounting, Moment, Sortable,
 
     // Components
 
+    Vue.component('v-select', VueSelect.default);
     Vue.component('v-multiselect', VueMultiselect.default);
     Vue.component('vue-password', VuePassword.default);
 

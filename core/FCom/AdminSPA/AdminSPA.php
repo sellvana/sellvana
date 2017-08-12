@@ -1,5 +1,7 @@
 <?php
 
+use FCom_AdminSPA_AdminSPA_Controller_Abstract as Ctrl;
+
 /**
  * Class FCom_AdminSPA_AdminSPA
  *
@@ -69,7 +71,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
         if (is_array($data)) {
             foreach ($data as $i => $r) {
                 if (is_string($r)) {
-                    $data[$i] = ['type' => 'info', 'message' => $r];
+                    $data[$i] = [Ctrl::TYPE => 'info', 'message' => $r];
                 }
             }
         }
@@ -142,251 +144,251 @@ class FCom_AdminSPA_AdminSPA extends BClass
         $cacheBackends = $this->BCache->getAllBackendsAsOptions();
 
         $args['navs'] = array_merge_recursive($args['navs'], [
-            '/areas' => ['label' => (('Areas')), 'pos' => 10],
-            '/areas/core' => ['label' => (('Core Settings')), 'pos' => 10],
-            '/areas/core/website' => ['label' => (('Website')), 'pos' => 10],
-            '/areas/core/l10n' => ['label' => (('Localization')), 'pos' => 20],
-            '/areas/core/session' => ['label' => (('Session')), 'pos' => 30],
-            '/areas/core/db' => ['label' => (('DB')), 'pos' => 40, 'hide_for_site' => true],
-            '/areas/core/cache' => ['label' => (('Cache')), 'pos' => 50],
-            '/areas/core/dev' => ['label' => (('Developer')), 'pos' => 60],
-            '/areas/core/web' => ['label' => (('Web Settings')), 'pos' => 70],
-            '/areas/core/staging' => ['label' => (('Staging')), 'pos' => 80],
+            '/areas' => [Ctrl::LABEL => (('Areas')), 'pos' => 10],
+            '/areas/core' => [Ctrl::LABEL => (('Core Settings')), 'pos' => 10],
+            '/areas/core/website' => [Ctrl::LABEL => (('Website')), 'pos' => 10],
+            '/areas/core/l10n' => [Ctrl::LABEL => (('Localization')), 'pos' => 20],
+            '/areas/core/session' => [Ctrl::LABEL => (('Session')), 'pos' => 30],
+            '/areas/core/db' => [Ctrl::LABEL => (('DB')), 'pos' => 40, 'hide_for_site' => true],
+            '/areas/core/cache' => [Ctrl::LABEL => (('Cache')), 'pos' => 50],
+            '/areas/core/dev' => [Ctrl::LABEL => (('Developer')), 'pos' => 60],
+            '/areas/core/web' => [Ctrl::LABEL => (('Web Settings')), 'pos' => 70],
+            '/areas/core/staging' => [Ctrl::LABEL => (('Staging')), 'pos' => 80],
 
-            '/areas/frontend' => ['label' => (('Frontend Settings')), 'pos' => 20],
-            '/areas/frontend/html' => ['label' => (('Frontend HTML')), 'pos' => 10],
-            '/areas/frontend/session' => ['label' => (('Frontend Session')), 'pos' => 20],
-            '/areas/frontend/web_security' => ['label' => (('Frontend Web Security')), 'pos' => 30],
-            '/areas/frontend/area' => ['label' => (('Area Settings')), 'pos' => 40],
-            '/areas/frontend/custom_tags' => ['label' => (('Custom Tags')), 'pos' => 50],
+            '/areas/frontend' => [Ctrl::LABEL => (('Frontend Settings')), 'pos' => 20],
+            '/areas/frontend/html' => [Ctrl::LABEL => (('Frontend HTML')), 'pos' => 10],
+            '/areas/frontend/session' => [Ctrl::LABEL => (('Frontend Session')), 'pos' => 20],
+            '/areas/frontend/web_security' => [Ctrl::LABEL => (('Frontend Web Security')), 'pos' => 30],
+            '/areas/frontend/area' => [Ctrl::LABEL => (('Area Settings')), 'pos' => 40],
+            '/areas/frontend/custom_tags' => [Ctrl::LABEL => (('Custom Tags')), 'pos' => 50],
 
-            '/areas/admin' => ['label' => (('Admin Settings')), 'pos' => 30],
-            '/areas/admin/html' => ['label' => (('Admin HTML')), 'pos' => 10],
-            '/areas/admin/area' => ['label' => (('Area Settings')), 'pos' => 20],
-            '/areas/admin/user_security' => ['label' => (('User Security')), 'pos' => 30],
-            '/areas/admin/dashboard' => ['label' => (('Dashboard')), 'pos' => 50],
+            '/areas/admin' => [Ctrl::LABEL => (('Admin Settings')), 'pos' => 30],
+            '/areas/admin/html' => [Ctrl::LABEL => (('Admin HTML')), 'pos' => 10],
+            '/areas/admin/area' => [Ctrl::LABEL => (('Area Settings')), 'pos' => 20],
+            '/areas/admin/user_security' => [Ctrl::LABEL => (('User Security')), 'pos' => 30],
+            '/areas/admin/dashboard' => [Ctrl::LABEL => (('Dashboard')), 'pos' => 50],
 
-            '/areas/cron' => ['label' => (('Cron Settings')), 'pos' => 30],
-            '/areas/cron/area' => ['label' => (('Area Settings')), 'pos' => 10],
-            '/areas/cron/dispatch' => ['label' => (('Cron Dispatch')), 'pos' => 20],
+            '/areas/cron' => [Ctrl::LABEL => (('Cron Settings')), 'pos' => 30],
+            '/areas/cron/area' => [Ctrl::LABEL => (('Area Settings')), 'pos' => 10],
+            '/areas/cron/dispatch' => [Ctrl::LABEL => (('Cron Dispatch')), 'pos' => 20],
 
-            '/themes' => ['label' => (('Themes')), 'pos' => 80],
+            '/themes' => [Ctrl::LABEL => (('Themes')), 'pos' => 80],
 
-            '/other' => ['label' => (('Other')), 'pos' => 90],
+            '/other' => [Ctrl::LABEL => (('Other')), 'pos' => 90],
         ]);
 
         $args['forms'] = array_merge_recursive($args['forms'], [
             '/areas/core/website' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Core'],
-                        ['name' => 'company_name', 'label' => (('Company Name'))],
-                        ['name' => 'site_title', 'label' => (('Site Title'))],
-                        ['name' => 'admin_email', 'label' => (('Admin Email')), 'input_type' => 'email'],
-                        ['name' => 'sales_name', 'label' => (('Sales Name'))],
-                        ['name' => 'sales_email', 'label' => (('Sales Email')), 'input_type' => 'email'],
-                        ['name' => 'support_name', 'label' => (('Support Name'))],
-                        ['name' => 'support_email', 'label' => (('Support Email')), 'input_type' => 'email'],
-                        ['name' => 'copyright_message', 'label' => (('Copyright Message'))],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Core'],
+                        [Ctrl::NAME => 'company_name', Ctrl::LABEL => (('Company Name'))],
+                        [Ctrl::NAME => 'site_title', Ctrl::LABEL => (('Site Title'))],
+                        [Ctrl::NAME => 'admin_email', Ctrl::LABEL => (('Admin Email')), Ctrl::INPUT_TYPE => 'email'],
+                        [Ctrl::NAME => 'sales_name', Ctrl::LABEL => (('Sales Name'))],
+                        [Ctrl::NAME => 'sales_email', Ctrl::LABEL => (('Sales Email')), Ctrl::INPUT_TYPE => 'email'],
+                        [Ctrl::NAME => 'support_name', Ctrl::LABEL => (('Support Name'))],
+                        [Ctrl::NAME => 'support_email', Ctrl::LABEL => (('Support Email')), Ctrl::INPUT_TYPE => 'email'],
+                        [Ctrl::NAME => 'copyright_message', Ctrl::LABEL => (('Copyright Message'))],
                     ],
                 ],
             ],
             '/areas/core/l10n' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Core'],
-                        ['name' => 'limit_countries', 'label' => (('Limit Countries')), 'type' => 'checkbox'],
-                        ['name' => 'allowed_countries', 'label' => (('Allowed Countries')), 'options' => $countries,
-                            'multiple' => true, 'if' => '{limit_countries}'],
-                        ['name' => 'default_country', 'label' => (('Default Country')), 'options' => $countries],
-                        ['name' => 'default_tz', 'label' => (('Default Timezone')), 'options' => $tzs],
-                        ['name' => 'default_locale', 'label' => (('Default Locale')), 'options' => $locales],
-                        ['name' => 'base_currency', 'label' => (('Base Currency'))],
-                        ['name' => 'default_currency', 'label' => (('Default Currency'))],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Core'],
+                        [Ctrl::NAME => 'limit_countries', Ctrl::LABEL => (('Limit Countries')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'allowed_countries', Ctrl::LABEL => (('Allowed Countries')), Ctrl::OPTIONS => $countries,
+                            Ctrl::MULTIPLE => true, 'if' => '{limit_countries}'],
+                        [Ctrl::NAME => 'default_country', Ctrl::LABEL => (('Default Country')), Ctrl::OPTIONS => $countries],
+                        [Ctrl::NAME => 'default_tz', Ctrl::LABEL => (('Default Timezone')), Ctrl::OPTIONS => $tzs],
+                        [Ctrl::NAME => 'default_locale', Ctrl::LABEL => (('Default Locale')), Ctrl::OPTIONS => $locales],
+                        [Ctrl::NAME => 'base_currency', Ctrl::LABEL => (('Base Currency'))],
+                        [Ctrl::NAME => 'default_currency', Ctrl::LABEL => (('Default Currency'))],
                     ],
                 ],
             ],
             '/areas/core/session' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'cookie'],
-                        ['name' => 'session_handler', 'label' => (('Session Handler')), 'options' => $sessionHandlers],
-                        ['name' => 'session_savepath', 'label' => (('Session Save Path'))],
-                        ['name' => 'remember_days', 'label' => (('Remember Me Timeout (days)'))],
-                        ['name' => 'domain', 'label' => (('Session Cookie Domain'))],
-                        ['name' => 'path', 'label' => (('Session Cookie Path'))],
-                        ['name' => 'session_namespace', 'label' => (('Session Cookie Namespace'))],
-                        ['name' => 'session_check_ip', 'label' => (('Verify Session IP and User Agent')), 'type' => 'checkbox'],
-                        ['name' => 'use_strict_mode', 'label' => (('Use Cookie Strict Mode')), 'type' => 'checkbox',
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'cookie'],
+                        [Ctrl::NAME => 'session_handler', Ctrl::LABEL => (('Session Handler')), Ctrl::OPTIONS => $sessionHandlers],
+                        [Ctrl::NAME => 'session_savepath', Ctrl::LABEL => (('Session Save Path'))],
+                        [Ctrl::NAME => 'remember_days', Ctrl::LABEL => (('Remember Me Timeout (days)'))],
+                        [Ctrl::NAME => 'domain', Ctrl::LABEL => (('Session Cookie Domain'))],
+                        [Ctrl::NAME => 'path', Ctrl::LABEL => (('Session Cookie Path'))],
+                        [Ctrl::NAME => 'session_namespace', Ctrl::LABEL => (('Session Cookie Namespace'))],
+                        [Ctrl::NAME => 'session_check_ip', Ctrl::LABEL => (('Verify Session IP and User Agent')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'use_strict_mode', Ctrl::LABEL => (('Use Cookie Strict Mode')), Ctrl::TYPE => 'checkbox',
                             'notes_tpl' => '<a href="https://secure.php.net/manual/en/session.configuration.php#ini.session.use-strict-mode" target="_blank">{{"Details"|_}}</a>'],
-                        ['name' => 'delete_old_session', 'label' => (('Delete Old Session on session_regenerate_id()')), 'type' => 'checkbox',
+                        [Ctrl::NAME => 'delete_old_session', Ctrl::LABEL => (('Delete Old Session on session_regenerate_id()')), Ctrl::TYPE => 'checkbox',
                             'notes_tpl' => '<a href="https://wiki.php.net/rfc/precise_session_management" target="_blank">{{"Details"|_}}</a>'],
                     ],
                 ],
             ],
             '/areas/core/db' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'db'],
-                        ['name' => 'host', 'label' => (('Host'))],
-                        ['name' => 'port', 'label' => (('Port'))],
-                        ['name' => 'dbname', 'label' => (('Database'))],
-                        ['name' => 'username', 'label' => (('Username'))],
-                        ['name' => 'password', 'label' => (('Password')), 'input_type' => 'password'],
-                        ['name' => 'table_prefix', 'label' => (('Table Prefix'))],
-                        ['name' => 'logging', 'label' => (('Logging')), 'type' => 'checkbox'],
-                        ['name' => 'implicit_migration', 'label' => (('Implicit Migration')), 'type' => 'checkbox'],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'db'],
+                        [Ctrl::NAME => 'host', Ctrl::LABEL => (('Host'))],
+                        [Ctrl::NAME => 'port', Ctrl::LABEL => (('Port'))],
+                        [Ctrl::NAME => 'dbname', Ctrl::LABEL => (('Database'))],
+                        [Ctrl::NAME => 'username', Ctrl::LABEL => (('Username'))],
+                        [Ctrl::NAME => 'password', Ctrl::LABEL => (('Password')), Ctrl::INPUT_TYPE => 'password'],
+                        [Ctrl::NAME => 'table_prefix', Ctrl::LABEL => (('Table Prefix'))],
+                        [Ctrl::NAME => 'logging', Ctrl::LABEL => (('Logging')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'implicit_migration', Ctrl::LABEL => (('Implicit Migration')), Ctrl::TYPE => 'checkbox'],
                     ],
                 ],
             ],
             '/areas/core/cache' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'core/cache'],
-                        ['name' => 'manifest_files', 'label' => (('Module Manifest Files Cache')), 'options' => $cacheOptions],
-                        ['name' => 'layout_files', 'label' => (('Layout Files Cache')), 'options' => $cacheOptions],
-                        ['name' => 'view_files', 'label' => (('View Template Files Cache')), 'options' => $cacheOptions],
-                        ['name' => 'twig', 'label' => (('Twig Cache')), 'options' => $cacheOptions],
-                        ['name' => 'default_backend', 'label' => (('Default Backend')), 'options' => $cacheBackends],
-                        ['name' => 'host', 'label' => (('Memcached Host')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
-                        ['name' => 'port', 'label' => (('Memcached Port')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
-                        ['name' => 'prefix', 'label' => (('Memcached Prefix')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'core/cache'],
+                        [Ctrl::NAME => 'manifest_files', Ctrl::LABEL => (('Module Manifest Files Cache')), Ctrl::OPTIONS => $cacheOptions],
+                        [Ctrl::NAME => 'layout_files', Ctrl::LABEL => (('Layout Files Cache')), Ctrl::OPTIONS => $cacheOptions],
+                        [Ctrl::NAME => 'view_files', Ctrl::LABEL => (('View Template Files Cache')), Ctrl::OPTIONS => $cacheOptions],
+                        [Ctrl::NAME => 'twig', Ctrl::LABEL => (('Twig Cache')), Ctrl::OPTIONS => $cacheOptions],
+                        [Ctrl::NAME => 'default_backend', Ctrl::LABEL => (('Default Backend')), Ctrl::OPTIONS => $cacheBackends],
+                        [Ctrl::NAME => 'host', Ctrl::LABEL => (('Memcached Host')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
+                        [Ctrl::NAME => 'port', Ctrl::LABEL => (('Memcached Port')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
+                        [Ctrl::NAME => 'prefix', Ctrl::LABEL => (('Memcached Prefix')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
                     ],
                 ],
             ],
 
             '/areas/frontend/html' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Frontend'],
-                        ['name' => 'theme', 'label' => (('Theme')), 'options' => $this->BLayout->getThemes('FCom_Frontend', true)],
-                        ['name' => 'add_js_files', 'label' => (('Additional JS Files')), 'type' => 'textarea'],
-                        ['name' => 'add_css_files', 'label' => (('Additional CSS Files')), 'type' => 'textarea'],
-                        ['name' => 'add_js_code', 'label' => (('Additional JS Code')), 'type' => 'textarea'],
-                        ['name' => 'add_css_code', 'label' => (('Additional CSS Code')), 'type' => 'textarea'],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Frontend'],
+                        [Ctrl::NAME => 'theme', Ctrl::LABEL => (('Theme')), Ctrl::OPTIONS => $this->BLayout->getThemes('FCom_Frontend', true)],
+                        [Ctrl::NAME => 'add_js_files', Ctrl::LABEL => (('Additional JS Files')), Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'add_css_files', Ctrl::LABEL => (('Additional CSS Files')), Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'add_js_code', Ctrl::LABEL => (('Additional JS Code')), Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'add_css_code', Ctrl::LABEL => (('Additional CSS Code')), Ctrl::TYPE => 'textarea'],
                     ],
                 ],
             ],
             '/areas/frontend/session' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Frontend'],
-                        ['name' => 'session_handler', 'label' => (('Session Handler')), 'options' => $sessionHandlers],
-                        ['name' => 'session_savepath', 'label' => (('Session Save Path'))],
-                        ['name' => 'remember_days', 'label' => (('Remember Me Timeout (days)'))],
-                        ['name' => 'domain', 'label' => (('Session Cookie Domain'))],
-                        ['name' => 'path', 'label' => (('Session Cookie Path'))],
-                        ['name' => 'session_namespace', 'label' => (('Session Cookie Namespace'))],
-                        ['name' => 'session_check_ip', 'label' => (('Verify Session IP and User Agent')), 'type' => 'checkbox'],
-                        ['name' => 'use_strict_mode', 'label' => (('Use Cookie Strict Mode')), 'type' => 'checkbox',
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Frontend'],
+                        [Ctrl::NAME => 'session_handler', Ctrl::LABEL => (('Session Handler')), Ctrl::OPTIONS => $sessionHandlers],
+                        [Ctrl::NAME => 'session_savepath', Ctrl::LABEL => (('Session Save Path'))],
+                        [Ctrl::NAME => 'remember_days', Ctrl::LABEL => (('Remember Me Timeout (days)'))],
+                        [Ctrl::NAME => 'domain', Ctrl::LABEL => (('Session Cookie Domain'))],
+                        [Ctrl::NAME => 'path', Ctrl::LABEL => (('Session Cookie Path'))],
+                        [Ctrl::NAME => 'session_namespace', Ctrl::LABEL => (('Session Cookie Namespace'))],
+                        [Ctrl::NAME => 'session_check_ip', Ctrl::LABEL => (('Verify Session IP and User Agent')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'use_strict_mode', Ctrl::LABEL => (('Use Cookie Strict Mode')), Ctrl::TYPE => 'checkbox',
                             'notes_tpl' => '<a href="https://secure.php.net/manual/en/session.configuration.php#ini.session.use-strict-mode" target="_blank">{{"Details"|_}}</a>'],
-                        ['name' => 'delete_old_session', 'label' => (('Delete Old Session on session_regenerate_id()')), 'type' => 'checkbox',
+                        [Ctrl::NAME => 'delete_old_session', Ctrl::LABEL => (('Delete Old Session on session_regenerate_id()')), Ctrl::TYPE => 'checkbox',
                             'notes_tpl' => '<a href="https://wiki.php.net/rfc/precise_session_management" target="_blank">{{"Details"|_}}</a>'],
                     ],
                 ],
             ],
             '/areas/frontend/web_security' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Frontend/web'],
-                        ['name' => 'hide_script_name', 'label' => (('Hide script file name in URL')), 'options' => ['' => '', 0 => (('No')), 1 => (('Automatic')), 2 => (('FORCE'))]],
-                        ['name' => 'http_host_whitelist', 'label' => (('HTTP Host Whitelist')), 'notes' => (('comma separated'))],
-                        ['name' => 'force_domain', 'label' => (('Force Domain Name'))],
-                        ['name' => 'force_https', 'label' => (('Force HTTPS')), 'options' => $blankBool],
-                        ['name' => 'csrf_check_method', 'label' => (('CSRF Check Method')), 'options' => $this->BRequest->getAvailableCsrfMethods(true)],
-                        ['name' => 'csrf_web_root', 'label' => (('CSRF Referrer Web Root Path (optional)'))],
-                        ['name' => 'hsts_enable', 'label' => (('Enable HSTS header')), 'notes' => (('HTTP Strict Transport Security')), 'options' => $blankBool],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Frontend/web'],
+                        [Ctrl::NAME => 'hide_script_name', Ctrl::LABEL => (('Hide script file name in URL')), Ctrl::OPTIONS => ['' => '', 0 => (('No')), 1 => (('Automatic')), 2 => (('FORCE'))]],
+                        [Ctrl::NAME => 'http_host_whitelist', Ctrl::LABEL => (('HTTP Host Whitelist')), Ctrl::NOTES => (('comma separated'))],
+                        [Ctrl::NAME => 'force_domain', Ctrl::LABEL => (('Force Domain Name'))],
+                        [Ctrl::NAME => 'force_https', Ctrl::LABEL => (('Force HTTPS')), Ctrl::OPTIONS => $blankBool],
+                        [Ctrl::NAME => 'csrf_check_method', Ctrl::LABEL => (('CSRF Check Method')), Ctrl::OPTIONS => $this->BRequest->getAvailableCsrfMethods(true)],
+                        [Ctrl::NAME => 'csrf_web_root', Ctrl::LABEL => (('CSRF Referrer Web Root Path (optional)'))],
+                        [Ctrl::NAME => 'hsts_enable', Ctrl::LABEL => (('Enable HSTS header')), Ctrl::NOTES => (('HTTP Strict Transport Security')), Ctrl::OPTIONS => $blankBool],
                     ],
                 ],
             ],
             '/areas/frontend/area' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Frontend'],
-                        ['name' => 'FCom_Frontend', 'label' => (('IP: Mode')), 'type' => 'component',
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Frontend'],
+                        [Ctrl::NAME => 'FCom_Frontend', Ctrl::LABEL => (('IP: Mode')), Ctrl::TYPE => 'component',
                             'component' => 'sv-comp-form-ip-mode', 'root' => 'mode_by_ip'],
-                        ['name' => 'modules', 'label' => (('Modules to run in RECOVERY mode')), 'root' => 'recovery/FCom_Admin', 'type' => 'textarea'],
+                        [Ctrl::NAME => 'modules', Ctrl::LABEL => (('Modules to run in RECOVERY mode')), 'root' => 'recovery/FCom_Admin', Ctrl::TYPE => 'textarea'],
                     ],
                 ],
             ],
             '/areas/frontend/custom_tags' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Frontend'],
-                        ['name' => 'custom_tags_homepage', 'label' => 'Home Page', 'type' => 'textarea'],
-                        ['name' => 'custom_tags_category', 'label' => 'Category Page', 'type' => 'textarea'],
-                        ['name' => 'custom_tags_search', 'label' => 'Search Page', 'type' => 'textarea'],
-                        ['name' => 'custom_tags_product', 'label' => 'Product Page', 'type' => 'textarea'],
-                        ['name' => 'custom_tags_cart', 'label' => 'Shopping Cart Page', 'type' => 'textarea'],
-                        ['name' => 'custom_tags_checkout', 'label' => 'Checkout Page', 'type' => 'textarea'],
-                        ['name' => 'custom_tags_success', 'label' => 'Checkout Success Page', 'type' => 'textarea'],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Frontend'],
+                        [Ctrl::NAME => 'custom_tags_homepage', Ctrl::LABEL => 'Home Page', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'custom_tags_category', Ctrl::LABEL => 'Category Page', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'custom_tags_search', Ctrl::LABEL => 'Search Page', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'custom_tags_product', Ctrl::LABEL => 'Product Page', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'custom_tags_cart', Ctrl::LABEL => 'Shopping Cart Page', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'custom_tags_checkout', Ctrl::LABEL => 'Checkout Page', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'custom_tags_success', Ctrl::LABEL => 'Checkout Success Page', Ctrl::TYPE => 'textarea'],
                     ],
                 ],
             ],
 
             '/areas/admin/html' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Admin'],
-                        ['name' => 'theme', 'label' => (('Theme')), 'options' => $this->BLayout->getThemes('FCom_Admin', true)],
-                        ['name' => 'add_js_files', 'label' => (('Additional JS Files')), 'type' => 'textarea'],
-                        ['name' => 'add_css_files', 'label' => (('Additional CSS Files')), 'type' => 'textarea'],
-                        ['name' => 'add_js_code', 'label' => (('Additional JS Code')), 'type' => 'textarea'],
-                        ['name' => 'add_css_code', 'label' => (('Additional CSS Code')), 'type' => 'textarea'],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Admin'],
+                        [Ctrl::NAME => 'theme', Ctrl::LABEL => (('Theme')), Ctrl::OPTIONS => $this->BLayout->getThemes('FCom_Admin', true)],
+                        [Ctrl::NAME => 'add_js_files', Ctrl::LABEL => (('Additional JS Files')), Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'add_css_files', Ctrl::LABEL => (('Additional CSS Files')), Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'add_js_code', Ctrl::LABEL => (('Additional JS Code')), Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'add_css_code', Ctrl::LABEL => (('Additional CSS Code')), Ctrl::TYPE => 'textarea'],
                     ],
                 ],
             ],
             '/areas/admin/area' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Admin'],
-                        ['name' => 'FCom_Admin', 'label' => (('IP: Mode')), 'type' => 'component',
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Admin'],
+                        [Ctrl::NAME => 'FCom_Admin', Ctrl::LABEL => (('IP: Mode')), Ctrl::TYPE => 'component',
                             'component' => 'sv-comp-form-ip-mode', 'root' => 'mode_by_ip'],
-                        ['name' => 'modules', 'label' => (('Modules to run in RECOVERY mode')), 'root' => 'recovery/FCom_Admin', 'type' => 'textarea'],
-                        ['name' => 'enable_locales', 'label' => (('Enable UI Multi Locale')), 'type' => 'checkbox'],
-                        ['name' => 'default_locale', 'label' => (('Default Admin UI Locale')), 'options' => $locales],
-                        ['name' => 'allowed_locales', 'label' => (('Allowed Admin UI Locale')), 'options' => $locales, 'multiple' => true],
-                        ['name' => 'enable_debug_in_js', 'label' => (('Enable Debug Moe in JS')), 'type' => 'checkbox'],
+                        [Ctrl::NAME => 'modules', Ctrl::LABEL => (('Modules to run in RECOVERY mode')), 'root' => 'recovery/FCom_Admin', Ctrl::TYPE => 'textarea'],
+                        [Ctrl::NAME => 'enable_locales', Ctrl::LABEL => (('Enable UI Multi Locale')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'default_locale', Ctrl::LABEL => (('Default Admin UI Locale')), Ctrl::OPTIONS => $locales],
+                        [Ctrl::NAME => 'allowed_locales', Ctrl::LABEL => (('Allowed Admin UI Locale')), Ctrl::OPTIONS => $locales, Ctrl::MULTIPLE => true],
+                        [Ctrl::NAME => 'enable_debug_in_js', Ctrl::LABEL => (('Enable Debug Moe in JS')), Ctrl::TYPE => 'checkbox'],
                     ],
                 ],
             ],
             '/areas/admin/dashboard' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Admin'],
-                        ['name' => 'default_dashboard_widget_limit', 'label' => (('Default Widgets Rows Limit'))],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Admin'],
+                        [Ctrl::NAME => 'default_dashboard_widget_limit', Ctrl::LABEL => (('Default Widgets Rows Limit'))],
                     ],
                 ],
             ],
             '/areas/admin/user_security' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Admin'],
-                        ['name' => 'password_strength', 'label' => (('Strong Password Security')), 'type' => 'checkbox'],
-                        ['name' => 'password_reset_token_ttl_hr', 'label' => (('Password Reset Token TTL')), 'notes' => (('hours, default 24'))],
-                        ['name' => 'recaptcha_login', 'label' => (('Recaptcha on Login Form')), 'type' => 'checkbox'],
-                        ['name' => 'recaptcha_password_recover', 'label' => (('Recaptcha on Password Recovery Form')), 'type' => 'checkbox'],
-                        ['name' => 'recaptcha_g2fa_recover', 'label' => (('Recaptcha on Google 2FA Recovery Form')), 'type' => 'checkbox'],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Admin'],
+                        [Ctrl::NAME => 'password_strength', Ctrl::LABEL => (('Strong Password Security')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'password_reset_token_ttl_hr', Ctrl::LABEL => (('Password Reset Token TTL')), Ctrl::NOTES => (('hours, default 24'))],
+                        [Ctrl::NAME => 'recaptcha_login', Ctrl::LABEL => (('Recaptcha on Login Form')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'recaptcha_password_recover', Ctrl::LABEL => (('Recaptcha on Password Recovery Form')), Ctrl::TYPE => 'checkbox'],
+                        [Ctrl::NAME => 'recaptcha_g2fa_recover', Ctrl::LABEL => (('Recaptcha on Google 2FA Recovery Form')), Ctrl::TYPE => 'checkbox'],
                     ],
                 ],
             ],
 
             '/areas/cron/area' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Cron'],
-                        ['name' => 'FCom_Cron', 'label' => (('IP: Mode')), 'type' => 'component',
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Cron'],
+                        [Ctrl::NAME => 'FCom_Cron', Ctrl::LABEL => (('IP: Mode')), Ctrl::TYPE => 'component',
                             'component' => 'sv-comp-form-ip-mode', 'root' => 'mode_by_ip'],
                     ],
                 ],
             ],
             '/areas/cron/dispatch' => [
-                static::CONFIG => [
-                    'fields' => [
-                        'default' => ['root' => 'modules/FCom_Cron'],
-                        ['name' => 'leeway_mins', 'label' => (('Leeway Minutes')), 'input_type' => 'number'],
-                        ['name' => 'timeout_mins', 'label' => (('Timeout Minutes')), 'input_type' => 'number'],
-                        ['name' => 'wait_sec', 'label' => (('Wait Seconds')), 'input_type' => 'number'],
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Cron'],
+                        [Ctrl::NAME => 'leeway_mins', Ctrl::LABEL => (('Leeway Minutes')), Ctrl::INPUT_TYPE => 'number'],
+                        [Ctrl::NAME => 'timeout_mins', Ctrl::LABEL => (('Timeout Minutes')), Ctrl::INPUT_TYPE => 'number'],
+                        [Ctrl::NAME => 'wait_sec', Ctrl::LABEL => (('Wait Seconds')), Ctrl::INPUT_TYPE => 'number'],
                     ],
                 ],
             ],

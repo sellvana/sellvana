@@ -13,17 +13,14 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-defa
             }
         },
         computed: {
-            fieldClass: function () {
-                var vm = this;
-                return function (field) {
-                    return {};
-                }
-            },
             i18n_enabled: function () {
                 return SvAppData.modules.hasOwnProperty('Sellvana_MultiLanguage');
             }
         },
         methods: {
+            fieldClass: function (field) {
+                return {};
+            },
             edited: function (field, value) {
                 var config = this.form.config;
                 if (!config.fields || !config.fields[field]) {

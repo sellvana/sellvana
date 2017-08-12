@@ -442,7 +442,6 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         $this->respond($result);
     }
 
-
     public function action_form_history_grid_data()
     {
         $orderId = $this->BRequest->get('id');
@@ -453,6 +452,32 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
         ];
         $this->respond($result);
     }
+
+    public function onHeaderSearch($args)
+    {
+        $r = $this->BRequest->get();
+        if (isset($r['q']) && $r['q'] != '') {
+            $value = '%' . (string)$r['q'] . '%';
+            $result = $this->Sellvana_Sales_Model_Order->orm()
+                ->where(['OR' => [
+                    ['id like ?', $value],
+                    ['customer_email like ?', $value],
+                    ['unique_id like ?', $value],
+                    ['coupon_code like ?', $value],
+                ]])->find_one();
+            $args['result']['order'] = null;
+            if ($result) {
+                $args['result']['order'] = [
+                    'priority' => 20,
+                    static::LINK => '/sales/orders/form?id=' . $result->id(),
+                ];
+            }
+        }
+    }
+
+
+    /// OLD FORM
+
 
     public function action_payment_add__POST()
     {
@@ -779,10 +804,10 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     {
 
     }
-    
+
     public function action_entity_delete__POST()
     {
-        $result = []; 
+        $result = [];
         try {
             $orderId = $this->BRequest->post('order_id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
@@ -836,27 +861,4 @@ class Sellvana_Sales_AdminSPA_Controller_Orders extends FCom_AdminSPA_AdminSPA_C
     }
 
 
-
-
-    public function onHeaderSearch($args)
-    {
-        $r = $this->BRequest->get();
-        if (isset($r['q']) && $r['q'] != '') {
-            $value = '%' . (string)$r['q'] . '%';
-            $result = $this->Sellvana_Sales_Model_Order->orm()
-                ->where(['OR' => [
-                    ['id like ?', $value],
-                    ['customer_email like ?', $value],
-                    ['unique_id like ?', $value],
-                    ['coupon_code like ?', $value],
-                ]])->find_one();
-            $args['result']['order'] = null;
-            if ($result) {
-                $args['result']['order'] = [
-                    'priority' => 20,
-                    static::LINK => '/sales/orders/form?id=' . $result->id(),
-                ];
-            }
-        }
-    }
 }

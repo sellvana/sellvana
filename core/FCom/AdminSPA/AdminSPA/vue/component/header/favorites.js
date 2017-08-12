@@ -5,12 +5,6 @@ define(['text!sv-comp-header-favorites-tpl'], function (headerFavoritesTpl) {
         computed: {
             favorites: function () {
                 return this.$store.state.favorites || [];
-            },
-            isActive: function () {
-                var vm = this;
-                return function (fav) {
-                    return fav.link === this.$route.fullPath;
-                }
             }
         },
         methods: {
@@ -19,6 +13,9 @@ define(['text!sv-comp-header-favorites-tpl'], function (headerFavoritesTpl) {
                 this.sendRequest('POST', 'favorites/remove', fav, function (response) {
 
                 });
+            },
+            isActive: function (fav) {
+                return fav.link === this.$route.fullPath;
             }
         }
     };

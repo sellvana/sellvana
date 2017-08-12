@@ -9,23 +9,21 @@ define(['lodash'], function (_) {
             + '<span v-else>{{col.label|_}}</span>'
             + '</th>',
         computed: {
-            sorted: function() {
-                return function (dir, def) {
-                    if (!this.col.sortable) {
-                        return false;
-                    }
-                    if (!this.grid || !this.grid.config || !this.grid.config.state || this.grid.config.state.s !== this.col.field) {
-                        return def;
-                    }
-                    var sd = this.grid.config.state.sd;
-                    return (dir === 'up' && sd === 'asc') || (dir === 'down' && sd === 'desc');
-                }
-            },
             anchorClass: function () {
                 return {'sorted-up':this.sorted('up', 0), 'sorted-down':this.sorted('down', 0)};
             }
         },
         methods: {
+            sorted: function (dir, def) {
+                if (!this.col.sortable) {
+                    return false;
+                }
+                if (!this.grid || !this.grid.config || !this.grid.config.state || this.grid.config.state.s !== this.col.field) {
+                    return def;
+                }
+                var sd = this.grid.config.state.sd;
+                return (dir === 'up' && sd === 'asc') || (dir === 'down' && sd === 'desc');
+            },
             toggleSort: function () {
                 if (!this.col.sortable) {
                     return;
