@@ -20,7 +20,7 @@
                     <label class="col-sm-5 f-form-label" :for="'id' + field">{{ field }}</label>
                     <div class="col-sm-7">
                         <select :value="config.columns[id]" :id="'id' + field" @change="setColumn(id, $event)">
-                            <option v-for="option in select2options" :value="option">{{option}}</option>
+                            <option v-for="option in select2options" :value="option">{{ option }}</option>
                         </select>
                     </div>
                 </div>

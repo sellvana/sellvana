@@ -82,6 +82,13 @@ define(['lodash', 'sv-mixin-common', 'text!sv-page-catalog-import-products-confi
                 if (this.config.skip_first === false) {
                     this.config.skip_first = 0;
                 }
+
+                var self = this;
+                _.each(this.config.first_row, function (val, idx) {
+                    if (self.config.columns[idx] === undefined) {
+                        self.config.columns[idx] = '';
+                    }
+                })
             },
             onConfigError: function (error) {
                 this.error = error;

@@ -186,10 +186,11 @@ class BImport extends BClass
         if (!$this->BUtil->isPathWithinRoot($filename, $importDir)) {
             throw new BException('Invalid file location');
         }
+        $fp = fopen($filename, 'rb');
         $status = [
             'start_time' => time(),
             'status' => 'running',
-            'rows_total' => sizeof(file($filename)), // file() will load entire file in memory, may be not good idea???
+            'rows_total' => $this->getLinesCount($fp),// file() will load entire file in memory, may be not good idea???
             'rows_processed' => 0,
             'rows_skipped' => 0,
             'rows_warning' => 0,
@@ -202,7 +203,6 @@ class BImport extends BClass
             'errors' => ''
         ];
         $this->config($status, true);
-        $fp = fopen($filename, 'r');
         if (!empty($config['skip_first'])) {
             for ($i = 0; $i < $config['skip_first']; $i++) {
                 fgets($fp);
@@ -225,12 +225,12 @@ class BImport extends BClass
 
         $dataBatch = [];
         while (($r = fgetcsv($fp, 0, $config['delim']))) {
-            if (empty($config['columns']) || count($r) != count($config['columns'])) {
+            if (empty($config['columns']) || count($r) !== count($config['columns'])) {
                 continue;
             }
             $row = array_combine($config['columns'], $r);
             foreach ($config['defaults'] as $k => $v) {
-                if (!is_null($v) && $v !== '' && (!isset($row[$k]) || $row[$k] === '')) {
+                if (null !== $v && $v !== '' && (!isset($row[$k]) || $row[$k] === '')) {
                     $row[$k] = $v;
                 }
             }
@@ -309,5 +309,18 @@ class BImport extends BClass
 
         $this->BDebug->mode($oldDebugMode);
         return true;
+    }
+
+    /**
+     * @param resource $fh
+     * @return int
+     */
+    public function getLinesCount($fh)
+    {
+        $c = 0;
+        while (fgetcsv($fh)) {
+            $c++;
+        }
+        return $c;
     }
 }
