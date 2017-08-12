@@ -78,7 +78,8 @@ class Sellvana_Catalog_AdminSPA_Controller_ImportProducts extends FCom_AdminSPA_
 
     public function action_stop__POST()
     {
-        return $this->respond($this->Sellvana_Catalog_ProductsImport->config(['status' => 'stopped'], true));
+        $this->Sellvana_Catalog_ProductsImport->config(['status' => BImport::STATUS_STOPPED], true);
+        return $this->respond($this->Sellvana_Catalog_ProductsImport->config());
     }
 
     public function action_status()

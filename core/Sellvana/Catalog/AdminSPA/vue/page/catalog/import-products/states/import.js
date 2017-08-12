@@ -52,11 +52,16 @@ define(['sv-mixin-common',
 
             stopImport: function () {
                 // stop current import, emit import:stopped event
+                var self = this;
                 var url = baseUrl + '/stop';
                 this.sendRequest('POST', url, {})
                     .done(function (result) {
                         if (result) {
                             this.c = result;
+                        }
+
+                        if ( result.status === 'stopped' || result.status === 'done') {
+                            self.$emit('import-complete')
                         }
                     })
                     .fail(function (error) {
@@ -65,8 +70,6 @@ define(['sv-mixin-common',
             },
 
             fetchStatus: function () {
-                console.log('fetching status');
-
                 this.$emit('status');
             }
         },

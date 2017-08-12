@@ -1,9 +1,9 @@
 define(['lodash', 'moment', 'sv-mixin-common', 'text!sv-page-catalog-import-products-status-tpl'], function (_, moment, SvMixinCommon, tpl) {
     function formatBytes(a, b) {
-        if (0 === a) {
+        if (0 === a || undefined === a) {
             return "0 Bytes";
         }
-        var c = 1024 ,
+        var c = 1024,
             d = b || 2,
             e = ['Bits', "Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
             f = Math.floor(Math.log(a) / Math.log(c));
@@ -44,7 +44,7 @@ define(['lodash', 'moment', 'sv-mixin-common', 'text!sv-page-catalog-import-prod
                 }
                 return moment.duration(this.config.run_time, 'seconds').humanize();
             },
-            estimatedFinish : function () {
+            estimatedFinish: function () {
                 if (!this.config.start_time) {
                     return 0;
                 }
@@ -52,7 +52,7 @@ define(['lodash', 'moment', 'sv-mixin-common', 'text!sv-page-catalog-import-prod
                 return runtime.format("YYYY MMM DD, HH:mm:ss");
             },
             peakMemoryUsage: function () {
-                return formatBytes(this.config.memory_usage);
+                return formatBytes(this.config.memory_peak_usage);
             },
             memoryUsage: function () {
                 return formatBytes(this.config.memory_usage);
