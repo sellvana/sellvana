@@ -1,0 +1,95 @@
+<div class="f-bordered-block">
+    <div class="f-bordered-block__title">
+        <p>{{ 'Status: "{status}"'|_({status: c.status}) }}</p>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="scrollable-area">
+                <table class="f-total-table f-striped-table">
+                    <tr>
+                        <td>{{ 'Rows Found'|_ }}</td>
+                        <th>{{ c.rows_total | int }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Rows Processed'|_ }}</td>
+                        <th>{{ c.rows_processed | int }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Rows Successful'|_ }} <span class="f-line-valid"></span></td>
+                        <th>{{ successful }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Rows Depends'|_ }}</td>
+                        <th>{{ c.rows_depends | int  }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Rows Not Changed'|_ }}</td>
+                        <th>{{ c.rows_nochange | int  }}</th>
+                    </tr>
+                    <tr v-if="c.rows_empty">
+                        <td>{{ 'Rows Empty/Comment'|_ }}</td>
+                        <th>{{ c.rows_empty| int }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Rows With Errors'|_ }}</td>
+                        <th>{{ c.rows_error | int }} <span class="f-line-error" v-if="totalErrors"></span></th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Total Errors'|_ }}</td>
+                        <th>{{ totalErrors }} <span class="f-line-error" v-if="totalErrors"></span></th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Total Warnings'|_ }}</td>
+                        <th>{{ totalWarnings }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Running For'|_ }}</td>
+                        <th class="f-status-td">{{ runTime }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Crunch Rate'|_ }}</td>
+                        <th class="f-status-td">{{ crunchRate }} row/sec</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Estimate Run Time'|_ }}</td>
+                        <th>{{ estimatedRunTime }}</th>
+                    </tr>
+                    <tr>
+                        <td>{{ 'Estimate Finish'|_ }}</td>
+                        <th>{{ estimatedFinish }}</th>
+                    </tr>
+                    <tr v-if="c.memory_usage">
+                        <td>{{ 'Memory Used'|_ }}</td>
+                        <th>{{ memoryUsage }}</th>
+                    </tr>
+                    <tr v-if="peakMemoryUsage">
+                        <td>{{ 'Peak Memory Used'|_ }}</td>
+                        <th>{{ peakMemoryUsage }}</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-7 col-lg-offset-1">
+            <div class="scrollable-area">
+                <table class="f-total-table f-striped-table f-errors-table" v-if="totalErrors">
+                    <thead>
+                    <tr>
+                        <th>{{ 'Type'|_ }}</th>
+                        <th>{{ 'Line'|_ }}</th>
+                        <th>{{ 'Column'|_ }}</th>
+                        <th>{{ 'Message'|_ }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="e in c.errors">
+                        <td class="f-status-td">{{ 'ERROR'|_ }} <span class="f-line-error"></span></td>
+                        <th>{{ e.line }}</th>
+                        <th>{{ e.col }}</th>
+                        <td>{{ e.message }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

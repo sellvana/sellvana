@@ -89,6 +89,11 @@ modules:
                         folder: media/category/images
 
             FCom_AdminSPA:
+                uploads:
+                    product-import:
+                        permission: catalog/product/import
+                        filetype: csv,txt
+                        folder: {random}/import/products
                 auto_use: [ layout ]
                 routing:
                     - [ /categories/?.action, Sellvana_Catalog_AdminSPA_Controller_Categories ]

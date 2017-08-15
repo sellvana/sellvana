@@ -1,0 +1,10 @@
+<div>
+    <div class="f-options-title">
+        <p class="f-options-title__text">Upload or select file</p>
+    </div>
+    <div class="f-options-content">
+        <dropzone id="product-csv-file-upload" :url="upload_url"
+                  :use-custom-dropzone-options="true" :dropzone-options="dropzone_options"
+                  @vdropzone-sending="dropzoneSending" @vdropzone-success="dropzoneSuccess"></dropzone>
+    </div>
+</div>

@@ -1,25 +1,32 @@
-define(['sv-comp-grid', 'text!sv-page-catalog-fields-form-options-tpl', 'json!sv-page-catalog-fields-form-options-config'],
-	function (SvCompGrid, tabFieldOptionsTpl, fieldOptionsGridConfig) {
-
-	return {
-		props: {
-			form: {
-				type: Object
-			}
-		},
-		data: function () {
-			if (fieldOptionsGridConfig.data_url && this.form.field && this.form.field.id) {
-				fieldOptionsGridConfig.data_url = fieldOptionsGridConfig.data_url.supplant({id: this.form.field.id});
-			}
-			return {
-				grid: {
-					config: fieldOptionsGridConfig
-				}
-			}
-		},
-		template: tabFieldOptionsTpl,
-		components: {
-			'sv-comp-grid': SvCompGrid
-		}
-	};
+define(['lodash', 'vue', 'sv-hlp', 'text!sv-page-catalog-fields-form-options-tpl'], function (_, Vue, SvHlp, tabFieldOptionsTpl) {
+    return {
+        data: function () {
+            return {
+                options: [],
+                defaultOption: {
+                    label: '',
+                    swatch_info: ''
+                }
+            }
+        },
+        mounted: function() {
+            this.options = this.form.options;
+        },
+        props: ['form'],
+        mixins: [SvHlp.mixins.common],
+        template: tabFieldOptionsTpl,
+        methods: {
+            addNewOption: function () {
+                this.options.push(_.clone(this.defaultOption))
+            },
+            deleteOption: function (option) {
+                var idx = _.findIndex(this.options, function (o) {
+                    return o === option;
+                });
+                if (idx !== -1) {
+                    this.options.splice(idx, 1);
+                }
+            }
+        }
+    }
 });

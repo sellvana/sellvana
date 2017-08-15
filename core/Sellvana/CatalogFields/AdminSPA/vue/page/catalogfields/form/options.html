@@ -1,7 +1,33 @@
 <div class="row">
-      <div class="col-md-12 col-lg-6">
-            <div class="f-content-block box-no-padding">
-                  <sv-comp-grid :grid="grid"></sv-comp-grid>
+    <div class="col-md-12 col-lg-6">
+        <div class="f-content-block">
+            <div class="f-options">
+                <div class="f-buttons-block">
+                    <button class="button button1 f-options__control-elem" @click="addNewOption">Insert new option</button>
+                </div>
+                <div class="f-options-content">
+                    <div class="f-tags">
+                        <div class="f-tag-container row field_option">
+                            <p class="col-xs-4 f-form-label">Label</p>
+                            <p class="col-xs-4 f-form-label">Swatch Color/URL</p>
+                            <p class="col-xs-2 f-form-label">Actions</p>
+                        </div>
+                        <div v-for="option in options" class="f-tag-container row field_option" :key="option.id">
+                            <div class="col-xs-4">
+                                <input :id="'field_option_label_' + option.id" required="required" type="text" class="f-input" v-model="option.label">
+                            </div>
+                            <div class="col-xs-4">
+                                <input :id="'field_option_swatch_' + option.id" type="text" class="f-input" v-model="option.swatch_info">
+                            </div>
+                            <div class="col-xs-2 text-right">
+                                <a class="f-delete" title="Delete" data-action="delete" @click="deleteOption(option)">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-      </div>
+        </div>
+    </div>
 </div>

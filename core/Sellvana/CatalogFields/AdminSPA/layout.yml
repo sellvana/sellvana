@@ -8,13 +8,12 @@
             - [ requireJs, sv-page-catalog-fields-form-info-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/info.html ]
             - [ requireJs, sv-page-catalog-fields-form-options, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/options ]
             - [ requireJs, sv-page-catalog-fields-form-options-tpl, @Sellvana_CatalogFields/AdminSPA/vue/page/catalogfields/form/options.html ]
-            - [ requireJs, sv-page-catalog-fields-form-options-config, ~/catalogfields/options/grid_config ]
 
-			- [ requireJs, sv-page-catalog-products-form-variants, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants" ]
+            - [ requireJs, sv-page-catalog-products-form-variants, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants" ]
             - [ requireJs, sv-page-catalog-products-form-variants-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/variants.html" ]
-			- [ requireJs, sv-page-catalog-products-form-customfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/customfields" ]
+            - [ requireJs, sv-page-catalog-products-form-customfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/customfields" ]
             - [ requireJs, sv-page-catalog-products-form-customfields-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/customfields.html" ]
-			- [ requireJs, sv-page-catalog-products-form-shopperfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields" ]
+            - [ requireJs, sv-page-catalog-products-form-shopperfields, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields" ]
             - [ requireJs, sv-page-catalog-products-form-shopperfields-tpl, "@Sellvana_CatalogFields/AdminSPA/vue/page/catalog/products/form/shopperfields.html" ]
 
 sv-app-data-js:

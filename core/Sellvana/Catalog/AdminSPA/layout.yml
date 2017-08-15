@@ -64,6 +64,14 @@
 
 			- [ requireJs, sv-page-catalog-import-products, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/index" ]
 			- [ requireJs, sv-page-catalog-import-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/index.html" ]
+			- [ requireJs, sv-page-catalog-import-products-upload, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/upload" ]
+			- [ requireJs, sv-page-catalog-import-products-upload-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/upload.html" ]
+			- [ requireJs, sv-page-catalog-import-products-configure, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/configure" ]
+			- [ requireJs, sv-page-catalog-import-products-configure-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/configure.html" ]
+			- [ requireJs, sv-page-catalog-import-products-import, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/import" ]
+			- [ requireJs, sv-page-catalog-import-products-import-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/import.html" ]
+			- [ requireJs, sv-page-catalog-import-products-status, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/status" ]
+			- [ requireJs, sv-page-catalog-import-products-status-tpl, "@Sellvana_Catalog/AdminSPA/vue/page/catalog/import-products/states/status.html" ]
 
             - [ requireJs, sv-comp-dashboard-low-inventory-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/low-inventory.html" ]
             - [ requireJs, sv-comp-dashboard-new-products-tpl, "@Sellvana_Catalog/AdminSPA/vue/component/dashboard/new-products.html" ]

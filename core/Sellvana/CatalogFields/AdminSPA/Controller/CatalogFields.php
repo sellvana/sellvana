@@ -70,7 +70,7 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
     public function getGridOrm()
     {
         $subSql = '(select count(*) from ' . $this->FCom_Core_Model_FieldOption->table() . ' where field_id=f.id)';
-                                              ;
+
         return $this->FCom_Core_Model_Field
             ->orm('f')
             ->where('field_type', 'product')
@@ -80,10 +80,10 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
 
     public function getFormData()
     {
-        $pId = $this->BRequest->get('id');
+        $fId = $this->BRequest->get('id');
         $bool = [[static::ID => 0, 'text' => 'no'], [static::ID => 1, 'text' => (('Yes'))]];
 
-        $field = $this->FCom_Core_Model_Field->load($pId);
+        $field = $this->FCom_Core_Model_Field->load($fId);
         if (!$field) {
             throw new BException('Field not found');
         }
@@ -91,6 +91,15 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
         $result = [];
 
         $result[static::FORM][static::$_modelName] = $field->as_array();
+
+        $fieldOptions = $this->FCom_Core_Model_FieldOption
+            ->orm()
+            ->select(['id', 'label', 'swatch_info'])
+            ->where('field_id', $fId);
+
+        $result['form']['options'] = array_map(function (BModel $obj) {
+            return $obj->as_array();
+        }, $fieldOptions->find_many());
 
 		$result[static::FORM][static::CONFIG][static::PAGE_ACTIONS] = $this->getDefaultFormPageActions();
 		$result[static::FORM][static::CONFIG][static::TITLE] = $field->get('field_name');
@@ -147,24 +156,24 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
             if (!$model) {
                 throw new BException("This field does not exist");
             }
-
-            if ($data) {
-                $model->set($data);
+            if (isset($data['field'])) {
+                $model->set($data['field']);
             }
 
-            $origModelData = $modelData = $model->as_array();
-            $validated = $model->validate($modelData, [], 'product');
+            $modelData = $model->as_array();
+            $validated = $model->validate($modelData, [], 'field');
             //if ($modelData !== $origModelData) {
                 //var_dump($modelData);
                 //$model->set($modelData);
             //}
 
-
             if ($validated) {
-                $model->save();
+                $model->save();if (isset($data['options'])) {
+                    $this->saveFieldOptions($model->id(), $data['options']);
+                }
                 $result = $this->getFormData();
                 $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
-                $this->ok()->addMessage('Inventory was saved successfully', 'success');
+                $this->ok()->addMessage(static::$_recordName . ' was saved successfully', 'success');
             } else {
                 $result = ['status' => 'error'];
                 $this->error()->addMessage('Cannot save data, please fix above errors', 'error');
@@ -174,5 +183,42 @@ class Sellvana_CatalogFields_AdminSPA_Controller_CatalogFields
             $this->addMessage($e);
         }
         $this->respond($result);
+    }
+
+    /**
+     * Options should be in format:
+     *  [
+     *      [label: "Label", swatch_info: "INFO"],
+     *          ...
+     *  ]
+     *
+     * @param       $id      - Field Id
+     * @param array $options - array of field options
+     * @throws \BException
+     */
+    protected function saveFieldOptions($id, array $options)
+    {
+        if (empty($options)) {
+            return;
+        }
+
+        foreach ($options as $option) {
+            if (isset($option['id'])) {
+                $model = $this->FCom_Core_Model_FieldOption->load($id);
+            } else {
+                $model = $this->FCom_Core_Model_FieldOption->create();
+            }
+
+            $model->set($option);
+            $model->set('field_id', $id);
+            $modelData = $model->as_array();
+            $validated = $model->validate($modelData, [], 'field');
+
+            if ($validated) {
+                $model->save();
+            } else {
+                $this->error()->addMessage('Cannot save data, please fix above errors', 'error');
+            }
+        }
     }
 }

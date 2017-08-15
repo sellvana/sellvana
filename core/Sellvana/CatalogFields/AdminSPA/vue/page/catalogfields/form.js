@@ -18,14 +18,14 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
                     ]
                 }});
             },
-			fetchData: function () {
-                var orderId = this.$router.currentRoute.query.id, vm = this;
-                this.sendRequest('GET', 'catalogfields/form_data', {id: orderId}, function (response) {
+            fetchData: function () {
+                var fieldId = this.$router.currentRoute.query.id, vm = this;
+                this.sendRequest('GET', 'catalogfields/form_data', {id: fieldId}, function (response) {
                     vm.processFormDataResponse(response);
                     vm.updateBreadcrumbs(vm.form.field.field_name);
                 });
-			},
-			doDelete: function () {
+            },
+            doDelete: function () {
                 var vm = this;
 				if (!confirm(this._(('Are you sure you want to delete this field?')))) {
 					return;
@@ -33,34 +33,37 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
 				this.sendRequest('POST', 'catalogfields/form_delete', {id: this.form.field.id}, function (response) {
 					if (response.status) {
                         vm.$router.push('/catalog/fields');
-					}
-				});
-			},
-			save: function (stayOnPage) {
-				var vm = this;
+                    }
+                });
+            },
+            save: function (stayOnPage) {
+                var vm = this;
                 this.$store.commit('actionInProgress', stayOnPage ? 'save-continue' : 'save');
-				
-				if (!this.validateForm()) {
+
+                if (!this.validateForm()) {
                     this.$store.commit('actionInProgress', false);
-					return;
-				}
-				this.sendRequest('POST', 'catalogfields/form_data?id=' + this.form.field.id, this.form.field, function (response) {
-					if (response.form) {
+                    return;
+                }
+                this.sendRequest('POST', 'catalogfields/form_data?id=' + this.form.field.id, {
+                    field: this.form.field,
+                    options: this.form.options
+                }, function (response) {
+                    if (response.form) {
                         vm.processFormDataResponse(response);
                         vm.updateBreadcrumbs(vm.form.field.field_name);
-					}
+                    }
                     for (var i in response.form) {
                         //Vue.set(vm.form, i, response.form[i]);
                     }
                     if (!vm.form.updates) {
-						//Vue.set(vm.form, 'updates', {});
-					}
+                        //Vue.set(vm.form, 'updates', {});
+                    }
                     if (!stayOnPage) {
                         vm.$router.push('/catalog/fields');
                     }
                     vm.$store.commit('actionInProgress', false);
-				})
-		    }
-		}
+                })
+            }
+        }
     };
 });

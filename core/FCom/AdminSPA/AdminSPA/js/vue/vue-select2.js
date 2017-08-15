@@ -39,13 +39,13 @@ define(['jquery', 'lodash', 'vue', 'select2'], function ($, _, Vue) {
             if (this.value === null) {
                 // this.value = '';
             }
-            $(this.$el).val(this.value).select2(params).on('change', function () {
+            $(this.$el).select2(params).on('change', function () {
                 var $el = $(vm.$el), val = $el.val();
                 vm.$emit('input', val);
                 if (vm.onChange) {
                     vm.onChange(val);
                 }
-            });
+            }).val(this.value);
         },
         watch: {
             value: function (value) {

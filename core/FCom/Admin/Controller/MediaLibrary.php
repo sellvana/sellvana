@@ -474,7 +474,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
          */
         $do = $r->post('oper');
         if (empty($do)) {
-            $do = $r->param('do');
+            $do = $r->param('do') ?: (isset($options['do']) ? $options['do'] : null);
         }
 
         switch ($do) {
@@ -602,6 +602,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         // solution two is to find a way to pass rowid to the server side
                         //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
 
+                    }
+
+                    if (isset($options['return'])) {
+                        return $rows;
                     }
                     $this->BResponse->json(['files' => $rows]);
                 }
