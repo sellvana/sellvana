@@ -47,6 +47,7 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         VALIDATE = 'validate',
         INPUT_TYPE = 'input_type',
         NOTES = 'notes',
+        NOTES_TEMPLATE = 'notes_tpl',
         THUMB_URL = 'thumb_url',
         I18N = 'i18n',
         EDIT = 'edit',

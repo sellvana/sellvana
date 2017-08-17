@@ -77,7 +77,10 @@ class FCom_Dev_Translations extends BClass
         $newTranslations = [];
         if ($translations) {
             foreach ($translations as $trKey => $tr) {
-                list(, $newTranslations[$trKey]) = each($tr);
+                foreach ($tr as $trVal) {
+                    $newTranslations[$trKey] = $trVal;
+                    break;
+                }
             }
         }
         $newTranslations = array_merge($newTranslations, $keys);

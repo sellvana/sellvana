@@ -292,7 +292,9 @@ class BRequest extends BClass
             return false;
         }
 
-        list($toplang) = each($langs);
+        foreach ($langs as $toplang => $_) {
+            break;
+        }
         //return en, de, es, it.... first two characters of language code
         return substr($toplang, 0, 2);
     }
@@ -1083,7 +1085,7 @@ class BRequest extends BClass
         static $alreadyRan = false;
         if (get_magic_quotes_gpc() && !$alreadyRan) {
             $process = [&$_GET, &$_POST, &$_COOKIE, &$_REQUEST];
-            while (list($key, $val) = each($process)) {
+            foreach ($process as $key => $val) {
                 foreach ($val as $k => $v) {
                     unset($process[$key][$k]);
                     if (is_array($v)) {

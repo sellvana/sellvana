@@ -110,7 +110,7 @@
         <a v-if="fieldConfig('removable')" href="#" class="field-row-icon" @click.prevent="emitEvent('remove_field', field_config)"><i class="fa fa-trash" aria-hidden="true"></i></a>
 
         <div v-if="fieldConfig('notes')">{{fieldConfig('notes')}}</div>
-        <div v-if="fieldConfig('notes_tpl')"><component :is="{template: fieldConfig('notes_tpl')}"></component></div>
+        <div v-if="fieldConfig('notes_tpl')"><component :is="{props: ['form'], template: fieldConfig('notes_tpl')}" :form="form"></component></div>
 
         <span v-for="e in field_errors" class="error-message">{{e}}</span>
     </div>

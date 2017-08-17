@@ -767,6 +767,9 @@ EOT
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
                 if (substr($idxLower, 0, 3) !== 'fk_') { // expand fk idx from 'name' to 'FK_{$table}_{$idx}'
+                    if (is_string($def) && strpos($def, ' ') === false) {
+                        $def = [$idx . '_id', $def]; // expand string def ($tableName) to ['col_id', $tableName]
+                    }
                     $idx = 'FK_' . $dbTableName . '_' . $idx;
                     $idxLower = strtolower($idx);
                 }

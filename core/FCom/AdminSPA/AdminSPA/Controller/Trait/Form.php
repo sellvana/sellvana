@@ -135,35 +135,30 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             $models = [];
             if (!empty($form[static::CONFIG]['default_field'])) {
                 $def = array_merge(static::$_defaultFieldConfig, $form[static::CONFIG]['default_field']);
-            } elseif (!empty($form[static::CONFIG][static::FIELDS]['default'])) {
-                $def = array_merge(static::$_defaultFieldConfig, $form[static::CONFIG][static::FIELDS]['default']);
-                unset($form[static::CONFIG][static::FIELDS]['default']);
+            } elseif (!empty($form[static::CONFIG][static::FIELDS][static::DEFAULT_FIELD])) {
+                $def = array_merge(static::$_defaultFieldConfig, $form[static::CONFIG][static::FIELDS][static::DEFAULT_FIELD]);
+                unset($form[static::CONFIG][static::FIELDS][static::DEFAULT_FIELD]);
             } else {
                 $def = static::$_defaultFieldConfig;
             }
             foreach ($form[static::CONFIG][static::FIELDS] as &$field) {
                 $field = array_merge($def, $field);
                 if (!empty($field[static::OPTIONS])) {
-                    if (empty($field['type']) || $field['type'] === 'input') {
-                        $field['type'] = 'select2';
+                    if (empty($field[static::TYPE]) || $field[static::TYPE] === 'input') {
+                        $field[static::TYPE] = 'select2';
 //                        $field['type'] = !empty($field['multiple']) ? 'v-multiselect' : 'select';
                     }
                     if (empty($field[static::OPTIONS][0])) {
                         $field[static::OPTIONS] = $this->BUtil->arrayMapToSeq($field[static::OPTIONS]);
                     }
                 }
-                if (!empty($field['model'])) {
-                    $models[$field['model']] = $field['model'];
-                }
-            }
-            unset($field);
-            if ($models) {
-                foreach ($models as $model) {
-                    if (empty($form[$model])) {
-                        $form[$model] = new stdClass;
+                if (!empty($field[static::MODEL])) {
+                    if (!empty($field[static::NAME]) && !isset($form[$field[static::MODEL]][$field[static::NAME]])) {
+                        $form[$field[static::MODEL]][$field[static::NAME]] = null;
                     }
                 }
             }
+            unset($field);
         }
 
         if (!empty($form[static::CONFIG][static::PAGE_ACTIONS])) {
