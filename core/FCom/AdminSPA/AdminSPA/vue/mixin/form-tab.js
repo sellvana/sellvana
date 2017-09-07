@@ -72,9 +72,26 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-defa
                 // result = cond.replace(/\{(([a-z0-9_/]+)\/)?([a-z0-9_]+)\}/g, function (_, _, root, field) {
                 //     return vm.fieldModel(f, root)[field];
                 // });
-
-                cond = cond.replace(/\{(([a-z0-9_/]+)\/)?([a-z0-9_]+)\}/g, "this.fieldModel(f, '$2').$3");
-                result = eval(cond);
+                if (_.isArray(cond)) {
+                    var i, matches, model, field;
+                    for (i = 0; i < cond.length; i++) {
+                        matches = true;
+                        for (model in cond[i]) {
+                            for (field in cond[i][model]) {
+                                if (this.form[model][field] !== cond[i][model][field]) {
+                                    matches = false;
+                                }
+                            }
+                        }
+                        if (matches) {
+                            return true;
+                        }
+                    }
+                    return false;
+                } else {
+                    cond = cond.replace(/\{(([a-z0-9_.]+)[.])?([a-z0-9_]+)\}/g, "this.fieldModel(f, '$2').$3");
+                    result = eval(cond);
+                }
 
                 return result;
             },

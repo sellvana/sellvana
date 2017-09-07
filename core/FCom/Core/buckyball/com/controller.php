@@ -216,6 +216,21 @@ class BRequest extends BClass
         return $this->https() ? 'https' : 'http';
     }
 
+    static protected $_headers;
+
+    public function headers()
+    {
+        if (!static::$_headers) {
+            foreach ($_SERVER as $k => $v) {
+                if (strpos($k, 'HTTP_') === 0) {
+                    $name = str_replace([' '], ['-'], strtolower(preg_replace(['/^HTTP_/', '/_/'], ['', ' '], $k)));
+                    static::$_headers[$name] = $v;
+                }
+            }
+        }
+        return static::$_headers;
+    }
+
     /**
      * Get all mime types accepted by client browser, or return the preferred type
      *
@@ -528,13 +543,13 @@ class BRequest extends BClass
     * @param string $key
     * @return array|string|null
     */
-    public function get($key = null)
+    public function get($key = null, $default = null)
     {
         // Encountered this in some nginx + apache environments
         if (empty($_GET) && !empty($_SERVER['QUERY_STRING'])) {
             parse_str($_SERVER['QUERY_STRING'], $_GET);
         }
-        return null === $key ? $_GET : (isset($_GET[$key]) ? $_GET[$key] : null);
+        return null === $key ? $_GET : (isset($_GET[$key]) ? $_GET[$key] : $default);
     }
 
     public function server($key = null)
@@ -1155,9 +1170,11 @@ class BRequest extends BClass
      */
     public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
     {
+#var_dump($data, $forUrlPath, $curPath);
         $allowedTags = $this->getAllowedTags();
         foreach ($data as $k => &$v) {
             $childPath = null === $curPath ? $k : ($curPath . '/' . $k);
+#var_dump($childPath);
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
@@ -1174,7 +1191,6 @@ class BRequest extends BClass
                     }
                     if ('*' !== $tags) {
                         $v = strip_tags($v, $tags);
-
                         $v = preg_replace('/
                             < [a-z:-]+ \s .*? (
                                 [a-z]+ \s* = \s* [\'"] \s* javascript \s* :   # src="javascript:..."
@@ -1452,9 +1468,10 @@ class BResponse extends BClass
      * @param        $source
      * @param null   $fileName
      * @param string $disposition
+     * @param string $root
      * @return exit
      */
-    public function sendFile($source, $fileName = null, $disposition = 'attachment')
+    public function sendFile($source, $fileName = null, $disposition = 'attachment', $root = null)
     {
         $this->BSession->close();
 
@@ -1464,7 +1481,8 @@ class BResponse extends BClass
             return;
         }
 
-        if (!$this->BUtil->isPathWithinRoot($source)) {
+        $source = realpath($source);
+        if (!$this->BUtil->isPathWithinRoot($source, $root)) {
             $this->status(403, (('Invalid file location')), 'Invalid file location');
             $this->shutdown(__METHOD__);
             return;
@@ -2155,7 +2173,7 @@ class BRouting extends BClass
 #echo "<pre>"; print_r($this->_routes); exit;
         while (($attempts++ < 100) && (false === $forward || is_array($forward))) {
             $route = $this->findRoute($requestRoute);
-#echo "<pre>"; print_r($route); echo "</pre>"; exit;
+#echo "<pre>"; print_r($route); echo "</pre>";
             if (!$route) {
                 $route = $this->findRoute('_ /noroute');
             }
@@ -2383,6 +2401,7 @@ class BRouteNode extends BClass
         $attempts = 0;
         $observer = $this->validObserver();
         while ((++$attempts < 100) && $observer) {
+
 #print_r($observer); exit;
             $forward = $observer->dispatch();
             if (is_array($forward)) {

@@ -73,6 +73,10 @@ define(['lodash', 'vue', 'sv-app-data', 'text!sv-comp-form-field-tpl'], function
                     }
                 }
                 return this.field_config[key];
+            },
+            fieldComponent: function () {
+                return this.fieldConfig('component') ? this.fieldConfig('component')
+                    : {props:['form', 'field'], template: this.fieldConfig('template')};
             }
         },
         created: function () {

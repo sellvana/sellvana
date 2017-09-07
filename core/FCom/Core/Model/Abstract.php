@@ -93,7 +93,7 @@ class FCom_Core_Model_Abstract extends BModel
      *
      * Works only for models with `data_serialized` field existing
      *
-     * @param string $path slash separated path to the data within structured array
+     * @param array|string $path slash separated path to the data within structured array
      * @param        $value mixed
      * @param bool   $merge
      * @return FCom_Core_Model_Abstract

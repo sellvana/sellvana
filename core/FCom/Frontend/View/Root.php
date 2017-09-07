@@ -9,6 +9,19 @@
  */
 class FCom_Frontend_View_Root extends FCom_Core_View_Root
 {
+    protected $_docType = 'html';
+
+    public function doctype($docType)
+    {
+        $this->_docType = $docType;
+        return $this;
+    }
+
+    public function getDoctype()
+    {
+        return $this->_docType;
+    }
+
     public function setLayoutClass($layout)
     {
         $this->layout_class = $layout;

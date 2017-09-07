@@ -268,4 +268,22 @@ class Sellvana_Customer_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
+        $tAddress = $this->Sellvana_Customer_Model_Address->table();
+
+        $this->BDb->ddlTableDef($tCustomer, [
+            BDb::KEYS => [
+                'UNQ_email' => 'UNIQUE (email)',
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tAddress, [
+            BDb::COLUMNS => [
+                'data_serialized' => "mediumtext",
+                'country_name' => 'varchar(50)',
+            ],
+        ]);
+    }
 }

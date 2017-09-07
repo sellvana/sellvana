@@ -3,37 +3,39 @@
         <div class="f-content-block">
             <div class="row">
                 <div class="col-md-3">
-                    <select2>
-                        <option selected>Color</option>
-                        <option>Size</option>
+                    <select2 v-model="add_fieldset" @change="addFieldset()">
+                        <option value="">{{'Add a Fieldset'|_}}</option>
+                        <option v-for="fs in available_fieldsets" value="fs.id">{{fs.text}}</option>
                     </select2>
                 </div>
                 <div class="col-md-9">
                     <div class="f-buttons-block">
-                        <button class="button button1">Create New Fieldset</button>
+                        <button class="button button1" @click="openCreateFieldset()">{{'Create a New Fieldset'|_}}</button>
                     </div>
                 </div>
             </div>
             <div class="line"></div>
-            <div class="f-options">
+            <div v-for="fs in fieldsets" class="f-options">
                 <div class="f-options-title">
-                    <p class="f-options-title__text">Default</p>
+                    <p class="f-options-title__text">{{fs.label}}</p>
                     <div class="f-options__control">
-                        <select2 class="f-options__control-elem">
-                            <option>Color</option>
-                            <option>Size</option>
+                        <select2 class="f-options__control-elem" v-model="add_field" @change="addField(fs)">
+                            <option value="">{{'Add a Field'|_}}</option>
+                            <option v-for="f in availableFields(fs)" value="f.id">{{f.text}}</option>
                         </select2>
-                        <button class="button button1 f-options__control-elem">Create Field</button>
-                        <a href="#" title="close" class="f-options__control-elem f-delete"><i class="fa fa-times"></i></a>
-                        <a href="#" title="ok" class="f-options__control-elem f-collapse"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+                        <button class="button button1 f-options__control-elem" @click="openCreateField(fs)">{{'Create Field'|_}}</button>
+                        <a href="#" title="remove" class="f-options__control-elem f-delete" @click.prevent="removeFieldset(fs)"><i class="fa fa-times"></i></a>
+                        <a href="#" title="toggle" class="f-options__control-elem f-collapse" @click.prevent="toggleFieldset(fs)"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
                     </div>
                 </div>
                 <div class="f-options-content">
                     <fieldset class="f-form-container ">
+                        <sv-comp-form-field v-for="f in fs.config.fields" :key="f.name" :form="fs" :field="f.name"
+                            v-model="form.product[f.name]" @event="onFieldEvent"></sv-comp-form-field>
                         <div class="f-form-group row translating">
                             <label class="f-form-label col-md-3">
-                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                 Color
+                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                             </label>
                             <div class="col-md-9">
                                 <select2>
@@ -47,8 +49,8 @@
                         </div>
                         <div class="f-form-group row translating">
                             <label class="f-form-label col-md-3">
-                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                                 Size
+                                <a href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
                             </label>
                             <div class="col-md-9">
                                 <select2>

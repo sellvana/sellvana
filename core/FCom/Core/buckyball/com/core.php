@@ -459,7 +459,7 @@ class BApp extends BClass
         return $baseUrl . $url;
     }
 
-    public function adminHref($url = '')
+    public function adminHref($url = '', $folder = 'admin')
     {
         static $baseAdminHref;
         if (!$baseAdminHref) {
@@ -467,7 +467,7 @@ class BApp extends BClass
             $r = $this->BRequest;
             $adminHref = $conf->get('web/admin_href');
             if (!$adminHref) {
-                $adminHref = rtrim($this->BConfig->get('web/base_store'), '/') . '/admin/index.php';
+                $adminHref = rtrim($this->BConfig->get('web/base_store'), '/') . '/' . $folder . '/index.php';
                 $conf->set('web/admin_href', $adminHref);
             }
             if (!$this->BUtil->isUrlFull($adminHref)) {
@@ -2166,6 +2166,7 @@ class BEvents extends BClass
         if (empty($this->_events[$eventName])) {
             return $result;
         }
+
         $profileStart =
             BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
         $observers =& $this->_events[$eventName]['observers'];
@@ -2182,7 +2183,6 @@ class BEvents extends BClass
                 }
             }
         } while ($dirty);
-
         foreach ($observers as $i => $observer) {
             if (!empty($this->_events[$eventName]['args'])) {
                 $args = array_merge($this->_events[$eventName]['args'], $args);

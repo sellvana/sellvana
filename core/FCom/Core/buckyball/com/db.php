@@ -733,7 +733,7 @@ EOT
         if ($indexes) {
             foreach ($indexes as $idx => $def) {
                 $idxLower = strtolower($idx);
-                if ($def === 'DROP') {
+                if ($def === static::DROP) {
                     if (!empty($tableIndexes[$idxLower])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
@@ -767,7 +767,7 @@ EOT
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
                 if (substr($idxLower, 0, 3) !== 'fk_') { // expand fk idx from 'name' to 'FK_{$table}_{$idx}'
-                    if (is_string($def) && strpos($def, ' ') === false) {
+                    if (is_string($def) && $def !== static::DROP && strpos($def, ' ') === false) {
                         $def = [$idx . '_id', $def]; // expand string def ($tableName) to ['col_id', $tableName]
                     }
                     $idx = 'FK_' . $dbTableName . '_' . $idx;
@@ -784,7 +784,7 @@ EOT
                     $od = !empty($def[4]) ? $def[4] : 'CASCADE';
                     $def = "FOREIGN KEY ({$lk}) REFERENCES {$ft} ({$fk}) ON UPDATE {$ou} ON DELETE {$od}";
                 }
-                if ($def === 'DROP') {
+                if ($def === static::DROP) {
                     if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }

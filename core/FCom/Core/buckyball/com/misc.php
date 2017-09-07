@@ -28,20 +28,6 @@
 class BUtil extends BClass
 {
     /**
-    * IV for mcrypt operations
-    *
-    * @var string
-    */
-    protected static $_mcryptIV;
-
-    /**
-    * Encryption key from configuration (encrypt/key)
-    *
-    * @var string
-    */
-    protected static $_mcryptKey;
-
-    /**
     * Default hash algorithm
     *
     * @var string default sha512 for strength and slowness
@@ -958,71 +944,31 @@ class BUtil extends BClass
         return $out;
     }
 
-     /**
-     * Create IV for mcrypt operations
-     *
-     * @deprecated not used
-     * @return string
-     */
-    public function mcryptIV()
+    public function encrypt($data, $key = null)
     {
-        if (!static::$_mcryptIV) {
-            static::$_mcryptIV = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_DEV_URANDOM);
+        if (!$key) {
+            $key = $this->BConfig->get('encrypt_key');
         }
-        return static::$_mcryptIV;
-    }
-
-     /**
-     * Fetch default encryption key from config
-     *
-     * @deprecated not used
-     * @return string
-     */
-    public function mcryptKey($key = null, $configPath = null)
-    {
-        if (null !== $key) {
-            static::$_mcryptKey = $key;
-        } elseif (null === static::$_mcryptKey && $configPath) {
-            static::$_mcryptKey = $this->BConfig->get($configPath);
+        $l = strlen($key);
+        if ($l < 16) {
+            $key = str_repeat($key, ceil(16 / $l));
         }
-        return static::$_mcryptKey;
-
+        if (($m = strlen($data) % 8)) {
+            $data .= str_repeat("\x00", 8 - $m);
+        }
+        return openssl_encrypt($data, 'BF-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING);
     }
 
-     /**
-     * Encrypt using AES256
-     *
-     * Requires PHP extension mcrypt
-     *
-     * @deprecated not used
-     * @param string $value
-     * @param string $key
-     * @param boolean $base64
-     * @return string
-     */
-    public function encrypt($value, $key = null, $base64 = true)
+    public function decrypt($data, $key = null)
     {
-        if (null === $key) $key = static::mcryptKey();
-        $enc = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_ECB, static::mcryptIV());
-        return $base64 ? trim(base64_encode($enc)) : $enc;
-    }
-
-    /**
-     * Decrypt using AES256
-     *
-     * Requires PHP extension mcrypt
-     *
-     * @deprecated not used
-     * @param string $value
-     * @param string $key
-     * @param boolean $base64
-     * @return string
-     */
-    public function decrypt($value, $key = null, $base64 = true)
-    {
-        if (null === $key) $key = static::mcryptKey();
-        $enc = $base64 ? base64_decode($value) : $value;
-        return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $enc, MCRYPT_MODE_ECB, static::mcryptIV()));
+        if (!$key) {
+            $key = $this->BConfig->get('encrypt_key');
+        }
+        $l = strlen($key);
+        if ($l < 16) {
+            $key = str_repeat($key, ceil(16 / $l));
+        }
+        return openssl_decrypt($data, 'BF-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING);
     }
 
     /**
@@ -1383,13 +1329,13 @@ class BUtil extends BClass
             }
         }
 
-        $headers = $this->mergeHttpHeaders([$headers, [
+        $headers = $this->mergeHttpHeaders([[
             'Expect' => '', //Fixes the HTTP/1.1 417 Expectation Failed
             'Referer' => $this->BRequest->currentUrl(),
             'Accept' => '*/*',
             'Content-Type' => $contentType,
             'Content-Length' => $postContent ? strlen($postContent) : null,
-        ]]);
+        ], $headers]);
 
         if (($useCurl && function_exists('curl_init')) || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
@@ -1475,18 +1421,18 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-/*
-$curlConstants = get_defined_constants(true)['curl'];
-$curlOptInfo = [];
-foreach ($curlConstants as $name => $key) {
-    if (!empty($curlOpt[$key])) {
-        if (preg_match('#^CURLOPT#', $name)) {
-            $curlOptInfo[$name] = $curlOpt[$key];
-        }
-    }
-}
-echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
-*/
+
+//$curlConstants = get_defined_constants(true)['curl'];
+//$curlOptInfo = [];
+//foreach ($curlConstants as $name => $key) {
+//    if (!empty($curlOpt[$key])) {
+//        if (preg_match('#^CURLOPT#', $name)) {
+//            $curlOptInfo[$name] = $curlOpt[$key];
+//        }
+//    }
+//}
+//echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
+
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
@@ -1690,7 +1636,6 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
                 return $this->BConfig->get('fs/' . $m[1]) . $m[2];
             }, $root);
         }
-
         $this->ensureDir($root);
         $root = $this->normalizePath(realpath($root));
         if (!$path || !$root || substr($path, 0, strlen($root)) !== $root) {
@@ -1762,7 +1707,7 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
     {
         if (is_file($dir)) {
             BDebug::warning($dir . ' is a file, directory required');
-            return;
+            return $this;
         }
         if (!is_dir($dir)) {
             @$res = mkdir($dir, 0777, true);
@@ -1770,6 +1715,7 @@ echo "<xmp>"; print_r($curlOptInfo); echo $rawResponse; echo "</xmp>";
                 BDebug::warning("Can't create directory: " . $dir);
             }
         }
+        return $this;
     }
 
     /**

@@ -1,6 +1,7 @@
-<div class="f-form-group row" :class="{required: fieldConfig('required'), error: field_errors, translating:  i18n_enabled}">
-    <label v-if="fieldConfig('label')" :for="field_id" class="f-form-label" :class="fieldConfig('label_class')">
+<div class="f-form-group row" :class="{required: fieldConfig('required'), error: field_errors, translating: i18n_enabled}">
+    <label v-if="fieldConfig('label') !== null" :for="field_id" class="f-form-label" :class="fieldConfig('label_class')">
         {{fieldConfig('label')|_}}
+        <a v-if="form.config.draggable" href="#" class="f-tags__drop"><i aria-hidden="true" class="handle fa fa-ellipsis-v"></i></a>
     </label>
 
     <div :class="fieldConfig('field_container_class')">
@@ -61,7 +62,8 @@
                        :disabled="fieldConfig('disabled')"
                        :required="fieldConfig('required')"
                        :searchable="true"
-                       :multiple="fieldConfig('multiple')">
+                       :multiple="fieldConfig('multiple')"
+                       :show-labels="false">
         </v-multiselect>
 
         <v-select v-if="field_type === 'v-select'"
@@ -102,15 +104,24 @@
 
         <component v-if="field_type === 'component'"
                    v-model="value_model"
-                   :is="fieldConfig('component')"
-                   :id="field_id"></component>
+                   :is="fieldComponent()"
+                   :id="field_id"
+                   :form="form"
+                   :field="field"
+        ></component>
 
-        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="field-row-icon" @click.prevent="emitEvent('toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
+        <a v-if="i18n_enabled && fieldConfig('i18n')" href="#" class="field-row-icon"
+           @click.prevent="emitEvent('toggle_i18n', field_config)"><i class="fa fa-globe" aria-hidden="true"></i></a>
 
-        <a v-if="fieldConfig('removable')" href="#" class="field-row-icon" @click.prevent="emitEvent('remove_field', field_config)"><i class="fa fa-trash" aria-hidden="true"></i></a>
+        <a v-if="form.config.removable || fieldConfig('removable')" href="#" class="field-row-icon"
+           @click.prevent="emitEvent('remove_field', field_config)"><i class="fa fa-trash" aria-hidden="true"></i></a>
 
         <div v-if="fieldConfig('notes')">{{fieldConfig('notes')}}</div>
-        <div v-if="fieldConfig('notes_tpl')"><component :is="{props: ['form'], template: fieldConfig('notes_tpl')}" :form="form"></component></div>
+        <div v-if="fieldConfig('notes_tpl')"><component
+                :is="{props: ['form', 'field'], template: fieldConfig('notes_tpl')}"
+                :form="form"
+                :field="field"
+        ></component></div>
 
         <span v-for="e in field_errors" class="error-message">{{e}}</span>
     </div>

@@ -106,6 +106,12 @@ modules:
                     - [ /import-products/?.action, Sellvana_Catalog_AdminSPA_Controller_ImportProducts ]
                 observe:
                     - [ "FCom_AdminSPA_AdminSPA_Controller_Header::action_search", Sellvana_Catalog_AdminSPA_Controller_Products.onHeaderSearch ]
+                security:
+                    request_fields_whitelist:
+                        /categories/form_data:
+                            POST/category/content: "*"
+                        /products/form_data:
+                            POST/product/description: "*"
 
             FCom_Frontend:
                 routing:

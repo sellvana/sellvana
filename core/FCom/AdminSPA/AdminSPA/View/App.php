@@ -100,9 +100,24 @@ class FCom_AdminSPA_AdminSPA_View_App extends FCom_Core_View_Abstract
         foreach ($this->_navs as $nav) {
             $a = explode('/', trim($nav['path'], '/'));
             switch (count($a)) {
-                case 1: $tree[$a[0]] = $nav; break;
-                case 2: $tree[$a[0]]['children'][$a[1]] = $nav; break;
-                case 3: $tree[$a[0]]['children'][$a[1]]['children'][$a[2]] = $nav; break;
+                case 1:
+                    if (!empty($tree[$a[0]])) {
+                        $nav = array_merge_recursive($tree[$a[0]], $nav);
+                    }
+                    $tree[$a[0]] = $nav;
+                    break;
+                case 2:
+                    if (!empty($tree[$a[0]]['children'][$a[1]])) {
+                        $nav = array_merge_recursive($tree[$a[0]]['children'][$a[1]], $nav);
+                    }
+                    $tree[$a[0]]['children'][$a[1]] = $nav;
+                    break;
+                case 3:
+                    if (!empty($tree[$a[0]]['children'][$a[1]]['children'][$a[2]])) {
+                        $nav = array_merge_recursive($tree[$a[0]]['children'][$a[1]]['children'][$a[2]], $nav);
+                    }
+                    $tree[$a[0]]['children'][$a[1]]['children'][$a[2]] = $nav;
+                    break;
             }
         }
         $tree = $this->sortNavRecursively($tree);

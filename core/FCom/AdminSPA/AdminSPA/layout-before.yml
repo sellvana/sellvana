@@ -103,7 +103,7 @@
             - [ requireJs, sv-store, "@FCom_AdminSPA/AdminSPA/vue/core/sv-store" ]
             - [ requireJs, sv-router, "@FCom_AdminSPA/AdminSPA/vue/core/sv-router" ]
             - [ requireJs, sv-app, "@FCom_AdminSPA/AdminSPA/vue/core/sv-app" ]
-            - [ requireJs, sv-app-data, "~/sv-app-data" ]
+            - [ requireJs, sv-app-data, "~/sv-app-data.js?ts={ts}" ]
             - [ requireRun, sv-app ]
 
             - [ requireJs, sv-mixin-common, "@FCom_AdminSPA/AdminSPA/vue/mixin/common" ]

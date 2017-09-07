@@ -1,4 +1,4 @@
-define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
+define(['lodash', 'vue', 'sv-mixin-form'], function (_, Vue, SvMixinForm) {
 
 	return {
 		mixins: [SvMixinForm],
@@ -6,7 +6,7 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
             updateBreadcrumbs: function (label) {
                 this.$store.commit('setData', {curPage: {
                     link: this.$router.currentRoute.fullPath,
-                    label: label,
+                    label: _.get(this.form, 'config.title', (('Loading...'))),
                     breadcrumbs: [
                         {nav:'/catalog', label:'Catalog', icon_class:'fa fa-book'},
                         {link:'/catalog/products', label:'Products'}
@@ -39,18 +39,13 @@ define(['vue', 'sv-mixin-form'], function (Vue, SvMixinForm) {
                     alert(this._(('Please correct form errors before submitting.')));
 					return;
 				}
-				this.sendRequest('POST', 'products/form_data?id=' + this.form.product.id, this.form.product, function (response) {
+				var postData = { product: this.form.product };
+				this.sendRequest('POST', 'products/form_data?id=' + this.form.product.id, postData, function (response) {
 					if (response.form) {
                         vm.processFormDataResponse(response);
-                        vm.updateBreadcrumbs(vm.form.product.product_name);
+                        vm.updateBreadcrumbs();
 					}
-                    for (var i in response.form) {
-                        //Vue.set(vm.form, i, response.form[i]);
-                    }
-                    if (!vm.form.updates) {
-						//Vue.set(vm.form, 'updates', {});
-					}
-                    if (!stayOnPage) {
+                    if (!response.error && !stayOnPage) {
                         vm.$router.push('/catalog/products');
                     }
                     vm.$store.commit('actionInProgress', false);

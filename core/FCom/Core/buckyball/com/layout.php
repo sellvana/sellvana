@@ -2195,13 +2195,13 @@ class BViewHead extends BView
      * @var array
      */
     protected $_defaultTag = [
-        'js'      => '<script type="text/javascript" src="%s" %a></script>',
-        'js_raw'  => '<script type="text/javascript" %a>%c</script>',
-        'css'     => '<link rel="stylesheet" type="text/css" href="%s" %a/>',
+        'js' => '<script type="text/javascript" src="%s" %a></script>',
+        'js_raw' => '<script type="text/javascript" %a>%c</script>',
+        'css' => '<link rel="stylesheet" type="text/css" href="%s" %a/>',
         'css_raw' => '<style type="text/css" %a>%c</style>',
         //'less' => '<link rel="stylesheet" type="text/less" href="%s" %a/>',
-        'less'    => '<link rel="stylesheet/less" type="text/css" href="%s" %a/>',
-        'icon'    => '<link rel="icon" href="%s" type="image/x-icon" %a/><link rel="shortcut icon" href="%s" type="image/x-icon" %a/>',
+        'less' => '<link rel="stylesheet/less" type="text/css" href="%s" %a/>',
+        'icon' => '<link rel="icon" href="%s" type="image/x-icon" %a/><link rel="shortcut icon" href="%s" type="image/x-icon" %a/>',
     ];
 
     /**
@@ -2693,6 +2693,7 @@ if ($this->BDebug->is('DEBUG')) {
      */
     public function requireJs($name, $path, $shim = null)
     {
+        $path = str_replace('{ts}', time(), $path);
         $this->_requireJs['config']['paths'][$name] = $path;
         if (null !== $shim) {
             $this->_requireJs['config']['shim'][$name] = $shim;

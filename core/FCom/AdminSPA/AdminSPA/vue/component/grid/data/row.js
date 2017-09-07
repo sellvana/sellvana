@@ -8,7 +8,7 @@ define(['lodash', 'vue', 'sv-comp-grid-data-cell-default', 'sv-comp-grid-data-ce
     return {
         props: ['grid', 'row'],
         template: '<tr><component v-for="col in columns" :key="col.name" v-if="!col.hidden" :is="cellComponent(col)" '
-            + ':name="col.name" :grid="grid" :row="row" :col="col" @event="onEvent"></component></tr>',
+            + ':name="col.name" :grid="grid" :row="row" :col="col" :value="row[col.name]" @event="onEvent"></component></tr>',
         computed: {
             columns: function () {
                 return _.get(this.grid, 'config.columns', []);

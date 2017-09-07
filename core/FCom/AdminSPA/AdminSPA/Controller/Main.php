@@ -53,6 +53,8 @@ class FCom_AdminSPA_AdminSPA_Controller_Main extends FCom_Admin_Controller_Abstr
             'regions_seq' => $this->BUtil->arrayMapToSeq($regions),
 
             'csrf_token' => $this->BSession->csrfToken(),
+
+            'messages' => $this->BSession->messages(),
         ];
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_MultiLanguage')) {

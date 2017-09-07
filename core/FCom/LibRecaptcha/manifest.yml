@@ -6,3 +6,7 @@ modules:
         areas:
             FCom_Admin:
                 auto_use: [ views ]
+
+            FCom_AdminSPA:
+                observe:
+                    - [ "FCom_AdminSPA_AdminSPA_Controller_Settings::collectFormConfig", "FCom_LibRecaptcha_AdminSPA.onSettingsConfig" ]

@@ -1,7 +1,7 @@
 {% set colLeft = THIS.getCol('left') %}
 {% set colRight = THIS.getCol('right') %}
 
-<!DOCTYPE html>
+<!DOCTYPE {{ THIS.getDoctype() }}>
 <html {{ THIS.getHtmlAttributes() | raw }} >
     <head>
         {{ THIS.hook('head') | raw }}

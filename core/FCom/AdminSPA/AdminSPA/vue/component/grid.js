@@ -115,7 +115,7 @@ console.log(filters, result);
                     datacell_names.push(col.name);
                 } else if (col.datacell_template) {
                     Vue.set(grid.components.datacell_columns, col.name, {
-                        props: ['grid', 'row', 'col'],
+                        props: ['grid', 'row', 'col', 'value'],
                         template: col.datacell_template
                     });
                 } else {

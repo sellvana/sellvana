@@ -154,7 +154,11 @@ function ($, _, Vue, VueResource, SvMixinCommon, Accounting, Moment, Sortable,
     Vue.filter('date', function (value, format) {
         switch (format || '') {
             case '': format = 'MMMM Do YYYY, h:mm:ss a'; break;
-            case 'short': format = 'MM Do \'YY'; break;
+            case 'short': format = 'MMM, Do \'YY'; break;
+            case 'db-date': format = 'YYYY-MM-DD'; break;
+        }
+        if (!value) {
+            return '';
         }
         return Moment(value, 'YYYY-MM-DD hh:mm:ss').format(format);
     });

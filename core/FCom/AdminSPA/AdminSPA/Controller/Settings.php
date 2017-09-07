@@ -12,7 +12,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
         $result['forms'] = $forms;
         $result['nav'] = $this->collectNavConfig();
-
+#echo "<xmp>"; print_r($result); echo "</xmp>";
         foreach ($result['nav'] as $l1 => $n1) {
             if (empty($n1['children'])) {
                 continue;
@@ -99,7 +99,6 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
 
             $forms[$path] = $this->normalizeFormConfig($form, $path);
         }
-
         return $forms;
     }
 
@@ -124,17 +123,18 @@ class FCom_AdminSPA_AdminSPA_Controller_Settings extends FCom_AdminSPA_AdminSPA_
                 }
             }
         }
-
         foreach ($roots as $path => $_) {
             $pathArr = explode('/', $path);
             $d =& $data;
             foreach ($pathArr as $p) {
                 $d =& $d[$p];
             }
-            $d = $this->BUtil->arrayMerge($d, $confHlp->get($path));
+            $value = $confHlp->get($path);
+            if (null !== $value) {
+                $d = $this->BUtil->arrayMerge($d, $value);
+            }
             unset($d);
         }
-
         $this->BEvents->fire(__METHOD__ . ':after', ['data' => &$data]);
 
         return $data;

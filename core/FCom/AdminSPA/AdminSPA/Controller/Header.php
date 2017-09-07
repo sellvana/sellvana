@@ -9,7 +9,7 @@ class FCom_AdminSPA_AdminSPA_Controller_Header extends FCom_AdminSPA_AdminSPA_Co
             $collect  = [];
             $priority = 1000000;
             $link      = '';
-            $query = $this->BRequest->get('q');
+            $query = trim($this->BRequest->get('q'));
             $this->BEvents->fire(__METHOD__, ['query' => $query, 'result' => &$collect]);
             foreach ($collect as $key) {
                 if (is_array($key)) {

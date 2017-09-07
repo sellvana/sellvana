@@ -89,7 +89,7 @@
                               <a href="#" @click.prevent="togglePanel(panel)">{{panel.label}}</a>
                         </div>
                         <div class="f-settings-block__content" v-if="panelsOpen[panel.path]">
-                              <component :is="panel.component" :settings="settings" :panel="panel" :site="site"></component>
+                              <component :is="panel.component" :settings="settings" :panel="panel" :site="site" :form="settings.config.forms[panel.path]"></component>
                         </div>
                   </li>
             </ul>

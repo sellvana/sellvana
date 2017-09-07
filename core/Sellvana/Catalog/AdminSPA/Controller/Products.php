@@ -15,6 +15,23 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 {
     static protected $_origClass = __CLASS__;
 
+    public function onBeforeDispatch()
+    {
+        if (!parent::onBeforeDispatch()) {
+            return false;
+        }
+        if ($this->_action === 'form_data' && $this->BRequest->method() === 'POST') {
+            $whitelist = [];
+            $fields = $this->FCom_Core_Model_Field->orm()->where('field_type', 'product')
+                ->where('admin_input_type', 'wysiwyg')->find_many();
+            foreach ($fields as $field) {
+                $whiltelist["POST/product/{$field->get('field_code')}"] = '*';
+            }
+            $this->BRequest->addRequestFieldsWhitelist([$this->BRequest->rawPath() => $whitelist]);
+        }
+        return true;
+    }
+
     public function getGridConfig()
     {
         $bool = [0 => (('no')), 1 => (('Yes'))];
@@ -118,7 +135,7 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
     public function getGridOrm()
     {
         $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
-            ->join('Sellvana_Catalog_Model_InventorySku', ['p.inventory_sku', '=', 'i.inventory_sku'], 'i')
+            ->left_outer_join('Sellvana_Catalog_Model_InventorySku', ['p.inventory_sku', '=', 'i.inventory_sku'], 'i')
             ->select(['i.net_weight', 'i.shipping_weight']);
         return $orm;
     }
@@ -172,16 +189,18 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $this->respond(['result' => $result]);
     }
 
-    public function getFormData()
+    public function getFormData($product = null)
     {
         $pId = $this->BRequest->get('id');
 
-        if ($pId === null || $pId === '') {
-            $product = $this->Sellvana_Catalog_Model_Product->create();
-        } else {
-            $product = $this->Sellvana_Catalog_Model_Product->load($pId);
-            if (!$product) {
-                throw new BException('Product not found');
+        if (!$product) {
+            if ($pId === null || $pId === '') {
+                $product = $this->Sellvana_Catalog_Model_Product->create();
+            } else {
+                $product = $this->Sellvana_Catalog_Model_Product->load($pId);
+                if (!$product) {
+                    throw new BException('Product not found');
+                }
             }
         }
 
@@ -274,15 +293,19 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
         $result = [];
         try {
             $r = $this->BRequest;
-            $data = $r->post();
+            $data = $r->post('product');
             $id = $r->param('id', true);
 
             $eventName =  "{$this->origClass()}::action_form_data_POST";
             $this->BEvents->fire("{$eventName}:before", ['data' => &$data, 'model_id' => &$id]);
 
-            $model = $this->Sellvana_Catalog_Model_Product->load($id);
-            if (!$model) {
-                throw new BException("This item does not exist");
+            if ($id) {
+                $model = $this->Sellvana_Catalog_Model_Product->load($id);
+                if (!$model) {
+                    throw new BException("This item does not exist");
+                }
+            } else {
+                $model = $this->Sellvana_Catalog_Model_Product->create();
             }
             if ($data) {
                 $model->set($data);
@@ -299,12 +322,12 @@ class Sellvana_Catalog_AdminSPA_Controller_Products extends FCom_AdminSPA_AdminS
 
                 $this->BEvents->fire("{$eventName}:after", ['data' => $data, static::MODEL => $model]);
 
-                $result = $this->getFormData();
+                $result = $this->getFormData($model);
                 $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
                 $this->ok()->addMessage('Product was saved successfully', 'success');
             } else {
                 $result = ['status' => 'error'];
-                $this->error()->addMessage('Cannot save data, please fix above errors', 'error');
+                $this->error()->addMessage($this->BValidate->validateErrorsString(), 'error');
             }
 
         } catch (Exception $e) {
