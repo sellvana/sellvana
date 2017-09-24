@@ -37,7 +37,7 @@
 
 	<div class="col-lg-6">
 		<div class="f-grid-panel">
-			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="visible-xs f-filter__elem"></sv-comp-grid-pager-dropdown>
+			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="visible-xs f-filter__elem" v-if="grid.config.pager"></sv-comp-grid-pager-dropdown>
 
 			<span v-if="grid.config.data_url"><a href="#" @click.prevent="emitEvent('fetch-data')">&#8635;</a></span>
 			<span v-if="cntTotal" class="amount-rows f-filter__elem"> {{'Showing {visible} of {total} rows'|_({visible:cntVisible, total:cntTotal})}} </span>
@@ -50,7 +50,7 @@
 				</button>
 			</div>
 			<sv-comp-grid-bulk-actions v-if="grid.config && grid.config.bulk_actions" :grid="grid" @event="onEvent"></sv-comp-grid-bulk-actions>
-			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="hidden-xs"></sv-comp-grid-pager-dropdown>
+			<sv-comp-grid-pager-dropdown :grid="grid" @event="onEvent" class="hidden-xs" v-if="grid.config.pager"></sv-comp-grid-pager-dropdown>
 			<sv-comp-actions :groups="grid.config.panel_actions_groups" class="f-filter__elem" event-name="panel-action" @event="onEvent"></sv-comp-actions>
 		</div>
 	</div>

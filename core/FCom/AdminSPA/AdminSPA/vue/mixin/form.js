@@ -294,6 +294,55 @@ define(['lodash', 'vue', 'text!sv-page-default-form-tpl'], function (_, Vue, svP
                         }
                     }
                 }
+            },
+            updateBreadcrumbs: function () {
+                this.$store.commit('setData', {curPage: {
+                    link: this.$router.currentRoute.fullPath,
+                    label: this.form.config.title || (('Loading...')),
+                    breadcrumbs: this.form.config.breadcrumbs
+                }});
+            },
+            fetchData: function () {
+                var id = this.$router.currentRoute.query.id, vm = this;
+                this.sendRequest('GET', this.form_data_url, {id: id}, function (response) {
+                    vm.processFormDataResponse(response);
+                    vm.updateBreadcrumbs();
+                });
+            },
+            getPostDataForSave: function () {
+                var model = this.form.config.main_model, postData = {};
+                postData[model] = this.form[model];
+                return postData;
+            },
+            save: function (stayOnPage) {
+                var vm = this;
+                this.$store.commit('actionInProgress', stayOnPage ? 'save-continue' : 'save');
+                if (!this.validateForm()) {
+                    this.$store.commit('actionInProgress', false);
+                    alert(this._(('Please correct form errors before submitting.')));
+                    return;
+                }
+                this.sendRequest('POST', this.form_data_url, this.getPostDataForSave(), function (response) {
+                    if (response.form) {
+                        vm.processFormDataResponse(response);
+                        vm.updateBreadcrumbs();
+                    }
+                    if (!response.error && !stayOnPage) {
+                        vm.$router.push(vm.form.config.index_url);
+                    }
+                    vm.$store.commit('actionInProgress', false);
+                });
+            },
+            doDelete: function () {
+                var vm = this;
+                if (!confirm(this._(('Are you sure you want to delete this record?')))) {
+                    return;
+                }
+                this.sendRequest('DELETE', this.form_data_url, {id: this.form[this.form.config.main_model].id}, function (response) {
+                    if (response.ok) {
+                        vm.$router.push(vm.form.config.index_url);
+                    }
+                });
             }
         },
         watch: {

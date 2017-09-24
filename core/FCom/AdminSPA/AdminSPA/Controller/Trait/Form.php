@@ -63,10 +63,12 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             }
             $model->set($data)->save();
 
-            $args = [static::DATA => $data, static::MODEL => $model];
+            $args = [static::DATA => $this->BRequest->post(), static::MODEL => $model];
             $this->onAfterFormDataPost($args);
             $this->BEvents->fire("{$eventName}:after", $args);
 
+            $result = $this->getFormData($modelId);
+            $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
             $this->ok();
             if ($modelId) {
                 $this->addMessage($this->_((('%s has been updated')), $recordName), 'success');
@@ -79,7 +81,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         $this->respond($result);
     }
 
-    public function action_form_delete__POST()
+    public function action_form_data__DELETE()
     {
         $result = [];
         $modelClass = static::$_modelClass;
@@ -126,6 +128,15 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
         $eventName = $this->origClass() . '::normalizeFormConfig:before';
 
         $this->BEvents->fire($eventName, [static::FORM => &$form]);
+
+        if (!empty($form[static::CONFIG]['index_url'])) {
+            if (empty($form[static::CONFIG][static::TABS])) {
+                $form[static::CONFIG][static::TABS] = $form[static::CONFIG]['index_url'] . '/form';
+            }
+            if (empty($form[static::CONFIG][static::DATA_URL])) {
+                $form[static::CONFIG][static::DATA_URL] = $form[static::CONFIG]['index_url'] . '/form_data';
+            }
+        }
 
         if (!empty($form[static::CONFIG][static::TABS]) && is_string($form[static::CONFIG][static::TABS])) {
             $form[static::CONFIG][static::TABS] = $this->getFormTabs($form[static::CONFIG][static::TABS]);

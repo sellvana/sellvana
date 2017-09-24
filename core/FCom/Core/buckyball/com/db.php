@@ -1170,6 +1170,8 @@ class BORM extends ORMWrapper
     protected function _build_select($calculate_values = true) {
         // If the query is raw, just set the $this->_values to be
         // the raw query parameters and return the raw query
+//echo "<xmp>"; debug_print_backtrace(); echo "</xmp>";
+//var_dump($this->_is_raw_query, $this->_raw_query, $this->_raw_parameters, spl_object_hash($this));
         if ($this->_is_raw_query) {
             $this->_values = $this->_raw_parameters;
             return $this->_raw_query;
@@ -1182,7 +1184,7 @@ class BORM extends ORMWrapper
             $this->_build_join(),
             $this->_build_where($calculate_values),
             $this->_build_group_by(),
-            $this->_build_having(),
+            $this->_build_having($calculate_values),
             $this->_build_order_by(),
             $this->_build_limit(),
             $this->_build_offset(),
@@ -1856,13 +1858,15 @@ class BORM extends ORMWrapper
         if (empty($s['c'])) {
             $cntOrm = clone $this; // clone ORM to count
             // Change the way we calculate count if grouping is detected in query
-            if ( count($cntOrm->_group_by) ) {
+            if (count($cntOrm->_group_by) || count($cntOrm->_having_conditions)) {
                 $cntQuery = $this->as_sql(false);
-                $cntFilters = $this->_build_values();
-                $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
-                unset( $cntQuery, $cntFilters ); // free mem
+                $cntParams = $this->_build_values();
+                $cntSql = "SELECT COUNT(*) AS count FROM ({$cntQuery}) AS cntQuery";
+                $s['c'] = BORM::i()->raw_query($cntSql, $cntParams)
+                    ->find_one()->get('count');
+                unset($cntQuery, $cntParams, $cntSql); // free mem
             } else {
-                $s[ 'c' ] = $cntOrm->count(); // total row count
+                $s['c'] = $cntOrm->count(); // total row count
             }
             unset( $cntOrm ); // free mem
         }
@@ -1925,8 +1929,9 @@ class BORM extends ORMWrapper
     */
     protected function _build_values()
     {
+        // UPDATED
         // If there are no WHERE clauses, return empty array
-        if (count($this->_where_conditions) === 0) {
+        if (count($this->_where_conditions) === 0 && count($this->_having_conditions) === 0) {
             return [];
         }
 
@@ -1938,6 +1943,11 @@ class BORM extends ORMWrapper
             }
         }
 
+        foreach ($this->_having_conditions as $condition) {
+            if (isset($condition[static::HAVING_VALUES][0])) {
+                $values[] = $condition[static::HAVING_VALUES][0];
+            }
+        }
         return $values;
     }
 
@@ -2127,7 +2137,7 @@ class BORM extends ORMWrapper
         return $this->_add_having("{$column_name} {$separator} ?", $value);
     }
 
-    protected function _build_having()
+    protected function _build_having($calculate_values = true)
     {
         if (count($this->_having_conditions) === 0) {
             return '';
@@ -2136,7 +2146,9 @@ class BORM extends ORMWrapper
         $having_conditions = [];
         foreach ($this->_having_conditions as $condition) {
             $having_conditions[] = $condition[static::HAVING_FRAGMENT];
-            $this->_values = array_merge($this->_values, $condition[static::HAVING_VALUES]);
+            if ($calculate_values) {
+                $this->_values = array_merge($this->_values, $condition[static::HAVING_VALUES]);
+            }
         }
         return "HAVING " . join(" AND ", $having_conditions);
     }
@@ -2929,15 +2941,11 @@ class BModel extends Model
     public function save($callBeforeAfter = true, $replace = false)
     {
         $fields = $this->BDb->ddlFieldInfo($this->table());
+        $nullTypesRe = '#^((|tiny|small|medium|big)int|dec|fixed|real|bit|date)#i';
         foreach ($fields as $fName => $field) {
             $value = $this->get($fName);
-            if ($value !== null && !is_numeric($value)
-                && preg_match('#^((|tiny|small|medium|big)int|dec|fixed|real|bit)#i', $field->get('Type'))
-            ) {
-                $this->set($fName, null);
-                if (null !== $field->get('Default')) {
-                    $this->set($fName, $field->get('Default'));
-                }
+            if ($value === '' && preg_match($nullTypesRe, $field->get('Type'))) {
+                $this->set($fName, $field->get('Default'));
             }
         }
         if ($callBeforeAfter) {

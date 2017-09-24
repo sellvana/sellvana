@@ -1,4 +1,4 @@
-define(['lodash', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], function (_, Vue, store, router, NProgress, SvAppData) {
+define(['lodash', 'jquery', 'vue', 'sv-store', 'sv-router', 'nprogress', 'sv-app-data'], function (_, $, Vue, store, router, NProgress, SvAppData) {
 
     // TODO: RegEx to collect translations: (\{\{|\(\()\s*['"](.*?)['"]\s*(\)\)|\|\s*_)
     function translate(text, args) {

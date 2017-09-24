@@ -51,7 +51,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
         THUMB_URL = 'thumb_url',
         I18N = 'i18n',
         EDIT = 'edit',
-        STATE = 'state'
+        STATE = 'state',
+        ROUTE = 'route'
     ;
 
     public function authenticate($args = [])
@@ -110,6 +111,8 @@ abstract class FCom_AdminSPA_AdminSPA_Controller_Abstract extends FCom_Admin_Con
             if (!$type) {
                 $type = 'info';
             }
+        } elseif (is_array($text) && sizeof($text) === 2) {
+            $text = $this->_($text[0], $text[1]);
         } else {
             throw new BException('Invalid message text type');
         }

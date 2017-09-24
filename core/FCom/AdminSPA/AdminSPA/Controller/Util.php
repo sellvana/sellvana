@@ -2,7 +2,6 @@
 
 class FCom_AdminSPA_AdminSPA_Controller_Util extends FCom_AdminSPA_AdminSPA_Controller_Abstract
 {
-
     public function action_personalize__POST()
     {
         $r = $this->BRequest->request();

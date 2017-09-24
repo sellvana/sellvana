@@ -25,6 +25,9 @@ define(['lodash', 'vue', 'sv-app-data', 'text!sv-comp-form-field-tpl'], function
             },
             field_id: function () {
                 var c = this.field_config;
+                if (!c) {
+                    console.trace();
+                }
                 return c.id || ('form-' + c.model + '-' + c.tab + '-' + c.name);
             },
             field_type: function () {

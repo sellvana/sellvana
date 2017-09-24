@@ -92,8 +92,8 @@ define(['lodash', 'vue', 'sv-app-data', 'sv-comp-form-field', 'text!sv-page-defa
                     cond = cond.replace(/\{(([a-z0-9_.]+)[.])?([a-z0-9_]+)\}/g, "this.fieldModel(f, '$2').$3");
                     result = eval(cond);
                 }
-
-                return result;
+console.log(cond, !!result);
+                return !!result;
             },
 
             setTabFlag: function (flag, value) {

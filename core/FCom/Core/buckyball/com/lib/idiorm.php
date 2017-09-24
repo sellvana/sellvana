@@ -268,9 +268,12 @@
                 $parameters = array_map(array(static::$_db, 'quote'), $parameters);
 
                 // Replace placeholders in the query for vsprintf
-                $query = str_replace("?", "%s", $query);
+//                $query = str_replace("?", "%s", $query);
+                $query = preg_replace('#([^a-z0-9])\?([^a-z0-9])#', '\1%s\2', $query);
+                // FIXED
 
                 // Replace the question marks in the query with the parameters
+//var_dump($query, $parameters);
                 $bound_query = vsprintf($query, $parameters);
             } else {
                 $bound_query = $query;
@@ -956,6 +959,8 @@
          */
         protected function _run() {
             $query = $this->_build_select();
+//echo "<xmp>"; debug_print_backtrace(); echo "</xmp>";
+//var_dump($this->_is_raw_query, spl_object_hash($this), $this->_values);
             $caching_enabled = static::$_config['caching'];
 
             if ($caching_enabled) {
@@ -966,18 +971,12 @@
                     return $cached_result;
                 }
             }
-
             static::$_last_values = $this->_values; //ADDED
             static::_log_query($query, $this->_values);
             $statement = static::$_db->prepare($query);
 //try {
             $statement->execute($this->_values);
-//} catch (Exception $e) {
-//echo $query;
-//print_r($this->_values);
-//print_r($e);
-//exit;
-//}
+//} catch (Exception $e) { echo "<xmp>"; echo $query; print_r($this->_values); print_r($e); echo "</xmp>"; exit; }
             $rows = array();
             while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $rows[] = $row;

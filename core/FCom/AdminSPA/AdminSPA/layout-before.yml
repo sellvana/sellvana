@@ -57,6 +57,7 @@
             - [ requireJs, json, "@FCom_AdminSPA/AdminSPA/js/lib/json-0.4.0" ]
             - [ requireJs, lodash, "@FCom_AdminSPA/AdminSPA/js/lib/lodash-4.17.3" ]
             - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.1.1.min" ]
+#            - [ requireJs, jquery, "@FCom_AdminSPA/AdminSPA/js/lib/jquery-3.2.1" ]
 
             - [ requireJs, perfect-scrollbar, "@FCom_AdminSPA/AdminSPA/js/lib/perfect-scrollbar.min" ]
    #         - [ js,  "@FCom_AdminSPA/AdminSPA/js/lib/script.js" ]

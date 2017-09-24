@@ -96,29 +96,34 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     public function action_grid_data()
     {
-        $config = $this->getNormalizedGridConfig();
-        $config = $this->processGridStatePersonalization($config);
-        $filters = isset($config['state'][static::FILTERS]) ? $config['state'][static::FILTERS] : null;
-        $data = $this->getGridRequestOrm()->paginate($config['state']);
-        $data = $this->processGridPageData($data);
+        $result = [];
+        try {
+            $config = $this->getNormalizedGridConfig();
+            $config = $this->processGridStatePersonalization($config);
+            $filters = isset($config['state'][static::FILTERS]) ? $config['state'][static::FILTERS] : null;
+            $data = $this->getGridRequestOrm()->paginate($config['state']);
+            $data = $this->processGridPageData($data);
 
-        if ($filters) {
-            foreach ($filters as &$f) {
-                if (is_array($f['val'])) {
-                    $f['values'] = $f['val'];
-                } else {
-                    $f['value'] = $f['val'];
+            if ($filters) {
+                foreach ($filters as &$f) {
+                    if (is_array($f['val'])) {
+                        $f['values'] = $f['val'];
+                    } else {
+                        $f['value'] = $f['val'];
+                    }
+                    unset($f['val']);
                 }
-                unset($f['val']);
+                unset($f);
             }
-            unset($f);
-        }
 
-        $data['state'][static::FILTERS] = $filters;
-        $result = [
-            'rows' => $data['rows'],
-            'state' => $data['state'],
-        ];
+            $data['state'][static::FILTERS] = $filters;
+            $result = [
+                'rows' => $data['rows'],
+                'state' => $data['state'],
+            ];
+        } catch (Exception $e) {
+            $this->addMessage($e);
+        }
         $this->respond($result);
     }
 
@@ -246,6 +251,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
         if (!empty($config[static::DATA_URL]) && empty($config['personalize_url'])) {
             $config['personalize_url'] = str_replace('grid_data', 'grid_personalize', $config[static::DATA_URL]);
+        } else {
+            $config['personalize_url'] = $this->BApp->href('personalize');
         }
 
         $colsByName = [];
@@ -263,9 +270,9 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
             } else {
                 throw new BException('Invalid field configuration: ' . print_r($col, 1));
             }
-            if (empty($col['index']) && !empty($indexPrefix) && !empty($col['name'])) {
-                $col['index'] = $indexPrefix . $col['name'];
-            }
+//            if (empty($col['index']) && !empty($indexPrefix) && !empty($col['name'])) {
+//                $col['index'] = $indexPrefix . $col['name'];
+//            }
             if (!empty($col['type'])) {
                 switch ($col['type']) {
                     case static::ROW_SELECT:
@@ -385,6 +392,9 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         $flt['default_op'] = 'equals';
                     }
                 }
+                if (!isset($flt['having'])) {
+                    $flt['having'] = !empty($col['having']);
+                }
             }
             unset($flt);
         }
@@ -488,7 +498,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
                         foreach ($f['args'] as $a) {
                             $args[] = str_replace('?', $filters['_quick'], $a);
                         }
-                        $orm->where_raw('(' . $config[static::FILTERS]['_quick']['expr'] . ')', $args);
+                        $method = !empty($f['having']) ? 'having_raw' : 'where_raw';
+                        $orm->{$method}('(' . $config[static::FILTERS]['_quick']['expr'] . ')', $args);
                     }
                     break;
                 } elseif (!empty($f['field'])) {
@@ -522,6 +533,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
     protected function _defaultFilterCallback($fieldConfig, $f, $orm)
     {
+        $f['having'] = $fieldConfig['having'];
         switch ($f['type']) {
             case 'text':
                 $val = $f;
@@ -589,7 +601,8 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Grid
 
                         case 'not_in':
                             // $f['field'] has been sanitized before
-                            $orm->where_raw($f['field'] . ' NOT BETWEEN ? and ?', [$from, $to]);
+                            $method = !empty($f['having']) ? 'having_raw' : 'where_raw';
+                            $orm->{$method}($f['field'] . ' NOT BETWEEN ? and ?', [$from, $to]);
                             break;
 
                         case 'empty':
