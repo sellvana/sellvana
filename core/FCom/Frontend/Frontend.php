@@ -4,7 +4,13 @@ class FCom_Frontend_Frontend extends BClass
 {
     public function bootstrap()
     {
-        if ($this->BRequest->https() && $this->BConfig->get('web/hsts_enable')) {
+        if ($this->BConfig->get('modules/FCom_Admin/web/cors_enable')) {
+            $this->BResponse->cors();
+        }
+        if ($this->BConfig->get('modules/FCom_Admin/web/csp_enable')) {
+            $this->BResponse->csp();
+        }
+        if ($this->BRequest->https() && $this->BConfig->get('modules/FCom_Admin/web/hsts_enable')) {
             $this->BResponse->httpSTS();
         }
 

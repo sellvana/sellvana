@@ -26,6 +26,21 @@ class FCom_AdminSPA_AdminSPA extends BClass
 
     protected $_responsesToPush = [];
 
+    public function bootstrap()
+    {
+        $this->FCom_Admin_Model_User;
+
+        if ($this->BConfig->get('modules/FCom_Admin/web/cors_enable')) {
+            $this->BResponse->cors();
+        }
+        if ($this->BConfig->get('modules/FCom_Admin/web/csp_enable')) {
+            $this->BResponse->csp();
+        }
+        if ($this->BRequest->https() && $this->BConfig->get('modules/FCom_Admin/web/hsts_enable')) {
+            $this->BResponse->httpSTS();
+        }
+    }
+
     public function addResponseType($type, $callback)
     {
         $this->_responseTypes[$type] = $callback;
@@ -166,6 +181,7 @@ class FCom_AdminSPA_AdminSPA extends BClass
             '/areas/admin/html' => [Ctrl::LABEL => (('Admin HTML')), 'pos' => 10],
             '/areas/admin/area' => [Ctrl::LABEL => (('Area Settings')), 'pos' => 20],
             '/areas/admin/user_security' => [Ctrl::LABEL => (('User Security')), 'pos' => 30],
+            '/areas/admin/web_security' => [Ctrl::LABEL => (('Frontend Web Security')), 'pos' => 40],
             '/areas/admin/dashboard' => [Ctrl::LABEL => (('Dashboard')), 'pos' => 50],
 
             '/areas/cron' => [Ctrl::LABEL => (('Cron Settings')), 'pos' => 30],
@@ -250,9 +266,9 @@ class FCom_AdminSPA_AdminSPA extends BClass
                         [Ctrl::NAME => 'view_files', Ctrl::LABEL => (('View Template Files Cache')), Ctrl::OPTIONS => $cacheOptions],
                         [Ctrl::NAME => 'twig', Ctrl::LABEL => (('Twig Cache')), Ctrl::OPTIONS => $cacheOptions],
                         [Ctrl::NAME => 'default_backend', Ctrl::LABEL => (('Default Backend')), Ctrl::OPTIONS => $cacheBackends],
-                        [Ctrl::NAME => 'host', Ctrl::LABEL => (('Memcached Host')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
-                        [Ctrl::NAME => 'port', Ctrl::LABEL => (('Memcached Port')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
-                        [Ctrl::NAME => 'prefix', Ctrl::LABEL => (('Memcached Prefix')), 'root' => 'core/cache/memcache', 'if' => "{core/cache/default_backend} == 'memcache'"],
+                        [Ctrl::NAME => 'host', Ctrl::LABEL => (('Memcached Host')), 'root' => 'core/cache/memcache', 'if' => "{core.cache.default_backend} == 'memcache'"],
+                        [Ctrl::NAME => 'port', Ctrl::LABEL => (('Memcached Port')), 'root' => 'core/cache/memcache', 'if' => "{core.cache.default_backend} == 'memcache'"],
+                        [Ctrl::NAME => 'prefix', Ctrl::LABEL => (('Memcached Prefix')), 'root' => 'core/cache/memcache', 'if' => "{core.cache.default_backend} == 'memcache'"],
                     ],
                 ],
             ],
@@ -298,6 +314,8 @@ class FCom_AdminSPA_AdminSPA extends BClass
                         [Ctrl::NAME => 'csrf_check_method', Ctrl::LABEL => (('CSRF Check Method')), Ctrl::OPTIONS => $this->BRequest->getAvailableCsrfMethods(true)],
                         [Ctrl::NAME => 'csrf_web_root', Ctrl::LABEL => (('CSRF Referrer Web Root Path (optional)'))],
                         [Ctrl::NAME => 'hsts_enable', Ctrl::LABEL => (('Enable HSTS header')), Ctrl::NOTES => (('HTTP Strict Transport Security')), Ctrl::OPTIONS => $blankBool],
+                        [Ctrl::NAME => 'cors_enable', Ctrl::LABEL => (('Enable CORS header')), Ctrl::NOTES => (('Cross-Origin Resource Sharing')), Ctrl::OPTIONS => $blankBool],
+                        [Ctrl::NAME => 'csp_enable', Ctrl::LABEL => (('Enable CSP header')), Ctrl::NOTES => (('Content Security Policy')), Ctrl::OPTIONS => $blankBool],
                     ],
                 ],
             ],
@@ -357,6 +375,22 @@ class FCom_AdminSPA_AdminSPA extends BClass
                     Ctrl::FIELDS => [
                         Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Admin'],
                         [Ctrl::NAME => 'default_dashboard_widget_limit', Ctrl::LABEL => (('Default Widgets Rows Limit'))],
+                    ],
+                ],
+            ],
+            '/areas/admin/web_security' => [
+                Ctrl::CONFIG => [
+                    Ctrl::FIELDS => [
+                        Ctrl::DEFAULT_FIELD => ['root' => 'modules/FCom_Admin/web'],
+                        [Ctrl::NAME => 'hide_script_name', Ctrl::LABEL => (('Hide script file name in URL')), Ctrl::OPTIONS => ['' => '', 0 => (('No')), 1 => (('Automatic')), 2 => (('FORCE'))]],
+                        [Ctrl::NAME => 'http_host_whitelist', Ctrl::LABEL => (('HTTP Host Whitelist')), Ctrl::NOTES => (('comma separated'))],
+                        [Ctrl::NAME => 'force_domain', Ctrl::LABEL => (('Force Domain Name'))],
+                        [Ctrl::NAME => 'force_https', Ctrl::LABEL => (('Force HTTPS')), Ctrl::OPTIONS => $blankBool],
+                        [Ctrl::NAME => 'csrf_check_method', Ctrl::LABEL => (('CSRF Check Method')), Ctrl::OPTIONS => $this->BRequest->getAvailableCsrfMethods(true)],
+                        [Ctrl::NAME => 'csrf_web_root', Ctrl::LABEL => (('CSRF Referrer Web Root Path (optional)'))],
+                        [Ctrl::NAME => 'hsts_enable', Ctrl::LABEL => (('Enable HSTS header')), Ctrl::NOTES => (('HTTP Strict Transport Security')), Ctrl::OPTIONS => $blankBool],
+                        [Ctrl::NAME => 'cors_enable', Ctrl::LABEL => (('Enable CORS header')), Ctrl::NOTES => (('Cross-Origin Resource Sharing')), Ctrl::OPTIONS => $blankBool],
+                        [Ctrl::NAME => 'csp_enable', Ctrl::LABEL => (('Enable CSP header')), Ctrl::NOTES => (('Content Security Policy')), Ctrl::OPTIONS => $blankBool],
                     ],
                 ],
             ],

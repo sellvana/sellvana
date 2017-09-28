@@ -156,7 +156,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
                 $field = array_merge($def, $field);
                 if (!empty($field[static::OPTIONS])) {
                     if (empty($field[static::TYPE]) || $field[static::TYPE] === 'input') {
-                        $field[static::TYPE] = 'select2';
+                        $field[static::TYPE] = 'select';
 //                        $field['type'] = !empty($field['multiple']) ? 'v-multiselect' : 'select';
                     }
                     if (empty($field[static::OPTIONS][0])) {

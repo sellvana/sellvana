@@ -118,7 +118,7 @@
 
         <div v-if="fieldConfig('notes')">{{fieldConfig('notes')}}</div>
         <div v-if="fieldConfig('notes_tpl')"><component
-                :is="{props: ['form', 'field'], template: fieldConfig('notes_tpl'), methods: { emitEvent: emitEvent } }"
+                :is="{props: ['form', 'field', 'value'], template: fieldConfig('notes_tpl'), methods: { emitEvent: emitEvent } }"
                 :form="form"
                 :field="field"
                 @event="emitEvent"

@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <script type="text/javascript">
+        <script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
             require(['bootstrap-ladda', 'bootstrap-ladda-spin'], function (Ladda) {
                 var loader = Ladda.create(document.querySelector('.ladda-button'));
                 $('form').on('submit', function (e) {

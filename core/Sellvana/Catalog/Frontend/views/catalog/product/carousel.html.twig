@@ -33,7 +33,7 @@
     </a>
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
     require(['jquery', 'bootstrap'], function ($) {
         $("#carousel-{{ THIS.get('widget_id') }}").carousel({
             interval: {{ THIS.get('interval')|default(5000) }},

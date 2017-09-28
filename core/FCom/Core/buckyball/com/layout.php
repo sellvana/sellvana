@@ -2196,9 +2196,9 @@ class BViewHead extends BView
      */
     protected $_defaultTag = [
         'js' => '<script type="text/javascript" src="%s" %a></script>',
-        'js_raw' => '<script type="text/javascript" %a>%c</script>',
+        'js_raw' => '<script type="text/javascript" %a %n>%c</script>',
         'css' => '<link rel="stylesheet" type="text/css" href="%s" %a/>',
-        'css_raw' => '<style type="text/css" %a>%c</style>',
+        'css_raw' => '<style type="text/css" %a $n>%c</style>',
         //'less' => '<link rel="stylesheet" type="text/less" href="%s" %a/>',
         'less' => '<link rel="stylesheet/less" type="text/css" href="%s" %a/>',
         'icon' => '<link rel="icon" href="%s" type="image/x-icon" %a/><link rel="shortcut icon" href="%s" type="image/x-icon" %a/>',
@@ -2624,6 +2624,7 @@ if ($this->BDebug->is('DEBUG')) {
         $tag = str_replace('%s', htmlspecialchars($webFile), $tag);
         $tag = str_replace('%c', !empty($args['content']) ? $args['content'] : '', $tag);
         $tag = str_replace('%a', !empty($args['params']) ? $args['params'] : '', $tag);
+        $tag = str_replace('%n', $this->BResponse->pageNonce(), $tag);
         if (!empty($args['if'])) {
             $tag = '<!--[if ' . $args['if'] . ']>' . $tag . '<![endif]-->';
         }

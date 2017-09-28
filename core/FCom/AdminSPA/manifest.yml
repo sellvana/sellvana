@@ -6,7 +6,7 @@ modules:
 
         areas:
             FCom_AdminSPA:
-                auto_use: [ layout, views ]
+                auto_use: [ bootstrap, layout, views ]
                 routing:
                     - [ /sv-app-data.js, FCom_AdminSPA_AdminSPA_Controller_Main.sv_app_data_js ]
                     - [ /.action, FCom_AdminSPA_AdminSPA_Controller_Main ]

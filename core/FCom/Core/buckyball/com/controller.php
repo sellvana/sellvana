@@ -1294,6 +1294,8 @@ class BResponse extends BClass
 
     protected $_contentSuffix;
 
+    protected $_pageNonce;
+
     /**
     * Content to be returned to client
     *
@@ -1711,6 +1713,28 @@ class BResponse extends BClass
             $headers[] = 'Access-Control-Max-Age: ' . $options['age'];
         }
         $this->header($headers);
+        return $this;
+    }
+
+    public function pageNonce()
+    {
+        if (!$this->_pageNonce) {
+            $this->_pageNonce = $this->BUtil->randomString(16);
+        }
+        return $this->_pageNonce;
+    }
+
+    public function csp()
+    {
+        $nonce = $this->pageNonce();
+        $policies = [];
+        $policies[] = "default-src 'self'";
+        $policies[] = "connect-src 'self'";
+        $policies[] = "img-src 'self'";
+        $policies[] = "script-src 'self' 'nonce-{$nonce}'";
+        $policies[] = "style-src 'self' 'nonce-{$nonce}'";
+        $reportOnly = $this->BDebug->is('DEBUG,DEVELOPMENT') ? '-Report-Only' : '';
+        $this->header(["Content-Security-Policy{$reportOnly}: " . join('; ', $policies)]);
         return $this;
     }
 

@@ -75,6 +75,7 @@ class FCom_LibTwig_Main extends BClass
             'CONFIG' => 'BConfig',
             'LAYOUT' => 'BLayout',
             'REQUEST' => 'BRequest',
+            'RESPONSE' => 'BResponse',
             'SESSION' => 'BSession',
             'UTIL' => 'BUtil',
             'DEBUG' => 'BDebug',

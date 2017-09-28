@@ -209,7 +209,7 @@
 </form>
 
 {% if not THIS.get('for_mobile') %}
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
     require(['jquery', 'underscore', 'bloodhound', 'typeahead'], function($, _, Bloodhound) {
         var $input = $('.typeahead');
         var url = '{{ APP.href('catalog/search/autocomplete') }}';

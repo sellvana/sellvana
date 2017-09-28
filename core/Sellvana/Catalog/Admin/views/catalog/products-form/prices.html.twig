@@ -36,7 +36,7 @@
 
 {{ THIS.hook('product_prices_form_after', {'model' : m}) | raw }}
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
     require(['jquery', 'react', 'fcom.catalog.product.price', 'fcom.locale', 'fcom.catalog.components', 'jquery.validate', 'daterangepicker'], function ($, React, Price, Locale) {
 
         var data = '{{m.get('sale_price_period')}}', s, e;

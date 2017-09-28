@@ -20,7 +20,7 @@
 </dl>
 
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
     require(['jquery'], function($){
         $('.payment_method').click(function(){
             $('.payment_form').addClass('hidden').find('input, select, textarea').prop('disabled', true);

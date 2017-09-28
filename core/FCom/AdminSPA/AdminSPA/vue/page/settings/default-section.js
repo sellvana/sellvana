@@ -5,7 +5,7 @@ define(['lodash', 'sv-mixin-form-tab'], function (_, SvMixinFormTab) {
         props: ['settings', 'panel', 'site'],
         computed: {
             formFields: function () {
-                return this.form && this.form.config.fields || [];
+                return this.form && this.form.config && this.form.config.fields || [];
             }
         },
         methods: {
@@ -18,7 +18,7 @@ define(['lodash', 'sv-mixin-form-tab'], function (_, SvMixinFormTab) {
                     _.set(this.settings.data, path, {});
                     model = _.get(this.settings.data, path, {})
                 }
-                console.log(this.settings.data, (root || field.root).replace('/', '.'), model);
+                // console.log(this.settings.data, (root || field.root).replace(/\//, '.'), model);
                 return model;
             }
         }

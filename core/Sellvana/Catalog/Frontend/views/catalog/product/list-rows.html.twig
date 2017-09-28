@@ -59,7 +59,7 @@
     {% endfor %}
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
     require(['jquery', 'jquery-ui'], function ($) {
         var $imgs = $('.f-prod-img');
         // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide

@@ -41,7 +41,7 @@ define(['lodash', 'vue', 'sv-comp-grid', 'text!sv-page-default-grid-tpl'],
                     case 'bulk_update':
                     case 'bulk_delete':
                         var vm = this,
-                            data = this.grid.popup.form ? _.cloneDeep(this.grid.popup.form) : {},
+                            data = this.grid.popup && this.grid.popup.form ? _.cloneDeep(this.grid.popup.form) : {},
                             ids = Object.keys(this.grid.rows_selected);
                         delete data.config;
                         var postData = {do: act.name, ids: ids, data: data};

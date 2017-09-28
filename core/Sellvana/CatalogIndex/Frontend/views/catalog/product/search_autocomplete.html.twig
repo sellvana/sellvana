@@ -8,13 +8,13 @@ var remoteSource = publicApiUrl + "/v1/indexes/" + indexName + "/autocomplete";
 
 <script src='https://www.google.com/jsapi' type='text/javascript'></script>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce="{{ RESPONSE.pageNonce() }}">
     var theme = "flick";
     google.load("jqueryui", "1.8.17");
     google.loader.writeLoadTag("css", "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/" + theme + "/jquery-ui.css");
 </script>
 
-<script type='text/javascript'>
+<script type='text/javascript' nonce="{{ RESPONSE.pageNonce() }}">
     google.setOnLoadCallback(function() {
     $(function() {
 

@@ -30,11 +30,13 @@ define(['text!sv-comp-header-breadcrumbs-tpl'], function (headerBreadcrumbsTpl) 
                     });
                 } else {
                     var labelArr = [], iconClass = null;
-                    for (var i = 0; i < curPage.breadcrumbs.length; i++) {
-                        var part = curPage.breadcrumbs[i];
-                        labelArr.push(part.label);
-                        if (part.icon_class) {
-                            iconClass = part.icon_class;
+                    if (curPage.breadcrumbs) {
+                        for (var i = 0; i < curPage.breadcrumbs.length; i++) {
+                            var part = curPage.breadcrumbs[i];
+                            labelArr.push(part.label);
+                            if (part.icon_class) {
+                                iconClass = part.icon_class;
+                            }
                         }
                     }
                     labelArr.push(curPage.label);

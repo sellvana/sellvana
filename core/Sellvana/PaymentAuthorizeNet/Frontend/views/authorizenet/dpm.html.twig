@@ -3,7 +3,7 @@
 {% block extra %}
 
 
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ RESPONSE.pageNonce() }}">
         require(['jquery'], function($){
             var iframeName = 'dpm_post';
             var dpmUrl = '{{ config["cgi_url"] }}';

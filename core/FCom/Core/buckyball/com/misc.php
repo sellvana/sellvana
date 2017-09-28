@@ -949,14 +949,14 @@ class BUtil extends BClass
         if (!$key) {
             $key = $this->BConfig->get('encrypt_key');
         }
-        $l = strlen($key);
-        if ($l < 16) {
-            $key = str_repeat($key, ceil(16 / $l));
-        }
-        if (($m = strlen($data) % 8)) {
-            $data .= str_repeat("\x00", 8 - $m);
-        }
-        return openssl_encrypt($data, 'BF-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING);
+        $cipher = "AES-256-CTR";
+
+        $ivLen = openssl_cipher_iv_length($cipher);
+        $iv = openssl_random_pseudo_bytes($ivLen);
+        $cipherTextRaw = openssl_encrypt($data, $cipher, $key, $options = OPENSSL_RAW_DATA, $iv);
+        $hmac = hash_hmac('sha256', $cipherTextRaw, $key, $asBinary = true);
+        $hmacLen = strlen($hmac);
+        return "{$cipher}|{$ivLen}|{$hmacLen}|" . base64_encode("{$iv}{$hmac}{$cipherTextRaw}");
     }
 
     public function decrypt($data, $key = null)
@@ -964,11 +964,22 @@ class BUtil extends BClass
         if (!$key) {
             $key = $this->BConfig->get('encrypt_key');
         }
-        $l = strlen($key);
-        if ($l < 16) {
-            $key = str_repeat($key, ceil(16 / $l));
+        $a = explode('|', $data);
+        $cipher = $a[0];
+        $ivLen = $a[1];
+        $hmacLen = $a[2];
+        $raw = base64_decode($a[3]);
+        $iv = substr($raw, 0, $ivLen);
+        $hmac = substr($raw, $ivLen, $hmacLen);
+        $cipherTextRaw = substr($raw, $ivLen + $hmacLen);
+        $plainText = openssl_decrypt($cipherTextRaw, $cipher, $key, $options = OPENSSL_RAW_DATA, $iv);
+        $calcMac = hash_hmac('sha256', $cipherTextRaw, $key, $asBinary = true);
+//        return $plainText;
+        if (hash_equals($hmac, $calcMac)) { // PHP 5.6+ timing attack safe comparison
+            return $plainText;
+        } else {
+            return false;
         }
-        return openssl_decrypt($data, 'BF-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING);
     }
 
     /**
