@@ -42,7 +42,8 @@ class Sellvana_Customer_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
 
         $orm = $this->{$this->_modelClass}->orm()
             ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])
-            ->order_by_desc('create_at');
+            ->order_by_desc('create_at')
+            ->limit(20);
         if ($dayLimit) {
             $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayLimit * 86400);
             $orm->where_gte('create_at', $recent);

@@ -61,6 +61,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             } else {
                 $model = $this->{$modelClass}->create();
             }
+            foreach ($data as $k => $v) {
+                if (is_bool($v)) {
+                    $data[$k] = (int)$v;
+                }
+            }
             $model->set($data)->save();
 
             $args = [static::DATA => $this->BRequest->post(), static::MODEL => $model];
