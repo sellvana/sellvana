@@ -64,7 +64,11 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             foreach ($data as $k => $v) {
                 if (is_bool($v)) {
                     $data[$k] = (int)$v;
-                }
+                } elseif ($v === 'true') {
+		    $data[$k] = 1;
+		} elseif ($v === 'false') {
+		    $data[$k] = 0;
+		}
             }
             $model->set($data)->save();
 
