@@ -17,7 +17,7 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function onBeforeDispatch()
     {
-        if ($this->BRequest->csrf() && false == $this->isApiCall()) {
+        if ($this->BRequest->csrf() && false === $this->isApiCall()) {
             $this->message('Session token expired, please try again', 'warning');
             $this->BResponse->redirect(true);
             return false;

@@ -287,4 +287,16 @@ class Sellvana_Email_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tPref = $this->Sellvana_Email_Model_Pref->table();
+
+        $this->BDb->ddlTableDef($tPref, [
+            BDb::COLUMNS => [
+                'reason' => 'varchar(100)',
+                'data_serialized' => 'text',
+            ],
+        ]);
+    }
 }

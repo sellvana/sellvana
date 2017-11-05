@@ -1,6 +1,6 @@
 modules:
     Sellvana_Email:
-        version: 0.6.1.0
+        version: 0.6.2.0
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.3 } }
         translations: { en: en.php }

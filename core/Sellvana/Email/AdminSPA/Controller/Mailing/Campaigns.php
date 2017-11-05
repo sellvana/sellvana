@@ -169,7 +169,7 @@ class Sellvana_Email_AdminSPA_Controller_Mailing_Campaigns extends FCom_AdminSPA
         try {
             $campaignId = $this->BRequest->request('id');
             $data = $this->Sellvana_Email_Model_Mailing_Campaign->load($campaignId)->as_array();
-            unset($data['data_serialized'], $data['template_html']);
+            unset($data['data_serialized']);
             $result[static::FORM]['campaign'] = $data;
             $this->ok();
         } catch (Exception $e) {

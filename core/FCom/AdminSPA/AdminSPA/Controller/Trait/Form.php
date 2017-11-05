@@ -72,7 +72,7 @@ trait FCom_AdminSPA_AdminSPA_Controller_Trait_Form
             $this->onAfterFormDataPost($args);
             $this->BEvents->fire("{$eventName}:after", $args);
 
-            $result = $this->getFormData($modelId);
+            $result = $this->getFormData($model->id());
             $result[static::FORM] = $this->normalizeFormConfig($result[static::FORM]);
             $this->ok();
             if ($modelId) {
